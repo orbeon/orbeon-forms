@@ -13,28 +13,10 @@
   */
 package org.orbeon.oxf.fr
 
-import enumeratum._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-
-sealed abstract class Direction extends EnumEntry
-
-object Direction extends Enum[Direction] {
-
-   val values = findValues
-
-   case object Up    extends Direction
-   case object Down  extends Direction
-   case object Left  extends Direction
-   case object Right extends Direction
-}
-
-case class Coordinate(x: Int, y: Int) {
-  require(x > 0 && y > 0)
-}
 
 case class Cell[Underlying](u: Option[Underlying], x: Int, y: Int, h: Int, w: Int, missing: Boolean) {
   def td = u getOrElse (throw new NoSuchElementException)
@@ -42,8 +24,12 @@ case class Cell[Underlying](u: Option[Underlying], x: Int, y: Int, h: Int, w: In
 
 trait CellOps[Underlying] {
 
-  def underlyingRowspan (u: Underlying): Int
-  def underlyingRowspan_(u: Underlying, rowspan: Int): Unit
+  def updateH(u: Underlying, rowspan: Int): Unit
+
+  def x(u: Underlying): Option[Int]
+  def y(u: Underlying): Option[Int]
+  def w(u: Underlying): Option[Int]
+  def h(u: Underlying): Option[Int]
 
   def attValueOpt(u: Underlying, name: String): Option[String]
   def children   (u: Underlying, name: String): List[Underlying]
@@ -196,21 +182,18 @@ object Cell {
       val ops = implicitly[CellOps[Underlying]]
       val cs  = ops.children(grid, "*:c")
 
-      def getIntValue(u: Underlying, name: String): Int =
-        ops.attValueOpt(u, name) map (_.toInt) getOrElse 1
-
       // TODO: can it be 0?
-      val gridHeight = if (cs.nonEmpty) cs map (c ⇒ getIntValue(c, "y") + getIntValue(c, "h") - 1) max else 0
+      val gridHeight = if (cs.nonEmpty) cs map (c ⇒ ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
 
       val xy = Array.fill[Cell[Underlying]](gridHeight, StandardGridWidth)(null)
 
       // Mark cells
       cs foreach { c ⇒
 
-        val x = getIntValue(c, "x")
-        val y = getIntValue(c, "y")
-        val w = getIntValue(c, "w")
-        val h = getIntValue(c, "h")
+        val x = ops.x(c).getOrElse(1)
+        val y = ops.y(c).getOrElse(1)
+        val w = ops.w(c).getOrElse(1)
+        val h = ops.h(c).getOrElse(1)
 
         val newCell = Cell(Some(c), x, y, h, w, missing = false)
 

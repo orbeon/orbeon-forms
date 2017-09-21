@@ -28,8 +28,12 @@ object NodeInfoCell {
     def children   (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
     def attValueOpt(u: NodeInfo, name: String): Option[String] = u attValueOpt name
 
-    def underlyingRowspan (u: NodeInfo): Int                = getNormalizedSpan(u, "rowspan")
-    def underlyingRowspan_(u: NodeInfo, rowspan: Int): Unit = toggleAttribute(u, "rowspan", rowspan.toString, rowspan > 1)
+    def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)
+    def y(u: NodeInfo): Option[Int] = attValueOpt(u, "y") map (_.toInt)
+    def w(u: NodeInfo): Option[Int] = attValueOpt(u, "w") map (_.toInt)
+    def h(u: NodeInfo): Option[Int] = attValueOpt(u, "h") map (_.toInt)
+
+    def updateH(u: NodeInfo, rowspan: Int): Unit = toggleAttribute(u, "rowspan", rowspan.toString, rowspan > 1)
   }
 
   def getNormalizedSpan(td: NodeInfo, name: String) =  td attValueOpt name map (_.toInt) getOrElse 1

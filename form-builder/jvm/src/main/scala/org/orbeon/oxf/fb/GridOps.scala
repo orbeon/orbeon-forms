@@ -73,7 +73,7 @@ trait GridOps extends ContainerOps {
     // Increment rowspan of cells that don't end at the current row
     rowCells foreach { cell ⇒
       if (cell.h > 1)
-        NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) + 1)
+        NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) + 1)
     }
 
     // Insert the new row
@@ -133,10 +133,10 @@ trait GridOps extends ContainerOps {
     // Decrement rowspans if needed
     rowCells.zipWithIndex foreach {
       case (cell, posx) ⇒
-        if (NodeInfoCellOps.underlyingRowspan(cell.td) > 1) {
+        if (NodeInfoCellOps.h(cell.td).getOrElse(1) > 1) {
           if (cell.missing) {
             // This cell is part of a rowspan that starts in a previous row, so decrement
-            NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) - 1)
+            NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) - 1)
           } else if (nextRowCells.isDefined) {
             // This cell is the start of a rowspan, and we are deleting it, so add a td in the next row
             // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated ⇒
@@ -467,7 +467,7 @@ trait GridOps extends ContainerOps {
       val cellBelow = allRowCells(y + cell.h)(x)
 
       // Increment rowspan
-      NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) + NodeInfoCellOps.underlyingRowspan(cellBelow.td))
+      NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) + NodeInfoCellOps.h(cellBelow.td).getOrElse(1))
 
       // Delete cell below
       delete(cellBelow.td)
@@ -489,7 +489,7 @@ trait GridOps extends ContainerOps {
       val cell = allRowCells(y)(x)
 
       // Decrement rowspan attribute
-      NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) - 1)
+      NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) - 1)
 
       // Insert new td
       val posyToInsertInto = y + cell.h - 1

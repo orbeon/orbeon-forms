@@ -331,7 +331,8 @@ lazy val assetsSettings = Seq(
 lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-common"
+    name := "orbeon-common",
+    libraryDependencies += "com.beachape"           %%% "enumeratum"  % EnumeratumVersion
   )
   .jvmSettings(
     (unmanagedJars in Compile) := myFindUnmanagedJars(
@@ -509,6 +510,8 @@ lazy val formBuilderJS: Project = formBuilder.js
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+
+    test in Test := {},
 
     scalaJSUseMainModuleInitializer in Compile := true,
     scalaJSUseMainModuleInitializer in Test    := false,

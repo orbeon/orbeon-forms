@@ -27,10 +27,12 @@ object HtmlElementCell {
     def children   (u: html.Element, name: String): List[html.Element] = u.children.to[List].asInstanceOf[List[html.Element]]
     def attValueOpt(u: html.Element, name: String): Option[String]     = Option(u.getAttribute(name))
 
-    def underlyingRowspan (u: html.Element): Int =
-      attValueOpt(u, RowspanName) map (_.toInt) getOrElse 1
+    def x(u: html.Element): Option[Int] = attValueOpt(u, "data-x") map (_.toInt)
+    def y(u: html.Element): Option[Int] = attValueOpt(u, "data-y") map (_.toInt)
+    def w(u: html.Element): Option[Int] = attValueOpt(u, "data-w") map (_.toInt)
+    def h(u: html.Element): Option[Int] = attValueOpt(u, "data-h") map (_.toInt)
 
-    def underlyingRowspan_(u: html.Element, rowspan: Int): Unit =
+    def updateH(u: html.Element, rowspan: Int): Unit =
       if (rowspan > 1)
         u.setAttribute(RowspanName, rowspan.toString)
       else

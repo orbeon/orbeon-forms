@@ -333,6 +333,7 @@
     <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                     value=""/>
 
     <property as="xs:integer" name="oxf.fr.home.page-size"                                      value="20"/>
+    <property as="xs:string"  name="oxf.fr.home.table.link-to"                                  value="summary new"/>
 
     <!-- Example:
         [

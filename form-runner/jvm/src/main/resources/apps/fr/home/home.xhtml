@@ -949,19 +949,23 @@
                                     <xf:var name="can-navigate-new"     value="$local-available and $ops = ('*', 'create')"/>
 
                                     <xf:var
+                                        name="link-to"
+                                        value="xxf:split(xxf:property('oxf.fr.home.table.link-to'))[
+                                            (. = 'summary' and $can-navigate-summary) or
+                                            (. = 'new'     and $can-navigate-new)
+                                        ][1]"/>
+
+                                    <xf:var
                                         name="link"
                                         value="
-                                            if ($can-navigate-summary or $can-navigate-new) then
+                                            if (exists($link-to)) then
                                                 concat(
                                                     '/fr/',
                                                     application-name,
                                                     '/',
                                                     form-name,
                                                     '/',
-                                                    if ($can-navigate-summary) then
-                                                        'summary'
-                                                    else
-                                                        'new'
+                                                    $link-to
                                                 )
                                             else
                                                 ()"/>

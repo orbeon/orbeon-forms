@@ -31,6 +31,7 @@
           fb-show-test-dialog
           fb-update-control-lhha
           fb-dnd-control-from
+          fb-control-delete
       "
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
@@ -535,6 +536,10 @@
         <xf:action type="xpath">
             toolboxOps:dndControl($source, $target, $do-copy)
         </xf:action>
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-control-delete" xxf:phantom="true" type="xpath">
+        fbf:deleteCellContent(id(event('xxf:targetid'))/.., true())
     </xf:action>
 
     <xf:var name="variables" value="instance('fb-variables')"/>

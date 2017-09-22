@@ -55,23 +55,15 @@ object ControlEditor {
 
   // Register listener on editor icons
   $(document).ready(() ⇒ {
-    scala.scalajs.js.Dynamic.global.console.log("register listeners")
     ControlActionNames.foreach((actionName) ⇒ {
-      val className =  s".fb-control-$actionName"
-      val actionEl = controlEditorRight.find(className)
-      scala.scalajs.js.Dynamic.global.console.log("on", actionEl)
+      val classEventName =  s"fb-control-$actionName"
+      val actionEl = controlEditorRight.find(s".$classEventName")
       actionEl.on("click", () ⇒ {
-        scala.scalajs.js.Dynamic.global.console.log("click", currentCellOpt.asInstanceOf[js.Any])
         currentCellOpt.foreach((currentCell) ⇒ {
-          val gridEl = currentCell.el.closest(".xbl-fr-grid")
-          val gridId = gridEl.attr("id").get
+          val controlEl = currentCell.el.children()
           DocumentAPI.dispatchEvent(
-            targetId   = gridId,
-            eventName  = s"fb-control-$actionName",
-            properties = js.Dictionary(
-              "fb-cell-x" → currentCell.el.attr("data-x").get,
-              "fb-cell-y" → currentCell.el.attr("data-y").get
-            )
+            targetId   = controlEl.attr("id").get,
+            eventName  = classEventName
           )
         })
       })

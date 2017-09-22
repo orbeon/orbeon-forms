@@ -25,8 +25,8 @@ object NodeInfoCell {
 
   implicit object NodeInfoCellOps extends CellOps[NodeInfo] {
 
-    def children   (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
     def attValueOpt(u: NodeInfo, name: String): Option[String] = u attValueOpt name
+    def children   (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
 
     def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)
     def y(u: NodeInfo): Option[Int] = attValueOpt(u, "y") map (_.toInt)

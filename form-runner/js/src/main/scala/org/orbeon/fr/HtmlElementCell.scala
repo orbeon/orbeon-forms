@@ -24,8 +24,8 @@ object HtmlElementCell {
 
   implicit object HtmlElementCellOps extends CellOps[html.Element] {
 
-    def children   (u: html.Element, name: String): List[html.Element] = u.children.to[List].asInstanceOf[List[html.Element]]
     def attValueOpt(u: html.Element, name: String): Option[String]     = Option(u.getAttribute(name))
+    def children   (u: html.Element, name: String): List[html.Element] = u.children.to[List].asInstanceOf[List[html.Element]]
 
     def x(u: html.Element): Option[Int] = attValueOpt(u, "data-x") map (_.toInt)
     def y(u: html.Element): Option[Int] = attValueOpt(u, "data-y") map (_.toInt)

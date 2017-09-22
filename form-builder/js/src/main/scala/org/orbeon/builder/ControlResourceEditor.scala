@@ -20,7 +20,6 @@ import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.scalajs.js
-import scala.xml
 import org.scalajs.dom.document
 
 import scala.scalajs.js.Dictionary

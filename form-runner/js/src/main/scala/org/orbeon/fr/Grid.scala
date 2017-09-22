@@ -53,8 +53,8 @@ object Grid {
             cellsUnder.iterator map (c ⇒ if (c.u.nonEmpty) 0 else c.h) min
           }
 
-        case Direction.Left ⇒ ???
-        case Direction.Up   ⇒ ???
+        case Direction.Left ⇒ Some(0) // TODO
+        case Direction.Up   ⇒ Some(0) // TODO
       }
     } getOrElse 0
   }

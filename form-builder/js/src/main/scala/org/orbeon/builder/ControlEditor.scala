@@ -14,10 +14,10 @@
 package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.datatypes.Direction
+import org.orbeon.fr.Grid
 import org.orbeon.xforms._
-import org.scalajs.dom.document
-
-import scala.scalajs.js
+import org.scalajs.dom.{document, html}
 
 object ControlEditor {
 
@@ -45,16 +45,38 @@ object ControlEditor {
         override val left = cell.left
         override val top  = cell.top
       })
-      controlEditorRight.show()
-      Position.offset(controlEditorRight, new Position.Offset {
-        override val left = cell.left + cell.width - controlEditorRight.outerWidth()
-        override val top  = cell.top
-      })
+      if (cell.el.children().length > 0) {
+        // Control editor is only show when the cell isn't empty
+        controlEditorRight.show()
+        Position.offset(controlEditorRight, new Position.Offset {
+          override val left = cell.left + cell.width - controlEditorRight.outerWidth()
+          override val top  = cell.top
+        })
+      }
+
+      // Enable/disable arrow icons
+      for (direction ← Direction.values) {
+        val cellEl = cell.el.get(0).asInstanceOf[html.Element]
+        val directionName = direction.entryName
+        val disableIcon =
+          direction match {
+            case Direction.Right | Direction.Down ⇒
+              Grid.spaceToExtendCell(cellEl, direction) == 0
+            case Direction.Left ⇒
+              cell.el.attr("data-w").isEmpty
+            case Direction.Up ⇒
+              cell.el.attr("data-h").isEmpty
+          }
+        val icon = controlEditorLeft.find(s".icon-arrow-$directionName")
+        icon.toggleClass("disabled", disableIcon)
+      }
     }
   )
 
   // Register listener on editor icons
   $(document).ready(() ⇒ {
+
+    // Control actions
     ControlActionNames.foreach((actionName) ⇒ {
       val classEventName =  s"fb-control-$actionName"
       val actionEl = controlEditorRight.find(s".$classEventName")
@@ -68,6 +90,28 @@ object ControlEditor {
         })
       })
     })
+
+    // Expand/shrink actions
+    for (direction ← Direction.values) {
+      val directionName = direction.entryName
+      val className = s"icon-arrow-$directionName"
+      val iconEl = controlEditorLeft.find(s".$className")
+      val eventName = direction match {
+        case Direction.Up    ⇒ "fb-shrink-y"
+        case Direction.Right ⇒ "fb-expand-x"
+        case Direction.Down  ⇒ "fb-expand-y"
+        case Direction.Left  ⇒ "fb-shrink-x"
+      }
+      iconEl.on("click", () ⇒ {
+        if (! iconEl.is(".disabled"))
+          for (currentCell ← currentCellOpt)
+            DocumentAPI.dispatchEvent(
+              targetId   = currentCell.el.attr("id").get,
+              eventName  = eventName
+            )
+      })
+
+    }
   })
 
 }

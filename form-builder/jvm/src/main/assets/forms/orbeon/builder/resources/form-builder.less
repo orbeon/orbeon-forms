@@ -81,10 +81,8 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;                                                 // Its left/right set in CoffeeScript relative to the current section
         display: none;                                                      // Shown in CoffeeScript when mouse over section
         padding: 0 10px 20px 20px;                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
-        .xforms-trigger, i {
-            display: block;                                                 // Icons shown vertically
-            cursor: pointer;                                                // Icons are clickable
-        }
+        i { display: block }                                                // Icons shown vertically
+        i:not([class ~= 'disabled']) { cursor: pointer }                    // Non-disabled icons are clickable
     }
     .fb-section-grid-editor {
         padding-right: 10px;                                                // Space between icons and section

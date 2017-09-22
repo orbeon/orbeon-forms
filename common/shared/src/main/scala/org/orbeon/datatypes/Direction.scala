@@ -13,9 +13,10 @@
   */
 package org.orbeon.datatypes
 
+import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 
-sealed abstract class Direction extends EnumEntry
+sealed abstract class Direction extends EnumEntry with Lowercase
 
 object Direction extends Enum[Direction] {
 

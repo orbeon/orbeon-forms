@@ -55,10 +55,13 @@ object ControlEditor {
 
   // Register listener on editor icons
   $(document).ready(() ⇒ {
+    scala.scalajs.js.Dynamic.global.console.log("register listeners")
     ControlActionNames.foreach((actionName) ⇒ {
       val className =  s".fb-control-$actionName"
-      val actionEl = controlEditorLeft.find(className)
-      actionEl.on("click", () ⇒
+      val actionEl = controlEditorRight.find(className)
+      scala.scalajs.js.Dynamic.global.console.log("on", actionEl)
+      actionEl.on("click", () ⇒ {
+        scala.scalajs.js.Dynamic.global.console.log("click", currentCellOpt.asInstanceOf[js.Any])
         currentCellOpt.foreach((currentCell) ⇒ {
           val gridEl = currentCell.el.closest(".xbl-fr-grid")
           val gridId = gridEl.attr("id").get
@@ -71,7 +74,7 @@ object ControlEditor {
             )
           )
         })
-      )
+      })
     })
   })
 

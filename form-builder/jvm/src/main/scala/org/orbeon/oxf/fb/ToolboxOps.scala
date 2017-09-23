@@ -37,7 +37,7 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewControl(doc: NodeInfo, binding: NodeInfo): Option[String] = {
 
-    ensureEmptyTd(doc) match {
+    ensureEmptyCell(doc) match {
       case Some(gridTd) ⇒
 
         val newControlName = controlNameFromId(nextId(doc, "control"))
@@ -103,7 +103,7 @@ object ToolboxOps {
                   }
                 }
               } else {
-                Seq.empty
+                Nil
               }
 
             val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
@@ -149,9 +149,9 @@ object ToolboxOps {
   //@XPathFunction
   def canInsertSection(inDoc: NodeInfo) = inDoc ne null
   //@XPathFunction
-  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedTd(inDoc).isDefined
+  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedCell(inDoc).isDefined
   //@XPathFunction
-  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyTdSucceed(inDoc)
+  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyCellSucceed(inDoc)
 
   // Insert a new grid
   //@XPathFunction
@@ -160,12 +160,12 @@ object ToolboxOps {
     val (into, after, _) = findGridInsertionPoint(inDoc)
 
     // Obtain ids first
-    val ids = nextIds(inDoc, "tmp", 2).toIterator
+    val ids = nextIds(inDoc, "tmp", 3).toIterator
 
     // The grid template
     val gridTemplate: NodeInfo =
       <fr:grid edit-ref="" id={ids.next()} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <fr:c id={ids.next()} x="1" y="1" w="6"/>
+        <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
       </fr:grid>
 
     // Insert after current level 2 if found, otherwise into level 1
@@ -190,7 +190,7 @@ object ToolboxOps {
     val precedingSectionName = after flatMap getControlNameOpt
 
     // Obtain ids first
-    val ids = nextIds(inDoc, "tmp", 2).toIterator
+    val ids = nextIds(inDoc, "tmp", 3).toIterator
 
     // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
     val sectionTemplate: NodeInfo =
@@ -203,7 +203,7 @@ object ToolboxOps {
         <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
         if (withGrid)
           <fr:grid edit-ref="" id={ids.next()}>
-            <fr:c id={ids.next()} x="1" y="1" w="6"/>
+            <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
           </fr:grid>
       }</fr:section>
 
@@ -246,6 +246,8 @@ object ToolboxOps {
     val (into, after, grid) = findGridInsertionPoint(inDoc)
     val newGridName         = controlNameFromId(nextId(inDoc, "grid"))
 
+    val ids = nextIds(inDoc, "tmp", 2).toIterator
+
     // The grid template
     val gridTemplate: NodeInfo =
       <fr:grid
@@ -253,7 +255,7 @@ object ToolboxOps {
          id={gridId(newGridName)}
          bind={bindId(newGridName)}
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <fr:c id={nextId(inDoc, "tmp")} x="1" y="1" w="6"/>
+        <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
       </fr:grid>
 
     // Insert grid
@@ -263,7 +265,7 @@ object ToolboxOps {
     insertHolders(
       controlElement       = newGridElement,
       dataHolder           = elementInfo(newGridName),
-      resourceHolders      = Seq.empty,
+      resourceHolders      = Nil,
       precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
     )
 
@@ -291,7 +293,7 @@ object ToolboxOps {
   }
 
   private def selectFirstCellInContainer(container: NodeInfo): Unit =
-    (container descendant "*:c" headOption) foreach selectTd
+    (container descendant "*:c" headOption) foreach selectCell
 
   // Insert a new section template
   //@XPathFunction
@@ -385,7 +387,7 @@ object ToolboxOps {
   //@XPathFunction
   def cutToClipboard(td: NodeInfo): Unit = {
     copyToClipboard(td)
-    deleteCellContent(td, updateTemplates = true)
+    deleteControlWithinCell(td, updateTemplates = true)
   }
 
   private def clipboardXvc: NodeInfo =
@@ -411,7 +413,7 @@ object ToolboxOps {
     controlElementsInCellToXvc(source)
       .foreach(pasteFromXvc(target, _))
     if (! copy)
-      deleteCellContent(source, updateTemplates = true)
+      deleteControlWithinCell(source, updateTemplates = true)
   }
 
   // Paste control from the clipboard
@@ -420,7 +422,7 @@ object ToolboxOps {
     pasteFromXvc(td, readXvcFromClipboard)
 
   private def pasteFromXvc(td: NodeInfo, xvc: NodeInfo): Unit = {
-    ensureEmptyTd(td) foreach { gridTd ⇒
+    ensureEmptyCell(td) foreach { gridTd ⇒
 
       (xvc / "control" / * headOption) foreach { control ⇒
 
@@ -518,10 +520,10 @@ object ToolboxOps {
       </template>
 
     def findGridInsertionPoint(inDoc: NodeInfo) =
-      findSelectedTd(inDoc) match {
+      findSelectedCell(inDoc) match {
         case Some(currentTd) ⇒ // A td is selected
 
-          val containers = findAncestorContainers(currentTd)
+          val containers = findAncestorContainersLeafToRoot(currentTd)
 
           // We must always have a parent (grid) and grandparent (possibly fr:body) container
           assert(containers.size >= 2)
@@ -540,10 +542,10 @@ object ToolboxOps {
       }
 
     def findSectionInsertionPoint(inDoc: NodeInfo) =
-      findSelectedTd(inDoc) match {
+      findSelectedCell(inDoc) match {
         case Some(currentTd) ⇒ // A td is selected
 
-          val containers = findAncestorContainers(currentTd)
+          val containers = findAncestorContainersLeafToRoot(currentTd)
 
           // We must always have a parent (grid) and grandparent (possibly fr:body) container
           assert(containers.size >= 2)

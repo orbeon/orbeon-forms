@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.Cell._
+import org.orbeon.datatypes.Direction
+import org.orbeon.oxf.fr.Cell
+import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -32,294 +32,169 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
-//  import NodeInfoCell.NodeInfoCellOps
-
   // Get the first enclosing repeated grid or legacy repeat
-  def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-    findAncestorContainers(descendantOrSelf, includeSelf) filter IsGrid head
+  def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
+    findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
-  // Width of the grid in columns
-  // TODO: FIX: Old layout.
-  def getGridSize(grid: NodeInfo): Int = (grid / "*:tr").headOption.toList / "*:td" size
+  //@XPathFunction
+  def rowInsertBelow(gridId: String, rowPos: Int): NodeInfo = {
 
-  def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
-    case Some(rowspan) ⇒
-      <xh:td xmlns:xh="http://www.w3.org/1999/xhtml" id={id} rowspan={rowspan.toString}/>
-    case _ ⇒
-      <xh:td xmlns:xh="http://www.w3.org/1999/xhtml" id={id}/>
-  }
+    val gridNode       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+    val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-  // TODO: FIX: Old layout.
-  private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
-    val grid = containerById(gridId)
-    val trs = grid / "*:tr"
-    // Reason for the modulo: the value of rowPos sent by client is on the flatten iterations / rows;
-    // it is not just row position in the first iteration.
-    trs(rowPos % trs.length)
-  }
+    debugDumpDocumentForGrids("insert row below, before", gridNode)
 
-  // Insert a row below
-  def insertRowBelow(gridId: String, rowPos: Int): NodeInfo = insertRowBelow(trAtRowPos(gridId, rowPos))
-  def insertRowBelow(tr: NodeInfo): NodeInfo = {
-
-    // NOTE: This algorithm expands rowspans that span over the current row, but not rowspans that end with the
-    // current row.
-    val grid = getContainingGrid(tr)
-    val rowCells = getRowCells(tr)
-
-    // Number of cells that end at the current row
-    val newCellCount = rowCells count (cell ⇒ cell.h == 1)
-
-    // Increment rowspan of cells that don't end at the current row
-    rowCells foreach { cell ⇒
-      if (cell.h > 1)
-        NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) + 1)
+    // Increment height of origin cells that don't end at the current row
+    collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
+      NodeInfoCellOps.updateH(cell.td, cell.h + 1)
     }
 
-    // Insert the new row
-    val result = insert(into = grid, after = tr, origin = newRow(grid, newCellCount)).headOption
-    debugDumpDocumentForGrids("insert row below", grid)
+    // Increment the position of all cells on subsequent rows
+    allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
+      case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
+      case _ ⇒
+    }
+
+    // Insert a cell in the new row
+    // NOTE: This is not very efficient. We should be able to just iterate back in the grid.
+    val precedingCellOpt = allCells.slice(0, adjustedRowPos + 1).flatten.reverse collectFirst {
+      case Cell(Some(u), None, _, _, _, _) ⇒ u
+    }
+
+    // Cells that end at the current row
+    val distinctCellsEndingAtCurrentRow =
+      allCells(adjustedRowPos) collect {
+        case c @ Cell(Some(u), _, _, _, 1, _) ⇒ c
+      } keepDistinctBy (_.u)
+
+    val idsIt =
+      nextIds(gridNode, "tmp", distinctCellsEndingAtCurrentRow.size).iterator
+
+    val newCells =
+      distinctCellsEndingAtCurrentRow map { cell ⇒
+        <fr:c
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          id={idsIt.next()}
+          x={cell.x.toString}
+          y={adjustedRowPos + 2 toString}
+          w={cell.w.toString}/>: NodeInfo
+      }
+
+    val result = insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption
+
+    debugDumpDocumentForGrids("insert row below, after", gridNode)
     result orNull // bad, but insert() is not always able to return the inserted item at this time
   }
 
-  // Insert a row above
-  def insertRowAbove(gridId: String, rowPos: Int): NodeInfo = insertRowAbove(trAtRowPos(gridId, rowPos))
-  // TODO: FIX: Old layout.
-  def insertRowAbove(tr: NodeInfo): NodeInfo =
-    tr precedingSibling "*:tr" headOption match {
-      case Some(prevRow) ⇒
-        // Do as if this was an insert below the previous row
-        // This makes things simpler as we can reuse insertRowBelow, but maybe another logic could make sense too
-        insertRowBelow(prevRow)
-      case None ⇒
-        // Insert as first row of the table
-        val grid = getContainingGrid(tr)
-        val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
-        debugDumpDocumentForGrids("insert row above", grid)
-        result
-    }
+  //@XPathFunction
+  def rowInsertAbove(gridId: String, rowPos: Int): NodeInfo = {
 
-  private def newRow(grid: NodeInfo, size: Int): NodeInfo = {
-    // Get as many fresh ids as there are tds
-    val ids = nextIds(grid, "tmp", size).toIterator
+    val gridNode       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+    val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-    <xh:tr xmlns:xh="http://www.w3.org/1999/xhtml">{
-      1 to size map (_ ⇒ <xh:td id={ids.next()}/>)
-    }</xh:tr>
+    // TODO
+    null
   }
 
-  // Delete a row and contained controls
 
-  def deleteRow(gridId: String, rowPos: Int): Unit =
-    deleteRow(trAtRowPos(gridId, rowPos))
+//  def insertRowAbove(tr: NodeInfo): NodeInfo =
+//    tr precedingSibling TrTest headOption match {
+//      case Some(prevRow) ⇒
+//        // Do as if this was an insert below the previous row
+//        // This makes things simpler as we can reuse insertRowBelow, but maybe another logic could make sense too
+//        insertRowBelow(prevRow)
+//      case None ⇒
+//        // Insert as first row of the table
+//        val grid = getContainingGrid(tr)
+//        val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
+//        debugDumpDocumentForGrids("insert row above", grid)
+//        result
+//    }
 
-  def deleteRow(tr: NodeInfo): Unit = {
+  private def collectDistinctOriginCellsSpanningAfter[Underlying](cells: List[List[Cell[Underlying]]], rowPos: Int): List[Cell[Underlying]] =
+    cells(rowPos) collect {
+      case c @ Cell(Some(u), _, _, _, h, _) if h > 1 ⇒ c
+    } keepDistinctBy (_.u)
 
-    val doc = tr.getDocumentRoot
+  private def collectDistinctOriginCellsSpanningBefore[Underlying](cells: List[List[Cell[Underlying]]], rowPos: Int): List[Underlying] =
+    cells(rowPos) collect {
+      case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y ⇒ u
+    } distinct
 
-    val allRowCells  = getAllRowCells(getContainingGrid(tr))
+  //@XPathFunction
+  def rowDelete(gridId: String, rowPos: Int): Unit = {
 
-    // TODO: FIX: Old layout.
-    val posy = tr precedingSibling "*:tr" size
-    val rowCells = allRowCells(posy)
-    val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
+    val gridNode       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+    val adjustedRowPos = rowPos % allCells.size
 
-    // Find all tds to delete
-    val tdsToDelete = tr descendant "*:td"
+    // Reduce height of cells which start on a previous row
+    val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
 
-    // Find the new td to select if we are removing the currently selected td
-    val newTdToSelect = findNewTdToSelect(tr, tdsToDelete)
+    distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
 
-    // Decrement rowspans if needed
-    rowCells.zipWithIndex foreach {
-      case (cell, posx) ⇒
-        if (NodeInfoCellOps.h(cell.td).getOrElse(1) > 1) {
-          if (cell.missing) {
-            // This cell is part of a rowspan that starts in a previous row, so decrement
-            NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) - 1)
-          } else if (nextRowCells.isDefined) {
-            // This cell is the start of a rowspan, and we are deleting it, so add a td in the next row
-            // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated ⇒
-          }
-        }
+    // Decrement the position of all cells on subsequent rows
+    allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
+      case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
+      case _ ⇒
     }
 
+    val cellsToDelete =
+      allCells(adjustedRowPos) collect {
+        case Cell(Some(u), None, _, _, _, _) ⇒ u
+      }
+
+    // Find the new cell to select if we are removing the currently selected cell
+    val newCellToSelect = findNewCellToSelect(gridNode, cellsToDelete)
+
     // Delete all controls in the row
-    tdsToDelete foreach (deleteCellContent(_))
+    cellsToDelete foreach (deleteControlWithinCell(_))
 
     // Delete row and its content
-    delete(tr)
+    delete(cellsToDelete)
 
     // Update templates
-    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(tr).to[Set])
+    updateTemplatesCheckContainers(gridNode, findAncestorRepeatNames(gridNode, includeSelf = true).to[Set])
 
-    // Adjust selected td if needed
-    newTdToSelect foreach selectTd
+    // Adjust selected cell if needed
+    newCellToSelect foreach selectCell
 
-    debugDumpDocumentForGrids("delete row", tr)
+    debugDumpDocumentForGrids("delete row", gridNode)
   }
 
   // Whether this is the last grid in the section
   // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
-  def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
-
-  // TODO: FIX: Old layout.
-  private def tdAtColPosOpt(gridId: String, colPos: Int): Option[NodeInfo] = {
-
-    require(colPos >= 0)
-
-    val grid        = containerById(gridId)
-    val firstRowOpt = (grid / "*:tr").headOption
-    val tds         = firstRowOpt.toList / "*:td"
-
-    colPos < tds.size option tds(colPos)
-  }
-
-  def maxGridColumns = Properties.instance.getPropertySet.getInteger("oxf.fb.grid.max-columns", 4)
-
-  // Insert a column to the right if possible
-  //@XPathFunction
-  def insertColRight(gridId: String, colPos: Int): Unit =
-    tdAtColPosOpt(gridId, colPos) foreach insertColRight
-
-  def insertColRight(firstRowTd: NodeInfo): Unit = {
-    val grid = getContainingGrid(firstRowTd)
-    if (getGridSize(grid) < maxGridColumns) {
-
-      val allRowCells = getAllRowCells(grid)
-      val pos = firstRowTd precedingSibling "*:td" size
-
-      val ids = nextIds(grid, "tmp", allRowCells.size).toIterator
-
-      allRowCells foreach { cells ⇒
-        val cell = cells(pos)
-
-        // For now insert same rowspans as previous column, but could also insert full column as an option
-        if (! cell.missing) {
-          insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.h > 1) Some(cell.h) else None))
-        }
-      }
-
-      debugDumpDocumentForGrids("insert col right", grid)
-    }
-  }
-
-  // Insert a column to the left if possible
-  //@XPathFunction
-  def insertColLeft(gridId: String, colPos: Int): Unit =
-    tdAtColPosOpt(gridId, colPos) foreach insertColLeft
-
-  def insertColLeft(firstRowTd: NodeInfo): Unit = {
-    val grid = getContainingGrid(firstRowTd)
-    if (getGridSize(grid) < maxGridColumns) {
-      val pos = firstRowTd precedingSibling "*:td" size
-
-      if (pos > 0) {
-        // Do as if this was an insert to the right of the previous column
-        // This makes things simpler as we can reuse insertColRight, but maybe another logic could make sense too
-        insertColRight(firstRowTd precedingSibling "*:td" head)
-      } else {
-        // First column: just insert plain tds as the first row
-        // TODO: FIX: Old layout.
-        val trs = grid / "*:tr"
-        val ids = nextIds(grid, "tmp", trs.size).toIterator
-
-        trs foreach { tr ⇒
-          insert(into = tr, origin = newTdElement(grid, ids.next()))
-        }
-
-        debugDumpDocumentForGrids("insert col left", grid)
-      }
-    }
-  }
-
-  // Find a column's tds
-  // TODO: FIX: Old layout.
-  def getColTds(td: NodeInfo) = {
-    val rows = getContainingGrid(td) / "*:tr"
-    val (x, _) = tdCoordinates(td)
-
-    rows map (row ⇒ (row / "*:td")(x))
-  }
-
-  // Delete a column and contained controls if possible
-  //@XPathFunction
-  def deleteCol(gridId: String, colPos: Int): Unit =
-    tdAtColPosOpt(gridId, colPos) foreach deleteCol
-
-  def deleteCol(firstRowTd: NodeInfo): Unit = {
-
-    val doc = firstRowTd.getDocumentRoot
-
-    val grid = getContainingGrid(firstRowTd)
-    val allRowCells = getAllRowCells(grid)
-    val pos = firstRowTd precedingSibling "*:td" size
-
-    // Find all tds to delete
-    val tdsToDelete = allRowCells map (_(pos)) filterNot (_.missing) map (_.td)
-
-    // Find the new td to select if we are removing the currently selected td
-    val newTdToSelect = findNewTdToSelect(firstRowTd, tdsToDelete)
-
-    // Delete the concrete td at this column position in each row
-    tdsToDelete foreach { td ⇒
-      deleteCellContent(td)
-      delete(td)
-    }
-
-    // Update templates
-    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(firstRowTd).to[Set])
-
-    // Adjust selected td if needed
-    newTdToSelect foreach selectTd
-
-    debugDumpDocumentForGrids("delete col", grid)
-  }
-
-  //@XPathFunction
-  def controlsInCol(gridId: String, colPos: Int): Int =
-    tdAtColPosOpt(gridId, colPos) map controlsInCol getOrElse 0
-
-  def controlsInCol(firstRowTd: NodeInfo): Int = {
-    val grid = getContainingGrid(firstRowTd)
-    val allRowCells = getAllRowCells(grid)
-
-    val (x, _) = NodeInfoCell.tdCoordinates(firstRowTd: NodeInfo, allRowCells).get
-
-    allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ cell.td.hasChildElement)
-  }
-
-  def controlsInRow(gridId: String, rowPos: Int): Int = {
-    val row = trAtRowPos(gridId, rowPos)
-    (row / "*:td" / *).length
-  }
+  def isLastGridInSection(grid: NodeInfo): Boolean =
+    childrenGrids(findAncestorContainersLeafToRoot(grid).head).size == 1
 
   private def selectedCellVar =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("selected-cell")
 
-  // Find the currently selected grid td if any
-  def findSelectedTd(inDoc: NodeInfo) =
+  // Find the currently selected grid cell if any
+  def findSelectedCell(inDoc: NodeInfo): Option[NodeInfo] =
     findInViewTryIndex(inDoc, selectedCellVar.stringValue)
 
   //@XPathFunction
-  def selectTdForControlId(inDoc: NodeInfo, controlId: String): Unit =
-    findControlByName(inDoc, controlNameFromId(controlId)).to[List] flatMap (_ parent "*:td") foreach selectTd
+  def selectCellForControlId(inDoc: NodeInfo, controlId: String): Unit =
+    findControlByName(inDoc, controlNameFromId(controlId)).to[List] flatMap (_ parent CellTest) foreach selectCell
 
-  // Make the given grid td selected
-  def selectTd(newTd: NodeInfo): Unit =
-    setvalue(selectedCellVar, newTd.id)
+  // Make the given grid cell selected
+  def selectCell(newCell: NodeInfo): Unit =
+    setvalue(selectedCellVar, newCell.id)
 
-  // Whether a call to ensureEmptyTd() will succeed
+  // Whether a call to ensureEmptyCell() will succeed
   // For now say we'll always succeed as we'll fill gaps and insert a row as needed.
   // TODO: Remove once no longer needed.
-  def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
-    findSelectedTd(inDoc).isDefined
+  def willEnsureEmptyCellSucceed(inDoc: NodeInfo): Boolean =
+    findSelectedCell(inDoc).isDefined
 
-  // Try to ensure that there is an empty td after the current location, inserting a new row if possible
-  def ensureEmptyTd(inDoc: NodeInfo): Option[NodeInfo] =
-    findSelectedTd(inDoc) flatMap { currentCellNode ⇒
+  // Try to ensure that there is an empty cell after the current location, inserting a new row if possible
+  def ensureEmptyCell(inDoc: NodeInfo): Option[NodeInfo] =
+    findSelectedCell(inDoc) flatMap { currentCellNode ⇒
       if (currentCellNode.hasChildElement) {
-        // There is an element in the current td, figure out what to do
+        // There is an element in the current cell, figure out what to do
 
         // - start with `currentCell`
         // - find closest following available space with width `MinimumWidth`
@@ -327,13 +202,13 @@ trait GridOps extends ContainerOps {
         // - if found, then insert new cell at the right spot
         // - if none, then insert new row below OR at end of grid
 
-        val grid         = getContainingGrid(currentCellNode)
-        val cells        = Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true, simplify = false)
-        val currentCell  = Cell.find(currentCellNode, cells).get
+        val gridNode     = getContainingGrid(currentCellNode)
+        val cells        = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+        val currentCell  = Cell.findOriginCell(cells, currentCellNode).get
         val MinimumWidth = currentCell.w
 
         val availableCellOpt = cells.iterator.flatten collectFirst {
-          case c @ Cell(None, _, _, _, w, _) if w >= MinimumWidth ⇒ c
+          case c @ Cell(None, _, _, _, _, w) if w >= MinimumWidth ⇒ c
         }
 
         val newCell =
@@ -350,7 +225,7 @@ trait GridOps extends ContainerOps {
                 val newCellNode: NodeInfo =
                   <fr:c
                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                    id={nextId(grid, "tmp")}
+                    id={nextId(gridNode, "tmp")}
                     x={availableCell.x.toString}
                     y={availableCell.y.toString}
                     w={MinimumWidth.toString}/>
@@ -361,7 +236,7 @@ trait GridOps extends ContainerOps {
               val newCellNode: NodeInfo =
                 <fr:c
                   xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                  id={nextId(grid, "tmp")}
+                  id={nextId(gridNode, "tmp")}
                   x="1"
                   y={cells.size + 1 toString}
                   w={MinimumWidth.toString}/>
@@ -369,7 +244,7 @@ trait GridOps extends ContainerOps {
               insert(into = Nil, after = cells.last.last.u.toList, origin = newCellNode).headOption
           }
 
-         newCell |!> selectTd
+         newCell |!> selectCell
       } else
         Some(currentCellNode)
     }
@@ -387,17 +262,19 @@ trait GridOps extends ContainerOps {
   }
 
   // NOTE: Value can be a simple AVT
-  def getNormalizedMin(doc: NodeInfo, gridName: String) =
+  //@XPathFunction
+  def getNormalizedMin(doc: NodeInfo, gridName: String): String =
     findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
 
   private val NoMaximum = Set("none", "unbounded")
 
   // NOTE: Value can be a simple AVT
-  def getNormalizedMax(doc: NodeInfo, gridName: String) =
+  def getNormalizedMax(doc: NodeInfo, gridName: String): Option[String] =
     findControlByName(doc, gridName) flatMap (_ attValueOpt "max") filterNot NoMaximum map trimSimpleAVT
 
   // XForms callers: get the grid's normalized max attribute, the empty sequence if no maximum
-  def getNormalizedMaxOrEmpty(doc: NodeInfo, gridName: String) =
+  //@XPathFunction
+  def getNormalizedMaxOrEmpty(doc: NodeInfo, gridName: String): String =
     getNormalizedMax(doc, gridName).orNull
 
   // Convert a min/max value to a value suitable to be written to the @min/@max attributes.
@@ -406,7 +283,8 @@ trait GridOps extends ContainerOps {
   // - non-positive integer value → None
   // - positive integer value     → Some(int: String)
   // - any other value            → Some("{expression}")
-  def minMaxForAttribute(s: String) = s.trimAllToOpt flatMap { value ⇒
+  //
+  def minMaxForAttribute(s: String): Option[String] = s.trimAllToOpt flatMap { value ⇒
     try {
       val int = value.toInt
       int > 0 option int.toString
@@ -417,92 +295,130 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  // Get the x/y position of a td given Cell information
-  def tdCoordinates(td: NodeInfo): (Int, Int) =
-    NodeInfoCell.tdCoordinates(td, getAllRowCells(getContainingGrid(td))).get
+  // Get the x/y position of a cell given Cell information
+//  def tdCoordinates(td: NodeInfo): (Int, Int) =
+//    NodeInfoCell.tdCoordinates(td, analyzeTrTdGrid(getContainingGrid(td))).get
+//
+//  // TODO
+//  // Whether there will be controls to delete if the cell is expanded
+//  //@XPathFunction
+//  def expandCellTouchesControl(td: NodeInfo): Boolean =
+//    canExpandCell(td) && { // https://github.com/orbeon/orbeon-forms/issues/3282
+//
+//    debugDumpDocumentForGrids("expandCellTouchesControl", td)
+//
+//    val allRowCells = analyzeTrTdGrid(getContainingGrid(td))
+//    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
+//
+//    val cell = allRowCells(y)(x)
+//
+//    allRowCells(y + cell.h)(x).td.hasChildElement
+//  }
 
-  private def canExpandCell(td: NodeInfo): Boolean = {
-    val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
-    val cell = allRowCells(y)(x)
-
-    (y + cell.h) < allRowCells.size
-  }
-
-  private def canShrinkCell(td: NodeInfo): Boolean = {
-    val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
-    val cell = allRowCells(y)(x)
-
-    cell.h > 1
-  }
-
-  // Whether there will be controls to delete if the cell is expanded
-  // @XPathFunction
-  def expandCellTouchesControl(td: NodeInfo): Boolean =
-    canExpandCell(td) && { // https://github.com/orbeon/orbeon-forms/issues/3282
-
-    debugDumpDocumentForGrids("expandCellTouchesControl", td)
-
-    val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
-
-    val cell = allRowCells(y)(x)
-
-    allRowCells(y + cell.h)(x).td.hasChildElement
-  }
-
-
-  // Vertically expand the given cell
   //@XPathFunction
-  def expandCell(td: NodeInfo): Unit =
-    if (canExpandCell(td)) {
+  def expandCellRight(cellElem: NodeInfo, amount: Int): Unit = {
+    val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Right) >= amount) {
 
-      debugDumpDocumentForGrids("expandCell before", td)
+      debugDumpDocumentForGrids("expandCellRight before", cellElem)
 
-      val allRowCells = getAllRowCells(getContainingGrid(td))
-      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
+      Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
+        NodeInfoCellOps.updateW(originCell.td, originCell.w + amount)
 
-      val cell = allRowCells(y)(x)
-      val cellBelow = allRowCells(y + cell.h)(x)
+        findDistinctOriginCellsToTheRight(cells, cellElem) foreach {
+          case Cell(Some(u), _, x, _, _, w) if w > 1 ⇒
+            NodeInfoCellOps.updateX(u, x + 1)
+            NodeInfoCellOps.updateW(u, w - 1)
+          case Cell(Some(u), _, _, _, _, _) ⇒
+            deleteControlWithinCell(u)
+            delete(u)
+          case _ ⇒
+        }
+      }
 
-      // Increment rowspan
-      NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) + NodeInfoCellOps.h(cellBelow.td).getOrElse(1))
-
-      // Delete cell below
-      delete(cellBelow.td)
-
-      debugDumpDocumentForGrids("expandCell after", td)
+      debugDumpDocumentForGrids("expandCellRight after", cellElem)
     }
+  }
 
-  // Vertically shrink the given cell
   //@XPathFunction
-  def shrinkCell(td: NodeInfo): Unit =
-    if (canShrinkCell(td)) {
-      debugDumpDocumentForGrids("shrinkCell before", td)
+  def shrinkCellRight(cellElem: NodeInfo, amount: Int): Unit = {
+    val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
+    val cellOpt = Cell.findOriginCell(cells, cellElem)
 
-      val grid = getContainingGrid(td)
-      val allRowCells  = getAllRowCells(grid)
+    cellOpt filter (_.w - amount >= 1) foreach { cell ⇒
+      debugDumpDocumentForGrids("shrinkCellRight before", cellElem)
 
-      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
+      val newCellW = cell.w - amount
 
-      val cell = allRowCells(y)(x)
+      NodeInfoCellOps.updateW(cell.td, newCellW)
 
-      // Decrement rowspan attribute
-      NodeInfoCellOps.updateH(cell.td, NodeInfoCellOps.h(cell.td).getOrElse(1) - 1)
+      val newCell: NodeInfo =
+        <fr:c
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          id={nextId(cell.td, "tmp")}
+          x={(cell.x + newCellW).toString}
+          y={cell.y.toString}
+          w={amount.toString}
+          h={cell.h.toString}/>: NodeInfo
 
-      // Insert new td
-      val posyToInsertInto = y + cell.h - 1
-      val rowBelow = allRowCells(posyToInsertInto)
-
-      // TODO: FIX: Old layout.
-      val trToInsertInto = grid / "*:tr" apply posyToInsertInto
-      val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
-
-      insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
-
-      debugDumpDocumentForGrids("shrinkCell after", td)
+      val result = insert(into = Nil, after = cell.td, origin = newCell).headOption
+      debugDumpDocumentForGrids("shrinkCellRight after", cellElem)
     }
+  }
+
+  //@XPathFunction
+  def expandCellDown(cellElem: NodeInfo, amount: Int): Unit = {
+    val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount) {
+
+      debugDumpDocumentForGrids("expandCellDown before", cellElem)
+
+      Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
+        NodeInfoCellOps.updateH(originCell.td, originCell.h + amount)
+
+        Cell.findDistinctOriginCellsBelow(cells, cellElem) foreach {
+          case Cell(Some(u), _, _, y, h, _) if h > 1 ⇒
+            NodeInfoCellOps.updateY(u, y + 1)
+            NodeInfoCellOps.updateW(u, h - 1)
+          case Cell(Some(u), _, _, _, _, _) ⇒
+            deleteControlWithinCell(u)
+            delete(u)
+          case _ ⇒
+        }
+      }
+
+      debugDumpDocumentForGrids("expandCellDown after", cellElem)
+    }
+  }
+
+  //@XPathFunction
+  def shrinkCellDown(cellElem: NodeInfo, amount: Int): Unit = {
+    val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
+    val cellOpt = Cell.findOriginCell(cells, cellElem)
+
+    cellOpt filter (_.h - amount >= 1) foreach { cell ⇒
+      debugDumpDocumentForGrids("shrinkCellDown before", cellElem)
+
+      val newCellH = cell.h - amount
+
+      NodeInfoCellOps.updateH(cell.td, newCellH)
+
+      val newCell: NodeInfo =
+        <fr:c
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          id={nextId(cell.td, "tmp")}
+          x={cell.x.toString}
+          y={(cell.y + newCellH).toString}
+          w={cell.w.toString}
+          h={amount.toString}/>: NodeInfo
+
+      // TODO: find placement
+      val insertCell = cell
+
+      val result = insert(into = Nil, after = insertCell.td, origin = newCell).headOption
+      debugDumpDocumentForGrids("shrinkCellDown after", cellElem)
+    }
+  }
 
   def initializeGrids(doc: NodeInfo): Unit = {
     // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
@@ -519,62 +435,43 @@ trait GridOps extends ContainerOps {
 
     // All grids and grid tds with no existing id
     val bodyElement = findFRBodyElement(doc)
-    val grids       = bodyElement descendant "*:grid"
+    val grids       = bodyElement descendant GridTest
 
-    annotate("tmp", grids descendant ("*:c" || "*:td") filterNot (_.hasId)) // remove `*:td` annotation once we are sure we only need `*:c`
+    annotate("tmp", grids descendant CellTest filterNot (_.hasId))
     annotate("tmp", grids filterNot (_.hasId))
 
     // 2. Select the first td if any
-    bodyElement descendant "*:grid" descendant "*:c" take 1 foreach selectTd
+    bodyElement descendant GridTest descendant CellTest take 1 foreach selectCell
   }
 
-  def deleteGridById(gridId: String) =
+  def deleteGridById(gridId: String): Unit =
     deleteContainerById(canDeleteGrid, gridId)
 
-  // TODO: FIX: Old layout.
-  def canDeleteGrid(grid: NodeInfo): Boolean = canDeleteContainer(grid)
-  def canDeleteRow (grid: NodeInfo): Boolean = (grid / "*:tr").size > 1
-  def canDeleteCol (grid: NodeInfo): Boolean = ((grid / "*:tr").headOption.toList / "*:td").size > 1
+  def canDeleteGrid(grid: NodeInfo): Boolean =
+    canDeleteContainer(grid)
 
-  private val DeleteTests = List(
-    "grid" → canDeleteGrid _,
-    "row"  → canDeleteRow  _,
-    "col"  → canDeleteCol  _
-  )
-
-  // Return all classes that need to be added to an editable grid
-  def gridCanDoClasses(gridId: String): Seq[String] = {
-
-    val grid = containerById(gridId)
-
-    val deleteClasses = DeleteTests collect { case (what, test) if test(grid) ⇒ "fb-can-delete-" + what }
-    val insertClasses = getGridSize(grid) < maxGridColumns list "fb-can-add-col"
-
-    "fr-editable" :: deleteClasses ::: insertClasses
-  }
+   // Return all classes that need to be added to an editable grid
+  // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
+  //@XPathFunction
+  def gridCanDoClasses(gridId: String): List[String] =
+    "fr-editable" :: (canDeleteGrid(containerById(gridId)) list "fb-can-delete-grid")
 
   // Find the new td to select if we are removing the currently selected td
-  def findNewTdToSelect(inDoc: NodeInfo, tdsToDelete: Seq[NodeInfo]) =
-    findSelectedTd(inDoc) match {
-      case Some(selectedTd) if tdsToDelete contains selectedTd ⇒
+  def findNewCellToSelect(inDoc: NodeInfo, cellsToDelete: Seq[NodeInfo]): Option[NodeInfo] =
+    findSelectedCell(inDoc) match {
+      case Some(selectedCell) if cellsToDelete contains selectedCell ⇒
+
+        def findCells(find: Test ⇒ Seq[NodeInfo], selectedCell: NodeInfo) =
+          find(CellTest)                                                            intersect
+          (findAncestorContainersLeafToRoot(selectedCell).last descendant CellTest) filterNot
+          (cellsToDelete contains _)                                                headOption
+
         // Prefer trying following before preceding, as things move up and left when deleting
         // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
         // stay in section, etc.
-        (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
-          (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
+        findCells(selectedCell following _, selectedCell) orElse
+          findCells(selectedCell preceding  _, selectedCell)
       case _ ⇒
         None
     }
-
-  // Return a td's preceding tds in the hierarchy of containers
-  def precedingTds(td: NodeInfo) = {
-    val preceding = td preceding "*:td"
-    preceding intersect (findAncestorContainers(td).last descendant "*:td")
-  }
-
-  // Return a td's following tds in the hierarchy of containers
-  def followingTd(td: NodeInfo) = {
-    val following = td following "*:td"
-    following intersect (findAncestorContainers(td).last descendant "*:td")
-  }
 }

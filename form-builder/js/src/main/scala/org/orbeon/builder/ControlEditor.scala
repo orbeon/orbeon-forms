@@ -67,9 +67,9 @@ object ControlEditor {
             case Direction.Right | Direction.Down ⇒
               Grid.spaceToExtendCell(cellEl, direction) == 0
             case Direction.Left ⇒
-              cell.el.attr("data-w").isEmpty
+              (cell.el.attr("data-w") map (_.toInt) getOrElse 1) <= 1
             case Direction.Up ⇒
-              cell.el.attr("data-h").isEmpty
+              (cell.el.attr("data-h") map (_.toInt) getOrElse 1) <= 1
           }
         val icon = controlEditorLeft.find(s".icon-arrow-$directionName")
         icon.toggleClass("disabled", disableIcon)
@@ -101,10 +101,10 @@ object ControlEditor {
       val className = s"icon-arrow-$directionName"
       val iconEl = controlEditorLeft.find(s".$className")
       val eventName = direction match {
-        case Direction.Up    ⇒ "fb-shrink-y"
-        case Direction.Right ⇒ "fb-expand-x"
-        case Direction.Down  ⇒ "fb-expand-y"
-        case Direction.Left  ⇒ "fb-shrink-x"
+        case Direction.Up    ⇒ "fb-shrink-down"
+        case Direction.Right ⇒ "fb-expand-right"
+        case Direction.Down  ⇒ "fb-expand-down"
+        case Direction.Left  ⇒ "fb-shrink-right"
       }
       iconEl.on("click", () ⇒ {
         if (! iconEl.is(".disabled"))

@@ -271,6 +271,7 @@
                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                            </xf:input>
                        </fr:c>
+                       <fr:c y="1" x="7" w="6"/>
                    </fr:grid>
                    <fr:grid edit-ref="" id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1" template="instance('grid-3-template')">
                        <fr:c y="1" x="1" w="6">

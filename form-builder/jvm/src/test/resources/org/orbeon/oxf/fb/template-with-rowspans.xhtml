@@ -1,4 +1,4 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
     <xh:head>
         <xf:model id="fr-form-model" xmlns:xf="http://www.w3.org/2002/xforms">
             <xf:instance id="fr-form-instance"><form/></xf:instance>
@@ -7,9 +7,9 @@
     <xh:body>
         <fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <fr:grid>
-                <xh:tr><xh:td id="11"/><xh:td id="12" rowspan="2"/><xh:td id="13"/></xh:tr>
-                <xh:tr><xh:td id="21" rowspan="2"/><xh:td id="23"/></xh:tr>
-                <xh:tr><xh:td id="32"/><xh:td id="33"/></xh:tr>
+                <xh:tr><xh:td id="11"><xf:input/></xh:td><xh:td id="12" rowspan="2"><xf:input/></xh:td><xh:td id="13"><xf:input/></xh:td></xh:tr>
+                <xh:tr><xh:td id="21" rowspan="2"><xf:input/></xh:td><xh:td id="23"><xf:input/></xh:td></xh:tr>
+                <xh:tr><xh:td id="32"><xf:input/></xh:td><xh:td id="33"><xf:input/></xh:td></xh:tr>
             </fr:grid>
         </fr:body>
     </xh:body>

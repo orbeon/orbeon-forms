@@ -99,8 +99,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   // XForms callers: get the name for a section or grid element or null (the empty sequence)
   def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
 
-  // Find ancestor sections and grids (including non-repeated grids) from leaf to root
-  def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
+  // Find ancestor sections and grids (including non-repeated grids)
+  def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
   // Find ancestor section and grid names from root to leaf
@@ -111,7 +111,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     val namesWithContainers =
       for {
-        container ← findAncestorContainers(descendant, includeSelf)
+        container ← findAncestorContainersLeafToRoot(descendant, includeSelf)
         name      ← getControlNameOpt(container)
         if ! (IsGrid(container) && ! isRepeat(container))
       } yield
@@ -128,23 +128,23 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   }
 
   // A container's children containers
-  def childrenContainers(container: NodeInfo) =
+  def childrenContainers(container: NodeInfo): Seq[NodeInfo] =
     container / * filter IsContainer
 
   // A container's children grids (including repeated grids)
-  def childrenGrids(container: NodeInfo) =
+  def childrenGrids(container: NodeInfo): Seq[NodeInfo] =
     container / * filter IsGrid
 
   // Find all ancestor repeats from leaf to root
   def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-    findAncestorContainers(descendantOrSelf, includeSelf) filter isRepeat
+    findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter isRepeat
 
   def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
     findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 
   // Find all ancestor sections from leaf to root
   def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-    findAncestorContainers(descendantOrSelf, includeSelf) filter IsSection
+    findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsSection
 
   //@XPathFunction
   def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =

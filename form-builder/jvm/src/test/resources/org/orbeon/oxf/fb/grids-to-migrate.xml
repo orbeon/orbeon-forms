@@ -3,7 +3,6 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xf="http://www.w3.org/2002/xforms">
 
-    <!-- Grid with holes -->
     <fr:grid edit-ref="">
         <xh:tr>
            <xh:td colspan="4">
@@ -54,7 +53,6 @@
            </xh:td>
         </xh:tr>
     </fr:grid>
-    <!-- Create empty rows -->
     <fr:grid>
         <xh:tr>
             <xh:td>

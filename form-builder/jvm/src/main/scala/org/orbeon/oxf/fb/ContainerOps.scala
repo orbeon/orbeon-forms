@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Names._
+import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
@@ -77,12 +78,13 @@ trait ContainerOps extends ControlOps {
       deleteContainer(container)
   }
 
-  def deleteContainer(container: NodeInfo) = {
+  def deleteContainer(containerNode: NodeInfo): Unit = {
 
-    val doc = container.getDocumentRoot
+    val doc = containerNode.getDocumentRoot
 
     // Find the new td to select if we are removing the currently selected td
-    val newTdToSelect = findNewTdToSelect(container, container descendant "*:td")
+    val newCellToSelectOpt = findNewCellToSelect(containerNode, containerNode descendant CellTest)
+
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
@@ -94,27 +96,26 @@ trait ContainerOps extends ControlOps {
       // NOTE: Use toList to make sure we are not lazy, otherwise items might be deleted as we go!
       val children = childrenContainers(container).reverse.toList flatMap recurse
 
-      // TODO: FIX: Old layout.
       val gridContent =
         if (IsGrid(container))
-          container descendant "*:tr" descendant "*:td" child * filter IsControl reverse
+          container descendant CellTest child * filter IsControl reverse
         else
-          Seq.empty
+          Nil
 
       children ++ gridContent :+ container
     }
 
     // Start with top-level container
-    val controls = recurse(container)
+    val controls = recurse(containerNode)
 
     //  Delete all controls in order
     controls flatMap controlElementsToDelete foreach (delete(_))
 
     // Update templates
-    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(container).to[Set])
+    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(containerNode).to[Set])
 
     // Adjust selected td if needed
-    newTdToSelect foreach selectTd
+    newCellToSelectOpt foreach selectCell
   }
 
   // Move a container based on a move function

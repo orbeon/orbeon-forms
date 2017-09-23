@@ -27,6 +27,8 @@ import org.orbeon.scaxon.SimplePath._
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
+import scala.collection.immutable
+
 trait BaseOps extends Logging {
 
   implicit def logger = inScopeContainingDocument.getIndentedLogger("form-builder")
@@ -56,12 +58,12 @@ trait BaseOps extends Logging {
     inlineInstanceRootElement(inDoc, templateId(repeatName))
 
   // Find the next available id for a given token
-  def nextId(inDoc: NodeInfo, token: String) =
+  def nextId(inDoc: NodeInfo, token: String): String =
     nextIds(inDoc, token, 1).head
 
   // Find a series of next available ids for a given token
   // Return ids of the form "foo-123-foo", where "foo" is the token
-  def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
+  def nextIds(inDoc: NodeInfo, token: String, count: Int): immutable.IndexedSeq[String] = {
 
     val prefix = token + "-"
     val suffix = "-" + token

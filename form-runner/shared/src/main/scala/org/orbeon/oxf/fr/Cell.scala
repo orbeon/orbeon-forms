@@ -13,127 +13,129 @@
   */
 package org.orbeon.oxf.fr
 
+import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.immutable
+import scala.util.Try
 
-case class Cell[Underlying](u: Option[Underlying], x: Int, y: Int, h: Int, w: Int, missing: Boolean) {
-  def td = u getOrElse (throw new NoSuchElementException)
+case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
+
+  require(x > 0 && y > 0 && h > 0 && w > 0,                                     s"`$x`, `$y`, `$h`, `$w`")
+  require(x <= Cell.StandardGridWidth && (x + w - 1) <= Cell.StandardGridWidth, s"`$x`, `$y`, `$h`, `$w`")
+
+  def td      = u getOrElse (throw new NoSuchElementException)
+  def missing = origin.isDefined
 }
+
+// TODO: Pass this around and add operations
+case class GridModel[Underlying](cells: List[Cell[Underlying]])
 
 trait CellOps[Underlying] {
 
-  def attValueOpt(u: Underlying, name: String): Option[String]
-  def children   (u: Underlying, name: String): List[Underlying]
+  def attValueOpt    (u: Underlying, name: String): Option[String]
+  def children       (u: Underlying, name: String): List[Underlying]
+  def parent         (u: Underlying)              : Underlying
+  def hasChildElement(u: Underlying)              : Boolean
 
   def x(u: Underlying): Option[Int]
   def y(u: Underlying): Option[Int]
   def w(u: Underlying): Option[Int]
   def h(u: Underlying): Option[Int]
 
-  def updateH(u: Underlying, rowspan: Int): Unit
+  def updateX(u: Underlying, x: Int): Unit
+  def updateY(u: Underlying, y: Int): Unit
+  def updateH(u: Underlying, h: Int): Unit
+  def updateW(u: Underlying, w: Int): Unit
 }
 
 object Cell {
 
+  import Private._
+
   val StandardGridWidth = 12
 
-  private def getNormalizedSpan[Underlying : CellOps](td: Underlying, name: String): Int =
-    implicitly[CellOps[Underlying]].attValueOpt(td, name) map (_.toInt) getOrElse 1
+  val GridTestName = "*:grid"
+  val TrTestName   = "*:tr"
+  val TdTestName   = "*:td"
+  val CellTestName = "*:c"
 
-  private def getNormalizedRowspan[Underlying : CellOps](td: Underlying): Int = getNormalizedSpan(td, "rowspan")
-  private def getNormalizedColspan[Underlying : CellOps](td: Underlying): Int = getNormalizedSpan(td, "colspan")
-
-  // For the previous row of prepared cells, and a new row of tds, return the new row of prepared cells
-  def newCellsRow[Underlying : CellOps](previousRow: List[Cell[Underlying]], tds: List[Underlying]): List[Cell[Underlying]] =
-    previousRow match {
-
-      case Nil ⇒
-        // First row: start with initial rowspans
-        tds flatMap { td ⇒
-
-          val colspan = getNormalizedColspan(td)
-          val rowspan = getNormalizedRowspan(td)
-
-          val firstCell =
-            Cell(Some(td), -1, -1, rowspan, colspan, missing = false)
-
-          val spanCells =
-            if (colspan == 1)
-              Nil
-            else
-              (1 until colspan).reverse map { index ⇒
-                Cell(Some(td), -1, -1, rowspan, colspan - index, missing = true)
-              } toList
-
-          firstCell :: spanCells
-        }
-      case _ ⇒
-        // Subsequent rows
-
-        // Assumption is that all rows have the same width
-        // TODO: Handle error conditions. Throw if error is found.
-
-        val previousRowIt = previousRow.toIterator
-        val tdsIt         = tds.toIterator
-
-        val result = ListBuffer[Cell[Underlying]]()
-
-        previousRowIt foreach {
-          // Previous row's cell does NOT span over this current row
-          case Cell(_, -1, -1, 1, colspan, _) ⇒
-
-            val td = tdsIt.next()
-
-            val colspan = getNormalizedColspan(td)
-            val rowspan = getNormalizedRowspan(td)
-
-            // Always at least one cell
-            result += Cell(Some(td), -1, -1, rowspan, colspan, missing = false)
-
-            // Add cells for remaining colspans
-            (1 until colspan).reverse foreach { remainingColspan ⇒
-              result += Cell(Some(td), -1, -1, rowspan, remainingColspan, missing = true)
-              // Advance the previous row iterator explicitly!
-              previousRowIt.next()
-            }
-
-          // Previous row's cell DOES span over this current row
-          case Cell(td, -1, -1, rowspan, colspan, _) ⇒
-            // Create a hole
-            result += Cell(td, -1, -1, rowspan - 1, colspan, missing = true)
-        }
-
-        result.result()
-    }
-
-  // Get cell/rowspan information for all the rows in the grid
-  def getAllRowCells[Underlying : CellOps](grid: Underlying): List[List[Cell[Underlying]]] = {
+  // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
+  // The cells return can have a width which is less than `StandardGridWidth`.
+  def analyzeTrTdGrid[Underlying : CellOps](
+    grid     : Underlying,
+    simplify : Boolean
+  ): (Int, List[List[Cell[Underlying]]]) = {
 
     val ops  = implicitly[CellOps[Underlying]]
-    val rows = ops.children(grid, "*:tr") map (ops.children(_, "*:td"))
+    val rows = ops.children(grid, TrTestName)
 
-    // Accumulate the result for each row as we go
-    val result = mutable.ListBuffer[List[Cell[Underlying]]]()
+    // TODO: can it be 0?
+    val gridHeight = rows.size
 
-    rows.foldLeft[List[Cell[Underlying]]](Nil) { (previousRow, tds) ⇒
-      val newRow = newCellsRow(previousRow, tds)
-      result += newRow
-      newRow
+    val xy = Array.fill[Cell[Underlying]](gridHeight, StandardGridWidth)(null)
+
+    // Mark cells
+    rows.iterator.zipWithIndex foreach { case (tr, iy) ⇒
+
+      var ix = 0
+
+      ops.children(tr, TdTestName) foreach { td ⇒
+
+        findStart(xy(iy), ix) match {
+          case Some(start) ⇒
+
+            val w = getNormalizedSizeAtt(td, "colspan")
+            val h = getNormalizedSizeAtt(td, "rowspan")
+
+            val newCell = Cell(Some(td), None, start + 1, iy + 1, h, w)
+
+            for {
+              iy1 ← iy until iy + h
+              ix1 ← start until start + w
+              isOriginCell = ix1 == start && iy1 == iy
+            } locally {
+              xy(iy1)(ix1) =
+                if (isOriginCell)
+                  newCell
+                else
+                  newCell.copy(origin = Some(newCell), x = ix1 + 1, y = iy1 + 1, h = h + iy - iy1, w = w + start - ix1)
+            }
+
+            ix = start + w
+
+            case None ⇒
+              ix = StandardGridWidth // break
+        }
+      }
     }
 
-    result.result()
+    // The resulting grid so far might take, for example, only 2, 3, or 4 columns. So we trim the
+    // right side of the grid if needed. We could do the converse and adjust everything on a 12-column
+    // basis.
+
+    // NOTE: Checking the first row should be enough if the grid is well-formed.
+    val gridWidth = xy map (_ filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum) max
+
+    val widthToTruncate =
+      if (simplify && Cell.StandardGridWidth % gridWidth == 0)
+        gridWidth
+      else
+        StandardGridWidth
+
+    // In most cases, there won't be holes as `<xh:tr>`/`<xh:td>` grids are supposed to be fully populated.
+    fillHoles(xy, widthToTruncate)
+    widthToTruncate → xyToList(xy, widthToTruncate)
   }
 
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
     grid       : Underlying,
-    mergeHoles : Boolean,
     simplify   : Boolean
   ): List[List[Cell[Underlying]]] = {
 
     val ops = implicitly[CellOps[Underlying]]
-    val cs  = ops.children(grid, "*:c")
+    val cs  = ops.children(grid, CellTestName)
 
     // TODO: can it be 0?
     val gridHeight = if (cs.nonEmpty) cs map (c ⇒ ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
@@ -148,72 +150,209 @@ object Cell {
       val w = ops.w(c).getOrElse(1)
       val h = ops.h(c).getOrElse(1)
 
-      val newCell = Cell(Some(c), x, y, h, w, missing = false)
+      val newCell = Cell(Some(c), None, x, y, h, w)
 
       for {
         iy ← (y - 1) until (y + h - 1)
         ix ← (x - 1) until (x + w - 1)
-        isFirstCell = ix == x - 1 && iy == y - 1
+        isOriginCell = ix == x - 1 && iy == y - 1
       } locally {
         xy(iy)(ix) =
-          if (isFirstCell)
+          if (isOriginCell)
             newCell
           else
-            newCell.copy(x = ix + 1, y = iy + 1, h = h - iy + y - 1, w = w - ix + x - 1, missing = true)
+            newCell.copy(origin = Some(newCell), x = ix + 1, y = iy + 1, h = h - iy + y - 1, w = w - ix + x - 1)
       }
     }
 
-    // Fill holes with cells that can span columns but not rows
-    for ((row, iy) ← xy.zipWithIndex) {
+    fillHoles(xy, StandardGridWidth)
 
-      def findStart(from: Int) =
-        row.indexWhere(_ eq null, from)
+    if (simplify)
+      Private.simplify(xy)
+    else
+      xyToList(xy, StandardGridWidth)
+  }
 
-      def findEnd(from: Int) =
-        row.indexWhere(_ ne null, from)
-
-      def findRun(from: Int): Option[(Int, Int)] = {
-        val x1 = findStart(from)
-        (x1 != -1) option {
-          val x2 = findEnd(x1 + 1)
-          x1 → (if (x2 == -1) StandardGridWidth - 1 else x2 - 1)
-        }
-      }
-
-      var ix = 0
-      while (ix < StandardGridWidth) {
-        findRun(ix) match {
-          case Some((start, end)) ⇒
-
-            val newCell = Cell[Underlying](None, start + 1, iy + 1, 1, end - start + 1, missing = false)
-
-            for {
-              ix2 ← start to end
-              isFirstCell = ix2 == start
-            } locally {
-              xy(iy)(ix2) =
-                if (isFirstCell)
-                  newCell
-                else
-                  newCell.copy(x = ix2 + 1, w = end - ix2 + 1, missing = true)
-            }
-
-            ix = end + 1
-          case None ⇒
-            ix = StandardGridWidth // break
-        }
-      }
-
+  def findOriginCell[Underlying](cells: List[List[Cell[Underlying]]], u: Underlying): Option[Cell[Underlying]] =
+    cells.iterator.flatten collectFirst {
+      case c @ Cell(Some(`u`), None, _, _, _, _) ⇒ c
     }
 
-    def xyToList =
-      xy map (_.toList) toList
+//  def findCoordinates[Underlying](cells: List[List[Cell[Underlying]]], u: Underlying): Option[(Int, Int)] =
+//    findOriginCell(cells, u) map (c ⇒ c.x → c.y)
 
-    // Adjust factors
-    if (simplify) {
+  def selfCellOrOrigin[Underlying](cell: Cell[Underlying]): Cell[Underlying] = cell match {
+    case c @ Cell(_, None, _, _, _, _)     ⇒ c
+    case Cell(_, Some(origin), _, _, _, _) ⇒ origin
+  }
+
+  def findDistinctOriginCellsToTheRight[Underlying : CellOps](
+    cells     : List[List[Cell[Underlying]]],
+    cellElem  : Underlying
+  ): List[Cell[Underlying]] =
+    findOriginCell(cells, cellElem).toList flatMap { originCell ⇒
+
+      val cellToTheRightX = originCell.x + originCell.w
+
+      if (cellToTheRightX <= Cell.StandardGridWidth)
+        originCell.y until (originCell.y + originCell.h) map
+          (iy ⇒ cells(iy - 1)(cellToTheRightX - 1))      map
+          selfCellOrOrigin                               keepDistinctBy
+          (_.u)
+      else
+        Nil
+    }
+
+  def findDistinctOriginCellsBelow[Underlying : CellOps](
+    cells     : List[List[Cell[Underlying]]],
+    cellElem  : Underlying
+  ): List[Cell[Underlying]] =
+    findOriginCell(cells, cellElem).toList flatMap { originCell ⇒
+
+      val cellBelowY = originCell.y + originCell.h
+
+      if (cellBelowY <= cells.size)
+        originCell.x until (originCell.x + originCell.w) map
+          (ix ⇒ cells(cellBelowY - 1)(ix - 1))           map
+          selfCellOrOrigin                               keepDistinctBy
+          (_.u)
+      else
+        Nil
+    }
+
+  def spaceToExtendCell[Underlying : CellOps](
+    cells     : List[List[Cell[Underlying]]],
+    cellElem  : Underlying,
+    direction : Direction
+  ): Int =
+    findOriginCell(cells, cellElem) flatMap { originCell ⇒
+
+      val ops = implicitly[CellOps[Underlying]]
+
+      direction match {
+        case Direction.Right ⇒
+
+          //val currentCellHasContent = originCell.u exists ops.hasChildElement
+
+          val cellsToTheRight = findDistinctOriginCellsToTheRight(cells, cellElem)
+
+          cellsToTheRight.nonEmpty option {
+
+            // For now, simplification: we can only expand to the right if:
+            //
+            // - all the cells to the right are empty
+            // - and they don't start or end over the height of the expanding cell
+            //
+            // In the future, something smarter can be done.
+
+            cellsToTheRight.iterator map { cellToTheRight ⇒
+
+              val originRightCell = selfCellOrOrigin(cellToTheRight)
+
+              val hasContent   = originRightCell.u exists ops.hasChildElement
+              val startsBefore = originRightCell.y < originCell.y
+              val endsAfter    = originRightCell.y + originRightCell.h > originCell.y + originCell.h
+
+              if (hasContent || startsBefore || endsAfter)
+                0
+              else
+                cellToTheRight.w
+
+            } min
+          }
+
+        case Direction.Down ⇒
+
+          val cellsBelow = findDistinctOriginCellsBelow(cells, cellElem)
+
+          cellsBelow.nonEmpty option {
+
+            cellsBelow.iterator map { cellBelow ⇒
+
+              val originBelowCell = selfCellOrOrigin(cellBelow)
+
+              val hasContent   = originBelowCell.u exists ops.hasChildElement
+              val startsBefore = originBelowCell.x < originCell.x
+              val endsAfter    = originBelowCell.x + originBelowCell.w > originCell.x + originCell.w
+
+              if (hasContent || startsBefore || endsAfter)
+                0
+              else
+                cellBelow.h
+
+            } min
+          }
+
+        case Direction.Left ⇒ Some(0) // TODO
+        case Direction.Up   ⇒ Some(0) // TODO
+      }
+    } getOrElse 0
+
+  private object Private {
+
+    // Try to get a positive attribute value, returning 1 if that fails for any reason
+    def getNormalizedSizeAtt[Underlying : CellOps](u: Underlying, attName: String): Int =
+      implicitly[CellOps[Underlying]].attValueOpt(u, attName) flatMap (s ⇒ Try(s.toInt).toOption) filter (_ > 0) getOrElse 1
+
+    def findStart[Underlying <: AnyRef](row: Seq[Underlying], from: Int): Option[Int] = {
+      val index = row.indexWhere(_ eq null, from)
+      index != -1 option index
+    }
+
+    def findEnd[Underlying <: AnyRef](row: Seq[Underlying], from: Int): Option[Int] = {
+      val index = row.indexWhere(_ ne null, from)
+      index != -1 option index
+    }
+
+    def xyToList[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): List[List[Cell[Underlying]]] =
+      xy map (_ take width toList) toList
+
+     // Fill holes with cells that can span columns (but not rows, to make things simpler)
+    def fillHoles[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): Unit =
+      for {
+        (rowFullLength, iy) ← xy.zipWithIndex
+        row = rowFullLength take width
+      } locally {
+
+        def findRun(from: Int): Option[(Int, Int)] = {
+          findStart(row, from) map { x ⇒
+            x → (findEnd(row, x + 1) map (_ - 1) getOrElse (width - 1))
+          }
+        }
+
+        var ix = 0
+        while (ix < width) {
+          findRun(ix) match {
+            case Some((start, endInclusive)) ⇒
+
+              val newCell = Cell[Underlying](None, None, start + 1, iy + 1, 1, endInclusive - start + 1)
+
+              for {
+                ix1 ← start to endInclusive
+                isOriginCell = ix1 == start
+              } locally {
+                xy(iy)(ix1) =
+                  if (isOriginCell)
+                    newCell
+                  else
+                    newCell.copy(origin = Some(newCell), x = ix1 + 1, w = endInclusive - ix1 + 1)
+              }
+
+              ix = endInclusive + 1
+            case None ⇒
+              ix = width // break
+          }
+        }
+      }
+
+    // Create a simplified grid if positions and widths have a gcd
+    // NOTE: The resulting grid will then not necessarily have `StandardGridWidth` cells on each row,
+    // but 1, 2, 3, 4, 6, or 12 cells.
+    def simplify[Underlying](xy: Array[Array[Cell[Underlying]]]): List[List[Cell[Underlying]]] = {
+
       val gcd = {
 
-        val Divisors = List(6, 4, 3, 2)
+        val Divisors = List(12, 6, 4, 3, 2)
 
         def gcd2(v1: Int, v2: Int): Int =
           Divisors find (d ⇒ v1 % d == 0 && v2 % d == 0) getOrElse 1
@@ -224,20 +363,16 @@ object Cell {
           (! _.missing) flatMap
           (c ⇒ Iterator(c.x - 1, c.w)) toSet
 
-        distinctValues.fold(Divisors.head)(gcd2)
+        if (distinctValues.size == 1)
+          distinctValues.head
+        else
+          distinctValues.reduce(gcd2)
       }
 
       if (gcd > 1)
-        xy map (_ map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList
+        xy map (_ grouped gcd map (x ⇒ x.head) map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList
       else
-        xyToList
-    } else
-        xyToList
+        xyToList(xy, StandardGridWidth)
+    }
   }
-
-  def find[Underlying](td: Underlying, cells: List[List[Cell[Underlying]]]): Option[Cell[Underlying]] =
-    cells.iterator.flatten find (_.td == td)
-
-  def findCoordinates[Underlying](td: Underlying, cells: List[List[Cell[Underlying]]]): Option[(Int, Int)] =
-     find(td, cells) map (c ⇒ c.x → c.y)
 }

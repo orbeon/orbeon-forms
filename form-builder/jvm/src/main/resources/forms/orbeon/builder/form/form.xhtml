@@ -497,11 +497,11 @@
                                     title="{$fb-resources/edit-items/label}"/>
 
                                 <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
-                                <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
-                                    <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = fbf:controlNameFromId($control-id)]/label">
-                                        <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>
-                                    </xf:input>
-                                </xf:group>
+                                <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
+                                    <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = fbf:controlNameFromId($control-id)]/label">-->
+                                        <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
+                                    <!--</xf:input>-->
+                                <!--</xf:group>-->
 
                                 <!--
                                     Upload control for static image

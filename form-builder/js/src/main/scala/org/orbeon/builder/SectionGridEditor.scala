@@ -58,9 +58,9 @@ object SectionGridEditor {
   }
 
   sealed case class RowEditor(selector: String    , eventName: String )
-  val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-add-row-above")
-  val DeleteRow   = RowEditor(".icon-minus-sign"  , "fb-delete-row"   )
-  val AddRowBelow = RowEditor(".icon-chevron-down", "fb-add-row-below")
+  val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-row-insert-above")
+  val DeleteRow   = RowEditor(".icon-minus-sign"  , "fb-row-delete"   )
+  val AddRowBelow = RowEditor(".icon-chevron-down", "fb-row-insert-below")
   val RowEditors  = List(AddRowAbove, DeleteRow, AddRowBelow)
 
   // Position editor when block becomes current

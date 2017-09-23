@@ -30,8 +30,21 @@
       xxf:external-events="
           fb-show-test-dialog
           fb-update-control-lhha
-          fb-dnd-control-from
+
+          fb-control-edit-details
+          fb-control-edit-items
           fb-control-delete
+
+          fb-row-insert-above
+          fb-row-delete
+          fb-row-insert-below
+
+          fb-expand-right
+          fb-shrink-right
+          fb-expand-down
+          fb-shrink-down
+
+          fb-dnd-control-from
       "
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
@@ -529,6 +542,48 @@
         <xf:action type="xpath">fbf:setControlLHHAMediatype(instance('fb-form-instance'), fbf:controlNameFromId(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
     </xf:action>
 
+    <xf:action ev:observer="fb" ev:event="fb-control-edit-details" xxf:phantom="true">
+        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
+            <xf:property name="control-id" value="event('xxf:targetid')"/>
+        </xf:dispatch>
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-control-edit-items" xxf:phantom="true">
+        <!-- TODO -->
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-control-delete" xxf:phantom="true" type="xpath">
+        fbf:deleteCellWithControlContent(id(event('xxf:targetid'))/.., true())
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-row-insert-above" xxf:phantom="true" type="xpath">
+        fbf:rowInsertAbove(event('xxf:targetid'), xs:integer(event('fb-row-pos')) - 1)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-row-delete" xxf:phantom="true" type="xpath">
+        fbf:rowDelete(event('xxf:targetid'), xs:integer(event('fb-row-pos')) - 1)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-row-insert-below" xxf:phantom="true" type="xpath">
+        fbf:rowInsertBelow(event('xxf:targetid'), xs:integer(event('fb-row-pos')) - 1)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-expand-right" xxf:phantom="true" type="xpath">
+        fbf:expandCellRight(id(event('xxf:targetid')), 1) (: TODO: Support expanding by more than 1 :)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-shrink-right" xxf:phantom="true" type="xpath">
+        fbf:shrinkCellRight(id(event('xxf:targetid')), 1) (: TODO: Support shrinking by more than 1 :)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-expand-down" xxf:phantom="true" type="xpath">
+        fbf:expandCellDown(id(event('xxf:targetid')), 1) (: TODO: Support expanding by more than 1 :)
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-shrink-down" xxf:phantom="true" type="xpath">
+        fbf:shrinkCellDown(id(event('xxf:targetid')), 1) (: TODO: Support shrinking by more than 1 :)
+    </xf:action>
+
     <xf:action ev:observer="fb" ev:event="fb-dnd-control-from" xxf:phantom="true">
         <xf:var name="do-copy" value="event('fb-do-copy') = 'true'"/>
         <xf:var name="source"  value="id(event('xxf:targetid'))"/>
@@ -536,10 +591,6 @@
         <xf:action type="xpath">
             toolboxOps:dndControl($source, $target, $do-copy)
         </xf:action>
-    </xf:action>
-
-    <xf:action ev:observer="fb" ev:event="fb-control-delete" xxf:phantom="true" type="xpath">
-        fbf:deleteCellContent(id(event('xxf:targetid'))/.., true())
     </xf:action>
 
     <xf:var name="variables" value="instance('fb-variables')"/>

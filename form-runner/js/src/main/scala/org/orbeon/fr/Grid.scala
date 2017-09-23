@@ -13,50 +13,34 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.datatypes.Direction
+import org.orbeon.datatypes.{Coordinate, Direction}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.oxf.fr.Cell
+import org.orbeon.oxf.fr.Cell.analyze12ColumnGridAndFillHoles
 import org.orbeon.oxf.util.CoreUtils._
 import org.scalajs.dom.html
 
+// NOTE: This is currently in the `fr` package and project, but probably should be in the `builder` package and project.
+// We put it in
 object Grid {
 
+   def canDeleteRow(cellElem: html.Element): Boolean = {
+
+    val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, simplify = false)
+
+    ???
+  }
+
+  def canMoveToCoordinate(cellElem: html.Element, coordinate: Coordinate): Boolean = {
+
+    val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, simplify = false)
+
+    ???
+  }
+
   def spaceToExtendCell(cellElem: html.Element, direction: Direction): Int = {
-
-    val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, mergeHoles = true, simplify = false)
-
-    cells.iterator.flatten find (_.u exists (_ eq cellElem)) flatMap { cell ⇒
-
-      direction match {
-        case Direction.Right ⇒
-
-          val cellToTheRightX = cell.x + cell.w
-
-          cellToTheRightX <= Cell.StandardGridWidth option {
-
-            val cellsToTheRight =
-              cell.y until cell.y + cell.h map (iy ⇒ cells(iy - 1)(cellToTheRightX - 1))
-
-            cellsToTheRight.iterator map (c ⇒ if (c.u.nonEmpty) 0 else c.w) min
-
-          }
-
-        case Direction.Down ⇒
-
-          val cellUnderRightY = cell.y + cell.h
-
-          cellUnderRightY <= cells.size option {
-
-            val cellsUnder =
-              cell.x until cell.x + cell.w map (ix ⇒ cells(cellUnderRightY - 1)(ix - 1))
-
-            cellsUnder.iterator map (c ⇒ if (c.u.nonEmpty) 0 else c.h) min
-          }
-
-        case Direction.Left ⇒ Some(0) // TODO
-        case Direction.Up   ⇒ Some(0) // TODO
-      }
-    } getOrElse 0
+    val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, simplify = false)
+    Cell.spaceToExtendCell(cells, cellElem, direction)
   }
 
 }

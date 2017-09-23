@@ -32,7 +32,7 @@
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <xf:action type="xpath">fbf:selectTdForControlId($form, event('control-id'))</xf:action>
+                <xf:action type="xpath">fbf:selectCellForControlId($form, event('control-id'))</xf:action>
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 

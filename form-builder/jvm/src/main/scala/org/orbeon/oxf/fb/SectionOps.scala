@@ -57,7 +57,7 @@ trait SectionOps extends ContainerOps {
   // Move the section left if possible
   def moveSectionLeft(container: NodeInfo) =
     if (canMoveLeft(container))
-      moveContainer(container, findAncestorContainers(container).head, moveElementAfter)
+      moveContainer(container, findAncestorContainersLeafToRoot(container).head, moveElementAfter)
 
   // Find the section name given a descendant node
   def findSectionName(descendant: NodeInfo): String =
@@ -81,7 +81,7 @@ trait SectionOps extends ContainerOps {
 
   // Whether the given container can be moved to the left
   def canMoveLeft(container: NodeInfo) =
-    canDeleteSection(container) && findAncestorContainers(container).size >= 2
+    canDeleteSection(container) && findAncestorContainersLeafToRoot(container).size >= 2
 
   private val DirectionCheck = List(
     "up"    → canMoveUp _,

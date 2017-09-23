@@ -34,6 +34,7 @@ import org.orbeon.xforms.XFormsId
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import org.orbeon.oxf.util.CoreUtils._
 
 /*
  * Form Builder: operations on controls.
@@ -55,35 +56,33 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findDataHolders(inDoc: NodeInfo, controlName: String): List[NodeInfo] =
     findBindPathHoldersInDocument(inDoc, controlName, Some(formInstanceRoot(inDoc))) flatMap (_.holders) getOrElse Nil
 
-  def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
+  def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
 
-    val td = controlElement parent * head
-    val grid = findAncestorContainers(td).head
+    val cell = controlElement parent * head
+    val grid = findAncestorContainersLeafToRoot(cell).head
+
+    assert(cell.localname == "c")
     assert(grid.localname == "grid")
 
-    // First check within the current grid as well as the grid itself
-    val preceding = td preceding "*:td"
-    val precedingInGrid = preceding intersect (grid descendant "*:td")
+    val precedingCellsInGrid = cell precedingSibling  "*:c"
 
-    val nameInGridOption = precedingInGrid :+ grid flatMap
-      { case td if td.localname == "td" ⇒ td / *; case other ⇒ other } flatMap
-        (getControlNameOpt(_).toSeq) headOption
+    def fromPrecedingNamesInGrid = precedingCellsInGrid flatMap (_ child * flatMap getControlNameOpt) headOption
+    def fromGridNameOpt          = getControlNameOpt(grid)
 
-    // Return that if found, otherwise find before the current grid
-    nameInGridOption orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
+    fromPrecedingNamesInGrid orElse fromGridNameOpt orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
   }
 
-  def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
+  def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean): Option[String] = {
 
     val precedingOrSelfContainers =
-      (if (includeSelf) Seq(grid) else Seq.empty) ++ (grid precedingSibling * filter IsContainer)
+      (includeSelf list grid) ++ (grid precedingSibling * filter IsContainer)
 
     // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
     // with a name (there might not be one).
     val controlsWithName =
       precedingOrSelfContainers flatMap {
-        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant "*:td" child * filter hasName lastOption
-        case other ⇒ Some(other)
+        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant "*:c" child * filter hasName lastOption
+        case other                                   ⇒ Some(other)
       }
 
     // Take the first result
@@ -135,12 +134,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def iterateSelfAndDescendantBinds(rootBind: NodeInfo): Iterator[NodeInfo] =
     rootBind descendantOrSelf "*:bind" iterator
 
-  // Delete the controls in the given grid cell, if any
-  // @XPathFunction
-  def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {
-    td / * flatMap controlElementsToDelete foreach (delete(_))
+  //@XPathFunction
+  def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false): Unit = {
+    cellElem / * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)
-      self.updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
+      self.updateTemplatesCheckContainers(cellElem, findAncestorRepeatNames(cellElem).to[Set])
   }
 
   // Find all associated elements to delete for a given control element
@@ -546,7 +544,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)
     } else
-      Seq.empty
+      Nil
   }
 
   private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {
@@ -559,13 +557,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // XForms callers: build an effective id for a given static id or return null (the empty sequence)
-  def buildFormBuilderControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+  //@XPathFunction
+  def buildFormBuilderControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String): String =
     buildFormBuilderControlEffectiveId(inDoc, staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
-  def buildFormBuilderControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+  //@XPathFunction
+  def buildFormBuilderControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String): String =
     buildFormBuilderControlEffectiveId(inDoc, staticId).orNull
 
-  private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String) =
+  private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String): Option[String] =
     findInViewTryIndex(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
   // Build an effective id for a given static id
@@ -580,7 +580,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val staticId = control.id
 
     // Ancestors from root to leaf except fb-body group if present
-    val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse filterNot isFBBody
+    val ancestorContainers = findAncestorContainersLeafToRoot(control, includeSelf = false).reverse filterNot isFBBody
 
     val containerIds = ancestorContainers map (_.id)
     val repeatDepth  = ancestorContainers count isRepeat

@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
@@ -21,41 +20,42 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
+// This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition
+// as seen in Form Builder.
 object NodeInfoCell {
+
+  val GridTest: Test = Cell.GridTestName
+  val TrTest  : Test = Cell.TrTestName
+  val TdTest  : Test = Cell.TdTestName
+  val CellTest: Test = Cell.CellTestName
 
   implicit object NodeInfoCellOps extends CellOps[NodeInfo] {
 
-    def attValueOpt(u: NodeInfo, name: String): Option[String] = u attValueOpt name
-    def children   (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
+    def attValueOpt    (u: NodeInfo, name: String): Option[String] = u attValueOpt name
+    def children       (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
+    def parent         (u: NodeInfo)              : NodeInfo       = u.getParent
+    def hasChildElement(u: NodeInfo)              : Boolean        = u.hasChildElement
 
     def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)
     def y(u: NodeInfo): Option[Int] = attValueOpt(u, "y") map (_.toInt)
     def w(u: NodeInfo): Option[Int] = attValueOpt(u, "w") map (_.toInt)
     def h(u: NodeInfo): Option[Int] = attValueOpt(u, "h") map (_.toInt)
 
-    def updateH(u: NodeInfo, rowspan: Int): Unit = toggleAttribute(u, "rowspan", rowspan.toString, rowspan > 1)
-  }
+    import org.orbeon.oxf.xforms.action.XFormsAPI
 
-  def getNormalizedSpan(td: NodeInfo, name: String) =  td attValueOpt name map (_.toInt) getOrElse 1
-
-  // Get cell/rowspan information for the given grid row
-  def getRowCells(tr: NodeInfo): Seq[Cell[NodeInfo]] = {
-
-    // All trs up to and including the current tr
-    val trs = (tr precedingSibling "*:tr").reverse.to[List] ::: tr :: Nil
-
-    // For each row, the Seq of tds
-    val rows = trs map (_ / "*:td" toList)
-
-    // Return the final row of prepared cells
-    rows.foldLeft[List[Cell[NodeInfo]]](Nil)(Cell.newCellsRow)
+    def updateX(u: NodeInfo, x: Int): Unit = XFormsAPI.ensureAttribute(u, "x", x.toString)
+    def updateY(u: NodeInfo, y: Int): Unit = XFormsAPI.ensureAttribute(u, "y", y.toString)
+    def updateH(u: NodeInfo, h: Int): Unit = XFormsAPI.toggleAttribute(u, "h", h.toString, h > 1)
+    def updateW(u: NodeInfo, w: Int): Unit = XFormsAPI.ensureAttribute(u, "w", w.toString)
   }
 
   // Get the x/y position of a td given Cell information
   def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): Option[(Int, Int)] =
     cells.iterator.flatten find (_.td == td) map (c ⇒ c.x → c.y)
 
-  // Find all grid cells which are not empty and return for each:
+  // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
+  //
+  // It finds all grid cells which are not empty and return for each:
   //
   // - the cell element
   // - the row-position
@@ -66,59 +66,40 @@ object NodeInfoCell {
   //@XPathFunction
   def findTdsWithPositionAndSize(grid: NodeInfo): Item = { // `map(*)`
 
-    val allRowCells = Cell.getAllRowCells(grid)
+    val (gridWidth, allRowCells) = Cell.analyzeTrTdGrid(grid, simplify = true)
 
-    val gridWidth = allRowCells map (_ filterNot (_.missing) map (_.w) sum) max
+    val mapIt = {
 
-    // Maybe refine this condition
-    def isEmptyRow(row: List[Cell[NodeInfo]]) =
-      (row filter (cell ⇒ cell.h == 1 && ! cell.missing && ! cell.td.hasChildElement) map (_.w) sum) == gridWidth
+      val ratio =
+        if (Cell.StandardGridWidth % gridWidth == 0)
+          Cell.StandardGridWidth / gridWidth
+        else
+          1
 
-    import org.orbeon.oxf.util.CoreUtils._
-
-    val itOpt =
-      12 % gridWidth == 0 option {
-
-        val ratio = 12 / gridWidth
-
-        val it =
-          for {
-            (row, rowStart) ← allRowCells.iterator.zipWithIndex
-          } yield {
-            if (isEmptyRow(row)) {
-              Iterator(
-                Map[AtomicValue, ValueRepresentation](
-                  (SaxonUtils.fixStringValue("c"), row.head.td),
-                  (SaxonUtils.fixStringValue("x"), 1),
-                  (SaxonUtils.fixStringValue("y"), rowStart + 1),
-                  (SaxonUtils.fixStringValue("w"), 12),
-                  (SaxonUtils.fixStringValue("h"), 1)
-                )
+      val itIt =
+        for {
+          (row, iy) ← allRowCells.iterator.zipWithIndex
+        } yield {
+            for {
+              (cell, ix) ← row.zipWithIndex.iterator
+              if ! cell.missing
+            } yield {
+              Map[AtomicValue, ValueRepresentation](
+                (SaxonUtils.fixStringValue("c"), cell.u getOrElse EmptySequence.getInstance),
+                (SaxonUtils.fixStringValue("x"), ix * ratio + 1),
+                (SaxonUtils.fixStringValue("y"), iy + 1),
+                (SaxonUtils.fixStringValue("w"), cell.w * ratio),
+                (SaxonUtils.fixStringValue("h"), cell.h)
               )
-            } else
-              for {
-                (cell, columnStart) ← row.zipWithIndex.iterator
-                if ! cell.missing && cell.td.hasChildElement
-              } yield {
-                Map[AtomicValue, ValueRepresentation](
-                  (SaxonUtils.fixStringValue("c"), cell.td),
-                  (SaxonUtils.fixStringValue("x"), columnStart * ratio + 1),
-                  (SaxonUtils.fixStringValue("y"), rowStart + 1),
-                  (SaxonUtils.fixStringValue("w"), cell.w * ratio),
-                  (SaxonUtils.fixStringValue("h"), cell.h)
-                )
-            }
           }
+        }
 
-        it.flatten
-      }
+      itIt.flatten
+    }
 
     // NOTE: Conversions have too much boilerplate, we should improve this at some point.
     val cells =
-      itOpt                                          map
-      (_ map (MapFunctions.createValue(_)) toVector) map
-      (ArrayFunctions.createValue(_))                getOrElse
-      EmptySequence.getInstance
+      ArrayFunctions.createValue(mapIt map (MapFunctions.createValue(_)) toVector)
 
     MapFunctions.createValue(
       Map[AtomicValue, ValueRepresentation](
@@ -148,16 +129,19 @@ object NodeInfoCell {
   }
   */
 
+  //
+  // This function is used to analyze a grid in `<fr:c>` format. It i used by `grid.xbl` at runtime and by tests.
+  //
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true, simplify = true).to[Vector] map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify = true).to[Vector] map { row ⇒
         new SequenceExtent(
           row collect {
-            case Cell(uOpt, x, y, h, w, false) ⇒
+            case Cell(u, None, x, y, h, w) ⇒
               MapFunctions.createValue(
                 Map[AtomicValue, ValueRepresentation](
-                  (SaxonUtils.fixStringValue("c"), uOpt getOrElse EmptySequence.getInstance),
+                  (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
                   (SaxonUtils.fixStringValue("x"), x),
                   (SaxonUtils.fixStringValue("y"), y),
                   (SaxonUtils.fixStringValue("w"), w),

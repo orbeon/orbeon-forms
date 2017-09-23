@@ -252,7 +252,7 @@ object SimplePath {
 
     def stringValue = nodeInfo.getStringValue
 
-    def hasIdValue(id: String) = nodeInfo /@ "id" === id
+    def hasIdValue(id: String) = nodeInfo.id == id
 
     def isAttribute          : Boolean = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
     def isElement            : Boolean = nodeInfo.getNodeKind.toShort == Type.ELEMENT

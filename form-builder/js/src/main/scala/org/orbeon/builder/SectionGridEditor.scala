@@ -99,9 +99,9 @@ object SectionGridEditor {
         )
       }
 
-      positionElWithClass(".fb-grid-insert-row-above", (_) ⇒ cellBlock.top)
-      positionElWithClass(".fb-grid-delete-row",       (e) ⇒ cellBlock.top + cellBlock.height/2 - e.height()/2)
-      positionElWithClass(".fb-grid-insert-row-below", (e) ⇒ cellBlock.top + cellBlock.height - e.height())
+      positionElWithClass(".icon-chevron-up",   (_) ⇒ cellBlock.top)
+      positionElWithClass(".icon-minus-sign",   (e) ⇒ cellBlock.top + cellBlock.height/2 - e.height()/2)
+      positionElWithClass(".icon-chevron-down", (e) ⇒ cellBlock.top + cellBlock.height - e.height())
     }
   )
 

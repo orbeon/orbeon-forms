@@ -666,49 +666,19 @@
 
                             <xh:div class="fb-row-editor">
                                 <!-- Insert row above -->
-                                <xf:trigger class="fb-grid-insert-row-above" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-chevron-up"
-                                            title="{$fb-resources/insert-row-above-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowAbove(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
-                                </xf:trigger>
+                                <xh:i
+                                    class="icon-chevron-up"
+                                    title="{$fb-resources/insert-row-above-icon/label}"/>
                                 <!-- Delete row -->
-                                <xf:trigger class="fb-grid-delete-row" tabindex="-1" appearance="minimal" id="delete-row-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-minus-sign"
-                                            title="{$fb-resources/delete-row-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate">
-                                        <xf:var name="context" value="concat(event('grid-id'), ' ', event('row-pos'))"/>
-                                        <xf:var name="count" value="fbf:controlsInRow(event('grid-id'), xs:integer(event('row-pos')))"/>
-
-                                        <!-- Ask confirmation -->
-                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
-                                            <xf:property name="message"
-                                                 value="concat($fb-resources/messages/delete-row, ' ',
-                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                            <xf:property name="positive-targetid" value="xxf:absolute-id('delete-row-trigger')"/>
-                                            <xf:property name="context" value="$context"/>
-                                        </xf:dispatch>
-                                        <!-- We are automatically confirmed-->
-                                        <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-row-trigger">
-                                            <xf:property name="context" value="$context"/>
-                                        </xf:dispatch>
-                                    </xf:action>
-                                    <xf:action ev:event="fr-positive">
-                                        <xf:var name="grid-row" value="xxf:split(event('context'))"/>
-                                        <xf:action type="xpath">fbf:deleteRow($grid-row[1], xs:integer($grid-row[2]))</xf:action>
-                                    </xf:action>
-                                </xf:trigger>
+                                <xh:i
+                                    class="icon-minus-sign"
+                                    title="{$fb-resources/delete-row-icon/label}"/>
                                 <!-- Insert row below -->
+                                <xh:i
+                                    class="icon-chevron-down"
+                                    title="{$fb-resources/insert-row-below-icon/label}"/>
                                 <xf:trigger class="fb-grid-insert-row-below" tabindex="-1" appearance="minimal">
                                     <xf:label>
-                                        <xh:i
-                                            class="icon-chevron-down"
-                                            title="{$fb-resources/insert-row-below-icon/label}"/>
                                     </xf:label>
                                     <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                                 </xf:trigger>

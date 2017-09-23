@@ -196,10 +196,11 @@ object ArrayFunctions {
     }
   }
 
-  def createValue(value: Vector[ValueRepresentation], config: Configuration = XPath.GlobalConfiguration): ObjectValue =
+  def createValue(value: UnderlyingType, config: Configuration = XPath.GlobalConfiguration): ObjectValue = {
     new ObjectValue(
       value,
       saxonTypeForArray(config)
     )
+  }
 
 }

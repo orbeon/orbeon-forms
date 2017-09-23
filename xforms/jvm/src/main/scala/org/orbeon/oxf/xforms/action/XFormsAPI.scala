@@ -53,7 +53,7 @@ object XFormsAPI {
   }
 
   // For Java callers
-  def withContainingDocumentJava(containingDocument: XFormsContainingDocument, runnable: Runnable) =
+  def withContainingDocumentJava(containingDocument: XFormsContainingDocument, runnable: Runnable): Unit =
     withContainingDocument(containingDocument) {
       runnable.run()
     }

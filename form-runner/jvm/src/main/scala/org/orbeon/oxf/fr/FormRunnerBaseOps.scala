@@ -94,7 +94,7 @@ trait FormRunnerBaseOps {
 
   // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
   // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
-  def findFRBodyElement(inDoc: NodeInfo) = {
+  def findFRBodyElement(inDoc: NodeInfo): NodeInfo = {
 
     def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")

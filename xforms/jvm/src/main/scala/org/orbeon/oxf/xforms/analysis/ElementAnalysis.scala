@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsId
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.control.Breaks
 
@@ -148,9 +149,17 @@ abstract class ElementAnalysis(
   val classes = ""
 
   // Extension attributes
-  protected def allowedExtensionAttributes      = Set[QName]()
-  final lazy val extensionAttributes            = Map() ++ (CommonExtensionAttributes ++ allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null))
-  final lazy val nonRelevantExtensionAttributes = extensionAttributes map { case (k, v) ⇒ k → (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
+  protected def allowedExtensionAttributes = Set.empty[QName]
+
+  final lazy val extensionAttributes =
+    Map() ++ (
+      CommonExtensionAttributes ++
+      (element.attributeIterator.asScala collect { case att if att.getName.startsWith("data-") ⇒ att.getQName }) ++
+      allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null)
+    )
+
+  final lazy val nonRelevantExtensionAttributes =
+    extensionAttributes map { case (k, v) ⇒ k → (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
   private var contextAnalysis: Option[XPathAnalysis] = None

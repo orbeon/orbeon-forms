@@ -48,7 +48,7 @@ object LabelEditor {
 
     if (eventName == "DOMActivate" && inSectionEditor)
       addProperties(js.Dictionary(
-        "section-id" → SectionGridEditor.currentSectionGridOpt.get.attr("id").get
+        "section-id" → SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
       ))
   })
 
@@ -104,7 +104,7 @@ object LabelEditor {
 
       // Set placeholder, done every time to account for a value change when changing current language
       locally {
-        val placeholderOutput = SectionGridEditor.sectionGridEditor.children(".fb-type-section-title-label")
+        val placeholderOutput = SectionGridEditor.sectionGridEditorContainer.children(".fb-type-section-title-label")
         val placeholderValue  = Controls.getCurrentValue(placeholderOutput.get(0).asInstanceOf[dom.html.Element])
         labelInput.attr("placeholder", placeholderValue)
       }
@@ -147,7 +147,7 @@ object LabelEditor {
     val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
     val labelAnchor = section.el.find(SectionLabelSelector)
     if (labelAnchor.text() == "") {
-      val outputWithHintMessage = SectionGridEditor.sectionGridEditor.children(".fb-enter-section-title-label")
+      val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")
       val hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0).asInstanceOf[dom.html.Element]).get
       clickInterceptor.text(hintMessage)
     }

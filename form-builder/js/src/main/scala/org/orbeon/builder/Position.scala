@@ -71,11 +71,11 @@ object Position {
   }
 
   // Calls listener when what is under the pointer has potentially changed
-  def onUnderPointerChange(fn: js.Function): Unit = {
-    $(document).on("mousemove", fn)
+  def onUnderPointerChange(fn: ⇒ Unit): Unit = {
+    $(document).on("mousemove", fn _)
     // Resizing the window might change what is under the pointer the last time we saw it in the window
-    $(window).on("resize", fn)
-    Events.ajaxResponseProcessedEvent.subscribe(fn)
+    $(window).on("resize", fn _)
+    Events.ajaxResponseProcessedEvent.subscribe(fn _)
   }
 
   // Call listener when anything on the page that could change element positions happened
@@ -109,12 +109,12 @@ object Position {
                    : Unit = {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
-    onUnderPointerChange(() ⇒ {
+    onUnderPointerChange {
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
       val newContainer = findInCache(containerCache, top, left)
       notifyChange(newContainer)
-    })
+    }
   }
 
   // Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
@@ -136,7 +136,7 @@ object Position {
     val notifyRowChange = Position.notifyOnChange(wasCurrentRow, becomesCurrentRow)
     val notifyColChange = Position.notifyOnChange(wasCurrentCol, becomesCurrentCol)
 
-    Position.onUnderPointerChange(() ⇒ {
+    Position.onUnderPointerChange {
 
       val (newRow, newCol) =
         currentGridOpt
@@ -157,7 +157,7 @@ object Position {
 
       notifyRowChange(newRow.orUndefined)
       notifyColChange(newCol.orUndefined)
-    })
+    }
   }
 
   // Returns a function, which is expected to be called every time the value changes passing the new value, and which

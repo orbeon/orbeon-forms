@@ -14,94 +14,71 @@
 package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
-
-import scala.scalajs.js
-import org.scalajs.dom
+import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefined}
+import scala.scalajs.js
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.builder.SideEditor")
 @JSExportAll
 object SectionGridEditor {
 
-  lazy val sectionGridEditor                    = $(".fb-section-grid-editor")
-  lazy val rowEditor                            = $(".fb-row-editor")
-  var currentSectionGridOpt: js.UndefOr[JQuery] = js.undefined
+  lazy val sectionGridEditorContainer          = $(".fb-section-grid-editor")
+  lazy val rowEditorContainer                  = $(".fb-row-editor")
+
+  var currentSectionGridOpt: js.UndefOr[Block] = js.undefined
+  var currentRowPosOpt     : js.UndefOr[Int]   = js.undefined
+
+  sealed case class RowEditor(selector: String    , eventName: String )
+  val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-add-row-above")
+  val DeleteRow   = RowEditor(".icon-minus-sign"  , "fb-delete-row"   )
+  val AddRowBelow = RowEditor(".icon-chevron-down", "fb-add-row-below")
+  val RowEditors  = List(AddRowAbove, DeleteRow, AddRowBelow)
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
     containerCache = BlockCache.sectionGridCache,
-    wasCurrent = (_: Block) ⇒
-      rowEditor.hide(),
+    wasCurrent = (_: Block) ⇒ (),
     becomesCurrent = (sectionGrid: Block) ⇒ {
-      currentSectionGridOpt = sectionGrid.el
+      currentSectionGridOpt = sectionGrid
 
       // Position the editor
-      sectionGridEditor.show()
-      Position.offset(sectionGridEditor, new Position.Offset {
+      sectionGridEditorContainer.show()
+      Position.offset(sectionGridEditorContainer, new Position.Offset {
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-        override val left = Position.offset($(".fr-body")).left - sectionGridEditor.outerWidth()
+        override val left = Position.offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth()
         override val top  = sectionGrid.top - Position.scrollTop()
       })
 
       // Start by hiding all the icons
-      sectionGridEditor.children().hide()
+      sectionGridEditorContainer.children().hide()
 
       // Update triggers relevance for section
       if (sectionGrid.el.is(BlockCache.SectionSelector)) {
 
         // Edit details and help are always visible
-        sectionGridEditor.children(".fb-section-edit-details, .fb-section-edit-help").show()
+        sectionGridEditorContainer.children(".fb-section-edit-details, .fb-section-edit-help").show()
 
         // Hide/show section move icons
         val container = sectionGrid.el.children(".fr-section-container")
         List("up", "right", "down", "left").foreach((direction) ⇒ {
             val relevant = container.hasClass("fb-can-move-" + direction)
-            val trigger  = sectionGridEditor.children(".fb-section-move-" + direction)
+            val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction)
             if (relevant) trigger.show()
         })
 
         // Hide/show delete icon
-        val deleteTrigger = sectionGridEditor.children(".delete-section-trigger")
+        val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
         if (container.is(".fb-can-delete")) deleteTrigger.show()
       }
 
       // Update triggers relevance for section
       if (sectionGrid.el.is(BlockCache.GridSelector)) {
-        sectionGridEditor.children(".fb-grid-edit-details, .fb-grid-delete").show()
+        sectionGridEditorContainer.children(".fb-grid-edit-details, .fb-grid-delete").show()
       }
-    }
-  )
-
-  Position.currentContainerChanged(
-    wasCurrent = (_: Block) ⇒ (),
-    containerCache = BlockCache.cellCache,
-    becomesCurrent = (cellBlock: Block) ⇒ {
-      rowEditor.show()
-      rowEditor.children().hide()
-
-      val frGridEl      = cellBlock.el.closest(".fr-grid")
-      val xblGridEl     = frGridEl.parent()
-      val xblGridOffset = Position.offset(xblGridEl)
-
-      def positionElWithClass(cssClass: String, topOffset: (JQuery) ⇒ Double): Unit = {
-        val elem = rowEditor.children(cssClass)
-        elem.show()
-        Position.offset(
-          el = elem,
-          offset = new Position.Offset {
-            override val left: Double = xblGridOffset.left
-            override val top: Double = topOffset(elem)
-          }
-        )
-      }
-
-      positionElWithClass(".icon-chevron-up",   (_) ⇒ cellBlock.top)
-      positionElWithClass(".icon-minus-sign",   (e) ⇒ cellBlock.top + cellBlock.height/2 - e.height()/2)
-      positionElWithClass(".icon-chevron-down", (e) ⇒ cellBlock.top + cellBlock.height - e.height())
     }
   )
 
@@ -109,10 +86,102 @@ object SectionGridEditor {
   Position.currentContainerChanged(
     containerCache = BlockCache.fbMainCache,
     wasCurrent = (_: Block) ⇒ {
-      sectionGridEditor.hide()
-      rowEditor.hide()
+      sectionGridEditorContainer.hide()
+      rowEditorContainer.hide()
       currentSectionGridOpt = js.undefined
+      currentRowPosOpt      = js.undefined
     },
     becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
+  )
+
+  // Position row editor
+  Position.onUnderPointerChange {
+    withCurrentGrid((currentGrid) ⇒ {
+
+      // Get the height of each row track
+      val rowsHeight = {
+        val gridBody = currentGrid.el.find(".fr-grid-body")
+        gridBody
+          .css("grid-template-rows")
+          .splitTo[List]()
+          .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
+          .map(_.toDouble)
+      }
+
+      case class TopBottom(top: Double, bottom: Double)
+
+      // For each row track, find its top/bottom
+      val rowsTopBottom = {
+        val gridTop = currentGrid.top
+        val zero = List(TopBottom(0, gridTop))
+        rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
+          val lastBottom = soFar.last.bottom
+          val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)
+          soFar :+ newTopBottom
+        }.drop(1)
+      }
+
+      // Find top/bottom of the row track the pointer is on
+      val pointerRowTopBottomIndexOpt = {
+        val pointerTop = Position.pointerPos.top
+        rowsTopBottom.zipWithIndex.find { case (topBottom, index) ⇒
+          topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
+        }
+      }
+
+      // Position row editor
+      pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
+        rowEditorContainer.show()
+        rowEditorContainer.children().hide()
+
+        val rowTop    = pointerRowTopBottom._1.top
+        val rowBottom = pointerRowTopBottom._1.bottom
+        val rowHeight = rowBottom - rowTop
+        val rowIndex  = pointerRowTopBottom._2
+
+        def positionElWithClass(selector: String, topOffset: (JQuery) ⇒ Double): Unit = {
+          val elem = rowEditorContainer.children(selector)
+          elem.show()
+          Position.offset(
+            el = elem,
+            offset = new Position.Offset {
+              override val left: Double = currentGrid.left
+              override val top: Double = topOffset(elem)
+            }
+          )
+        }
+
+        currentRowPosOpt = rowIndex + 1
+        positionElWithClass(AddRowAbove.selector, (_) ⇒ rowTop)
+        positionElWithClass(DeleteRow.selector  , (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
+        positionElWithClass(AddRowBelow.selector, (e) ⇒ rowBottom - e.height())
+      })
+    })
+  }
+
+  def withCurrentGrid(fn: Block ⇒ Unit): Unit =
+    currentSectionGridOpt.foreach((currentSectionGrid) ⇒
+      if (currentSectionGrid.el.is(".xbl-fr-grid"))
+        fn(currentSectionGrid)
+    )
+
+  // Register listener on editor icons
+  $(document).ready(() ⇒
+    RowEditors.foreach((rowEditor) ⇒ {
+      val iconEl = rowEditorContainer.children(rowEditor.selector)
+      iconEl.on("click", () ⇒
+        withCurrentGrid((currentGrid) ⇒
+          currentRowPosOpt.foreach((currentRowPos) ⇒
+            DocumentAPI.dispatchEvent(
+              targetId   = currentGrid.el.attr("id").get,
+              eventName  = rowEditor.eventName,
+              properties = js.Dictionary(
+                "fb-row-pos" → currentRowPos.toString
+              )
+            )
+          )
+        )
+      )
+    })
   )
 }

@@ -32,6 +32,17 @@ object SectionGridEditor {
   var currentSectionGridOpt: js.UndefOr[Block] = js.undefined
   var currentRowPosOpt     : js.UndefOr[Int]   = js.undefined
 
+  sealed case class        Editor(name: String              , enableClass: Option[String])
+  val SectionDelete      = Editor("fb-section-delete"       , None)
+  val SectionEditDetails = Editor("fb-section-edit-details" , None)
+  val SectionEditHelp    = Editor("fb-section-edit-help"    , None)
+  val SectionMoveUp      = Editor("fb-section-move-up"      , Some("fb-can-move-up"))
+  val SectionMoveDown    = Editor("fb-section-move-down"    , Some("fb-can-move-down"))
+  val SectionMoveRight   = Editor("fb-section-move-right"   , Some("fb-can-move-right"))
+  val SectionMoveLeft    = Editor("fb-section-move-left"    , Some("fb-can-move-left"))
+  val SectionEditors     = List(SectionDelete, SectionEditDetails, SectionEditHelp,
+                                SectionMoveUp, SectionMoveDown, SectionMoveRight, SectionMoveLeft)
+
   sealed case class RowEditor(selector: String    , eventName: String )
   val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-add-row-above")
   val DeleteRow   = RowEditor(".icon-minus-sign"  , "fb-delete-row"   )
@@ -166,7 +177,21 @@ object SectionGridEditor {
     )
 
   // Register listener on editor icons
-  $(document).ready(() ⇒
+  $(document).ready(() ⇒ {
+    SectionEditors.foreach((sectionEditor) ⇒ {
+      val editorName = sectionEditor.name
+      val iconEl = sectionGridEditorContainer.children(s".$editorName")
+      iconEl.on("click", () ⇒ {
+        currentSectionGridOpt.foreach((currentSection) ⇒
+          if (currentSection.el.is(".xbl-fr-section")) {
+            DocumentAPI.dispatchEvent(
+              targetId   = currentSection.el.attr("id").get,
+              eventName  = editorName
+            )
+          }
+        )
+      })
+    })
     RowEditors.foreach((rowEditor) ⇒ {
       val iconEl = rowEditorContainer.children(rowEditor.selector)
       iconEl.on("click", () ⇒
@@ -183,5 +208,5 @@ object SectionGridEditor {
         )
       )
     })
-  )
+  })
 }

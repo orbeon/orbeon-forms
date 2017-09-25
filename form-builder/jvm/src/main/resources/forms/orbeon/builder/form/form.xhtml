@@ -541,147 +541,62 @@
                             </xh:div>
 
                             <xh:div class="fb-section-grid-editor">
-                                <!-- Resources -->
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
-                                <!-- Delete section -->
-                                <xf:trigger class="fb-section-delete" tabindex="-1" appearance="minimal" id="delete-section-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-minus-sign"
-                                            title="{$fb-resources/delete-section-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Ask confirmation -->
-                                    <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
-                                        <xf:property name="message"
-                                             value="concat($fb-resources/messages/delete-section, ' ',
-                                                           xxf:format-message($fb-resources/messages/controls-will-be-deleted,
-                                                                              fbf:controlsInContainer(event('section-id'))))"/>
-                                        <xf:property name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
-                                        <xf:property name="context" value="event('section-id')"/>
-                                    </xf:dispatch>
-                                    <xf:action ev:event="fr-positive" type="xpath">fbf:deleteSectionById(event('context'))</xf:action>
-                                </xf:trigger>
-                                <!-- Edit details -->
-                                <xf:trigger class="fb-section-edit-details" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-cog"
-                                            title="{$fb-resources/section-details-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Show section details dialog -->
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">
-                                        <xf:property name="container" value="fbf:containerById(event('section-id'))"/>
-                                    </xf:dispatch>
-                                </xf:trigger>
-                                <!-- Edit help for section -->
-                                <xf:trigger class="fb-section-edit-help" tabindex="-1" appearance="minimal" id="fb-edit-section-help-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-info-sign"
-                                            title="{$fb-resources/help-icon/label}"/>
-                                    </xf:label>
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-help">
-                                        <xf:property name="control-id" value="event('section-id')"/>
-                                    </xf:dispatch>
-                                </xf:trigger>
-                                <!-- Move up -->
-                                <xf:trigger class="fb-section-move-up" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-up"
-                                            title="{$fb-resources/move-up-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Move section up -->
-                                    <xf:action ev:event="DOMActivate" type="xpath">
-                                        fbf:moveSectionUp(fbf:containerById(event('section-id')))
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Move down -->
-                                <xf:trigger class="fb-section-move-down" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-down"
-                                            title="{$fb-resources/move-down-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Move section down -->
-                                    <xf:action ev:event="DOMActivate" type="xpath">
-                                        fbf:moveSectionDown(fbf:containerById(event('section-id')))
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Move right -->
-                                <xf:trigger class="fb-section-move-right" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-right"
-                                            title="{$fb-resources/move-right-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Move section right -->
-                                    <xf:action ev:event="DOMActivate" type="xpath">
-                                        fbf:moveSectionRight(fbf:containerById(event('section-id')))
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Move left -->
-                                <xf:trigger class="fb-section-move-left" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-left"
-                                            title="{$fb-resources/move-left-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Move section left -->
-                                    <xf:action ev:event="DOMActivate" type="xpath">
-                                        fbf:moveSectionLeft(fbf:containerById(event('section-id')))
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Grid details -->
-                                <xf:trigger class="fb-grid-edit-details" tabindex="-1" appearance="minimal" id="grid-details-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-cog"
-                                            title="{$fb-resources/grid-details-icon/label}"/>
-                                    </xf:label>
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">
-                                        <xf:property name="container" value="fbf:containerById(event('grid-id'))"/>
-                                    </xf:dispatch>
-                                </xf:trigger>
-                                <!-- Delete grid -->
-                                <xf:trigger  class="fb-grid-delete" tabindex="-1" appearance="minimal" id="delete-grid-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-minus-sign"
-                                            title="{$fb-resources/delete-grid-icon/label}"/>
-                                    </xf:label>
-                                    <!-- Ask confirmation -->
-                                    <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
-                                        <xf:property name="message"
-                                             value="concat($fb-resources/messages/delete-grid, ' ',
-                                                           xxf:format-message($fb-resources/messages/controls-will-be-deleted,
-                                                                              fbf:controlsInContainer(event('grid-id'))))"/>
-                                        <xf:property name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
-                                        <xf:property name="context" value="event('grid-id')"/>
-                                    </xf:dispatch>
-                                    <xf:action ev:event="fr-positive" type="xpath">fbf:deleteGridById(event('context'))</xf:action>
-                                </xf:trigger>
+                                <xh:i
+                                    class="fb-section-delete icon-minus-sign"
+                                    role="button"
+                                    title="{$fb-resources/delete-section-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-edit-details icon-cog"
+                                    role="button"
+                                    title="{$fb-resources/section-details-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-edit-help icon-info-sign"
+                                    role="button"
+                                    title="{$fb-resources/help-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-move-up icon-arrow-up"
+                                    role="button"
+                                    title="{$fb-resources/move-up-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-move-down icon-arrow-down"
+                                    role="button"
+                                    title="{$fb-resources/move-down-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-move-right icon-arrow-right"
+                                    role="button"
+                                    title="{$fb-resources/move-right-icon/label}"/>
+                                <xh:i
+                                    class="fb-section-move-left icon-arrow-left"
+                                    role="button"
+                                    title="{$fb-resources/move-left-icon/label}"/>
+                                <xh:i
+                                    class="fb-grid-edit-details icon-cog"
+                                    role="button"
+                                    title="{$fb-resources/grid-details-icon/label}"/>
+                                <xh:i
+                                    class="fb-grid-delete icon-minus-sign"
+                                    role="button"
+                                    title="{$fb-resources/delete-grid-icon/label}"/>
                             </xh:div>
 
                             <xh:div class="fb-row-editor">
                                 <!-- Insert row above -->
                                 <xh:i
                                     class="icon-chevron-up"
+                                    role="button"
                                     title="{$fb-resources/insert-row-above-icon/label}"/>
                                 <!-- Delete row -->
                                 <xh:i
                                     class="icon-minus-sign"
+                                    role="button"
                                     title="{$fb-resources/delete-row-icon/label}"/>
                                 <!-- Insert row below -->
                                 <xh:i
                                     class="icon-chevron-down"
+                                    role="button"
                                     title="{$fb-resources/insert-row-below-icon/label}"/>
-                                <xf:trigger class="fb-grid-insert-row-below" tabindex="-1" appearance="minimal">
-                                    <xf:label>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
-                                </xf:trigger>
                             </xh:div>
 
                         </xf:group>

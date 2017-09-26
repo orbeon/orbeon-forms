@@ -72,7 +72,7 @@ object LabelEditor {
 
     if (Globals.eventQueue.length > 0 || Globals.requestInProgress) {
 
-      // If we have a request in progress or events in the qeue, try this again later
+      // If we have a request in progress or events in the queue, try this again later
       js.timers.setTimeout(
         interval = Properties.internalShortDelay.get())(
         body     = () ⇒ showLabelEditor(clickInterceptor)
@@ -137,7 +137,7 @@ object LabelEditor {
 
     val offset  = Position.adjustedOffset(clickInterceptor)
     val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left)
-    val sectionTitle = section.get.el.find(".fr-section-title:first")
+    val sectionTitle = section.get.el.find(SectionTitleSelector)
     updateClass("hover", sectionTitle)
   }
 

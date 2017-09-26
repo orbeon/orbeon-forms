@@ -13,6 +13,8 @@
  */
 package org.orbeon.builder
 
+import enumeratum._
+import enumeratum.EnumEntry._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
@@ -30,16 +32,30 @@ object SectionGridEditor {
   var currentSectionGridOpt: js.UndefOr[Block] = js.undefined
   var currentRowPosOpt     : js.UndefOr[Int]   = js.undefined
 
-  sealed case class        Editor(name: String              , enableClass: Option[String])
-  val SectionDelete      = Editor("fb-section-delete"       , None)
-  val SectionEditDetails = Editor("fb-section-edit-details" , None)
-  val SectionEditHelp    = Editor("fb-section-edit-help"    , None)
-  val SectionMoveUp      = Editor("fb-section-move-up"      , Some("fb-can-move-up"))
-  val SectionMoveDown    = Editor("fb-section-move-down"    , Some("fb-can-move-down"))
-  val SectionMoveRight   = Editor("fb-section-move-right"   , Some("fb-can-move-right"))
-  val SectionMoveLeft    = Editor("fb-section-move-left"    , Some("fb-can-move-left"))
-  val SectionEditors     = List(SectionDelete, SectionEditDetails, SectionEditHelp,
-                                SectionMoveUp, SectionMoveDown, SectionMoveRight, SectionMoveLeft)
+  sealed trait GridSectionEditor extends EnumEntry with Hyphencase
+  object GridSectionEditor extends Enum[GridSectionEditor] {
+    val values = findValues
+    case object FbSectionDelete      extends GridSectionEditor
+    case object FbSectionEditDetails extends GridSectionEditor
+    case object FbSectionEditHelp    extends GridSectionEditor
+    case object FbSectionMoveUp      extends GridSectionEditor
+    case object FbSectionMoveDown    extends GridSectionEditor
+    case object FbSectionMoveRight   extends GridSectionEditor
+    case object FbSectionMoveLeft    extends GridSectionEditor
+    case object FbSectionEditors     extends GridSectionEditor
+    case object FbGridEditDetails    extends GridSectionEditor
+    case object FbGridDelete         extends GridSectionEditor
+
+    // What class, if any, must be present on the corresponding container to the the editor to be enabled
+    def enableClass(editor: GridSectionEditor): Option[String] =
+      editor match {
+        case FbSectionMoveUp    ⇒ Some("fb-can-move-up")
+        case FbSectionMoveDown  ⇒ Some("fb-can-move-down")
+        case FbSectionMoveRight ⇒ Some("fb-can-move-right")
+        case FbSectionMoveLeft  ⇒ Some("fb-can-move-left")
+        case _                  ⇒ None
+      }
+  }
 
   sealed case class RowEditor(selector: String    , eventName: String )
   val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-add-row-above")
@@ -176,17 +192,15 @@ object SectionGridEditor {
 
   // Register listener on editor icons
   $(document).ready(() ⇒ {
-    SectionEditors.foreach((sectionEditor) ⇒ {
-      val editorName = sectionEditor.name
+    GridSectionEditor.values.foreach((editor) ⇒ {
+      val editorName = editor.entryName
       val iconEl = sectionGridEditorContainer.children(s".$editorName")
       iconEl.on("click", () ⇒ {
-        currentSectionGridOpt.foreach((currentSection) ⇒
-          if (currentSection.el.is(".xbl-fr-section")) {
-            DocumentAPI.dispatchEvent(
-              targetId   = currentSection.el.attr("id").get,
-              eventName  = editorName
-            )
-          }
+        currentSectionGridOpt.foreach((currentSectionGrid) ⇒
+          DocumentAPI.dispatchEvent(
+            targetId   = currentSectionGrid.el.attr("id").get,
+            eventName  = editorName
+          )
         )
       })
     })

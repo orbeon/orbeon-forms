@@ -54,7 +54,7 @@ object BlockCache {
         val section = $(domSection)
 
         val mostOuterSection =
-          section.parents(".xbl-fr-section").last()
+          section.parents(SectionSelector).last()
             .pipe(Option(_)).filter(_.is("*"))
             .getOrElse(section)
 

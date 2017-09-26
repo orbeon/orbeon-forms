@@ -33,26 +33,30 @@ object ControlEditor {
       currentCellOpt = None
       controlEditorLeft.hide()
       controlEditorRight.hide()
+      controlEditorLeft.detach()
+      controlEditorRight.detach()
     },
 
     becomesCurrent = (cell: Block) ⇒ {
 
       currentCellOpt = Some(cell)
 
-      // Position editors
-      controlEditorLeft.show()
-      Position.offset(controlEditorLeft, new Position.Offset {
-        override val left = cell.left
-        override val top  = cell.top
-      })
       if (cell.el.children().length > 0) {
         // Control editor is only show when the cell isn't empty
+        cell.el.append(controlEditorRight)
         controlEditorRight.show()
         Position.offset(controlEditorRight, new Position.Offset {
           override val left = cell.left + cell.width - controlEditorRight.outerWidth()
           override val top  = cell.top
         })
       }
+      // Position editors
+      cell.el.append(controlEditorLeft)
+      controlEditorLeft.show()
+      Position.offset(controlEditorLeft, new Position.Offset {
+        override val left = cell.left
+        override val top  = cell.top
+      })
 
       // Enable/disable arrow icons
       for (direction ← Direction.values) {

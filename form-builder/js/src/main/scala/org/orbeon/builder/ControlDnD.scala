@@ -34,10 +34,12 @@ object ControlDnD {
   val drake = Dragula(
     js.Array(),
     new DragulaOptions {
-      override def isContainer(el: html.Element): Boolean =
+      override def isContainer(el: html.Element): Boolean = {
         el.classList.contains("fr-grid-td")
-      override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean =
+      }
+      override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
         handle.classList.contains("fb-control-handle")
+      }
       override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean = {
         // Can only drop into an empty cell
         $(target)

@@ -95,8 +95,9 @@ object Position {
   )                : js.UndefOr[Block] = {
 
     containerCache.find { container ⇒
-      val horizontalPosInside = container.left <= left && left <= container.left + container.width
-      val verticalPosInside   = container.top  <= top  && top  <= container.top  + container.height
+      // Rounding when comparing as the offset of an element isn't always exactly the same as the offset it was set to
+      val horizontalPosInside = Math.floor(container.left) <= left && left <= Math.ceil(container.left + container.width)
+      val verticalPosInside   = Math.floor(container.top ) <= top  && top  <= Math.ceil(container.top  + container.height)
       horizontalPosInside && verticalPosInside
     }.orUndefined
   }

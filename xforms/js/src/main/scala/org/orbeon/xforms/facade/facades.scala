@@ -223,18 +223,18 @@ abstract class JQueryTooltipConfig extends js.Object {
 @js.native
 @JSGlobal("tinymce.Editor")
 class TinyMceEditor(containerId: String, config: TinyMceConfig) extends js.Object {
-  val initialized            : Boolean       = js.native
-  val onInit                 : TinyMceEvent  = js.native
-  val editorContainer        : String        = js.native
-  val container              : dom.Element   = js.native
-  def render()               : Unit          = js.native
-  def getWin()               : dom.Window    = js.native
-  def getContent()           : String        = js.native
-  def setContent(c: String)  : Unit          = js.native
-  def execCommand(c: String) : Unit          = js.native
-  def show()                 : Unit          = js.native
-  def hide()                 : Unit          = js.native
-  def focus()                : Unit          = js.native
+  val initialized            : js.UndefOr[Boolean] = js.native
+  val onInit                 : TinyMceEvent        = js.native
+  val editorContainer        : String              = js.native
+  val container              : dom.Element         = js.native
+  def render()               : Unit                = js.native
+  def getWin()               : dom.Window          = js.native
+  def getContent()           : String              = js.native
+  def setContent(c: String)  : Unit                = js.native
+  def execCommand(c: String) : Unit                = js.native
+  def show()                 : Unit                = js.native
+  def hide()                 : Unit                = js.native
+  def focus()                : Unit                = js.native
 }
 
 @js.native

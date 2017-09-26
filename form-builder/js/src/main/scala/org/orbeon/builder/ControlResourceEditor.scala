@@ -13,16 +13,14 @@
  */
 package org.orbeon.builder
 
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
-import org.orbeon.xforms._
-import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
-import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.xforms._
+import org.orbeon.xforms.facade.JQueryTooltip._
+import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
+import org.scalajs.dom.document
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
-import org.scalajs.dom.document
-
-import scala.scalajs.js.Dictionary
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 private object ControlResourceEditor {
@@ -203,9 +201,9 @@ private object ControlResourceEditor {
       else                 resourceEditorCurrentLabelHint.text(value)
 
     def afterTinyMCEInitialized(f: TinyMceEditor ⇒ Unit): Unit =
-      tinymceObject.initialized match {
-        case true  ⇒ f(tinymceObject)
-        case false ⇒ tinymceObject.onInit.add(f)
+      tinymceObject.initialized.toOption match {
+        case Some(true)  ⇒ f(tinymceObject)
+        case _           ⇒ tinymceObject.onInit.add(f)
       }
 
     def makeSpaceForMCE(): Unit = {

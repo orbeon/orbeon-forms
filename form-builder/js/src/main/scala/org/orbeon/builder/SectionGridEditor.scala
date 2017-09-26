@@ -22,8 +22,6 @@ import org.scalajs.jquery.JQuery
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.builder.SideEditor")
-@JSExportAll
 object SectionGridEditor {
 
   lazy val sectionGridEditorContainer          = $(".fb-section-grid-editor")

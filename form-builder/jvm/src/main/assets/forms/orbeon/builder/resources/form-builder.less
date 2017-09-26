@@ -789,7 +789,18 @@ div.orbeon.orbeon-portlet-div {
             border-collapse: collapse;
             &:hover .fr-grid-td { border: 1px solid @lightBlue }
         }
-        .fr-grid-td { min-height: 60px }                                                                            // Enough space to hold row icons so hovering doesn't cause the row to expand
+
+        // Enough space to hold row icons so hovering doesn't cause the row to expand
+        .fr-grid-td { min-height: 60px }
+
+        // Generate multiples of min height so that empty cells take space
+        .generateMinHeight(@h) when (@h > 0) {
+            .fr-grid-td[data-h =  '@{h}'] { min-height: @h * 60px; }
+            .generateMinHeight(@h - 1)
+        }
+
+        .generateMinHeight(20);
+
         .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
             &:hover { background-color: #eee }                                                                      // Indicate the value can be edited
         }

@@ -272,7 +272,7 @@ public class XFormsProperties {
             new PropertyDefinition(USE_ARIA                                      , false,                          true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY                    , true,                           true),
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY     , 500,                            true),
-            new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY                 , 10,                             true),
+            new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY                 , 100,                            true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY         , 500,                            true),
             new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY , 2000,                           true),
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY                     , REVISIT_HANDLING_RESTORE_VALUE, true),

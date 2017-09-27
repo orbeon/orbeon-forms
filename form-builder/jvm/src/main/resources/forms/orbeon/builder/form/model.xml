@@ -44,6 +44,15 @@
           fb-expand-down
           fb-shrink-down
 
+          fb-section-edit-details
+          fb-section-edit-help
+          fb-section-move-up
+          fb-section-move-down
+          fb-section-move-right
+          fb-section-move-left
+
+          fb-grid-edit-details
+
           fb-dnd-control-from
       "
       xxf:noscript-support="false"
@@ -543,13 +552,15 @@
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-control-edit-details" xxf:phantom="true">
-        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
+        <xf:dispatch  name="fb-show-dialog" targetid="dialog-control-details">
             <xf:property name="control-id" value="event('xxf:targetid')"/>
         </xf:dispatch>
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-control-edit-items" xxf:phantom="true">
-        <!-- TODO -->
+        <xf:dispatch name="fb-show-dialog" targetid="dialog-itemsets">
+            <xf:property name="control-element" value="id(event('xxf:targetid'))"/>
+        </xf:dispatch>
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-control-delete" xxf:phantom="true" type="xpath">
@@ -583,6 +594,40 @@
     <xf:action ev:observer="fb" ev:event="fb-shrink-down" xxf:phantom="true" type="xpath">
         fbf:shrinkCellDown(id(event('xxf:targetid')), 1) (: TODO: Support shrinking by more than 1 :)
     </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-edit-details fb-grid-edit-details" xxf:phantom="true">
+        <xf:dispatch name="fb-show-dialog" targetid="dialog-container-details">
+            <xf:property name="container" value="fbf:containerById(event('xxf:targetid'))"/>
+        </xf:dispatch>
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-edit-help" xxf:phantom="true">
+        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-help">
+            <xf:property name="control-id" value="event('xxf:targetid')"/>
+        </xf:dispatch>
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-move-up" xxf:phantom="true" type="xpath">
+        fbf:moveSectionUp(fbf:containerById(event('xxf:targetid')))
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-move-down" xxf:phantom="true" type="xpath">
+        fbf:moveSectionDown(fbf:containerById(event('xxf:targetid')))
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-move-right" xxf:phantom="true" type="xpath">
+        fbf:moveSectionRight(fbf:containerById(event('xxf:targetid')))
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-section-move-left" xxf:phantom="true" type="xpath">
+        fbf:moveSectionLeft(fbf:containerById(event('xxf:targetid')))
+    </xf:action>
+
+    <!--<xf:action ev:observer="fb" ev:event="fb-grid-edit-details"  xxf:phantom="true" type="xpath">-->
+        <!--<xf:dispatch name="fb-show-dialog" targetid="dialog-container-details">-->
+            <!--<xf:property name="container" value="fbf:containerById(event('xxf:targetid'))"/>-->
+        <!--</xf:dispatch>-->
+    <!--</xf:action>-->
 
     <xf:action ev:observer="fb" ev:event="fb-dnd-control-from" xxf:phantom="true">
         <xf:var name="do-copy" value="event('fb-do-copy') = 'true'"/>

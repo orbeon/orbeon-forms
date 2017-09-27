@@ -61,26 +61,26 @@ trait SectionOps extends ContainerOps {
 
   // Find the section name given a descendant node
   def findSectionName(descendant: NodeInfo): String =
-    (descendant ancestor "*:section" map getControlNameOpt flatten).head
+    (descendant ancestor "*:section" flatMap getControlNameOpt).head
 
   // Find the section name for a given control name
   def findSectionName(doc: NodeInfo, controlName: String): Option[String] =
     findControlByName(doc, controlName) map findSectionName
 
   // Whether the given container can be moved up
-  def canMoveUp(container: NodeInfo) =
-    container precedingSibling * filter IsContainer nonEmpty
+  def canMoveUp(container: NodeInfo): Boolean =
+    container precedingSibling * exists IsContainer
 
   // Whether the given container can be moved down
-  def canMoveDown(container: NodeInfo) =
-    container followingSibling * filter IsContainer nonEmpty
+  def canMoveDown(container: NodeInfo): Boolean =
+    container followingSibling * exists IsContainer
 
   // Whether the given container can be moved to the right
-  def canMoveRight(container: NodeInfo) =
+  def canMoveRight(container: NodeInfo): Boolean =
     precedingSection(container) exists canMoveInto
 
   // Whether the given container can be moved to the left
-  def canMoveLeft(container: NodeInfo) =
+  def canMoveLeft(container: NodeInfo): Boolean =
     canDeleteSection(container) && findAncestorContainersLeafToRoot(container).size >= 2
 
   private val DirectionCheck = List(

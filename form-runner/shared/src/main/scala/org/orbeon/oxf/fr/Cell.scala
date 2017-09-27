@@ -62,7 +62,7 @@ object Cell {
   val CellTestName = "*:c"
 
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
-  // The cells return can have a width which is less than `StandardGridWidth`.
+  // The cells returned can have a width which is less than `StandardGridWidth`.
   def analyzeTrTdGrid[Underlying : CellOps](
     grid     : Underlying,
     simplify : Boolean

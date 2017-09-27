@@ -55,87 +55,50 @@ object NodeInfoCell {
 
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
   //
-  // It finds all grid cells which are not empty and return for each:
-  //
-  // - the cell element
-  // - the row-position
-  // - the column-position
-  // - the row-span
-  // - the column-span
+  // Return `array(map(xs:string, *)*)`.
   //
   //@XPathFunction
-  def findTdsWithPositionAndSize(grid: NodeInfo): Item = { // `map(*)`
+  def analyzeTrTdGridAndFillHoles(grid: NodeInfo, forMigration: Boolean): Item = {
 
     val (gridWidth, allRowCells) = Cell.analyzeTrTdGrid(grid, simplify = true)
 
-    val mapIt = {
+    val ratio =
+      if (forMigration && Cell.StandardGridWidth % gridWidth == 0)
+        Cell.StandardGridWidth / gridWidth
+      else
+        1
 
-      val ratio =
-        if (Cell.StandardGridWidth % gridWidth == 0)
-          Cell.StandardGridWidth / gridWidth
-        else
-          1
+    println(s"xxx analyzeTrTdGridAndFillHoles: $ratio, $allRowCells")
 
-      val itIt =
-        for {
-          (row, iy) ← allRowCells.iterator.zipWithIndex
-        } yield {
-            for {
-              (cell, ix) ← row.zipWithIndex.iterator
-              if ! cell.missing
-            } yield {
-              Map[AtomicValue, ValueRepresentation](
-                (SaxonUtils.fixStringValue("c"), cell.u getOrElse EmptySequence.getInstance),
-                (SaxonUtils.fixStringValue("x"), ix * ratio + 1),
-                (SaxonUtils.fixStringValue("y"), iy + 1),
-                (SaxonUtils.fixStringValue("w"), cell.w * ratio),
-                (SaxonUtils.fixStringValue("h"), cell.h)
-              )
-          }
-        }
-
-      itIt.flatten
-    }
-
-    // NOTE: Conversions have too much boilerplate, we should improve this at some point.
-    val cells =
-      ArrayFunctions.createValue(mapIt map (MapFunctions.createValue(_)) toVector)
-
-    MapFunctions.createValue(
-      Map[AtomicValue, ValueRepresentation](
-        (SaxonUtils.fixStringValue("width"),  gridWidth),        // xs:integer
-        (SaxonUtils.fixStringValue("height"), allRowCells.size), // xs:integer
-        (SaxonUtils.fixStringValue("cells"),  cells)             // array(map(*))?
-      )
+    ArrayFunctions.createValue(
+      allRowCells.to[Vector] map { row ⇒
+        new SequenceExtent(
+            row collect {
+              case Cell(u, None, x, y, h, w) ⇒
+                MapFunctions.createValue(
+                  Map[AtomicValue, ValueRepresentation](
+                    (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
+                    (SaxonUtils.fixStringValue("x"), (x - 1) * ratio + 1),
+                    (SaxonUtils.fixStringValue("y"), y),
+                    (SaxonUtils.fixStringValue("w"), w * ratio),
+                    (SaxonUtils.fixStringValue("h"), h)
+                  )
+                )
+            }
+        )
+      }
     )
   }
-
-
-  /* How I would like to write the function below with explicit conversions for less boilerplate:
-
-  def testAnalyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
-    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row ⇒
-      row collect {
-        case Cell(uOpt, x, y, h, w, false) ⇒
-          Map(
-            "c" → uOpt getOrElse EmptySequence.getInstance,
-            "x" → x,
-            "y" → y,
-            "w" → w,
-            "h" → h
-          ).asXPath // or `toXPath`?
-      } asXPathSeq  // or `toXPathSeq`?
-    } asXPathArray  // or `toXPathArray`?
-  }
-  */
 
   //
   // This function is used to analyze a grid in `<fr:c>` format. It i used by `grid.xbl` at runtime and by tests.
   //
+  // Return `array(map(xs:string, *)*)`.
+  //
   //@XPathFunction
-  def analyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
+  def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify = true).to[Vector] map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).to[Vector] map { row ⇒
         new SequenceExtent(
           row collect {
             case Cell(u, None, x, y, h, w) ⇒
@@ -152,5 +115,22 @@ object NodeInfoCell {
         )
       }
     )
-  }
+
+
+  /* How I would like to write the function above with conversions for less boilerplate:
+
+  def testAnalyze12ColumnGridAndFillHoles(grid: NodeInfo): Item =
+    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row ⇒
+      row collect {
+        case Cell(uOpt, x, y, h, w, false) ⇒
+          Map(
+            "c" → uOpt getOrElse EmptySequence.getInstance,
+            "x" → x,
+            "y" → y,
+            "w" → w,
+            "h" → h
+          ) asXPath // or `toXPath`?
+      } asXPathSeq  // or `toXPathSeq`?
+    } asXPathArray  // or `toXPathArray`?
+  */
 }

@@ -233,18 +233,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       setvalue(ref.toSeq, s"$$form-resources/$newName/$resourceName")
     }
 
-    // If using a static itemset editor, set xf:itemset/@ref xf:itemset/@nodeset value
+    // If using a static itemset editor, set `xf:itemset/@ref` value
     if (hasEditor(controlElement, "static-itemset"))
-      for (attName ← Seq("ref", "nodeset"))
-        setvalue(controlElement / "*:itemset" /@ attName, s"$$form-resources/$newName/item")
+      setvalue(controlElement / "*:itemset" /@ "ref", s"$$form-resources/$newName/item")
   }
 
   // Rename a bind
-  def renameBindElement(bindElement: NodeInfo, newName: String): Seq[NodeInfo] = {
+  def renameBindElement(bindElement: NodeInfo, newName: String): Unit = {
     ensureAttribute(bindElement, "id",   bindId(newName))
     ensureAttribute(bindElement, "name", newName)
     ensureAttribute(bindElement, "ref",  newName)
-    delete(bindElement /@ "nodeset") // sanitize
   }
 
   // Rename a bind

@@ -48,7 +48,6 @@ object DataModel {
   // Update binds for automatic mode
   def updateBindsForAutomatic(inDoc: NodeInfo) =
     foreachBindWithName(inDoc) { child ⇒
-      delete(child /@ "nodeset")
       ensureAttribute(child, "ref", child attValue "name")
     }
 

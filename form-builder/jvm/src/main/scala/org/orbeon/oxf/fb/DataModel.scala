@@ -46,7 +46,7 @@ object DataModel {
   }
 
   // Update binds for automatic mode
-  def updateBindsForAutomatic(inDoc: NodeInfo) =
+  def updateBindsForAutomatic(inDoc: NodeInfo): Unit =
     foreachBindWithName(inDoc) { child ⇒
       ensureAttribute(child, "ref", child attValue "name")
     }
@@ -67,7 +67,7 @@ object DataModel {
   }
 
   // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
-  def isAllowedBoundItem(controlName: String, itemOption: Option[Item]) = {
+  def isAllowedBoundItem(controlName: String, itemOption: Option[Item]): Boolean = {
     for {
       item    ← itemOption
       control ← findStaticControlByName(controlName)

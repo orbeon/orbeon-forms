@@ -25,28 +25,29 @@ import org.orbeon.scaxon.SimplePath._
 
 trait ResourcesOps extends BaseOps {
 
-  def currentResources      = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
-  def currentLang           = currentResources attValue "*:lang"
-  def resourcesRoot         = currentResources parent * head
+  def currentResources: NodeInfo = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
+  def currentLang: String        = currentResources attValue "*:lang"
+  def resourcesRoot: NodeInfo    = currentResources parent * head
 
-  def resourcesInLang(lang: String)      = allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
+  def resourcesInLang(lang: String): NodeInfo =
+    allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
 
   // Find the current resource holder for the given name
   def findCurrentResourceHolder(controlName: String): Option[NodeInfo] =
     currentResources child controlName headOption
 
   // Get the control's resource value or blank
-  def getControlResourceOrEmpty(controlName: String, resourceName: String) =
+  def getControlResourceOrEmpty(controlName: String, resourceName: String): String =
     findCurrentResourceHolder(controlName) flatMap
       (n ⇒ n / resourceName map (_.stringValue) headOption) getOrElse ""
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
-  def getControlResources(controlName: String, resourceName: String) =
+  def getControlResources(controlName: String, resourceName: String): List[NodeInfo] =
     findCurrentResourceHolder(controlName).toList flatMap
       (n ⇒ n / resourceName)
 
   // NOTE: Doesn't enforce that the same number of e.g. <alert> elements are present per lang
-  def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs(resourcesRoot)) = {
+  def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs(resourcesRoot)): Seq[(String, Seq[NodeInfo])] = {
     val langsSet = langs.toSet
     findResourceHoldersWithLang(controlName, resourcesRoot) collect {
       case (lang, holder) if langsSet(lang) ⇒ lang → (holder child resourceName)
@@ -77,10 +78,10 @@ trait ResourcesOps extends BaseOps {
     }
   }
 
-  def getControlHelpOrEmpty(controlName: String) =
+  def getControlHelpOrEmpty(controlName: String): String =
     getControlResourceOrEmpty(controlName, "help")
 
-  def hasItemHintEditor(controlName: String) =
+  def hasItemHintEditor(controlName: String): Boolean =
     findControlByName(getFormDoc, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
@@ -170,13 +171,13 @@ trait ResourcesOps extends BaseOps {
   }
 
   // Set a control's current resource for the current language
-  def setControlResource(controlName: String, resourceName: String, value: String) = {
+  def setControlResource(controlName: String, resourceName: String, value: String): Option[NodeInfo] = {
     val resourceHolder = ensureResourceHolder(controlName, resourceName)
     setvalue(resourceHolder, value)
   }
 
   // Delete existing control resources and set new resource values
-  def setControlResources(controlName: String, resourceName: String, values: Seq[String]) = {
+  def setControlResources(controlName: String, resourceName: String, values: Seq[String]): Unit = {
     // For simplicity and consistency, delete and recreate
     delete(getControlResources(controlName, resourceName))
     val resourceHolders = ensureResourceHoldersForCurrentLang(controlName, resourceName, values.size)
@@ -189,7 +190,7 @@ trait ResourcesOps extends BaseOps {
     ensureResourceHoldersForCurrentLang(controlName, resourceName, 1).head
 
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHoldersForCurrentLang(controlName: String, resourceName: String, count: Int) =
+  def ensureResourceHoldersForCurrentLang(controlName: String, resourceName: String, count: Int): Seq[NodeInfo] =
     ensureResourceHoldersForLang(controlName, resourceName, count, currentLang)
 
   // NOTE: Assume enclosing control resource holder already exists

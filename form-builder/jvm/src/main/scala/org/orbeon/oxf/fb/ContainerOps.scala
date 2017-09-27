@@ -18,11 +18,11 @@ import org.orbeon.oxf.fb.Names._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -40,7 +40,7 @@ trait ContainerOps extends ControlOps {
     findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer head
   }
 
-  def controlsInContainer(containerId: String): Int = (containerById(containerId) descendant "*:td" child *).length
+  def controlsInContainer(containerId: String): Int = (containerById(containerId) descendant CellTest child *).length
 
   // Find all siblings of the given element with the given name, excepting the given element
   def findSiblingsWithName(element: NodeInfo, siblingName: String) =

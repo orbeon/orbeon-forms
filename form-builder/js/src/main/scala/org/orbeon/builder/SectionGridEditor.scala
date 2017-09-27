@@ -90,9 +90,9 @@ object SectionGridEditor {
         // Hide/show section move icons
         val container = sectionGrid.el.children(".fr-section-container")
         List("up", "right", "down", "left").foreach((direction) ⇒ {
-            val relevant = container.hasClass("fb-can-move-" + direction)
-            val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction)
-            if (relevant) trigger.show()
+          val relevant = container.hasClass("fb-can-move-" + direction)
+          val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction)
+          if (relevant) trigger.show()
         })
 
         // Hide/show delete icon

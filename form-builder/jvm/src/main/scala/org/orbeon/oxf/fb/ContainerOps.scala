@@ -178,11 +178,11 @@ trait ContainerOps extends ControlOps {
   // Whether it is possible to move an item into the given container
   // Currently: must be a section without section template content
   // Later: fr:tab (maybe fr:tabview), wizard
-  def canMoveInto(container: NodeInfo) =
+  def canMoveInto(container: NodeInfo): Boolean =
     IsSection(container) && ! (container / * exists isSectionTemplateContent)
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
-  def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {
+  def deleteSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {
 
     // Find data holders for all section templates
     val holders =
@@ -199,10 +199,10 @@ trait ContainerOps extends ControlOps {
     }
   }
 
-  def hasCustomIterationName(inDoc: NodeInfo, controlName: String) =
+  def hasCustomIterationName(inDoc: NodeInfo, controlName: String): Boolean =
     findRepeatIterationName(inDoc, controlName) exists (isCustomIterationName(controlName, _))
 
-  def isCustomIterationName(controlName: String, iterationName: String) =
+  def isCustomIterationName(controlName: String, iterationName: String): Boolean =
     defaultIterationName(controlName) != iterationName
 
   def setRepeatProperties(
@@ -313,7 +313,7 @@ trait ContainerOps extends ControlOps {
       ensureAttribute(instance, "id", templateId(newName))
     }
 
-  def findTemplateInstance(doc: NodeInfo, controlName: String) =
+  def findTemplateInstance(doc: NodeInfo, controlName: String): Option[NodeInfo] =
     instanceElement(doc, templateId(controlName))
 
   def ensureTemplateReplaceContent(inDoc: NodeInfo, controlName: String, content: NodeInfo): Unit = {

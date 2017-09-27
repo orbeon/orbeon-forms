@@ -30,17 +30,17 @@ trait SectionOps extends ContainerOps {
     deleteContainerById(canDeleteSection, sectionId)
 
   // Move the section up if possible
-  def moveSectionUp(container: NodeInfo) =
+  def moveSectionUp(container: NodeInfo): Unit =
     if (canMoveUp(container))
       moveContainer(container, container precedingSibling * filter IsContainer head, moveElementBefore)
 
   // Move the section down if possible
-  def moveSectionDown(container: NodeInfo) =
+  def moveSectionDown(container: NodeInfo): Unit =
     if (canMoveDown(container))
       moveContainer(container, container followingSibling * filter IsContainer head, moveElementAfter)
 
   // Move the section right if possible
-  def moveSectionRight(container: NodeInfo) =
+  def moveSectionRight(container: NodeInfo): Unit =
     if (canMoveRight(container)) {
 
       val otherContainer = precedingSection(container).get
@@ -55,7 +55,7 @@ trait SectionOps extends ContainerOps {
     }
 
   // Move the section left if possible
-  def moveSectionLeft(container: NodeInfo) =
+  def moveSectionLeft(container: NodeInfo): Unit =
     if (canMoveLeft(container))
       moveContainer(container, findAncestorContainersLeafToRoot(container).head, moveElementAfter)
 

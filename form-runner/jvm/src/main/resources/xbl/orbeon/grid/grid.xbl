@@ -449,9 +449,11 @@
                                                                 <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
                                                                 <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
                                                             </xsl:if>
-                                                            <xsl:attribute name="class" select="
-                                                                if (node-name($control) = xs:QName('xf:input')) then 'fr-grid-lhh-for-xforms-input' else (),
-                                                                fr:fb-is-html-classes($control)
+                                                            <xsl:attribute
+                                                                name="class"
+                                                                select="
+                                                                    'fr-grid-lhh-for-xforms-input'[node-name($control) = xs:QName('xf:input')],
+                                                                    fr:fb-control-classes($control, false())
                                                             "/>
                                                             <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                         </xf:output>
@@ -531,6 +533,7 @@
                                                     <xsl:variable name="cells" select="array:get($rows, $index)"/>
 
                                                     <xsl:element name="{$tr-elem}">
+                                                        <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
                                                         <xsl:for-each select="$cells">
                                                             <xsl:variable name="map" select="."/>
 
@@ -904,26 +907,22 @@
 
                             </xsl:when>
                             <xsl:otherwise>
-                                <!--<xsl:attribute name="xxf:control">true</xsl:attribute>-->
+                                <xsl:attribute name="xxf:control">true</xsl:attribute>
 
                                 <!-- Propagate position/size attributes as `data-*` attributes -->
                                 <xsl:for-each select="@x, @y, @w, @h">
                                     <xsl:attribute name="data-{name(.)}" select="."/>
                                 </xsl:for-each>
 
-                                <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or
-                                     the upload button. -->
-                                <!-- TODO: `fb-itemset`. -->
                                 <!-- Optimization: don't generate a group for empty cells -->
                                 <xsl:for-each select="$control">
                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                        <!-- Limitation of the editable mode: only handle the first control -->
                                         <xsl:copy>
                                             <xsl:attribute
                                                 name="class"
                                                 select="
                                                     @class,
-                                                    fr:fb-is-html-classes(.)"
+                                                    fr:fb-control-classes(., true())"
                                             />
                                             <xsl:copy-of select="@* except @class | node()"/>
                                         </xsl:copy>
@@ -959,14 +958,15 @@
                         "/>
                 </xsl:function>
 
-                <!-- Classes so the client-side code can populate the checkbox when editing the label -->
-                <xsl:function name="fr:fb-is-html-classes" as="xs:string*">
-                    <xsl:param name="control" as="element()"/>
-                    <xsl:value-of select="(
-                        if ($control/xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else (),
-                        if ($control/xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else (),
-                        if ($control/fr:text/@mediatype = 'text/html')  then 'fb-text-is-html'  else ()
-                    )"/>
+                <xsl:function name="fr:fb-control-classes" as="xs:string">
+                    <xsl:param name="control"       as="element()"/>
+                    <xsl:param name="check-itemset" as="xs:boolean"/>
+                    <xsl:value-of select="
+                        'fb-label-is-html'[$control/xf:label/@mediatype = 'text/html'],
+                        'fb-hint-is-html' [$control/xf:hint /@mediatype = 'text/html'],
+                        'fb-text-is-html' [$control/fr:text /@mediatype = 'text/html'],
+                        'fb-itemset'      [$check-itemset and fbf:hasEditor($control, 'static-itemset')]
+                    "/>
                 </xsl:function>
 
             </xsl:transform>

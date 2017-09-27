@@ -45,8 +45,9 @@ abstract class DragulaOptions extends js.Object {
 
 @js.native
 trait Drake extends js.Any {
-  def on(eventName: String, callback: js.Function): Unit = js.native
-  def destroy(): Unit = js.native
+  def on(eventName: String, callback: js.Function): Unit                            = js.native
+  def destroy(): Unit                                                               = js.native
+  val dragging: Boolean                                                             = js.native
 }
 
 object Drake {

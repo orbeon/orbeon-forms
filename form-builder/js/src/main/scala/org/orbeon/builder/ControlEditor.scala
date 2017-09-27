@@ -18,6 +18,8 @@ import org.orbeon.datatypes.Direction
 import org.orbeon.fr.Grid
 import org.orbeon.xforms._
 import org.scalajs.dom.{document, html}
+import org.scalajs.jquery.JQuery
+import org.orbeon.oxf.util.CoreUtils._
 
 object ControlEditor {
 
@@ -41,22 +43,23 @@ object ControlEditor {
 
       currentCellOpt = Some(cell)
 
-      if (cell.el.children().length > 0) {
-        // Control editor is only show when the cell isn't empty
-        cell.el.append(controlEditorRight)
-        controlEditorRight.show()
-        Position.offset(controlEditorRight, new Position.Offset {
-          override val left = cell.left + cell.width - controlEditorRight.outerWidth()
+      // Position editors
+      def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
+        editor.show()
+        Position.offset(editor, new Position.Offset {
+          override val left = cell.left + offsetLeft
           override val top  = cell.top
         })
       }
-      // Position editors
-      cell.el.append(controlEditorLeft)
-      controlEditorLeft.show()
-      Position.offset(controlEditorLeft, new Position.Offset {
-        override val left = cell.left
-        override val top  = cell.top
+      val cellContent = cell.el.children()
+      val controlElOpt = (cellContent.length > 0).option(cellContent.first())
+      controlElOpt.foreach((controlEl) ⇒ {
+        // Control editor is only show when the cell isn't empty
+        controlEl.append(controlEditorRight)
+        positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
       })
+      controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
+      positionEditor(controlEditorLeft, 0)
 
       // Enable/disable arrow icons
       for (direction ← Direction.values) {

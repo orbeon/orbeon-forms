@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.NodeInfoCell
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
@@ -58,7 +59,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
 
-    val cell = controlElement parent * head
+    val cell = controlElement parent NodeInfoCell.CellTest head
     val grid = findAncestorContainersLeafToRoot(cell).head
 
     assert(cell.localname == "c")
@@ -612,17 +613,17 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findNextControlId(inDoc: NodeInfo, controlName: String, previousOrNext: String): Option[String] = {
     findControlByName(inDoc, controlName) flatMap { control ⇒
 
-      val currentTd = control parent *
+      val currentCell = control parent NodeInfoCell.CellTest
 
-      val tds =
+      val cells =
         previousOrNext match {
-          case "previous" ⇒ currentTd preceding "*:td"
-          case "next"     ⇒ currentTd following "*:td"
+          case "previous" ⇒ currentCell preceding NodeInfoCell.CellTest
+          case "next"     ⇒ currentCell following NodeInfoCell.CellTest
         }
 
-      val tdWithChild = tds find (_.hasChildElement)
+      val cellWithChild = cells find (_.hasChildElement)
 
-      tdWithChild flatMap (_ child * map (_.id) headOption)
+      cellWithChild flatMap (_ child * map (_.id) headOption)
     }
   }
 

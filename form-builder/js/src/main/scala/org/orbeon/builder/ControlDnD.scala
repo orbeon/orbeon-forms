@@ -43,8 +43,7 @@ object ControlDnD {
       override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean = {
         // Can only drop into an empty cell
         $(target)
-          .find("> .fb-hover:not(.gu-mirror, .gu-transit) > .fr-grid-content > *, " +
-                "> .fr-grid-content > *")
+          .find("> .fb-hover:not(.gu-mirror, .gu-transit) > *, > *")
           .length == 0
       }
       override def mirrorContainer: html.Element =

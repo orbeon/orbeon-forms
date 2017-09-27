@@ -176,10 +176,6 @@ div.orbeon.orbeon-portlet-div {
     .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
     .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
 
-    // Hide empty grid content, otherwise since it has padding, and the element Dragula shows
-    // in an empty cell shows lower than it should be
-    .fr-grid-content:empty { display: none }
-
     // ***** Toolbox ***************************************************************************************************
 
     .fb-toolbox {
@@ -750,8 +746,8 @@ div.orbeon.orbeon-portlet-div {
     .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
     .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
     .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
-    .fr-grid .fr-grid-content .xforms-trigger .btn input,                               // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
-    .fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
+    .fr-grid .fr-grid-td .xforms-trigger .btn input,                                    // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
+    .fr-grid .fr-grid-td .xforms-trigger .fb-mock-link input
         { margin: 0 }
     .fb-mock-link { color: @darkBlue; text-decoration: underline }                      // Simulate  styling of a link
     .btn .xforms-label { margin: 0 }                                                    // Override margin set in form-runner-base.css for regular labels
@@ -771,17 +767,11 @@ div.orbeon.orbeon-portlet-div {
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
-        // Until #3198 is fixed
-        &.fr-repeat.fr-repeat-single-row .fr-grid-tr > .fr-grid-td {
-            &> .fb-hover > .fr-grid-content,
-            &> .fr-grid-content {
-                &> * {
-                    &> .xforms-label,
-                    &> .xforms-help,
-                    &> .xforms-hint {
-                        display: none;
-                    }
-                }
+        &.fr-repeat.fr-repeat-single-row .fr-grid-tr > .fr-grid-td > * {
+            &> .xforms-label,
+            &> .xforms-help,
+            &> .xforms-hint {
+                display: none;
             }
         }
 

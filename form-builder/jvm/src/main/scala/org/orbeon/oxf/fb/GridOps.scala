@@ -207,41 +207,15 @@ trait GridOps extends ContainerOps {
         val currentCell  = Cell.findOriginCell(cells, currentCellNode).get
         val MinimumWidth = currentCell.w
 
-        val availableCellOpt = cells.iterator.flatten collectFirst {
-          case c @ Cell(None, _, _, _, _, w) if w >= MinimumWidth ⇒ c
-        }
+        val availableCellOpt =
+          cells.iterator.flatten dropWhile (_ != currentCell) drop 1 collect {
+            case c @ Cell(Some(cellNode), None, _, _, _, _) if ! cellNode.hasChildElement ⇒ c
+          } nextOption()
 
         val newCell =
           availableCellOpt match {
-            case Some(availableCell) ⇒
-
-              val precedingCellOpt =
-                cells.iterator.flatten filter
-                (! _.missing)          takeWhile
-                (_ != availableCell)   lastOption()
-
-              precedingCellOpt flatMap (_.u) flatMap { precedingCellNode ⇒
-
-                val newCellNode: NodeInfo =
-                  <fr:c
-                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                    id={nextId(gridNode, "tmp")}
-                    x={availableCell.x.toString}
-                    y={availableCell.y.toString}
-                    w={MinimumWidth.toString}/>
-
-                insert(into = Nil, after = precedingCellNode, origin = newCellNode).headOption
-              }
-            case None ⇒
-              val newCellNode: NodeInfo =
-                <fr:c
-                  xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                  id={nextId(gridNode, "tmp")}
-                  x="1"
-                  y={cells.size + 1 toString}
-                  w={MinimumWidth.toString}/>
-
-              insert(into = Nil, after = cells.last.last.u.toList, origin = newCellNode).headOption
+            case Some(Cell(Some(cellNode), _, _, _, _, _)) ⇒ Some(cellNode)
+            case _                                         ⇒ Option(rowInsertBelow(gridNode.id, currentCell.y - 1))
           }
 
          newCell |!> selectCell

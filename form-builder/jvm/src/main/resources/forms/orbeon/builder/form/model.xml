@@ -52,6 +52,7 @@
           fb-section-move-left
 
           fb-grid-edit-details
+          fb-grid-delete
 
           fb-dnd-control-from
       "
@@ -564,7 +565,7 @@
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-control-delete" xxf:phantom="true" type="xpath">
-        fbf:deleteCellWithControlContent(id(event('xxf:targetid'))/.., true())
+        fbf:deleteControlWithinCell(id(event('xxf:targetid'))/.., true())
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-row-insert-above" xxf:phantom="true" type="xpath">
@@ -599,6 +600,10 @@
         <xf:dispatch name="fb-show-dialog" targetid="dialog-container-details">
             <xf:property name="container" value="fbf:containerById(event('xxf:targetid'))"/>
         </xf:dispatch>
+    </xf:action>
+
+    <xf:action ev:observer="fb" ev:event="fb-grid-delete" xxf:phantom="true" type="xpath">
+        fbf:deleteGridById(event('xxf:targetid'))
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-section-edit-help" xxf:phantom="true">

@@ -124,21 +124,19 @@ object SectionGridEditor {
     withCurrentGrid((currentGrid) ⇒ {
 
       // Get the height of each row track
-      val rowsHeight = {
-        val gridBody = currentGrid.el.find(".fr-grid-body")
-        gridBody
+      val rowsHeight =
+        currentGrid.el
           .css("grid-template-rows")
           .splitTo[List]()
           .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
           .map(_.toDouble)
-      }
 
       case class TopBottom(top: Double, bottom: Double)
 
       // For each row track, find its top/bottom
       val rowsTopBottom = {
-        val gridTop = currentGrid.top
-        val zero = List(TopBottom(0, gridTop))
+        val gridBodyTop = currentGrid.top
+        val zero = List(TopBottom(0, gridBodyTop))
         rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
           val lastBottom = soFar.last.bottom
           val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)
@@ -149,10 +147,13 @@ object SectionGridEditor {
       // Find top/bottom of the row track the pointer is on
       val pointerRowTopBottomIndexOpt = {
         val pointerTop = Position.pointerPos.top
-        rowsTopBottom.zipWithIndex.find { case (topBottom, index) ⇒
+        rowsTopBottom.zipWithIndex.find { case (topBottom, _) ⇒
           topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
         }
       }
+
+      // Find where to position the row editor on the left
+      val containerLeft = Position.offset(currentGrid.el.closest(".xbl-fr-grid")).left
 
       // Position row editor
       pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
@@ -170,7 +171,7 @@ object SectionGridEditor {
           Position.offset(
             el = elem,
             offset = new Position.Offset {
-              override val left: Double = currentGrid.left
+              override val left: Double = containerLeft
               override val top: Double = topOffset(elem)
             }
           )
@@ -186,7 +187,7 @@ object SectionGridEditor {
 
   def withCurrentGrid(fn: Block ⇒ Unit): Unit =
     currentSectionGridOpt.foreach((currentSectionGrid) ⇒
-      if (currentSectionGrid.el.is(".xbl-fr-grid"))
+      if (currentSectionGrid.el.is(".fr-grid-body"))
         fn(currentSectionGrid)
     )
 

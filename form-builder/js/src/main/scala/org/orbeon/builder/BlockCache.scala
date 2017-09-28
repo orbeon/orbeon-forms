@@ -70,7 +70,7 @@ object BlockCache {
         })
 
       })
-      val gridEls = $(".xbl-fr-grid:has(> .fr-editable)")
+      val gridEls = $(".xbl-fr-grid > .fr-grid.fr-editable> .fr-grid-body")
       gridEls.each((grid: dom.Element) ⇒
         addToCache(sectionGridCache, $(grid))
       )

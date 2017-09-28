@@ -440,6 +440,12 @@
                                 <!-- Dynamically display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
                                 <!--<fr:xforms-inspector/>-->
+
+                                <xf:action event="xxforms-action-error" observer="fb" propagate="stop">
+                                    <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                                    <xf:message level="xxf:log-error" value="event('element')"/>
+                                </xf:action>
+
                             </xf:group>
 
                             <xf:var name="fb-resources"  value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>

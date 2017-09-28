@@ -37,13 +37,15 @@ trait GridOps extends ContainerOps {
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
   //@XPathFunction
-  def rowInsertBelow(gridId: String, rowPos: Int): NodeInfo = {
+  def rowInsertBelow(gridId: String, rowPos: Int): NodeInfo =
+    rowInsertBelow(containerById(gridId), rowPos)
 
-    val gridNode       = containerById(gridId)
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int): NodeInfo = {
+
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-    debugDumpDocumentForGrids("insert row below, before", gridNode)
+    debugDumpDocumentForGrids("insert row below, before", gridElem)
 
     // Increment height of origin cells that don't end at the current row
     collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
@@ -69,7 +71,7 @@ trait GridOps extends ContainerOps {
       } keepDistinctBy (_.u)
 
     val idsIt =
-      nextIds(gridNode, "tmp", distinctCellsEndingAtCurrentRow.size).iterator
+      nextIds(gridElem, "tmp", distinctCellsEndingAtCurrentRow.size).iterator
 
     val newCells =
       distinctCellsEndingAtCurrentRow map { cell ⇒
@@ -83,15 +85,15 @@ trait GridOps extends ContainerOps {
 
     val result = insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption
 
-    debugDumpDocumentForGrids("insert row below, after", gridNode)
+    debugDumpDocumentForGrids("insert row below, after", gridElem)
     result orNull // bad, but insert() is not always able to return the inserted item at this time
   }
 
   //@XPathFunction
   def rowInsertAbove(gridId: String, rowPos: Int): NodeInfo = {
 
-    val gridNode       = containerById(gridId)
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+    val gridElem       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
     // TODO
@@ -126,8 +128,8 @@ trait GridOps extends ContainerOps {
   //@XPathFunction
   def rowDelete(gridId: String, rowPos: Int): Unit = {
 
-    val gridNode       = containerById(gridId)
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+    val gridElem       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
     // Reduce height of cells which start on a previous row
@@ -147,7 +149,7 @@ trait GridOps extends ContainerOps {
       }
 
     // Find the new cell to select if we are removing the currently selected cell
-    val newCellToSelect = findNewCellToSelect(gridNode, cellsToDelete)
+    val newCellToSelect = findNewCellToSelect(gridElem, cellsToDelete)
 
     // Delete all controls in the row
     cellsToDelete foreach (deleteControlWithinCell(_))
@@ -156,12 +158,12 @@ trait GridOps extends ContainerOps {
     delete(cellsToDelete)
 
     // Update templates
-    updateTemplatesCheckContainers(gridNode, findAncestorRepeatNames(gridNode, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(gridElem, findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
 
     // Adjust selected cell if needed
     newCellToSelect foreach selectCell
 
-    debugDumpDocumentForGrids("delete row", gridNode)
+    debugDumpDocumentForGrids("delete row", gridElem)
   }
 
   // Whether this is the last grid in the section
@@ -202,8 +204,8 @@ trait GridOps extends ContainerOps {
         // - if found, then insert new cell at the right spot
         // - if none, then insert new row below OR at end of grid
 
-        val gridNode     = getContainingGrid(currentCellNode)
-        val cells        = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = false)
+        val gridElem     = getContainingGrid(currentCellNode)
+        val cells        = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
         val currentCell  = Cell.findOriginCell(cells, currentCellNode).get
         val MinimumWidth = currentCell.w
 
@@ -215,7 +217,7 @@ trait GridOps extends ContainerOps {
         val newCell =
           availableCellOpt match {
             case Some(Cell(Some(cellNode), _, _, _, _, _)) ⇒ Some(cellNode)
-            case _                                         ⇒ Option(rowInsertBelow(gridNode.id, currentCell.y - 1))
+            case _                                         ⇒ Option(rowInsertBelow(gridElem, currentCell.y - 1))
           }
 
          newCell |!> selectCell

@@ -14,10 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 
-import scala.collection.immutable
 import scala.util.Try
 
 case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
@@ -374,5 +373,33 @@ object Cell {
       else
         xyToList(xy, StandardGridWidth)
     }
+  }
+
+  def makeASCII[Underlying](
+    cells           : List[List[Cell[Underlying]]],
+    existingMapping : Map[Underlying, Char] = Map.empty[Underlying, Char]
+  ): (String, Map[Underlying, Char]) = {
+
+    val usToLetters = {
+
+      val existingKeys   = existingMapping.keySet
+      val existingValues = existingMapping.values.toSet
+
+      val distinctUs  = (cells.flatten collect { case Cell(Some(u), None, _, _, _, _) ⇒ u } distinct) filterNot existingKeys
+      val lettersIt   = Iterator.tabulate(26)('A'.toInt + _ toChar)                          filterNot existingValues
+
+      existingMapping ++ (distinctUs.iterator zip lettersIt)
+    }
+
+    val charGrid =
+      cells map { row ⇒
+        row map {
+          case Cell(Some(u), None,    _, _, _, _) ⇒ usToLetters(u)
+          case Cell(Some(u), Some(_), _, _, _, _) ⇒ usToLetters(u).toLower
+          case Cell(None,    _,       _, _, _, _) ⇒ ' '
+        }
+      }
+
+    (charGrid map (_.mkString) mkString "\n", usToLetters)
   }
 }

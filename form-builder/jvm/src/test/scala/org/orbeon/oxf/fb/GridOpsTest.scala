@@ -13,26 +13,19 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner.findInViewTryIndex
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
-import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{Cell, FormRunner, NodeInfoCell}
+import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike
 
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.
-class GridOpsTestTest
+class GridOpsTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with FunSpecLike
@@ -40,6 +33,8 @@ class GridOpsTestTest
 
   val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
   val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"
+
+
 
   describe("Row insertion below") {
     it("must insert as expected") {
@@ -51,30 +46,39 @@ class GridOpsTestTest
 
           import NodeInfoCell._
 
+          // Keep updating mapping so that initial cells keep their letter names
+          var mapping = {
+            val expected =
+              """
+                |ABC
+                |DbE
+                |dFG
+              """.stripMargin.trim
+
+            val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true))
+            assert(expected === actual)
+            newMapping
+          }
+
           // Insert one row below each existing row
-          for (rowPos ← List(0, 2, 4))
+
+          for (rowPos ← List(0, 2, 4)) {
             rowInsertBelow(gridNode.id, rowPos)
+            val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)
+            mapping = newMapping
+          }
 
-          def td(id: String) = gridNode descendant * find (_.hasIdValue(id))
+          val after =
+            """
+              |ABC
+              |HbI
+              |DbE
+              |dJK
+              |dFG
+              |LMN
+            """.stripMargin.trim
 
-          val FakeOrigin = Some(Cell[NodeInfo](None, None, 1, 1, 1, 1))
-
-          val expected: List[List[Cell[NodeInfo]]] = List(
-            List(Cell(td("11"),        None,       1, 1, 1, 1), Cell(td("12"),        None, 2, 1, 3, 1),        Cell(td("13"),        None, 3, 1, 1, 1)),
-            List(Cell(None,            None,       1, 2, 1, 1), Cell(td("12"),        FakeOrigin, 2, 2, 2, 1),  Cell(None,            None, 3, 2, 1, 1)),
-            List(Cell(td("21"),        None,       1, 3, 3, 1), Cell(td("12"),        FakeOrigin, 2, 3, 1, 1),  Cell(td("23"),        None, 3, 3, 1, 1)),
-            List(Cell(td("21"),        FakeOrigin, 1, 4, 2, 1), Cell(None,            None, 2, 4, 1, 2),        Cell(None,            FakeOrigin, 3, 4, 1, 1)),
-            List(Cell(td("21"),        FakeOrigin, 1, 5, 1, 1), Cell(td("32"),        None, 2, 5, 1, 1),        Cell(td("33"),        None, 3, 5, 1, 1)),
-            List(Cell(td("tmp-2-tmp"), None,       1, 6, 1, 3), Cell(td("tmp-2-tmp"), FakeOrigin, 2, 6, 1, 2),  Cell(td("tmp-2-tmp"), FakeOrigin, 3, 6, 1, 1))
-          )
-
-          val actual = Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true)
-
-          // Compare all except `origin` as it's a pain to setup `expected` above with that
-          def compareCells(c1: Cell[NodeInfo], c2: Cell[NodeInfo]): Boolean =
-            c1.u == c2.u && c1.x == c2.x && c1.y == c2.y && c1.w == c2.w && c1.h == c2.h && c1.missing == c2.missing
-
-          assert(expected.flatten.zipAll(actual.flatten, null, null) forall (compareCells _).tupled)
+         assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)._1)
         }
       }
     }

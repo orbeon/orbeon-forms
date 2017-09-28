@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.client.{FormBuilderOps, XFormsOps}
 import org.orbeon.oxf.common.Version
 
-trait Services extends FormBuilderOps with XFormsOps {
+trait ClientServicesTest extends FormBuilderOps with XFormsOps {
 
   val requestBody = """<response>
             |    <row>

@@ -19,7 +19,7 @@ import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.AssertionsForJUnit
 
-trait ControlResourcesEditor extends AssertionsForJUnit with FormBuilderOps with Matchers {
+trait ClientControlResourcesEditorTest extends AssertionsForJUnit with FormBuilderOps with Matchers {
 
   // CSS selectors
   private val FirstControl = cssSelector("*[id $= 'control-1-control']")

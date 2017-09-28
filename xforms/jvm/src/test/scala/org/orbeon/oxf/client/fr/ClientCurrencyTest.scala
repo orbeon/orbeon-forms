@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.client.FormRunnerOps
 import org.scalatest.junit.AssertionsForJUnit
 
-trait Currency extends AssertionsForJUnit with FormRunnerOps {
+trait ClientCurrencyTest extends AssertionsForJUnit with FormRunnerOps {
 
   // https://github.com/orbeon/orbeon-forms/issues/1026
   @Test def displayUpdateWhenNoXFormsUpdate(): Unit = {

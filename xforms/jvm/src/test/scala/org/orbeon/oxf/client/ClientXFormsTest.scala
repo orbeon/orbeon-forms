@@ -22,7 +22,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 import scala.util.Try
 
-trait XForms extends AssertionsForJUnit with FormRunnerOps {
+trait ClientXFormsTest extends AssertionsForJUnit with FormRunnerOps {
 
   def isInvalid(el: WebElement): Boolean = el.getAttribute("class").splitTo[Set]().contains("xforms-invalid")
   def inErrorSummary(id: String): Boolean = Try(webDriver.findElement(By.linkText(id))).isSuccess

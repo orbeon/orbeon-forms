@@ -19,7 +19,7 @@ import org.junit.Test
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.xforms.XFormsConstants._
 
-trait Permissions extends AssertionsForJUnit with FormBuilderOps {
+trait ClientPermissionsTest extends AssertionsForJUnit with FormBuilderOps {
 
   private val RepeatSeparator = "" + REPEAT_SEPARATOR
 

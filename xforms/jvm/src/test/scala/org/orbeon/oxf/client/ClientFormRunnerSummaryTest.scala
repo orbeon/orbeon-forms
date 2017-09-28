@@ -16,7 +16,7 @@ package org.orbeon.oxf.client
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 
-trait FormRunnerSummary extends AssertionsForJUnit with FormRunnerOps {
+trait ClientFormRunnerSummaryTest extends AssertionsForJUnit with FormRunnerOps {
 
   @Test def navigateSummary(): Unit = {
     Summary.navigate("orbeon", "bookshelf")

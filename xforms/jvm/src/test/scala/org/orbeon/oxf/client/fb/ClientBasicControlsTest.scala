@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.client.{FormBuilderOps, XFormsOps}
 import org.scalatest.junit.AssertionsForJUnit
 
-trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
+trait ClientBasicControlsTest extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
   import Builder._
 

@@ -18,7 +18,7 @@ import org.openqa.selenium.By
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.AssertionsForJUnit
 
-trait OrbeonFormsDemoPath extends AssertionsForJUnit with FormRunnerOps { // with AssertionsForJUnit
+trait ClientOrbeonFormsDemoPathTest extends AssertionsForJUnit with FormRunnerOps { // with AssertionsForJUnit
 
   // RFE: split into parts so we can start in the middle
   @Test def demoPath(): Unit = {

@@ -18,7 +18,7 @@ import org.orbeon.oxf.client.{FormBuilderOps, XFormsOps}
 import org.scalatest.junit.AssertionsForJUnit
 
 
-trait RepeatSettings extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
+trait ClientRepeatSettingsTest extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
   private object Private {
 

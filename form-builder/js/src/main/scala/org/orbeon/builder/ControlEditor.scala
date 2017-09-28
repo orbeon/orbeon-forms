@@ -57,6 +57,12 @@ object ControlEditor {
         // Control editor is only show when the cell isn't empty
         controlEl.append(controlEditorRight)
         positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
+        // Show/hide itemset icon
+        val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
+        if (controlEl.is(".fb-itemset"))
+          itemsetIcon.show()
+        else
+          itemsetIcon.hide()
       })
       controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
       positionEditor(controlEditorLeft, 0)

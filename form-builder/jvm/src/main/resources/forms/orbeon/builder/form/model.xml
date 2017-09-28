@@ -25,6 +25,7 @@
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+      xmlns:xformsid="java:org.orbeon.xforms.XFormsId"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       xxf:external-events="
@@ -54,7 +55,7 @@
           fb-grid-edit-details
           fb-grid-delete
 
-          fb-dnd-control-from
+          fb-dnd-control
       "
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
@@ -634,12 +635,14 @@
         <!--</xf:dispatch>-->
     <!--</xf:action>-->
 
-    <xf:action ev:observer="fb" ev:event="fb-dnd-control-from" xxf:phantom="true">
-        <xf:var name="do-copy" value="event('fb-do-copy') = 'true'"/>
-        <xf:var name="source"  value="id(event('xxf:targetid'))"/>
-        <xf:var name="target"  value="$current-td"/>
+    <xf:action ev:observer="fb" ev:event="fb-dnd-control" xxf:phantom="true">
+
+        <xf:var name="from-cell" value="fbf:findInViewTryIndex(instance('fb-form-instance'), xformsid:getStaticIdFromId(event('xxf:targetid')))/.."/>
+        <xf:var name="to-cell"   value="fbf:findInViewTryIndex(instance('fb-form-instance'), xformsid:getStaticIdFromId(event('fb-to-cell')))"/>
+        <xf:var name="do-copy"   value="event('fb-do-copy') = 'true'"/>
+
         <xf:action type="xpath">
-            toolboxOps:dndControl($source, $target, $do-copy)
+            toolboxOps:dndControl($from-cell, $to-cell, $do-copy)
         </xf:action>
     </xf:action>
 

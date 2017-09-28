@@ -25,6 +25,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.CoreUtils._
 
 /*
  * Form Builder: toolbox operations.
@@ -352,10 +353,10 @@ object ToolboxOps {
     case object Bind      extends XvcEntry
   }
 
-  private def controlElementsInCellToXvc(td: NodeInfo): Option[NodeInfo] = {
+  private def controlElementsInCellToXvc(cellElem: NodeInfo): Option[NodeInfo] = {
 
-    val doc  = td.getDocumentRoot
-    val name = getControlName(td / * head)
+    val doc  = cellElem.getDocumentRoot
+    val name = getControlName(cellElem / * head)
 
     findControlByName(doc, name).map { controlElement ⇒
 
@@ -409,20 +410,23 @@ object ToolboxOps {
   }
 
   //@XPathFunction
-  def dndControl(source: NodeInfo, target: NodeInfo, copy: Boolean): Unit = {
-    controlElementsInCellToXvc(source)
-      .foreach(pasteFromXvc(target, _))
+  def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
+    val xvc = controlElementsInCellToXvc(sourceCellElem)
+
     if (! copy)
-      deleteControlWithinCell(source, updateTemplates = true)
+      deleteControlWithinCell(sourceCellElem, updateTemplates = true)
+
+    selectCell(targetCellElem)
+    xvc foreach (pasteFromXvc(targetCellElem, _))
   }
 
   // Paste control from the clipboard
   //@XPathFunction
-  def pasteFromClipboard(td: NodeInfo): Unit =
-    pasteFromXvc(td, readXvcFromClipboard)
+  def pasteFromClipboard(targetCellElem: NodeInfo): Unit =
+    pasteFromXvc(targetCellElem, readXvcFromClipboard)
 
-  private def pasteFromXvc(td: NodeInfo, xvc: NodeInfo): Unit = {
-    ensureEmptyCell(td) foreach { gridTd ⇒
+  private def pasteFromXvc(targetCellElem: NodeInfo, xvc: NodeInfo): Unit = {
+    ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
 
       (xvc / "control" / * headOption) foreach { control ⇒
 
@@ -433,9 +437,9 @@ object ToolboxOps {
           val requestedName = getControlName(control)
 
           // Check if id is already in use
-          if (findInViewTryIndex(td, controlId(requestedName)).isDefined) {
+          if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
             // If so create new id
-            val newName = controlNameFromId(nextId(td, "control"))
+            val newName = controlNameFromId(nextId(targetCellElem, "control"))
 
             // Rename everything
             renameControlByElement(control, newName, resources / * map (_.localname) toSet)
@@ -452,7 +456,7 @@ object ToolboxOps {
         }
 
         // Insert control and holders
-        val newControlElement = insert(into = gridTd, origin = control).head
+        val newControlElement = insert(into = gridCellElem, origin = control).head
         insertHolders(
           newControlElement,
           holders.head,
@@ -461,7 +465,7 @@ object ToolboxOps {
         )
 
         // Create the bind and copy all attributes and content
-        val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
+        val bind = ensureBinds(gridCellElem, findContainerNamesForModel(gridCellElem) :+ name)
         (xvc / "bind" / * headOption) foreach { xvcBind ⇒
           insert(into = bind, origin = (xvcBind /@ @*) ++ (xvcBind / *))
         }
@@ -477,7 +481,7 @@ object ToolboxOps {
             nestedElem → id
 
         val oldIdToNewId =
-          nestedElemsWithId map (_._2) zip nextIds(td, Validation, nestedElemsWithId.size) toMap
+          nestedElemsWithId map (_._2) zip nextIds(targetCellElem, Validation, nestedElemsWithId.size) toMap
 
         // Update nested element ids, in particular xf:constraint/@id
         nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
@@ -502,7 +506,7 @@ object ToolboxOps {
         }
 
         // This can impact templates
-        updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
+        updateTemplatesCheckContainers(targetCellElem, findAncestorRepeatNames(targetCellElem).to[Set])
       }
     }
   }

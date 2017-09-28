@@ -51,8 +51,8 @@ trait FormRunnerBaseOps {
 
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
-  def findInViewTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findTryIndex(inDoc, id, findFRBodyElement(inDoc), includeSelf = false)
+  def findInViewTryIndex(inDoc: NodeInfo, staticId: String): Option[NodeInfo] =
+    findTryIndex(inDoc, staticId, findFRBodyElement(inDoc), includeSelf = false)
 
   def findInModelTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     findTryIndex(inDoc, id, findModelElement(inDoc), includeSelf = false)

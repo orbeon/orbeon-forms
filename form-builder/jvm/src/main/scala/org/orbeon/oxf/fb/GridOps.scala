@@ -183,8 +183,8 @@ trait GridOps extends ContainerOps {
     findControlByName(inDoc, controlNameFromId(controlId)).to[List] flatMap (_ parent CellTest) foreach selectCell
 
   // Make the given grid cell selected
-  def selectCell(newCell: NodeInfo): Unit =
-    setvalue(selectedCellVar, newCell.id)
+  def selectCell(newCellElem: NodeInfo): Unit =
+    setvalue(selectedCellVar, newCellElem.id)
 
   // Whether a call to ensureEmptyCell() will succeed
   // For now say we'll always succeed as we'll fill gaps and insert a row as needed.

@@ -112,7 +112,6 @@
 
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                                       value="true"/>
-    <property as="xs:integer" name="oxf.fb.grid.max-columns"                                    value="4"/>
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
 
     <!-- Form Builder detail page buttons -->

@@ -43,32 +43,34 @@
     // For phones, use 1 column
     @media (max-width: 640px) {
 
-      .fr-grid:not(.fr-repeat-single-row) {
+        .xbl-fr-grid .fr-grid:not(.fr-repeat-single-row) {
 
-          // Instead of fixed, so each cell doesn't take 1/x of the width of the table
-          table-layout: inherit;
+            // Instead of fixed, so each cell doesn't take 1/x of the width of the table
+            table-layout: inherit;
 
-          & > .fr-grid-body .fr-grid-td  {
-              // The main thing this CSS does: change table cells into blocks
-              display: block;
-              // For the `td` to take all the space taken by the control, and avoid part of the border missing
-              overflow: auto;
-          }
+            & > .fr-grid-body .fr-grid-td {
+                // The main thing this CSS does: change table cells into blocks
+                display: block;
+                // For the `td` to take all the space taken by the control, and avoid part of the border missing
+                overflow: auto;
+            }
 
-          &.fr-repeat-multiple-rows {
-              // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
-              .fr-grid-th:nth-child(n+3) { display: none }
-          }
-      }
+            &.fr-repeat-multiple-rows {
+                // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
+                .fr-grid-th:nth-child(n+3) {
+                    display: none
+                }
+            }
+        }
 
-      .fr-buttons {
-          .xforms-trigger button {
-              // Each button is on its own line and takes the whole line
-              display: block;
-              width: 100%;
-              margin-left: 0;
-          }
-      }
+        .fr-buttons {
+            .xforms-trigger button {
+                // Each button is on its own line and takes the whole line
+                display: block;
+                width: 100%;
+                margin-left: 0;
+            }
+        }
     }
 
 }

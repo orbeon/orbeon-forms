@@ -101,7 +101,7 @@ object SectionGridEditor {
       }
 
       // Update triggers relevance for section
-      if (sectionGridBody.el.is(BlockCache.GridSelector)) {
+      if (sectionGridBody.el.is(BlockCache.GridBodySelector)) {
         sectionGridEditorContainer.children(".fb-grid-edit-details, .fb-grid-delete").show()
       }
     }
@@ -186,13 +186,13 @@ object SectionGridEditor {
   }
 
   def gridFromGridBody(block: Block): JQuery = {
-    assert(block.el.is(".fr-grid-body"))
-    block.el.closest(".xbl-fr-grid")
+    assert(block.el.is(BlockCache.GridBodySelector))
+    block.el.closest(BlockCache.GridSelector)
   }
 
   def withCurrentGridBody(fn: Block ⇒ Unit): Unit =
     currentSectionGridBodyOpt.foreach((currentSectionGridBody) ⇒
-      if (currentSectionGridBody.el.is(".fr-grid-body"))
+      if (currentSectionGridBody.el.is(BlockCache.GridBodySelector))
         fn(currentSectionGridBody)
     )
 
@@ -202,12 +202,16 @@ object SectionGridEditor {
       val editorName = editor.entryName
       val iconEl = sectionGridEditorContainer.children(s".$editorName")
       iconEl.on("click", () ⇒ {
-        currentSectionGridBodyOpt.foreach((currentSectionGrid) ⇒
+        currentSectionGridBodyOpt.foreach((currentSectionGridBody) ⇒ {
+          val isSection = currentSectionGridBody.el.is(BlockCache.SectionSelector)
+          val sectionGrid =
+            if (isSection) currentSectionGridBody.el
+            else gridFromGridBody(currentSectionGridBody)
           DocumentAPI.dispatchEvent(
-            targetId   = currentSectionGrid.el.attr("id").get,
+            targetId   = sectionGrid.attr("id").get,
             eventName  = editorName
           )
-        )
+        })
       })
     })
     RowEditors.foreach((rowEditor) ⇒ {

@@ -25,8 +25,9 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 @JSExportAll
 object BlockCache {
 
-  val SectionSelector = ".xbl-fr-section"
-  val GridSelector    = ".xbl-fr-grid"
+  val SectionSelector  = ".xbl-fr-section"
+  val GridSelector     = ".xbl-fr-grid"
+  val GridBodySelector = ".fr-grid-body"
 
   @ScalaJSDefined
   class Block extends js.Object {

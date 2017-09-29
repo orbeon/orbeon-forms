@@ -14,6 +14,7 @@
 package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.jquery.Offset
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
@@ -21,7 +22,6 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefined}
 
 object Position {
 
@@ -40,28 +40,9 @@ object Position {
   def scrollTop() : Double  = $(".fb-main").scrollTop ()
   def scrollLeft(): Double  = $(".fb-main").scrollLeft()
 
-  case class Offset(
-    left : Double,
-    top  : Double
-  )
-
-  // Typed version of JQuery's offset()
-  def offset(el: JQuery, offset: Offset): Unit =
-    el.offset(new js.Object {
-      val left : Double = offset.left
-      val top  : Double = offset.top
-    })
-  def offset(el: JQuery): Offset = {
-    val jOffset = el.offset().asInstanceOf[js.Dynamic]
-    Offset(
-      left = jOffset.left.asInstanceOf[Double],
-      top  = jOffset.top .asInstanceOf[Double]
-    )
-  }
-
   // Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
   def adjustedOffset(el: JQuery): Offset = {
-    val rawOffset = offset(el)
+    val rawOffset = Offset(el)
     Offset(
       left = rawOffset.left,
       top  = rawOffset.top + scrollTop()

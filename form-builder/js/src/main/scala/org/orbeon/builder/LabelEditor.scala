@@ -13,18 +13,14 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.BlockCache.Block
-import org.orbeon.builder.Position.Offset
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.$
-import org.orbeon.xforms._
+import org.orbeon.jquery.Offset
+import org.orbeon.xforms.{$, _}
 import org.orbeon.xforms.facade._
-
-import scala.scalajs.js
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefined}
+import scala.scalajs.js
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.builder.LabelEditor")
 @JSExportAll
@@ -114,7 +110,7 @@ object LabelEditor {
       labelInput.show()
 
       // Position and size input
-      val inputOffset = Position.Offset(
+      val inputOffset = Offset(
         top = interceptorOffset.top -
           // Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
           Position.scrollTop() +
@@ -122,8 +118,8 @@ object LabelEditor {
           (clickInterceptor.height() - labelInput.outerHeight()) / 2,
         left = interceptorOffset.left
       )
-      Position.offset(labelInput, inputOffset)
-      Position.offset(labelInput, inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
+      Offset.offset(labelInput, inputOffset)
+      Offset.offset(labelInput, inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
       labelInput.width(clickInterceptor.width() - 10)
       labelInput.focus()
     }
@@ -188,7 +184,7 @@ object LabelEditor {
         // Start at the label, but extend all the way to the right to the end of the title
         interceptor.offset(sectionLabel.offset())
         interceptor.height(sectionTitle.height())
-        interceptor.width(sectionTitle.width() - (Position.offset(sectionLabel).left - Position.offset(sectionTitle).left))
+        interceptor.width(sectionTitle.width() - (Offset(sectionLabel).left - Offset(sectionTitle).left))
       }
     })
   }

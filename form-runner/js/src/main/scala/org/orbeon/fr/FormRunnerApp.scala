@@ -13,8 +13,8 @@
  */
 package org.orbeon.fr
 
-import org.orbeon.xbl.{DndRepeat, HrefButton, TreeSelect1, WPaint}
-import org.orbeon.xforms.{$, XFormsApp}
+import org.orbeon.{xbl, xforms}
+import org.orbeon.xforms.$
 
 // Scala.js starting point for Form Runner
 object FormRunnerApp {
@@ -22,11 +22,12 @@ object FormRunnerApp {
   def main(args: Array[String]): Unit = {
 
     def initializeOnDomReady(): Unit = {
-      DndRepeat
-      TreeSelect1
-      WPaint
-      HrefButton
-      XFormsApp.main(Array.empty)
+      xbl.DndRepeat
+      xbl.TreeSelect1
+      xbl.WPaint
+      xbl.HrefButton
+      xbl.Grid
+      xforms.XFormsApp.main(Array.empty)
     }
 
     $(initializeOnDomReady _)

@@ -16,6 +16,7 @@ package org.orbeon.builder
 import enumeratum.EnumEntry._
 import enumeratum._
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.scalajs.dom.document
@@ -71,11 +72,14 @@ object SectionGridEditor {
 
       // Position the editor
       sectionGridEditorContainer.show()
-      Position.offset(sectionGridEditorContainer, Position.Offset(
-        // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-        left = Position.offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
-        top  = sectionGridBody.top - Position.scrollTop()
-      ))
+      Offset.offset(
+        sectionGridEditorContainer,
+        Offset(
+          // Use `.fr-body` left rather than the section left to account for sub-sections indentation
+          left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
+          top  = sectionGridBody.top - Position.scrollTop()
+        )
+      )
 
       // Start by hiding all the icons
       sectionGridEditorContainer.children().hide()
@@ -152,7 +156,7 @@ object SectionGridEditor {
       }
 
       // Find where to position the row editor on the left
-      val containerLeft = Position.offset(gridFromGridBody(currentGridBody)).left
+      val containerLeft = Offset(gridFromGridBody(currentGridBody)).left
 
       // Position row editor
       pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
@@ -167,9 +171,9 @@ object SectionGridEditor {
         def positionElWithClass(selector: String, topOffset: (JQuery) ⇒ Double): Unit = {
           val elem = rowEditorContainer.children(selector)
           elem.show()
-          Position.offset(
+          Offset.offset(
             el = elem,
-            offset = Position.Offset(
+            offset = Offset(
               left = containerLeft,
               top  = topOffset(elem) - Position.scrollTop()
             )

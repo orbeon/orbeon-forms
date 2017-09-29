@@ -34,8 +34,6 @@
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
          such as xh:, xf:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
 
-    <xbl:script src="/xbl/orbeon/grid/grid.js"/>
-
     <xbl:binding
         id="fr-grid-binding"
         element="fr|grid"

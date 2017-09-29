@@ -16,10 +16,11 @@ package org.orbeon.builder
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.Grid
+import org.orbeon.jquery.Offset
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQuery
-import org.orbeon.oxf.util.CoreUtils._
 
 object ControlEditor {
 
@@ -46,7 +47,7 @@ object ControlEditor {
       // Position editors
       def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
         editor.show()
-        Position.offset(editor, Position.Offset(
+        Offset.offset(editor, Offset(
           left = cell.left + offsetLeft,
           top  = cell.top - Position.scrollTop()
         ))

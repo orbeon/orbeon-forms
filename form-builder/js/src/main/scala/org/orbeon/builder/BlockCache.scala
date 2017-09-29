@@ -13,6 +13,7 @@
  */
 package org.orbeon.builder
 
+import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.$
 import org.scalajs.dom
@@ -37,7 +38,7 @@ object BlockCache {
     val top: Double = 0
     val width: Double = 0
     val height: Double = 0
-    val titleOffset: Position.Offset = null
+    val titleOffset: Offset = null
     val rows: js.Array[Block] = js.Array()
     val cols: js.Array[Block] = js.Array()
   }
@@ -67,7 +68,7 @@ object BlockCache {
           override val left        = Position.adjustedOffset(mostOuterSection).left
           override val height      = titleAnchor.height()
           override val width       = mostOuterSection.width()
-          override val titleOffset = Position.offset(titleAnchor)
+          override val titleOffset = Offset(titleAnchor)
         })
 
       })

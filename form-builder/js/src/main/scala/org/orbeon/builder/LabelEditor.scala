@@ -48,7 +48,7 @@ object LabelEditor {
 
     if (eventName == "DOMActivate" && inSectionEditor)
       addProperties(js.Dictionary(
-        "section-id" → SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
+        "section-id" → SectionGridEditor.currentSectionGridBodyOpt.get.el.attr("id").get
       ))
   })
 

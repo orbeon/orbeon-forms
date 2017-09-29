@@ -18,7 +18,7 @@ import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
 import org.scalajs.dom.document
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -30,7 +30,7 @@ private object ControlResourceEditor {
   val ExplanationSelector = ".xbl-component.xbl-fr-explanation"
 
   @JSExportTopLevel("ORBEON.Builder.controlAdded")
-  val controlAdded = $.Callbacks()
+  val controlAdded: JQueryCallback = $.Callbacks()
 
   var resourceEditorCurrentControl: JQuery = null
   var resourceEditorCurrentLabelHint: JQuery = null

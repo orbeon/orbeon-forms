@@ -26,11 +26,11 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 object SectionGridEditor {
 
-  lazy val sectionGridEditorContainer          = $(".fb-section-grid-editor")
-  lazy val rowEditorContainer                  = $(".fb-row-editor")
+  lazy val sectionGridEditorContainer               = $(".fb-section-grid-editor")
+  lazy val rowEditorContainer                       = $(".fb-row-editor")
 
-  var currentSectionGridOpt: js.UndefOr[Block] = js.undefined
-  var currentRowPosOpt     : js.UndefOr[Int]   = js.undefined
+  var currentSectionGridBodyOpt : js.UndefOr[Block] = js.undefined
+  var currentRowPosOpt          : js.UndefOr[Int]   = js.undefined
 
   sealed trait GridSectionEditor extends EnumEntry with Hyphencase
   object GridSectionEditor extends Enum[GridSectionEditor] {
@@ -68,7 +68,7 @@ object SectionGridEditor {
     containerCache = BlockCache.sectionGridCache,
     wasCurrent = (_: Block) ⇒ (),
     becomesCurrent = (sectionGrid: Block) ⇒ {
-      currentSectionGridOpt = sectionGrid
+      currentSectionGridBodyOpt = sectionGrid
 
       // Position the editor
       sectionGridEditorContainer.show()
@@ -113,7 +113,7 @@ object SectionGridEditor {
     wasCurrent = (_: Block) ⇒ {
       sectionGridEditorContainer.hide()
       rowEditorContainer.hide()
-      currentSectionGridOpt = js.undefined
+      currentSectionGridBodyOpt = js.undefined
       currentRowPosOpt      = js.undefined
     },
     becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
@@ -121,11 +121,11 @@ object SectionGridEditor {
 
   // Position row editor
   Position.onUnderPointerChange {
-    withCurrentGrid((currentGrid) ⇒ {
+    withCurrentGridBody((currentGridBody) ⇒ {
 
       // Get the height of each row track
       val rowsHeight =
-        currentGrid.el
+        currentGridBody.el
           .css("grid-template-rows")
           .splitTo[List]()
           .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
@@ -135,7 +135,7 @@ object SectionGridEditor {
 
       // For each row track, find its top/bottom
       val rowsTopBottom = {
-        val gridBodyTop = currentGrid.top
+        val gridBodyTop = currentGridBody.top
         val zero = List(TopBottom(0, gridBodyTop))
         rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
           val lastBottom = soFar.last.bottom
@@ -153,7 +153,7 @@ object SectionGridEditor {
       }
 
       // Find where to position the row editor on the left
-      val containerLeft = Position.offset(currentGrid.el.closest(".xbl-fr-grid")).left
+      val containerLeft = Position.offset(gridFromGridBody(currentGridBody)).left
 
       // Position row editor
       pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
@@ -185,10 +185,15 @@ object SectionGridEditor {
     })
   }
 
-  def withCurrentGrid(fn: Block ⇒ Unit): Unit =
-    currentSectionGridOpt.foreach((currentSectionGrid) ⇒
-      if (currentSectionGrid.el.is(".fr-grid-body"))
-        fn(currentSectionGrid)
+  def gridFromGridBody(block: Block): JQuery = {
+    assert(block.el.is(".fr-grid-body"))
+    block.el.closest(".xbl-fr-grid")
+  }
+
+  def withCurrentGridBody(fn: Block ⇒ Unit): Unit =
+    currentSectionGridBodyOpt.foreach((currentSectionGridBody) ⇒
+      if (currentSectionGridBody.el.is(".fr-grid-body"))
+        fn(currentSectionGridBody)
     )
 
   // Register listener on editor icons
@@ -197,7 +202,7 @@ object SectionGridEditor {
       val editorName = editor.entryName
       val iconEl = sectionGridEditorContainer.children(s".$editorName")
       iconEl.on("click", () ⇒ {
-        currentSectionGridOpt.foreach((currentSectionGrid) ⇒
+        currentSectionGridBodyOpt.foreach((currentSectionGrid) ⇒
           DocumentAPI.dispatchEvent(
             targetId   = currentSectionGrid.el.attr("id").get,
             eventName  = editorName
@@ -208,10 +213,10 @@ object SectionGridEditor {
     RowEditors.foreach((rowEditor) ⇒ {
       val iconEl = rowEditorContainer.children(rowEditor.selector)
       iconEl.on("click", () ⇒
-        withCurrentGrid((currentGrid) ⇒
+        withCurrentGridBody((currentGridBody) ⇒
           currentRowPosOpt.foreach((currentRowPos) ⇒
             DocumentAPI.dispatchEvent(
-              targetId   = currentGrid.el.attr("id").get,
+              targetId   = gridFromGridBody(currentGridBody).attr("id").get,
               eventName  = rowEditor.eventName,
               properties = js.Dictionary(
                 "fb-row-pos" → currentRowPos.toString

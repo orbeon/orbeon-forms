@@ -35,7 +35,7 @@
             }
         }
 
-        .fr-grid.fr-grid-css > .fr-grid-body {
+        .fr-grid.fr-grid-css > .fr-grid-body, .fr-grid.fr-grid-css > .fr-grid-head {
             display: grid;
             width: 100%;
             grid-template-columns: repeat(12, 1fr);
@@ -43,7 +43,7 @@
             //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
 
             .generateColumnStart(@x) when (@x > 0) {
-                .fr-grid-td[data-x =  '@{x}'] { grid-column-start: @x; }
+                .fr-grid-td[data-x =  '@{x}'], .fr-grid-th[data-x =  '@{x}'] { grid-column-start: @x; }
                 .generateColumnStart(@x - 1)
             }
 
@@ -57,7 +57,7 @@
             .generateRowStart(20);
 
             .generateColumnEnd(@w) when (@w > 0) {
-                .fr-grid-td[data-w =  '@{w}'] { grid-column-end: span @w; }
+                .fr-grid-td[data-w =  '@{w}'], .fr-grid-th[data-w =  '@{w}'] { grid-column-end: span @w; }
                 .generateColumnEnd(@w - 1)
             }
 
@@ -87,49 +87,37 @@
                 display: table-row-group;
             }
 
-            .fr-grid-tr {
+            .fr-grid-tr, .fr-grid-master-row {
                 display: table-row;
-
-                // Padding/margin in the cell content: see https://github.com/orbeon/orbeon-forms/issues/2414
-                &> .fr-grid-td {
-                    display: table-cell;
-                    vertical-align: top;
-                    padding: 0 @frGridCellPadding;
-
-                    &> .xforms-control, &> .xbl-component, &> .xforms-group {
-                        margin: @frGridCellPadding 0;
-                        display: block;
-                    }
-                }
             }
 
-            .fr-grid-master-row {
-                display: table-row;
-
-                &> .fr-grid-th {
-                    display: table-cell;
-                    text-align: left;
-
-                    .xforms-output {
-                        // We want the block for the label in the header to "go around" its content, so the help
-                        // popover is correctly positioned.
-                        display: block;
-                    }
-
-                    // If there is a group with a label in a grid th, remove the border added by Bootstrap
-                    legend.xforms-label {
-                        border-bottom: none;
-                        margin: 0;
-                    }
-                }
-            }
-
-            .fr-grid-body .fr-grid-tr > .fr-grid-th {
+            // Padding/margin in the cell content: see https://github.com/orbeon/orbeon-forms/issues/2414
+            .fr-grid-body .fr-grid-td {
+                display: table-cell;
                 vertical-align: top;
-                width: auto;
-                // Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                // absolute positioning of the cell editors, this crops overlays, in particular the date picker
-                // overflow: hidden
+                padding: 0 @frGridCellPadding;
+
+                &> .xforms-control, &> .xbl-component, &> .xforms-group {
+                    margin: @frGridCellPadding 0;
+                    display: block;
+                }
+            }
+
+            .fr-grid-head .fr-grid-th {
+                display: table-cell;
+                text-align: left;
+
+                .xforms-output {
+                    // We want the block for the label in the header to "go around" its content, so the help
+                    // popover is correctly positioned.
+                    display: block;
+                }
+
+                // If there is a group with a label in a grid th, remove the border added by Bootstrap
+                legend.xforms-label {
+                    border-bottom: none;
+                    margin: 0;
+                }
             }
 
             // In non-repeated grids, make rows except the last one take the minimum possible amount of vertical space in
@@ -233,7 +221,7 @@
 
         .fr-grid.fr-repeat {
 
-            .fr-grid-tr > .fr-grid-td {
+            .fr-grid-body .fr-grid-td {
                 &> .xforms-control, &> .xbl-component, &> .xforms-group {
                     padding-top: 0;                                                 // No top/bottom padding in repeated grid cells
                     padding-bottom: 0.1px;                                          // 0 causes https://github.com/orbeon/orbeon-forms/issues/2690
@@ -242,7 +230,7 @@
 
             &.fr-repeat-single-row {
 
-                .fr-grid-tr > .fr-grid-td {
+                .fr-grid-body .fr-grid-td {
                     // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they are shown in the
                     // column header). But only do this for the top-level control within a cell.
                     &> .xforms-control, &> .xbl-component, &> .xforms-group {
@@ -259,7 +247,7 @@
             }
 
             // But if there is a nested table, show those in the label in the column header of that table
-            .fr-grid-master-row > .fr-grid-th {
+            .fr-grid-head .fr-grid-th {
                 .xforms-label { display: block }                                    // Label in repeat table header is block so yellow background in FB takes the whole width
                 .xforms-help { margin-top: @frGridCellPadding }
             }
@@ -286,7 +274,7 @@
                 }
             }
 
-            .fr-grid-master-row {
+            .fr-grid-head {
                 .fr-repeat-column-left, .fr-repeat-column-right {
                     vertical-align: middle;
                 }
@@ -322,13 +310,13 @@
     // Changes for view mode only
     .fr-mode-view {
 
-        .fr-grid .fr-grid-tr > .fr-grid-td {
+        .fr-grid .fr-grid-body > .fr-grid-td {
             &> .xforms-control, &> .xbl-component, &> .xforms-group {
                 margin-bottom: 3 * @frGridCellPadding;
             }
         }
 
-        .fr-grid.fr-repeat .fr-grid-tr > .fr-grid-td {
+        .fr-grid.fr-repeat .fr-grid-body > .fr-grid-td {
             &> .xforms-control, &> .xbl-component, &> .xforms-group {
                 background-color: transparent;
                 margin-bottom: @frGridCellPadding; // some margin as there is no more padding

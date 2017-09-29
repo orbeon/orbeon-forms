@@ -335,7 +335,7 @@
 
         margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
 
-        .fr-grid .fr-grid-tr .fr-grid-td {
+        .fr-grid .fr-grid-body .fr-grid-td {
 
             // Custom control widths
             .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
@@ -375,7 +375,7 @@
             }
 
             .fr-repeat-multiple-rows {
-                .fr-grid-master-row { display: none }       // Hide the top header row, as we don't need the space for the *add* icon in view mode
+                .fr-grid-head { display: none }             // Hide the top header row, as we don't need the space for the *add* icon in view mode
                 border-top: none;                           // Avoid double border at the top
             }
         }

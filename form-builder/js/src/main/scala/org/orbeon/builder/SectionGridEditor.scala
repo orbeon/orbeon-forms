@@ -71,11 +71,11 @@ object SectionGridEditor {
 
       // Position the editor
       sectionGridEditorContainer.show()
-      Position.offset(sectionGridEditorContainer, new Position.Offset {
+      Position.offset(sectionGridEditorContainer, Position.Offset(
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-        override val left = Position.offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth()
-        override val top  = sectionGridBody.top - Position.scrollTop()
-      })
+        left = Position.offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
+        top  = sectionGridBody.top - Position.scrollTop()
+      ))
 
       // Start by hiding all the icons
       sectionGridEditorContainer.children().hide()
@@ -169,10 +169,10 @@ object SectionGridEditor {
           elem.show()
           Position.offset(
             el = elem,
-            offset = new Position.Offset {
-              override val left: Double = containerLeft
-              override val top: Double = topOffset(elem) - Position.scrollTop()
-            }
+            offset = Position.Offset(
+              left = containerLeft,
+              top  = topOffset(elem) - Position.scrollTop()
+            )
           )
         }
 

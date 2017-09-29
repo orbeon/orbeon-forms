@@ -23,51 +23,49 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefined}
 
-@JSExportTopLevel("ORBEON.builder.Position")
-@JSExportAll
 object Position {
 
   // Keeps track of pointer position
-  var pointerPos: Offset = new Offset {
-    override val left: Double = 0
-    override val top : Double = 0
-  }
+  var pointerPos: Offset = Offset(0, 0)
 
   $(document).on("mousemove", (event: JQueryEventObject) ⇒ {
     pointerPos =
-      new Offset {
-        override val left: Double = event.pageX
-        override val top : Double = event.pageY
-      }
+      Offset(
+        left = event.pageX,
+        top  = event.pageY
+    )
   })
 
   // How much we need to add to offset to account for the form having been scrolled
   def scrollTop() : Double  = $(".fb-main").scrollTop ()
   def scrollLeft(): Double  = $(".fb-main").scrollLeft()
 
-  @ScalaJSDefined
-  class Offset extends js.Object {
-    val left   : Double = 0
-    val top    : Double = 0
-  }
+  case class Offset(
+    left : Double,
+    top  : Double
+  )
 
   // Typed version of JQuery's offset()
-  def offset(el: JQuery, offset: Offset): Unit = el.offset(offset)
+  def offset(el: JQuery, offset: Offset): Unit =
+    el.offset(new js.Object {
+      val left : Double = offset.left
+      val top  : Double = offset.top
+    })
   def offset(el: JQuery): Offset = {
     val jOffset = el.offset().asInstanceOf[js.Dynamic]
-    new Offset {
-      override val left = jOffset.left.asInstanceOf[Double]
-      override val top  = jOffset.top .asInstanceOf[Double]
-    }
+    Offset(
+      left = jOffset.left.asInstanceOf[Double],
+      top  = jOffset.top .asInstanceOf[Double]
+    )
   }
 
   // Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
   def adjustedOffset(el: JQuery): Offset = {
     val rawOffset = offset(el)
-    new Offset {
-      override val left = rawOffset.left
-      override val top  = rawOffset.top + scrollTop()
-    }
+    Offset(
+      left = rawOffset.left,
+      top  = rawOffset.top + scrollTop()
+    )
   }
 
   // Calls listener when what is under the pointer has potentially changed

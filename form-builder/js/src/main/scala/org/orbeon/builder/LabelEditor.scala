@@ -114,16 +114,16 @@ object LabelEditor {
       labelInput.show()
 
       // Position and size input
-      val inputOffset = new Position.Offset {
-          override val top = interceptorOffset.top -
-            // Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
-            Position.scrollTop() +
-            // Vertically center input inside click interceptor
-            (clickInterceptor.height() - labelInput.outerHeight()) / 2
-        override val left = interceptorOffset.left
-      }
-      labelInput.offset(inputOffset)
-      labelInput.offset(inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
+      val inputOffset = Position.Offset(
+        top = interceptorOffset.top -
+          // Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
+          Position.scrollTop() +
+          // Vertically center input inside click interceptor
+          (clickInterceptor.height() - labelInput.outerHeight()) / 2,
+        left = interceptorOffset.left
+      )
+      Position.offset(labelInput, inputOffset)
+      Position.offset(labelInput, inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
       labelInput.width(clickInterceptor.width() - 10)
       labelInput.focus()
     }

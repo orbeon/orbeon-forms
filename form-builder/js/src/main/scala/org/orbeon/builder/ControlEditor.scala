@@ -46,10 +46,10 @@ object ControlEditor {
       // Position editors
       def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
         editor.show()
-        Position.offset(editor, new Position.Offset {
-          override val left = cell.left + offsetLeft
-          override val top  = cell.top - Position.scrollTop()
-        })
+        Position.offset(editor, Position.Offset(
+          left = cell.left + offsetLeft,
+          top  = cell.top - Position.scrollTop()
+        ))
       }
       val cellContent = cell.el.children()
       val controlElOpt = (cellContent.length > 0).option(cellContent.first())

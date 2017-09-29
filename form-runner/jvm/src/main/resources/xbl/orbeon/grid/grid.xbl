@@ -87,7 +87,7 @@
                 <xsl:variable name="root" select="/*[1]"/>
 
                 <!-- Point to the source element for this grid -->
-                <!-- TODO: Remove this once we no longer need `fbf:hasEditor($control, 'static-itemset'))` -->
+                <!-- TODO LATER: Remove this once we no longer need `fbf:hasEditor($control, 'static-itemset'))` -->
                 <xsl:variable name="edit-ref"                 select="$root/@edit-ref"/>
 
                 <xsl:variable name="is-editable"              select="exists($edit-ref)"/>
@@ -165,7 +165,7 @@
                 <xsl:variable name="has-rowspan-or-colspan"   select="exists($root//(@rowspan | @colspan | @h | @w)[. > 1])"/>
                 <!--<xsl:variable name="has-rowspan-or-colspan"   select="exists($root//@rowspan)"/>-->
 
-                <!-- TODO: refine, repeats? -->
+                <!-- TODO LATER: refine, repeats? -->
                 <xsl:variable name="is-table"                 select="not($use-css-grids-output) and ($has-rowspan-or-colspan or $is-repeat or exists($root/(xf:group | xf:repeat)))"/>
 
                 <xsl:variable name="table-elem"               select="if ($is-table) then 'xh:table' else 'xh:div'"/>
@@ -326,10 +326,13 @@
                                     'fr-grid-css'[$use-css-grids-output],
                                     (: Control name might not be available (unclear why normalize-space() is needed) :)
                                     for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
-                                    if ($is-repeat) then (
+                                    if ($is-repeat and not($use-css-grids-output)) then (
                                         'table',
                                         'table-bordered'[$appearance = 'full'],
-                                        'table-condensed',
+                                        'table-condensed'
+                                    ) else
+                                        (),
+                                    if ($is-repeat) then (
                                         'fr-repeat',
                                         if ($static-row-count le 1) then
                                             'fr-repeat-single-row'
@@ -375,254 +378,219 @@
                                         </xsl:if>
                                     </xh:colgroup>
                                 </xsl:if>
-                                <xsl:element name="{$thead-elem}">
-                                    <xsl:attribute name="class">fr-grid-head</xsl:attribute>
 
-                                    <xsl:variable name="side-block">
-                                        <xsl:if test="$left-column or $right-column">
-                                            <xsl:element name="{$th-elem}">
-                                                <xsl:attribute name="class" select="concat('fr-repeat-column-', if ($left-column) then 'left' else 'right')"/>
-                                                <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
-                                                <xsl:if test="$left-column">
-                                                    <xf:trigger
-                                                        appearance="minimal"
-                                                        ref="$repeat-context[$can-add]"
-                                                        id="fr-grid-add"
-                                                        tabindex="-1"
-                                                        xxf:title="{{xxf:r('components.grid.add-another', '|fr-fr-resources|')}}">
-                                                        <xf:label><xh:i class="icon-plus-sign"/></xf:label>
-                                                    </xf:trigger>
-                                                    <xf:group ref="$repeat-context[not($can-add)]">
-                                                        <xh:i class="icon-plus-sign disabled"/>
-                                                    </xf:group>
-                                                </xsl:if>
-                                            </xsl:element>
-                                        </xsl:if>
-                                    </xsl:variable>
-
-                                    <!-- Row with column headers -->
-                                    <xsl:variable name="head-content">
-
-                                        <xsl:if test="$lhh-in-header">
-                                            <xsl:for-each select="array:get($rows-array, 1)">
-
-                                                <xsl:variable name="map" select="."/>
-
-                                                <xsl:variable name="c" select="map:get($map, 'c')"/>
-                                                <xsl:variable name="x" select="map:get($map, 'x')"/>
-                                                <xsl:variable name="w" select="map:get($map, 'w')"/>
-
-                                                <xsl:variable name="control" select="$c/*[1]"/>
-                                                <xsl:copy-of select="fr:scope-outer-avt-class($c/@class)"/>
-                                                <xsl:element name="{$th-elem}">
-                                                    <xsl:copy-of select="fr:th-td-classes-attr('th', $c/@class, $c/@id)"/>
-                                                    <xsl:if test="$w gt 1">
-                                                        <xsl:attribute name="{fr:colspan-attribute()}" select="$w"/>
-                                                    </xsl:if>
-                                                    <xsl:if test="$use-css-grids-output">
-                                                        <xsl:attribute name="data-x" select="$x"/>
-                                                        <xsl:attribute name="data-y" select="'1'"/>
-                                                    </xsl:if>
-                                                    <xsl:if test="$is-editable">
-                                                        <xsl:attribute name="xxf:control" select="'true'"/>
-                                                    </xsl:if>
-                                                    <!-- Control exists AND is not a trigger -->
-                                                    <xsl:if test="empty($control/self::xf:trigger) and exists($control)">
-                                                        <!--
-                                                            1.  See also https://github.com/orbeon/orbeon-forms/issues/241
-                                                            2.  In order to determine an LHH when there is no iteration,
-                                                                XPath expressions on LHH elements can't be relative to
-                                                                control binding, as the context will be empty. This works
-                                                                for Form Runner though, as LHH point to resources and are not
-                                                                relative.
-                                                            3.  The bind attribute and bind() function return an empty
-                                                                sequence when the repeat is empty or when not in the context
-                                                                of the repeat (the latter is arguably wrong or at the very
-                                                                least unhelpful!).
-                                                            4.  So what we do is this: we try to obtain the binding for the
-                                                                control in the first iteration, within the context of the
-                                                                repeat expression, by copying all binding attributes on a
-                                                                variable. This will return the empty sequence if there is no
-                                                                iteration.
-                                                            5.  We can't simply use an enclosing group, otherwise the group
-                                                                will be non-relevant when no binding is found.
-                                                            6.  We can't use the xxf:control-binding() function to obtain the
-                                                                binding, because the repeat is further below and might not be
-                                                                up to date.
-                                                            7.  If there is no iteration, we cannot determine the binding,
-                                                                so we cannot determine whether the control is required or
-                                                                not.
-                                                            8.  Arguably, if there are no iteration, whether a control is
-                                                                required or not doesn't matter ;)
-                                                            9.  Even though, in most cases, we *could* know whether the
-                                                                control is required, because if the expression says
-                                                                `required="true()"`, the result is constant. But we don't
-                                                                have a good solution for that.
-                                                            10. So the control label shows in the table header when the first
-                                                                iteration of the control is non-relevant, we use bind() instead
-                                                                of bind="" to retrieve the controls bindings; see #2783 and #2821.
-                                                        -->
-                                                        <xf:var
-                                                            xxbl:scope="outer"
-                                                            name="control-binding"
-                                                            context="({$repeat-expression}){$repeat-expression-suffix}">
-                                                            <xxf:value>
-                                                                <xsl:choose>
-                                                                    <xsl:when test="$control/@bind">
-                                                                        <xsl:attribute name="value" select="concat('bind(''', $control/@bind, ''')')"/>
-                                                                    </xsl:when>
-                                                                    <xsl:otherwise>
-                                                                        <xsl:apply-templates select="$control/(@model, @context, @ref)"/>
-                                                                        <xsl:attribute name="value" select="'.'"/>
-                                                                    </xsl:otherwise>
-                                                                </xsl:choose>
-                                                            </xxf:value>
-                                                        </xf:var>
-                                                        <!-- Point to control binding if any, dummy value otherwise
-                                                             and make sure there is an empty value. -->
-                                                        <xf:output
-                                                                xxbl:scope="outer"
-                                                                ref="$control-binding[xxf:relevant()], ."
-                                                                value="''">
-                                                            <xsl:if test="$control/@id">
-                                                                <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
-                                                                <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
-                                                            </xsl:if>
-                                                            <xsl:attribute
-                                                                name="class"
-                                                                select="
-                                                                    'fr-grid-lhh-for-xforms-input'[node-name($control) = xs:QName('xf:input')],
-                                                                    fr:fb-control-classes($control, false())
-                                                            "/>
-                                                            <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
-                                                        </xf:output>
-                                                    </xsl:if>
-                                                </xsl:element><!-- $th-elem -->
-                                            </xsl:for-each>
-                                        </xsl:if>
-                                    </xsl:variable>
-
-                                    <xsl:choose>
-                                        <xsl:when test="not($use-css-grids-output)">
-                                            <xsl:element name="{$tr-elem}">
-                                                <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
-                                                <xsl:if test="$left-column">
-                                                    <xsl:copy-of select="$side-block"/>
-                                                </xsl:if>
-                                                <xsl:copy-of select="$head-content"/>
-                                                <xsl:if test="$right-column">
-                                                    <xsl:copy-of select="$side-block"/>
-                                                </xsl:if>
-                                            </xsl:element>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <!-- TODO: Place left/right block. We might need another enclosing element for positioning. -->
-                                            <xsl:copy-of select="$head-content"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-
-                                </xsl:element><!-- $thead-elem -->
-                            </xsl:if>
-
-                            <!-- Row group -->
-                            <xsl:variable name="repeated-content">
-                                <xsl:if test="$is-repeat">
-                                    <xsl:choose>
-                                        <xsl:when test="not($readonly)">
-                                            <!-- Local -->
-                                            <xf:var name="repeat-position" value="xxf:repeat-position()"/>
-                                            <xf:var name="frozen"          value="$repeat-position le $freeze"/>
-
-                                            <!-- Local -->
-                                            <xf:var name="remove-constraint">
-                                                <!-- Evaluate the constraint in the context of the iteration -->
-                                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
-                                                <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
-                                            </xf:var>
-
-                                            <xf:var
-                                                name="can-remove"
-                                                value="
-                                                    $remove-constraint and
-                                                    not($frozen) and
-                                                    $min castable as xs:integer and
-                                                    count($repeat-sequence) gt xs:integer($min)"
-                                            />
-
-                                            <xf:var
-                                                name="can-classes"
-                                                value="
-                                                    'can-remove'      [$can-remove],
-                                                    'can-move-up'     [$repeat-position gt $freeze + 1],
-                                                    'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
-                                                    'can-insert-above'[$can-add and not($frozen)],
-                                                    'can-insert-below'[$can-add and $repeat-position ge $freeze]"
-                                            />
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xf:var name="can-classes"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xsl:if>
-
-                                <xsl:variable name="side-block">
+                                <xsl:variable name="header-side-block">
                                     <xsl:if test="$left-column or $right-column">
-                                        <xsl:element name="{$td-elem}">
+                                        <xsl:element name="{$th-elem}">
                                             <xsl:attribute name="class" select="concat('fr-repeat-column-', if ($left-column) then 'left' else 'right')"/>
-                                            <!-- TODO: Not in css grid mode -->
-                                            <xsl:if test="$static-row-count gt 1">
-                                                <xsl:attribute name="{fr:rowspan-attribute()}" select="$static-row-count"/>
-                                            </xsl:if>
                                             <xsl:attribute name="xxf:control">true</xsl:attribute>
                                             <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
-
-                                            <!-- TODO: Whether we are left/right or menu/add should be orthogonal. -->
-                                            <xsl:choose>
-                                                <xsl:when test="$left-column">
-                                                    <xh:div class="dropdown">
-                                                        <xh:button
-                                                            class="btn btn-mini fr-grid-dropdown-button"
-                                                            aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
-                                                            aria-expanded="false">
-                                                            <xh:span class="caret"/>
-                                                        </xh:button>
-                                                    </xh:div>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xf:trigger
-                                                        appearance="minimal"
-                                                        ref="$repeat-context[$can-remove]"
-                                                        id="fr-grid-remove"
-                                                        tabindex="-1"
-                                                        xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
-
-                                                        <xf:label><xh:i class="icon-minus-sign"/></xf:label>
-                                                        <xf:dispatch
-                                                            event="DOMActivate"
-                                                            name="fr-remove"
-                                                            targetid="repeat-group"/>
-                                                    </xf:trigger>
-                                                    <xf:group ref="$repeat-context[not($can-remove)]">
-                                                        <xh:i class="icon-minus-sign disabled"/>
-                                                    </xf:group>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                       </xsl:element>
+                                            <xsl:if test="$left-column">
+                                                <xf:trigger
+                                                    appearance="minimal"
+                                                    ref="$repeat-context[$can-add]"
+                                                    id="fr-grid-add"
+                                                    tabindex="-1"
+                                                    xxf:title="{{xxf:r('components.grid.add-another', '|fr-fr-resources|')}}">
+                                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                                </xf:trigger>
+                                                <xf:group ref="$repeat-context[not($can-add)]">
+                                                    <xh:i class="icon-plus-sign disabled"/>
+                                                </xf:group>
+                                            </xsl:if>
+                                        </xsl:element>
                                     </xsl:if>
                                 </xsl:variable>
 
+                                <!-- Row with column headers -->
+                                <xsl:variable name="head-content">
+                                    <xsl:if test="$lhh-in-header">
+                                        <xsl:for-each select="array:get($rows-array, 1)">
+
+                                            <xsl:variable name="map" select="."/>
+
+                                            <xsl:variable name="c" select="map:get($map, 'c')"/>
+                                            <xsl:variable name="x" select="map:get($map, 'x')"/>
+                                            <xsl:variable name="w" select="map:get($map, 'w')"/>
+
+                                            <xsl:variable name="control" select="$c/*[1]"/>
+                                            <xsl:copy-of select="fr:scope-outer-avt-class($c/@class)"/>
+                                            <xsl:element name="{$th-elem}">
+                                                <xsl:copy-of select="fr:th-td-classes-attr('th', $c/@class, $c/@id)"/>
+                                                <xsl:if test="$w gt 1">
+                                                    <xsl:attribute name="{fr:colspan-attribute()}" select="$w"/>
+                                                </xsl:if>
+                                                <xsl:if test="$use-css-grids-output">
+                                                    <xsl:attribute name="data-x" select="$x"/>
+                                                    <xsl:attribute name="data-y" select="'1'"/>
+                                                </xsl:if>
+                                                <xsl:if test="$is-editable">
+                                                    <xsl:attribute name="xxf:control" select="'true'"/>
+                                                </xsl:if>
+                                                <!-- Control exists AND is not a trigger -->
+                                                <xsl:if test="empty($control/self::xf:trigger) and exists($control)">
+                                                    <!--
+                                                        1.  See also https://github.com/orbeon/orbeon-forms/issues/241
+                                                        2.  In order to determine an LHH when there is no iteration,
+                                                            XPath expressions on LHH elements can't be relative to
+                                                            control binding, as the context will be empty. This works
+                                                            for Form Runner though, as LHH point to resources and are not
+                                                            relative.
+                                                        3.  The bind attribute and bind() function return an empty
+                                                            sequence when the repeat is empty or when not in the context
+                                                            of the repeat (the latter is arguably wrong or at the very
+                                                            least unhelpful!).
+                                                        4.  So what we do is this: we try to obtain the binding for the
+                                                            control in the first iteration, within the context of the
+                                                            repeat expression, by copying all binding attributes on a
+                                                            variable. This will return the empty sequence if there is no
+                                                            iteration.
+                                                        5.  We can't simply use an enclosing group, otherwise the group
+                                                            will be non-relevant when no binding is found.
+                                                        6.  We can't use the xxf:control-binding() function to obtain the
+                                                            binding, because the repeat is further below and might not be
+                                                            up to date.
+                                                        7.  If there is no iteration, we cannot determine the binding,
+                                                            so we cannot determine whether the control is required or
+                                                            not.
+                                                        8.  Arguably, if there are no iteration, whether a control is
+                                                            required or not doesn't matter ;)
+                                                        9.  Even though, in most cases, we *could* know whether the
+                                                            control is required, because if the expression says
+                                                            `required="true()"`, the result is constant. But we don't
+                                                            have a good solution for that.
+                                                        10. So the control label shows in the table header when the first
+                                                            iteration of the control is non-relevant, we use bind() instead
+                                                            of bind="" to retrieve the controls bindings; see #2783 and #2821.
+                                                    -->
+                                                    <xf:var
+                                                        xxbl:scope="outer"
+                                                        name="control-binding"
+                                                        context="({$repeat-expression}){$repeat-expression-suffix}">
+                                                        <xxf:value>
+                                                            <xsl:choose>
+                                                                <xsl:when test="$control/@bind">
+                                                                    <xsl:attribute name="value" select="concat('bind(''', $control/@bind, ''')')"/>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <xsl:apply-templates select="$control/(@model, @context, @ref)"/>
+                                                                    <xsl:attribute name="value" select="'.'"/>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
+                                                        </xxf:value>
+                                                    </xf:var>
+                                                    <!-- Point to control binding if any, dummy value otherwise
+                                                         and make sure there is an empty value. -->
+                                                    <xf:output
+                                                            xxbl:scope="outer"
+                                                            ref="$control-binding[xxf:relevant()], ."
+                                                            value="''">
+                                                        <xsl:if test="$control/@id">
+                                                            <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
+                                                            <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
+                                                        </xsl:if>
+                                                        <xsl:attribute
+                                                            name="class"
+                                                            select="
+                                                                'fr-grid-lhh-for-xforms-input'[node-name($control) = xs:QName('xf:input')],
+                                                                fr:fb-control-classes($control, false())
+                                                        "/>
+                                                        <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
+                                                    </xf:output>
+                                                </xsl:if>
+                                            </xsl:element><!-- $th-elem -->
+                                        </xsl:for-each>
+                                    </xsl:if>
+                                </xsl:variable>
+
+                                <xsl:choose>
+                                    <xsl:when test="not($use-css-grids-output)">
+                                        <xsl:element name="{$thead-elem}">
+                                            <xsl:attribute name="class">fr-grid-head</xsl:attribute>
+                                            <xsl:element name="{$tr-elem}">
+                                                <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
+                                                <xsl:if test="$left-column">
+                                                    <xsl:copy-of select="$header-side-block"/>
+                                                </xsl:if>
+                                                <xsl:copy-of select="$head-content"/>
+                                                <xsl:if test="$right-column">
+                                                    <xsl:copy-of select="$header-side-block"/>
+                                                </xsl:if>
+                                            </xsl:element>
+                                        </xsl:element>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:element name="xh:div">
+                                            <xsl:attribute name="class">fr-grid-repeat-top-row</xsl:attribute>
+                                            <xsl:if test="$left-column">
+                                                <xsl:copy-of select="$header-side-block"/>
+                                            </xsl:if>
+                                            <xsl:element name="xh:div">
+                                                <xsl:attribute name="class">fr-grid-head</xsl:attribute>
+                                                <xsl:copy-of select="$head-content"/>
+                                            </xsl:element>
+                                            <xsl:if test="$right-column">
+                                                <xsl:copy-of select="$header-side-block"/>
+                                            </xsl:if>
+                                        </xsl:element>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:if>
+
+                            <xsl:variable name="side-block">
+                                <xsl:if test="$left-column or $right-column">
+                                    <xsl:element name="{$td-elem}">
+                                        <xsl:attribute
+                                            name="class"
+                                            select="concat('fr-repeat-column-', if ($left-column) then 'left' else 'right')"/>
+                                        <xsl:if test="$static-row-count gt 1 and not($use-css-grids-output)">
+                                            <xsl:attribute name="{fr:rowspan-attribute()}" select="$static-row-count"/>
+                                        </xsl:if>
+                                        <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                        <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+
+                                        <!-- TODO LATER: Whether we are left/right or menu/add should be orthogonal. -->
+                                        <xsl:choose>
+                                            <xsl:when test="$left-column">
+                                                <xh:div class="dropdown">
+                                                    <xh:button
+                                                        class="btn btn-mini fr-grid-dropdown-button"
+                                                        aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
+                                                        aria-expanded="false">
+                                                        <xh:span class="caret"/>
+                                                    </xh:button>
+                                                </xh:div>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xf:trigger
+                                                    appearance="minimal"
+                                                    ref="$repeat-context[$can-remove]"
+                                                    id="fr-grid-remove"
+                                                    tabindex="-1"
+                                                    xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
+
+                                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                                    <xf:dispatch
+                                                        event="DOMActivate"
+                                                        name="fr-remove"
+                                                        targetid="repeat-group"/>
+                                                </xf:trigger>
+                                                <xf:group ref="$repeat-context[not($can-remove)]">
+                                                    <xh:i class="icon-minus-sign disabled"/>
+                                                </xf:group>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                   </xsl:element>
+                                </xsl:if>
+                            </xsl:variable>
+
+                            <xsl:variable name="rows-content">
                                 <xsl:for-each select="1 to array:size($rows-array)">
 
                                     <xsl:variable name="static-row-pos" select="."/>
                                     <xsl:variable name="cells"          select="array:get($rows-array, $static-row-pos)"/>
 
                                     <xsl:variable name="cells-content">
-
-                                        <xsl:if test="$left-column and $static-row-pos = 1">
-                                            <xsl:copy-of select="$side-block"/>
-                                        </xsl:if>
-
                                         <xsl:for-each select="$cells">
                                             <xsl:variable name="map" select="."/>
 
@@ -688,46 +656,119 @@
                                                 </xf:group>
                                             </xsl:element>
                                         </xsl:for-each>
-
-                                        <xsl:if test="$right-column and $static-row-pos = 1">
-                                            <xsl:copy-of select="$side-block"/>
-                                        </xsl:if>
                                     </xsl:variable><!-- $cells-content -->
 
                                     <xsl:choose>
                                         <xsl:when test="not($use-css-grids-output)">
                                             <xsl:element name="{$tr-elem}">
-
                                                 <!--  Maybe: restore `@class` coming from `*:tr` if there is one. But since anyway
                                                       the new grid format doesn't have explicit rows, this would be only for
                                                       backward compatibility. -->
-                                                <xsl:choose>
-                                                    <xsl:when test="$is-repeat and $static-row-pos = 1">
-                                                        <xsl:attribute name="class" select="'fr-grid-tr', '{$can-classes}'"/>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <xsl:attribute name="class" select="'fr-grid-tr'"/>
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-
+                                                <xsl:attribute name="class" select="'fr-grid-tr'"/>
+                                                <!--<xsl:choose>-->
+                                                    <!--<xsl:when test="$is-repeat and $static-row-pos = 1">-->
+                                                        <!--<xsl:attribute name="class" select="'fr-grid-tr', '{$can-classes}'"/>-->
+                                                    <!--</xsl:when>-->
+                                                    <!--<xsl:otherwise>-->
+                                                        <!---->
+                                                    <!--</xsl:otherwise>-->
+                                                <!--</xsl:choose>-->
+                                                <xsl:if test="$left-column and $static-row-pos = 1">
+                                                    <xsl:copy-of select="$side-block"/>
+                                                </xsl:if>
                                                 <xsl:copy-of select="$cells-content"/>
+                                                <xsl:if test="$right-column and $static-row-pos = 1">
+                                                    <xsl:copy-of select="$side-block"/>
+                                                </xsl:if>
                                             </xsl:element>
                                         </xsl:when>
                                         <xsl:otherwise>
+                                            <!-- CSS grids output -->
                                             <xsl:copy-of select="$cells-content"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
 
                                 </xsl:for-each>
-                            </xsl:variable><!-- $repeated-content -->
+                            </xsl:variable><!-- $rows-content -->
+
+                            <xsl:variable name="maybe-repeated-content">
+                                <xsl:choose>
+                                    <xsl:when test="not($use-css-grids-output) and $is-repeat">
+                                        <xsl:copy-of select="$rows-content"/>
+                                    </xsl:when>
+                                    <xsl:when test="not($use-css-grids-output)">
+                                        <xsl:element name="{$tbody-elem}">
+                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
+                                            <xsl:copy-of select="$rows-content"/>
+                                        </xsl:element>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- CSS grids output -->
+                                        <xsl:if test="$left-column">
+                                            <xsl:copy-of select="$side-block"/>
+                                        </xsl:if>
+                                        <xsl:element name="xh:div">
+                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
+                                            <xsl:copy-of select="$rows-content"/>
+                                        </xsl:element>
+                                        <xsl:if test="$right-column">
+                                            <xsl:copy-of select="$side-block"/>
+                                        </xsl:if>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:variable><!-- $maybe-repeated-content -->
 
                             <xsl:choose>
                                 <xsl:when test="$is-repeat">
                                     <!-- Enclose within repeat -->
                                     <xf:repeat ref="({$repeat-expression}){$repeat-expression-suffix}" id="{$repeat-id}" xxbl:scope="outer">
-                                        <xsl:element name="{$tbody-elem}">
-                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
-                                            <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+                                        <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+
+                                            <xsl:choose>
+                                                <xsl:when test="not($readonly)">
+                                                    <!-- Local -->
+                                                    <xf:var name="repeat-position" value="xxf:repeat-position()"/>
+                                                    <xf:var name="frozen"          value="$repeat-position le $freeze"/>
+
+                                                    <!-- Local -->
+                                                    <xf:var name="remove-constraint">
+                                                        <!-- Evaluate the constraint in the context of the iteration -->
+                                                        <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
+                                                        <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
+                                                    </xf:var>
+
+                                                    <xf:var
+                                                        name="can-remove"
+                                                        value="
+                                                            $remove-constraint and
+                                                            not($frozen) and
+                                                            $min castable as xs:integer and
+                                                            count($repeat-sequence) gt xs:integer($min)"
+                                                    />
+
+                                                    <xf:var
+                                                        name="can-classes"
+                                                        value="
+                                                            'can-remove'      [$can-remove],
+                                                            'can-move-up'     [$repeat-position gt $freeze + 1],
+                                                            'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
+                                                            'can-insert-above'[$can-add and not($frozen)],
+                                                            'can-insert-below'[$can-add and $repeat-position ge $freeze]"
+                                                    />
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xf:var name="can-classes"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+
+                                            <xsl:element name="{$tbody-elem}">
+                                                <xsl:attribute
+                                                    name="class"
+                                                    select="
+                                                        'fr-grid-repeat-iteration',
+                                                        '{$can-classes}',
+                                                        'fr-grid-body'[not($use-css-grids-output)]
+                                                    "/>
 
                                                 <!-- Run row operations, checking that they are allowed first -->
                                                 <xsl:if test="not($readonly)">
@@ -853,16 +894,13 @@
                                                     </xf:action>
                                                 </xsl:if>
 
-                                                <xsl:copy-of select="$repeated-content"/>
-                                            </xf:group>
-                                        </xsl:element>
+                                                <xsl:copy-of select="$maybe-repeated-content"/>
+                                            </xsl:element>
+                                        </xf:group>
                                     </xf:repeat>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:element name="{$tbody-elem}">
-                                        <xsl:attribute name="class">fr-grid-body</xsl:attribute>
-                                        <xsl:copy-of select="$repeated-content"/>
-                                    </xsl:element>
+                                    <xsl:copy-of select="$maybe-repeated-content"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:element><!-- $table-elem -->
@@ -875,7 +913,7 @@
 
                                 <xsl:if test="$remove-at-bottom">
                                     <!-- NOTE: Don't apply remove constraint: in this mode last row can always be removed (until `$min`). -->
-                                    <!-- TODO: not($frozen) -->
+                                    <!-- TODO LATER: not($frozen) -->
                                     <xf:var
                                         name="can-remove"
                                         value="

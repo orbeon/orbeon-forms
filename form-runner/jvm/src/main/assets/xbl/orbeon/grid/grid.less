@@ -35,7 +35,13 @@
             }
         }
 
-        .fr-grid.fr-grid-css > .fr-grid-body, .fr-grid.fr-grid-css > .fr-grid-head {
+        .fr-grid.fr-grid-css .fr-grid-repeat-top-row, .fr-grid.fr-grid-css .fr-grid-repeat-iteration {
+            display: grid;
+            width: 100%;
+            grid-template-columns: 35px auto;
+        }
+
+        .fr-grid.fr-grid-css .fr-grid-head, .fr-grid.fr-grid-css .fr-grid-body {
             display: grid;
             width: 100%;
             grid-template-columns: repeat(12, 1fr);

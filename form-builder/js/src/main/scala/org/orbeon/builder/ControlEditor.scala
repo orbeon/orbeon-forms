@@ -48,7 +48,7 @@ object ControlEditor {
         editor.show()
         Position.offset(editor, new Position.Offset {
           override val left = cell.left + offsetLeft
-          override val top  = cell.top
+          override val top  = cell.top - Position.scrollTop()
         })
       }
       val cellContent = cell.el.children()

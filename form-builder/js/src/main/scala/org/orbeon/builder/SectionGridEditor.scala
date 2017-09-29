@@ -13,8 +13,8 @@
  */
 package org.orbeon.builder
 
-import enumeratum._
 import enumeratum.EnumEntry._
+import enumeratum._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
@@ -22,7 +22,6 @@ import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 object SectionGridEditor {
 
@@ -146,7 +145,7 @@ object SectionGridEditor {
 
       // Find top/bottom of the row track the pointer is on
       val pointerRowTopBottomIndexOpt = {
-        val pointerTop = Position.pointerPos.top
+        val pointerTop = Position.pointerPos.top + Position.scrollTop()
         rowsTopBottom.zipWithIndex.find { case (topBottom, _) ⇒
           topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
         }
@@ -172,7 +171,7 @@ object SectionGridEditor {
             el = elem,
             offset = new Position.Offset {
               override val left: Double = containerLeft
-              override val top: Double = topOffset(elem)
+              override val top: Double = topOffset(elem) - Position.scrollTop()
             }
           )
         }

@@ -41,15 +41,15 @@ object BlockCache {
     val cols: js.Array[Block] = js.Array()
   }
 
-  val sectionGridCache = js.Array[Block]()
-  val fbMainCache      = js.Array[Block]()
-  val cellCache        = js.Array[Block]()
+  val sectionGridBodyCache = js.Array[Block]()
+  val fbMainCache          = js.Array[Block]()
+  val cellCache            = js.Array[Block]()
 
   // Keep caches current
   Position.onOffsetMayHaveChanged(() ⇒ {
 
     locally {
-      sectionGridCache.length = 0
+      sectionGridBodyCache.length = 0
       $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
         val section = $(domSection)
 
@@ -60,7 +60,7 @@ object BlockCache {
 
         val titleAnchor = section.find("a")
 
-        sectionGridCache.unshift(new Block {
+        sectionGridBodyCache.unshift(new Block {
           override val el          = section
           override val top         = Position.adjustedOffset(section).top
           override val left        = Position.adjustedOffset(mostOuterSection).left
@@ -70,9 +70,9 @@ object BlockCache {
         })
 
       })
-      val gridEls = $(".xbl-fr-grid > .fr-grid.fr-editable> .fr-grid-body")
+      val gridEls = $(".xbl-fr-grid > .fr-grid.fr-editable > .fr-grid-body")
       gridEls.each((grid: dom.Element) ⇒
-        addToCache(sectionGridCache, $(grid))
+        addToCache(sectionGridBodyCache, $(grid))
       )
     }
 

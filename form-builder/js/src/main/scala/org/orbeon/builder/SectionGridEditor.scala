@@ -29,8 +29,8 @@ object SectionGridEditor {
   lazy val sectionGridEditorContainer               = $(".fb-section-grid-editor")
   lazy val rowEditorContainer                       = $(".fb-row-editor")
 
-  var currentSectionGridBodyOpt : js.UndefOr[Block] = js.undefined
-  var currentRowPosOpt          : js.UndefOr[Int]   = js.undefined
+  var currentSectionGridBodyOpt : Option[Block] = None
+  var currentRowPosOpt          : Option[Int]   = None
 
   sealed trait GridSectionEditor extends EnumEntry with Hyphencase
   object GridSectionEditor extends Enum[GridSectionEditor] {
@@ -65,30 +65,30 @@ object SectionGridEditor {
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
-    containerCache = BlockCache.sectionGridCache,
+    containerCache = BlockCache.sectionGridBodyCache,
     wasCurrent = (_: Block) ⇒ (),
-    becomesCurrent = (sectionGrid: Block) ⇒ {
-      currentSectionGridBodyOpt = sectionGrid
+    becomesCurrent = (sectionGridBody: Block) ⇒ {
+      currentSectionGridBodyOpt = Some(sectionGridBody)
 
       // Position the editor
       sectionGridEditorContainer.show()
       Position.offset(sectionGridEditorContainer, new Position.Offset {
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
         override val left = Position.offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth()
-        override val top  = sectionGrid.top - Position.scrollTop()
+        override val top  = sectionGridBody.top - Position.scrollTop()
       })
 
       // Start by hiding all the icons
       sectionGridEditorContainer.children().hide()
 
       // Update triggers relevance for section
-      if (sectionGrid.el.is(BlockCache.SectionSelector)) {
+      if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
 
         // Edit details and help are always visible
         sectionGridEditorContainer.children(".fb-section-edit-details, .fb-section-edit-help").show()
 
         // Hide/show section move icons
-        val container = sectionGrid.el.children(".fr-section-container")
+        val container = sectionGridBody.el.children(".fr-section-container")
         List("up", "right", "down", "left").foreach((direction) ⇒ {
           val relevant = container.hasClass("fb-can-move-" + direction)
           val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction)
@@ -101,7 +101,7 @@ object SectionGridEditor {
       }
 
       // Update triggers relevance for section
-      if (sectionGrid.el.is(BlockCache.GridSelector)) {
+      if (sectionGridBody.el.is(BlockCache.GridSelector)) {
         sectionGridEditorContainer.children(".fb-grid-edit-details, .fb-grid-delete").show()
       }
     }
@@ -113,8 +113,8 @@ object SectionGridEditor {
     wasCurrent = (_: Block) ⇒ {
       sectionGridEditorContainer.hide()
       rowEditorContainer.hide()
-      currentSectionGridBodyOpt = js.undefined
-      currentRowPosOpt      = js.undefined
+      currentSectionGridBodyOpt = None
+      currentRowPosOpt          = None
     },
     becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
   )
@@ -177,7 +177,7 @@ object SectionGridEditor {
           )
         }
 
-        currentRowPosOpt = rowIndex + 1
+        currentRowPosOpt = Some(rowIndex + 1)
         positionElWithClass(AddRowAbove.selector, (_) ⇒ rowTop)
         positionElWithClass(DeleteRow.selector  , (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
         positionElWithClass(AddRowBelow.selector, (e) ⇒ rowBottom - e.height())

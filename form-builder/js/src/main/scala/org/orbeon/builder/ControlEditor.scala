@@ -59,10 +59,7 @@ object ControlEditor {
         positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
         // Show/hide itemset icon
         val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
-        if (controlEl.is(".fb-itemset"))
-          itemsetIcon.show()
-        else
-          itemsetIcon.hide()
+        itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
       })
       controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
       positionEditor(controlEditorLeft, 0)

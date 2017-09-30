@@ -37,9 +37,6 @@ trait GridOps extends ContainerOps {
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
   //@XPathFunction
-  def rowInsertBelow(gridId: String, rowPos: Int): NodeInfo =
-    rowInsertBelow(containerById(gridId), rowPos)
-
   def rowInsertBelow(gridElem: NodeInfo, rowPos: Int): NodeInfo = {
 
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)

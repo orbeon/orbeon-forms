@@ -63,7 +63,7 @@ class GridOpsTest
           // Insert one row below each existing row
 
           for (rowPos ← List(0, 2, 4)) {
-            rowInsertBelow(gridNode.id, rowPos)
+            rowInsertBelow(gridNode, rowPos)
             val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)
             mapping = newMapping
           }

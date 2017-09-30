@@ -578,7 +578,7 @@
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-row-insert-below" xxf:phantom="true" type="xpath">
-        fbf:rowInsertBelow(event('xxf:targetid'), xs:integer(event('fb-row-pos')) - 1)
+        fbf:rowInsertBelow(fbf:containerById(event('xxf:targetid')), xs:integer(event('fb-row-pos')) - 1)
     </xf:action>
 
     <xf:action ev:observer="fb" ev:event="fb-expand-right" xxf:phantom="true" type="xpath">

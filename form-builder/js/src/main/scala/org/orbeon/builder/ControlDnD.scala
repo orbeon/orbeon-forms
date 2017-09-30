@@ -15,21 +15,23 @@ package org.orbeon.builder
 
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.{$, DocumentAPI}
+import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
-import scala.scalajs.js.Dictionary
 
 object ControlDnD {
 
   private val CopyClass = "fb-dnd-copy"
   private val MoveClass = "fb-dnd-move"
+
   private var shiftPressed = false
 
-  $(document).on("keyup keydown", {event: JQueryEventObject ⇒
-    shiftPressed = event.asInstanceOf[js.Dynamic].shiftKey.asInstanceOf[Boolean]
-  })
+  $(document).on(
+    "keyup keydown",
+    (event: JQueryEventObject) ⇒ shiftPressed = event.asInstanceOf[KeyboardEvent].shiftKey
+  )
 
   val drake = Dragula(
     js.Array(),

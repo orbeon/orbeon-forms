@@ -16,6 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.jquery.Offset
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, DocumentAPI}
+import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
@@ -29,9 +30,9 @@ object Grid {
 
   var OpNames = List("move-up", "move-down", "insert-above", "insert-below", "remove")
 
-  // Not very nice: global context for actionFunction.
-  var currentGridIdOpt: Option[String]        = None
-  var currentGridIterationOpt: Option[String] = None
+  case class CurrentGrid(currentGridId: String, currentGridIteration: Int)
+
+  private var currentGridOpt: Option[CurrentGrid] = None
 
   // Initialization
   globalMenuElem foreach { _ ⇒
@@ -63,19 +64,21 @@ object Grid {
     def moveMenu(e: JQueryEventObject): Boolean = {
       val dropdown = $(e.target).closest(".dropdown")
 
-      val dropdownOffset = Offset(dropdown.offset())
+      val dropdownOffset = Offset(dropdown)
 
       $(globalMenuElem).css("position", "absolute")
       Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + dropdown.height()))
 
-      val iteration = $(gridIteration(e))
-
       OpNames foreach { opName ⇒
-        $(globalMenuElem).find(".dropdown-menu").children(s".fr-$opName").toggleClass("disabled", ! iteration.is(s".can-$opName"))
+        $(globalMenuElem).find(".dropdown-menu").children(s".fr-$opName").toggleClass(
+          "disabled",
+          ! $(gridIteration(e)).is(s".can-$opName")
+        )
       }
 
-      currentGridIdOpt = gridId(e)
-      currentGridIterationOpt = findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])
+      gridId(e).zip(findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])) foreach {
+        case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
+      }
 
       // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
       // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
@@ -84,21 +87,28 @@ object Grid {
       false
     }
 
-    // Handle keyboard events that arrive on our button and delegate the to the Bootstrap menu button
+    // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
     def delegateKeyEventToBootstrapButton(e: JQueryEventObject): js.Any = {
       moveMenu(e)
-      println(s"xxx delegate: ${e.`type`}, ${e.asInstanceOf[js.Dynamic].keyCode}")
-      $(globalMenuElem).find(".dropdown-toggle").trigger(new js.Object {
-        val `type`  = e.`type`
-        val keyCode = e.asInstanceOf[js.Dynamic].keyCode
-      }.asInstanceOf[JQueryEventObject]) // NOTE: Type appears in correct, but this seems to work.
+      $(globalMenuElem).find(".dropdown-toggle").trigger(
+        $.asInstanceOf[js.Dynamic].Event(e.`type`, new js.Object { // `Event` constructor is not present in the jQuery facade
+          val charCode = e.asInstanceOf[KeyboardEvent].charCode
+
+          // Putting these to be complete, but `charCode` above does the trick for the menu
+          val keyCode  = e.asInstanceOf[KeyboardEvent].keyCode
+          val which    = e.asInstanceOf[KeyboardEvent].asInstanceOf[js.Dynamic].which
+          val ctrlKey  = e.asInstanceOf[KeyboardEvent].ctrlKey
+          val shiftKey = e.asInstanceOf[KeyboardEvent].shiftKey
+          val altKey   = e.asInstanceOf[KeyboardEvent].altKey
+          val metaKey  = e.asInstanceOf[KeyboardEvent].metaKey
+        }).asInstanceOf[JQueryEventObject])
     }
 
     def gridIteration(e: JQueryEventObject): js.UndefOr[html.Element] =
       $(e.target).closest(".fr-grid-repeat-iteration")(0)
 
-    def findGridIterationsForElemWithId(elemWithId: html.Element): Option[String] =
-      $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption)
+    def findGridIterationsForElemWithId(elemWithId: html.Element): Option[Int] =
+      $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
 
     def grid(e: JQueryEventObject): js.UndefOr[html.Element] =
         $(e.target).closest(".xbl-fr-grid")(0)
@@ -107,13 +117,12 @@ object Grid {
         $(grid(e)).attr("id").toOption
 
     def actionFunction(forEventName: String): JQueryEventObject ⇒ js.Any = e ⇒ {
-
-      currentGridIdOpt.zip(currentGridIterationOpt) foreach {
-        case (currentGridId, currentGridIteration) ⇒
+      currentGridOpt foreach {
+        case CurrentGrid(currentGridId, currentGridIteration) ⇒
           DocumentAPI.dispatchEvent(
             targetId   = currentGridId,
             eventName  = s"fr-$forEventName",
-            properties = js.Dictionary("row" → currentGridIteration)
+            properties = js.Dictionary("row" → currentGridIteration.toString)
           )
       }
       e.preventDefault()

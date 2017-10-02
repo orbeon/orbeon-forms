@@ -14,6 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.CellOps
+import org.orbeon.oxf.fr.ClientNames._
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -29,22 +30,22 @@ object HtmlElementCell {
     def parent         (u: Element)                   : Element            = u.parentElement
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
-    def x(u: html.Element): Option[Int] = attValueOpt(u, "data-x") map (_.toInt)
-    def y(u: html.Element): Option[Int] = attValueOpt(u, "data-y") map (_.toInt)
-    def w(u: html.Element): Option[Int] = attValueOpt(u, "data-w") map (_.toInt)
-    def h(u: html.Element): Option[Int] = attValueOpt(u, "data-h") map (_.toInt)
+    def x(u: html.Element): Option[Int] = attValueOpt(u, AttX) map (_.toInt)
+    def y(u: html.Element): Option[Int] = attValueOpt(u, AttY) map (_.toInt)
+    def w(u: html.Element): Option[Int] = attValueOpt(u, AttW) map (_.toInt)
+    def h(u: html.Element): Option[Int] = attValueOpt(u, AttH) map (_.toInt)
 
     def updateX(u: html.Element, x: Int): Unit =
-      u.setAttribute("data-x", x.toString)
+      u.setAttribute(AttX, x.toString)
 
     def updateY(u: html.Element, y: Int): Unit =
-      u.setAttribute("data-y", y.toString)
+      u.setAttribute(AttY, y.toString)
 
     def updateH(u: html.Element, h: Int): Unit =
       if (h > 1)
-        u.setAttribute("data-h", h.toString)
+        u.setAttribute(AttH, h.toString)
       else
-        u.removeAttribute("data-h")
+        u.removeAttribute(AttH)
 
     def updateW(u: Element, w: Int): Unit =
       u.setAttribute("data-w", w.toString)

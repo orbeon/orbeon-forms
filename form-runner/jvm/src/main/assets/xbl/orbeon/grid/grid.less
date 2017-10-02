@@ -72,21 +72,21 @@
                 //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
 
                 .generateColumnStart(@x) when (@x > 0) {
-                    .fr-grid-td[data-x =  '@{x}'], .fr-grid-th[data-x =  '@{x}'] { grid-column-start: @x; }
+                    .fr-grid-td[data-fr-x =  '@{x}'], .fr-grid-th[data-fr-x =  '@{x}'] { grid-column-start: @x; }
                     .generateColumnStart(@x - 1)
                 }
 
                 .generateColumnStart(12);
 
                 .generateRowStart(@y) when (@y > 0) {
-                    .fr-grid-td[data-y =  '@{y}'] { grid-row-start: @y; }
+                    .fr-grid-td[data-fr-y =  '@{y}'] { grid-row-start: @y; }
                     .generateRowStart(@y - 1)
                 }
 
                 .generateRowStart(20);
 
                 .generateColumnEnd(@w) when (@w > 0) {
-                    .fr-grid-td[data-w =  '@{w}'], .fr-grid-th[data-w =  '@{w}'] { grid-column-end: span @w; }
+                    .fr-grid-td[data-fr-w =  '@{w}'], .fr-grid-th[data-fr-w =  '@{w}'] { grid-column-end: span @w; }
                     .generateColumnEnd(@w - 1)
                 }
 
@@ -94,7 +94,7 @@
                 .generateColumnEnd(12);
 
                 .generateRowEnd(@h) when (@h > 0) {
-                    .fr-grid-td[data-h =  '@{h}'] { grid-row-end: span @h; }
+                    .fr-grid-td[data-fr-h =  '@{h}'] { grid-row-end: span @h; }
                     .generateRowEnd(@h - 1)
                 }
 

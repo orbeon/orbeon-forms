@@ -17,6 +17,7 @@ import org.orbeon.builder.BlockCache.Block
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.Grid
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.fr.ClientNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.scalajs.dom.{document, html}
@@ -74,9 +75,9 @@ object ControlEditor {
             case Direction.Right | Direction.Down ⇒
               Grid.spaceToExtendCell(cellEl, direction) == 0
             case Direction.Left ⇒
-              (cell.el.attr("data-w") map (_.toInt) getOrElse 1) <= 1
+              (cell.el.attr(AttW) map (_.toInt) getOrElse 1) <= 1
             case Direction.Up ⇒
-              (cell.el.attr("data-h") map (_.toInt) getOrElse 1) <= 1
+              (cell.el.attr(AttH) map (_.toInt) getOrElse 1) <= 1
           }
         val icon = controlEditorLeft.find(s".icon-arrow-$directionName")
         icon.toggleClass("disabled", disableIcon)

@@ -23,6 +23,7 @@
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"
 
          xmlns:array="http://www.w3.org/2005/xpath-functions/array"
          xmlns:map="http://www.w3.org/2005/xpath-functions/map"
@@ -83,6 +84,12 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:variable name="root" select="/*[1]"/>
+
+                <!-- Don't duplicate constants between Scala/XSLT -->
+                <xsl:variable name="att-x" select="ClientNames:AttX()"/>
+                <xsl:variable name="att-y" select="ClientNames:AttY()"/>
+                <xsl:variable name="att-w" select="ClientNames:AttW()"/>
+                <xsl:variable name="att-h" select="ClientNames:AttH()"/>
 
                 <!-- Point to the source element for this grid -->
                 <!-- TODO LATER: Remove this once we no longer need `fbf:hasEditor($control, 'static-itemset'))` -->
@@ -419,8 +426,8 @@
                                                     <xsl:attribute name="{fr:colspan-attribute()}" select="$w"/>
                                                 </xsl:if>
                                                 <xsl:if test="$use-css-grids-output">
-                                                    <xsl:attribute name="data-x" select="$x"/>
-                                                    <xsl:attribute name="data-y" select="'1'"/>
+                                                    <xsl:attribute name="{$att-x}" select="$x"/>
+                                                    <xsl:attribute name="{$att-y}" select="'1'"/>
                                                 </xsl:if>
                                                 <xsl:if test="$is-editable">
                                                     <xsl:attribute name="xxf:control" select="'true'"/>
@@ -625,8 +632,8 @@
                                                 <xsl:if test="$w > 1"><xsl:attribute name="{fr:colspan-attribute()}" select="$w"/></xsl:if>
 
                                                 <xsl:if test="$use-css-grids-output">
-                                                    <xsl:attribute name="data-x" select="$x"/>
-                                                    <xsl:attribute name="data-y" select="$y"/>
+                                                    <xsl:attribute name="{$att-x}" select="$x"/>
+                                                    <xsl:attribute name="{$att-y}" select="$y"/>
                                                 </xsl:if>
 
                                                 <xsl:apply-templates select="$c/(@* except (@class, @xxf:control, @x, @y, @h, @w))"/>
@@ -975,11 +982,11 @@
                 </xsl:function>
 
                 <xsl:function name="fr:rowspan-attribute" as="xs:string">
-                    <xsl:value-of select="if ($use-css-grids-output) then 'data-h' else 'rowspan'"/>
+                    <xsl:value-of select="if ($use-css-grids-output) then $att-h else 'rowspan'"/>
                 </xsl:function>
 
                 <xsl:function name="fr:colspan-attribute" as="xs:string">
-                    <xsl:value-of select="if ($use-css-grids-output) then 'data-w' else 'colspan'"/>
+                    <xsl:value-of select="if ($use-css-grids-output) then $att-w else 'colspan'"/>
                 </xsl:function>
 
             </xsl:transform>

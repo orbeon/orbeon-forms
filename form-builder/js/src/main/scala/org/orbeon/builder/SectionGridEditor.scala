@@ -18,10 +18,10 @@ import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
-import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,7 +55,7 @@ object SectionGridEditor {
         case SectionMoveDown  ⇒ Some("fb-can-move-down")
         case SectionMoveRight ⇒ Some("fb-can-move-right")
         case SectionMoveLeft  ⇒ Some("fb-can-move-left")
-        case _                  ⇒ None
+        case _                ⇒ None
       }
   }
 
@@ -97,19 +97,25 @@ object SectionGridEditor {
 
         // Hide/show section move icons
         val container = sectionGridBody.el.children(".fr-section-container")
-        List("up", "right", "down", "left").foreach((direction) ⇒ {
-          val relevant = container.hasClass("fb-can-move-" + direction)
-          val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction)
+        Direction.values foreach { direction ⇒
+          val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
+          val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
           if (relevant) trigger.show()
-        })
+        }
 
         // Hide/show delete icon
         val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
         if (container.is(".fb-can-delete")) deleteTrigger.show()
       }
 
+      // Update triggers relevance for repeated grid only
       if (sectionGridBody.el.is(BlockCache.GridBodySelector)) {
-        sectionGridEditorContainer.children(".fb-grid-edit-details, .fb-grid-delete").show()
+
+        sectionGridEditorContainer.children(".fb-grid-delete").show()
+
+        if (sectionGridBody.el.closest(".fr-grid").is(".fr-repeat"))
+          sectionGridEditorContainer.children(".fb-grid-edit-details").show()
+
         sectionGridBody.el.parent.addClass("fb-hover")
       }
     }
@@ -205,11 +211,11 @@ object SectionGridEditor {
     )
 
   // Register listener on editor icons
-  $(document).ready(() ⇒ {
+  locally {
 
     GridSectionEditor.values foreach { editor ⇒
-      val editorName = editor.entryName
-      val iconEl     = sectionGridEditorContainer.children(s".fb-$editorName")
+
+      val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
 
       iconEl.on("click", () ⇒ {
         currentSectionGridBodyOpt foreach { currentSectionGridBody ⇒
@@ -226,17 +232,19 @@ object SectionGridEditor {
 
           import GridSectionEditor._
 
+          val client = FormBuilderClient[FormBuilderRpcApi]
+
           editor match {
-            case SectionDelete      ⇒ FormBuilderClient[FormBuilderRpcApi].sectionDelete     (sectionGridId).call()
-            case SectionEditDetails ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditDetails(sectionGridId).call()
-            case SectionEditHelp    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditHelp   (sectionGridId).call()
-            case SectionMoveUp      ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveUp     (sectionGridId).call()
-            case SectionMoveDown    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveDown   (sectionGridId).call()
-            case SectionMoveRight   ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveRight  (sectionGridId).call()
-            case SectionMoveLeft    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveLeft   (sectionGridId).call()
-            case SectionEditors     ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditors    (sectionGridId).call()
-            case GridEditDetails    ⇒ FormBuilderClient[FormBuilderRpcApi].gridEditDetails   (sectionGridId).call()
-            case GridDelete         ⇒ FormBuilderClient[FormBuilderRpcApi].gridDelete        (sectionGridId).call()
+            case SectionDelete      ⇒ client.sectionDelete     (sectionGridId).call()
+            case SectionEditDetails ⇒ client.sectionEditDetails(sectionGridId).call()
+            case SectionEditHelp    ⇒ client.sectionEditHelp   (sectionGridId).call()
+            case SectionMoveUp      ⇒ client.sectionMoveUp     (sectionGridId).call()
+            case SectionMoveDown    ⇒ client.sectionMoveDown   (sectionGridId).call()
+            case SectionMoveRight   ⇒ client.sectionMoveRight  (sectionGridId).call()
+            case SectionMoveLeft    ⇒ client.sectionMoveLeft   (sectionGridId).call()
+            case SectionEditors     ⇒ client.sectionEditors    (sectionGridId).call()
+            case GridEditDetails    ⇒ client.gridEditDetails   (sectionGridId).call()
+            case GridDelete         ⇒ client.gridDelete        (sectionGridId).call()
           }
         }
       })
@@ -250,14 +258,16 @@ object SectionGridEditor {
 
             val controlId = gridFromGridBody(currentGridBody).attr("id").get
 
+            val client = FormBuilderClient[FormBuilderRpcApi]
+
             rowEditor match {
-              case RowInsertAbove ⇒ FormBuilderClient[FormBuilderRpcApi].rowInsertAbove    (controlId, currentRowPos).call()
-              case RowDelete      ⇒ FormBuilderClient[FormBuilderRpcApi].rowDelete         (controlId, currentRowPos).call()
-              case RowInsertBelow ⇒ FormBuilderClient[FormBuilderRpcApi].rowInsertBelow    (controlId, currentRowPos).call()
+              case RowInsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()
+              case RowDelete      ⇒ client.rowDelete     (controlId, currentRowPos).call()
+              case RowInsertBelow ⇒ client.rowInsertBelow(controlId, currentRowPos).call()
             }
           }
         }
       )
     }
-  })
+  }
 }

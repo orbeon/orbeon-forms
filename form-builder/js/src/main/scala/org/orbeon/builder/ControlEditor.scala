@@ -22,7 +22,7 @@ import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.ClientNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
-import org.scalajs.dom.{document, html}
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -91,7 +91,7 @@ object ControlEditor {
   )
 
   // Register listener on editor icons
-  $(document).ready(() ⇒ {
+  locally {
 
     // Control actions
     ControlActionNames.foreach((actionName) ⇒ {
@@ -138,6 +138,5 @@ object ControlEditor {
           }
       })
     }
-  })
-
+  }
 }

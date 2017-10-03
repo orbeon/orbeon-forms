@@ -51,7 +51,7 @@ private object ControlResourceEditor {
       resourceEditorEndEdit()
   }
 
-  $(document).ready(() ⇒ {
+  locally {
 
     $(document).on("click", clickOrFocus _)
     $(document).on("focusin", clickOrFocus _)
@@ -94,7 +94,7 @@ private object ControlResourceEditor {
       if (resourceEditorCurrentLabelHint.is("*"))
           resourceEditorStartEdit()
     })
-  })
+  }
 
   // Show editor on click on label
   def resourceEditorStartEdit(): Unit = {
@@ -157,7 +157,7 @@ private object ControlResourceEditor {
   private object Private {
 
     // State
-    var tinymceObject: TinyMceEditor = null
+    var tinyMceObject: TinyMceEditor = null
 
     // Create elements for editing
     val container     = $("""<div   style="display: none" class = "fb-label-editor"/>""")
@@ -204,14 +204,14 @@ private object ControlResourceEditor {
       else                 resourceEditorCurrentLabelHint.text(value)
 
     def afterTinyMCEInitialized(f: TinyMceEditor ⇒ Unit): Unit =
-      tinymceObject.initialized.toOption match {
-        case Some(true)  ⇒ f(tinymceObject)
-        case _           ⇒ tinymceObject.onInit.add(f)
+      tinyMceObject.initialized.toOption match {
+        case Some(true)  ⇒ f(tinyMceObject)
+        case _           ⇒ tinyMceObject.onInit.add(f)
       }
 
     def makeSpaceForMCE(): Unit = {
       // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-      val mceContainer = document.getElementById(tinymceObject.editorContainer)
+      val mceContainer = document.getElementById(tinyMceObject.editorContainer)
       val mceHeight = $(mceContainer).height()
       resourceEditorCurrentLabelHint.height(mceHeight)
     }
@@ -228,12 +228,12 @@ private object ControlResourceEditor {
       mceConfig.autoresize_min_height = 100
       mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom
 
-      tinymceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig)
-      tinymceObject.render()
+      tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig)
+      tinyMceObject.render()
       afterTinyMCEInitialized((_) ⇒ {
         // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM
         tinymceAnchor.detach()
-        $(tinymceObject.getWin()).on("resize", makeSpaceForMCE _)
+        $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
       })
     })
 
@@ -242,8 +242,8 @@ private object ControlResourceEditor {
     // - If already initialized, set width directly on table created by TinyMCE
     // (Hacky, but didn't find a better way to do it)
     def setTinyMCEWidth(): Unit = {
-      if (tinymceObject != null) {
-        val tinymceTable = $(tinymceObject.container).find(".mceLayout")
+      if (tinyMceObject != null) {
+        val tinymceTable = $(tinyMceObject.container).find(".mceLayout")
         val widthSetOn = if (tinymceTable.is("*")) tinymceTable else tinymceAnchor
         widthSetOn.width(container.outerWidth())
       }
@@ -251,7 +251,7 @@ private object ControlResourceEditor {
 
     def getValue: String =
       if (lhha == "text") {
-          val content = tinymceObject.getContent()
+          val content = tinyMceObject.getContent()
           // Workaround to TinyMCE issue, see
           // https://twitter.com/avernet/status/579031182605750272
           if (content == "<div>\u00A0</div>") "" else content
@@ -262,10 +262,10 @@ private object ControlResourceEditor {
     def setValue(newValue: String): Unit =
       if (lhha == "text") {
           afterTinyMCEInitialized((_) ⇒ {
-            tinymceObject.setContent(newValue)
+            tinyMceObject.setContent(newValue)
             // Workaround for resize not happening with empty values, see
             // https://twitter.com/avernet/status/580798585291177984
-            tinymceObject.execCommand("mceAutoResize")
+            tinyMceObject.execCommand("mceAutoResize")
           })
       } else {
         textfield.value(newValue)
@@ -277,14 +277,14 @@ private object ControlResourceEditor {
     def startEdit(): Unit = {
       textfield.hide()
       checkbox.hide()
-      if (tinymceObject != null) tinymceObject.hide()
+      if (tinyMceObject != null) tinyMceObject.hide()
       if (lhha == "text") {
         setTinyMCEWidth()
         initTinyMCE()
         afterTinyMCEInitialized((_) ⇒ {
           makeSpaceForMCE()
-          tinymceObject.show()
-          tinymceObject.focus()
+          tinyMceObject.show()
+          tinyMceObject.focus()
         })
       } else {
         textfield.show()

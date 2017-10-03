@@ -25,8 +25,9 @@ import org.orbeon.scaxon.XML._
 
 trait FormRunnerResourcesOps {
 
-  def allResources(resources: NodeInfo) : Seq[NodeInfo] = resources child "resource"
+  //@XPathFunction
   def allLangs    (resources: NodeInfo) : Seq[String]   = allResources(resources) attValue "*:lang"
+  def allResources(resources: NodeInfo) : Seq[NodeInfo] = resources child "resource"
 
   def resourcesInstanceRootOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElement(inDoc, FormResources)
 

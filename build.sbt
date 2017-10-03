@@ -19,6 +19,7 @@ val HttpComponentsVersion         = "4.3.5"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
+val AutowireVersion               = "0.2.6"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -473,7 +474,14 @@ lazy val formRunnerJS = formRunner.js
 lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-builder"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-form-builder"
+    name                := "orbeon-form-builder",
+    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
   )
 
 lazy val formBuilderJVM = formBuilder.jvm

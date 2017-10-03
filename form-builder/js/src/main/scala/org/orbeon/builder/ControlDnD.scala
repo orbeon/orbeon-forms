@@ -13,12 +13,15 @@
  */
 package org.orbeon.builder
 
+import autowire._
+import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.xbl.{Dragula, DragulaOptions}
-import org.orbeon.xforms.{$, DocumentAPI}
+import org.orbeon.xforms.$
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
 object ControlDnD {
@@ -61,14 +64,8 @@ object ControlDnD {
 
   drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
     // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
-    if (target != null) {
-      DocumentAPI.dispatchEvent(el.id, "fb-dnd-control",
-        properties = js.Dictionary(
-          "fb-to-cell" → target.id,
-          "fb-do-copy" → $(el).hasClass(CopyClass).toString
-        )
-      )
-    }
+    if (target ne null)
+      FormBuilderClient[FormBuilderRpcApi].controlDnD(el.id, target.id, $(el).hasClass(CopyClass)).call()
   })
 
 }

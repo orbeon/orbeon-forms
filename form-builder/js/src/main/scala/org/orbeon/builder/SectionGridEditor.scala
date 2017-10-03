@@ -13,16 +13,18 @@
  */
 package org.orbeon.builder
 
-import enumeratum.EnumEntry._
+import autowire._
+import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
-import scala.scalajs.js
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object SectionGridEditor {
 
@@ -35,33 +37,33 @@ object SectionGridEditor {
   sealed trait GridSectionEditor extends EnumEntry with Hyphencase
   object GridSectionEditor extends Enum[GridSectionEditor] {
     val values = findValues
-    case object FbSectionDelete      extends GridSectionEditor
-    case object FbSectionEditDetails extends GridSectionEditor
-    case object FbSectionEditHelp    extends GridSectionEditor
-    case object FbSectionMoveUp      extends GridSectionEditor
-    case object FbSectionMoveDown    extends GridSectionEditor
-    case object FbSectionMoveRight   extends GridSectionEditor
-    case object FbSectionMoveLeft    extends GridSectionEditor
-    case object FbSectionEditors     extends GridSectionEditor
-    case object FbGridEditDetails    extends GridSectionEditor
-    case object FbGridDelete         extends GridSectionEditor
+    case object SectionDelete      extends GridSectionEditor
+    case object SectionEditDetails extends GridSectionEditor
+    case object SectionEditHelp    extends GridSectionEditor
+    case object SectionMoveUp      extends GridSectionEditor
+    case object SectionMoveDown    extends GridSectionEditor
+    case object SectionMoveRight   extends GridSectionEditor
+    case object SectionMoveLeft    extends GridSectionEditor
+    case object SectionEditors     extends GridSectionEditor
+    case object GridEditDetails    extends GridSectionEditor
+    case object GridDelete         extends GridSectionEditor
 
     // What class, if any, must be present on the corresponding container to the the editor to be enabled
     def enableClass(editor: GridSectionEditor): Option[String] =
       editor match {
-        case FbSectionMoveUp    ⇒ Some("fb-can-move-up")
-        case FbSectionMoveDown  ⇒ Some("fb-can-move-down")
-        case FbSectionMoveRight ⇒ Some("fb-can-move-right")
-        case FbSectionMoveLeft  ⇒ Some("fb-can-move-left")
+        case SectionMoveUp    ⇒ Some("fb-can-move-up")
+        case SectionMoveDown  ⇒ Some("fb-can-move-down")
+        case SectionMoveRight ⇒ Some("fb-can-move-right")
+        case SectionMoveLeft  ⇒ Some("fb-can-move-left")
         case _                  ⇒ None
       }
   }
 
-  sealed case class RowEditor(selector: String    , eventName: String )
-  val AddRowAbove = RowEditor(".icon-chevron-up"  , "fb-row-insert-above")
-  val DeleteRow   = RowEditor(".icon-minus-sign"  , "fb-row-delete"   )
-  val AddRowBelow = RowEditor(".icon-chevron-down", "fb-row-insert-below")
-  val RowEditors  = List(AddRowAbove, DeleteRow, AddRowBelow)
+  sealed case class RowEditor(selector: String)
+  val RowInsertAbove = RowEditor(".icon-chevron-up")
+  val RowDelete      = RowEditor(".icon-minus-sign")
+  val RowInsertBelow = RowEditor(".icon-chevron-down")
+  val RowEditors     = List(RowInsertAbove, RowDelete, RowInsertBelow)
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
@@ -181,9 +183,9 @@ object SectionGridEditor {
         }
 
         currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(AddRowAbove.selector, (_) ⇒ rowTop)
-        positionElWithClass(DeleteRow.selector  , (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(AddRowBelow.selector, (e) ⇒ rowBottom - e.height())
+        positionElWithClass(RowInsertAbove.selector, (_) ⇒ rowTop)
+        positionElWithClass(RowDelete.selector  , (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
+        positionElWithClass(RowInsertBelow.selector, (e) ⇒ rowBottom - e.height())
       })
     })
   }
@@ -201,37 +203,58 @@ object SectionGridEditor {
 
   // Register listener on editor icons
   $(document).ready(() ⇒ {
-    GridSectionEditor.values.foreach((editor) ⇒ {
+
+    GridSectionEditor.values foreach { editor ⇒
       val editorName = editor.entryName
-      val iconEl = sectionGridEditorContainer.children(s".$editorName")
+      val iconEl     = sectionGridEditorContainer.children(s".fb-$editorName")
+
       iconEl.on("click", () ⇒ {
-        currentSectionGridBodyOpt.foreach((currentSectionGridBody) ⇒ {
+        currentSectionGridBodyOpt foreach { currentSectionGridBody ⇒
+
           val isSection = currentSectionGridBody.el.is(BlockCache.SectionSelector)
+
           val sectionGrid =
-            if (isSection) currentSectionGridBody.el
-            else gridFromGridBody(currentSectionGridBody)
-          DocumentAPI.dispatchEvent(
-            targetId   = sectionGrid.attr("id").get,
-            eventName  = editorName
-          )
-        })
+            if (isSection)
+              currentSectionGridBody.el
+            else
+              gridFromGridBody(currentSectionGridBody)
+
+          val sectionGridId = sectionGrid.attr("id").get
+
+          import GridSectionEditor._
+
+          editor match {
+            case SectionDelete      ⇒ FormBuilderClient[FormBuilderRpcApi].sectionDelete     (sectionGridId).call()
+            case SectionEditDetails ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditDetails(sectionGridId).call()
+            case SectionEditHelp    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditHelp   (sectionGridId).call()
+            case SectionMoveUp      ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveUp     (sectionGridId).call()
+            case SectionMoveDown    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveDown   (sectionGridId).call()
+            case SectionMoveRight   ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveRight  (sectionGridId).call()
+            case SectionMoveLeft    ⇒ FormBuilderClient[FormBuilderRpcApi].sectionMoveLeft   (sectionGridId).call()
+            case SectionEditors     ⇒ FormBuilderClient[FormBuilderRpcApi].sectionEditors    (sectionGridId).call()
+            case GridEditDetails    ⇒ FormBuilderClient[FormBuilderRpcApi].gridEditDetails   (sectionGridId).call()
+            case GridDelete         ⇒ FormBuilderClient[FormBuilderRpcApi].gridDelete        (sectionGridId).call()
+          }
+        }
       })
-    })
-    RowEditors.foreach((rowEditor) ⇒ {
+    }
+
+    RowEditors foreach { rowEditor ⇒
       val iconEl = rowEditorContainer.children(rowEditor.selector)
       iconEl.on("click", () ⇒
-        withCurrentGridBody((currentGridBody) ⇒
-          currentRowPosOpt.foreach((currentRowPos) ⇒
-            DocumentAPI.dispatchEvent(
-              targetId   = gridFromGridBody(currentGridBody).attr("id").get,
-              eventName  = rowEditor.eventName,
-              properties = js.Dictionary(
-                "fb-row-pos" → currentRowPos.toString
-              )
-            )
-          )
-        )
+        withCurrentGridBody { currentGridBody ⇒
+          currentRowPosOpt foreach { currentRowPos ⇒
+
+            val controlId = gridFromGridBody(currentGridBody).attr("id").get
+
+            rowEditor match {
+              case RowInsertAbove ⇒ FormBuilderClient[FormBuilderRpcApi].rowInsertAbove    (controlId, currentRowPos).call()
+              case RowDelete      ⇒ FormBuilderClient[FormBuilderRpcApi].rowDelete         (controlId, currentRowPos).call()
+              case RowInsertBelow ⇒ FormBuilderClient[FormBuilderRpcApi].rowInsertBelow    (controlId, currentRowPos).call()
+            }
+          }
+        }
       )
-    })
+    }
   })
 }

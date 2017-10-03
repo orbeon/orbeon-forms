@@ -36,7 +36,6 @@ trait GridOps extends ContainerOps {
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
-  //@XPathFunction
   def rowInsertBelow(gridElem: NodeInfo, rowPos: Int): NodeInfo = {
 
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
@@ -86,7 +85,6 @@ trait GridOps extends ContainerOps {
     result orNull // bad, but insert() is not always able to return the inserted item at this time
   }
 
-  //@XPathFunction
   def rowInsertAbove(gridId: String, rowPos: Int): NodeInfo = {
 
     val gridElem       = containerById(gridId)
@@ -122,7 +120,6 @@ trait GridOps extends ContainerOps {
       case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y ⇒ u
     } distinct
 
-  //@XPathFunction
   def rowDelete(gridId: String, rowPos: Int): Unit = {
 
     val gridElem       = containerById(gridId)

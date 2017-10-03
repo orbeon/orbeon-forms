@@ -409,7 +409,6 @@ object ToolboxOps {
     insert(into = clipboard, origin = xvc/ *)
   }
 
-  //@XPathFunction
   def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
     val xvc = controlElementsInCellToXvc(sourceCellElem)
 

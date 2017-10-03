@@ -11,8 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+
 package org.orbeon.builder
 
+import autowire._
+import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
@@ -20,7 +23,7 @@ import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, Tiny
 import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
-import scala.scalajs.js
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 private object ControlResourceEditor {
@@ -109,7 +112,7 @@ private object ControlResourceEditor {
     Private.checkbox.prop("checked", Private.isLabelHintHtml)
     // Set tooltip for checkbox and HTML5 placeholders (don"t do this once for all, as the language can change)
     Private.checkbox.tooltip(new JQueryTooltipConfig() {
-      override val title = $(".fb-message-lhha-checkbox").text()
+      val title = $(".fb-message-lhha-checkbox").text()
     })
     val lhha = Private.lhha
     Private.textfield.attr("placeholder", $(s".fb-message-type-$lhha").text())
@@ -125,17 +128,17 @@ private object ControlResourceEditor {
     // If editor is hidden, editing has already been ended (endEdit can be called more than once)
     if (Private.container.is(":visible")) {
       // Send value to server, handled in FB"s model.xml
-      val newValue = Private.getValue
-      val isHTML = Private.isHTML
-      DocumentAPI.dispatchEvent(
-        targetId = resourceEditorCurrentControl.attr("id").get,
-        eventName = "fb-update-control-lhha",
-        properties = js.Dictionary(
-          "lhha" → Private.lhha,
-          "value" → newValue,
-          "isHtml" → isHTML.toString()
-        )
-      )
+      val controlId   = resourceEditorCurrentControl.attr("id").get
+      val newValue    = Private.getValue
+      val isHTML      = Private.isHTML
+
+      FormBuilderClient[FormBuilderRpcApi].controlUpdateLHHA(
+        controlId = controlId,
+        lhha      = Private.lhha,
+        value     = newValue,
+        isHTML    = isHTML
+      ).call() // ignoring the `Future` completion
+
       // Destroy tooltip, or it doesn't get recreated on startEdit()
       Private.checkbox.tooltip("destroy")
       Private.container.hide()

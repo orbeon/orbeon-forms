@@ -13,12 +13,15 @@
  */
 package org.orbeon.builder
 
+import autowire._
+import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.jquery.Offset
-import org.orbeon.xforms.{$, _}
+import org.orbeon.xforms.$
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
@@ -56,11 +59,9 @@ object LabelEditor {
     val sectionId        = section.el.attr("id").get
 
     section.el.find(SectionLabelSelector).text(newLabelValue)
-    DocumentAPI.dispatchEvent(
-      targetId   = sectionId,
-      eventName  = "fb-update-section-label",
-      properties = js.Dictionary("label" → newLabelValue)
-    )
+
+    FormBuilderClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
+
     labelInputOpt.get.hide()
   }
 

@@ -13,7 +13,9 @@
  */
 package org.orbeon.builder
 
+import autowire._
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.Grid
 import org.orbeon.jquery.Offset
@@ -23,9 +25,12 @@ import org.orbeon.xforms._
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQuery
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 object ControlEditor {
 
   val ControlActionNames            = List("delete", "edit-details", "edit-items")
+
   var currentCellOpt: Option[Block] = None
   lazy val controlEditorLeft        = $(".fb-control-editor-left")
   lazy val controlEditorRight       = $(".fb-control-editor-right")
@@ -90,15 +95,17 @@ object ControlEditor {
 
     // Control actions
     ControlActionNames.foreach((actionName) ⇒ {
-      val classEventName =  s"fb-control-$actionName"
-      val actionEl = controlEditorRight.find(s".$classEventName")
+      val actionEl = controlEditorRight.find(s".fb-control-$actionName")
       actionEl.on("click", () ⇒ {
         currentCellOpt.foreach((currentCell) ⇒ {
-          val controlEl = currentCell.el.children()
-          DocumentAPI.dispatchEvent(
-            targetId   = controlEl.attr("id").get,
-            eventName  = classEventName
-          )
+
+          val controlId = currentCell.el.children().attr("id").get
+
+          actionName match {
+            case "delete"       ⇒ FormBuilderClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
+            case "edit-details" ⇒ FormBuilderClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
+            case "edit-items"   ⇒ FormBuilderClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
+          }
         })
       })
     })
@@ -108,21 +115,28 @@ object ControlEditor {
       val directionName = direction.entryName
       val className = s"icon-arrow-$directionName"
       val iconEl = controlEditorLeft.find(s".$className")
+
       val eventName = direction match {
         case Direction.Up    ⇒ "fb-shrink-down"
         case Direction.Right ⇒ "fb-expand-right"
         case Direction.Down  ⇒ "fb-expand-down"
         case Direction.Left  ⇒ "fb-shrink-right"
       }
+
       iconEl.on("click", () ⇒ {
         if (! iconEl.is(".disabled"))
-          for (currentCell ← currentCellOpt)
-            DocumentAPI.dispatchEvent(
-              targetId   = currentCell.el.attr("id").get,
-              eventName  = eventName
-            )
+          for {
+            currentCell ← currentCellOpt
+            cellId      = currentCell.el.attr("id").get
+          } locally {
+            direction match {
+              case Direction.Up    ⇒ FormBuilderClient[FormBuilderRpcApi].shrinkDown (cellId).call()
+              case Direction.Right ⇒ FormBuilderClient[FormBuilderRpcApi].expandRight(cellId).call()
+              case Direction.Down  ⇒ FormBuilderClient[FormBuilderRpcApi].expandDown (cellId).call()
+              case Direction.Left  ⇒ FormBuilderClient[FormBuilderRpcApi].shrinkRight(cellId).call()
+            }
+          }
       })
-
     }
   })
 

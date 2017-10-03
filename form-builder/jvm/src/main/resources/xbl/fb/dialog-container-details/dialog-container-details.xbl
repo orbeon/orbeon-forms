@@ -443,7 +443,7 @@
                         <fr:tab id="repeat-tab">
                             <fr:label ref="$resources/dialog-container-details/tab-repeat/label"/>
 
-                            <fr:grid id="repeat-tab-grid">
+                            <fr:grid id="repeat-tab-grid-1">
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Repeat -->
@@ -464,7 +464,10 @@
                                         </fr:checkbox-input>
                                     </xh:td>
                                 </xh:tr>
-                                <xf:group ref=".[is-repeat = true()]">
+                            </fr:grid>
+
+                            <xf:group ref=".[is-repeat = true()]">
+                                <fr:grid id="repeat-tab-grid-2">
                                     <xh:tr>
                                         <xh:td colspan="1">
                                             <fr:checkbox-input ref="apply-defaults">
@@ -547,8 +550,8 @@
                                             </xf:input>
                                         </xh:td>
                                     </xh:tr>
-                                </xf:group>
-                            </fr:grid>
+                                </fr:grid>
+                            </xf:group>
                         </fr:tab>
                     </fr:tabbable>
 

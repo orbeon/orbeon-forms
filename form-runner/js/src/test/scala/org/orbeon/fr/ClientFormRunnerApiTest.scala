@@ -18,7 +18,7 @@ import org.scalajs.dom
 import org.scalatest.FunSpec
 
 
-class FormRunnerAPITest extends FunSpec {
+class ClientFormRunnerApiTest extends FunSpec {
 
   describe("the `findControlsByName` function") {
 

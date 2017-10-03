@@ -20,7 +20,7 @@ import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalatest.FunSpec
 
-class GridTest extends FunSpec {
+class ClientGridTest extends FunSpec {
 
   describe("The `spaceToExtendCell()` function") {
 

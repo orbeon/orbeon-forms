@@ -19,7 +19,7 @@ import org.scalatest.FunSpec
 
 import scala.scalajs.js
 
-class UserAgentAndJQueryTest extends FunSpec {
+class ClientUserAgentAndJQueryTest extends FunSpec {
 
   describe("The environment's user agent string") {
     val userAgent = dom.window.navigator.userAgent

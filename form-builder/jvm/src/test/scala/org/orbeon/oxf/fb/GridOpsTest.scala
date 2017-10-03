@@ -34,8 +34,6 @@ class GridOpsTest
   val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
   val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"
 
-
-
   describe("Row insertion below") {
     it("must insert as expected") {
       withTestExternalContext { _ ⇒

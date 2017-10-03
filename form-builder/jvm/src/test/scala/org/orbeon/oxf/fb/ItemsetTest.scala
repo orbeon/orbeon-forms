@@ -219,7 +219,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
       assertNewControlResources(Seq("fr" → itemTemplates("fr")))
 
       // Add English, in addition to French
-      XFormsAPI.insert(into = FormBuilder.currentResources.getParent,
+      XFormsAPI.insert(into = FormBuilder.currentResources.parentUnsafe,
                origin = FormBuilder.currentResources)
       XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
       assertNewControlResources(Seq("fr" → itemTemplates("fr"), "en" → itemTemplates("en")))

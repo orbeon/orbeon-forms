@@ -25,6 +25,8 @@ import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.XFormsId
 
+import org.orbeon.scaxon.SimplePath._
+
 import org.w3c.dom.Node._
 
 import scala.collection.JavaConverters._
@@ -91,9 +93,7 @@ class PathMapXPathDependencies(
           // string value of /a/b did as well, and so did /a's.
           // This adds more entries to the changeset, but handles cases such as detecting changes impacting
           // the string() or serialize() functions.
-          val parent = n.getParent
-          if ((parent ne null) && parent.getNodeKind == ELEMENT_NODE)
-            processNode(parent)
+          n parent * foreach processNode
         }
 
         processNode(node)

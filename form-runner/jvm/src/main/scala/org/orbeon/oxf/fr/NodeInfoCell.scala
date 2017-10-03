@@ -33,7 +33,7 @@ object NodeInfoCell {
 
     def attValueOpt    (u: NodeInfo, name: String): Option[String] = u attValueOpt name
     def children       (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
-    def parent         (u: NodeInfo)              : NodeInfo       = u.getParent
+    def parent         (u: NodeInfo)              : NodeInfo       = u.parentUnsafe
     def hasChildElement(u: NodeInfo)              : Boolean        = u.hasChildElement
 
     def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)

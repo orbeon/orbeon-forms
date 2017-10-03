@@ -194,6 +194,7 @@ object SimplePath {
     def parent(test: Test) = find(Axis.PARENT, test)
 
     def parentOption: Option[NodeInfo] = Option(nodeInfo.getParent)
+    def parentUnsafe: NodeInfo = parentOption getOrElse (throw new NoSuchElementException)
 
     def ancestor(test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR, test)
     def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR_OR_SELF, test)

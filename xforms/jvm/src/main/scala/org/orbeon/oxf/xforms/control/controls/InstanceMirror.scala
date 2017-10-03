@@ -146,7 +146,7 @@ object InstanceMirror {
 
     def namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
 
-    inScope option InstanceDetails(innerInstance.getId, referenceNode.getParent.asInstanceOf[VirtualNode], namespaces)
+    inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNode], namespaces)
   }
 
   // Find the inner instance node from a node in an outer instance
@@ -200,7 +200,7 @@ object InstanceMirror {
   private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
     siblingIndexOpt match {
       case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE ⇒
-        SaxonUtils.buildNodePath(node.getParent) :+ s"node()[${siblingIndex + 1}]"
+        SaxonUtils.buildNodePath(node.parentUnsafe) :+ s"node()[${siblingIndex + 1}]"
       case _ ⇒
         SaxonUtils.buildNodePath(node)
     }

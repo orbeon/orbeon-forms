@@ -68,7 +68,10 @@ object SectionGridEditor {
   // Position editor when block becomes current
   Position.currentContainerChanged(
     containerCache = BlockCache.sectionGridBodyCache,
-    wasCurrent = (_: Block) ⇒ (),
+    wasCurrent = (sectionGridBody: Block) ⇒ {
+      if (sectionGridBody.el.is(BlockCache.GridBodySelector))
+        sectionGridBody.el.parent.removeClass("fb-hover")
+    },
     becomesCurrent = (sectionGridBody: Block) ⇒ {
       currentSectionGridBodyOpt = Some(sectionGridBody)
 
@@ -105,9 +108,9 @@ object SectionGridEditor {
         if (container.is(".fb-can-delete")) deleteTrigger.show()
       }
 
-      // Update triggers relevance for section
       if (sectionGridBody.el.is(BlockCache.GridBodySelector)) {
         sectionGridEditorContainer.children(".fb-grid-edit-details, .fb-grid-delete").show()
+        sectionGridBody.el.parent.addClass("fb-hover")
       }
     }
   )

@@ -973,11 +973,22 @@
                 <xsl:function name="fr:fb-control-classes" as="xs:string">
                     <xsl:param name="control"       as="element()"/>
                     <xsl:param name="check-itemset" as="xs:boolean"/>
+
+                    <xsl:variable
+                        use-when="function-available('fbf:hasEditor')"
+                        name="itemset-editor-class"
+                        select="'fb-itemset'[$check-itemset and fbf:hasEditor($control, 'static-itemset')]"/>
+
+                    <xsl:variable
+                        use-when="not(function-available('fbf:hasEditor'))"
+                        name="itemset-editor-class"
+                        select="()"/>
+
                     <xsl:value-of select="
                         'fb-label-is-html'[$control/xf:label/@mediatype = 'text/html'],
                         'fb-hint-is-html' [$control/xf:hint /@mediatype = 'text/html'],
                         'fb-text-is-html' [$control/fr:text /@mediatype = 'text/html'],
-                        'fb-itemset'      [$check-itemset and fbf:hasEditor($control, 'static-itemset')]
+                        $itemset-editor-class
                     "/>
                 </xsl:function>
 

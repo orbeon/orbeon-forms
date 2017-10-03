@@ -1975,7 +1975,7 @@
                 <move-down>Nach unten verschieben</move-down>
                 <remove>Löschen</remove>
                 <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <add-another todo="true">Linie hinzufügen</add-another>
             </grid>
             <date-time>
                 <year>Jahr</year>

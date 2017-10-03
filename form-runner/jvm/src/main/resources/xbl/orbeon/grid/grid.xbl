@@ -780,7 +780,7 @@
                                                     <xf:action
                                                         event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
                                                         target="#observer"
-                                                        if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
+                                                        if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = $can-classes">
 
                                                         <!-- Make sure we have stable references -->
                                                         <xf:var name="context"  value="$repeat-context"/>

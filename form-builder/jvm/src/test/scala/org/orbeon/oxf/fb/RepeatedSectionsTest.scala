@@ -13,313 +13,364 @@
  */
 package org.orbeon.oxf.fb
 
-import org.junit.Test
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fb.ToolboxOps._
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.fb.ToolboxOps.insertNewControl
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
+class RepeatedSectionsTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike
+     with FormBuilderSupport {
 
   val Doc = "oxf:/org/orbeon/oxf/fr/template-for-repeated-sections.xhtml"
 
-  @Test def modelInstanceBodyElements(): Unit =
-    withActionAndFBDoc(Doc) { doc ⇒
+  describe("Model instance body elements") {
+    it("must enable repeat") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
 
-      // Enable repeat
-      locally {
-        setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
 
-        val expected =
-          elemToDom4j(
-            <form>
-              <my-section>
-                <my-section-iteration>
+          val expected =
+            elemToDom4j(
+              <form>
+                <my-section>
+                  <my-section-iteration>
+                    <my-input/>
+                    <my-grid>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                    </my-grid>
+                  </my-section-iteration>
+                </my-section>
+                <other-section>
+                  <other-input/>
+                </other-section>
+              </form>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        }
+      }
+    }
+
+    it("must rename section") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          renameControlIterationIfNeeded(doc, "my-section", "foo", "", "")
+          renameControlIfNeeded(doc, "my-section", "foo")
+
+          val expected =
+            elemToDom4j(
+              <form>
+                <foo>
+                  <foo-iteration>
+                    <my-input/>
+                    <my-grid>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                    </my-grid>
+                  </foo-iteration>
+                </foo>
+                <other-section>
+                  <other-input/>
+                </other-section>
+              </form>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        }
+      }
+    }
+
+    it("must support custom iteration element name") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          renameControlIterationIfNeeded(doc, "my-section", "foo", "", "bar")
+
+          val expected =
+            elemToDom4j(
+              <form>
+                <my-section>
+                  <bar>
+                    <my-input/>
+                    <my-grid>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                    </my-grid>
+                  </bar>
+                </my-section>
+                <other-section>
+                  <other-input/>
+                </other-section>
+              </form>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        }
+      }
+    }
+
+    it("must change min/max") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "1", "2", "", applyDefaults = false, "")
+
+          val section = findControlByName(doc, "my-section").get
+
+          assert("1" === section.attValue("min"))
+          assert("2" === section.attValue("max"))
+
+          assert("1" === getNormalizedMin(doc, "my-section"))
+          assert(Some("2") === getNormalizedMax(doc, "my-section"))
+        }
+      }
+    }
+
+    it("must change calculated min/max") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", applyDefaults = false, "")
+
+          val section = findControlByName(doc, "my-section").get
+
+          assert("{1 + 1}" === section.attValue("min"))
+          assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
+
+          assert("1 + 1" === getNormalizedMin(doc, "my-section"))
+          assert(Some("count(//*[contains(@foo, '{')])") === getNormalizedMax(doc, "my-section"))
+        }
+      }
+    }
+
+    it("must move section into it") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          moveSectionRight(findControlByName(doc, "other-section").get)
+
+          val expected =
+            elemToDom4j(
+              <form>
+                <my-section>
+                  <my-section-iteration>
+                    <my-input/>
+                    <my-grid>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                      <my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
+                    </my-grid>
+                    <other-section>
+                      <other-input/>
+                    </other-section>
+                  </my-section-iteration>
+                </my-section>
+              </form>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        }
+      }
+    }
+
+    it("must disable repeat") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true,  "", "", "", applyDefaults = false, "")
+          setRepeatProperties(doc, "my-section", repeat = false, "", "", "", applyDefaults = false, "")
+
+          val expected =
+            elemToDom4j(
+              <form>
+                <my-section>
                   <my-input/>
                   <my-grid>
                     <my-grid-iteration>
                       <my-textarea/>
                     </my-grid-iteration>
                     <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
+                        <my-textarea/>
+                      </my-grid-iteration>
                   </my-grid>
-                </my-section-iteration>
-              </my-section>
-              <other-section>
-                <other-input/>
-              </other-section>
-            </form>
+                </my-section>
+                <other-section>
+                  <other-input/>
+                </other-section>
+              </form>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+
+          assert("0" === getNormalizedMin(doc, "foo"))
+          assert(None === getNormalizedMax(doc, "foo"))
+        }
+      }
+    }
+  }
+
+  describe("Initial iterations") {
+
+    def templateRootElementFor(doc: NodeInfo, name: String) =
+      unsafeUnwrapElement(findTemplateInstance(doc, name).get / * head)
+
+    it("must enable repeat") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+
+          // Expect 1 iteration of `my-grid`
+          val expected =
+            elemToDom4j(
+              <my-section-iteration>
+                <my-input/>
+                <my-grid>
+                  <my-grid-iteration>
+                    <my-textarea/>
+                  </my-grid-iteration>
+                </my-grid>
+              </my-section-iteration>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(
+            expected.getRootElement,
+            templateRootElementFor(doc, "my-section")
           )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        }
       }
+    }
 
-      // Rename section
-      locally {
-        renameControlIterationIfNeeded(doc, "my-section", "foo", "", "")
-        renameControlIfNeeded(doc, "my-section", "foo")
+    it("must switch grid to `fb:initial-iterations=\"first\"`") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
 
-        val expected =
-          elemToDom4j(
-            <form>
-              <foo>
-                <foo-iteration>
-                  <my-input/>
-                  <my-grid>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                  </my-grid>
-                </foo-iteration>
-              </foo>
-              <other-section>
-                <other-input/>
-              </other-section>
-            </form>
-          )
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          setRepeatProperties(doc, "my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
-      }
-
-      // Custom iteration element name
-      locally {
-        renameControlIterationIfNeeded(doc, "foo", "", "", "bar")
-
-        val expected =
-          elemToDom4j(
-            <form>
-              <foo>
-                <bar>
-                  <my-input/>
-                  <my-grid>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                  </my-grid>
-                </bar>
-              </foo>
-              <other-section>
-                <other-input/>
-              </other-section>
-            </form>
-          )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
-      }
-
-      // Change min/max
-      locally {
-        setRepeatProperties(doc, "foo", repeat = true, "1", "2", "", applyDefaults = false, "")
-
-        val section = findControlByName(doc, "foo").get
-
-        assert("1" === section.attValue("min"))
-        assert("2" === section.attValue("max"))
-
-        assert("1" === getNormalizedMin(doc, "foo"))
-        assert(Some("2") === getNormalizedMax(doc, "foo"))
-      }
-
-      // Change min/max
-      locally {
-        setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", applyDefaults = false, "")
-
-        val section = findControlByName(doc, "foo").get
-
-        assert("{1 + 1}" === section.attValue("min"))
-        assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
-
-        assert("1 + 1" === getNormalizedMin(doc, "foo"))
-        assert(Some("count(//*[contains(@foo, '{')])") === getNormalizedMax(doc, "foo"))
-      }
-
-      // Move section into it
-      locally {
-        moveSectionRight(findControlByName(doc, "other-section").get)
-
-        val expected =
-          elemToDom4j(
-            <form>
-              <foo>
-                <bar>
-                  <my-input/>
-                  <my-grid>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                    <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
-                  </my-grid>
-                  <other-section>
-                    <other-input/>
-                  </other-section>
-                </bar>
-              </foo>
-            </form>
-          )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
-      }
-
-      // Disable repeat
-      locally {
-        setRepeatProperties(doc, "foo", repeat = false, "", "", "", applyDefaults = false, "")
-
-        val expected =
-          elemToDom4j(
-            <form>
-              <foo>
+          // Expect 2 iterations of `my-grid`
+          val expected =
+            elemToDom4j(
+              <my-section-iteration>
                 <my-input/>
                 <my-grid>
                   <my-grid-iteration>
                     <my-textarea/>
                   </my-grid-iteration>
                   <my-grid-iteration>
-                      <my-textarea/>
-                    </my-grid-iteration>
+                    <my-textarea/>
+                  </my-grid-iteration>
                 </my-grid>
-                <other-section>
-                  <other-input/>
-                </other-section>
-              </foo>
-            </form>
+              </my-section-iteration>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(
+            expected.getRootElement,
+            templateRootElementFor(doc, "my-section")
           )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
-
-        assert("0" === getNormalizedMin(doc, "foo"))
-        assert(None === getNormalizedMax(doc, "foo"))
+        }
       }
     }
 
-  @Test def initialIterations(): Unit =
-    withActionAndFBDoc(Doc) { doc ⇒
+    it("must insert control within grid") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
 
-      def templateRootElementFor(name: String) =
-        unsafeUnwrapElement(findTemplateInstance(doc, name).get / * head)
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          setRepeatProperties(doc, "my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
 
-      // Enable repeat
-      locally {
-        setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          val myTextareaCell = findControlByName(doc, "my-textarea").get.parentUnsafe
 
-        // Expect 1 iteration of `my-grid`
-        val expected =
-          elemToDom4j(
-            <my-section-iteration>
-              <my-input/>
-              <my-grid>
-                <my-grid-iteration>
-                  <my-textarea/>
-                </my-grid-iteration>
-              </my-grid>
-            </my-section-iteration>
+          FormBuilder.selectCell(myTextareaCell)
+
+          val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
+
+          insertNewControl(doc, binding)
+
+          // Expect new control in 2 iterations in the template
+          val expected =
+            elemToDom4j(
+              <my-section-iteration>
+                <my-input/>
+                <my-grid>
+                  <my-grid-iteration>
+                    <my-textarea/>
+                    <control-9/>
+                  </my-grid-iteration>
+                  <my-grid-iteration>
+                    <my-textarea/>
+                    <control-9/>
+                  </my-grid-iteration>
+                </my-grid>
+              </my-section-iteration>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(
+            expected.getRootElement,
+            templateRootElementFor(doc, "my-section")
           )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(
-          expected.getRootElement,
-          templateRootElementFor("my-section")
-        )
+        }
       }
-
-      // Switch grid to `fb:initial-iterations="first"`
-      locally {
-        setRepeatProperties(doc, "my-grid", repeat = true, "", "", "", applyDefaults = false, "first")
-
-        // Expect 2 iterations of `my-grid`
-        val expected =
-          elemToDom4j(
-            <my-section-iteration>
-              <my-input/>
-              <my-grid>
-                <my-grid-iteration>
-                  <my-textarea/>
-                </my-grid-iteration>
-                <my-grid-iteration>
-                  <my-textarea/>
-                </my-grid-iteration>
-              </my-grid>
-            </my-section-iteration>
-          )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(
-          expected.getRootElement,
-          templateRootElementFor("my-section")
-        )
-      }
-
-      // Insert control within grid
-      locally {
-
-        val myTextareaTd = findControlByName(doc, "my-textarea").get parent * head
-
-        insertColRight(myTextareaTd)
-        selectTd(myTextareaTd)
-
-        val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
-
-        insertNewControl(doc, binding)
-
-        // Expect new control in 2 iterations in the template
-        val expected =
-          elemToDom4j(
-            <my-section-iteration>
-              <my-input/>
-              <my-grid>
-                <my-grid-iteration>
-                  <my-textarea/>
-                  <control-9/>
-                </my-grid-iteration>
-                <my-grid-iteration>
-                  <my-textarea/>
-                  <control-9/>
-                </my-grid-iteration>
-              </my-grid>
-            </my-section-iteration>
-          )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(
-          expected.getRootElement,
-          templateRootElementFor("my-section")
-        )
-      }
-
-      // Switch grid back to no `fb:initial-iterations`
-      locally {
-        setRepeatProperties(doc, "my-grid", repeat = true, "", "", "", applyDefaults = false, "")
-
-        // Expect 1 iteration of `my-grid`
-        val expected =
-          elemToDom4j(
-            <my-section-iteration>
-              <my-input/>
-              <my-grid>
-                <my-grid-iteration>
-                  <my-textarea/>
-                  <control-9/>
-                </my-grid-iteration>
-              </my-grid>
-            </my-section-iteration>
-          )
-
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(
-          expected.getRootElement,
-          templateRootElementFor("my-section")
-        )
-      }
-
-      // We could test more, including:
-      //
-      // - more nesting levels
-      // - adding iterations/removing iterations from the grids/sections
     }
+
+    it("must switch grid back to no `fb:initial-iterations`") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(Doc) { doc ⇒
+
+          setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false, "")
+          setRepeatProperties(doc, "my-grid",    repeat = true, "", "", "", applyDefaults = false, "")
+
+          // Expect 1 iteration of `my-grid`
+          val expected =
+            elemToDom4j(
+              <my-section-iteration>
+                <my-input/>
+                <my-grid>
+                  <my-grid-iteration>
+                    <my-textarea/>
+                  </my-grid-iteration>
+                </my-grid>
+              </my-section-iteration>
+            )
+
+          assertXMLElementsIgnoreNamespacesInScopeCollapse(
+            expected.getRootElement,
+            templateRootElementFor(doc, "my-section")
+          )
+        }
+      }
+    }
+
+    // We could test more, including:
+    //
+    // - more nesting levels
+    // - adding iterations/removing iterations from the grids/sections
+  }
 }

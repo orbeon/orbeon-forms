@@ -135,7 +135,7 @@
 
                     <xf:var
                         name="available-languages"
-                        value="fbf:allLangs(fbf:resourcesRoot())"/>
+                        value="frf:allLangs(fbf:resourcesRoot())"/>
 
                     <!-- Don't display language selector if there is only one language -->
                     <!-- FIXME: This logic is duplicated in view.xsl -->

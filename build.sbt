@@ -206,7 +206,7 @@ def jUnitTestOptions =
 
     testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((baseDirectory in ThisBuild).value): _*),
     testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
-    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
+    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("ClientTest")),
     parallelExecution in Test          := false,
     fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
     javaOptions       in Test          ++= testJavaOptions((baseDirectory in ThisBuild).value),

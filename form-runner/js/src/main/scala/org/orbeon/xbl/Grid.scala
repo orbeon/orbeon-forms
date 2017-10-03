@@ -13,6 +13,8 @@
   */
 package org.orbeon.xbl
 
+import enumeratum.EnumEntry.Hyphencase
+import enumeratum._
 import org.orbeon.jquery.Offset
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, DocumentAPI}
@@ -28,7 +30,15 @@ object Grid {
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
   val globalMenuElem: js.UndefOr[html.Element] = $(".fr-grid-dropdown-menu")(0)
 
-  var OpNames = List("move-up", "move-down", "insert-above", "insert-below", "remove")
+  sealed trait Operation extends EnumEntry with Hyphencase
+  object Operation extends Enum[Operation] {
+    val values = findValues
+    case object MoveUp          extends Operation
+    case object MoveDown        extends Operation
+    case object MoveInsertAbove extends Operation
+    case object MoveInsertBelow extends Operation
+    case object Remove          extends Operation
+  }
 
   case class CurrentGrid(currentGridId: String, currentGridIteration: Int)
 
@@ -41,92 +51,92 @@ object Grid {
     $(document).on("keydown.orbeon.grid", ".fr-grid-dropdown-button", delegateKeyEventToBootstrapButton _)
 
     // Listeners for all menu actions
-    OpNames foreach { opName ⇒
-      $(document).on("click.orbeon.grid", s".fr-grid-dropdown-menu .fr-$opName", actionFunction(opName))
+    Operation.values foreach { op ⇒
+      $(document).on("click.orbeon.grid", s".fr-grid-dropdown-menu .fr-${op.entryName}", actionFunction(op))
     }
   }
 
   def moveAndShowMenu(e: JQueryEventObject): js.Any = {
 
-        moveMenu(e)
+      moveMenu(e)
 
-        // NOTE: Don"t use dropdown("toggle") as that registers a new handler further down the DOM!
-        $(globalMenuElem).find(".dropdown-toggle").trigger("click")
-
-        // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
-        // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
-        // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
-        // running.
-        false
-    }
-
-    // Move the menu just below the button
-    def moveMenu(e: JQueryEventObject): Boolean = {
-      val dropdown = $(e.target).closest(".dropdown")
-
-      val dropdownOffset = Offset(dropdown)
-
-      $(globalMenuElem).css("position", "absolute")
-      Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + dropdown.height()))
-
-      OpNames foreach { opName ⇒
-        $(globalMenuElem).find(".dropdown-menu").children(s".fr-$opName").toggleClass(
-          "disabled",
-          ! $(gridIteration(e)).is(s".can-$opName")
-        )
-      }
-
-      gridId(e).zip(findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])) foreach {
-        case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
-      }
+      // NOTE: Don"t use dropdown("toggle") as that registers a new handler further down the DOM!
+      $(globalMenuElem).find(".dropdown-toggle").trigger("click")
 
       // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
       // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
       // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
       // running.
       false
+  }
+
+  // Move the menu just below the button
+  def moveMenu(e: JQueryEventObject): Boolean = {
+    val dropdown = $(e.target).closest(".dropdown")
+
+    val dropdownOffset = Offset(dropdown)
+
+    $(globalMenuElem).css("position", "absolute")
+    Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + dropdown.height()))
+
+    Operation.values foreach { op ⇒
+      $(globalMenuElem).find(".dropdown-menu").children(s".fr-${op.entryName}").toggleClass(
+        "disabled",
+        ! $(gridIteration(e)).is(s".can-${op.entryName}")
+      )
     }
 
-    // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
-    def delegateKeyEventToBootstrapButton(e: JQueryEventObject): js.Any = {
-      moveMenu(e)
-      $(globalMenuElem).find(".dropdown-toggle").trigger(
-        $.asInstanceOf[js.Dynamic].Event(e.`type`, new js.Object { // `Event` constructor is not present in the jQuery facade
-          val charCode = e.asInstanceOf[KeyboardEvent].charCode
-
-          // Putting these to be complete, but `charCode` above does the trick for the menu
-          val keyCode  = e.asInstanceOf[KeyboardEvent].keyCode
-          val which    = e.asInstanceOf[KeyboardEvent].asInstanceOf[js.Dynamic].which
-          val ctrlKey  = e.asInstanceOf[KeyboardEvent].ctrlKey
-          val shiftKey = e.asInstanceOf[KeyboardEvent].shiftKey
-          val altKey   = e.asInstanceOf[KeyboardEvent].altKey
-          val metaKey  = e.asInstanceOf[KeyboardEvent].metaKey
-        }).asInstanceOf[JQueryEventObject])
+    gridId(e).zip(findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])) foreach {
+      case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
     }
 
-    def gridIteration(e: JQueryEventObject): js.UndefOr[html.Element] =
-      $(e.target).closest(".fr-grid-repeat-iteration")(0)
+    // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
+    // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
+    // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
+    // running.
+    false
+  }
 
-    def findGridIterationsForElemWithId(elemWithId: html.Element): Option[Int] =
-      $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
+  // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
+  def delegateKeyEventToBootstrapButton(e: JQueryEventObject): js.Any = {
+    moveMenu(e)
+    $(globalMenuElem).find(".dropdown-toggle").trigger(
+      $.asInstanceOf[js.Dynamic].Event(e.`type`, new js.Object { // `Event` constructor is not present in the jQuery facade
+        val charCode = e.asInstanceOf[KeyboardEvent].charCode
 
-    def grid(e: JQueryEventObject): js.UndefOr[html.Element] =
-        $(e.target).closest(".xbl-fr-grid")(0)
+        // Putting these to be complete, but `charCode` above does the trick for the menu
+        val keyCode  = e.asInstanceOf[KeyboardEvent].keyCode
+        val which    = e.asInstanceOf[KeyboardEvent].asInstanceOf[js.Dynamic].which
+        val ctrlKey  = e.asInstanceOf[KeyboardEvent].ctrlKey
+        val shiftKey = e.asInstanceOf[KeyboardEvent].shiftKey
+        val altKey   = e.asInstanceOf[KeyboardEvent].altKey
+        val metaKey  = e.asInstanceOf[KeyboardEvent].metaKey
+      }).asInstanceOf[JQueryEventObject])
+  }
 
-    def gridId(e: JQueryEventObject): Option[String] =
-        $(grid(e)).attr("id").toOption
+  def gridIteration(e: JQueryEventObject): js.UndefOr[html.Element] =
+    $(e.target).closest(".fr-grid-repeat-iteration")(0)
 
-    def actionFunction(forEventName: String): JQueryEventObject ⇒ js.Any = e ⇒ {
-      currentGridOpt foreach {
-        case CurrentGrid(currentGridId, currentGridIteration) ⇒
-          DocumentAPI.dispatchEvent(
-            targetId   = currentGridId,
-            eventName  = s"fr-$forEventName",
-            properties = js.Dictionary("row" → currentGridIteration.toString)
-          )
-      }
-      e.preventDefault()
-      true
+  def findGridIterationsForElemWithId(elemWithId: html.Element): Option[Int] =
+    $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
+
+  def grid(e: JQueryEventObject): js.UndefOr[html.Element] =
+      $(e.target).closest(".xbl-fr-grid")(0)
+
+  def gridId(e: JQueryEventObject): Option[String] =
+      $(grid(e)).attr("id").toOption
+
+  def actionFunction(op: Operation): JQueryEventObject ⇒ js.Any = e ⇒ {
+    currentGridOpt foreach {
+      case CurrentGrid(currentGridId, currentGridIteration) ⇒
+        DocumentAPI.dispatchEvent(
+          targetId   = currentGridId,
+          eventName  = s"fr-${op.entryName}",
+          properties = js.Dictionary("row" → currentGridIteration.toString)
+        )
+    }
+    e.preventDefault()
+    true
   }
 
 }

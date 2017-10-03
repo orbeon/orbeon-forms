@@ -82,61 +82,19 @@ object Position {
   }
 
   // Container is either a section or grid; calls listeners passing old/new container
-  def currentContainerChanged[T](
+  def currentContainerChanged(
     containerCache : js.Array[Block],
-    wasCurrent     : js.Function1[Block, T],
-    becomesCurrent : js.Function1[Block, T])
+    wasCurrent     : (Block) ⇒ Unit,
+    becomesCurrent : (Block) ⇒ Unit)
                    : Unit = {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
     onUnderPointerChange {
+      scala.scalajs.js.Dynamic.global.console.log("check new container")
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
       val newContainer = findInCache(containerCache, top, left)
-      notifyChange(newContainer)
-    }
-  }
-
-  // Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
-  def currentRowColChanged[T](
-    gridsCache        : js.Array[Block],
-    wasCurrentRow     : js.Function1[Block, T],
-    becomesCurrentRow : js.Function1[Block, T],
-    wasCurrentCol     : js.Function1[Block, T],
-    becomesCurrentCol : js.Function1[Block, T])
-                      : Unit = {
-
-    var currentGridOpt: js.UndefOr[Block] = js.undefined
-    currentContainerChanged(
-      gridsCache,
-      wasCurrent     = (g: Block) ⇒ currentGridOpt = js.undefined,
-      becomesCurrent = (g: Block) ⇒ currentGridOpt = g
-    )
-
-    val notifyRowChange = Position.notifyOnChange(wasCurrentRow, becomesCurrentRow)
-    val notifyColChange = Position.notifyOnChange(wasCurrentCol, becomesCurrentCol)
-
-    Position.onUnderPointerChange {
-
-      val (newRow, newCol) =
-        currentGridOpt
-          .map((currentGrid) ⇒
-            {
-              val newRow =
-                currentGrid.rows.toList.find((r) ⇒ {
-                  val pointerTop = pointerPos.top + Position.scrollTop()
-                  r.top  <= pointerTop && pointerTop <= r.top + r.height
-                })
-              val newCol =
-                currentGrid.cols.toList.find((c) ⇒
-                  c.left <= pointerPos.left && pointerPos.left <= c.left + c.width
-                )
-              (newRow, newCol)
-            })
-          .getOrElse((None, None))
-
-      notifyRowChange(newRow.orUndefined)
-      notifyColChange(newCol.orUndefined)
+      notifyChange(newContainer.toOption)
     }
   }
 
@@ -144,35 +102,35 @@ object Position {
   // will when appropriate notify the listeners `was` and `becomes` of the old and new value
   // TODO: replace `Any` by `Unit` once callers are all in Scala
   def notifyOnChange[T](
-    was     : js.Function1[Block, T],
-    becomes : js.Function1[Block, T])
-            : js.Function1[js.UndefOr[Block], Any] = {
+    was     : (Block) ⇒ Unit,
+    becomes : (Block) ⇒ Unit)
+            : (Option[Block]) ⇒ Unit = {
 
-    var currentValueOpt: js.UndefOr[Block] = js.undefined
+    var currentBlockOpt: Option[Block] = None
 
-    (newValueOpt: js.UndefOr[Block]) ⇒ {
-      newValueOpt.toOption match {
-        case Some(newValue) ⇒
-          val notify =
-            currentValueOpt.toOption match {
+    (newBlockOpt: Option[Block]) ⇒ {
+      newBlockOpt match {
+        case Some(newBlock) ⇒
+          val doNotify =
+            currentBlockOpt match {
               case None ⇒ true
-              case Some(currentValue) ⇒
+              case Some(currentBlock) ⇒
                 // Typically after an Ajax request, maybe a column/row was added/removed, so we might consequently
                 // need to update the icon position
-                ! newValue.el.is(currentValue.el) ||
+                ! newBlock.el.is(currentBlock.el) ||
                 // The elements could be the same, but their position could have changed, in which case want to
                 // reposition relative icons, so we don't consider the value to be the "same"
-                newValue.left != currentValue.left ||
-                newValue.top != currentValue.top
+                newBlock.left != currentBlock.left ||
+                newBlock.top != currentBlock.top
             }
-          if (notify) {
-            currentValueOpt.toOption.foreach(was)
-            currentValueOpt = newValueOpt
-            becomes(newValue)
+          if (doNotify) {
+            currentBlockOpt.foreach(was)
+            currentBlockOpt = newBlockOpt
+            becomes(newBlock)
           }
         case None ⇒
-          currentValueOpt.toOption.foreach(was)
-          currentValueOpt = js.undefined
+          currentBlockOpt.foreach(was)
+          currentBlockOpt = None
       }
     }
   }

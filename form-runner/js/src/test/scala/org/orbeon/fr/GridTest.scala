@@ -14,6 +14,8 @@
 package org.orbeon.fr
 
 import org.orbeon.datatypes.Direction
+import org.orbeon.fr.HtmlElementCell._
+import org.orbeon.oxf.fr.Cell
 import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalatest.FunSpec
@@ -27,17 +29,17 @@ class GridTest extends FunSpec {
         |<div id="fb≡section-1-control≡grid-1-control" class="xbl-component xbl-fr-grid">
         |    <div class="fr-grid fr-grid-12 fr-grid-css fr-norepeat fr-editable">
         |        <div class="fr-grid-body">
-        |            <div id="cell-1-1"  class="fr-grid-td  xforms-activable" data-y="1" data-x="1"            data-w="4"></div>
-        |            <div id="cell-1-8"  class="fr-grid-td  xforms-activable" data-y="1" data-x="8" data-h="3"           ></div>
-        |            <div id="cell-1-9"  class="fr-grid-td  xforms-activable" data-y="1" data-x="9"            data-w="4"></div>
-        |            <div id="cell-2-3"  class="fr-grid-td  xforms-activable" data-y="2" data-x="3" data-h="2" data-w="2"></div>
-        |            <div id="cell-2-5"  class="fr-grid-td  xforms-activable" data-y="2" data-x="5"            data-w="3"></div>
-        |            <div id="cell-2-9"  class="fr-grid-td  xforms-activable" data-y="2" data-x="9"            data-w="3"></div>
-        |            <div id="cell-3-1"  class="fr-grid-td  xforms-activable" data-y="3" data-x="1"            data-w="2"></div>
-        |            <div id="cell-3-5"  class="fr-grid-td  xforms-activable" data-y="3" data-x="5" data-h="2" data-w="2"></div>
-        |            <div id="cell-3-9"  class="fr-grid-td  xforms-activable" data-y="3" data-x="9"            data-w="4"></div>
-        |            <div id="cell-4-8"  class="fr-grid-td  xforms-activable" data-y="4" data-x="8"                      ></div>
-        |            <div id="cell-4-10" class="fr-grid-td  xforms-activable" data-y="4" data-x="10"           data-w="3"></div>
+        |            <div id="cell-1-1"  class="fr-grid-td xforms-activable" data-fr-y="1" data-fr-x="1"               data-fr-w="4"><span/></div>
+        |            <div id="cell-1-8"  class="fr-grid-td xforms-activable" data-fr-y="1" data-fr-x="8" data-fr-h="3"              ><span/></div>
+        |            <div id="cell-1-9"  class="fr-grid-td xforms-activable" data-fr-y="1" data-fr-x="9"               data-fr-w="4"><span/></div>
+        |            <div id="cell-2-3"  class="fr-grid-td xforms-activable" data-fr-y="2" data-fr-x="3" data-fr-h="2" data-fr-w="2"><span/></div>
+        |            <div id="cell-2-5"  class="fr-grid-td xforms-activable" data-fr-y="2" data-fr-x="5"               data-fr-w="3"><span/></div>
+        |            <div id="cell-2-9"  class="fr-grid-td xforms-activable" data-fr-y="2" data-fr-x="9"               data-fr-w="3"><span/></div>
+        |            <div id="cell-3-1"  class="fr-grid-td xforms-activable" data-fr-y="3" data-fr-x="1"               data-fr-w="2"><span/></div>
+        |            <div id="cell-3-5"  class="fr-grid-td xforms-activable" data-fr-y="3" data-fr-x="5" data-fr-h="2" data-fr-w="2"><span/></div>
+        |            <div id="cell-3-9"  class="fr-grid-td xforms-activable" data-fr-y="3" data-fr-x="9"               data-fr-w="4"><span/></div>
+        |            <div id="cell-4-8"  class="fr-grid-td xforms-activable" data-fr-y="4" data-fr-x="8"                            ><span/></div>
+        |            <div id="cell-4-10" class="fr-grid-td xforms-activable" data-fr-y="4" data-fr-x="10"              data-fr-w="3"><span/></div>
         |        </div>
         |    </div>
         |</div>
@@ -58,7 +60,7 @@ class GridTest extends FunSpec {
       ),
       "cell-2-3"  → List(
         Direction.Right → 0,
-        Direction.Down  → 1
+        Direction.Down  → 0
       ),
       "cell-2-5"  → List(
         Direction.Right → 0,
@@ -70,7 +72,7 @@ class GridTest extends FunSpec {
       ),
       "cell-3-1"  → List(
         Direction.Right → 0,
-        Direction.Down  → 1
+        Direction.Down  → 0
       ),
       "cell-3-5"  → List(
         Direction.Right → 1,
@@ -90,6 +92,23 @@ class GridTest extends FunSpec {
       )
     )
 
+    val GridBodySelector = "#fb≡section-1-control≡grid-1-control .fr-grid-body"
+
+    val expectedASCII =
+      """
+        |Aaaa   BCccc|
+        |  DdEeebFff |
+        |GgddHh bIiii|
+        |    hh J Kkk|
+      """.stripMargin.trim.replaceAllLiterally("|", "")
+
+    it(s"must must analyze as expected") {
+      assert(expectedASCII === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridBodySelector)(0), simplify = false))._1)
+    }
+
+    // NOTE: The logic which allows expanding cells can be improved. Right now (2017-10-03), it won't
+    // allow at all expanding into cells which have controls, or expand into cells spanning in some
+    // ways.
     for {
       (id, dirValue)     ← expected
       (direction, space) ← dirValue

@@ -29,7 +29,7 @@ object Position {
   // Keeps track of pointer position
   var pointerPos: Offset = Offset(0, 0)
 
-  $(document).on("mousemove", (event: JQueryEventObject) ⇒ asUnit {
+  $(document).on("mousemove.orbeon.builder", (event: JQueryEventObject) ⇒ asUnit {
     pointerPos =
       Offset(
         left = event.pageX,
@@ -52,9 +52,9 @@ object Position {
 
   // Calls listener when what is under the pointer has potentially changed
   def onUnderPointerChange(fn: ⇒ Unit): Unit = {
-    $(document).on("mousemove", fn _)
+    $(document).on("mousemove.orbeon.builder", fn _)
     // Resizing the window might change what is under the pointer the last time we saw it in the window
-    $(window).on("resize", fn _)
+    $(window).on("resize.orbeon.builder", fn _)
     Events.ajaxResponseProcessedEvent.subscribe(fn _)
   }
 
@@ -64,7 +64,7 @@ object Position {
       Events.orbeonLoadedEvent.subscribe(fn)
       // After an Ajax response, as it might have changed the DOM
       Events.ajaxResponseProcessedEvent.subscribe(fn)
-      $(window).on("resize", fn)
+      $(window).on("resize.orbeon.builder", fn)
   }
 
   // Finds the container, if any, based on a vertical position

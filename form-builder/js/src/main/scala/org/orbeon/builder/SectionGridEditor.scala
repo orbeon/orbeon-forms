@@ -61,11 +61,17 @@ object SectionGridEditor {
       }
   }
 
-  sealed case class RowEditor(selector: String)
-  val RowInsertAbove = RowEditor(".icon-chevron-up")
-  val RowDelete      = RowEditor(".icon-minus-sign")
-  val RowInsertBelow = RowEditor(".icon-chevron-down")
-  val RowEditors     = List(RowInsertAbove, RowDelete, RowInsertBelow)
+  import GridSectionEditor._
+
+  sealed abstract class RowEditor(val selector: String) extends EnumEntry
+  object RowEditor extends Enum[RowEditor] {
+    val values = findValues
+    case object InsertAbove extends RowEditor(".icon-chevron-up")
+    case object Delete      extends RowEditor(".icon-minus-sign")
+    case object InsertBelow extends RowEditor(".icon-chevron-down")
+  }
+
+  import RowEditor._
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
@@ -202,9 +208,9 @@ object SectionGridEditor {
         }
 
         currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(RowInsertAbove.selector, (_) ⇒ rowTop)
-        positionElWithClass(RowDelete.selector  , (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(RowInsertBelow.selector, (e) ⇒ rowBottom - e.height())
+        positionElWithClass(RowEditor.InsertAbove.selector, (_) ⇒ rowTop)
+        positionElWithClass(RowEditor.Delete.selector,      (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
+        positionElWithClass(RowEditor.InsertBelow.selector, (e) ⇒ rowBottom - e.height())
       })
     })
   }
@@ -239,10 +245,7 @@ object SectionGridEditor {
               gridFromGridBody(currentSectionGridBody)
 
           val sectionGridId = sectionGrid.attr("id").get
-
-          import GridSectionEditor._
-
-          val client = RpcClient[FormBuilderRpcApi]
+          val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
             case SectionDelete      ⇒ client.sectionDelete     (sectionGridId).call()
@@ -260,20 +263,19 @@ object SectionGridEditor {
       })
     }
 
-    RowEditors foreach { rowEditor ⇒
+    RowEditor.values foreach { rowEditor ⇒
       val iconEl = rowEditorContainer.children(rowEditor.selector)
       iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
         withCurrentGridBody { currentGridBody ⇒
           currentRowPosOpt foreach { currentRowPos ⇒
 
             val controlId = gridFromGridBody(currentGridBody).attr("id").get
-
-            val client = RpcClient[FormBuilderRpcApi]
+            val client    = RpcClient[FormBuilderRpcApi]
 
             rowEditor match {
-              case RowInsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()
-              case RowDelete      ⇒ client.rowDelete     (controlId, currentRowPos).call()
-              case RowInsertBelow ⇒ client.rowInsertBelow(controlId, currentRowPos).call()
+              case InsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()
+              case Delete      ⇒ client.rowDelete     (controlId, currentRowPos).call()
+              case InsertBelow ⇒ client.rowInsertBelow(controlId, currentRowPos).call()
             }
           }
         }

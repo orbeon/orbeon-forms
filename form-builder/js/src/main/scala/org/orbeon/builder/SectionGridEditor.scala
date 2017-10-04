@@ -125,14 +125,20 @@ object SectionGridEditor {
   // Hide editor when the pointer gets out of the Form Builder main area
   Position.currentContainerChanged(
     containerCache = BlockCache.fbMainCache,
-    wasCurrent = (_: Block) ⇒ {
-      sectionGridEditorContainer.hide()
-      rowEditorContainer.hide()
-      currentSectionGridBodyOpt = None
-      currentRowPosOpt          = None
-    },
+    wasCurrent = (_: Block) ⇒ hideSideEditors(),
     becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
   )
+
+  // Also hide when blocks may have moved, e.g. on Ajax response, say after a row was added,
+  // to avoid inappropriately positioned editors
+  Position.onOffsetMayHaveChanged(hideSideEditors _)
+
+  def hideSideEditors(): Unit = {
+    sectionGridEditorContainer.hide()
+    rowEditorContainer.hide()
+    currentSectionGridBodyOpt = None
+    currentRowPosOpt          = None
+  }
 
   // Position row editor
   Position.onUnderPointerChange {

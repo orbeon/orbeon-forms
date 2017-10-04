@@ -91,7 +91,6 @@ object Position {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
     onUnderPointerChange {
-      scala.scalajs.js.Dynamic.global.console.log("check new container")
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
       val newContainer = findInCache(containerCache, top, left)

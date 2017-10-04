@@ -76,8 +76,10 @@ object Position {
 
     containerCache.find { container ⇒
       // Rounding when comparing as the offset of an element isn't always exactly the same as the offset it was set to
-      val horizontalPosInside = Math.floor(container.left) <= left && left <= Math.ceil(container.left + container.width)
-      val verticalPosInside   = Math.floor(container.top ) <= top  && top  <= Math.ceil(container.top  + container.height)
+      val horizontalPosInside = Math.round(container.left) <= Math.round(left) &&
+                                Math.round(left)           <= Math.round(container.left + container.width)
+      val verticalPosInside   = Math.round(container.top ) <= Math.round(top)  &&
+                                Math.round(top)            <= Math.round(container.top  + container.height)
       horizontalPosInside && verticalPosInside
     }.orUndefined
   }

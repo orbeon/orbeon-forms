@@ -152,8 +152,14 @@
                                         <xf:var
                                             name="effective-id"
                                             value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
-                                        <xf:load
-                                            resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                        <xf:action type="javascript">
+                                            <xf:param
+                                                name="effectiveId"
+                                                value="$effective-id"/>
+                                            <xf:body>
+                                                ORBEON.Builder.controlAdded.fire(effectiveId);
+                                            </xf:body>
+                                        </xf:action>
                                     </xf:action>
                                 </xf:action>
                             </xf:trigger>

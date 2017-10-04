@@ -23,7 +23,7 @@ object HrefButton {
     "fr|href-button",
     new XBLCompanion {
       override def init(): Unit = {
-        $(containerElem).find("button").on("click", onClick _)
+        $(containerElem).find("button").on("click.orbeon.href-button", onClick _)
       }
 
       def enabled() = ()

@@ -52,4 +52,6 @@ object CoreUtils {
       }
     }
   }
+
+  @inline def asUnit(body: ⇒ Any): Unit = body
 }

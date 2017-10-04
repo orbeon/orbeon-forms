@@ -30,7 +30,7 @@ object FormBuilderApp {
       SectionGridEditor
       LabelEditor
       ControlEditor
-      ControlResourceEditor
+      ControlLabelHintTextEditor
     }
 
     $(initializeOnDomReady _)

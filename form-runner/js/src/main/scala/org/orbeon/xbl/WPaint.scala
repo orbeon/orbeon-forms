@@ -93,7 +93,7 @@ object WPaint {
       }
 
       // Send the image data from wPaint to the server, which will put it in <annotation>
-      private def sendAnnotationToServer() = {
+      private def sendAnnotationToServer(): Unit = {
         val annotationImgData = wpaintElC.asInstanceOf[Dynamic].wPaint("image")
         DocumentAPI.dispatchEvent(new js.Object {
           val targetId = containerElem.id

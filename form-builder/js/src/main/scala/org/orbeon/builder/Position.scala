@@ -15,6 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
@@ -28,7 +29,7 @@ object Position {
   // Keeps track of pointer position
   var pointerPos: Offset = Offset(0, 0)
 
-  $(document).on("mousemove", (event: JQueryEventObject) ⇒ {
+  $(document).on("mousemove", (event: JQueryEventObject) ⇒ asUnit {
     pointerPos =
       Offset(
         left = event.pageX,

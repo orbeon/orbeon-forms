@@ -51,6 +51,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       node.att("max").nonEmpty
     )
 
+  //@XPathFunction
   def isRepeat(node: NodeInfo) =
     isContentRepeat(node) || isLegacyRepeat(node)
 

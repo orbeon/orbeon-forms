@@ -56,7 +56,7 @@ class Upload extends Control {
       // Register listener on the cancel link
       val cancelAnchor = getElementByClassName(UploadCancelClass)
 
-      $(cancelAnchor).on("click.orbeon", self.cancel _)
+      $(cancelAnchor).on("click.orbeon.upload", self.cancel _)
     }
   }
 

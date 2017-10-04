@@ -20,6 +20,7 @@ import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.scalajs.jquery.JQuery
@@ -217,7 +218,7 @@ object SectionGridEditor {
 
       val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
 
-      iconEl.on("click", () ⇒ {
+      iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
         currentSectionGridBodyOpt foreach { currentSectionGridBody ⇒
 
           val isSection = currentSectionGridBody.el.is(BlockCache.SectionSelector)
@@ -252,7 +253,7 @@ object SectionGridEditor {
 
     RowEditors foreach { rowEditor ⇒
       val iconEl = rowEditorContainer.children(rowEditor.selector)
-      iconEl.on("click", () ⇒
+      iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
         withCurrentGridBody { currentGridBody ⇒
           currentRowPosOpt foreach { currentRowPos ⇒
 
@@ -267,7 +268,7 @@ object SectionGridEditor {
             }
           }
         }
-      )
+      })
     }
   }
 }

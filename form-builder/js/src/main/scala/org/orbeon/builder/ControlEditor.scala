@@ -96,7 +96,7 @@ object ControlEditor {
     // Control actions
     ControlActionNames.foreach((actionName) ⇒ {
       val actionEl = controlEditorRight.find(s".fb-control-$actionName")
-      actionEl.on("click", () ⇒ {
+      actionEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
         currentCellOpt.foreach((currentCell) ⇒ {
 
           val controlId = currentCell.el.children().attr("id").get
@@ -123,7 +123,7 @@ object ControlEditor {
         case Direction.Left  ⇒ "fb-shrink-right"
       }
 
-      iconEl.on("click", () ⇒ {
+      iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
         if (! iconEl.is(".disabled"))
           for {
             currentCell ← currentCellOpt

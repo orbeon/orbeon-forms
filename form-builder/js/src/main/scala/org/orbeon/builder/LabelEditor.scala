@@ -16,6 +16,7 @@ package org.orbeon.builder
 import autowire._
 import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
@@ -23,10 +24,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.builder.LabelEditor")
-@JSExportAll
 object LabelEditor {
 
   val SectionTitleSelector = ".fr-section-title:first"
@@ -84,8 +82,8 @@ object LabelEditor {
       val labelInput = labelInputOpt.getOrElse {
         val labelInput = $("<input class='fb-edit-section-label'/>")
         $(".fb-main").append(labelInput)
-        labelInput.on("blur", () ⇒ if (labelInput.is(":visible")) sendNewLabelValue())
-        labelInput.on("keypress", (e: JQueryEventObject) ⇒ if (e.which == 13) sendNewLabelValue())
+        labelInput.on("blur", () ⇒ asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
+        labelInput.on("keypress", (e: JQueryEventObject) ⇒ asUnit { if (e.which == 13) sendNewLabelValue() })
         Events.ajaxResponseProcessedEvent.subscribe(() ⇒ labelInput.hide())
         labelInputOpt = labelInput
         labelInput
@@ -160,12 +158,12 @@ object LabelEditor {
       for (_ ← 1 to sections.length - labelClickInterceptors.length) {
         val container = $("<div class='fb-section-label-editor-click-interceptor'>")
         $(".fb-main").append(container)
-        container.on("click", (e: JQueryEventObject) ⇒ LabelEditor.showLabelEditor($(e.target)))
-        container.on("mouseover", (e: JQueryEventObject) ⇒ {
+        container.on("click.orbeon.builder.label-editor", (e: JQueryEventObject) ⇒ LabelEditor.showLabelEditor($(e.target)))
+        container.on("mouseover", (e: JQueryEventObject) ⇒ asUnit {
             updateHighlight((cssClass: String, el: JQuery) ⇒ { el.addClass(cssClass); () }, $(e.target))
             showClickHintIfTitleEmpty($(e.target))
         })
-        container.on("mouseout", (e: JQueryEventObject) ⇒ {
+        container.on("mouseout", (e: JQueryEventObject) ⇒ asUnit {
           updateHighlight((cssClass: String, el: JQuery) ⇒ { el.removeClass(cssClass); () }, $(e.target))
           $(e.target).text("")
         })

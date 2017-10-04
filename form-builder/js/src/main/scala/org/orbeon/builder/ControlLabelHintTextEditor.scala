@@ -24,13 +24,17 @@ import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-private object ControlResourceEditor {
+import org.orbeon.oxf.util.StringUtils._
 
-  val LabelHintSelector   = ".fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text .xforms-output-output"
-  val ControlSelector     = ".xforms-control, .xbl-component"
-  val ExplanationSelector = ".xbl-component.xbl-fr-explanation"
+private object ControlLabelHintTextEditor {
+
+  val LabelHintSelectorList = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output") map (".fb-main .fr-editable " + _)
+  val LabelHintSelector     = LabelHintSelectorList mkString ","
+  val ControlSelector       = ".xforms-control, .xbl-component"
+  val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
 
   @JSExportTopLevel("ORBEON.Builder.controlAdded")
   val controlAdded: JQueryCallback = $.Callbacks()
@@ -53,47 +57,54 @@ private object ControlResourceEditor {
 
   locally {
 
-    $(document).on("click", clickOrFocus _)
-    $(document).on("focusin", clickOrFocus _)
+    $(document).on("click.orbeon.builder.lht-editor", clickOrFocus _)
+    $(document).on("focusin.orbeon.builder.lht-editor", clickOrFocus _)
 
     // Click on label/hint
-    $(".fb-main").on("click", LabelHintSelector, (event: JQueryEventObject) ⇒ {
-      // Close current editor, if there is one open
-      if (resourceEditorCurrentControl != null) resourceEditorEndEdit()
-      resourceEditorCurrentLabelHint = $(event.currentTarget)
-      // Find control for this label
-      val th = resourceEditorCurrentLabelHint.parents("th")
-      resourceEditorCurrentControl =
-        if (th.is("*")) {
-          // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-          resourceEditorCurrentLabelHint.parents(ControlSelector).first()
-        } else {
-          val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
-          val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
-          val parents = $($.merge(explanation, controls))
-          parents.first()
-        }
-      resourceEditorStartEdit()
-    })
+    $(document).on(
+      "click.orbeon.builder.resource-editor",
+      LabelHintSelector,
+      (event: JQueryEventObject) ⇒ {
 
-    // New control added
-    controlAdded.add((containerId: String) ⇒ {
-      val container = $(document.getElementById(containerId))
-      resourceEditorCurrentControl = container.find(ControlSelector)
-      val repeat = container.parents(".fr-repeat").first()
-      resourceEditorCurrentLabelHint =
-          if (repeat.is("*"))
-            repeat.find(
-              "thead tr th:nth-child(" +
-                (container.index() + 1) +
-                ") .xforms-label, tbody tr td:nth-child(" +
-                (container.index() + 1) +
-                ") .xforms-text .xforms-output-output")
-          else
-            container.find(".xforms-label, .xforms-text .xforms-output-output").first()
-      if (resourceEditorCurrentLabelHint.is("*"))
-          resourceEditorStartEdit()
-    })
+        // Close current editor, if there is one open
+        if (resourceEditorCurrentControl ne null) resourceEditorEndEdit()
+        resourceEditorCurrentLabelHint = $(event.currentTarget)
+        // Find control for this label
+        val th = resourceEditorCurrentLabelHint.parents("th")
+        resourceEditorCurrentControl =
+          if (th.is("*")) {
+            // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
+            resourceEditorCurrentLabelHint.parents(ControlSelector).first()
+          } else {
+            val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
+            val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
+            val parents = $($.merge(explanation, controls))
+            parents.first()
+          }
+        resourceEditorStartEdit()
+      })
+
+      // New control added
+      controlAdded.add((containerId: String) ⇒ {
+        val container = $(document.getElementById(containerId))
+        resourceEditorCurrentControl = container.find(ControlSelector)
+        val repeat = container.parents(".fr-repeat").first()
+        resourceEditorCurrentLabelHint =
+            if (repeat.is("*"))
+              repeat.find(
+                "thead tr th:nth-child(" +
+                  (container.index() + 1) +
+                  ") .xforms-label, tbody tr td:nth-child(" +
+                  (container.index() + 1) +
+                  ") .xforms-text .xforms-output-output")
+            else
+              container.find(".xforms-label, .xforms-text .xforms-output-output").first()
+        if (resourceEditorCurrentLabelHint.is("*"))
+            resourceEditorStartEdit()
+      }
+    )
+
+    (): js.Any
   }
 
   // Show editor on click on label
@@ -175,14 +186,15 @@ private object ControlResourceEditor {
        $(".fb-main").append(container)
 
       // Event handlers
-      textfield.on("keypress", (e: JQueryEventObject) ⇒
+      textfield.on("keypress", (e: JQueryEventObject) ⇒ asUnit {
         // End edit when users press enter
-        if (e.which == 13) resourceEditorEndEdit()
-      )
-      checkbox.on("click", () ⇒
-        // When checkbox clicked, set focus back on the textfield, where it was before
+        if (e.which == 13)
+          resourceEditorEndEdit()
+      })
+      checkbox.on("click.orbeon.builder.lht-editor", () ⇒ asUnit {
+        // When checkbox clicked, set focus back on the text field, where it was before
         textfield.focus()
-      )
+      })
     }
 
     // Read/write class telling us if the label/hint is in HTML, set in grid.xml
@@ -242,7 +254,7 @@ private object ControlResourceEditor {
     // - If already initialized, set width directly on table created by TinyMCE
     // (Hacky, but didn't find a better way to do it)
     def setTinyMCEWidth(): Unit = {
-      if (tinyMceObject != null) {
+      if (tinyMceObject ne null) {
         val tinymceTable = $(tinyMceObject.container).find(".mceLayout")
         val widthSetOn = if (tinymceTable.is("*")) tinymceTable else tinymceAnchor
         widthSetOn.width(container.outerWidth())
@@ -277,7 +289,7 @@ private object ControlResourceEditor {
     def startEdit(): Unit = {
       textfield.hide()
       checkbox.hide()
-      if (tinyMceObject != null) tinyMceObject.hide()
+      if (tinyMceObject ne null) tinyMceObject.hide()
       if (lhha == "text") {
         setTinyMCEWidth()
         initTinyMCE()

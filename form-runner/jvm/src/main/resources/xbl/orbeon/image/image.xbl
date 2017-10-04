@@ -60,8 +60,7 @@
                     <xf:value value="."/>
                 </xf:header>
             </xf:output>
-            <xf:var name="is-fb" value="exists(xxf:instance('fb-form-instance'))"/>
-            <fr:attachment ref="if ($is-fb) then xxf:binding('fr-image') else ()"/>
+            <fr:attachment ref="if (fr:is-design-time()) then xxf:binding('fr-image') else ()"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

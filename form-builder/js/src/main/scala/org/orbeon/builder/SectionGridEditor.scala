@@ -94,7 +94,9 @@ object SectionGridEditor {
       if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
 
         // Edit details and help are always visible
-        sectionGridEditorContainer.children(".fb-section-edit-details, .fb-section-edit-help").show()
+        sectionGridEditorContainer
+          .children(".fb-section-edit-details, .fb-section-delete, .fb-section-edit-help")
+          .show()
 
         // Hide/show section move icons
         val container = sectionGridBody.el.children(".fr-section-container")

@@ -14,11 +14,12 @@
 package org.orbeon.builder
 
 import autowire._
-import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade._
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -58,7 +59,7 @@ object LabelEditor {
 
     section.el.find(SectionLabelSelector).text(newLabelValue)
 
-    FormBuilderClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
+    RpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
 
     labelInputOpt.get.hide()
   }

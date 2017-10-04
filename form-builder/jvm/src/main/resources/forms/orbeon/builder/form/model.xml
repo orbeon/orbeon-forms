@@ -28,7 +28,7 @@
       xmlns:xformsid="java:org.orbeon.xforms.XFormsId"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
-      xxf:external-events="fb-show-test-dialog fb-rpc-request"
+      xxf:external-events="fb-show-test-dialog xxforms-rpc-request"
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
       xxf:expose-xpath-types="true"
@@ -68,7 +68,11 @@
     <xf:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
 
     <!-- RPC request from the client -->
-    <xf:action event="fb-rpc-request" type="javascript" xmlns:router="java:org.orbeon.builder.rpc.Router">
+    <xf:action
+        xmlns:router="java:org.orbeon.builder.rpc.Router"
+        ev:observer="#document"
+        event="xxforms-rpc-request"
+        type="javascript">
         <xf:param
             name="id"
             value="event('id')"/>
@@ -76,7 +80,7 @@
             name="response"
             value="router:processRequest(event('path'), event('args'))"/>
         <xf:body>
-            ORBEON.builder.rpc.Client.serverCallback(id, response);
+            ORBEON.xforms.rpc.Client.processResponse(id, response);
         </xf:body>
     </xf:action>
 

@@ -15,13 +15,14 @@ package org.orbeon.builder
 
 import autowire._
 import org.orbeon.builder.BlockCache.Block
-import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.Grid
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.ClientNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
@@ -102,9 +103,9 @@ object ControlEditor {
           val controlId = currentCell.el.children().attr("id").get
 
           actionName match {
-            case "delete"       ⇒ FormBuilderClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
-            case "edit-details" ⇒ FormBuilderClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
-            case "edit-items"   ⇒ FormBuilderClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
+            case "delete"       ⇒ RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
+            case "edit-details" ⇒ RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
+            case "edit-items"   ⇒ RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
           }
         })
       })
@@ -130,10 +131,10 @@ object ControlEditor {
             cellId      = currentCell.el.attr("id").get
           } locally {
             direction match {
-              case Direction.Up    ⇒ FormBuilderClient[FormBuilderRpcApi].shrinkDown (cellId).call()
-              case Direction.Right ⇒ FormBuilderClient[FormBuilderRpcApi].expandRight(cellId).call()
-              case Direction.Down  ⇒ FormBuilderClient[FormBuilderRpcApi].expandDown (cellId).call()
-              case Direction.Left  ⇒ FormBuilderClient[FormBuilderRpcApi].shrinkRight(cellId).call()
+              case Direction.Up    ⇒ RpcClient[FormBuilderRpcApi].shrinkDown (cellId).call()
+              case Direction.Right ⇒ RpcClient[FormBuilderRpcApi].expandRight(cellId).call()
+              case Direction.Down  ⇒ RpcClient[FormBuilderRpcApi].expandDown (cellId).call()
+              case Direction.Left  ⇒ RpcClient[FormBuilderRpcApi].shrinkRight(cellId).call()
             }
           }
       })

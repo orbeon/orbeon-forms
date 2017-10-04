@@ -17,12 +17,13 @@ import autowire._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
 import org.orbeon.builder.BlockCache.Block
-import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.jquery.JQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -241,7 +242,7 @@ object SectionGridEditor {
 
           import GridSectionEditor._
 
-          val client = FormBuilderClient[FormBuilderRpcApi]
+          val client = RpcClient[FormBuilderRpcApi]
 
           editor match {
             case SectionDelete      ⇒ client.sectionDelete     (sectionGridId).call()
@@ -267,7 +268,7 @@ object SectionGridEditor {
 
             val controlId = gridFromGridBody(currentGridBody).attr("id").get
 
-            val client = FormBuilderClient[FormBuilderRpcApi]
+            val client = RpcClient[FormBuilderRpcApi]
 
             rowEditor match {
               case RowInsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()

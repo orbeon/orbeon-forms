@@ -15,7 +15,7 @@
 package org.orbeon.builder
 
 import autowire._
-import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
@@ -26,8 +26,8 @@ import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
-
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.rpc.RpcClient
 
 private object ControlLabelHintTextEditor {
 
@@ -143,7 +143,7 @@ private object ControlLabelHintTextEditor {
       val newValue    = Private.getValue
       val isHTML      = Private.isHTML
 
-      FormBuilderClient[FormBuilderRpcApi].controlUpdateLHHA(
+      RpcClient[FormBuilderRpcApi].controlUpdateLHHA(
         controlId = controlId,
         lhha      = Private.lhha,
         value     = newValue,

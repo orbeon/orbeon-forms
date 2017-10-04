@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.builder.rpc
+package org.orbeon.xforms.rpc
 
 import io.circe.parser._
 import io.circe.{Decoder, Encoder, Json}
@@ -23,14 +23,16 @@ import scala.scalajs.js.URIUtils
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
 
-@JSExportTopLevel("ORBEON.builder.rpc.Client")
-object FormBuilderClient extends autowire.Client[Json, Decoder, Encoder] with JsonSerializers {
+@JSExportTopLevel("ORBEON.xforms.rpc.Client")
+object RpcClient
+  extends autowire.Client[Json, Decoder, Encoder]
+     with JsonSerializers {
 
   private var lastSequenceNumber = 0
   private var pending: Map[Int, Promise[Json]] = Map.empty
 
   // Autowire calls this with the request containing the method call already encoded. We dispatch a custom event to
-  // the server, register a promise with an id, and return a Future to Autowire.
+  // the server, register a promise with an id, and return a `Future` to Autowire.
   def doCall(req: Request): Future[Json] = {
 
     val pathValue = req.path mkString "/"
@@ -42,8 +44,8 @@ object FormBuilderClient extends autowire.Client[Json, Decoder, Encoder] with Js
     println(s"RPC: dispatching request for id: $id (${pathValue.length + argsValue.length} bytes)")
 
     DocumentAPI.dispatchEvent(
-      targetId   = "fr-form-model",
-      eventName  = "fb-rpc-request",
+      targetId   = "#document",
+      eventName  = "xxforms-rpc-request",
       properties = js.Dictionary(
         "id"   → id.toString,
         "path" → pathValue,
@@ -60,7 +62,7 @@ object FormBuilderClient extends autowire.Client[Json, Decoder, Encoder] with Js
   // response and completes the `Promise` with it. By doing so, Autowire then handles the response and in turn
   // completes the `Future` which was returned to the original caller with the result of the remote method call.
   @JSExport
-  def serverCallback(id: String, response: String): Unit = {
+  def processResponse(id: String, response: String): Unit = {
     pending.get(id.toInt) match {
       case Some(promise) ⇒
         println(s"RPC: got correct id in response: $id (${response.length} bytes)")

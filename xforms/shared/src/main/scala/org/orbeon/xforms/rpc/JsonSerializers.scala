@@ -11,7 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.builder.rpc
+package org.orbeon.xforms.rpc
 
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder, Json}

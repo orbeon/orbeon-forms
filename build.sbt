@@ -475,14 +475,7 @@ lazy val formRunnerJS = formRunner.js
 lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-builder"))
   .settings(commonSettings: _*)
   .settings(
-    name                := "orbeon-form-builder",
-    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
-
-    libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser"
-    ).map(_ % CirceVersion)
+    name := "orbeon-form-builder"
   )
 
 lazy val formBuilderJVM = formBuilder.jvm
@@ -541,9 +534,16 @@ lazy val formBuilderJS: Project = formBuilder.js
 lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-xforms"
-  )
+    name := "orbeon-xforms",
 
+    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
+  )
 
 lazy val xformsJVM = xforms.jvm
   .dependsOn(
@@ -571,7 +571,6 @@ lazy val xformsJS: Project = xforms.js
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
       "com.beachape" %%% "enumeratum"     % EnumeratumVersion
-
     ),
 
     skip in packageJSDependencies  := false,

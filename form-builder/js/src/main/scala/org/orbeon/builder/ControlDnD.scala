@@ -14,9 +14,10 @@
 package org.orbeon.builder
 
 import autowire._
-import org.orbeon.builder.rpc.{FormBuilderClient, FormBuilderRpcApi}
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.$
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
@@ -65,7 +66,7 @@ private object ControlDnD {
   drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
     // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
     if (target ne null)
-      FormBuilderClient[FormBuilderRpcApi].controlDnD(el.id, target.id, $(el).hasClass(CopyClass)).call()
+      RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, $(el).hasClass(CopyClass)).call()
   })
 
 }

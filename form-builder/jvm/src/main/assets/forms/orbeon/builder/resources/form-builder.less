@@ -15,6 +15,8 @@
 @darkBlue: #004B92;
 @lightBlue: #DEF;
 @yellow: #ffffd3;
+@cellSelectColor: rgba(23,146, 0, 0.7);
+
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
 @fbBottomHeight: 54px;
@@ -769,8 +771,8 @@ div.orbeon.orbeon-portlet-div {
                                                                                         // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
     .fb-selected {                                                                      // Selected cell in grids
-        box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
-        border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
+        box-shadow: 0 0 3px 3px @cellSelectColor inset;                                 // Highlight current cell with "halo"
+        border-radius: 4px;
     }
 
     .fr-grid-td { border: 1px solid transparent }                                       // So that we can show the grid border on hover changing the border size

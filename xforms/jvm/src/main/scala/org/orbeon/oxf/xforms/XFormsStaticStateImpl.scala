@@ -189,8 +189,12 @@ class XFormsStaticStateImpl(
   def staticIntProperty    (name: String) = staticPropertyOrDefault(name: String).asInstanceOf[Int]
 
   // 2014-05-02: Used by XHTMLHeadHandler only
-  def clientNonDefaultProperties = staticStateDocument.nonDefaultProperties filter
-    { case (propertyName, _) ⇒ getPropertyDefinition(propertyName).isPropagateToClient }
+  def clientNonDefaultProperties: Map[String, AnyRef] =
+    for {
+      (propertyName, _) ← staticStateDocument.nonDefaultProperties
+      if getPropertyDefinition(propertyName).isPropagateToClient
+    } yield
+      propertyName → staticProperty(propertyName)
 }
 
 object XFormsStaticStateImpl {

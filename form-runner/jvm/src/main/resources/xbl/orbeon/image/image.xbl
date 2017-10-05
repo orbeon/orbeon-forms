@@ -21,6 +21,10 @@
 
     <xbl:binding id="fr-image" element="fr|image" xxbl:mode="binding lhha" xxbl:container="span" class="fb-upload">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/image/image.css"/>
+        </xbl:resources>
+
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Static Image</display-name>
             <display-name lang="es">Imagen</display-name>
@@ -60,7 +64,12 @@
                     <xf:value value="."/>
                 </xf:header>
             </xf:output>
-            <fr:attachment ref="if (fr:is-design-time()) then xxf:binding('fr-image') else ()"/>
+            <fr:attachment
+                class="fr-image-attach"
+                ref="
+                    if (fr:is-design-time())
+                    then xxf:binding('fr-image')
+                    else ()"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

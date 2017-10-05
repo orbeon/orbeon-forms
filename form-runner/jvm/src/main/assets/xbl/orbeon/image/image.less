@@ -1,0 +1,14 @@
+.fr-grid-td {
+
+    // Hidden by default
+    .xbl-fr-image .xforms-upload { visibility: hidden }
+
+    // Shown on mouseover the cell or when an upload is in progress
+    &:hover .fb-upload .xforms-upload,
+    .xbl-fr-image .xforms-upload.xforms-upload-state-progress
+        { visibility: visible }
+
+    // Never show download link
+    .xbl-fr-image .xforms-output { display: none }
+
+}

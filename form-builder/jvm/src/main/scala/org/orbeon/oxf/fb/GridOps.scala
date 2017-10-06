@@ -32,6 +32,32 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
+  def initializeGrids(doc: NodeInfo): Unit = {
+
+    // 1. Annotate all the grid and grid cells of the given document with unique ids,
+    // if they don't have them already. We do this so that ids are stable as we move
+    // things around, otherwise if the XForms document is recreated new automatic ids
+    // are generated for objects without id.
+
+    def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
+      // Get as many fresh ids as there are tds
+      val ids = nextIds(doc, token, elements.size).toIterator
+
+      // Add the missing ids
+      elements foreach (ensureAttribute(_, "id", ids.next()))
+    }
+
+    // All grids and grid tds with no existing id
+    val bodyElement = findFRBodyElem(doc)
+    val grids       = bodyElement descendant GridTest
+
+    annotate("tmp", grids descendant CellTest filterNot (_.hasId))
+    annotate("tmp", grids filterNot (_.hasId))
+
+    // 2. Select the first td if any
+    bodyElement descendant GridTest descendant CellTest take 1 foreach selectCell
+  }
+
   // Get the first enclosing repeated grid or legacy repeat
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
@@ -265,26 +291,6 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  // Get the x/y position of a cell given Cell information
-//  def tdCoordinates(td: NodeInfo): (Int, Int) =
-//    NodeInfoCell.tdCoordinates(td, analyzeTrTdGrid(getContainingGrid(td))).get
-//
-//  // TODO
-//  // Whether there will be controls to delete if the cell is expanded
-//  //@XPathFunction
-//  def expandCellTouchesControl(td: NodeInfo): Boolean =
-//    canExpandCell(td) && { // https://github.com/orbeon/orbeon-forms/issues/3282
-//
-//    debugDumpDocumentForGrids("expandCellTouchesControl", td)
-//
-//    val allRowCells = analyzeTrTdGrid(getContainingGrid(td))
-//    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
-//
-//    val cell = allRowCells(y)(x)
-//
-//    allRowCells(y + cell.h)(x).td.hasChildElement
-//  }
-
   //@XPathFunction
   def expandCellRight(cellElem: NodeInfo, amount: Int): Unit = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
@@ -390,35 +396,11 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  def initializeGrids(doc: NodeInfo): Unit = {
-    // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
-    // We do this so that ids are stable as we move things around, otherwise if the XForms document is recreated
-    // new automatic ids are generated for objects without id.
-
-    def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
-      // Get as many fresh ids as there are tds
-      val ids = nextIds(doc, token, elements.size).toIterator
-
-      // Add the missing ids
-      elements foreach (ensureAttribute(_, "id", ids.next()))
-    }
-
-    // All grids and grid tds with no existing id
-    val bodyElement = findFRBodyElem(doc)
-    val grids       = bodyElement descendant GridTest
-
-    annotate("tmp", grids descendant CellTest filterNot (_.hasId))
-    annotate("tmp", grids filterNot (_.hasId))
-
-    // 2. Select the first td if any
-    bodyElement descendant GridTest descendant CellTest take 1 foreach selectCell
-  }
-
   def deleteGridById(gridId: String): Unit =
     deleteContainerById(canDeleteGrid, gridId)
 
-  def canDeleteGrid(grid: NodeInfo): Boolean =
-    canDeleteContainer(grid)
+  def canDeleteGrid(gridElem: NodeInfo): Boolean =
+    canDeleteContainer(gridElem)
 
    // Return all classes that need to be added to an editable grid
   // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.

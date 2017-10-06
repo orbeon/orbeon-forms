@@ -222,8 +222,8 @@ trait ResourcesOps extends BaseOps {
     allLangs(resourcesRoot) map
       (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
-  def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo): Option[NodeInfo] =
-    findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resources) collectFirst
+  def findResourceHolderForLang(controlName: String, lang: String, resourcesRootElem: NodeInfo): Option[NodeInfo] =
+    findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resourcesRootElem) collectFirst
       { case (`lang`, holder) ⇒ holder }
 
   // Find control resource holders
@@ -231,17 +231,17 @@ trait ResourcesOps extends BaseOps {
     findResourceHoldersWithLang(controlName, resourcesRoot) map (_._2)
 
   // For the given bind and lang, find all associated resource holders
-  def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resources: NodeInfo): Iterator[NodeInfo] =
+  def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resourcesRootElem: NodeInfo): Iterator[NodeInfo] =
     for {
       bindNode ← FormBuilder.iterateSelfAndDescendantBinds(rootBind)
       bindName ← findBindName(bindNode)
-      holder   ← findResourceHolderForLang(bindName, lang, resources)
+      holder   ← findResourceHolderForLang(bindName, lang, resourcesRootElem)
     } yield
       holder
 
   //@XPathFunction
-  def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resources: NodeInfo): SequenceIterator =
-    iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resources)
+  def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resourcesRootElem: NodeInfo): SequenceIterator =
+    iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
 
   def lhhaHoldersForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Seq[NodeInfo] =
     for {

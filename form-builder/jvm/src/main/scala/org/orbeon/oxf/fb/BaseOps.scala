@@ -14,14 +14,14 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.{Logging, NetUtils, UserAgent}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.function.Property
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import spray.json.DefaultJsonProtocol._
@@ -31,7 +31,7 @@ import scala.collection.immutable
 
 trait BaseOps extends Logging {
 
-  implicit def logger = inScopeContainingDocument.getIndentedLogger("form-builder")
+  implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-builder")
 
   // Minimal version of IE supported
   val MinimalIEVersion = 11
@@ -40,21 +40,26 @@ trait BaseOps extends Logging {
   val DynamicControlId = "fb"
 
   // Find the form document being edited
-  def getFormDoc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
+  def getFormDoc: DocumentInfo =
+    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
 
   // All xbl:binding elements available
-  def componentBindings =
+  def componentBindings: Seq[NodeInfo] =
     asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
   // Return fb-form-instance
-  def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get
+  def fbFormInstance: XFormsInstance =
+    topLevelInstance("fr-form-model", "fb-form-instance").get
 
   // Find the top-level form model of the form being edited
-  def getFormModel = inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+  def getFormModel: XFormsModel =
+    inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model")
+      .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
-  def formResourcesRoot = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
+  def formResourcesRoot: NodeInfo =
+    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
-  def templateRoot(inDoc: NodeInfo, repeatName: String) =
+  def templateRoot(inDoc: NodeInfo, repeatName: String): Option[NodeInfo] =
     inlineInstanceRootElem(inDoc, templateId(repeatName))
 
   // Find the next available id for a given token
@@ -103,20 +108,20 @@ trait BaseOps extends Logging {
       yield nextId
   }
 
-  def makeInstanceExpression(name: String) = "instance('" + name + "')"
+  def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 
   // Whether the browser is supported
   // Concretely, we only return false if the browser is an "old" version of IE
-  def isBrowserSupported = {
+  def isBrowserSupported: Boolean = {
     val request = NetUtils.getExternalContext.getRequest
     ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
   }
 
-  def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo) =
+  def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo): Unit =
     if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
       debugDumpDocument(message, inDoc)
 
-  def debugDumpDocument(message: String, inDoc: NodeInfo) =
+  def debugDumpDocument(message: String, inDoc: NodeInfo): Unit =
     debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 
   def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
@@ -127,7 +132,8 @@ trait BaseOps extends Logging {
     insert(into = into, after = elementsBefore, origin = origin)
   }
 
-  def alwaysShowRoles(): List[String] = {
+  //@XPathExpression
+  def alwaysShowRoles: List[String] = {
     val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
     rolesJsonOpt.to[List].flatMap(_.parseJson.convertTo[List[String]])
   }

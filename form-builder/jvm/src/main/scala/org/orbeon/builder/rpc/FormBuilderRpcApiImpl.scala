@@ -127,11 +127,19 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     ToolboxOps.writeXcvToClipboard(ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)))
 
   def containerCut(containerId: String): Unit = {
-    containerCopy(containerId)
-    if (FormBuilder.IsGrid(FormBuilder.containerById(containerId)))
-      FormBuilder.deleteGridById(containerId)
-    else
-      FormBuilder.deleteSectionById(containerId)
+
+    val containerElem = FormBuilder.containerById(containerId)
+
+    if (FormBuilder.IsGrid(containerElem) && FormBuilder.canDeleteGrid(containerElem) ||
+      FormBuilder.IsSection(containerElem) && FormBuilder.canDeleteSection(containerElem)) {
+
+      containerCopy(containerId)
+
+      if (FormBuilder.IsGrid(FormBuilder.containerById(containerId)))
+        FormBuilder.deleteGridById(containerId)
+      else
+        FormBuilder.deleteSectionById(containerId)
+    }
   }
 
   private def resolveId(id: String): Option[NodeInfo] =

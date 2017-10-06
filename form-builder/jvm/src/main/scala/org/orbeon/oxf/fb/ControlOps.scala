@@ -291,26 +291,27 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Create one holder per existing language
     val resourceHolders = (formResourcesRoot / "resource" /@ "*:lang") map (_.stringValue → List(resourceHolder))
-    insertHolders(controlElement, Option(dataHolder), resourceHolders, precedingControlName)
+    insertHolders(controlElement, List(dataHolder), resourceHolders, precedingControlName)
   }
 
   // Insert data and resource holders for all languages
   def insertHolders(
     controlElement       : NodeInfo,
-    dataHolderOpt        : Option[NodeInfo],
+    dataHolders          : Seq[NodeInfo],
     resourceHolders      : Seq[(String, Seq[NodeInfo])],
     precedingControlName : Option[String]
   ): Unit = {
-    val doc = controlElement.getDocumentRoot
+
+    val doc            = controlElement.getDocumentRoot
+    val containerNames = findContainerNamesForModel(controlElement)
 
     // Insert hierarchy of data holders
     // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous
     // names. In practice, the ancestor holders should already exist.
-    dataHolderOpt foreach { dataHolder ⇒
-      val containerNames = findContainerNamesForModel(controlElement)
+    dataHolders foreach { dataHolder ⇒
       ensureDataHolder(
         formInstanceRoot(doc),
-        (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName)
+        (containerNames map (name ⇒ (() ⇒ elementInfo(name), None))) :+ (() ⇒ dataHolder, precedingControlName)
       )
     }
 

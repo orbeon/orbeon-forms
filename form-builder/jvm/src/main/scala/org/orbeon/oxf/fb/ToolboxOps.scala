@@ -113,7 +113,7 @@ object ToolboxOps {
         // Insert data and resource holders
         insertHolders(
           controlElement       = newControlElement,
-          dataHolderOpt        = Some(dataHolder),
+          dataHolders          = List(dataHolder),
           resourceHolders      = resourceHolders,
           precedingControlName = precedingControlNameInSectionForControl(newControlElement)
         )
@@ -263,7 +263,7 @@ object ToolboxOps {
     // Insert instance holder (but no resource holders)
     insertHolders(
       controlElement       = newGridElement,
-      dataHolderOpt        = Some(elementInfo(newGridName)),
+      dataHolders          = List(elementInfo(newGridName)),
       resourceHolders      = Nil,
       precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
     )
@@ -353,34 +353,74 @@ object ToolboxOps {
 
   def controlOrContainerElemToXcv(containerElem: NodeInfo): NodeInfo = {
 
-    val inDoc   = containerElem.getDocumentRoot
-    val nameOpt = getControlNameOpt(containerElem) // non-repeated grids don't have a name
+    val inDoc             = containerElem.getDocumentRoot
+    val resourcesRootElem = resourcesRoot
 
-    // Create <resource xml:lang="..."> containers
-    val resourcesWithLang =
-      for {
-        controlName       ← nameOpt.toList
-        rootBind          ← findBindByName(inDoc, controlName).toList
-        resourcesRootElem = resourcesRoot
-        lang              ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
-      } yield
-        elementInfo(
-          "resource",
-          attributeInfo(XMLLangQName, lang) ++
-            FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
-        )
+    val controlDetailsOpt =
+      searchControlBindPathHoldersInDoc(
+        controlElems   = List(containerElem),
+        inDoc          = inDoc,
+        contextItemOpt = Some(formInstanceRoot(inDoc)),
+        predicate      = _ ⇒ true
+      ).headOption
 
     val xcvContent =
-      Map(
-        XcvEntry.Control   → List(containerElem),
-        XcvEntry.Holder    → (nameOpt.toList flatMap (findDataHolders(inDoc, _))),
-        XcvEntry.Resources → resourcesWithLang,
-        XcvEntry.Bind      → (nameOpt.toList flatMap (findBindByName(inDoc, _)))
-      ) map { case (xcvEntry, content) ⇒
-        elementInfo(xcvEntry.entryName, content)
-      } toList
+      controlDetailsOpt match {
+        case Some(ControlBindPathHoldersResources(control, bind, _, holders, _)) ⇒
+          // The control has a name and a bind
 
-    elementInfo("xcv", xcvContent)
+          val bindAsList = List(bind)
+
+          // Handle resources separately since unlike holders and binds, they are not nested
+          val resourcesWithLang =
+            for {
+              rootBind ← bindAsList
+              lang     ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
+            } yield
+              elementInfo(
+                "resource",
+                attributeInfo(XMLLangQName, lang) ++
+                  FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
+              )
+
+          // LATER: handle repetitions, for now keep only the first data holder
+          val firstHolderOpt = holders flatMap (_.headOption)
+
+          XcvEntry.values map {
+            case e @ XcvEntry.Control   ⇒ e → List(control)
+            case e @ XcvEntry.Holder    ⇒ e → firstHolderOpt.toList
+            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
+            case e @ XcvEntry.Bind      ⇒ e → bindAsList
+          }
+
+        case None ⇒
+          // Non-repeated grids don't have a name or a bind.
+          // In this case, we use the grid control as a source of truth and find the nested controls.
+
+          val nestedControlDetails = searchControlBindPathHoldersInDoc(
+            controlElems   = findControlsInContainer(containerElem),
+            inDoc          = inDoc,
+            contextItemOpt = Some(formInstanceRoot(inDoc)),
+            predicate      = _ ⇒ true
+          )
+
+          val resourcesWithLang = nestedControlDetails flatMap (_.resources) groupBy (_._1) map {
+            case (lang, langsAndElems) ⇒
+              elementInfo(
+                "resource",
+                attributeInfo(XMLLangQName, lang) ++ (langsAndElems map (_._2))
+              )
+          }
+
+          XcvEntry.values map {
+            case e @ XcvEntry.Control   ⇒ e → List(containerElem)
+            case e @ XcvEntry.Holder    ⇒ e → (nestedControlDetails flatMap (_.holders flatMap (_.headOption)))
+            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang.toList
+            case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
+          }
+      }
+
+    elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
   }
 
   private def controlElementsInCellToXcv(cellElem: NodeInfo): Option[NodeInfo] = {
@@ -414,160 +454,184 @@ object ToolboxOps {
     clone
   }
 
-  def writeXcvToClipboard(xcv: NodeInfo): Unit = {
-    val clipboard = clipboardXcvRootElem
+  def clearClipboard(): Unit =
     XcvEntry.values
-        .map(_.entryName)
-        .foreach(entryName ⇒ delete(clipboard / entryName))
-    insert(into = clipboard, origin = xcv / *)
+      .map(_.entryName)
+      .foreach(entryName ⇒ delete(clipboardXcvRootElem / entryName))
+
+  def writeXcvToClipboard(xcv: NodeInfo): Unit = {
+    clearClipboard()
+    insert(into = clipboardXcvRootElem, origin = xcv / *)
+
+    FormBuilder.debugDumpDocument("xxx clipboard after write", clipboardXcvRootElem)
   }
 
   def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
+
     val xcv = controlElementsInCellToXcv(sourceCellElem)
 
     if (! copy)
       deleteControlWithinCell(sourceCellElem, updateTemplates = true)
 
     selectCell(targetCellElem)
-    xcv foreach (pasteFromXcv(targetCellElem, _))
+    xcv foreach (pasteSingleControlFromXcv(targetCellElem, _))
   }
 
   // Paste control from the clipboard
   //@XPathFunction
   def pasteFromClipboard(targetCellElem: NodeInfo): Unit = {
 
-    val inDoc       = FormBuilder.fbFormInstance.root
-    val controlElem = clipboardXcvRootElem / XcvEntry.Control.entryName / * head
+    val xcvElem     = readXcvFromClipboard
+    val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-    if (FormBuilder.IsGrid(controlElem) || FormBuilder.IsSection(controlElem)) {
-
-      val (into, after) =
-        if (FormBuilder.IsGrid(controlElem)) {
-          val (into, after, _) = findGridInsertionPoint(inDoc)
-          (into, after)
-        } else {
-          findSectionInsertionPoint(inDoc)
-        }
-
-      val precedingContainerName = after flatMap getControlNameOpt
-
-      val newContainerElement = insert(into = into, after = after.toList, origin = controlElem).head
-
-      val resourceHolders =
-        for {
-          resourceElem ← clipboardXcvRootElem / XcvEntry.Resources.entryName / "resource"
-          lang = resourceElem attValue "*:lang"
-        } yield
-          lang → (resourceElem / *)
-
-      // Insert holders
-      insertHolders(
-        controlElement       = newContainerElement,
-        dataHolderOpt        = clipboardXcvRootElem / XcvEntry.Holder.entryName / * headOption,
-        resourceHolders      = resourceHolders,
-        precedingControlName = precedingContainerName
-      )
-
-      // Insert the bind element
-      val newBind = ensureBinds(inDoc, findContainerNamesForModel(newContainerElement, includeSelf = true))
-      insert(after = newBind, origin = clipboardXcvRootElem / XcvEntry.Bind.entryName / *)
-      delete(newBind)
-
-      // This can impact templates
-      updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
-
-      // Select first grid cell
-      selectFirstCellInContainer(newContainerElement)
-    } else
-      pasteFromXcv(targetCellElem, readXcvFromClipboard)
+    if (FormBuilder.IsGrid(controlElem) || FormBuilder.IsSection(controlElem))
+      pasteSectionGridFromXcv(targetCellElem, xcvElem)
+    else
+      pasteSingleControlFromXcv(targetCellElem, xcvElem)
   }
 
-  private def pasteFromXcv(targetCellElem: NodeInfo, xcv: NodeInfo): Unit = {
+  private def pasteSectionGridFromXcv(
+    targetCellElem : NodeInfo,
+    xcvElem        : NodeInfo
+  ): Unit = {
+
+    val inDoc       = FormBuilder.fbFormInstance.root
+    val controlElem = xcvElem / XcvEntry.Control.entryName / * head
+
+    val (into, after) =
+      if (FormBuilder.IsGrid(controlElem)) {
+        val (into, after, _) = findGridInsertionPoint(inDoc)
+        (into, after)
+      } else {
+        findSectionInsertionPoint(inDoc)
+      }
+
+    // TODO: What if pasting after a non-repeated grid without name? We must try to keep the order of things!
+    val precedingContainerName = after flatMap getControlNameOpt
+
+    val newContainerElement = insert(into = into, after = after.toList, origin = controlElem).head
+
+    val resourceHolders =
+      for {
+        resourceElem ← xcvElem / XcvEntry.Resources.entryName / "resource"
+        lang = resourceElem attValue "*:lang"
+      } yield
+        lang → (resourceElem / *)
+
+    // Insert holders
+    insertHolders(
+      controlElement       = newContainerElement, // in order to find containers
+      dataHolders          = xcvElem / XcvEntry.Holder.entryName / * take 1,
+      resourceHolders      = resourceHolders,
+      precedingControlName = precedingContainerName
+    )
+
+    // Insert the bind element
+    val newBindOrNot = ensureBinds(inDoc, findContainerNamesForModel(newContainerElement, includeSelf = true))
+
+    if (newContainerElement attValueOpt "bind" nonEmpty) {
+      // Element has a `bind` so the bind is newly-created
+      insert(after = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
+      delete(newBindOrNot)
+    } else {
+      // Element doesn't have a `bind` so the bind was already there
+      insert(into = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
+    }
+
+    // This can impact templates
+    updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+
+    // Select first grid cell
+    selectFirstCellInContainer(newContainerElement)
+  }
+
+  private def pasteSingleControlFromXcv(
+    targetCellElem : NodeInfo,
+    xcvElem        : NodeInfo
+  ): Unit =
     ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
 
-      (xcv / XcvEntry.Control.entryName / * headOption) foreach { control ⇒
+      val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-        def holders   = xcv / XcvEntry.Holder.entryName / *
-        def resources = xcv / XcvEntry.Resources.entryName / "resource" / *
+      def dataHolders = xcvElem / XcvEntry.Holder.entryName / * take 1
+      def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
 
-        val name = {
-          val requestedName = getControlName(control)
+      val name = {
+        val requestedName = getControlName(controlElem)
 
-          // Check if id is already in use
-          if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
-            // If so create new id
-            val newName = controlNameFromId(nextId(targetCellElem, XcvEntry.Control.entryName))
+        // Check if id is already in use
+        if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
+          // If so create new id
+          val newName = controlNameFromId(nextId(targetCellElem, XcvEntry.Control.entryName))
 
-            // Rename everything
-            renameControlByElement(control, newName, resources / * map (_.localname) toSet)
+          // Rename everything
+          renameControlByElement(controlElem, newName, resources / * map (_.localname) toSet)
 
-            holders ++ resources foreach
-              (rename(_, newName))
+          dataHolders ++ resources foreach
+            (rename(_, newName))
 
-            (xcv / XcvEntry.Bind.entryName / * headOption) foreach
-              (renameBindElement(_, newName))
+          (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach
+            (renameBindElement(_, newName))
 
-            newName
-          } else
-            requestedName
-        }
-
-        // Insert control and holders
-        val newControlElement = insert(into = gridCellElem, origin = control).head
-
-        insertHolders(
-          controlElement       = newControlElement,
-          dataHolderOpt        = holders.headOption,
-          resourceHolders      = xcv / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
-          precedingControlName = precedingControlNameInSectionForControl(newControlElement)
-        )
-
-        // Create the bind and copy all attributes and content
-        val bind = ensureBinds(gridCellElem, findContainerNamesForModel(gridCellElem) :+ name)
-        (xcv / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
-          insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
-        }
-
-        import org.orbeon.oxf.fr.Names._
-
-        // Rename nested element ids and alert ids
-        val nestedElemsWithId =
-          for {
-            nestedElem ← bind descendant *
-            id         ← nestedElem.idOpt
-          } yield
-            nestedElem → id
-
-        val oldIdToNewId =
-          nestedElemsWithId map (_._2) zip nextIds(targetCellElem, Validation, nestedElemsWithId.size) toMap
-
-        // Update nested element ids, in particular xf:constraint/@id
-        nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
-          setvalue(nestedElem att "id", oldIdToNewId(oldId))
-        }
-
-        val alertsWithValidationId =
-          for {
-            alertElem    ← newControlElement / (XF → "alert")
-            validationId ← alertElem attValueOpt Validation
-          } yield
-            alertElem → validationId
-
-        // Update xf:alert/@validation and xf:constraint/@id
-        alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
-
-          val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
-
-          newValidationIdOpt foreach { newValidationId ⇒
-            setvalue(alertWithValidation att Validation, newValidationId)
-          }
-        }
-
-        // This can impact templates
-        updateTemplatesCheckContainers(targetCellElem, findAncestorRepeatNames(targetCellElem).to[Set])
+          newName
+        } else
+          requestedName
       }
+
+      // Insert control and holders
+      val newControlElement = insert(into = gridCellElem, origin = controlElem).head
+
+      insertHolders(
+        controlElement       = newControlElement,
+        dataHolders          = dataHolders,
+        resourceHolders      = xcvElem / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
+        precedingControlName = precedingControlNameInSectionForControl(newControlElement)
+      )
+
+      // Create the bind and copy all attributes and content
+      val bind = ensureBinds(gridCellElem, findContainerNamesForModel(gridCellElem) :+ name)
+      (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
+        insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
+      }
+
+      import org.orbeon.oxf.fr.Names._
+
+      // Rename nested element ids and alert ids
+      val nestedElemsWithId =
+        for {
+          nestedElem ← bind descendant *
+          id         ← nestedElem.idOpt
+        } yield
+          nestedElem → id
+
+      val oldIdToNewId =
+        nestedElemsWithId map (_._2) zip nextIds(targetCellElem, Validation, nestedElemsWithId.size) toMap
+
+      // Update nested element ids, in particular xf:constraint/@id
+      nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
+        setvalue(nestedElem att "id", oldIdToNewId(oldId))
+      }
+
+      val alertsWithValidationId =
+        for {
+          alertElem    ← newControlElement / (XF → "alert")
+          validationId ← alertElem attValueOpt Validation
+        } yield
+          alertElem → validationId
+
+      // Update xf:alert/@validation and xf:constraint/@id
+      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
+
+        val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
+
+        newValidationIdOpt foreach { newValidationId ⇒
+          setvalue(alertWithValidation att Validation, newValidationId)
+        }
+      }
+
+      // This can impact templates
+      updateTemplatesCheckContainers(targetCellElem, findAncestorRepeatNames(targetCellElem).to[Set])
     }
-  }
 
   private object Private {
 

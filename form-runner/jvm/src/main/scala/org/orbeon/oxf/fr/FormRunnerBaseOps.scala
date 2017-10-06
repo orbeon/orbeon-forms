@@ -137,7 +137,7 @@ trait FormRunnerBaseOps {
   def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
     findModelElem(inDoc) / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-      bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind).contains("instance('fr-form-instance')")
+      bind ⇒ TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
 
   def properties = Properties.instance.getPropertySet

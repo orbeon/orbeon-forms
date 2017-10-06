@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
@@ -179,11 +180,11 @@ class FormBuilderFunctionsTest
           // Test result
           assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
 
-          val newlySelectedTd = findSelectedCell(doc)
-          assert(newlySelectedTd.isDefined)
-          assert(newlySelectedTd.get / * /@ "id" === controlId(newControlName))
+          val newlySelectedCell = findSelectedCell(doc)
+          assert(newlySelectedCell.isDefined)
+          assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
 
-          val containerNames = findContainerNamesForModel(newlySelectedTd.get)
+          val containerNames = findContainerNamesForModel(newlySelectedCell.get)
           assert(containerNames == List("section-1"))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
@@ -249,11 +250,11 @@ class FormBuilderFunctionsTest
 
           locally {
 
-            val newlySelectedTd = findSelectedCell(doc)
-            assert(newlySelectedTd.isDefined)
-            assert((newlySelectedTd flatMap (_ parent * headOption) head) /@ "id" === gridId(newRepeatName))
+            val newlySelectedCell = findSelectedCell(doc)
+            assert(newlySelectedCell.isDefined)
+            assert((newlySelectedCell flatMap (_ parent * headOption) head) /@ "id" === gridId(newRepeatName))
 
-            val containerNames = findContainerNamesForModel(newlySelectedTd.get)
+            val containerNames = findContainerNamesForModel(newlySelectedCell.get)
             assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
@@ -276,11 +277,11 @@ class FormBuilderFunctionsTest
           // Test result
           locally {
 
-            val newlySelectedTd = findSelectedCell(doc)
-            assert(newlySelectedTd.isDefined)
-            assert(newlySelectedTd.get / * /@ "id" === controlId(newControlName))
+            val newlySelectedCell = findSelectedCell(doc)
+            assert(newlySelectedCell.isDefined)
+            assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
 
-            val containerNames = findContainerNamesForModel(newlySelectedTd.get)
+            val containerNames = findContainerNamesForModel(newlySelectedCell.get)
             assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
 
             assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
@@ -361,7 +362,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Control effective id") {
-    it("must return the expected statis ids") {
+    it("must return the expected statics ids") {
       withTestExternalContext { _ ⇒
         withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
 
@@ -402,9 +403,62 @@ class FormBuilderFunctionsTest
     }
   }
 
-  def assertDataHolder(doc: DocumentWrapper, holderName: String) = {
+  def assertDataHolder(doc: DocumentWrapper, holderName: String): List[NodeInfo] = {
     val dataHolder = findDataHolders(doc, holderName)
     assert(dataHolder.length == 1)
     dataHolder
+  }
+
+  describe("Clipboard cut and paste") {
+
+    it("Simple cut/paste must remove and restore the control, bind, holders, and resources") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
+
+          val selectedCell = FormBuilder.findSelectedCell(doc).get
+
+          def assertPresent() = {
+            assert(Control1 === FormBuilder.getControlName(selectedCell / * head))
+            assert(FormBuilder.findControlByName(doc, Control1).nonEmpty)
+            assert(FormBuilder.findBindByName(doc, Control1).nonEmpty)
+            assert(FormBuilder.findDataHolders(doc, Control1).nonEmpty)
+            assert(FormBuilder.findCurrentResourceHolder(Control1).nonEmpty)
+          }
+
+          assertPresent()
+
+          ToolboxOps.cutToClipboard(selectedCell)
+
+          // Selected cell hasn't changed
+          assert(FormBuilder.findSelectedCell(doc) contains selectedCell)
+
+          assert(FormBuilder.findControlByName(doc, Control1).isEmpty)
+          assert(FormBuilder.findBindByName(doc, Control1).isEmpty)
+          assert(FormBuilder.findDataHolders(doc, Control1).isEmpty)
+          assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
+
+          ToolboxOps.pasteFromClipboard(selectedCell)
+
+          assertPresent()
+        }
+      }
+    }
+
+    it("Non-repeated grid cut/paste must remove and restore the control, bind, holders, and resources") {
+      withTestExternalContext { _ ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
+
+          val firstGridId = (doc descendant FRGridTest head).id
+
+          assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
+          FormBuilderRpcApiImpl.containerCut(firstGridId)
+          assert(FormBuilder.findContainerById(firstGridId).isEmpty)
+          ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell(doc).get)
+          assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
+
+        }
+      }
+    }
+
   }
 }

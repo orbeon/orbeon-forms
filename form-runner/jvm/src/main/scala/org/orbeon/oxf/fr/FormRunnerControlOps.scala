@@ -49,7 +49,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   }
 
   val LHHAInOrder = Seq("label", "hint", "help", "alert")
-  val LHHANames   = LHHAInOrder.to[Set]
+  val LHHANames: Set[String] = LHHAInOrder.to[Set]
 
   // Get the control name based on the control, bind, grid, section or template id
   //@XPathFunction
@@ -61,14 +61,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     Option(controlNameFromId(controlOrBindId))
 
   // Whether the given id is for a control (given its reserved suffix)
-  def isIdForControl(controlOrBindId: String) = controlNameFromId(controlOrBindId) ne null
+  def isIdForControl(controlOrBindId: String): Boolean = controlNameFromId(controlOrBindId) ne null
 
   // Whether the given node corresponds to a control
   // TODO: should be more restrictive
   val IsControl: NodeInfo ⇒ Boolean = hasName
 
   // Find a control by name (less efficient than searching by id)
-  def findControlByName(inDoc: NodeInfo, controlName: String) = (
+  def findControlByName(inDoc: NodeInfo, controlName: String): Option[NodeInfo] = (
     for {
       suffix  ← PossibleControlSuffixes.iterator
       control ← findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
@@ -77,44 +77,43 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   ).nextOption()
 
   // Find a control id by name
-  def findControlIdByName(inDoc: NodeInfo, controlName: String) =
+  def findControlIdByName(inDoc: NodeInfo, controlName: String): Option[String] =
     findControlByName(inDoc, controlName) map (_.id)
 
   // XForms callers: find a control element by name or null (the empty sequence)
-  def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String) =
+  def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String): NodeInfo =
     findControlByName(inDoc, controlName).orNull
 
   // Get the control's name based on the control element
-  def getControlName(control: NodeInfo) = getControlNameOpt(control).get
+  def getControlName(control: NodeInfo): String = getControlNameOpt(control).get
 
   // Get the control's name based on the control element
-  def getControlNameOpt(control: NodeInfo) =
-    (control /@ "id" headOption) flatMap
-      (id ⇒ Option(controlNameFromId(id.stringValue)))
+  def getControlNameOpt(control: NodeInfo): Option[String] =
+    control.idOpt flatMap controlNameFromIdOpt
 
-  def hasName(control: NodeInfo) = getControlNameOpt(control).isDefined
+  def hasName(control: NodeInfo): Boolean = getControlNameOpt(control).isDefined
 
   // Return a bind ref or nodeset attribute value if present
-  def bindRefOrNodeset(bind: NodeInfo): Option[String] =
-    bind /@ ("ref" || "nodeset") map (_.stringValue) headOption
+  def bindRefOpt(bind: NodeInfo): Option[String] =
+    bind attValueOpt "ref"
 
   // Find a bind by name
   def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
     findInBindsTryIndex(inDoc, bindId(name))
 
   // XForms callers: find a bind by name or null (the empty sequence)
-  def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) =
+  def findBindByNameOrEmpty(inDoc: NodeInfo, name: String): NodeInfo =
     findBindByName(inDoc, name).orNull
 
   // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
-  def isBindForName(bind: NodeInfo, name: String) =
-    bind.hasIdValue(bindId(name)) || bindRefOrNodeset(bind).contains(name) // also check ref/nodeset in case id is not present
+  def isBindForName(bind: NodeInfo, name: String): Boolean =
+    bind.hasIdValue(bindId(name)) || bindRefOpt(bind).contains(name) // also check ref/nodeset in case id is not present
 
   // Canonical way: use the `name` attribute
-  def getBindNameOrEmpty(bind: NodeInfo) =
+  def getBindNameOrEmpty(bind: NodeInfo): String =
     bind attValue "name"
 
-  def findBindName(bind: NodeInfo) =
+  def findBindName(bind: NodeInfo): Option[String] =
     bind attValueOpt "name"
 
   def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[BindPath] =
@@ -149,15 +148,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       )
     }
 
-  def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
+  def hasHTMLMediatype(nodes: Seq[NodeInfo]): Boolean =
     nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
 
   //@XPathFunction
-  def isSingleSelectionControl(localName: String) =
+  def isSingleSelectionControl(localName: String): Boolean =
     localName == "select1" || localName.endsWith("-select1")
 
   //@XPathFunction
-  def isMultipleSelectionControl(localName: String) =
+  def isMultipleSelectionControl(localName: String): Boolean =
     localName == "select" || localName.endsWith("-select")
 
   def searchControlsTopLevelOnly(
@@ -166,7 +165,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     predicate : NodeInfo ⇒ Boolean
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
-      controls       = body descendant * filter IsControl,
+      controlElems       = body descendant * filter IsControl,
       inDoc          = body,
       contextItemOpt = data map (_.rootElement),
       predicate      = predicate
@@ -202,13 +201,30 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         holdersOpt,
         labels
       )              ← searchControlBindPathHoldersInDoc(
-                         controls       = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
+                         controlElems   = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
                          inDoc          = xblBinding,
                          contextItemOpt = contextItemOpt,
                          predicate      = predicate
                        )
     } yield
       ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels)
+
+  // NOTE: Return at most one `ControlBindPathHoldersResources` per incoming control element.
+  def searchControlBindPathHoldersInDoc(
+    controlElems   : Seq[NodeInfo],
+    inDoc          : NodeInfo,
+    contextItemOpt : Option[NodeInfo],
+    predicate      : NodeInfo ⇒ Boolean
+  ): Seq[ControlBindPathHoldersResources] =
+    for {
+      control                              ← controlElems
+      if predicate(control)
+      bindId                               ← control.attValueOpt("bind").toList
+      controlName                          ← controlNameFromIdOpt(bindId).toList
+      BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
+      resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)
+    } yield
+      ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
   private object Private {
 
@@ -226,7 +242,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // for all languages. So far, this is handled as a special case, as this is not something that happens
     // in other forms.
     def buildBindPath(bind: NodeInfo): List[DataMigration.PathElem] =
-      (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map { bindRef ⇒
+      (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef ⇒
         PathElem(
           if (bindRef.endsWith(FBLangPredicate))
             bindRef.dropRight(FBLangPredicate.length)
@@ -234,22 +250,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             bindRef
         )
       } toList
-
-    def searchControlBindPathHoldersInDoc(
-      controls       : Seq[NodeInfo],
-      inDoc          : NodeInfo,
-      contextItemOpt : Option[NodeInfo],
-      predicate      : NodeInfo ⇒ Boolean
-    ): Seq[ControlBindPathHoldersResources] =
-      for {
-        control                              ← controls
-        if predicate(control)
-        bindId                               ← control.attValueOpt("bind").toList
-        controlName                          ← controlNameFromIdOpt(bindId).toList
-        BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
-        resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)
-      } yield
-        ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
     def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
       val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)

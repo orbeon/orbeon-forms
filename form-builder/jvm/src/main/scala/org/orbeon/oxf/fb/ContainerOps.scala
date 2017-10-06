@@ -33,14 +33,21 @@ trait ContainerOps extends ControlOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  def containerById(containerId: String): NodeInfo = {
+  def containerById(containerId: String): NodeInfo =
+    findContainerById(containerId).get
+
+  def findContainerById(containerId: String): Option[NodeInfo] = {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // XFormsUtils.getStaticIdFromId every time)
     val staticId = XFormsId.getStaticIdFromId(containerId)
-    findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer head
+    findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer
   }
 
-  def controlsInContainer(containerId: String): Int = (containerById(containerId) descendant CellTest child *).length
+  def countControlsInContainer(containerId: String): Int =
+    findControlsInContainer(containerById(containerId)).size
+
+  def findControlsInContainer(containerElem: NodeInfo): Seq[NodeInfo] =
+    containerElem descendant CellTest child * filter IsControl
 
   // Find all siblings of the given element with the given name, excepting the given element
   def findSiblingsWithName(element: NodeInfo, siblingName: String): Seq[NodeInfo] =
@@ -68,8 +75,8 @@ trait ContainerOps extends ControlOps {
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
   // A container can be removed if it's not the last one at that level
-  def canDeleteContainer(container: NodeInfo): Boolean =
-    container sibling FRContainerTest nonEmpty
+  def canDeleteContainer(containerElem: NodeInfo): Boolean =
+    containerElem sibling FRContainerTest nonEmpty
 
   // Delete the entire container and contained controls
   def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
@@ -78,12 +85,12 @@ trait ContainerOps extends ControlOps {
       deleteContainer(container)
   }
 
-  def deleteContainer(containerNode: NodeInfo): Unit = {
+  def deleteContainer(containerElem: NodeInfo): Unit = {
 
-    val doc = containerNode.getDocumentRoot
+    val doc = containerElem.getDocumentRoot
 
     // Find the new td to select if we are removing the currently selected td
-    val newCellToSelectOpt = findNewCellToSelect(containerNode, containerNode descendant CellTest)
+    val newCellToSelectOpt = findNewCellToSelect(containerElem, containerElem descendant CellTest)
 
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
@@ -106,29 +113,29 @@ trait ContainerOps extends ControlOps {
     }
 
     // Start with top-level container
-    val controls = recurse(containerNode)
+    val controls = recurse(containerElem)
 
     //  Delete all controls in order
     controls flatMap controlElementsToDelete foreach (delete(_))
 
     // Update templates
-    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(containerNode).to[Set])
+    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(containerElem).to[Set])
 
     // Adjust selected td if needed
     newCellToSelectOpt foreach selectCell
   }
 
   // Move a container based on a move function
-  def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit = {
+  def moveContainer(containerElem: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit = {
 
     // Get names before moving the container
-    val nameOption      = getControlNameOpt(container)
+    val nameOption      = getControlNameOpt(containerElem)
     val otherNameOption = getControlNameOpt(otherContainer)
 
-    val doc = container.getDocumentRoot
+    val doc = containerElem.getDocumentRoot
 
     // Move container control itself
-    move(container, otherContainer)
+    move(containerElem, otherContainer)
 
     // Try to move holders and binds based on name of other element
     (nameOption, otherNameOption) match {
@@ -160,7 +167,7 @@ trait ContainerOps extends ControlOps {
                   (moveOp(holder, _))
           }
 
-        val movedContainer = findInViewTryIndex(doc, container.id).get // must get new reference
+        val movedContainer = findInViewTryIndex(doc, containerElem.id).get // must get new reference
 
         (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
           case (Some(preceding), _) ⇒ tryToMoveHolders(getControlName(preceding), moveElementAfter)
@@ -178,8 +185,8 @@ trait ContainerOps extends ControlOps {
   // Whether it is possible to move an item into the given container
   // Currently: must be a section without section template content
   // Later: fr:tab (maybe fr:tabview), wizard
-  def canMoveInto(container: NodeInfo): Boolean =
-    IsSection(container) && ! (container / * exists isSectionTemplateContent)
+  def canMoveInto(containerElem: NodeInfo): Boolean =
+    IsSection(containerElem) && ! (containerElem / * exists isSectionTemplateContent)
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   def deleteSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {

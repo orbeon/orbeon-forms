@@ -19,15 +19,13 @@ import org.orbeon.xforms.facade.Events
 object StaticUpload {
 
   private val SpacerImagePath = "/ops/images/xforms/spacer.gif"
-  private val PhotoImagePath  = "/apps/fr/style/images/silk/photo.png"
+  private val PhotoImageHtml  = """<i class="fa fa-fw fa-lg fa-photo"></i>"""
 
-  private def findAndReplaceAllSpacersWithImages() =
-    $(s"#fr-form-group .fb-upload img.xforms-output-output[src $$= '$SpacerImagePath']").toArray foreach { image ⇒
-      $(image).attr("src") foreach { src ⇒
-        val prefix = src.substring(0, src.indexOf(SpacerImagePath))
-        $(image).attr("src", prefix + PhotoImagePath)
-      }
-    }
+  // This is a bit of a hack: if we find a spacer, we insert an icon right after that if it is not yet present.
+  private def findAndReplaceAllSpacersWithImages(): Unit =
+    $(s"#fr-form-group .fb-upload .xforms-mediatype-image .xforms-output-output[src $$= '$SpacerImagePath']").toArray filter
+      ($(_).closest(".xforms-output").find("i.fa").toArray.isEmpty) foreach
+      $(PhotoImageHtml).insertAfter
 
   // Initial run when the form is first loaded
   findAndReplaceAllSpacersWithImages()

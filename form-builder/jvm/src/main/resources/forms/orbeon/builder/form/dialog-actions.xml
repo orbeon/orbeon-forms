@@ -293,13 +293,13 @@
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
-                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:delete ref="$current-action"/>
                                     </xf:action>
                                 </xf:trigger>
                                 <xf:trigger appearance="minimal">
-                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:insert
                                             context="$request-actions-container"
@@ -391,13 +391,13 @@
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
-                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:delete ref="$current-action"/>
                                     </xf:action>
                                 </xf:trigger>
                                 <xf:trigger appearance="minimal">
-                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
                                     <xf:action event="DOMActivate">
                                         <xf:insert
                                             context="$request-actions-container"
@@ -560,13 +560,13 @@
                             <xf:trigger
                                 appearance="minimal"
                                 ref="if ($can-remove-action) then $response-actions-container else ''">
-                                <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                 <xf:action event="DOMActivate">
                                     <xf:delete ref="$current-action"/>
                                 </xf:action>
                             </xf:trigger>
                             <xf:trigger appearance="minimal">
-                                <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
                                 <xf:action event="DOMActivate">
                                     <xf:insert
                                         context="$response-actions-container"

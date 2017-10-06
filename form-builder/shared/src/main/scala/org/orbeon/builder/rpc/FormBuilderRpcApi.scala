@@ -17,30 +17,31 @@ trait FormBuilderRpcApi {
 
   def controlUpdateLHHA (controlId: String, lhha: String, value: String, isHTML: Boolean): Unit
 
-  def controlDelete     (controlId: String): Unit
-  def controlEditDetails(controlId: String): Unit
-  def controlEditItems  (controlId: String): Unit
-  def controlDnD        (controlId: String, destCellId: String, copy: Boolean): Unit
+  def controlDelete       (controlId: String): Unit
+  def controlEditDetails  (controlId: String): Unit
+  def controlEditItems    (controlId: String): Unit
+  def controlDnD          (controlId: String, destCellId: String, copy: Boolean): Unit
 
-  def rowInsertAbove    (controlId: String, position: Int): Unit
-  def rowDelete         (controlId: String, position: Int): Unit
-  def rowInsertBelow    (controlId: String, position: Int): Unit
+  def rowInsertAbove      (controlId: String, position: Int): Unit
+  def rowDelete           (controlId: String, position: Int): Unit
+  def rowInsertBelow      (controlId: String, position: Int): Unit
 
-  def shrinkDown        (cellId: String): Unit
-  def expandRight       (cellId: String): Unit
-  def expandDown        (cellId: String): Unit
-  def shrinkRight       (cellId: String): Unit
+  def shrinkDown          (cellId: String): Unit
+  def expandRight         (cellId: String): Unit
+  def expandDown          (cellId: String): Unit
+  def shrinkRight         (cellId: String): Unit
 
-  def sectionDelete     (sectionId: String): Unit
-  def sectionUpdateLabel(sectionId: String, label: String): Unit
-  def sectionEditDetails(sectionId: String): Unit
-  def sectionEditHelp   (sectionId: String): Unit
-  def sectionMoveUp     (sectionId: String): Unit
-  def sectionMoveDown   (sectionId: String): Unit
-  def sectionMoveRight  (sectionId: String): Unit
-  def sectionMoveLeft   (sectionId: String): Unit
-  def sectionEditors    (sectionId: String): Unit
+  def sectionDelete       (sectionId: String): Unit
+  def sectionUpdateLabel  (sectionId: String, label: String): Unit
+  def sectionEditHelp     (sectionId: String): Unit
+  def sectionMoveUp       (sectionId: String): Unit
+  def sectionMoveDown     (sectionId: String): Unit
+  def sectionMoveRight    (sectionId: String): Unit
+  def sectionMoveLeft     (sectionId: String): Unit
 
-  def gridEditDetails   (gridId: String): Unit
-  def gridDelete        (gridId: String): Unit
+  def gridDelete          (gridId: String): Unit
+
+  def containerEditDetails(containerId: String): Unit
+  def containerCopy       (containerId: String): Unit
+  def containerCut        (containerId: String): Unit
 }

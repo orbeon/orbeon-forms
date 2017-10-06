@@ -404,7 +404,7 @@ trait GridOps extends ContainerOps {
     }
 
     // All grids and grid tds with no existing id
-    val bodyElement = findFRBodyElement(doc)
+    val bodyElement = findFRBodyElem(doc)
     val grids       = bodyElement descendant GridTest
 
     annotate("tmp", grids descendant CellTest filterNot (_.hasId))

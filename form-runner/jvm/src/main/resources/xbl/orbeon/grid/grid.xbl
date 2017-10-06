@@ -397,9 +397,11 @@
                                                     id="fr-grid-add"
                                                     tabindex="-1"
                                                     xxf:title="{{xxf:r('components.grid.add-another', '|fr-fr-resources|')}}">
-                                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                                    <!--<xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>-->
+                                                    <xf:label><xh:i class="icon-plus-sign "/></xf:label>
                                                 </xf:trigger>
                                                 <xf:group ref="$repeat-context[not($can-add)]">
+                                                    <!--<xh:i class="fa fa-fw fa-plus-circle disabled"/>-->
                                                     <xh:i class="icon-plus-sign disabled"/>
                                                 </xf:group>
                                             </xsl:if>

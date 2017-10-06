@@ -24,14 +24,14 @@ import org.orbeon.scaxon.SimplePath._
 object MigrationOps {
 
   private def findAllGridRepeats(doc: DocumentInfo) =
-    findFRBodyElement(doc) descendant * filter IsGrid filter isRepeat
+    findFRBodyElem(doc) descendant * filter IsGrid filter isRepeat
 
   private def findLegacyGridRepeats(doc: DocumentInfo) =
     findAllGridRepeats(doc) filter isLegacyRepeat
 
   //@XPathFunction
   def findAllRepeatNames(doc: DocumentInfo): SequenceIterator =
-    findFRBodyElement(doc) descendant * filter isRepeat map getControlName
+    findFRBodyElem(doc) descendant * filter isRepeat map getControlName
 
   // Used for migrating the form definition's legacy grid repeats
   // The rest of the implementation is in annotate.xpl.
@@ -71,7 +71,7 @@ object MigrationOps {
     val (sectionsWithTemplates, xblBindingsByURIQualifiedName) = availableXBLBindings match {
       case Some(bindingsDocument) ⇒
         (
-          findSectionsWithTemplates(findFRBodyElement(outerDocument)),
+          findSectionsWithTemplates(findFRBodyElem(outerDocument)),
           FormBuilder.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
         )
       case None ⇒

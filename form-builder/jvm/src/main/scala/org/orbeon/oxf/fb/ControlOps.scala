@@ -94,7 +94,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
 
     // Insert bind container if needed
-    val model = findModelElement(inDoc)
+    val model = findModelElem(inDoc)
     val topLevelBind = findTopLevelBind(inDoc) match {
       case Some(bind) ⇒
         bind
@@ -290,15 +290,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Unit = {
 
     // Create one holder per existing language
-    val resourceHolders = (formResourcesRoot / "resource" /@ "*:lang") map (_.stringValue → resourceHolder)
-    insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
+    val resourceHolders = (formResourcesRoot / "resource" /@ "*:lang") map (_.stringValue → List(resourceHolder))
+    insertHolders(controlElement, Option(dataHolder), resourceHolders, precedingControlName)
   }
 
   // Insert data and resource holders for all languages
   def insertHolders(
     controlElement       : NodeInfo,
-    dataHolder           : NodeInfo,
-    resourceHolders      : Seq[(String, NodeInfo)],
+    dataHolderOpt        : Option[NodeInfo],
+    resourceHolders      : Seq[(String, Seq[NodeInfo])],
     precedingControlName : Option[String]
   ): Unit = {
     val doc = controlElement.getDocumentRoot
@@ -306,7 +306,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Insert hierarchy of data holders
     // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous
     // names. In practice, the ancestor holders should already exist.
-    locally {
+    dataHolderOpt foreach { dataHolder ⇒
       val containerNames = findContainerNamesForModel(controlElement)
       ensureDataHolder(
         formInstanceRoot(doc),
@@ -317,15 +317,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Insert resources placeholders for all languages
     if (resourceHolders.nonEmpty) {
       val resourceHoldersMap = resourceHolders.toMap
-      formResourcesRoot / "resource" foreach (resource ⇒ {
-        val lang = (resource /@ "*:lang").stringValue
-        val holder = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
+      formResourcesRoot / "resource" foreach { resource ⇒
+        val lang    = (resource /@ "*:lang").stringValue
+        val holders = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
         insert(
           into   = resource,
           after  = resource / * filter (_.name == precedingControlName.getOrElse("")),
-          origin = holder
+          origin = holders
         )
-      })
+      }
     }
   }
 
@@ -425,7 +425,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
-    findFRBodyElement(inDoc) descendant * filter
+    findFRBodyElem(inDoc) descendant * filter
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")

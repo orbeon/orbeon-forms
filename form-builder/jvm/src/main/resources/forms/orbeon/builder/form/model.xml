@@ -184,7 +184,7 @@
             ref="frf:metadataInstanceRootOpt($template)/title"
             value="$form-resources/template/untitled-form"/>
         <xf:setvalue
-            ref="frf:resourcesInstanceRootOpt($template)/resource/section-1/label"
+            ref="frf:resourcesInstanceRootElemOpt($template)/resource/section-1/label"
             value="$form-resources/template/untitled-section"/>
 
         <!-- Annotate data -->
@@ -716,8 +716,8 @@
     <xf:var name="xcv" value="instance('fb-xcv-instance')"/>
 
     <xf:bind ref="$xcv">
-        <xf:bind ref="cut-trigger" readonly="not(exists($current-td/*))"/>
-        <xf:bind ref="copy-trigger" readonly="not(exists($current-td/*))"/>
+        <xf:bind ref="cut-trigger"   readonly="not(exists($current-td/*))"/>
+        <xf:bind ref="copy-trigger"  readonly="not(exists($current-td/*))"/>
         <xf:bind ref="paste-trigger" readonly="not(exists(../control/*))"/>
     </xf:bind>
 

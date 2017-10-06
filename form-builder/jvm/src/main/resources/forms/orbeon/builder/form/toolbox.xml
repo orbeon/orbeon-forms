@@ -31,48 +31,124 @@
 
     <xh:div class="fb-toolbox-inside">
 
-        <!-- XVC toolbox -->
-        <xh:div class="fb-tools fb-xvc">
-            <xf:trigger appearance="minimal" ref="$xcv/cut-trigger" id="cut-trigger">
-                <xf:label>
-                    <xh:img src="/apps/fr/style/images/silk/cut.png" alt="{$form-resources/cut/label}" title="{$form-resources/cut/label}"/>
-                </xf:label>
-                <xf:action ev:event="DOMActivate" type="xpath">
-                    toolboxOps:cutToClipboard($current-td)
-                </xf:action>
-            </xf:trigger>
-            <xf:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
-                <xf:label>
-                    <xh:img src="/forms/orbeon/builder/images/copy.png" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
-                </xf:label>
-                <xf:action ev:event="DOMActivate" type="xpath">
-                    toolboxOps:copyToClipboard($current-td)
-                </xf:action>
-            </xf:trigger>
-            <xf:trigger appearance="minimal" ref="$xcv/paste-trigger" id="paste-trigger">
-                <xf:label>
-                    <xh:img src="/apps/fr/style/images/silk/paste_plain.png" alt="{$form-resources/paste/label}" title="{$form-resources/paste/label}"/>
-                </xf:label>
-                <xf:action ev:event="DOMActivate" type="xpath">
-                    toolboxOps:pasteFromClipboard($current-td)
-                </xf:action>
-            </xf:trigger>
-            <!-- Reload components -->
-            <xf:trigger appearance="minimal" class="fb-reload-components-trigger" xxf:modal="true">
-                <xf:label>
-                    <xh:img src="/apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
-                </xf:label>
-                <xf:action ev:event="DOMActivate">
-                    <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                    <xf:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
-                    <!-- Invalidate and reload the toolbox -->
-                    <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
-                    <xf:send submission="fb-load-toolbox">
-                        <xf:property name="app"  value="bind('application-name-bind')"/>
-                        <xf:property name="form" value="bind('form-name-bind')"/>
-                    </xf:send>
-                </xf:action>
-            </xf:trigger>
+        <xh:div class="fb-tools fb-icons-tools">
+            <xf:group>
+
+                <!-- Form settings -->
+                <xf:trigger appearance="minimal" class="" id="open-form-settings-trigger">
+                    <xf:label><xh:i class="fa fa-cogs fa-fw" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <!-- Open the dialog in "edit" mode -->
+                        <xxf:show dialog="dialog-form-settings">
+                            <xf:property name="mode"                          value="'edit'"/>
+                            <xf:property name="app"                           value="bind('application-name-bind')"/>
+                            <xf:property name="form"                          value="bind('form-name-bind')"/>
+                            <xf:property name="title"                         value="bind('title-bind')"/>
+                            <xf:property name="description"                   value="bind('description-bind')"/>
+                            <xf:property name="singleton"                     value="bind('singleton-bind')"/>
+                            <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
+                            <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
+                            <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
+                            <xf:property name="wizard"                        value="bind('wizard-bind')"/>
+                            <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
+                            <xf:property name="labels"                        value="bind('labels-bind')"/>
+                            <xf:property name="hints"                         value="bind('hints-bind')"/>
+                        </xxf:show>
+                    </xf:action>
+                </xf:trigger>
+
+                <!-- Edit Source -->
+                <xf:trigger appearance="minimal" class="" ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                    <xf:label><xh:i class="fa fa-code fa-fw" title="{$form-resources/edit-source/label}"/></xf:label>
+                    <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
+                </xf:trigger>
+
+                <!-- Reload components -->
+                <xf:trigger appearance="minimal" class="fb-reload-components-trigger" xxf:modal="true">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/reload-components/label}"
+                            class="fb-container-cut fa fa-refresh fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
+                        <xf:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
+                        <!-- Invalidate and reload the toolbox -->
+                        <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
+                        <xf:send submission="fb-load-toolbox">
+                            <xf:property name="app"  value="bind('application-name-bind')"/>
+                            <xf:property name="form" value="bind('form-name-bind')"/>
+                        </xf:send>
+                    </xf:action>
+                </xf:trigger>
+
+                <!-- Workflow and permissions -->
+                <xf:trigger
+                    ref="instance('fb-metadata-instance')/toolbox/workflow"
+                    appearance="minimal"
+                    id="fb-workflow-button">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/dialog-workflow/label}"
+                            class="fa fa-lock fa-fw"/>
+                        <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
+                        <!--<xf:output ref="$form-resources/dialog-workflow/label"/>-->
+                    </xf:label>
+                    <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-workflow-dialog"/>
+                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                </xf:trigger>
+                <xf:trigger
+                    ref=".[instance('fb-metadata-instance')/toolbox/permissions]"
+                    appearance="minimal"
+                    id="fb-permissions-button">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/dialog-permissions/label}"
+                            class="fa fa-lock fa-fw"/>
+                        <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
+                        <!--<xf:output ref="$form-resources/permissions/label"/>-->
+                    </xf:label>
+                    <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
+                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                </xf:trigger>
+
+                <!-- Clipboard operations -->
+                <xf:trigger appearance="minimal" ref="$xcv/cut-trigger" id="cut-trigger">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/cut/label}"
+                            class="fa fa-cut fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate" type="xpath">
+                        toolboxOps:cutToClipboard($current-td)
+                    </xf:action>
+                </xf:trigger>
+                <xf:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/copy/label}"
+                            class="fa fa-copy fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate" type="xpath">
+                        toolboxOps:copyToClipboard($current-td)
+                    </xf:action>
+                </xf:trigger>
+                <xf:trigger appearance="minimal" ref="$xcv/paste-trigger" id="paste-trigger">
+                    <xf:label>
+                        <xh:i
+                            title="{$form-resources/paste/label}"
+                            class="fa fa-paste fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate" type="xpath">
+                        toolboxOps:pasteFromClipboard($current-td)
+                    </xf:action>
+                </xf:trigger>
+                <!--<xf:group ref=".[exists($xcv/control/*/@id)]">-->
+                    <!--<xh:i-->
+                        <!--title="{$form-resources/clipboard/label}"-->
+                        <!--class="fb-clipboard fa fa-clipboard fa-fw"/>-->
+                <!--</xf:group>-->
+            </xf:group>
         </xh:div>
 
         <!-- Sections, grids, etc. toolbox -->
@@ -200,19 +276,6 @@
                             <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                         </xf:trigger>
                     </xf:group>
-                    <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
-                        <!-- Permissions -->
-                        <fb:permissions id="fb-permissions-dialog" resources-ref="$form-resources"
-                            metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
-                        <xf:trigger id="fb-permissions-button">
-                            <xf:label>
-                                <xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
-                                <xf:output ref="$form-resources/permissions/label"/>
-                            </xf:label>
-                            <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
-                            <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                        </xf:trigger>
-                    </xf:group>
                 </xh:div>
             </xf:group>
         </xh:div>
@@ -238,7 +301,7 @@
                 <xh:div class="fb-tool">
                     <xf:trigger id="fb-add-service">
                         <xf:label>
-                            <xh:i class="icon-plus-sign"/>
+                            <xh:i class="fa fa-fw fa-plus-circle"/>
                             <xf:output value="$form-resources/add/label"/>
                         </xf:label>
                         <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="dialog-http-services">
@@ -270,7 +333,7 @@
                 <xh:div class="fb-tool">
                     <xf:trigger>
                         <xf:label>
-                            <xh:i class="icon-plus-sign"/>
+                            <xh:i class="fa fa-fw fa-plus-circle"/>
                             <xf:output value="$form-resources/add/label"/>
                         </xf:label>
                         <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-database-service-dialog"/>
@@ -300,7 +363,7 @@
                 <xh:div class="fb-tool">
                     <xf:trigger id="fb-add-action">
                         <xf:label>
-                            <xh:i class="icon-plus-sign"/>
+                            <xh:i class="fa fa-fw fa-plus-circle"/>
                             <xf:output value="$form-resources/add/label"/>
                         </xf:label>
                         <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>

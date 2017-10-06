@@ -204,7 +204,7 @@ class GridOpsTest
           assert(canInsertControl(doc) === true)
 
           // Remove everything (assume top-level section with a single grid inside)
-          childrenContainers(findFRBodyElement(doc)).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
+          childrenContainers(findFRBodyElem(doc)).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
             assert(isLastGridInSection(childrenGrids(section).head) === true)
             deleteContainer(section)
           }

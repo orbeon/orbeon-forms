@@ -649,11 +649,11 @@
             </xf:group>
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
                 <!-- Form has no error or warning messages -->
-                <xf:group model="fr-form-model"><xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/></xf:group>
+                <xf:group model="fr-form-model"><xh:i class="fa fa-check fa-fw" title="{{$fr-resources/errors/none}}"/></xf:group>
             </xf:group>
             <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
                 <!-- Data is dirty -->
-                <xf:group model="fr-form-model"><xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/></xf:group>
+                <xf:group model="fr-form-model"><xh:i class="fa fa-hdd-o fa-fw" title="{{$fr-resources/errors/unsaved}}"/></xf:group>
             </xf:group>
         </xf:group>
     </xsl:template>

@@ -43,29 +43,29 @@ trait ContainerOps extends ControlOps {
   def controlsInContainer(containerId: String): Int = (containerById(containerId) descendant CellTest child *).length
 
   // Find all siblings of the given element with the given name, excepting the given element
-  def findSiblingsWithName(element: NodeInfo, siblingName: String) =
+  def findSiblingsWithName(element: NodeInfo, siblingName: String): Seq[NodeInfo] =
     element parent * child * filter
       (_.name == siblingName) filterNot
       (_ == element)
 
-  def getInitialIterationsAttribute(controlElem: NodeInfo) =
+  def getInitialIterationsAttribute(controlElem: NodeInfo): Option[String] =
     controlElem attValueOpt InitialIterations flatMap trimAllToOpt
 
   // Return all the container controls in the view
-  def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
+  def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
 
-  def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
+  def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = findFRBodyElem(inDoc) descendant * filter IsContainer
 
   // Various counts
-  def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
-  def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
-  def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count isRepeat
-  def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count isSectionTemplateContent
+  def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count IsSection
+  def countAllGrids        (inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count IsGrid
+  def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count isRepeat
+  def countSectionTemplates(inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count isSectionTemplateContent
 
-  def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
-  def countAllContainers(inDoc: NodeInfo)    = getAllContainerControls(inDoc).size
-  def countAllControls(inDoc: NodeInfo)      = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
+  def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
+  def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot IsContainer size
+  def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
+  def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
   // A container can be removed if it's not the last one at that level
   def canDeleteContainer(container: NodeInfo): Boolean =
@@ -153,7 +153,7 @@ trait ContainerOps extends ControlOps {
         def firstControl(s: Seq[NodeInfo]) =
           s find (getControlNameOpt(_).isDefined)
 
-        def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
+        def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit =
           findResourceHolders(name) foreach {
             holder ⇒
               findSiblingsWithName(holder, siblingName).headOption foreach
@@ -187,7 +187,7 @@ trait ContainerOps extends ControlOps {
     // Find data holders for all section templates
     val holders =
       for {
-        section     ← findSectionsWithTemplates(findFRBodyElement(inDoc))
+        section     ← findSectionsWithTemplates(findFRBodyElem(inDoc))
         controlName ← getControlNameOpt(section).toList
         holder      ← findDataHolders(inDoc, controlName)
       } yield
@@ -314,12 +314,12 @@ trait ContainerOps extends ControlOps {
     }
 
   def findTemplateInstance(doc: NodeInfo, controlName: String): Option[NodeInfo] =
-    instanceElement(doc, templateId(controlName))
+    instanceElem(doc, templateId(controlName))
 
   def ensureTemplateReplaceContent(inDoc: NodeInfo, controlName: String, content: NodeInfo): Unit = {
 
     val templateInstanceId = templateId(controlName)
-    val modelElement = findModelElement(inDoc)
+    val modelElement = findModelElem(inDoc)
     modelElement / "*:instance" find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content

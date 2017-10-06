@@ -19,40 +19,41 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.IOUtils.useAndClose
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 
 trait FormRunnerResourcesOps {
 
   //@XPathFunction
-  def allLangs    (resources: NodeInfo) : Seq[String]   = allResources(resources) attValue "*:lang"
-  def allResources(resources: NodeInfo) : Seq[NodeInfo] = resources child "resource"
+  def allLangs    (resourcesRootElem: NodeInfo): Seq[String]   = allResources(resourcesRootElem) attValue "*:lang"
+  def allResources(resourcesRootElem: NodeInfo): Seq[NodeInfo] = resourcesRootElem child "resource"
 
-  def resourcesInstanceRootOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElement(inDoc, FormResources)
+  //@XPathFunction
+  def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElem(inDoc, FormResources)
 
   def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
-    instanceElement(inDoc, FormResources) flatMap
+    instanceElem(inDoc, FormResources) flatMap
       (_.attValueOpt("src"))              map
       readUrlAsImmutableXmlDocument       map
       (_.rootElement)
 
-  def allLangsWithResources(resources: NodeInfo): Seq[(String, NodeInfo)] =
-    allLangs(resources) zip allResources(resources)
+  def allLangsWithResources(resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
+    allLangs(resourcesRootElem) zip allResources(resourcesRootElem)
 
   // Same as above but doesn't require a Form Builder context
   // NOTE: Support an entirely missing resources instance (for tests).
   def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
-    resourcesInstanceRootOpt(inDoc)                 orElse
+    resourcesInstanceRootElemOpt(inDoc)             orElse
       resourcesInstanceDocFromUrlOpt(inDoc)         map
       (findResourceHoldersWithLang(controlName, _)) getOrElse
       Nil
 
 
   // Find control resource holders with their language
-  def findResourceHoldersWithLang(controlName: String, resources: NodeInfo): Seq[(String, NodeInfo)] =
+  def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     for {
-      (lang, resource) ← allLangsWithResources(resources)
+      (lang, resource) ← allLangsWithResources(resourcesRootElem)
       holder           ← resource child controlName headOption // there *should* be only one
     } yield
       (lang, holder)

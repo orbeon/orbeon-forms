@@ -55,7 +55,7 @@ trait BaseOps extends Logging {
   def formResourcesRoot = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
   def templateRoot(inDoc: NodeInfo, repeatName: String) =
-    inlineInstanceRootElement(inDoc, templateId(repeatName))
+    inlineInstanceRootElem(inDoc, templateId(repeatName))
 
   // Find the next available id for a given token
   def nextId(inDoc: NodeInfo, token: String): String =

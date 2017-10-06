@@ -49,8 +49,8 @@ class FormBuilderFunctionsTest
       withActionAndFBDoc(TemplateDoc) { doc ⇒
 
         it("must find the model") {
-          assert(findModelElement(doc).getDisplayName === "xf:model")
-          assert(findModelElement(doc).hasIdValue("fr-form-model"))
+          assert(findModelElem(doc).getDisplayName === "xf:model")
+          assert(findModelElem(doc).hasIdValue("fr-form-model"))
         }
 
         it("must find the instance") {
@@ -58,7 +58,7 @@ class FormBuilderFunctionsTest
         }
 
         it("must find the body group") {
-          assert(findFRBodyElement(doc).uriQualifiedName === URIQualifiedName(XF, "group"))
+          assert(findFRBodyElem(doc).uriQualifiedName === URIQualifiedName(XF, "group"))
         }
       }
     }
@@ -145,7 +145,7 @@ class FormBuilderFunctionsTest
   describe("Containers") {
     withTestExternalContext { _ ⇒
       withActionAndFBDoc(TemplateDoc) { doc ⇒
-        val firstTd = findFRBodyElement(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
+        val firstTd = findFRBodyElem(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
 
         val containers = findAncestorContainersLeafToRoot(firstTd)
 
@@ -161,7 +161,7 @@ class FormBuilderFunctionsTest
 
   // Select the first grid cell (assume there is one)
   def selectFirstCell(doc: NodeInfo): Unit =
-    selectCell(findFRBodyElement(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head)
+    selectCell(findFRBodyElem(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head)
 
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
@@ -264,7 +264,7 @@ class FormBuilderFunctionsTest
             assert(controlBind.hasIdValue(bindId(newRepeatName)))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-            assert(findModelElement(doc) / "*:instance" exists (_.hasIdValue("grid-3-template")))
+            assert(findModelElem(doc) / "*:instance" exists (_.hasIdValue("grid-3-template")))
           }
 
           // Insert a new control

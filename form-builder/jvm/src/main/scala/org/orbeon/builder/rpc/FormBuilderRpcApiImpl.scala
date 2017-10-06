@@ -15,6 +15,7 @@ package org.orbeon.builder.rpc
 
 import org.orbeon.oxf.fb.{FormBuilder, ToolboxOps}
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -93,11 +94,11 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   def sectionUpdateLabel(sectionId: String, label: String): Unit =
     XFormsAPI.setvalue(FormBuilder.currentResources / FormBuilder.controlNameFromId(sectionId) / "label", label)
 
-  def sectionEditDetails(sectionId: String): Unit =
+  def containerEditDetails(containerId: String): Unit =
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-container-details",
-      properties = Map("container" → Some(FormBuilder.containerById(sectionId)))
+      properties = Map("container" → Some(FormBuilder.containerById(containerId)))
     )
 
   def sectionEditHelp(sectionId: String): Unit =
@@ -119,18 +120,19 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   def sectionMoveLeft(sectionId: String): Unit =
     FormBuilder.moveSectionLeft(FormBuilder.containerById(sectionId))
 
-  // TODO: What is this one?
-  def sectionEditors(sectionId: String): Unit = ()
-
-  def gridEditDetails(gridId: String): Unit =
-    XFormsAPI.dispatch(
-      name       = "fb-show-dialog",
-      targetId   = "dialog-container-details",
-      properties = Map("container" → Some(FormBuilder.containerById(gridId)))
-    )
-
   def gridDelete(gridId: String): Unit =
     FormBuilder.deleteGridById(gridId)
+
+  def containerCopy(containerId: String): Unit =
+    ToolboxOps.writeXcvToClipboard(ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)))
+
+  def containerCut(containerId: String): Unit = {
+    containerCopy(containerId)
+    if (FormBuilder.IsGrid(FormBuilder.containerById(containerId)))
+      FormBuilder.deleteGridById(containerId)
+    else
+      FormBuilder.deleteSectionById(containerId)
+  }
 
   private def resolveId(id: String): Option[NodeInfo] =
     FormBuilder.findInViewTryIndex(FormBuilder.fbFormInstance.root, XFormsId.getStaticIdFromId(id))

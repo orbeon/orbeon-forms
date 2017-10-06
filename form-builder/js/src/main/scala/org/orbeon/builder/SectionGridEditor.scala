@@ -36,42 +36,45 @@ object SectionGridEditor {
   var currentSectionGridBodyOpt : Option[Block] = None
   var currentRowPosOpt          : Option[Int]   = None
 
-  sealed trait GridSectionEditor extends EnumEntry with Hyphencase
-  object GridSectionEditor extends Enum[GridSectionEditor] {
+  sealed trait ContainerEditor extends EnumEntry with Hyphencase {
+    def className = s".fb-$entryName"
+  }
+  object ContainerEditor extends Enum[ContainerEditor] {
     val values = findValues
-    case object SectionDelete      extends GridSectionEditor
-    case object SectionEditDetails extends GridSectionEditor
-    case object SectionEditHelp    extends GridSectionEditor
-    case object SectionMoveUp      extends GridSectionEditor
-    case object SectionMoveDown    extends GridSectionEditor
-    case object SectionMoveRight   extends GridSectionEditor
-    case object SectionMoveLeft    extends GridSectionEditor
-    case object SectionEditors     extends GridSectionEditor
-    case object GridEditDetails    extends GridSectionEditor
-    case object GridDelete         extends GridSectionEditor
-
-    // What class, if any, must be present on the corresponding container to the the editor to be enabled
-    def enableClass(editor: GridSectionEditor): Option[String] =
-      editor match {
-        case SectionMoveUp    ⇒ Some("fb-can-move-up")
-        case SectionMoveDown  ⇒ Some("fb-can-move-down")
-        case SectionMoveRight ⇒ Some("fb-can-move-right")
-        case SectionMoveLeft  ⇒ Some("fb-can-move-left")
-        case _                ⇒ None
-      }
+    case object SectionDelete        extends ContainerEditor
+    case object SectionEditHelp      extends ContainerEditor
+    case object SectionMoveUp        extends ContainerEditor
+    case object SectionMoveDown      extends ContainerEditor
+    case object SectionMoveRight     extends ContainerEditor
+    case object SectionMoveLeft      extends ContainerEditor
+    case object GridDelete           extends ContainerEditor
+    case object ContainerEditDetails extends ContainerEditor
+    case object ContainerCopy        extends ContainerEditor
+    case object ContainerCut         extends ContainerEditor
   }
 
-  import GridSectionEditor._
+  import ContainerEditor._
 
-  sealed abstract class RowEditor(val selector: String) extends EnumEntry
+  sealed abstract class RowEditor extends EnumEntry with Hyphencase {
+    def className = s".fb-row-$entryName"
+  }
   object RowEditor extends Enum[RowEditor] {
     val values = findValues
-    case object InsertAbove extends RowEditor(".icon-chevron-up")
-    case object Delete      extends RowEditor(".icon-minus-sign")
-    case object InsertBelow extends RowEditor(".icon-chevron-down")
+    case object InsertAbove extends RowEditor
+    case object Delete      extends RowEditor
+    case object InsertBelow extends RowEditor
   }
 
   import RowEditor._
+
+  private val AlwaysVisibleIcons =
+    List(
+      ContainerEditDetails,
+      SectionDelete, // TODO: not when last of container
+      SectionEditHelp,
+      ContainerCopy,
+      ContainerCut   // TODO: not when last of container
+    )
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
@@ -100,31 +103,35 @@ object SectionGridEditor {
       // Update triggers relevance for section
       if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
 
-        // Edit details and help are always visible
-        sectionGridEditorContainer
-          .children(".fb-section-edit-details, .fb-section-delete, .fb-section-edit-help")
-          .show()
+        // Icons which are always visible
+        sectionGridEditorContainer.children(AlwaysVisibleIcons map (_.className) mkString ",").show()
 
         // Hide/show section move icons
         val container = sectionGridBody.el.children(".fr-section-container")
         Direction.values foreach { direction ⇒
+
           val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
           val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
-          if (relevant) trigger.show()
+
+          if (relevant)
+            trigger.show()
         }
 
         // Hide/show delete icon
         val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
-        if (container.is(".fb-can-delete")) deleteTrigger.show()
+        if (container.is(".fb-can-delete"))
+          deleteTrigger.show()
       }
 
       // Update triggers relevance for repeated grid only
       if (sectionGridBody.el.is(BlockCache.GridBodySelector)) {
 
-        sectionGridEditorContainer.children(".fb-grid-delete").show()
-
         if (sectionGridBody.el.closest(".fr-grid").is(".fr-repeat"))
           sectionGridEditorContainer.children(".fb-grid-edit-details").show()
+
+        sectionGridEditorContainer.children(".fb-grid-delete").show()   // TODO: not when last of container
+        sectionGridEditorContainer.children(".fb-container-copy").show()
+        sectionGridEditorContainer.children(".fb-container-cut").show() // TODO: not when last of container
 
         sectionGridBody.el.parent.addClass("fb-hover")
       }
@@ -208,9 +215,9 @@ object SectionGridEditor {
         }
 
         currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(RowEditor.InsertAbove.selector, (_) ⇒ rowTop)
-        positionElWithClass(RowEditor.Delete.selector,      (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(RowEditor.InsertBelow.selector, (e) ⇒ rowBottom - e.height())
+        positionElWithClass(RowEditor.InsertAbove.className, (_) ⇒ rowTop)
+        positionElWithClass(RowEditor.Delete.className,      (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
+        positionElWithClass(RowEditor.InsertBelow.className, (e) ⇒ rowBottom - e.height())
       })
     })
   }
@@ -229,7 +236,7 @@ object SectionGridEditor {
   // Register listener on editor icons
   locally {
 
-    GridSectionEditor.values foreach { editor ⇒
+    ContainerEditor.values foreach { editor ⇒
 
       val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
 
@@ -248,23 +255,23 @@ object SectionGridEditor {
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
-            case SectionDelete      ⇒ client.sectionDelete     (sectionGridId).call()
-            case SectionEditDetails ⇒ client.sectionEditDetails(sectionGridId).call()
-            case SectionEditHelp    ⇒ client.sectionEditHelp   (sectionGridId).call()
-            case SectionMoveUp      ⇒ client.sectionMoveUp     (sectionGridId).call()
-            case SectionMoveDown    ⇒ client.sectionMoveDown   (sectionGridId).call()
-            case SectionMoveRight   ⇒ client.sectionMoveRight  (sectionGridId).call()
-            case SectionMoveLeft    ⇒ client.sectionMoveLeft   (sectionGridId).call()
-            case SectionEditors     ⇒ client.sectionEditors    (sectionGridId).call()
-            case GridEditDetails    ⇒ client.gridEditDetails   (sectionGridId).call()
-            case GridDelete         ⇒ client.gridDelete        (sectionGridId).call()
+            case SectionDelete        ⇒ client.sectionDelete       (sectionGridId).call()
+            case SectionEditHelp      ⇒ client.sectionEditHelp     (sectionGridId).call()
+            case SectionMoveUp        ⇒ client.sectionMoveUp       (sectionGridId).call()
+            case SectionMoveDown      ⇒ client.sectionMoveDown     (sectionGridId).call()
+            case SectionMoveRight     ⇒ client.sectionMoveRight    (sectionGridId).call()
+            case SectionMoveLeft      ⇒ client.sectionMoveLeft     (sectionGridId).call()
+            case GridDelete           ⇒ client.gridDelete          (sectionGridId).call()
+            case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
+            case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
+            case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()
           }
         }
       })
     }
 
     RowEditor.values foreach { rowEditor ⇒
-      val iconEl = rowEditorContainer.children(rowEditor.selector)
+      val iconEl = rowEditorContainer.children(rowEditor.className)
       iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
         withCurrentGridBody { currentGridBody ⇒
           currentRowPosOpt foreach { currentRowPos ⇒

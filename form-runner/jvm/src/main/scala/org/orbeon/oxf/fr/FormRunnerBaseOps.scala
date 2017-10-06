@@ -52,10 +52,10 @@ trait FormRunnerBaseOps {
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
   def findInViewTryIndex(inDoc: NodeInfo, staticId: String): Option[NodeInfo] =
-    findTryIndex(inDoc, staticId, findFRBodyElement(inDoc), includeSelf = false)
+    findTryIndex(inDoc, staticId, findFRBodyElem(inDoc), includeSelf = false)
 
   def findInModelTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findTryIndex(inDoc, id, findModelElement(inDoc), includeSelf = false)
+    findTryIndex(inDoc, id, findModelElem(inDoc), includeSelf = false)
 
   def findInBindsTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)
@@ -94,7 +94,7 @@ trait FormRunnerBaseOps {
 
   // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
   // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
-  def findFRBodyElement(inDoc: NodeInfo): NodeInfo = {
+  def findFRBodyElem(inDoc: NodeInfo): NodeInfo = {
 
     def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
@@ -105,7 +105,7 @@ trait FormRunnerBaseOps {
   }
 
   // Get the form model
-  def findModelElement(inDoc: NodeInfo): NodeInfo = {
+  def findModelElem(inDoc: NodeInfo): NodeInfo = {
 
     def fromHead           = inDoc.rootElement / "*:head" / XFModelTest find (_.hasIdValue(FormModel))
     def fromImplementation = inDoc.rootElement / XBLImplementationTest / XFModelTest headOption
@@ -114,28 +114,28 @@ trait FormRunnerBaseOps {
   }
 
   // Find an xf:instance element
-  def instanceElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findModelElement(inDoc) / "*:instance" find (_.hasIdValue(id))
+  def instanceElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
+    findModelElem(inDoc) / XFInstanceTest find (_.hasIdValue(id))
 
   // Find an inline instance's root element
-  def inlineInstanceRootElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    instanceElement(inDoc, id).toList / * headOption
+  def inlineInstanceRootElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
+    instanceElem(inDoc, id).toList / * headOption
 
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo) =
-    findModelElement(inDoc) / "*:instance" filter (_.id endsWith TemplateSuffix)
+    findModelElem(inDoc) / XFInstanceTest filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
-  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, FormInstance).get
+  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElem(inDoc, FormInstance).get
 
   //@XPathFunction
-  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, MetadataInstance)
+  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElem(inDoc, MetadataInstance)
 
   private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
 
   // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
   def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
-    findModelElement(inDoc) / "*:bind" find {
+    findModelElem(inDoc) / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
       bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind).contains("instance('fr-form-instance')")
     }

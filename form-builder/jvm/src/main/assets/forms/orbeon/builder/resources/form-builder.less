@@ -83,8 +83,33 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;                                                 // Its left/right set in CoffeeScript relative to the current section
         display: none;                                                      // Shown in CoffeeScript when mouse over section
         padding: 0 10px 20px 20px;                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
+        text-align: center;
         i { display: block }                                                // Icons shown vertically
         i:not([class ~= 'disabled']) { cursor: pointer }                    // Non-disabled icons are clickable
+
+        .fa {
+            height: 18px;
+        }
+
+        // Try a zoom effect
+        // Works well on section icons but needs work on cell and grid row icons
+        .fa:not([class ~= 'disabled']):hover {
+            font-size: 130%;
+            vertical-align: -10px;
+            margin-left: -2px;
+            transition: all ease 100ms;
+        }
+    }
+
+    .xforms-readonly .fa, .fa.disabled {
+        .opacity(40);
+    }
+
+    .fb-control-editor-left,
+    .fb-control-editor-right {
+        .fa {
+            height: 16px;
+        }
     }
     .fb-section-grid-editor {
         padding-right: 10px;                                                // Space between icons and section
@@ -209,7 +234,23 @@ div.orbeon.orbeon-portlet-div {
             .fb-tools {
                 .fr-border();
                 padding: 2px 8px 8px 8px;           // 2px at top or legend has too much space above
-                &.fb-xvc { padding-top: 8px }       // Except for the cut/copy/paste/reload, so they are centered in their box
+
+                &.fb-icons-tools {
+                    padding-top: 8px;               // except for icons tools where we need the full padding
+                    text-align: center;
+
+                    .xforms-trigger-appearance-minimal {
+                        margin-right: 5px;
+                    }
+
+                    .xforms-trigger-appearance-minimal a:focus {
+                        outline: none;
+                    }
+
+                    .fa-code {
+                        font-weight: bold;
+                    }
+                }
 
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
@@ -249,12 +290,11 @@ div.orbeon.orbeon-portlet-div {
                 // Services and actions
                 ul { margin: 0; overflow: auto }
                 li { list-style-type: none; white-space: nowrap; font-size: 11px }
-                .xforms-trigger a { text-decoration: none }
+                .xforms-trigger a {
+                    text-decoration: none;
+                    color: @frHeaderColor;
+                }
             }
-
-            // Cut / Copy / Paste
-            .fb-xvc { text-align: center }
-            .fb-xvc .xforms-trigger { margin-right: .5em }
 
             .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
 
@@ -321,7 +361,11 @@ div.orbeon.orbeon-portlet-div {
         width: 600px;
         max-width: none;
 
-        img { float: left; margin: 1em 2em 0 1em; }
+        img {
+            float: left;
+            margin: 1em 2em 0 1em;
+        }
+
         .xforms-label { display: block; }
 
         // Hide tabs in `new` mode
@@ -830,7 +874,15 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
-    .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
+    .fb-use-toolbar-message, .fb-click-message {
+        display: none;
+        font-size: 70%;
+        color: gray;
+        width: 100%;
+        font-style: italic;
+        text-align: center;
+        margin-top: 2em
+    }
     .fb-selected .fb-use-toolbar-message { display: block }
     td:hover .fb-click-message { display: block }
     td.fb-selected:hover .fb-click-message { display: none }
@@ -898,7 +950,7 @@ div.orbeon.orbeon-portlet-div {
             margin-left: 15px;
             margin-right: 15px;
             img, .brand { vertical-align: middle }                          // Logo and title vertically centered
-            img { padding: 0 10px }                                         // Space to the left/right of the logo
+            img { padding: 0 0 0 10px }                                         // Space to the left of the logo
             .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
                 float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
                 margin: 0; padding: 0; display: inline;                     // Override h1 styles
@@ -909,8 +961,21 @@ div.orbeon.orbeon-portlet-div {
     // Form navbar only
     .fb-main .navbar {
         margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
-        .fb-navbar-trigger { padding-left: 10px }
-        .icon-white { .opacity(70) }                                        // Make icons grayer, so they don't stand out too much in the inverted navbar
+        .fb-navbar-trigger {
+            padding-left: 10px;
+        }
+
+        .fr-language-selector .nav {
+            margin-right: 0;
+        }
+
+        .fb-navbar-trigger, .fb-language-triggers {
+            i {
+                background: none;
+                color: white;
+                .opacity(70)
+            }
+        }
     }
 
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder

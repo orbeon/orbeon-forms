@@ -85,7 +85,7 @@ object ControlEditor {
             case Direction.Up ⇒
               (cell.el.attr(AttH) map (_.toInt) getOrElse 1) <= 1
           }
-        val icon = controlEditorLeft.find(s".icon-arrow-$directionName")
+        val icon = controlEditorLeft.find(s".fb-arrow-$directionName")
         icon.toggleClass("disabled", disableIcon)
       }
     }
@@ -114,7 +114,7 @@ object ControlEditor {
     // Expand/shrink actions
     for (direction ← Direction.values) {
       val directionName = direction.entryName
-      val className = s"icon-arrow-$directionName"
+      val className = s"fb-arrow-$directionName"
       val iconEl = controlEditorLeft.find(s".$className")
 
       val eventName = direction match {

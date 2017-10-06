@@ -27,7 +27,7 @@ trait ResourcesOps extends BaseOps {
 
   def currentResources: NodeInfo = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
   def currentLang: String        = currentResources attValue "*:lang"
-  def resourcesRoot: NodeInfo    = currentResources parent * head
+  def resourcesRoot: NodeInfo    = currentResources.parentUnsafe
 
   def resourcesInLang(lang: String): NodeInfo =
     allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources

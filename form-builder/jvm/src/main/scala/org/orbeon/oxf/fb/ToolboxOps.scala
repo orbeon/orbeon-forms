@@ -17,15 +17,13 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunnerLang, FormRunnerResourcesOps}
+import org.orbeon.oxf.fr.{Cell, FormRunnerLang, FormRunnerResourcesOps}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
-import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.CoreUtils._
 
 /*
  * Form Builder: toolbox operations.
@@ -108,14 +106,14 @@ object ToolboxOps {
               }
 
             val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
-            formLang → elementInfo(newControlName, resourceEls)
+            formLang → List(elementInfo(newControlName, resourceEls))
           }
         }
 
         // Insert data and resource holders
         insertHolders(
           controlElement       = newControlElement,
-          dataHolder           = dataHolder,
+          dataHolderOpt        = Some(dataHolder),
           resourceHolders      = resourceHolders,
           precedingControlName = precedingControlNameInSectionForControl(newControlElement)
         )
@@ -170,7 +168,7 @@ object ToolboxOps {
       </fr:grid>
 
     // Insert after current level 2 if found, otherwise into level 1
-    val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
+    val newGridElement = insert(into = into, after = after.toList, origin = gridTemplate).head
 
     // This can impact templates
     updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
@@ -208,11 +206,11 @@ object ToolboxOps {
           </fr:grid>
       }</fr:section>
 
-    val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
+    val newSectionElement = insert(into = into, after = after.toList, origin = sectionTemplate).head
 
     // Create and insert holders
     val resourceHolder = {
-      val elementContent = Seq(elementInfo("label"), elementInfo("help"))
+      val elementContent = List(elementInfo("label"), elementInfo("help"))
       elementInfo(newSectionName, elementContent)
     }
 
@@ -260,12 +258,12 @@ object ToolboxOps {
       </fr:grid>
 
     // Insert grid
-    val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
+    val newGridElement = insert(into = into, after = after.toList, origin = gridTemplate).head
 
     // Insert instance holder (but no resource holders)
     insertHolders(
       controlElement       = newGridElement,
-      dataHolder           = elementInfo(newGridName),
+      dataHolderOpt        = Some(elementInfo(newGridName)),
       resourceHolders      = Nil,
       precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
     )
@@ -294,7 +292,7 @@ object ToolboxOps {
   }
 
   private def selectFirstCellInContainer(container: NodeInfo): Unit =
-    (container descendant "*:c" headOption) foreach selectCell
+    (container descendant Cell.CellTestName headOption) foreach selectCell
 
   // Insert a new section template
   //@XPathFunction
@@ -304,13 +302,13 @@ object ToolboxOps {
 
       val selector = binding /@ "element" stringValue
 
-      val model = findModelElement(inDoc)
+      val model = findModelElem(inDoc)
       val xbl = model followingSibling (XBL → "xbl")
       val existingBindings = xbl child (XBL → "binding")
 
       // Insert binding into form if needed
       if (! (existingBindings /@ "element" === selector))
-        insert(after = Seq(model) ++ xbl, origin = binding parent * )
+        insert(after = model +: xbl, origin = binding parent * )
 
       // Insert template into section
       findViewTemplate(binding) foreach
@@ -344,93 +342,153 @@ object ToolboxOps {
   </xcv>
   */
 
-  sealed abstract class XvcEntry extends EnumEntry with Lowercase
-  object XvcEntry extends Enum[XvcEntry] {
+  sealed abstract class XcvEntry extends EnumEntry with Lowercase
+  object XcvEntry extends Enum[XcvEntry] {
     val values = findValues
-    case object Control   extends XvcEntry
-    case object Holder    extends XvcEntry
-    case object Resources extends XvcEntry
-    case object Bind      extends XvcEntry
+    case object Control   extends XcvEntry
+    case object Holder    extends XcvEntry
+    case object Resources extends XcvEntry
+    case object Bind      extends XcvEntry
   }
 
-  private def controlElementsInCellToXvc(cellElem: NodeInfo): Option[NodeInfo] = {
+  def controlOrContainerElemToXcv(containerElem: NodeInfo): NodeInfo = {
 
-    val doc  = cellElem.getDocumentRoot
-    val name = getControlName(cellElem / * head)
+    val inDoc   = containerElem.getDocumentRoot
+    val nameOpt = getControlNameOpt(containerElem) // non-repeated grids don't have a name
 
-    findControlByName(doc, name).map { controlElement ⇒
+    // Create <resource xml:lang="..."> containers
+    val resourcesWithLang =
+      for {
+        controlName       ← nameOpt.toList
+        rootBind          ← findBindByName(inDoc, controlName).toList
+        resourcesRootElem = resourcesRoot
+        lang              ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
+      } yield
+        elementInfo(
+          "resource",
+          attributeInfo(XMLLangQName, lang) ++
+            FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
+        )
 
-      // Create <resource xml:lang="..."> containers
-      val resourcesWithLang = FormRunnerResourcesOps.findResourceHoldersWithLang(name, resourcesRoot) map {
-        case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
-      }
+    val xcvContent =
+      Map(
+        XcvEntry.Control   → List(containerElem),
+        XcvEntry.Holder    → (nameOpt.toList flatMap (findDataHolders(inDoc, _))),
+        XcvEntry.Resources → resourcesWithLang,
+        XcvEntry.Bind      → (nameOpt.toList flatMap (findBindByName(inDoc, _)))
+      ) map { case (xcvEntry, content) ⇒
+        elementInfo(xcvEntry.entryName, content)
+      } toList
 
-      val xvcContent =
-        Map(
-          XvcEntry.Control   → List(controlElement),
-          XvcEntry.Holder    → findDataHolders(doc, name),
-          XvcEntry.Resources → resourcesWithLang,
-          XvcEntry.Bind      → findBindByName(doc, name).toList
-        ).map { case (xvcEntry, content) ⇒
-          elementInfo(xvcEntry.entryName, content)
-        }.toList
-      elementInfo("xvc", xvcContent)
-    }
+    elementInfo("xcv", xcvContent)
+  }
+
+  private def controlElementsInCellToXcv(cellElem: NodeInfo): Option[NodeInfo] = {
+
+    val inDoc = cellElem.getDocumentRoot
+    val name  = getControlName(cellElem / * head)
+
+    findControlByName(inDoc, name) map controlOrContainerElemToXcv
   }
 
   // Copy control to the clipboard
   //@XPathFunction
-  def copyToClipboard(td: NodeInfo): Unit =
-    controlElementsInCellToXvc(td)
-      .foreach(writeXvcToClipboard)
+  def copyToClipboard(cellElem: NodeInfo): Unit =
+    controlElementsInCellToXcv(cellElem)
+      .foreach(writeXcvToClipboard)
 
   // Cut control to the clipboard
   //@XPathFunction
-  def cutToClipboard(td: NodeInfo): Unit = {
-    copyToClipboard(td)
-    deleteControlWithinCell(td, updateTemplates = true)
+  def cutToClipboard(cellElem: NodeInfo): Unit = {
+    copyToClipboard(cellElem)
+    deleteControlWithinCell(cellElem, updateTemplates = true)
   }
 
-  private def clipboardXvc: NodeInfo =
+  private def clipboardXcvRootElem: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
 
-  def readXvcFromClipboard: NodeInfo = {
-    val clipboard = clipboardXvc
-    val clone = elementInfo("xvc", Nil)
+  def readXcvFromClipboard: NodeInfo = {
+    val clipboard = clipboardXcvRootElem
+    val clone = elementInfo("xcv", Nil)
     insert(into = clone, origin = clipboard / *)
     clone
   }
 
-  def writeXvcToClipboard(xvc: NodeInfo): Unit = {
-    val clipboard = clipboardXvc
-    XvcEntry.values
+  def writeXcvToClipboard(xcv: NodeInfo): Unit = {
+    val clipboard = clipboardXcvRootElem
+    XcvEntry.values
         .map(_.entryName)
         .foreach(entryName ⇒ delete(clipboard / entryName))
-    insert(into = clipboard, origin = xvc/ *)
+    insert(into = clipboard, origin = xcv / *)
   }
 
   def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
-    val xvc = controlElementsInCellToXvc(sourceCellElem)
+    val xcv = controlElementsInCellToXcv(sourceCellElem)
 
     if (! copy)
       deleteControlWithinCell(sourceCellElem, updateTemplates = true)
 
     selectCell(targetCellElem)
-    xvc foreach (pasteFromXvc(targetCellElem, _))
+    xcv foreach (pasteFromXcv(targetCellElem, _))
   }
 
   // Paste control from the clipboard
   //@XPathFunction
-  def pasteFromClipboard(targetCellElem: NodeInfo): Unit =
-    pasteFromXvc(targetCellElem, readXvcFromClipboard)
+  def pasteFromClipboard(targetCellElem: NodeInfo): Unit = {
 
-  private def pasteFromXvc(targetCellElem: NodeInfo, xvc: NodeInfo): Unit = {
+    val inDoc       = FormBuilder.fbFormInstance.root
+    val controlElem = clipboardXcvRootElem / XcvEntry.Control.entryName / * head
+
+    if (FormBuilder.IsGrid(controlElem) || FormBuilder.IsSection(controlElem)) {
+
+      val (into, after) =
+        if (FormBuilder.IsGrid(controlElem)) {
+          val (into, after, _) = findGridInsertionPoint(inDoc)
+          (into, after)
+        } else {
+          findSectionInsertionPoint(inDoc)
+        }
+
+      val precedingContainerName = after flatMap getControlNameOpt
+
+      val newContainerElement = insert(into = into, after = after.toList, origin = controlElem).head
+
+      val resourceHolders =
+        for {
+          resourceElem ← clipboardXcvRootElem / XcvEntry.Resources.entryName / "resource"
+          lang = resourceElem attValue "*:lang"
+        } yield
+          lang → (resourceElem / *)
+
+      // Insert holders
+      insertHolders(
+        controlElement       = newContainerElement,
+        dataHolderOpt        = clipboardXcvRootElem / XcvEntry.Holder.entryName / * headOption,
+        resourceHolders      = resourceHolders,
+        precedingControlName = precedingContainerName
+      )
+
+      // Insert the bind element
+      val newBind = ensureBinds(inDoc, findContainerNamesForModel(newContainerElement, includeSelf = true))
+      insert(after = newBind, origin = clipboardXcvRootElem / XcvEntry.Bind.entryName / *)
+      delete(newBind)
+
+      // This can impact templates
+      updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+
+      // Select first grid cell
+      selectFirstCellInContainer(newContainerElement)
+    } else
+      pasteFromXcv(targetCellElem, readXcvFromClipboard)
+  }
+
+  private def pasteFromXcv(targetCellElem: NodeInfo, xcv: NodeInfo): Unit = {
     ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
 
-      (xvc / "control" / * headOption) foreach { control ⇒
+      (xcv / XcvEntry.Control.entryName / * headOption) foreach { control ⇒
 
-        def holders   = xvc / "holder" / *
-        def resources = xvc / "resources" / "resource" / *
+        def holders   = xcv / XcvEntry.Holder.entryName / *
+        def resources = xcv / XcvEntry.Resources.entryName / "resource" / *
 
         val name = {
           val requestedName = getControlName(control)
@@ -438,7 +496,7 @@ object ToolboxOps {
           // Check if id is already in use
           if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
             // If so create new id
-            val newName = controlNameFromId(nextId(targetCellElem, "control"))
+            val newName = controlNameFromId(nextId(targetCellElem, XcvEntry.Control.entryName))
 
             // Rename everything
             renameControlByElement(control, newName, resources / * map (_.localname) toSet)
@@ -446,7 +504,7 @@ object ToolboxOps {
             holders ++ resources foreach
               (rename(_, newName))
 
-            (xvc / "bind" / * headOption) foreach
+            (xcv / XcvEntry.Bind.entryName / * headOption) foreach
               (renameBindElement(_, newName))
 
             newName
@@ -456,17 +514,18 @@ object ToolboxOps {
 
         // Insert control and holders
         val newControlElement = insert(into = gridCellElem, origin = control).head
+
         insertHolders(
-          newControlElement,
-          holders.head,
-          xvc / "resources" / "resource" map (r ⇒ (r attValue "*:lang", r / * head)),
-          precedingControlNameInSectionForControl(newControlElement)
+          controlElement       = newControlElement,
+          dataHolderOpt        = holders.headOption,
+          resourceHolders      = xcv / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
+          precedingControlName = precedingControlNameInSectionForControl(newControlElement)
         )
 
         // Create the bind and copy all attributes and content
         val bind = ensureBinds(gridCellElem, findContainerNamesForModel(gridCellElem) :+ name)
-        (xvc / "bind" / * headOption) foreach { xvcBind ⇒
-          insert(into = bind, origin = (xvcBind /@ @*) ++ (xvcBind / *))
+        (xcv / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
+          insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
         }
 
         import org.orbeon.oxf.fr.Names._
@@ -518,20 +577,20 @@ object ToolboxOps {
     val lhhaTemplate: NodeInfo =
       <template xmlns:xf="http://www.w3.org/2002/xforms">
         <xf:label ref=""/>
-        <xf:hint ref=""/>
+        <xf:hint  ref=""/>
         <xf:alert ref=""/>
       </template>
 
-    def findGridInsertionPoint(inDoc: NodeInfo) =
+    def findGridInsertionPoint(inDoc: NodeInfo): (NodeInfo, Option[NodeInfo], Option[NodeInfo]) =
       findSelectedCell(inDoc) match {
-        case Some(currentTd) ⇒ // A td is selected
+        case Some(currentCellElem) ⇒ // A cell is selected
 
-          val containers = findAncestorContainersLeafToRoot(currentTd)
+          val containers = findAncestorContainersLeafToRoot(currentCellElem)
 
           // We must always have a parent (grid) and grandparent (possibly fr:body) container
           assert(containers.size >= 2)
 
-          val parentContainer = containers.headOption
+          val parentContainer      = containers.headOption
           val grandParentContainer = containers.tail.head
 
           // NOTE: At some point we could allow any grid bound and so with a name/id and bind
@@ -539,32 +598,32 @@ object ToolboxOps {
 
           (grandParentContainer, parentContainer, parentContainer)
 
-        case _ ⇒ // No td is selected, add top-level grid
-          val frBody = findFRBodyElement(inDoc)
+        case _ ⇒ // No cell is selected, add top-level grid
+          val frBody = findFRBodyElem(inDoc)
           (frBody, childrenContainers(frBody) lastOption, None)
       }
 
-    def findSectionInsertionPoint(inDoc: NodeInfo) =
+    def findSectionInsertionPoint(inDoc: NodeInfo): (NodeInfo, Option[NodeInfo]) =
       findSelectedCell(inDoc) match {
-        case Some(currentTd) ⇒ // A td is selected
+        case Some(currentCellElem) ⇒ // A cell is selected
 
-          val containers = findAncestorContainersLeafToRoot(currentTd)
+          val containers = findAncestorContainersLeafToRoot(currentCellElem)
 
           // We must always have a parent (grid) and grandparent (possibly fr:body) container
           assert(containers.size >= 2)
 
           // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
           // current section/tabview, the section is inserted after the current grid.
-          val grandParentContainer = containers.tail.head // section/tab, body
+          val grandParentContainer            = containers.tail.head // section/tab, body
           val greatGrandParentContainerOption = containers.tail.tail.headOption
 
           greatGrandParentContainerOption match {
             case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
-            case None ⇒ (grandParentContainer, grandParentContainer / * headOption)
+            case None                            ⇒ (grandParentContainer, grandParentContainer / * headOption)
           }
 
-        case _ ⇒ // No td is selected, add top-level section
-          val frBody = findFRBodyElement(inDoc)
+        case _ ⇒ // No cell is selected, add top-level section
+          val frBody = findFRBodyElem(inDoc)
           (frBody, childrenContainers(frBody) lastOption)
       }
   }

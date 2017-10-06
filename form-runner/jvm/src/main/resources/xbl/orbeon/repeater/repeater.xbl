@@ -180,6 +180,7 @@
                         <xsl:if test="$appearance = 'full' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1" id="fr-repeater-add">
+                                    <!--<xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>-->
                                     <xf:label><xh:i class="icon-plus-sign"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>
                                 </xf:trigger>
                             </xf:group>

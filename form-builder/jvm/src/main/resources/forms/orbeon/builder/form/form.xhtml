@@ -120,44 +120,15 @@
                             </xf:group>
                             <fr:title ref="bind('title-bind')"/>
 
-                            <!-- Form settings -->
-                            <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right" id="open-form-settings-trigger">
-                                <xf:label><xh:i class="icon-cog icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
-                                <xf:action ev:event="DOMActivate">
-                                    <!-- Open the dialog in "edit" mode -->
-                                    <xxf:show dialog="dialog-form-settings">
-                                        <xf:property name="mode"                          value="'edit'"/>
-                                        <xf:property name="app"                           value="bind('application-name-bind')"/>
-                                        <xf:property name="form"                          value="bind('form-name-bind')"/>
-                                        <xf:property name="title"                         value="bind('title-bind')"/>
-                                        <xf:property name="description"                   value="bind('description-bind')"/>
-                                        <xf:property name="singleton"                     value="bind('singleton-bind')"/>
-                                        <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
-                                        <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
-                                        <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
-                                        <xf:property name="wizard"                        value="bind('wizard-bind')"/>
-                                        <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
-                                        <xf:property name="labels"                        value="bind('labels-bind')"/>
-                                        <xf:property name="hints"                         value="bind('hints-bind')"/>
-                                    </xxf:show>
-                                </xf:action>
-                            </xf:trigger>
-
-                            <!-- Edit Source -->
-                            <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right" ref="instance('fb-metadata-instance')/toolbox/edit-source">
-                                <xf:label><xh:i class="icon-edit icon-white" title="{$form-resources/edit-source/label}"/></xf:label>
-                                <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
-                            </xf:trigger>
-
                             <!-- Add/remove language -->
                             <!--suppress XmlUnusedNamespaceDeclaration -->
                             <xf:group class="fb-language-triggers pull-right" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                                 <xf:trigger appearance="minimal" id="fb-add-language">
-                                    <xf:label><xh:i class="icon-plus-sign icon-white" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-plus-circle" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                                 </xf:trigger>
                                 <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                                    <xf:label><xh:i class="icon-minus-sign icon-white" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-minus-circle" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Ask confirmation -->
                                         <xxf:show dialog="fb-confirmation-dialog">
@@ -411,6 +382,17 @@
                                 <fb:dialog-edit-source         id="dialog-edit-source"       ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-http-services       id="dialog-http-services"     ref="$form"      resources-ref="$form-resources"/>
 
+                                <xf:group ref="instance('fb-metadata-instance')/toolbox/workflow">
+                                    <fb:workflow
+                                        id="fb-workflow-dialog"
+                                        resources-ref="$form-resources"
+                                        ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                                </xf:group>
+                                <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
+                                    <fb:permissions id="fb-permissions-dialog" resources-ref="$form-resources"
+                                        metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                                </xf:group>
+
                                 <xf:action event="fr-save" observer="dialog-edit-source">
                                     <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
                                         <xf:property name="data" value="event('value')"/>
@@ -441,7 +423,7 @@
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
                                 <!--<fr:xforms-inspector/>-->
 
-                                <xf:action event="xxforms-action-error" observer="fb" propagate="stop">
+                                <xf:action event="xxforms-action-error" observer="#document fb" propagate="stop">
                                     <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                                     <xf:message level="xxf:log-error" value="event('element')"/>
                                 </xf:action>
@@ -467,38 +449,38 @@
 
                             <xh:div class="fb-control-editor-left">
                                 <xh:i
-                                    class="icon-arrow-right"
+                                    class="fb-arrow-right fa fa-arrow-right fa-fw"
                                     role="button"
                                     title="{$fb-resources/expand-horizontally-icon/label}"/>
                                 <xh:i
-                                    class="icon-arrow-left"
+                                    class="fb-arrow-left fa fa-arrow-left fa-fw"
                                     role="button"
                                     title="{$fb-resources/shrink-horizontally-icon/label}"/>
                                 <xh:i
-                                    class="icon-arrow-down"
+                                    class="fb-arrow-down fa fa-arrow-down fa-fw"
                                     role="button"
                                     title="{$fb-resources/expand-vertically-icon/label}"/>
                                 <xh:i
-                                    class="icon-arrow-up"
+                                    class="fb-arrow-up fa fa-arrow-up fa-fw"
                                     role="button"
                                     title="{$fb-resources/shrink-vertically-icon/label}"/>
                             </xh:div>
 
                             <xh:div class="fb-control-editor-right">
                                 <xh:i
-                                    class="fb-control-handle icon-move"
+                                    class="fb-control-handle fa fa-arrows fa-fw"
                                     draggable="true"
                                     title="{$fb-resources/move-icon/label}"/>
                                 <xh:i
-                                    class="fb-control-edit-details icon-cog"
+                                    class="fb-control-edit-details fa fa-cogs fa-fw"
                                     role="button"
                                     title="{$fb-resources/control-details-icon/label}"/>
                                 <xh:i
-                                    class="fb-control-delete icon-minus-sign"
+                                    class="fb-control-delete fa fa-minus-circle fa-fw"
                                     role="button"
                                     title="{$fb-resources/delete-control-icon/label}"/>
                                 <xh:i
-                                    class="fb-control-edit-items icon-th-list"
+                                    class="fb-control-edit-items fa fa-th-list fa-fw"
                                     role="button"
                                     title="{$fb-resources/edit-items/label}"/>
 
@@ -550,57 +532,64 @@
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
                                 <xh:i
-                                    class="fb-section-edit-details icon-cog"
+                                    class="fb-container-edit-details fa fa-cogs fa-fw"
                                     role="button"
                                     title="{$fb-resources/section-details-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-delete icon-minus-sign"
+                                    class="fb-section-delete fa fa-minus-circle fa-fw"
                                     role="button"
                                     title="{$fb-resources/delete-section-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-edit-help icon-info-sign"
+                                    class="fb-section-edit-help fa fa-info-circle fa-fw"
                                     role="button"
                                     title="{$fb-resources/help-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-move-up icon-arrow-up"
+                                    class="fb-section-move-up fa fa-arrow-up fa-fw"
                                     role="button"
                                     title="{$fb-resources/move-up-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-move-down icon-arrow-down"
+                                    class="fb-section-move-down fa fa-arrow-down fa-fw"
                                     role="button"
                                     title="{$fb-resources/move-down-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-move-right icon-arrow-right"
+                                    class="fb-section-move-right fa fa-arrow-right fa-fw"
                                     role="button"
                                     title="{$fb-resources/move-right-icon/label}"/>
                                 <xh:i
-                                    class="fb-section-move-left icon-arrow-left"
+                                    class="fb-section-move-left fa fa-arrow-left fa-fw"
                                     role="button"
                                     title="{$fb-resources/move-left-icon/label}"/>
                                 <xh:i
-                                    class="fb-grid-edit-details icon-cog"
+                                    class="fb-grid-edit-details fa fa-cogs fa-fw"
                                     role="button"
                                     title="{$fb-resources/grid-details-icon/label}"/>
                                 <xh:i
-                                    class="fb-grid-delete icon-minus-sign"
+                                    class="fb-grid-delete fa fa-minus-circle fa-fw"
                                     role="button"
                                     title="{$fb-resources/delete-grid-icon/label}"/>
+                                <xh:i
+                                    class="fb-container-cut fa fa-cut fa-fw"
+                                    role="button"/>
+                                <xh:i
+                                    class="fb-container-copy fa fa-copy fa-fw"
+                                    role="button"/>
+                                <!-- MAYBE: Paste icon if allowed? -->
                             </xh:div>
 
                             <xh:div class="fb-row-editor">
                                 <!-- Insert row above -->
                                 <xh:i
-                                    class="icon-chevron-up"
+                                    class="fb-row-insert-above fa fa-chevron-up fa-fw"
                                     role="button"
                                     title="{$fb-resources/insert-row-above-icon/label}"/>
                                 <!-- Delete row -->
                                 <xh:i
-                                    class="icon-minus-sign"
+                                    class="fb-row-delete fa fa-minus-circle fa-fw"
                                     role="button"
                                     title="{$fb-resources/delete-row-icon/label}"/>
                                 <!-- Insert row below -->
                                 <xh:i
-                                    class="icon-chevron-down"
+                                    class="fb-row-insert-below fa fa-chevron-down fa-fw"
                                     role="button"
                                     title="{$fb-resources/insert-row-below-icon/label}"/>
                             </xh:div>

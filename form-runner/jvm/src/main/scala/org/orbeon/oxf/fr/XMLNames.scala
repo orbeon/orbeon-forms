@@ -52,4 +52,6 @@ object XMLNames {
   val ItemsetIdQName         = QName.get("itemsetid",           FRNamespace)
   val ItemsetMapQName        = QName.get("itemsetmap",          FRNamespace)
   val DataFormatVersionQName = QName.get("data-format-version", FRNamespace)
+
+  val XMLLangQName           = QName.get("lang", XML_URI)
 }

@@ -368,12 +368,6 @@ div.orbeon.orbeon-portlet-div {
 
         .xforms-label { display: block; }
 
-        // Hide tabs in `new` mode
-        // 2017-03-31: Actually it looks better without hiding tabs.
-        //.fb-settings-mode-new .nav-tabs {
-        //    display: none
-        //}
-
         .fb-dialog-form-settings-fields {
             float: left;
             width: 475px;
@@ -961,21 +955,18 @@ div.orbeon.orbeon-portlet-div {
     // Form navbar only
     .fb-main .navbar {
         margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
-        .fb-navbar-trigger {
-            padding-left: 10px;
-        }
 
-        .fr-language-selector .nav {
-            margin-right: 0;
-        }
-
-        .fb-navbar-trigger, .fb-language-triggers {
+        .fb-language-triggers {
             i {
                 background: none;
                 color: white;
                 .opacity(70)
             }
         }
+    }
+
+    .navbar .fr-language-choice .nav {
+        margin-right: 0;
     }
 
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder

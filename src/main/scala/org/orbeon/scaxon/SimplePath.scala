@@ -313,6 +313,8 @@ object SimplePath {
     def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
 
+    def ids: Seq[String] = seq flatMap (_.idOpt)
+
     def namespaceNodes: Seq[NodeInfo] = seq flatMap (_.namespaceNodes)
 
     def att(attName: String)   = /@(attName)

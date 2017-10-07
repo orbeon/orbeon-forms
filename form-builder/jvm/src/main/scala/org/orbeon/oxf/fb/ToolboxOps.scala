@@ -17,13 +17,14 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{Cell, FormRunnerLang, FormRunnerResourcesOps}
+import org.orbeon.oxf.fr.{Cell, FormRunnerLang, FormRunnerResourcesOps, NodeInfoCell}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.CoreUtils._
 
 /*
  * Form Builder: toolbox operations.
@@ -420,7 +421,14 @@ object ToolboxOps {
           }
       }
 
-    elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+    val result = elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+
+    // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
+    // we just re-annotate at that time
+    result descendant (FRGridTest || NodeInfoCell.CellTest) att "id" filter
+      (a ⇒ a.stringValue.startsWith("tmp-") && a.stringValue.endsWith("-tmp")) foreach (delete(_))
+
+    result
   }
 
   private def controlElementsInCellToXcv(cellElem: NodeInfo): Option[NodeInfo] = {
@@ -462,8 +470,6 @@ object ToolboxOps {
   def writeXcvToClipboard(xcv: NodeInfo): Unit = {
     clearClipboard()
     insert(into = clipboardXcvRootElem, origin = xcv / *)
-
-    FormBuilder.debugDumpDocument("xxx clipboard after write", clipboardXcvRootElem)
   }
 
   def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
@@ -495,11 +501,87 @@ object ToolboxOps {
     xcvElem        : NodeInfo
   ): Unit = {
 
-    val inDoc       = FormBuilder.fbFormInstance.root
-    val controlElem = xcvElem / XcvEntry.Control.entryName / * head
+    val inDoc                = FormBuilder.fbFormInstance.root
+    val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
+
+    // Rename if needed
+    locally {
+
+      def findXcvNames          = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
+      def existingUniqueNamesIt = fbFormInstance.idsIterator flatMap controlNameFromIdOpt
+
+      val needRename = collection.mutable.LinkedHashSet() ++ findXcvNames intersect existingUniqueNamesIt.toSet
+
+      if (needRename.nonEmpty) {
+
+        val newControlNames = nextIds(inDoc, XcvEntry.Control.entryName, needRename.size) map controlNameFromId
+        val oldToNewNames   = needRename.iterator.zip(newControlNames.iterator).toMap
+
+        // Rename controls, including self in case of a section or repeated grid
+        val selfContainerList = getControlNameOpt(containerControlElem).isDefined list containerControlElem
+        val nestedControls    = findControlsInContainer(containerControlElem)
+
+        selfContainerList.iterator ++ nestedControls.iterator foreach { controlElem ⇒
+
+          val oldName = controlNameFromId(controlElem.id)
+
+          oldToNewNames.get(oldName) foreach { newName ⇒
+            renameControlByElement(controlElem, newName, Set("label", "help", "hint", "alert", "itemset"))
+          }
+        }
+
+        // Rename holders
+        (xcvElem / XcvEntry.Holder.entryName / *).iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem ⇒
+
+          val oldName = holderElem.localname
+
+          val isDefaultIterationName = oldName.endsWith(DefaultIterationSuffix)
+
+          val oldNameAdjusted =
+            if (isDefaultIterationName)
+              oldName.substring(0, oldName.size - DefaultIterationSuffix.size)
+            else
+              oldName
+
+          oldToNewNames.get(oldNameAdjusted) foreach { newName ⇒
+            rename(holderElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
+          }
+        }
+
+        // Rename resources
+        val resourceHolders = xcvElem / XcvEntry.Resources.entryName / "resource" / *
+
+        resourceHolders foreach { holderElem ⇒
+
+          val oldName = holderElem.localname
+
+          oldToNewNames.get(oldName) foreach { newName ⇒
+            rename(holderElem, newName)
+          }
+        }
+
+        // Rename binds
+        (xcvElem / XcvEntry.Bind.entryName / *).iterator flatMap iterateSelfAndDescendantBindsReversed foreach { bindElem ⇒
+
+          val oldName = findBindName(bindElem).get
+
+          val isDefaultIterationName = oldName.endsWith(DefaultIterationSuffix)
+
+          val oldNameAdjusted =
+            if (isDefaultIterationName)
+              oldName.substring(0, oldName.size - DefaultIterationSuffix.size)
+            else
+              oldName
+
+          oldToNewNames.get(oldNameAdjusted) foreach { newName ⇒
+            renameBindElement(bindElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
+          }
+        }
+      }
+    }
 
     val (into, after) =
-      if (FormBuilder.IsGrid(controlElem)) {
+      if (FormBuilder.IsGrid(containerControlElem)) {
         val (into, after, _) = findGridInsertionPoint(inDoc)
         (into, after)
       } else {
@@ -509,7 +591,8 @@ object ToolboxOps {
     // TODO: What if pasting after a non-repeated grid without name? We must try to keep the order of things!
     val precedingContainerName = after flatMap getControlNameOpt
 
-    val newContainerElement = insert(into = into, after = after.toList, origin = controlElem).head
+    val newContainerElement =
+      insert(into = into, after = after.toList, origin = containerControlElem).head
 
     val resourceHolders =
       for {
@@ -521,7 +604,7 @@ object ToolboxOps {
     // Insert holders
     insertHolders(
       controlElement       = newContainerElement, // in order to find containers
-      dataHolders          = xcvElem / XcvEntry.Holder.entryName / * take 1,
+      dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
       resourceHolders      = resourceHolders,
       precedingControlName = precedingContainerName
     )
@@ -540,6 +623,8 @@ object ToolboxOps {
 
     // This can impact templates
     updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+
+    annotateGridsAndCells(findFRBodyElem(inDoc))
 
     // Select first grid cell
     selectFirstCellInContainer(newContainerElement)

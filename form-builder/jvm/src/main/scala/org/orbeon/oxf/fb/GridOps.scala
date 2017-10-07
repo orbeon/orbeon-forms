@@ -32,7 +32,7 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
-  def initializeGrids(doc: NodeInfo): Unit = {
+  def annotateGridsAndCells(startElem: NodeInfo): Unit = {
 
     // 1. Annotate all the grid and grid cells of the given document with unique ids,
     // if they don't have them already. We do this so that ids are stable as we move
@@ -41,18 +41,29 @@ trait GridOps extends ContainerOps {
 
     def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
       // Get as many fresh ids as there are tds
-      val ids = nextIds(doc, token, elements.size).toIterator
+      val ids = nextIds(startElem, token, elements.size).toIterator
 
       // Add the missing ids
       elements foreach (ensureAttribute(_, "id", ids.next()))
     }
 
-    // All grids and grid tds with no existing id
-    val bodyElement = findFRBodyElem(doc)
-    val grids       = bodyElement descendant GridTest
+    // All grids and grid cells with no existing id
+    val grids = startElem descendant GridTest
 
     annotate("tmp", grids descendant CellTest filterNot (_.hasId))
     annotate("tmp", grids filterNot (_.hasId))
+  }
+
+  def initializeGrids(doc: NodeInfo): Unit = {
+
+    // 1. Annotate all the grid and grid cells of the given document with unique ids,
+    // if they don't have them already. We do this so that ids are stable as we move
+    // things around, otherwise if the XForms document is recreated new automatic ids
+    // are generated for objects without id.
+
+    val bodyElement = findFRBodyElem(doc)
+
+    annotateGridsAndCells(bodyElement)
 
     // 2. Select the first td if any
     bodyElement descendant GridTest descendant CellTest take 1 foreach selectCell

@@ -110,7 +110,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
       if (names.hasNext) {
         val bindName = names.next()
-        val bind = container / "*:bind" filter (isBindForName(_, bindName)) match {
+        val bind = container / XFBindTest filter (isBindForName(_, bindName)) match {
           case Seq(bind: NodeInfo, _*) ⇒ bind
           case _ ⇒
 
@@ -120,7 +120,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                      name={bindName}
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
 
-            insert(into = container, after = container / "*:bind", origin = newBind).head
+            insert(into = container, after = container / XFBindTest, origin = newBind).head
         }
         ensureBind(bind, names)
       } else
@@ -133,7 +133,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Iterate over the given bind followed by all of its descendants, depth-first
   def iterateSelfAndDescendantBinds(rootBind: NodeInfo): Iterator[NodeInfo] =
-    rootBind descendantOrSelf "*:bind" iterator
+    rootBind descendantOrSelf XFBindTest iterator
+
+  def iterateSelfAndDescendantBindsReversed(rootBind: NodeInfo): Iterator[NodeInfo] =
+    (rootBind descendantOrSelf XFBindTest).reverseIterator
+
+  // Iterate over the given holder and descendants in reverse depth-first order
+  def iterateSelfAndDescendantHoldersReversed(rootHolder: NodeInfo): Iterator[NodeInfo] =
+    (rootHolder descendantOrSelf *).reverseIterator
 
   //@XPathFunction
   def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false): Unit = {
@@ -212,7 +219,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def renameControlByElement(controlElement: NodeInfo, newName: String, resourcesNames: Set[String]): Unit = {
 
     // Set @id in any case, @ref value if present, @bind value if present
-    ensureAttribute(controlElement, "id", controlId(newName))
+    ensureAttribute(controlElement, "id",   controlId(newName))
     ensureAttribute(controlElement, "bind", bindId(newName))
 
     // Make the control point to its template if @template (or legacy @origin) is present
@@ -221,18 +228,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
     for {
-      resourcePointer ← controlElement.child(*)
-      resourceName = resourcePointer.localname
+      resourcePointer ← controlElement child *
+      resourceName    = resourcePointer.localname
       if resourcesNames(resourceName)                             // We have a resource for this sub-element
-      ref = resourcePointer.att("ref").headOption
-      if ref.nonEmpty                                             // If no ref, value might be inline
-      refVal = ref.head.stringValue
+      ref             ← resourcePointer.att("ref").headOption
+      refVal          = ref.stringValue
       if refVal.isEmpty || refVal.startsWith("$form-resources")   // Don't overwrite ref pointing somewhere else
     } locally {
       setvalue(ref.toSeq, s"$$form-resources/$newName/$resourceName")
     }
 
     // If using a static itemset editor, set `xf:itemset/@ref` value
+    // TODO: Does this work if the itemset points to the data?
     if (hasEditor(controlElement, "static-itemset"))
       setvalue(controlElement / "*:itemset" /@ "ref", s"$$form-resources/$newName/item")
   }

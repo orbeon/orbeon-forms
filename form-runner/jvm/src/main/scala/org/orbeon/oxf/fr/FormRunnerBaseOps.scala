@@ -35,6 +35,8 @@ trait FormRunnerBaseOps {
 
   val LiferayLanguageHeader = "orbeon-liferay-language"
 
+  val DefaultIterationSuffix = "-iteration"
+
   val TemplateSuffix        = "-template"
 
   // Get an id based on a name
@@ -47,7 +49,7 @@ trait FormRunnerBaseOps {
   def controlId(controlName: String) = controlName + "-control"
   def templateId(gridName: String)   = gridName    + TemplateSuffix
 
-  def defaultIterationName(repeatName: String) = repeatName + "-iteration"
+  def defaultIterationName(repeatName: String) = repeatName + DefaultIterationSuffix
 
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.

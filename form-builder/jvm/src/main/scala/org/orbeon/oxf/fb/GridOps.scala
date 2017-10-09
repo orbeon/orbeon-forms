@@ -157,7 +157,7 @@ trait GridOps extends ContainerOps {
       case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y ⇒ u
     } distinct
 
-  def rowDelete(gridId: String, rowPos: Int): Unit = {
+  def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val gridElem       = containerById(gridId)
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
@@ -189,7 +189,7 @@ trait GridOps extends ContainerOps {
     delete(cellsToDelete)
 
     // Update templates
-    updateTemplatesCheckContainers(gridElem, findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
 
     // Adjust selected cell if needed
     newCellToSelect foreach selectCell

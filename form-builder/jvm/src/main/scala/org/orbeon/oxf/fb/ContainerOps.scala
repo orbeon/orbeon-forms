@@ -43,10 +43,10 @@ trait ContainerOps extends ControlOps {
     findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer
   }
 
-  def countControlsInContainer(containerId: String): Int =
-    findControlsInContainer(containerById(containerId)).size
+  def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
+    containerElem descendant FRContainerTest
 
-  def findControlsInContainer(containerElem: NodeInfo): Seq[NodeInfo] =
+  def findNestedControls(containerElem: NodeInfo): Seq[NodeInfo] =
     containerElem descendant CellTest child * filter IsControl
 
   // Find all siblings of the given element with the given name, excepting the given element
@@ -87,7 +87,7 @@ trait ContainerOps extends ControlOps {
 
   def deleteContainer(containerElem: NodeInfo): Unit = {
 
-    val doc = containerElem.getDocumentRoot
+    implicit val ctx = FormBuilderDocContext()
 
     // Find the new td to select if we are removing the currently selected td
     val newCellToSelectOpt = findNewCellToSelect(containerElem, containerElem descendant CellTest)
@@ -119,7 +119,7 @@ trait ContainerOps extends ControlOps {
     controls flatMap controlElementsToDelete foreach (delete(_))
 
     // Update templates
-    updateTemplatesCheckContainers(doc, findAncestorRepeatNames(containerElem).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(containerElem).to[Set])
 
     // Adjust selected td if needed
     newCellToSelectOpt foreach selectCell
@@ -127,6 +127,8 @@ trait ContainerOps extends ControlOps {
 
   // Move a container based on a move function
   def moveContainer(containerElem: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
 
     // Get names before moving the container
     val nameOption      = getControlNameOpt(containerElem)
@@ -176,7 +178,7 @@ trait ContainerOps extends ControlOps {
         }
 
         // Moving sections can impact templates
-        updateTemplates(doc, None)
+        updateTemplates(None)
 
       case _ ⇒
     }
@@ -212,8 +214,8 @@ trait ContainerOps extends ControlOps {
   def isCustomIterationName(controlName: String, iterationName: String): Boolean =
     defaultIterationName(controlName) != iterationName
 
-  def setRepeatProperties(
-    inDoc                : NodeInfo,
+  //@XPathFunction
+  def setRepeatPropertiesXPath(
     controlName          : String,
     repeat               : Boolean,
     min                  : String,
@@ -222,6 +224,30 @@ trait ContainerOps extends ControlOps {
     applyDefaults        : Boolean,
     initialIterations    : String
   ): Unit =
+    setRepeatProperties(
+      controlName          = controlName,
+      repeat               = repeat,
+      min                  = min,
+      max                  = max,
+      iterationNameOrEmpty = iterationNameOrEmpty,
+      applyDefaults        = applyDefaults,
+      initialIterations    = initialIterations
+    )(FormBuilderDocContext())
+
+  def setRepeatProperties(
+    controlName          : String,
+    repeat               : Boolean,
+    min                  : String,
+    max                  : String,
+    iterationNameOrEmpty : String,
+    applyDefaults        : Boolean,
+    initialIterations    : String)(implicit
+    ctx                  : FormBuilderDocContext
+  ): Unit = {
+
+    // TODO: Remove once `ctx` is used everywhere
+    val inDoc = ctx.rootElem
+
     findControlByName(inDoc, controlName) foreach { control ⇒
 
       val wasRepeat = isRepeat(control)
@@ -270,10 +296,10 @@ trait ContainerOps extends ControlOps {
 
         // Update existing templates
         // NOTE: Could skip if top-level repeat
-        updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
 
         // Ensure new template rooted at iteration
-        ensureTemplateReplaceContent(inDoc, controlName, createTemplateContentFromBind(iterationBind.head, componentBindings))
+        ensureTemplateReplaceContent(controlName, createTemplateContentFromBind(iterationBind.head, componentBindings))
 
       } else if (wasRepeat && ! repeat) {
         // Remove bind, holders and template
@@ -295,7 +321,7 @@ trait ContainerOps extends ControlOps {
         findTemplateInstance(inDoc, controlName) foreach (delete(_))
 
         // Update existing templates
-        updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
 
       } else if (repeat) {
         // Template should already exists an should have already been renamed if needed
@@ -304,13 +330,14 @@ trait ContainerOps extends ControlOps {
         val newInitialIterationsAttribute = getInitialIterationsAttribute(control)
 
         if (oldInitialIterationsAttribute != newInitialIterationsAttribute)
-          updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control, includeSelf = true).to[Set])
+          updateTemplatesCheckContainers(findAncestorRepeatNames(control, includeSelf = true).to[Set])
 
       } else if (! repeat) {
         // Template should not exist
         // MAYBE: Delete template just in case.
       }
     }
+  }
 
   def renameTemplate(doc: NodeInfo, oldName: String, newName: String): Unit =
     for {
@@ -323,11 +350,11 @@ trait ContainerOps extends ControlOps {
   def findTemplateInstance(doc: NodeInfo, controlName: String): Option[NodeInfo] =
     instanceElem(doc, templateId(controlName))
 
-  def ensureTemplateReplaceContent(inDoc: NodeInfo, controlName: String, content: NodeInfo): Unit = {
+  def ensureTemplateReplaceContent(controlName: String, content: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val templateInstanceId = templateId(controlName)
-    val modelElement = findModelElem(inDoc)
-    modelElement / "*:instance" find (_.hasIdValue(templateInstanceId)) match {
+    val modelElement = findModelElem(ctx.rootElem)
+    modelElement / XFInstanceTest find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content
         delete(templateInstance / *)
@@ -344,7 +371,7 @@ trait ContainerOps extends ControlOps {
             fb:readonly="true"
             xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
 
-        insert(into = modelElement, after = modelElement / "*:instance" takeRight 1, origin = template)
+        insert(into = modelElement, after = modelElement / XFInstanceTest takeRight 1, origin = template)
     }
   }
 
@@ -361,9 +388,9 @@ trait ContainerOps extends ControlOps {
 
   // Create an instance template based on a hierarchy of binds rooted at the given bind
   // This checks each control binding in case the control specifies a custom data holder.
-  def createTemplateContentFromBind(bind: NodeInfo, bindings: Seq[NodeInfo]): NodeInfo = {
+  def createTemplateContentFromBind(startBindElem: NodeInfo, bindings: Seq[NodeInfo]): NodeInfo = {
 
-    val inDoc       = bind.getDocumentRoot
+    val inDoc       = startBindElem.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
     def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
@@ -441,35 +468,35 @@ trait ContainerOps extends ControlOps {
       elementTemplateOpt
     }
 
-    holderForBind(bind, topLevel = true) getOrElse (throw new IllegalStateException)
+    holderForBind(startBindElem, topLevel = true) getOrElse (throw new IllegalStateException)
   }
 
   // Make sure all template instances reflect the current bind structure
-  def updateTemplates(inDoc: NodeInfo, ancestorContainerNames: Option[Set[String]]): Unit =
+  def updateTemplates(ancestorContainerNames: Option[Set[String]])(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      templateInstance ← templateInstanceElements(inDoc)
+      templateInstance ← templateInstanceElements(ctx.rootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
-      iterationName    ← findRepeatIterationName(inDoc, repeatName)
-      template         ← createTemplateContentFromBindName(inDoc, iterationName, componentBindings)
+      iterationName    ← findRepeatIterationName(ctx.rootElem, repeatName)
+      template         ← createTemplateContentFromBindName(ctx.rootElem, iterationName, componentBindings)
     } locally {
-      ensureTemplateReplaceContent(inDoc, repeatName, template)
+      ensureTemplateReplaceContent(repeatName, template)
     }
 
   // Update templates but only those which might contain one of specified names
-  def updateTemplatesCheckContainers(inDoc: NodeInfo, ancestorContainerNames: Set[String]): Unit =
-    updateTemplates(inDoc, Some(ancestorContainerNames))
+  def updateTemplatesCheckContainers(ancestorContainerNames: Set[String])(implicit ctx: FormBuilderDocContext): Unit =
+    updateTemplates(Some(ancestorContainerNames))
 
   // This is called when the user adds/removes an iteration, as we want to update the templates in this case in order
   // to adjust the default number of iterations. See https://github.com/orbeon/orbeon-forms/issues/2379
   //@XPathFunction
   def updateTemplatesFromDynamicIterationChange(controlName: String): Unit = {
 
-    val inDoc = getFormDoc
+    implicit val ctx = FormBuilderDocContext()
 
-    findControlByName(inDoc, controlNameFromId(controlName)) foreach { controlElem ⇒
+    findControlByName(ctx.rootElem, controlNameFromId(controlName)) foreach { controlElem ⇒
       assert(isRepeat(controlElem))
-      updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(controlElem).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(controlElem).to[Set])
     }
   }
 }

@@ -136,7 +136,7 @@
 
                     <xf:action type="xpath">
                         if ($remains-repeat) then
-                            fbf:renameControlIterationIfNeeded(
+                            fbf:renameControlIterationIfNeededXPath(
                                 $form,
                                 $old-name,
                                 $new-name,
@@ -145,11 +145,11 @@
                             )
                         else
                             (),
-                        fbf:renameControlIfNeeded($form, $old-name, $new-name),
+                        fbf:renameControlIfNeededXPath($old-name, $new-name),
                         fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
                         fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
-                        fbf:setRepeatProperties(
-                            $form, $new-name,
+                        fbf:setRepeatPropertiesXPath(
+                            $new-name,
                             $i/is-repeat = true(),
                             $i/min-repeat,
                             $i/max-repeat,

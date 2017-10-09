@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder.rpc
 
-import org.orbeon.oxf.fb.{FormBuilder, ToolboxOps}
+import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
@@ -71,7 +71,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.rowInsertAbove(controlId, position - 1)
 
   def rowDelete(controlId: String, position: Int): Unit =
-    FormBuilder.rowDelete(controlId, position - 1)
+    FormBuilder.rowDelete(controlId, position - 1)(FormBuilderDocContext())
 
   def rowInsertBelow(controlId: String, position: Int): Unit =
     FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)

@@ -29,6 +29,24 @@ import spray.json._
 
 import scala.collection.immutable
 
+case class FormBuilderDocContext(formInstance: XFormsInstance) {
+  val rootElem: NodeInfo = formInstance.rootElement
+
+  val componentBindings: Seq[NodeInfo] =
+    asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+
+  val formResourcesRoot: NodeInfo =
+    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
+
+}
+
+object FormBuilderDocContext {
+
+  def apply(): FormBuilderDocContext =
+    FormBuilderDocContext(topLevelInstance("fr-form-model", "fb-form-instance").get)
+
+}
+
 trait BaseOps extends Logging {
 
   implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-builder")
@@ -42,14 +60,17 @@ trait BaseOps extends Logging {
   val DynamicControlId = "fb"
 
   // Find the form document being edited
+  // TODO: remove once `FormBuilderDocContext` is used
   def getFormDoc: DocumentInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
 
   // All xbl:binding elements available
+  // TODO: remove once `FormBuilderDocContext` is used
   def componentBindings: Seq[NodeInfo] =
     asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
   // Return fb-form-instance
+  // TODO: remove once `FormBuilderDocContext` is used
   def fbFormInstance: XFormsInstance =
     topLevelInstance("fr-form-model", "fb-form-instance").get
 
@@ -58,6 +79,7 @@ trait BaseOps extends Logging {
     inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model")
       .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
+  // TODO: remove once `FormBuilderDocContext` is used
   def formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 

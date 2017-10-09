@@ -101,7 +101,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None ⇒
         insert(
           into   = model,
-          after  = model / "*:instance" filter (_.hasIdValue("fr-form-instance")),
+          after  = model / XFInstanceTest filter (_.hasIdValue("fr-form-instance")),
           origin = topLevelBindTemplate
         ).head
     }
@@ -146,7 +146,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false): Unit = {
     cellElem / * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)
-      self.updateTemplatesCheckContainers(cellElem, findAncestorRepeatNames(cellElem).to[Set])
+      self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
   }
 
   // Find all associated elements to delete for a given control element
@@ -172,41 +172,63 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     control :: holders
   }
 
+  //@XPathFunction
+  def renameControlIfNeededXPath(oldName: String, newName: String): Unit =
+    renameControlIfNeeded(oldName, newName)(FormBuilderDocContext())
+
   // Rename a control with its holders, binds, etc. but *not* its nested iteration if any
-  def renameControlIfNeeded(inDoc: NodeInfo, oldName: String, newName: String): Unit =
+  def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (oldName != newName) {
 
-      findDataHolders(inDoc, oldName) foreach (rename(_, newName))
+      findDataHolders(ctx.rootElem, oldName) foreach (rename(_, newName))
       findResourceHolders(oldName)    foreach (rename(_, newName))
 
-      renameBinds   (inDoc, oldName, newName)
-      renameControl (inDoc, oldName, newName)
-      renameTemplate(inDoc, oldName, newName)
+      renameBinds   (ctx.rootElem, oldName, newName)
+      renameControl (ctx.rootElem, oldName, newName)
+      renameTemplate(ctx.rootElem, oldName, newName)
 
-      findControlByName(inDoc, newName) foreach { newControl ⇒
-        updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(newControl).to[Set])
+      findControlByName(ctx.rootElem, newName) foreach { newControl ⇒
+        updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
     }
 
   // Rename a control's nested iteration if any
-  def renameControlIterationIfNeeded(
+  //@XPathFunction
+  def renameControlIterationIfNeededXPath(
     inDoc                      : NodeInfo,
     oldControlName             : String,
     newControlName             : String,
     oldChildElementNameOrBlank : String,
     newChildElementNameOrBlank : String
   ): Unit =
-    if (findControlByName(inDoc, oldControlName) exists controlRequiresNestedIterationElement) {
+    renameControlIterationIfNeeded(
+      oldControlName,
+      newControlName,
+      oldChildElementNameOrBlank.trimAllToOpt,
+      newChildElementNameOrBlank.trimAllToOpt
+    )(FormBuilderDocContext())
 
-      val oldName = oldChildElementNameOrBlank.trimAllToOpt getOrElse defaultIterationName(oldControlName)
-      val newName = newChildElementNameOrBlank.trimAllToOpt getOrElse defaultIterationName(newControlName)
+
+  def renameControlIterationIfNeeded(
+    oldControlName      : String,
+    newControlName      : String,
+    oldChildElementName : Option[String],
+    newChildElementName : Option[String])(implicit
+    ctx                 : FormBuilderDocContext
+  ): Unit = {
+
+    if (findControlByName(ctx.rootElem, oldControlName) exists controlRequiresNestedIterationElement) {
+
+      val oldName = oldChildElementName getOrElse defaultIterationName(oldControlName)
+      val newName = newChildElementName getOrElse defaultIterationName(newControlName)
 
       if (oldName != newName) {
-        findDataHolders(inDoc, oldName) foreach (rename(_, newName))
-        renameBinds(inDoc, oldName, newName)
-        updateTemplates(inDoc, None)
+        findDataHolders(ctx.rootElem, oldName) foreach (rename(_, newName))
+        renameBinds(ctx.rootElem, oldName, newName)
+        updateTemplates(None)
       }
     }
+  }
 
   def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
     findControlByName(inDoc, oldName) foreach
@@ -339,6 +361,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
+  // @XPathFunction
   def updateMipAsAttributeOnly(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
 
     require(Model.AllMIPNames(mipName))

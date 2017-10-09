@@ -15,9 +15,9 @@ package org.orbeon.oxf.fb
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{Cell, FormRunnerLang, FormRunnerResourcesOps, NodeInfoCell}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.NodeInfo
@@ -37,38 +37,40 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewControl(doc: NodeInfo, binding: NodeInfo): Option[String] = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     ensureEmptyCell(doc) match {
       case Some(gridTd) ⇒
 
         val newControlName = controlNameFromId(nextId(doc, "control"))
 
         // Insert control template
-        val newControlElement: NodeInfo =
+        val newControlElem: NodeInfo =
           findViewTemplate(binding) match {
             case Some(viewTemplate) ⇒
               // There is a specific template available
-              val controlElement = insert(into = gridTd, origin = viewTemplate).head
+              val controlElem = insert(into = gridTd, origin = viewTemplate).head
               // xf:help might be in the template, but we don't need it as it is created on demand
-              delete(controlElement / "help")
-              controlElement
+              delete(controlElem / "help")
+              controlElem
             case _ ⇒
               // No specific, create simple element with LHHA
-              val controlElement =
+              val controlElem =
                 insert(
                   into   = gridTd,
                   origin = elementInfo(bindingFirstURIQualifiedName(binding))
                 ).head
 
               insert(
-                into   = controlElement,
+                into   = controlElem,
                 origin = lhhaTemplate / *
               )
 
-              controlElement
+              controlElem
           }
 
         // Set default pointer to resources if there is an xf:alert
-        setvalue(newControlElement / "*:alert" /@ "ref", OldStandardAlertRef)
+        setvalue(newControlElem / "*:alert" /@ "ref", OldStandardAlertRef)
 
         // Data holder may contain file attributes
         val dataHolder = newDataHolder(newControlName, binding)
@@ -80,7 +82,7 @@ object ToolboxOps {
 
             // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
             val lhhaResourceEls = {
-              val lhhaNames = newControlElement / * map (_.localname) filter LHHAResourceNamesToInsert
+              val lhhaNames = newControlElem / * map (_.localname) filter LHHAResourceNamesToInsert
               lhhaNames map (elementInfo(_))
             }
 
@@ -89,10 +91,10 @@ object ToolboxOps {
 
             // Template items, if needed
             val itemsResourceEls =
-              if (hasEditor(newControlElement, "static-itemset")) {
+              if (hasEditor(newControlElem, "static-itemset")) {
                 val fbResourceInFormLang = FormRunnerLang.formResourcesInLang(formLang)
                 val originalTemplateItems = fbResourceInFormLang / "template" / "items" / "item"
-                if (hasEditor(newControlElement, "item-hint")) {
+                if (hasEditor(newControlElem, "item-hint")) {
                   // Supports hint: keep hint we have in the resources.xml
                   originalTemplateItems
                 }  else {
@@ -113,28 +115,28 @@ object ToolboxOps {
 
         // Insert data and resource holders
         insertHolders(
-          controlElement       = newControlElement,
+          controlElement       = newControlElem,
           dataHolders          = List(dataHolder),
           resourceHolders      = resourceHolders,
-          precedingControlName = precedingControlNameInSectionForControl(newControlElement)
+          precedingControlName = precedingControlNameInSectionForControl(newControlElem)
         )
 
         // Adjust bindings on newly inserted control, done after the control is added as
         // renameControlByElement() expects resources to be present
-        renameControlByElement(newControlElement, newControlName, resourceNamesInUseForControl(newControlName))
+        renameControlByElement(newControlElem, newControlName, resourceNamesInUseForControl(newControlName))
 
         // Insert the bind element
         val bind = ensureBinds(doc, findContainerNamesForModel(gridTd) :+ newControlName)
 
         // Make sure there is a @bind instead of a @ref on the control
-        delete(newControlElement /@ "ref")
-        ensureAttribute(newControlElement, "bind", bind /@ "id" stringValue)
+        delete(newControlElem /@ "ref")
+        ensureAttribute(newControlElem, "bind", bind /@ "id" stringValue)
 
         // Set bind attributes if any
         insert(into = bind, origin = findBindAttributesTemplate(binding))
 
         // This can impact templates
-        updateTemplatesCheckContainers(doc, findAncestorRepeatNames(gridTd).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
 
         debugDumpDocumentForGrids("insert new control", doc)
 
@@ -157,6 +159,8 @@ object ToolboxOps {
   //@XPathFunction
   def insertNewGrid(inDoc: NodeInfo): Unit = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     val (into, after, _) = findGridInsertionPoint(inDoc)
 
     // Obtain ids first
@@ -169,13 +173,13 @@ object ToolboxOps {
       </fr:grid>
 
     // Insert after current level 2 if found, otherwise into level 1
-    val newGridElement = insert(into = into, after = after.toList, origin = gridTemplate).head
+    val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
 
     // This can impact templates
-    updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
     // Select first grid cell
-    selectFirstCellInContainer(newGridElement)
+    selectFirstCellInContainer(newGridElem)
 
     debugDumpDocumentForGrids("insert new grid", inDoc)
   }
@@ -183,6 +187,8 @@ object ToolboxOps {
   // Insert a new section with optionally a nested grid
   //@XPathFunction
   def insertNewSection(inDoc: NodeInfo, withGrid: Boolean): Some[NodeInfo] = {
+
+    implicit val ctx = FormBuilderDocContext()
 
     val (into, after) = findSectionInsertionPoint(inDoc)
 
@@ -207,41 +213,43 @@ object ToolboxOps {
           </fr:grid>
       }</fr:section>
 
-    val newSectionElement = insert(into = into, after = after.toList, origin = sectionTemplate).head
+    val newSectionElem = insert(into = into, after = after.toList, origin = sectionTemplate).head
 
     // Create and insert holders
     val resourceHolder = {
-      val elementContent = List(elementInfo("label"), elementInfo("help"))
-      elementInfo(newSectionName, elementContent)
+      val elemContent = List(elementInfo("label"), elementInfo("help"))
+      elementInfo(newSectionName, elemContent)
     }
 
     insertHolderForAllLang(
-      controlElement       = newSectionElement,
+      controlElement       = newSectionElem,
       dataHolder           = elementInfo(newSectionName),
       resourceHolder       = resourceHolder,
       precedingControlName = precedingSectionName
     )
 
     // Insert the bind element
-    ensureBinds(inDoc, findContainerNamesForModel(newSectionElement, includeSelf = true))
+    ensureBinds(inDoc, findContainerNamesForModel(newSectionElem, includeSelf = true))
 
     // This can impact templates
-    updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
     // Select first grid cell
     if (withGrid)
-      selectFirstCellInContainer(newSectionElement)
+      selectFirstCellInContainer(newSectionElem)
 
     // TODO: Open label editor for newly inserted section
 
     debugDumpDocumentForGrids("insert new section", inDoc)
 
-    Some(newSectionElement)
+    Some(newSectionElem)
   }
 
   // Insert a new repeat
   //@XPathFunction
   def insertNewRepeatedGrid(inDoc: NodeInfo): Some[String] = {
+
+    implicit val ctx = FormBuilderDocContext()
 
     val (into, after, grid) = findGridInsertionPoint(inDoc)
     val newGridName         = controlNameFromId(nextId(inDoc, "grid"))
@@ -259,22 +267,21 @@ object ToolboxOps {
       </fr:grid>
 
     // Insert grid
-    val newGridElement = insert(into = into, after = after.toList, origin = gridTemplate).head
+    val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
 
     // Insert instance holder (but no resource holders)
     insertHolders(
-      controlElement       = newGridElement,
+      controlElement       = newGridElem,
       dataHolders          = List(elementInfo(newGridName)),
       resourceHolders      = Nil,
       precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
     )
 
     // Make sure binds are created
-    ensureBinds(inDoc, findContainerNamesForModel(newGridElement, includeSelf = true))
+    ensureBinds(inDoc, findContainerNamesForModel(newGridElem, includeSelf = true))
 
     // This takes care of all the repeat-related items
     setRepeatProperties(
-      inDoc                = inDoc,
       controlName          = newGridName,
       repeat               = true,
       min                  = "1",
@@ -285,7 +292,7 @@ object ToolboxOps {
     )
 
     // Select new td
-    selectFirstCellInContainer(newGridElement)
+    selectFirstCellInContainer(newGridElem)
 
     debugDumpDocumentForGrids("insert new repeat", inDoc)
 
@@ -399,7 +406,7 @@ object ToolboxOps {
           // In this case, we use the grid control as a source of truth and find the nested controls.
 
           val nestedControlDetails = searchControlBindPathHoldersInDoc(
-            controlElems   = findControlsInContainer(containerElem),
+            controlElems   = findNestedControls(containerElem),
             inDoc          = inDoc,
             contextItemOpt = Some(formInstanceRoot(inDoc)),
             predicate      = _ ⇒ true
@@ -501,7 +508,10 @@ object ToolboxOps {
     xcvElem        : NodeInfo
   ): Unit = {
 
-    val inDoc                = FormBuilder.fbFormInstance.root
+    implicit val ctx = FormBuilderDocContext()
+
+    // TODO: Remove once `ctx` is used everywhere
+    val inDoc                = ctx.rootElem
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
 
     // Rename if needed
@@ -517,11 +527,11 @@ object ToolboxOps {
         val newControlNames = nextIds(inDoc, XcvEntry.Control.entryName, needRename.size) map controlNameFromId
         val oldToNewNames   = needRename.iterator.zip(newControlNames.iterator).toMap
 
-        // Rename controls, including self in case of a section or repeated grid
-        val selfContainerList = getControlNameOpt(containerControlElem).isDefined list containerControlElem
-        val nestedControls    = findControlsInContainer(containerControlElem)
+        // Rename self control, nested sections and grids, and nested controls
 
-        selfContainerList.iterator ++ nestedControls.iterator foreach { controlElem ⇒
+        (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
+          findNestedContainers(containerControlElem).iterator                             ++
+          findNestedControls(containerControlElem).iterator foreach { controlElem ⇒
 
           val oldName = controlNameFromId(controlElem.id)
 
@@ -591,7 +601,7 @@ object ToolboxOps {
     // TODO: What if pasting after a non-repeated grid without name? We must try to keep the order of things!
     val precedingContainerName = after flatMap getControlNameOpt
 
-    val newContainerElement =
+    val newContainerElem =
       insert(into = into, after = after.toList, origin = containerControlElem).head
 
     val resourceHolders =
@@ -603,31 +613,45 @@ object ToolboxOps {
 
     // Insert holders
     insertHolders(
-      controlElement       = newContainerElement, // in order to find containers
+      controlElement       = newContainerElem, // in order to find containers
       dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
       resourceHolders      = resourceHolders,
       precedingControlName = precedingContainerName
     )
 
     // Insert the bind element
-    val newBindOrNot = ensureBinds(inDoc, findContainerNamesForModel(newContainerElement, includeSelf = true))
+    val newBindOrNot = ensureBinds(inDoc, findContainerNamesForModel(newContainerElem, includeSelf = true))
 
-    if (newContainerElement attValueOpt "bind" nonEmpty) {
-      // Element has a `bind` so the bind is newly-created
-      insert(after = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
-      delete(newBindOrNot)
-    } else {
-      // Element doesn't have a `bind` so the bind was already there
-      insert(into = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
+    val newBindElem =
+      if (newContainerElem attValueOpt "bind" nonEmpty) {
+        // Element has a `bind` so the bind is newly-created
+        val result = insert(after = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
+        delete(newBindOrNot)
+        result.head
+      } else {
+        // Element doesn't have a `bind` so the bind was already there
+        insert(into = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *).head
+      }
+
+    // Insert template for repeated grids/sections
+    (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
+      findNestedContainers(containerControlElem).iterator filter isRepeat foreach  { containerElem ⇒
+
+      val newControlName = getControlName(containerElem)
+      val bindElem       = findBindByName(inDoc, newControlName).get
+
+      ensureTemplateReplaceContent(
+        controlName = newControlName,
+        content     = createTemplateContentFromBind(bindElem firstChild * head, componentBindings))
     }
 
-    // This can impact templates
-    updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
+    // Update ancestor templates if any
+    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
-    annotateGridsAndCells(findFRBodyElem(inDoc))
+    annotateGridsAndCells(newContainerElem)
 
     // Select first grid cell
-    selectFirstCellInContainer(newContainerElement)
+    selectFirstCellInContainer(newContainerElem)
   }
 
   private def pasteSingleControlFromXcv(
@@ -635,6 +659,8 @@ object ToolboxOps {
     xcvElem        : NodeInfo
   ): Unit =
     ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
+
+      implicit val ctx = FormBuilderDocContext()
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
@@ -664,13 +690,13 @@ object ToolboxOps {
       }
 
       // Insert control and holders
-      val newControlElement = insert(into = gridCellElem, origin = controlElem).head
+      val newControlElem = insert(into = gridCellElem, origin = controlElem).head
 
       insertHolders(
-        controlElement       = newControlElement,
+        controlElement       = newControlElem,
         dataHolders          = dataHolders,
         resourceHolders      = xcvElem / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
-        precedingControlName = precedingControlNameInSectionForControl(newControlElement)
+        precedingControlName = precedingControlNameInSectionForControl(newControlElem)
       )
 
       // Create the bind and copy all attributes and content
@@ -699,7 +725,7 @@ object ToolboxOps {
 
       val alertsWithValidationId =
         for {
-          alertElem    ← newControlElement / (XF → "alert")
+          alertElem    ← newControlElem / (XF → "alert")
           validationId ← alertElem attValueOpt Validation
         } yield
           alertElem → validationId
@@ -715,7 +741,7 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(targetCellElem, findAncestorRepeatNames(targetCellElem).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(targetCellElem).to[Set])
     }
 
   private object Private {

@@ -161,6 +161,7 @@ class GridOpsTest
       )
 
       assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+        implicit val ctx = FormBuilderDocContext()
         rowDelete(getContainingGrid(cell).id, (NodeInfoCellOps.y(cell) getOrElse 1) - 1)
       }
     }

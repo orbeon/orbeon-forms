@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
@@ -225,7 +226,7 @@ trait BindingOps {
   // Create a new data holder given the new control name, using the instance template if found
   def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
 
-    val instanceTemplate = bindingMetadata(binding) / "*:templates" / "*:instance"
+    val instanceTemplate = bindingMetadata(binding) / "*:templates" / XFInstanceTest
 
     if (instanceTemplate.nonEmpty)
       elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))

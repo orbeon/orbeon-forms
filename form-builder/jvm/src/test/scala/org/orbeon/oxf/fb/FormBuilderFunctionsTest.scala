@@ -265,7 +265,7 @@ class FormBuilderFunctionsTest
             assert(controlBind.hasIdValue(bindId(newRepeatName)))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-            assert(findModelElem(doc) / "*:instance" exists (_.hasIdValue("grid-3-template")))
+            assert(findModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-3-template")))
           }
 
           // Insert a new control

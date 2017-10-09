@@ -18,10 +18,11 @@ import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
@@ -44,12 +45,12 @@ trait FormRunnerBaseOps {
   // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
   // -control. OTOH we must have distinct ids for binds, controls and templates, so the -bind, -control and -template
   // suffixes must remain.
-  def bindId(controlName: String)    = controlName + "-bind"
-  def gridId(gridName: String)       = gridName    + "-grid"
-  def controlId(controlName: String) = controlName + "-control"
-  def templateId(gridName: String)   = gridName    + TemplateSuffix
+  def bindId    (controlName: String): String = controlName + "-bind"
+  def gridId    (gridName: String)   : String = gridName    + "-grid"
+  def controlId (controlName: String): String = controlName + "-control"
+  def templateId(gridName: String)   : String = gridName    + TemplateSuffix
 
-  def defaultIterationName(repeatName: String) = repeatName + DefaultIterationSuffix
+  def defaultIterationName(repeatName: String): String = repeatName + DefaultIterationSuffix
 
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
@@ -124,14 +125,14 @@ trait FormRunnerBaseOps {
     instanceElem(inDoc, id).toList / * headOption
 
   // Find all template instances
-  def templateInstanceElements(inDoc: NodeInfo) =
+  def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
     findModelElem(inDoc) / XFInstanceTest filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
-  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElem(inDoc, FormInstance).get
+  def formInstanceRoot(inDoc: NodeInfo): NodeInfo = inlineInstanceRootElem(inDoc, FormInstance).get
 
   //@XPathFunction
-  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElem(inDoc, MetadataInstance)
+  def metadataInstanceRootOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElem(inDoc, MetadataInstance)
 
   private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
 
@@ -142,9 +143,9 @@ trait FormRunnerBaseOps {
       bind ⇒ TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
 
-  def properties = Properties.instance.getPropertySet
+  def properties: PropertySet = Properties.instance.getPropertySet
 
-  def buildPropertyName(name: String)(implicit p: FormRunnerParams) =
+  def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
     if (hasAppForm(p.app, p.form))
       name :: p.app :: p.form :: Nil mkString "."
     else
@@ -155,11 +156,11 @@ trait FormRunnerBaseOps {
     formRunnerProperty(name)(FormRunnerParams())
 
   // Return a property using the form's app/name, None if the property is not defined
-  def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
+  def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
 
   // Return a boolean property using the form's app/name, false if the property is not defined
-  def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams) =
+  def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString) contains "true"
 
   // Interrupt current processing and send an error code to the client.
@@ -169,41 +170,41 @@ trait FormRunnerBaseOps {
   def sendError(code: Int, resource: String) = throw HttpStatusCodeException(code, Option(resource))
 
   // Append a query string to a URL
-  def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
+  def appendQueryString(urlString: String, queryString: String): String = NetUtils.appendQueryString(urlString, queryString)
 
   // Return specific Form Runner instances
-  def formInstance                 = topLevelInstance(FormModel,         FormInstance)                get
-  def metadataInstance             = topLevelInstance(FormModel,         MetadataInstance)
+  def formInstance                : XFormsInstance = topLevelInstance(FormModel,         FormInstance)                get
+  def metadataInstance            : Option[XFormsInstance] = topLevelInstance(FormModel, MetadataInstance)
 
-  def parametersInstance           = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
-  def errorSummaryInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
-  def persistenceInstance          = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
-  def authorizedOperationsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
-  def documentMetadataInstance     = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
+  def parametersInstance          : XFormsInstance = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
+  def errorSummaryInstance        : XFormsInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
+  def persistenceInstance         : XFormsInstance = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
+  def authorizedOperationsInstance: XFormsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
+  def documentMetadataInstance    : XFormsInstance = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
 
   // See also FormRunnerHome
-  private val CreateOps    = Set("*", "create")
-  private val ReadOps      = Set("*", "read")
-  private val UpdateOps    = Set("*", "update")
-  private val DeleteOps    = Set("*", "delete")
+  private val CreateOps = Set("*", "create")
+  private val ReadOps   = Set("*", "read")
+  private val UpdateOps = Set("*", "update")
+  private val DeleteOps = Set("*", "delete")
 
-  def authorizedOperations = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
+  def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
-  def canCreate = authorizedOperations intersect CreateOps nonEmpty
-  def canRead   = authorizedOperations intersect ReadOps   nonEmpty
-  def canUpdate = authorizedOperations intersect UpdateOps nonEmpty
-  def canDelete = authorizedOperations intersect DeleteOps nonEmpty
+  def canCreate: Boolean = authorizedOperations intersect CreateOps nonEmpty
+  def canRead  : Boolean = authorizedOperations intersect ReadOps   nonEmpty
+  def canUpdate: Boolean = authorizedOperations intersect UpdateOps nonEmpty
+  def canDelete: Boolean = authorizedOperations intersect DeleteOps nonEmpty
 
   private def documentMetadataDate(name: String) =
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
-  def documentCreatedDate  = documentMetadataDate(Headers.Created)
-  def documentModifiedDate = documentMetadataDate(Headers.LastModified)
+  def documentCreatedDate: Option[Long] = documentMetadataDate(Headers.Created)
+  def documentModifiedDate: Option[Long] = documentMetadataDate(Headers.LastModified)
 
   // Captcha support
-  def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
+  def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
-  def showCaptcha   = Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+  def showCaptcha: Boolean = Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
@@ -237,11 +238,11 @@ trait FormRunnerBaseOps {
 
   private val ReadonlyModes = Set("view", "pdf", "email", "controls")
 
-  def isDesignTime   = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
+  def isDesignTime: Boolean = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
   def isReadonlyMode = ReadonlyModes(FormRunner.FormRunnerParams().mode)
 
-  def isNoscript     = inScopeContainingDocument.noscript
-  def isEmbeddable   = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
+  def isNoscript: Boolean = inScopeContainingDocument.noscript
+  def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
   // The standard Form Runner parameters
   case class FormRunnerParams(app: String, form: String, formVersion: Int, document: Option[String], mode: String)

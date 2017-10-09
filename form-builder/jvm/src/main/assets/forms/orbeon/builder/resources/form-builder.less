@@ -22,6 +22,7 @@
 @fbBottomHeight: 54px;
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
+@fbGridRowMinHeight: 64px;
 
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
@@ -686,9 +687,9 @@ div.orbeon.orbeon-portlet-div {
         .xxforms-dialog-body {
             position: relative;                     // So the source editor and buttons can be absolutely positioned relative to the dialog body
             overflow: inherit;                      // Override the overflow: auto in xforms.css to avoid a second scrollbar on the body on Firefox
-            @buttonsAreaHeight: 60px;
+            @buttonsAreaHeight: @fbGridRowMinHeight;
             .fb-dialog-remaining-height {           // Contains the CodeMirror editor
-                position: absolute;                 // Take all the vertical space, leaving just 60px at the bottom for the buttons
+                position: absolute;                 // Take all the vertical space, leaving just @buttonsAreaHeight at the bottom for the buttons
                 top: 0; left: 0; right: 0;
                 bottom: @buttonsAreaHeight;
                 .xbl-fr-code-mirror {
@@ -698,7 +699,7 @@ div.orbeon.orbeon-portlet-div {
                 }
             }
             .fr-dialog-buttons {
-                height: 60px;                       // Fixed height
+                height: @buttonsAreaHeight;         // Fixed height
                 position: absolute;                 // Absolutely positioned
                 bottom: 0; left: 0; right: 0;       // At the bottom of the dialog body
                 line-height: @buttonsAreaHeight;
@@ -776,8 +777,9 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
         display: block; width: @fbIconsHeight;
-        height: 60px;
-        text-align: center }
+        height: 60px; // Q: Should this use one of the constants?
+        text-align: center;
+    }
 
     // Delete, expand, shrink shown to the left of the cell
     .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
@@ -837,11 +839,13 @@ div.orbeon.orbeon-portlet-div {
         }
 
         // Enough space to hold row icons so hovering doesn't cause the row to expand
-        .fr-grid-td { min-height: 60px }
+        .fr-grid-td {
+            min-height: @fbGridRowMinHeight;
+        }
 
         // Generate multiples of min height so that empty cells take space
         .generateMinHeight(@h) when (@h > 0) {
-            .fr-grid-td[data-h =  '@{h}'] { min-height: @h * 60px; }
+            .fr-grid-td[data-fr-h =  '@{h}'] { min-height: @h * @fbGridRowMinHeight; }
             .generateMinHeight(@h - 1)
         }
 

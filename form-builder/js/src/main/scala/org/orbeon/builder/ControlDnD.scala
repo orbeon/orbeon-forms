@@ -24,12 +24,12 @@ import org.scalajs.jquery.JQueryEventObject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-object ControlDnD {
+private object ControlDnD {
 
-  private val CopyClass = "fb-dnd-copy"
-  private val MoveClass = "fb-dnd-move"
+  val CopyClass = "fb-dnd-copy"
+  val MoveClass = "fb-dnd-move"
 
-  private var shiftPressed = false
+  var shiftPressed = false
 
   $(document).on(
     "keyup keydown",

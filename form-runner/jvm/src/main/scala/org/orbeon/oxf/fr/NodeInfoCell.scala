@@ -68,8 +68,6 @@ object NodeInfoCell {
       else
         1
 
-    println(s"xxx analyzeTrTdGridAndFillHoles: $ratio, $allRowCells")
-
     ArrayFunctions.createValue(
       allRowCells.to[Vector] map { row ⇒
         new SequenceExtent(

@@ -31,6 +31,7 @@ object FormBuilderApp {
       LabelEditor
       ControlEditor
       ControlLabelHintTextEditor
+      GridColumnDnD
     }
 
     $(initializeOnDomReady _)

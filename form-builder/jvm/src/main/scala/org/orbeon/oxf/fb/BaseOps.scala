@@ -33,8 +33,10 @@ trait BaseOps extends Logging {
 
   implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-builder")
 
-  // Minimal version of IE supported
-  val MinimalIEVersion = 11
+  // Minimal version of IE supported for Form Builder
+  // 2017-10-06: Starting Orbeon Forms 2017.2, we don't support IE11 anymore and require Edge.
+  //@XPathExpression
+  val MinimalIEVersion = 12
 
   // Id of the xxf:dynamic control holding the edited form
   val DynamicControlId = "fb"

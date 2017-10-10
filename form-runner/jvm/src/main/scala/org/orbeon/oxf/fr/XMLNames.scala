@@ -20,38 +20,39 @@ import org.orbeon.scaxon.SimplePath.Test
 
 object XMLNames {
 
-  val FR = "http://orbeon.org/oxf/xml/form-runner"
+  val FRPrefix = "fr"
+  val FR       = "http://orbeon.org/oxf/xml/form-runner"
 
-  val XH = XHTML_NAMESPACE_URI
-  val XF = XFORMS_NAMESPACE_URI
-  val XS = XSD_URI
+  val XH  = XHTML_NAMESPACE_URI
+  val XF  = XFORMS_NAMESPACE_URI
+  val XS  = XSD_URI
   val XBL = XBL_NAMESPACE_URI
 
-  val XBLXBLTest            : Test = XBL → "xbl"
-  val XBLBindingTest        : Test = XBL → "binding"
-  val XBLTemplateTest       : Test = XBL → "template"
-  val XBLImplementationTest : Test = XBL → "implementation"
+  val XBLXBLTest             : Test      = XBL → "xbl"
+  val XBLBindingTest         : Test      = XBL → "binding"
+  val XBLTemplateTest        : Test      = XBL → "template"
+  val XBLImplementationTest  : Test      = XBL → "implementation"
 
-  val FRBodyTest            : Test = FR → "body"
+  val FRBodyTest             : Test      = FR → "body"
 
-  val FRGridTest            : Test = FR → "grid"
-  val FRSectionTest         : Test = FR → "section"
+  val FRGridTest             : Test      = FR → "grid"
+  val FRSectionTest          : Test      = FR → "section"
 
-  val XFModelTest           : Test = XF → "model"
-  val XFInstanceTest        : Test = XF → "instance"
-  val XFBindTest            : Test = XF → "bind"
-  val XFGroupTest           : Test = XF → "group"
+  val XFModelTest            : Test      = XF → "model"
+  val XFInstanceTest         : Test      = XF → "instance"
+  val XFBindTest             : Test      = XF → "bind"
+  val XFGroupTest            : Test      = XF → "group"
 
-  val FRMetadata            : Test = FR → "metadata"
-  val FRItemsetId           : Test = FR → "itemsetid"
-  val FRItemsetMap          : Test = FR → "itemsetmap"
+  val FRMetadata             : Test      = FR → "metadata"
+  val FRItemsetId            : Test      = FR → "itemsetid"
+  val FRItemsetMap           : Test      = FR → "itemsetmap"
+
+  val FRNamespace            : Namespace = Namespace(FRPrefix, FR)
+  val ItemsetIdQName         : QName     = QName.get("itemsetid",           FRNamespace)
+  val ItemsetMapQName        : QName     = QName.get("itemsetmap",          FRNamespace)
+  val DataFormatVersionQName : QName     = QName.get("data-format-version", FRNamespace)
+
+  val XMLLangQName           : QName     = QName.get("lang", XML_URI)
 
   val FRContainerTest = FRSectionTest || FRGridTest
-
-  val FRNamespace            = Namespace("fr", FR)
-  val ItemsetIdQName         = QName.get("itemsetid",           FRNamespace)
-  val ItemsetMapQName        = QName.get("itemsetmap",          FRNamespace)
-  val DataFormatVersionQName = QName.get("data-format-version", FRNamespace)
-
-  val XMLLangQName           = QName.get("lang", XML_URI)
 }

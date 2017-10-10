@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fb.Names._
+import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
@@ -91,7 +91,6 @@ trait ContainerOps extends ControlOps {
 
     // Find the new td to select if we are removing the currently selected td
     val newCellToSelectOpt = findNewCellToSelect(containerElem, containerElem descendant CellTest)
-
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 

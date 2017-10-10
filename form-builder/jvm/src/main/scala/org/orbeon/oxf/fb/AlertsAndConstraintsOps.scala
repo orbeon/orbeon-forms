@@ -17,6 +17,7 @@ import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -177,8 +178,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
               case Some(nonEmptyValue) ⇒
 
                 val prefix = mipElemQName.getNamespaceURI match {
-                  case Names.FB ⇒ "fb" // also covers the case of `xxf:default` (Form Builder names here)
-                  case XF       ⇒ "xf" // case of `xf:type`, `xf:required`
+                  case XMLNames.FB ⇒ XMLNames.FBPrefix // also covers the case of `xxf:default` (Form Builder names here)
+                  case XF          ⇒ "xf" // case of `xf:type`, `xf:required`
                 }
 
                 val dummyMIPElem =
@@ -187,7 +188,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     level={if (level != ErrorLevel) level.entryName else null}
                     value={if (mip != Type) nonEmptyValue else null}
                     xmlns:xf={XF}
-                    xmlns:fb={Names.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
+                    xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
                 List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.getName): NodeInfo)
               case None ⇒

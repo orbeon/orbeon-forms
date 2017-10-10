@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
@@ -126,8 +126,8 @@ trait BindingOps {
           fromLang orElse fromFirst map (_.stringValue) flatMap trimAllToOpt
         }
 
-        val displayNames = metadata / "*:display-name"
-        val icons        = metadata / "*:icon" / "*:small-icon"
+        val displayNames = metadata / FBDisplayNameTest
+        val icons        = metadata / FBIconTest / FBSmallIconTest
 
         val displayNameOpt = findMetadata(displayNames)
         val icon           = findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png"
@@ -140,12 +140,12 @@ trait BindingOps {
   }
 
   private def bindingMetadata(binding: NodeInfo) =
-    binding / "*:metadata"
+    binding / FBMetadataTest
 
   // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
   def findViewTemplate(binding: NodeInfo): Option[NodeInfo] = {
     val metadata = bindingMetadata(binding)
-    (((metadata / "*:template") ++ (metadata / "*:templates" / "*:view")) / *).headOption
+    (((metadata / FBTemplateTest) ++ (metadata / FBTemplatesTest / FBViewTest)) / *).headOption
   }
 
   // In other words we leave Type and Required and custom MIPs as they are
@@ -158,8 +158,8 @@ trait BindingOps {
   def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
 
     val metadata            = bindingMetadata(binding)
-    val datatypeMetadataOpt = metadata / "*:datatype" headOption
-    val bindMetadataOpt     = metadata / "*:templates" / "*:bind" headOption
+    val datatypeMetadataOpt = metadata / FBDatatypeTest headOption
+    val bindMetadataOpt     = metadata / FBTemplatesTest / FBBindTest headOption
 
     val allAttributes = {
 
@@ -182,7 +182,7 @@ trait BindingOps {
     allAttributes collect {
       case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
         // Some attributes must be prefixed before being inserted into the edited form
-        QName.get(qname.getName, "fb", Names.FB) → value
+        QName.get(qname.getName, "fb", XMLNames.FB) → value
       case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
         // Exclude `type="*:string"`
         qname → value
@@ -216,7 +216,7 @@ trait BindingOps {
     val editorAttributeValueOpt =
       for {
         binding         ← bindingForControlElement(controlElem, bindings)
-        editorAttribute ← (bindingMetadata(binding) / "*:editors" /@ editor).headOption
+        editorAttribute ← (bindingMetadata(binding) / FBEditorsTest /@ editor).headOption
       } yield
         editorAttribute.stringValue
 
@@ -226,7 +226,7 @@ trait BindingOps {
   // Create a new data holder given the new control name, using the instance template if found
   def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
 
-    val instanceTemplate = bindingMetadata(binding) / "*:templates" / XFInstanceTest
+    val instanceTemplate = bindingMetadata(binding) / FBTemplatesTest / FBInstanceTest
 
     if (instanceTemplate.nonEmpty)
       elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))

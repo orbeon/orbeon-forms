@@ -22,30 +22,32 @@ import scala.scalajs.js.timers._
 
 object DialogItemset {
 
-  private val LabelInputSelector = ".xforms-dialog.fb-dialog-itemsets .fb-itemset-label-input"
+  locally {
+    val LabelInputSelector = ".xforms-dialog.fb-dialog-itemsets .fb-itemset-label-input"
 
-  private def suggestValueFromLabel(label: String): Option[String] =
-    label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
+    def suggestValueFromLabel(label: String): Option[String] =
+      label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
 
-  // Automatically set a corresponding value when the user changes a label
-  $(g.window.document).on(
-    "change.orbeon",
-    LabelInputSelector,
-    (event: JQueryEventObject) ⇒ {
+    // Automatically set a corresponding value when the user changes a label
+    $(g.window.document).on(
+      "change.orbeon",
+      LabelInputSelector,
+      (event: JQueryEventObject) ⇒ {
 
-      val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
-      val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
+        val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
+        val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
 
-      if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
-        // If user pressed tab, after `change` on the label input, there is a `focus` on the value input,
-        // which stores the value as a server value, so if we set the value before the `focus`, the value
-        // isn't sent, hence the deferring.
-        DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue ⇒
-          setTimeout(1) {
-            DocumentAPI.setValue(valueXFormsInput, suggestedValue)
+        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
+          // If user pressed tab, after `change` on the label input, there is a `focus` on the value input,
+          // which stores the value as a server value, so if we set the value before the `focus`, the value
+          // isn't sent, hence the deferring.
+          DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue ⇒
+            setTimeout(1) {
+              DocumentAPI.setValue(valueXFormsInput, suggestedValue)
+            }
           }
         }
       }
-    }
-  )
+    )
+  }
 }

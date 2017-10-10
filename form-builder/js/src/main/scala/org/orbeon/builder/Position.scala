@@ -60,11 +60,10 @@ object Position {
 
   // Call listener when anything on the page that could change element positions happened
   def onOffsetMayHaveChanged(fn: () ⇒ Unit): Unit = {
-      // After the form is first shown
-      Events.orbeonLoadedEvent.subscribe(fn)
-      // After an Ajax response, as it might have changed the DOM
-      Events.ajaxResponseProcessedEvent.subscribe(fn)
-      $(window).on("resize.orbeon.builder", fn)
+    Events.orbeonLoadedEvent.subscribe(fn)
+    Events.ajaxResponseProcessedEvent.subscribe(fn)
+    Events.componentChangedLayoutEvent.subscribe(fn)
+    $(window).on("resize.orbeon.builder", fn)
   }
 
   // Finds the container, if any, based on a vertical position

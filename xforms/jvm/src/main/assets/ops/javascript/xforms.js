@@ -3099,10 +3099,11 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             }
         },
 
-        orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
-        ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
-        errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
-        yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
+        orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded"),
+        ajaxResponseProcessedEvent  : new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
+        errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),
+        yuiCalendarCreated          : new YAHOO.util.CustomEvent("yuiCalendarCreated"),
+        componentChangedLayoutEvent : new YAHOO.util.CustomEvent("componentChangedLayout")
     };
 
     (function () {

@@ -65,6 +65,7 @@
                 // Copy the tabindex on the iframe
                 if (!_.isUndefined(tabindex)) iframe.attr('tabindex', tabindex);
                 this.tinymceInitialized = true;
+                Events.componentChangedLayoutEvent.fire();
             }, this));
 
             // Render the component when visible (see https://github.com/orbeon/orbeon-forms/issues/172)

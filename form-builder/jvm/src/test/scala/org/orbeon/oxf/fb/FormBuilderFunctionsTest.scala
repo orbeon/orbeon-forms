@@ -444,18 +444,28 @@ class FormBuilderFunctionsTest
       }
     }
 
-    it("Non-repeated grid cut/paste must remove and restore the control, bind, holders, and resources") {
+    it("Non-repeated grid cut/paste must remove and restore nested control, bind, holders, and resources") {
       withTestExternalContext { _ ⇒
         withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
 
-          val firstGridId = (doc descendant FRGridTest head).id
+          val firstGridId       = (doc descendant FRGridTest head).id
+          val nestedControlName = FormBuilder.findContainerById(firstGridId).toList flatMap findNestedControls flatMap getControlNameOpt head
 
           assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
+          assert(FormBuilder.findControlByName(doc, nestedControlName).nonEmpty)
+
           FormBuilderRpcApiImpl.containerCut(firstGridId)
-          assert(FormBuilder.findContainerById(firstGridId).isEmpty)
-          ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell(doc).get)
-          assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
 
+          assert(FormBuilder.findContainerById(firstGridId).isEmpty)
+          assert(FormBuilder.findControlByName(doc, nestedControlName).isEmpty)
+
+          ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell(doc).get)
+
+          assert(FormBuilder.findControlByName(doc, nestedControlName).nonEmpty)
+
+          // The newly-inserted grid can have a different temporary id but make sure there is one
+          val newGrid = findAncestorContainersLeafToRoot(FormBuilder.findControlByName(doc, nestedControlName).get, includeSelf = false).head
+          assert(newGrid.id.startsWith("tmp-"))
         }
       }
     }

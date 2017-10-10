@@ -115,10 +115,13 @@ object Cell {
     // basis.
 
     // NOTE: Checking the first row should be enough if the grid is well-formed.
-    val gridWidth = xy map (_ filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum) max
+    val gridWidth = {
+      val widths = xy.iterator map (_.iterator filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum)
+      if (widths.nonEmpty) widths.max else 0
+    }
 
     val widthToTruncate =
-      if (simplify && Cell.StandardGridWidth % gridWidth == 0)
+      if (simplify && gridWidth != 0 && Cell.StandardGridWidth % gridWidth == 0)
         gridWidth
       else
         StandardGridWidth

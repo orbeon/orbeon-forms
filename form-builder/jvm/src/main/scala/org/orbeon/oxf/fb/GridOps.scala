@@ -162,44 +162,60 @@ trait GridOps extends ContainerOps {
       case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y ⇒ u
     } distinct
 
-  def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Unit = {
+  def canDeleteRow(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Boolean = {
+
+    require(rowPos >= 0)
 
     val gridElem       = containerById(gridId)
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
-    // Reduce height of cells which start on a previous row
-    val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
+    allCells.size > 1 && adjustedRowPos < allCells.size
+  }
 
-    distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
+  def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
-    // Decrement the position of all cells on subsequent rows
-    allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
-      case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
-      case _ ⇒
-    }
+    require(rowPos >= 0)
 
-    val cellsToDelete =
-      allCells(adjustedRowPos) collect {
-        case Cell(Some(u), None, _, _, _, _) ⇒ u
+    val gridElem       = containerById(gridId)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+    val adjustedRowPos = rowPos % allCells.size
+
+    if (allCells.size > 1 && adjustedRowPos < allCells.size) {
+
+      // Reduce height of cells which start on a previous row
+      val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
+
+      distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
+
+      // Decrement the position of all cells on subsequent rows
+      allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
+        case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
+        case _ ⇒
       }
 
-    // Find the new cell to select if we are removing the currently selected cell
-    val newCellToSelect = findNewCellToSelect(gridElem, cellsToDelete)
+      val cellsToDelete =
+        allCells(adjustedRowPos) collect {
+          case Cell(Some(u), None, _, _, _, _) ⇒ u
+        }
 
-    // Delete all controls in the row
-    cellsToDelete foreach (deleteControlWithinCell(_))
+      // Find the new cell to select if we are removing the currently selected cell
+      val newCellToSelect = findNewCellToSelect(gridElem, cellsToDelete)
 
-    // Delete row and its content
-    delete(cellsToDelete)
+      // Delete all controls in the row
+      cellsToDelete foreach (deleteControlWithinCell(_))
 
-    // Update templates
-    updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
+      // Delete row and its content
+      delete(cellsToDelete)
 
-    // Adjust selected cell if needed
-    newCellToSelect foreach selectCell
+      // Update templates
+      updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
 
-    debugDumpDocumentForGrids("delete row", gridElem)
+      // Adjust selected cell if needed
+      newCellToSelect foreach selectCell
+
+      debugDumpDocumentForGrids("delete row", gridElem)
+    }
   }
 
   // Whether this is the last grid in the section

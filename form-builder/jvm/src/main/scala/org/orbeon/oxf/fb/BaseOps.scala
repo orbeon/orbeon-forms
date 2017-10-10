@@ -31,10 +31,10 @@ import scala.collection.immutable
 
 case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XFormsInstance]) {
 
-  val componentBindings: Seq[NodeInfo] =
+  lazy val componentBindings: Seq[NodeInfo] =
     asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-  val formResourcesRoot: NodeInfo =
+  lazy val formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
 }

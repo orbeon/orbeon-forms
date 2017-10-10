@@ -16,15 +16,13 @@ package org.orbeon.fr
 import org.orbeon.datatypes.{Coordinate, Direction}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.oxf.fr.Cell
-import org.orbeon.oxf.fr.Cell.analyze12ColumnGridAndFillHoles
-import org.orbeon.oxf.util.CoreUtils._
 import org.scalajs.dom.html
 
 // NOTE: This is currently in the `fr` package and project, but probably should be in the `builder` package and project.
 // We put it in
 object Grid {
 
-   def canDeleteRow(cellElem: html.Element): Boolean = {
+ def canDeleteRow(cellElem: html.Element): Boolean = {
 
     val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, simplify = false)
 

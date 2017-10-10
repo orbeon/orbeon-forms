@@ -76,8 +76,13 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.rowInsertAbove(controlId, position - 1)
   }
 
-  def rowDelete(controlId: String, position: Int): Unit =
-    FormBuilder.rowDelete(controlId, position - 1)(FormBuilderDocContext())
+  def rowDelete(controlId: String, position: Int): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    if (FormBuilder.canDeleteRow(controlId, position - 1))
+      FormBuilder.rowDelete(controlId, position - 1)
+  }
 
   def rowInsertBelow(controlId: String, position: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()

@@ -18,13 +18,13 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.CoreUtils._
 
 /*
  * Form Builder: toolbox operations.
@@ -42,7 +42,7 @@ object ToolboxOps {
     ensureEmptyCell(doc) match {
       case Some(gridTd) ⇒
 
-        val newControlName = controlNameFromId(nextId(doc, "control"))
+        val newControlName = controlNameFromId(nextId("control"))
 
         // Insert control template
         val newControlElem: NodeInfo =
@@ -164,7 +164,7 @@ object ToolboxOps {
     val (into, after, _) = findGridInsertionPoint(inDoc)
 
     // Obtain ids first
-    val ids = nextIds(inDoc, "tmp", 3).toIterator
+    val ids = nextIds("tmp", 3).toIterator
 
     // The grid template
     val gridTemplate: NodeInfo =
@@ -192,11 +192,11 @@ object ToolboxOps {
 
     val (into, after) = findSectionInsertionPoint(inDoc)
 
-    val newSectionName = controlNameFromId(nextId(inDoc, "section"))
+    val newSectionName = controlNameFromId(nextId("section"))
     val precedingSectionName = after flatMap getControlNameOpt
 
     // Obtain ids first
-    val ids = nextIds(inDoc, "tmp", 3).toIterator
+    val ids = nextIds("tmp", 3).toIterator
 
     // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
     val sectionTemplate: NodeInfo =
@@ -252,9 +252,9 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     val (into, after, grid) = findGridInsertionPoint(inDoc)
-    val newGridName         = controlNameFromId(nextId(inDoc, "grid"))
+    val newGridName         = controlNameFromId(nextId("grid"))
 
-    val ids = nextIds(inDoc, "tmp", 2).toIterator
+    val ids = nextIds("tmp", 2).toIterator
 
     // The grid template
     val gridTemplate: NodeInfo =
@@ -479,7 +479,12 @@ object ToolboxOps {
     insert(into = clipboardXcvRootElem, origin = xcv / *)
   }
 
-  def dndControl(sourceCellElem: NodeInfo, targetCellElem: NodeInfo, copy: Boolean): Unit = {
+  def dndControl(
+    sourceCellElem : NodeInfo,
+    targetCellElem : NodeInfo,
+    copy           : Boolean)(implicit
+    ctx            : FormBuilderDocContext
+  ): Unit = {
 
     val xcv = controlElementsInCellToXcv(sourceCellElem)
 
@@ -494,6 +499,8 @@ object ToolboxOps {
   //@XPathFunction
   def pasteFromClipboard(targetCellElem: NodeInfo): Unit = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     val xcvElem     = readXcvFromClipboard
     val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
@@ -505,10 +512,8 @@ object ToolboxOps {
 
   private def pasteSectionGridFromXcv(
     targetCellElem : NodeInfo,
-    xcvElem        : NodeInfo
-  ): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+    xcvElem        : NodeInfo)(implicit
+    ctx            : FormBuilderDocContext): Unit = {
 
     // TODO: Remove once `ctx` is used everywhere
     val inDoc                = ctx.rootElem
@@ -517,14 +522,14 @@ object ToolboxOps {
     // Rename if needed
     locally {
 
-      def findXcvNames          = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
-      def existingUniqueNamesIt = fbFormInstance.idsIterator flatMap controlNameFromIdOpt
+      def findXcvNames           = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
+      def existingUniqueNamesSet = getAllControlNames
 
-      val needRename = collection.mutable.LinkedHashSet() ++ findXcvNames intersect existingUniqueNamesIt.toSet
+      val needRename = collection.mutable.LinkedHashSet() ++ findXcvNames intersect existingUniqueNamesSet
 
       if (needRename.nonEmpty) {
 
-        val newControlNames = nextIds(inDoc, XcvEntry.Control.entryName, needRename.size) map controlNameFromId
+        val newControlNames = nextIds(XcvEntry.Control.entryName, needRename.size) map controlNameFromId
         val oldToNewNames   = needRename.iterator.zip(newControlNames.iterator).toMap
 
         // Rename self control, nested sections and grids, and nested controls
@@ -657,7 +662,8 @@ object ToolboxOps {
 
   private def pasteSingleControlFromXcv(
     targetCellElem : NodeInfo,
-    xcvElem        : NodeInfo
+    xcvElem        : NodeInfo)(implicit
+    ctx            : FormBuilderDocContext
   ): Unit =
     ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
 
@@ -674,7 +680,7 @@ object ToolboxOps {
         // Check if id is already in use
         if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
           // If so create new id
-          val newName = controlNameFromId(nextId(targetCellElem, XcvEntry.Control.entryName))
+          val newName = controlNameFromId(nextId(XcvEntry.Control.entryName))
 
           // Rename everything
           renameControlByElement(controlElem, newName, resources / * map (_.localname) toSet)
@@ -717,7 +723,7 @@ object ToolboxOps {
           nestedElem → id
 
       val oldIdToNewId =
-        nestedElemsWithId map (_._2) zip nextIds(targetCellElem, Validation, nestedElemsWithId.size) toMap
+        nestedElemsWithId map (_._2) zip nextIds(Validation, nestedElemsWithId.size) toMap
 
       // Update nested element ids, in particular xf:constraint/@id
       nestedElemsWithId foreach { case (nestedElem, oldId) ⇒

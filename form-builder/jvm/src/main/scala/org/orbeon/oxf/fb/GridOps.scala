@@ -32,7 +32,7 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
-  def annotateGridsAndCells(startElem: NodeInfo): Unit = {
+  def annotateGridsAndCells(startElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
 
     // 1. Annotate all the grid and grid cells of the given document with unique ids,
     // if they don't have them already. We do this so that ids are stable as we move
@@ -41,7 +41,7 @@ trait GridOps extends ContainerOps {
 
     def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
       // Get as many fresh ids as there are tds
-      val ids = nextIds(startElem, token, elements.size).toIterator
+      val ids = nextIds(token, elements.size).toIterator
 
       // Add the missing ids
       elements foreach (ensureAttribute(_, "id", ids.next()))
@@ -54,14 +54,19 @@ trait GridOps extends ContainerOps {
     annotate("tmp", grids filterNot (_.hasId))
   }
 
+  //@XPathFunction
   def initializeGrids(doc: NodeInfo): Unit = {
+
+    // Create context explicitly based on the document passed, as the node might not be
+    // in the main Form Builder instance yet.
+    implicit val ctx = FormBuilderDocContext(doc)
 
     // 1. Annotate all the grid and grid cells of the given document with unique ids,
     // if they don't have them already. We do this so that ids are stable as we move
     // things around, otherwise if the XForms document is recreated new automatic ids
     // are generated for objects without id.
 
-    val bodyElement = findFRBodyElem(doc)
+    val bodyElement = findFRBodyElem(ctx.rootElem)
 
     annotateGridsAndCells(bodyElement)
 
@@ -73,7 +78,7 @@ trait GridOps extends ContainerOps {
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
-  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int): NodeInfo = {
+  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
@@ -104,7 +109,7 @@ trait GridOps extends ContainerOps {
       } keepDistinctBy (_.u)
 
     val idsIt =
-      nextIds(gridElem, "tmp", distinctCellsEndingAtCurrentRow.size).iterator
+      nextIds("tmp", distinctCellsEndingAtCurrentRow.size).iterator
 
     val newCells =
       distinctCellsEndingAtCurrentRow map { cell ⇒
@@ -122,7 +127,7 @@ trait GridOps extends ContainerOps {
     result orNull // bad, but insert() is not always able to return the inserted item at this time
   }
 
-  def rowInsertAbove(gridId: String, rowPos: Int): NodeInfo = {
+  def rowInsertAbove(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
     val gridElem       = containerById(gridId)
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
@@ -224,7 +229,7 @@ trait GridOps extends ContainerOps {
     findSelectedCell(inDoc).isDefined
 
   // Try to ensure that there is an empty cell after the current location, inserting a new row if possible
-  def ensureEmptyCell(inDoc: NodeInfo): Option[NodeInfo] =
+  def ensureEmptyCell(inDoc: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findSelectedCell(inDoc) flatMap { currentCellNode ⇒
       if (currentCellNode.hasChildElement) {
         // There is an element in the current cell, figure out what to do
@@ -329,6 +334,9 @@ trait GridOps extends ContainerOps {
 
   //@XPathFunction
   def shrinkCellRight(cellElem: NodeInfo, amount: Int): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
@@ -342,7 +350,7 @@ trait GridOps extends ContainerOps {
       val newCell: NodeInfo =
         <fr:c
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          id={nextId(cell.td, "tmp")}
+          id={nextId("tmp")}
           x={(cell.x + newCellW).toString}
           y={cell.y.toString}
           w={amount.toString}
@@ -355,7 +363,11 @@ trait GridOps extends ContainerOps {
 
   //@XPathFunction
   def expandCellDown(cellElem: NodeInfo, amount: Int): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+
     if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount) {
 
       debugDumpDocumentForGrids("expandCellDown before", cellElem)
@@ -380,6 +392,9 @@ trait GridOps extends ContainerOps {
 
   //@XPathFunction
   def shrinkCellDown(cellElem: NodeInfo, amount: Int): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
@@ -393,7 +408,7 @@ trait GridOps extends ContainerOps {
       val newCell: NodeInfo =
         <fr:c
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          id={nextId(cell.td, "tmp")}
+          id={nextId("tmp")}
           x={cell.x.toString}
           y={(cell.y + newCellH).toString}
           w={cell.w.toString}
@@ -407,7 +422,7 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  def deleteGridById(gridId: String): Unit =
+  def deleteGridById(gridId: String)(implicit ctx: FormBuilderDocContext): Unit =
     deleteContainerById(canDeleteGrid, gridId)
 
   def canDeleteGrid(gridElem: NodeInfo): Boolean =
@@ -416,8 +431,10 @@ trait GridOps extends ContainerOps {
    // Return all classes that need to be added to an editable grid
   // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
   //@XPathFunction
-  def gridCanDoClasses(gridId: String): List[String] =
+  def gridCanDoClasses(gridId: String): List[String] = {
+    implicit val ctx = FormBuilderDocContext()
     "fr-editable" :: (canDeleteGrid(containerById(gridId)) list "fb-can-delete-grid")
+  }
 
   // Find the new td to select if we are removing the currently selected td
   def findNewCellToSelect(inDoc: NodeInfo, cellsToDelete: Seq[NodeInfo]): Option[NodeInfo] =

@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.{FormBuilderPermissionsOps, FormRunnerContainerOps}
+import org.orbeon.oxf.fr.FormRunnerContainerOps
 
-/**
- * Form Builder functions.
- */
 object FormBuilder
   extends FormRunnerContainerOps // temporary, remove once no longer needed (check XForms/XSLT clients)
   with BaseOps
@@ -29,3 +26,4 @@ object FormBuilder
   with SchemaOps
   with PublishOps
   with BindingOps
+  with AnnotationOps

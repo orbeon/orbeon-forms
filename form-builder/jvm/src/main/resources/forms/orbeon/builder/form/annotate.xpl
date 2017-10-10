@@ -123,7 +123,7 @@
                 <xsl:variable
                     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
                     name="new-validation-ids"
-                    select="fbf:nextIds(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
+                    select="fbf:nextIdsXPath(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
 
                 <!-- Temporarily mark read-only instances as read-write -->
                 <xsl:template match="xf:model/xf:instance/@xxf:readonly[. = 'true']" mode="within-model">

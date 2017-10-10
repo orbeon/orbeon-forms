@@ -29,19 +29,19 @@ trait FormBuilderSupport extends XFormsSupport {
   val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
 
   // Run the body in the action context of a form which simulates the main Form Builder model
-  def withActionAndFBDoc[T](url: String)(body: DocumentWrapper ⇒ T): T =
+  def withActionAndFBDoc[T](url: String)(body: FormBuilderDocContext ⇒ T): T =
     withActionAndFBDoc(formBuilderContainingDocument(url))(body)
 
   private def formBuilderContainingDocument(url: String) =
     setupDocument(formBuilderDoc(url))
 
-  def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T): T =
+  def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: FormBuilderDocContext ⇒ T): T =
     withActionAndDoc(doc) {
       body(
         doc.models
         find    (_.getId == "fr-form-model")
         flatMap (m ⇒ Option(m.getInstance("fb-form-instance")))
-        map     (_.documentInfo.asInstanceOf[DocumentWrapper])
+        map     FormBuilderDocContext.apply
         orNull
       )
     }

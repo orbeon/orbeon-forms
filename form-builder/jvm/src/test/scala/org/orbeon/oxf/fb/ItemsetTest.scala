@@ -32,7 +32,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
   val ItemsetsDoc = "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"
 
   @Test def readAndWriteControlItems(): Unit =
-    withActionAndFBDoc(ItemsetsDoc) { doc ⇒
+    withActionAndFBDoc(ItemsetsDoc) { implicit ctx ⇒
 
       def assertControl(controlName: String, expectedItems: Seq[Elem]): Unit = {
 
@@ -166,7 +166,9 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
       }.toMap
     }
 
-    withActionAndFBDoc(TemplateDoc) { doc ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+      val doc = ctx.rootElem
 
       // Add a new radio control, and return the resources that were created for that control
       def resourceForNewControl(): Elem = {

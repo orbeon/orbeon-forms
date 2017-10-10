@@ -35,10 +35,10 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
   private val Control1 = "control-1"
 
   @Test def initialAlert(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
       // Read initial alert
-      val alertDetails = AlertDetails.fromForm(doc, Control1)
+      val alertDetails = AlertDetails.fromForm(Control1)
       assert(List(AlertDetails(None, List("en" → "Alert for en", "fr" → "Alert for fr"), global = false)) === alertDetails)
 
       // Read initial alert as XML
@@ -51,7 +51,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
   @Test def warningConstraintAutomaticId(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
       val newValidation =
         <validation type="formula" id="" level="warning" default-alert="false">
           <constraint expression="string-length() gt 10" argument=""/>
@@ -60,7 +60,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
 
       val expected =
         <validation type="formula" id="validation-3-validation" level="warning" default-alert="false">
@@ -70,11 +70,11 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
+      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
     }
 
   @Test def warningConstraintSpecifyId(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
       val newValidation =
         <validation type="formula" id="length-constraint" level="warning" default-alert="false">
           <constraint expression="string-length() gt 10" argument=""/>
@@ -83,12 +83,12 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
-      assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(doc, Control1))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
+      assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(Control1))
     }
 
   @Test def multipleValidations(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
       val newValidations = Array(
         <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -105,14 +105,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         </validation>
       )
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
-      assertAlertsXML(newValidations, readConstraintValidationsAsXML(doc, Control1))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+      assertAlertsXML(newValidations, readConstraintValidationsAsXML(Control1))
     }
 
   @Test def removeAlertInMiddle(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-      val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
+      val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(currentLang)
 
       locally {
 
@@ -131,8 +131,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, twoValidations map elemToNodeInfo)
-        assertAlertsXML(twoValidations, readConstraintValidationsAsXML(doc, Control1))
+        writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, twoValidations map elemToNodeInfo)
+        assertAlertsXML(twoValidations, readConstraintValidationsAsXML(Control1))
 
         val expectedResources: Document =
           <resources>
@@ -175,8 +175,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, oneValidation map elemToNodeInfo)
-        assertAlertsXML(oneValidation, readConstraintValidationsAsXML(doc, Control1))
+        writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, oneValidation map elemToNodeInfo)
+        assertAlertsXML(oneValidation, readConstraintValidationsAsXML(Control1))
 
         val expectedResources: Document =
           <resources>
@@ -209,25 +209,27 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
   @Test def defaultAlert(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-      val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
+      implicit val ctx = FormBuilderDocContext()
+
+      val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(currentLang)
 
       // Local default alert
       locally {
-        writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, Array())
-        assert("$form-resources/control-1/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
+        writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Array())
+        assert("$form-resources/control-1/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
       }
 
       // Global default alert
       locally {
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array())
-        assert("$fr-resources/detail/labels/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array())
+        assert("$fr-resources/detail/labels/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
       }
     }
 
   @Test def singleConstraintWithoutCustomAlert(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
       val newValidation =
         <validation type="formula" id="length5-constraint" level="error" default-alert="true">
@@ -235,7 +237,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           <alert message="" global="false"/>
         </validation>
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
 
       val expected =
         <validation type="formula" id="" level="error" default-alert="true">
@@ -243,15 +245,15 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           <alert message="" global="false"/>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
+      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
 
       // No elements inserted under the bind
-      val bind = findBindByName(doc, Control1).toList
+      val bind = findBindByName(ctx.rootElem, Control1).toList
       assert(bind child * isEmpty)
     }
 
   @Test def singleConstraintWithCustomAlert(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
       val newValidation =
         <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -261,7 +263,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
 
       val expected =
         <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -271,17 +273,17 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
+      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
 
       // One element inserted under the bind
-      val bind = findBindByName(doc, Control1).toList
+      val bind = findBindByName(ctx.rootElem, Control1).toList
       assert(1 ===(bind child * size))
     }
 
   @Test def requiredAndDatatypeValidations(): Unit =
-    withActionAndFBDoc(AlertsDoc) { doc ⇒
+    withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-      val bind = findBindByName(doc, Control1).toList
+      val bind = findBindByName(ctx.rootElem, Control1).toList
 
       locally {
         val newValidations = Array(
@@ -297,14 +299,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
-        assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+        assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
         assert("true()" === (bind att "required" stringValue))
         assert(bind att "type" isEmpty)
 
-        assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(doc, Control1))
+        assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(Control1))
       }
 
       locally {
@@ -321,13 +323,13 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
-        assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+        assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
         assert(bind att "required" isEmpty)
         assert("xf:decimal" === (bind att "type" stringValue))
 
-        assert(RequiredValidation(None, Left(false), None) === RequiredValidation.fromForm(doc, Control1))
+        assert(RequiredValidation(None, Left(false), None) === RequiredValidation.fromForm(Control1))
       }
 
       locally {
@@ -344,13 +346,13 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
-        assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+        assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
         assert("true()"     === (bind att "required" stringValue))
         assert("xs:decimal" === (bind att "type" stringValue))
 
-        assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(doc, Control1))
+        assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(Control1))
       }
 
       locally {
@@ -361,9 +363,9 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
-        assert(RequiredValidation(None, Right("../foo = 'bar'"), None) === RequiredValidation.fromForm(doc, Control1))
+        assert(RequiredValidation(None, Right("../foo = 'bar'"), None) === RequiredValidation.fromForm(Control1))
       }
 
       locally {
@@ -384,9 +386,9 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </validation>
         )
 
-        writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
-        assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+        assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
         val expectedRequiredValidation =
           RequiredValidation(
@@ -401,7 +403,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             )
           )
 
-        assert(expectedRequiredValidation === RequiredValidation.fromForm(doc, Control1))
+        assert(expectedRequiredValidation === RequiredValidation.fromForm(Control1))
 
         val expectedDatatypeValidation =
           DatatypeValidation(
@@ -416,14 +418,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             )
           )
 
-        assert(expectedDatatypeValidation === DatatypeValidation.fromForm(doc, Control1))
+        assert(expectedDatatypeValidation === DatatypeValidation.fromForm(Control1))
       }
     }
 
   @Test def schemaType(): Unit =
-    withActionAndFBDoc(SchemaDoc) { doc ⇒
+    withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
 
-      val bind = findBindByName(doc, Control1).toList
+      val bind = findBindByName(ctx.rootElem, Control1).toList
 
       val newValidations = Array(
         <validation type="required" level="error" default-alert="true">
@@ -438,22 +440,22 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         </validation>
       )
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
-      assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+      assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
       assert("true()"    === (bind att "required" stringValue))
       assert("foo:email" === (bind att "type" stringValue))
     }
 
   @Test def schemaPrefix(): Unit =
-    withActionAndFBDoc(SchemaDoc) { doc ⇒
-      assert(Some("foo") === findSchemaPrefix(doc))
+    withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
+      assert(Some("foo") === findSchemaPrefix(ctx.rootElem))
     }
 
   @Test def schemaTypeNoNamespace(): Unit =
-    withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
+    withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
 
-      val bind = findBindByName(doc, Control1).toList
+      val bind = findBindByName(ctx.rootElem, Control1).toList
 
       val newValidations = Array(
         <validation type="required" level="error" default-alert="true">
@@ -468,23 +470,23 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         </validation>
       )
 
-      writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
-      assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+      assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
       assert("true()" === (bind att "required" stringValue))
       assert("rating" === (bind att "type" stringValue))
     }
 
   @Test def schemaPrefixNoNamespace(): Unit =
-    withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
-      assert(None === findSchemaPrefix(doc))
+    withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
+      assert(None === findSchemaPrefix(ctx.rootElem))
     }
 
   private def globalAlert      = AlertDetails(None, List(currentLang → ""), global = true)
   private def globalAlertAsXML = globalAlert.toXML(currentLang)
 
-  private def readConstraintValidationsAsXML(inDoc: NodeInfo, controlName: String) =
-    ConstraintValidation.fromForm(inDoc, controlName) map
+  private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =
+    ConstraintValidation.fromForm(controlName) map
     (a ⇒ a.toXML(currentLang): NodeInfo) toArray
 
   private def assertAlertsXML(left: Array[sx.Elem], right: Array[NodeInfo]): Unit = {

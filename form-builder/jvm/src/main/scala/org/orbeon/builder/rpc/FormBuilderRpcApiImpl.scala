@@ -26,6 +26,8 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def controlUpdateLHHA(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     val staticControlId = XFormsId.getStaticIdFromId(controlId)
 
     // The target might the control itself, or for grids with LHH in headers, an `xf:output` added to edit the LHH
@@ -37,7 +39,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     )
 
     XFormsAPI.setvalue(FormBuilder.currentResources / controlName / lhha, value)
-    FormBuilder.setControlLHHAMediatype(FormBuilder.fbFormInstance.root, controlName, lhha, isHTML)
+    FormBuilder.setControlLHHAMediatype(controlName, lhha, isHTML)
   }
 
   def controlDelete(controlId: String): Unit =
@@ -61,20 +63,26 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     val sourceCellElem = resolveId(controlId).get.parentUnsafe
     val targetCellElem = resolveId(destCellId).get
 
     ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy)
   }
 
-  def rowInsertAbove(controlId: String, position: Int): Unit =
+  def rowInsertAbove(controlId: String, position: Int): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.rowInsertAbove(controlId, position - 1)
+  }
 
   def rowDelete(controlId: String, position: Int): Unit =
     FormBuilder.rowDelete(controlId, position - 1)(FormBuilderDocContext())
 
-  def rowInsertBelow(controlId: String, position: Int): Unit =
+  def rowInsertBelow(controlId: String, position: Int): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
+  }
 
   def shrinkDown(cellId: String): Unit =
     FormBuilder.shrinkCellDown(resolveId(cellId).get, 1)
@@ -89,7 +97,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.shrinkCellRight(resolveId(cellId).get, 1)
 
   def sectionDelete(sectionId: String): Unit =
-    FormBuilder.deleteSectionById(sectionId)
+    FormBuilder.deleteSectionById(sectionId)(FormBuilderDocContext())
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit =
     XFormsAPI.setvalue(FormBuilder.currentResources / FormBuilder.controlNameFromId(sectionId) / "label", label)
@@ -98,7 +106,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-container-details",
-      properties = Map("container" → Some(FormBuilder.containerById(containerId)))
+      properties = Map("container" → Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
     )
 
   def sectionEditHelp(sectionId: String): Unit =
@@ -108,25 +116,37 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       properties = Map("control-id" → Some(sectionId))
     )
 
-  def sectionMoveUp(sectionId: String): Unit =
+  def sectionMoveUp(sectionId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.moveSectionUp(FormBuilder.containerById(sectionId))
+  }
 
-  def sectionMoveDown(sectionId: String): Unit =
+  def sectionMoveDown(sectionId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.moveSectionDown(FormBuilder.containerById(sectionId))
+  }
 
-  def sectionMoveRight(sectionId: String): Unit =
+  def sectionMoveRight(sectionId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.moveSectionRight(FormBuilder.containerById(sectionId))
+  }
 
-  def sectionMoveLeft(sectionId: String): Unit =
+  def sectionMoveLeft(sectionId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.moveSectionLeft(FormBuilder.containerById(sectionId))
+  }
 
   def gridDelete(gridId: String): Unit =
-    FormBuilder.deleteGridById(gridId)
+    FormBuilder.deleteGridById(gridId)(FormBuilderDocContext())
 
-  def containerCopy(containerId: String): Unit =
+  def containerCopy(containerId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     ToolboxOps.writeXcvToClipboard(ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)))
+  }
 
   def containerCut(containerId: String): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
 
     val containerElem = FormBuilder.containerById(containerId)
 

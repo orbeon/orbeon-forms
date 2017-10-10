@@ -25,6 +25,8 @@ import org.orbeon.scaxon.SimplePath._
 
 trait ResourcesOps extends BaseOps {
 
+  val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
+
   def currentResources: NodeInfo = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
   def currentLang: String        = currentResources attValue "*:lang"
   def resourcesRoot: NodeInfo    = currentResources.parentUnsafe
@@ -240,17 +242,29 @@ trait ResourcesOps extends BaseOps {
       holder
 
   //@XPathFunction
-  def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resourcesRootElem: NodeInfo): SequenceIterator =
+  def iterateSelfAndDescendantBindsResourceHoldersXPath(
+    rootBind          : NodeInfo,
+    lang              : String,
+    resourcesRootElem : NodeInfo
+  ): SequenceIterator =
     iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
 
-  def lhhaHoldersForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Seq[NodeInfo] =
+  def lhhaHoldersForAllLangsUseDoc(
+    controlName : String,
+    lhha        : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Seq[NodeInfo] =
     for {
-      (_, controlHolder) ← findResourceHoldersWithLangUseDoc(inDoc, controlName)
+      (_, controlHolder) ← findResourceHoldersWithLangUseDoc(ctx.rootElem, controlName)
       lhhaHolder         ← controlHolder child lhha
     } yield
       lhhaHolder
 
-  def hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Boolean =
-    findResourceHoldersWithLangUseDoc(inDoc, controlName) forall
-    { case (_, holder) ⇒ (holder child lhha stringValue).isBlank }
+  def hasBlankOrMissingLHHAForAllLangsUseDoc(
+    controlName : String,
+    lhha        : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Boolean =
+    findResourceHoldersWithLangUseDoc(ctx.rootElem, controlName) forall
+      { case (_, holder) ⇒ (holder child lhha stringValue).isBlank }
 }

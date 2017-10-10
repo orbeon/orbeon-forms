@@ -58,10 +58,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   //@XPathFunction
   def controlNameFromIdOpt(controlOrBindId: String) =
-    Option(controlNameFromId(controlOrBindId))
+    ControlOps.controlNameFromIdOpt(controlOrBindId)
 
   // Whether the given id is for a control (given its reserved suffix)
-  def isIdForControl(controlOrBindId: String): Boolean = controlNameFromId(controlOrBindId) ne null
+  def isIdForControl(controlOrBindId: String): Boolean =
+    ControlOps.controlNameFromIdOpt(controlOrBindId).isDefined
 
   // Whether the given node corresponds to a control
   // TODO: should be more restrictive
@@ -110,6 +111,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind.hasIdValue(bindId(name)) || bindRefOpt(bind).contains(name) // also check ref/nodeset in case id is not present
 
   // Canonical way: use the `name` attribute
+  //@XPathFunction
   def getBindNameOrEmpty(bind: NodeInfo): String =
     bind attValue "name"
 

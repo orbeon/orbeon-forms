@@ -45,12 +45,15 @@ trait FormRunnerBaseOps {
   // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
   // -control. OTOH we must have distinct ids for binds, controls and templates, so the -bind, -control and -template
   // suffixes must remain.
+  //@XPathFunction
   def bindId    (controlName: String): String = controlName + "-bind"
   def gridId    (gridName: String)   : String = gridName    + "-grid"
   def controlId (controlName: String): String = controlName + "-control"
   def templateId(gridName: String)   : String = gridName    + TemplateSuffix
 
-  def defaultIterationName(repeatName: String): String = repeatName + DefaultIterationSuffix
+  //@XPathFunction
+  def defaultIterationName(repeatName: String): String =
+    repeatName + DefaultIterationSuffix
 
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.

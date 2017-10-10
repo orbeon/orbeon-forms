@@ -51,8 +51,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
            xmlns:xf="http://www.w3.org/2002/xforms"/>
 
-  private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
-
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(inDoc: NodeInfo, controlName: String): List[NodeInfo] =
     findBindPathHoldersInDocument(inDoc, controlName, Some(formInstanceRoot(inDoc))) flatMap (_.holders) getOrElse Nil
@@ -447,12 +445,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
   // Get all control names by inspecting all elements with an id that converts to a valid name
-  def getAllControlNames(inDoc: NodeInfo): Set[String] =
-    fbFormInstance.idsIterator filter isIdForControl map controlNameFromId toSet
+  def getAllControlNames(implicit ctx: FormBuilderDocContext): Set[String] =
+    ctx.formInstance match {
+      case Some(instance) ⇒ instance.idsIterator flatMap controlNameFromIdOpt toSet
+      case None           ⇒ (ctx.rootElem descendantOrSelf * ids) toSet
+    }
 
   // For XForms callers
-  def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator =
-    getAllControlNames(inDoc).iterator map stringToStringValue
+  //@XPathFunction
+  def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = {
+    implicit val ctx = FormBuilderDocContext()
+    getAllControlNames.iterator map stringToStringValue
+  }
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
@@ -494,30 +498,39 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   )
 
   // Find a control's LHHA (there can be more than one for alerts)
-  def getControlLHHA(inDoc: NodeInfo, controlName: String, lhha: String): Seq[NodeInfo] =
-    findControlByName(inDoc, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
+  def getControlLHHA(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+    findControlByName(ctx.rootElem, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
 
   // Set the control help and add/remove help element and placeholders as needed
+  //@XPathFunction
   def setControlHelp(controlName: String,  value: String): Seq[NodeInfo] = {
+
+    implicit val ctx = FormBuilderDocContext()
 
     setControlResource(controlName, "help", value.trimAllToEmpty)
 
-    val inDoc = getFormDoc
-
-    if (hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, "help"))
-      removeLHHAElementAndResources(inDoc, controlName, "help")
+    if (hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, "help"))
+      removeLHHAElementAndResources(controlName, "help")
     else
-      ensureCleanLHHAElements(inDoc, controlName, "help")
+      ensureCleanLHHAElements(controlName, "help")
   }
 
+  //@XPathFunction
+  def isControlLHHAHTMLMediatypeXPath(controlName: String, lhha: String): Boolean =
+    isControlLHHAHTMLMediatype(controlName, lhha)(FormBuilderDocContext())
+
   // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
-  def isControlLHHAHTMLMediatype(inDoc: NodeInfo, controlName: String, lhha: String): Boolean =
-    hasHTMLMediatype(getControlLHHA(inDoc, controlName, lhha))
+  def isControlLHHAHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
+    hasHTMLMediatype(getControlLHHA(controlName, lhha))
+
+  //@XPathFunction
+  def setControlLHHAMediatypeXPath(controlName: String, lhha: String, isHTML: Boolean): Unit =
+    setControlLHHAMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
-  def setControlLHHAMediatype(inDoc: NodeInfo, controlName: String, lhha: String, isHTML: Boolean): Unit =
-    if (isHTML != isControlLHHAHTMLMediatype(inDoc, controlName, lhha))
-      setHTMLMediatype(getControlLHHA(inDoc, controlName, lhha), isHTML)
+  def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Unit =
+    if (isHTML != isControlLHHAHTMLMediatype(controlName, lhha))
+      setHTMLMediatype(getControlLHHA(controlName, lhha), isHTML)
 
   // For a given control, whether the mediatype on itemset labels is HTML
   def isItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String): Boolean =
@@ -540,15 +553,17 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
   def ensureCleanLHHAElements(
-    inDoc       : NodeInfo,
     controlName : String,
     lhha        : String,
     count       : Int     = 1,
-    replace     : Boolean = true
+    replace     : Boolean = true)(implicit
+    ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
+    val inDoc = ctx.rootElem
+
     val control  = findControlByName(inDoc, controlName).get
-    val existing = getControlLHHA(inDoc, controlName, lhha)
+    val existing = getControlLHHA(controlName, lhha)
 
     if (replace)
       delete(existing)
@@ -577,10 +592,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       Nil
   }
 
-  private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {
+  private def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext) = {
+
+    val inDoc = ctx.rootElem
+
     val control = findControlByName(inDoc, controlName).get
 
-    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha))
+    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhha))
     val removedLHHA    = delete(control child ((if (lhha == "text") FR else XF) → lhha))
 
     removedHolders ++ removedLHHA
@@ -619,24 +637,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
 
     prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
-  }
-
-  // Find all resource holders and elements which are unneeded because the resources are blank
-  //@XPathFunction
-  def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String): Seq[NodeInfo] = {
-
-    val allHelpElements =
-      inDoc.root descendant ((if (lhha=="text") FR else XF) → lhha) map
-      (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
-      { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
-
-    val allUnneededHolders =
-      allHelpElements collect {
-        case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, lhha) ⇒
-           lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha) :+ lhhaElement
-      }
-
-    allUnneededHolders.flatten
   }
 
   //@XPathFunction

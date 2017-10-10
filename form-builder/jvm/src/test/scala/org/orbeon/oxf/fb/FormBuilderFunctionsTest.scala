@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.XMLNames._
@@ -47,7 +46,9 @@ class FormBuilderFunctionsTest
 
   describe("Model instance body elements") {
     withTestExternalContext { _ ⇒
-      withActionAndFBDoc(TemplateDoc) { doc ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+        val doc = ctx.rootElem
 
         it("must find the model") {
           assert(findModelElem(doc).getDisplayName === "xf:model")
@@ -67,7 +68,9 @@ class FormBuilderFunctionsTest
 
   describe("Name and id") {
     withTestExternalContext { _ ⇒
-      withActionAndFBDoc(TemplateDoc) { doc ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+        val doc = ctx.rootElem
 
         it("must return the control names") {
           assert(controlNameFromId(controlId(Control1)) === Control1)
@@ -84,7 +87,9 @@ class FormBuilderFunctionsTest
 
   describe("Control elements") {
     withTestExternalContext { _ ⇒
-      withActionAndFBDoc(TemplateDoc) { doc ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+        val doc = ctx.rootElem
 
         it("must find the bind element") {
           assert(findBindByName(doc, Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
@@ -104,7 +109,10 @@ class FormBuilderFunctionsTest
 
   describe("Section name") {
     withTestExternalContext { _ ⇒
-      withActionAndFBDoc(TemplateDoc) { doc ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+        val doc = ctx.rootElem
+
         it("must find the section name") {
           assert(findSectionName(doc, Control1).get === Section1)
           assert(getControlNameOpt(doc descendant "*:section" head).get === Section1)
@@ -116,7 +124,10 @@ class FormBuilderFunctionsTest
   describe("New binds") {
     it("must find the newly-created binds") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
+
           ensureBinds(doc, List(Section1, Control2))
 
           assert(findBindByName(doc, Control2).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
@@ -134,9 +145,9 @@ class FormBuilderFunctionsTest
   describe("Find the next id") {
     it("must find ids without collisions") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
-          assert(nextId(doc, "control") === "control-3-control")
-          assert(nextId(doc, "section") === "section-3-section")
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+          assert(nextId("control") === "control-3-control")
+          assert(nextId("section") === "section-3-section")
         }
         // TODO: test more collisions
       }
@@ -145,7 +156,10 @@ class FormBuilderFunctionsTest
 
   describe("Containers") {
     withTestExternalContext { _ ⇒
-      withActionAndFBDoc(TemplateDoc) { doc ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+        val doc = ctx.rootElem
+
         val firstTd = findFRBodyElem(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
 
         val containers = findAncestorContainersLeafToRoot(firstTd)
@@ -167,7 +181,9 @@ class FormBuilderFunctionsTest
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           // Insert a new control into the next empty td
           selectFirstCell(doc)
@@ -188,7 +204,7 @@ class FormBuilderFunctionsTest
           assert(containerNames == List("section-1"))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
-          val dataHolder = assertDataHolder(doc, newControlName)
+          val dataHolder = assertDataHolder(doc.root, newControlName)
           assert((dataHolder.head precedingSibling * head).name === "control-1")
 
           val controlBind = findBindByName(doc, newControlName).get
@@ -205,7 +221,9 @@ class FormBuilderFunctionsTest
   describe("Insert `fr:explanation` control") {
     it("must insert all elements in the right places") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           // Insert explanation control
           val frExplanation = {
@@ -238,7 +256,9 @@ class FormBuilderFunctionsTest
   describe("Insert repeat") {
     it("must insert all elements in the right places") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           // Insert a new repeated grid after the current grid
           selectFirstCell(doc)
@@ -258,7 +278,7 @@ class FormBuilderFunctionsTest
             assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = assertDataHolder(doc, containerNames.init.last)
+            val dataHolder = assertDataHolder(doc.root, containerNames.init.last)
             assert((dataHolder.head precedingSibling * head).name === "control-1")
 
             val controlBind = findBindByName(doc, newRepeatName).get
@@ -287,7 +307,7 @@ class FormBuilderFunctionsTest
             assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = assertDataHolder(doc, newControlName)
+            val dataHolder = assertDataHolder(doc.root, newControlName)
             assert(dataHolder.head precedingSibling * isEmpty)
             assert((dataHolder.head parent * head).name === newRepeatIterationName)
 
@@ -364,7 +384,9 @@ class FormBuilderFunctionsTest
   describe("Control effective id") {
     it("must return the expected statics ids") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           val expected = Map(
             "|fb≡section-1-section≡tmp-13-tmp≡control-1-control|"                      → "control-1-control",
@@ -403,7 +425,7 @@ class FormBuilderFunctionsTest
     }
   }
 
-  def assertDataHolder(doc: DocumentWrapper, holderName: String): List[NodeInfo] = {
+  def assertDataHolder(doc: DocumentInfo, holderName: String): List[NodeInfo] = {
     val dataHolder = findDataHolders(doc, holderName)
     assert(dataHolder.length == 1)
     dataHolder
@@ -413,7 +435,9 @@ class FormBuilderFunctionsTest
 
     it("Simple cut/paste must remove and restore the control, bind, holders, and resources") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           val selectedCell = FormBuilder.findSelectedCell(doc).get
 
@@ -446,7 +470,9 @@ class FormBuilderFunctionsTest
 
     it("Non-repeated grid cut/paste must remove and restore nested control, bind, holders, and resources") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           val firstGridId       = (doc descendant FRGridTest head).id
           val nestedControlName = FormBuilder.findContainerById(firstGridId).toList flatMap findNestedControls flatMap getControlNameOpt head

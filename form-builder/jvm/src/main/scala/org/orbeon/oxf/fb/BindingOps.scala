@@ -28,21 +28,23 @@ import org.orbeon.scaxon.SimplePath._
 
 trait BindingOps {
 
+  //@XPathFunction
   def possibleAppearancesByControlNameAsXML(
-    inDoc             : NodeInfo,
     controlName       : String,
     isInitialLoad     : Boolean,
     builtinDatatype   : String,
     desiredAppearance : String    // relevant only if isInitialLoad == false
   ): Array[NodeInfo] = {
 
+    implicit val ctx = FormBuilderDocContext()
+
     val bindings    = FormBuilder.componentBindings
     val descriptors = getAllRelevantDescriptors(bindings)
     val lang        = FormBuilder.currentLang
 
     for {
-      controlElem                  ← findControlByName(inDoc, controlName).to[Array]
-      originalDatatype             = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
+      controlElem                  ← findControlByName(ctx.rootElem, controlName).to[Array]
+      originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
       (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
           elemName    = controlElem.uriQualifiedName,
           datatype    = originalDatatype,

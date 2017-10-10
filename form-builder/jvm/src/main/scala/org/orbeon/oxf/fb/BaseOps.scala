@@ -29,8 +29,7 @@ import spray.json._
 
 import scala.collection.immutable
 
-case class FormBuilderDocContext(formInstance: XFormsInstance) {
-  val rootElem: NodeInfo = formInstance.rootElement
+case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XFormsInstance]) {
 
   val componentBindings: Seq[NodeInfo] =
     asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
@@ -42,9 +41,16 @@ case class FormBuilderDocContext(formInstance: XFormsInstance) {
 
 object FormBuilderDocContext {
 
-  def apply(): FormBuilderDocContext =
-    FormBuilderDocContext(topLevelInstance("fr-form-model", "fb-form-instance").get)
+  def apply(inDoc: NodeInfo): FormBuilderDocContext =
+    FormBuilderDocContext(inDoc.rootElement, None)
 
+  def apply(formInstance: XFormsInstance): FormBuilderDocContext =
+    FormBuilderDocContext(formInstance.rootElement, Some(formInstance ensuring (_ ne null)))
+
+  def apply(): FormBuilderDocContext =
+    FormBuilderDocContext(
+      topLevelInstance("fr-form-model", "fb-form-instance") getOrElse (throw new IllegalStateException)
+    )
 }
 
 trait BaseOps extends Logging {
@@ -87,18 +93,19 @@ trait BaseOps extends Logging {
     inlineInstanceRootElem(inDoc, templateId(repeatName))
 
   // Find the next available id for a given token
-  def nextId(inDoc: NodeInfo, token: String): String =
-    nextIds(inDoc, token, 1).head
+  def nextId(token: String)(implicit ctx: FormBuilderDocContext): String =
+    nextIds(token, 1).head
 
   // Find a series of next available ids for a given token
   // Return ids of the form "foo-123-foo", where "foo" is the token
-  def nextIds(inDoc: NodeInfo, token: String, count: Int): immutable.IndexedSeq[String] = {
+  def nextIds(token: String, count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
 
     val prefix = token + "-"
     val suffix = "-" + token
 
     def findAllIds = {
-      val root = inDoc.getDocumentRoot
+
+      val root = ctx.rootElem.root
 
       // Use id index when possible, otherwise use plain XPath
       val fbInstance = fbFormInstance

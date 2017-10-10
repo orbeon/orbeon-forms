@@ -37,10 +37,10 @@ class GridOpsTest
   describe("Row insertion below") {
     it("must insert as expected") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(RowspansDoc) { doc ⇒
+        withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
           def gridNode =
-            doc descendant NodeInfoCell.GridTest head
+            ctx.rootElem descendant NodeInfoCell.GridTest head
 
           import NodeInfoCell._
 
@@ -133,7 +133,9 @@ class GridOpsTest
       // For before/after cell ids: create a doc, call the delete function, and assert the resulting selected cell
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
         withTestExternalContext { _ ⇒
-          withActionAndFBDoc(SectionsGridsDoc) { doc ⇒
+          withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
+
+            val doc = ctx.rootElem
 
             findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
               selectCell(beforeCell)
@@ -197,7 +199,9 @@ class GridOpsTest
   describe("Last grid in section") {
     it("must allow inserting a new grid") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+
+          val doc = ctx.rootElem
 
           // Initially can insert all
           assert(canInsertSection(doc) === true)

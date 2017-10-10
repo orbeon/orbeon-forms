@@ -33,14 +33,14 @@ trait ContainerOps extends ControlOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  def containerById(containerId: String): NodeInfo =
+  def containerById(containerId: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
     findContainerById(containerId).get
 
-  def findContainerById(containerId: String): Option[NodeInfo] = {
+  def findContainerById(containerId: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // XFormsUtils.getStaticIdFromId every time)
     val staticId = XFormsId.getStaticIdFromId(containerId)
-    findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer
+    findInViewTryIndex(ctx.rootElem, staticId) filter IsContainer
   }
 
   def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
@@ -79,7 +79,7 @@ trait ContainerOps extends ControlOps {
     containerElem sibling FRContainerTest nonEmpty
 
   // Delete the entire container and contained controls
-  def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
+  def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String)(implicit ctx: FormBuilderDocContext): Unit = {
     val container = containerById(containerId)
     if (canDelete(container))
       deleteContainer(container)
@@ -125,9 +125,12 @@ trait ContainerOps extends ControlOps {
   }
 
   // Move a container based on a move function
-  def moveContainer(containerElem: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  def moveContainer(
+    containerElem  : NodeInfo,
+    otherContainer : NodeInfo,
+    move           : (NodeInfo, NodeInfo) ⇒ NodeInfo)(implicit
+    ctx            : FormBuilderDocContext
+  ): Unit = {
 
     // Get names before moving the container
     val nameOption      = getControlNameOpt(containerElem)
@@ -374,20 +377,22 @@ trait ContainerOps extends ControlOps {
     }
   }
 
-  // Create template content from a bind name
-  //@XPathFunction
-  // FIXME: Saxon can pass null as `bindings`.
-  def createTemplateContentFromBindNameXPath(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
-    createTemplateContentFromBindName(inDoc, name, Option(bindings) getOrElse Nil)
-
-  def createTemplateContentFromBindName(inDoc: NodeInfo, bindName: String, bindings: Seq[NodeInfo]): Option[NodeInfo] =
-    findBindByName(inDoc, bindName) map (createTemplateContentFromBind(_, bindings))
+  def createTemplateContentFromBindName(
+    bindName : String,
+    bindings : Seq[NodeInfo])(implicit
+    ctx      : FormBuilderDocContext
+  ): Option[NodeInfo] =
+    findBindByName(ctx.rootElem, bindName) map (createTemplateContentFromBind(_, bindings))
 
   private val AttributeRe = "@(.+)".r
 
   // Create an instance template based on a hierarchy of binds rooted at the given bind
   // This checks each control binding in case the control specifies a custom data holder.
-  def createTemplateContentFromBind(startBindElem: NodeInfo, bindings: Seq[NodeInfo]): NodeInfo = {
+  def createTemplateContentFromBind(
+    startBindElem : NodeInfo,
+    bindings      : Seq[NodeInfo])(implicit
+    ctx           : FormBuilderDocContext
+  ): NodeInfo = {
 
     val inDoc       = startBindElem.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
@@ -471,13 +476,14 @@ trait ContainerOps extends ControlOps {
   }
 
   // Make sure all template instances reflect the current bind structure
+
   def updateTemplates(ancestorContainerNames: Option[Set[String]])(implicit ctx: FormBuilderDocContext): Unit =
     for {
       templateInstance ← templateInstanceElements(ctx.rootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
       iterationName    ← findRepeatIterationName(ctx.rootElem, repeatName)
-      template         ← createTemplateContentFromBindName(ctx.rootElem, iterationName, componentBindings)
+      template         ← createTemplateContentFromBindName(iterationName, componentBindings)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)
     }

@@ -32,9 +32,9 @@ class RepeatedSectionsTest
   describe("Model instance body elements") {
     it("must enable repeat") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
 
@@ -67,9 +67,9 @@ class RepeatedSectionsTest
 
     it("must rename section") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           renameControlIterationIfNeeded("my-section", "foo", None, None)
@@ -104,9 +104,9 @@ class RepeatedSectionsTest
 
     it("must support custom iteration element name") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           renameControlIterationIfNeeded("my-section", "foo", None, Some("bar"))
@@ -140,9 +140,9 @@ class RepeatedSectionsTest
 
     it("must change min/max") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "1", "2", "", applyDefaults = false, "")
 
@@ -159,9 +159,9 @@ class RepeatedSectionsTest
 
     it("must change calculated min/max") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", applyDefaults = false, "")
 
@@ -178,9 +178,9 @@ class RepeatedSectionsTest
 
     it("must move section into it") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           moveSectionRight(findControlByName(doc, "other-section").get)
@@ -214,9 +214,9 @@ class RepeatedSectionsTest
 
     it("must disable repeat") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true,  "", "", "", applyDefaults = false, "")
           setRepeatProperties("my-section", repeat = false, "", "", "", applyDefaults = false, "")
@@ -257,9 +257,9 @@ class RepeatedSectionsTest
 
     it("must enable repeat") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
 
@@ -286,9 +286,9 @@ class RepeatedSectionsTest
 
     it("must switch grid to `fb:initial-iterations=\"first\"`") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
@@ -319,9 +319,9 @@ class RepeatedSectionsTest
 
     it("must insert control within grid") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
@@ -362,9 +362,9 @@ class RepeatedSectionsTest
 
     it("must switch grid back to no `fb:initial-iterations`") {
       withTestExternalContext { _ ⇒
-        withActionAndFBDoc(Doc) { doc ⇒
+        withActionAndFBDoc(Doc) { implicit ctx ⇒
 
-          implicit val ctx = FormBuilderDocContext()
+          val doc = ctx.rootElem
 
           setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
           setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "")

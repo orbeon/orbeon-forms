@@ -108,7 +108,7 @@
 
                 <xf:insert
                     context="$default-alert"
-                    origin="fbf:readDefaultAlertAsXML($form, $i/control-name)"/>
+                    origin="fbf:readDefaultAlertAsXML($i/control-name)"/>
 
                 <!-- Clear validations -->
                 <xf:var name="validations" value="$i/validations"/>
@@ -165,7 +165,7 @@
                     value="fbf:getControlHelpOrEmpty($i/control-name)"/>
                 <xf:setvalue
                     ref="$i/help/@isHTML"
-                    value="if (fbf:isControlLHHAHTMLMediatype($form, $i/control-name, 'help')) then 'true' else ''"/>
+                    value="if (fbf:isControlLHHAHTMLMediatypeXPath($i/control-name, 'help')) then 'true' else ''"/>
 
                 <!-- Set prev/next buttons -->
                 <xf:setvalue
@@ -267,8 +267,7 @@
 
                         <xf:action type="xpath">
                             (: Write alerts and constraints :)
-                            fbf:writeAlertsAndValidationsAsXML(
-                                $form,
+                            fbf:writeAlertsAndValidationsAsXMLXPath(
                                 $i/control-name,
                                 $i/appearances/@selection,
                                 $i/default-alert/alert,
@@ -279,7 +278,7 @@
                                 fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
                             (: Write help :)
                             fbf:setControlHelp($i/control-name, $i/help),
-                            fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
+                            fbf:setControlLHHAMediatypeXPath($i/control-name, 'help', $i/help/@isHTML = 'true')
                         </xf:action>
                     </xf:action>
                 </xf:action>

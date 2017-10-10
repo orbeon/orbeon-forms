@@ -17,7 +17,6 @@ import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -48,8 +47,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
   val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
   // Return the first default alert for the given control, or a blank template if none exists
-  def readDefaultAlertAsXML(inDoc: NodeInfo, controlName: String): NodeInfo = (
-    AlertDetails.fromForm(inDoc, controlName)
+  //@XPathFunction
+  def readDefaultAlertAsXML(controlName: String): NodeInfo = (
+    AlertDetails.fromForm(controlName)(FormBuilderDocContext())
     find      (_.default)
     getOrElse AlertDetails(None, List(currentLang → ""), global = true)
     toXML     currentLang
@@ -69,20 +69,36 @@ trait AlertsAndConstraintsOps extends ControlOps {
   }
 
   // Return all validations as XML for the given control
-  def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
-    RequiredValidation.fromForm(inDoc, controlName)                             ::
-    DatatypeValidation.fromForm(inDoc, controlName)                             ::
-    ConstraintValidation.fromForm(inDoc, controlName) map
+  def readValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext): Array[NodeInfo] =
+    RequiredValidation.fromForm(controlName)    ::
+    DatatypeValidation.fromForm(controlName)    ::
+    ConstraintValidation.fromForm(controlName)  map
     (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
 
   // Write back everything
-  def writeAlertsAndValidationsAsXML(
-    inDoc            : NodeInfo,
+  //@XPathFunction
+  def writeAlertsAndValidationsAsXMLXPath(
     controlName      : String,
     newAppearance    : String,
     defaultAlertElem : NodeInfo,
     validationElems  : Array[NodeInfo]
+  ): Unit =
+    writeAlertsAndValidationsAsXML(
+      controlName,
+      newAppearance,
+      defaultAlertElem,
+      validationElems
+    )(FormBuilderDocContext())
+
+  def writeAlertsAndValidationsAsXML(
+    controlName      : String,
+    newAppearance    : String,
+    defaultAlertElem : NodeInfo,
+    validationElems  : Array[NodeInfo])(implicit
+    ctx              : FormBuilderDocContext
   ): Unit = {
+
+    val inDoc = ctx.rootElem
 
     // Current resolutions, which could be lifted in the future:
     //
@@ -93,7 +109,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Extract from XML
     val allValidations = {
-      val idsIterator = nextIds(inDoc, "validation", validationElemsSeq.size).toIterator
+      val idsIterator = nextIds("validation", validationElemsSeq.size).toIterator
       validationElemsSeq map (v ⇒ v → (v attValue "type")) flatMap {
         case (e, Required.name)   ⇒ RequiredValidation.fromXML(e, idsIterator)
         case (e, "datatype")      ⇒ DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)
@@ -108,7 +124,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
       case v: RequiredValidation ⇒ v
     } foreach { v ⇒
       writeValidations(
-        inDoc,
         controlName,
         Required,
         List(v)
@@ -120,10 +135,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
       case v: DatatypeValidation ⇒ v
     } foreach { v ⇒
 
-      v.renameControlIfNeeded(inDoc, controlName, newAppearance.trimAllToOpt)
+      v.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt)
 
       writeValidations(
-        inDoc,
         controlName,
         Type,
         List(v)
@@ -132,14 +146,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Several "constraint" validations are supported
     writeValidations(
-      inDoc,
       controlName,
       Constraint,
       allValidations collect { case v: ConstraintValidation ⇒ v }
     )
 
     writeAlerts(
-      inDoc,
       controlName,
       allValidations,
       defaultAlert
@@ -147,11 +159,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
   }
 
   private def writeValidations(
-    inDoc       : NodeInfo,
     controlName : String,
     mip         : MIP,
-    validations : List[Validation]
+    validations : List[Validation])(implicit
+    ctx         : FormBuilderDocContext
   ): Unit = {
+
+    val inDoc = ctx.rootElem
 
     val bind = findBindByName(inDoc, controlName).get
 
@@ -204,10 +218,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
   // Write resources and alerts for those that have resources
   // If the default alert has resources, write it as well
   private def writeAlerts(
-    inDoc        : NodeInfo,
     controlName  : String,
     validations  : List[Validation],
-    defaultAlert : AlertDetails
+    defaultAlert : AlertDetails)(implicit
+    ctx          : FormBuilderDocContext
   ): Unit = {
 
     val alertsWithResources = {
@@ -249,7 +263,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // Write alerts
     val newAlertElements =
       ensureCleanLHHAElements(
-        inDoc       = inDoc,
         controlName = controlName,
         lhha        = "alert",
         count       = alertsWithResources.size,
@@ -265,7 +278,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Write global default alert if needed
     if (defaultAlert.global) {
-      val newGlobalAlert = ensureCleanLHHAElements(inDoc, controlName, "alert", count = 1, replace = false).head
+      val newGlobalAlert = ensureCleanLHHAElements(controlName, "alert", count = 1, replace = false).head
       setvalue(newGlobalAlert /@ "ref", OldStandardAlertRef)
     }
   }
@@ -311,8 +324,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val DefaultRequireValidation = RequiredValidation(None, Left(false), None)
 
-    def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation =
-      findMIPs(inDoc, controlName, Required).headOption map {
+    def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): RequiredValidation =
+      findMIPs(controlName, Required).headOption map {
         case (idOpt, _, value, alertOpt) ⇒
           RequiredValidation(idOpt, xpathOptToEither(Some(value)), alertOpt)
       } getOrElse
@@ -360,11 +373,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue = XMLUtils.buildQName(datatypeQName.getNamespacePrefix, datatypeQName.getName)
 
     // Rename control element if needed when the datatype changes
-    def renameControlIfNeeded(inDoc: NodeInfo, controlName: String, newAppearanceOpt: Option[String]): Unit = {
+    def renameControlIfNeeded(controlName: String, newAppearanceOpt: Option[String])(implicit ctx: FormBuilderDocContext): Unit = {
       val newDatatype = datatypeQName
       for {
-        controlElem    ← findControlByName(inDoc, controlName)
-        oldDatatype    = DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
+        controlElem    ← findControlByName(ctx.rootElem, controlName)
+        oldDatatype    = DatatypeValidation.fromForm(controlName).datatypeQName
         oldAppearances = controlElem attTokens APPEARANCE_QNAME
         (newElemName, newAppearanceAttOpt) ← BindingDescriptor.newElementName(
           controlElem.uriQualifiedName,
@@ -409,7 +422,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
       DatatypeValidation(None, Left(XMLConstants.XS_STRING_QNAME → false), None)
 
     // Create from a control name
-    def fromForm(inDoc: NodeInfo, controlName: String): DatatypeValidation = {
+    def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): DatatypeValidation = {
+
+      val inDoc = ctx.rootElem
 
       val bind = findBindByName(inDoc, controlName).get // require the bind
 
@@ -423,7 +438,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           Right(qName)
       }
 
-      findMIPs(inDoc, controlName, Type).headOption map {
+      findMIPs(controlName, Type).headOption map {
         case (idOpt, _, value, alertOpt) ⇒
           DatatypeValidation(idOpt, builtinOrSchemaType(value), alertOpt)
       } getOrElse
@@ -518,8 +533,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   object ConstraintValidation {
 
-    def fromForm(inDoc: NodeInfo, controlName: String): List[ConstraintValidation] =
-      findMIPs(inDoc, controlName, Constraint) map {
+    def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): List[ConstraintValidation] =
+      findMIPs(controlName, Constraint) map {
         case (idOpt, level, value, alertOpt) ⇒
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
@@ -576,7 +591,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
     //
     // - None if the alert message can't be found or if the alert/validation combination can't be handled by FB
     // - alerts returned are either global (no validation/level specified) or for a single specific validation
-    def fromForm(inDoc: NodeInfo, controlName: String): Seq[AlertDetails] = {
+    def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[AlertDetails] = {
+
+      val inDoc = ctx.rootElem
 
       val controlElem                = findControlByName(inDoc, controlName).get
       val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert")
@@ -650,10 +667,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
-  private def findMIPs(inDoc: NodeInfo, controlName: String, mip: MIP) = {
+  private def findMIPs(controlName: String, mip: MIP)(implicit ctx: FormBuilderDocContext) = {
+
+    val inDoc = ctx.rootElem
 
     val bind            = findBindByName(inDoc, controlName).get // require the bind
-    val supportedAlerts = AlertDetails.fromForm(inDoc, controlName)
+    val supportedAlerts = AlertDetails.fromForm(controlName)
 
     def findAlertForId(id: String) =
       supportedAlerts find (_.forValidationId.contains(id))

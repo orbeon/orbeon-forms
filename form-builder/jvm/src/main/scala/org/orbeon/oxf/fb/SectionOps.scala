@@ -26,21 +26,21 @@ trait SectionOps extends ContainerOps {
   def canDeleteSection(section: NodeInfo): Boolean =
     canDeleteContainer(section)
 
-  def deleteSectionById(sectionId: String): Unit =
+  def deleteSectionById(sectionId: String)(implicit ctx: FormBuilderDocContext): Unit =
     deleteContainerById(canDeleteSection, sectionId)
 
   // Move the section up if possible
-  def moveSectionUp(container: NodeInfo): Unit =
+  def moveSectionUp(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     if (canMoveUp(container))
       moveContainer(container, container precedingSibling * filter IsContainer head, moveElementBefore)
 
   // Move the section down if possible
-  def moveSectionDown(container: NodeInfo): Unit =
+  def moveSectionDown(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     if (canMoveDown(container))
       moveContainer(container, container followingSibling * filter IsContainer head, moveElementAfter)
 
   // Move the section right if possible
-  def moveSectionRight(container: NodeInfo): Unit =
+  def moveSectionRight(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     if (canMoveRight(container)) {
 
       val otherContainer = precedingSection(container).get
@@ -55,7 +55,7 @@ trait SectionOps extends ContainerOps {
     }
 
   // Move the section left if possible
-  def moveSectionLeft(container: NodeInfo): Unit =
+  def moveSectionLeft(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     if (canMoveLeft(container))
       moveContainer(container, findAncestorContainersLeafToRoot(container).head, moveElementAfter)
 

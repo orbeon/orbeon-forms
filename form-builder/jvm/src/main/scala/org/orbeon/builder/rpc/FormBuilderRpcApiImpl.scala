@@ -42,10 +42,14 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.setControlLHHAMediatype(controlName, lhha, isHTML)
   }
 
-  def controlDelete(controlId: String): Unit =
+  def controlDelete(controlId: String): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     resolveId(controlId) foreach { controlElem ⇒
       FormBuilder.deleteControlWithinCell(controlElem.parentUnsafe, updateTemplates = true)
     }
+  }
 
   def controlEditDetails(controlId: String): Unit =
     XFormsAPI.dispatch(
@@ -58,7 +62,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-itemsets",
-      properties = Map("control-element" → resolveId(controlId))
+      properties = Map("control-element" → resolveId(controlId)(FormBuilderDocContext()))
     )
 
   def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {
@@ -77,9 +81,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def rowDelete(controlId: String, position: Int): Unit = {
-
     implicit val ctx = FormBuilderDocContext()
-
     if (FormBuilder.canDeleteRow(controlId, position - 1))
       FormBuilder.rowDelete(controlId, position - 1)
   }
@@ -89,20 +91,30 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
   }
 
-  def shrinkDown(cellId: String): Unit =
+  def shrinkDown(cellId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.shrinkCellDown(resolveId(cellId).get, 1)
+  }
 
-  def expandRight(cellId: String): Unit =
+  def expandRight(cellId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.expandCellRight(resolveId(cellId).get, 1)
+  }
 
-  def expandDown(cellId: String): Unit =
+  def expandDown(cellId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.expandCellDown(resolveId(cellId).get, 1)
+  }
 
-  def shrinkRight(cellId: String): Unit =
+  def shrinkRight(cellId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     FormBuilder.shrinkCellRight(resolveId(cellId).get, 1)
+  }
 
-  def sectionDelete(sectionId: String): Unit =
-    FormBuilder.deleteSectionById(sectionId)(FormBuilderDocContext())
+  def sectionDelete(sectionId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.deleteSectionById(sectionId)
+  }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit =
     XFormsAPI.setvalue(FormBuilder.currentResources / FormBuilder.controlNameFromId(sectionId) / "label", label)
@@ -167,6 +179,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
-  private def resolveId(id: String): Option[NodeInfo] =
-    FormBuilder.findInViewTryIndex(FormBuilder.fbFormInstance.root, XFormsId.getStaticIdFromId(id))
+  private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    FormBuilder.findInViewTryIndex(ctx.rootElem, XFormsId.getStaticIdFromId(id))
 }

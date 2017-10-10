@@ -37,6 +37,8 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
   lazy val formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
+  val bodyElem = findFRBodyElem(rootElem)
+
 }
 
 object FormBuilderDocContext {
@@ -89,8 +91,8 @@ trait BaseOps extends Logging {
   def formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
-  def templateRoot(inDoc: NodeInfo, repeatName: String): Option[NodeInfo] =
-    inlineInstanceRootElem(inDoc, templateId(repeatName))
+  def templateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    inlineInstanceRootElem(ctx.rootElem, templateId(repeatName))
 
   // Find the next available id for a given token
   def nextId(token: String)(implicit ctx: FormBuilderDocContext): String =
@@ -108,6 +110,9 @@ trait BaseOps extends Logging {
       val root = ctx.rootElem.root
 
       // Use id index when possible, otherwise use plain XPath
+
+      // TODO: also get from xcv instance
+
       val fbInstance = fbFormInstance
 
       def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
@@ -148,12 +153,13 @@ trait BaseOps extends Logging {
     ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
   }
 
-  def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo): Unit =
+  def debugDumpDocumentForGrids(message: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
-      debugDumpDocument(message, inDoc)
+      debugDumpDocument(message)
 
-  def debugDumpDocument(message: String, inDoc: NodeInfo): Unit =
-    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
+  def debugDumpDocument(message: String)(implicit ctx: FormBuilderDocContext): Unit =
+    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(ctx.rootElem)))
+//    println(Seq(message → TransformerUtils.tinyTreeToString(ctx.rootElem)))
 
   def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
     val name            = origin.head.localname

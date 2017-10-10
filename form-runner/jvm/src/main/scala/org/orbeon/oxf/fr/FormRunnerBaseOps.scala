@@ -60,8 +60,9 @@ trait FormRunnerBaseOps {
   def findInViewTryIndex(inDoc: NodeInfo, staticId: String): Option[NodeInfo] =
     findTryIndex(inDoc, staticId, findFRBodyElem(inDoc), includeSelf = false)
 
-  def findInModelTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findTryIndex(inDoc, id, findModelElem(inDoc), includeSelf = false)
+  // Unused
+//  def findInModelTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
+//    findTryIndex(inDoc, id, findModelElem(inDoc), includeSelf = false)
 
   def findInBindsTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)

@@ -142,7 +142,7 @@ class GridOpsTest
               delete(beforeCell)
             }
 
-            val actualSelectedCellId = findSelectedCell(doc) map (_.id)
+            val actualSelectedCellId = findSelectedCell map (_.id)
 
             assert(actualSelectedCellId === Some(afterCellId))
           }
@@ -209,7 +209,7 @@ class GridOpsTest
           assert(canInsertControl(doc) === true)
 
           // Remove everything (assume top-level section with a single grid inside)
-          childrenContainers(findFRBodyElem(doc)).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
+          childrenContainers(ctx.bodyElem).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
             assert(isLastGridInSection(childrenGrids(section).head) === true)
             deleteContainer(section)
           }

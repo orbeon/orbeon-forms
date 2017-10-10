@@ -90,7 +90,7 @@ trait ContainerOps extends ControlOps {
     implicit val ctx = FormBuilderDocContext()
 
     // Find the new td to select if we are removing the currently selected td
-    val newCellToSelectOpt = findNewCellToSelect(containerElem, containerElem descendant CellTest)
+    val newCellToSelectOpt = findNewCellToSelect(containerElem descendant CellTest)
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
@@ -147,8 +147,8 @@ trait ContainerOps extends ControlOps {
 
         // Move data holder only
         for {
-          holder      ← findDataHolders(doc, name)
-          otherHolder ← findDataHolders(doc, otherName)
+          holder      ← findDataHolders(name)
+          otherHolder ← findDataHolders(otherName)
         } yield
           move(holder, otherHolder)
 
@@ -191,24 +191,6 @@ trait ContainerOps extends ControlOps {
   // Later: fr:tab (maybe fr:tabview), wizard
   def canMoveInto(containerElem: NodeInfo): Boolean =
     IsSection(containerElem) && ! (containerElem / * exists isSectionTemplateContent)
-
-  // See: https://github.com/orbeon/orbeon-forms/issues/633
-  def deleteSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {
-
-    // Find data holders for all section templates
-    val holders =
-      for {
-        section     ← findSectionsWithTemplates(findFRBodyElem(inDoc))
-        controlName ← getControlNameOpt(section).toList
-        holder      ← findDataHolders(inDoc, controlName)
-      } yield
-        holder
-
-    // Delete all elements underneath those holders
-    holders foreach { holder ⇒
-      delete(holder / *)
-    }
-  }
 
   def hasCustomIterationName(inDoc: NodeInfo, controlName: String): Boolean =
     findRepeatIterationName(inDoc, controlName) exists (isCustomIterationName(controlName, _))
@@ -290,7 +272,7 @@ trait ContainerOps extends ControlOps {
 
         // Insert nested iteration data holders
         // NOTE: There can be multiple existing data holders due to enclosing repeats
-        findDataHolders(inDoc, controlName) foreach { holder ⇒
+        findDataHolders(controlName) foreach { holder ⇒
           val nestedHolders = holder / *
           delete(nestedHolders)
           insert(into = holder, origin = elementInfo(iterationName, nestedHolders))
@@ -313,7 +295,7 @@ trait ContainerOps extends ControlOps {
         insert(into = controlBind, origin = oldNestedBinds)
 
         // Mover data holders up and keep only the first iteration
-        findDataHolders(inDoc, controlName) foreach { holder ⇒
+        findDataHolders(controlName) foreach { holder ⇒
           val nestedHolders = holder / * take 1 child *
           delete(holder / *)
           insert(into = holder, origin = nestedHolders)
@@ -341,9 +323,9 @@ trait ContainerOps extends ControlOps {
     }
   }
 
-  def renameTemplate(doc: NodeInfo, oldName: String, newName: String): Unit =
+  def renameTemplate(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      root     ← templateRoot(doc, oldName)
+      root     ← templateRoot(oldName)
       instance ← root.parentOption
     } locally {
       ensureAttribute(instance, "id", templateId(newName))
@@ -440,7 +422,7 @@ trait ContainerOps extends ControlOps {
           controlElemOpt match {
             case Some(controlElem) if useInitialIterations(controlElem) ⇒
 
-              val firstDataHolder   = findDataHolders(inDoc, controlName) take 1
+              val firstDataHolder   = findDataHolders(controlName) take 1
               val iterationsHolders = firstDataHolder / *
 
               iterationsHolders.size

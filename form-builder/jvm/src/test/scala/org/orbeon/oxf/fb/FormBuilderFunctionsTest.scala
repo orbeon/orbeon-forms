@@ -60,7 +60,7 @@ class FormBuilderFunctionsTest
         }
 
         it("must find the body group") {
-          assert(findFRBodyElem(doc).uriQualifiedName === URIQualifiedName(XF, "group"))
+          assert(ctx.bodyElem.uriQualifiedName === URIQualifiedName(XF, "group"))
         }
       }
     }
@@ -97,8 +97,8 @@ class FormBuilderFunctionsTest
         }
 
         it("must check the content of the value holder") {
-          assert(findDataHolders(doc, Control1).length == 1)
-          assert(findDataHolders(doc, Control1).head.getStringValue === "")
+          assert(findDataHolders(Control1).length == 1)
+          assert(findDataHolders(Control1).head.getStringValue === "")
         }
 
         // TODO
@@ -158,9 +158,7 @@ class FormBuilderFunctionsTest
     withTestExternalContext { _ ⇒
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
-
-        val firstTd = findFRBodyElem(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
+        val firstTd = ctx.bodyElem descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
 
         val containers = findAncestorContainersLeafToRoot(firstTd)
 
@@ -175,8 +173,8 @@ class FormBuilderFunctionsTest
   }
 
   // Select the first grid cell (assume there is one)
-  def selectFirstCell(doc: NodeInfo): Unit =
-    selectCell(findFRBodyElem(doc) descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head)
+  def selectFirstCell()(implicit ctx: FormBuilderDocContext): Unit =
+    selectCell(ctx.bodyElem descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head)
 
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
@@ -186,7 +184,7 @@ class FormBuilderFunctionsTest
           val doc = ctx.rootElem
 
           // Insert a new control into the next empty td
-          selectFirstCell(doc)
+          selectFirstCell()
           val newControlNameOption = insertNewControl(doc, <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
           // Check the control's name
@@ -196,7 +194,7 @@ class FormBuilderFunctionsTest
           // Test result
           assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
 
-          val newlySelectedCell = findSelectedCell(doc)
+          val newlySelectedCell = findSelectedCell
           assert(newlySelectedCell.isDefined)
           assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
 
@@ -204,7 +202,7 @@ class FormBuilderFunctionsTest
           assert(containerNames == List("section-1"))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
-          val dataHolder = assertDataHolder(doc.root, newControlName)
+          val dataHolder = assertDataHolder(newControlName)
           assert((dataHolder.head precedingSibling * head).name === "control-1")
 
           val controlBind = findBindByName(doc, newControlName).get
@@ -261,7 +259,7 @@ class FormBuilderFunctionsTest
           val doc = ctx.rootElem
 
           // Insert a new repeated grid after the current grid
-          selectFirstCell(doc)
+          selectFirstCell()
           val newRepeatNameOption = insertNewRepeatedGrid(doc)
 
           assert(newRepeatNameOption === Some("grid-3"))
@@ -270,7 +268,7 @@ class FormBuilderFunctionsTest
 
           locally {
 
-            val newlySelectedCell = findSelectedCell(doc)
+            val newlySelectedCell = findSelectedCell
             assert(newlySelectedCell.isDefined)
             assert((newlySelectedCell flatMap (_ parent * headOption) head) /@ "id" === gridId(newRepeatName))
 
@@ -278,7 +276,7 @@ class FormBuilderFunctionsTest
             assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = assertDataHolder(doc.root, containerNames.init.last)
+            val dataHolder = assertDataHolder(containerNames.init.last)
             assert((dataHolder.head precedingSibling * head).name === "control-1")
 
             val controlBind = findBindByName(doc, newRepeatName).get
@@ -297,7 +295,7 @@ class FormBuilderFunctionsTest
           // Test result
           locally {
 
-            val newlySelectedCell = findSelectedCell(doc)
+            val newlySelectedCell = findSelectedCell
             assert(newlySelectedCell.isDefined)
             assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
 
@@ -307,7 +305,7 @@ class FormBuilderFunctionsTest
             assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = assertDataHolder(doc.root, newControlName)
+            val dataHolder = assertDataHolder(newControlName)
             assert(dataHolder.head precedingSibling * isEmpty)
             assert((dataHolder.head parent * head).name === newRepeatIterationName)
 
@@ -317,7 +315,7 @@ class FormBuilderFunctionsTest
 
             assert(formResourcesRoot / "resource" / newControlName nonEmpty)
 
-            val templateHolder = templateRoot(doc, newRepeatName).get / newControlName headOption
+            val templateHolder = templateRoot(newRepeatName).get / newControlName headOption
 
             assert(templateHolder.isDefined)
             assert(templateHolder.get precedingSibling * isEmpty)
@@ -425,8 +423,8 @@ class FormBuilderFunctionsTest
     }
   }
 
-  def assertDataHolder(doc: DocumentInfo, holderName: String): List[NodeInfo] = {
-    val dataHolder = findDataHolders(doc, holderName)
+  def assertDataHolder(holderName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
+    val dataHolder = findDataHolders(holderName)
     assert(dataHolder.length == 1)
     dataHolder
   }
@@ -439,13 +437,13 @@ class FormBuilderFunctionsTest
 
           val doc = ctx.rootElem
 
-          val selectedCell = FormBuilder.findSelectedCell(doc).get
+          val selectedCell = FormBuilder.findSelectedCell.get
 
           def assertPresent() = {
             assert(Control1 === FormBuilder.getControlName(selectedCell / * head))
             assert(FormBuilder.findControlByName(doc, Control1).nonEmpty)
             assert(FormBuilder.findBindByName(doc, Control1).nonEmpty)
-            assert(FormBuilder.findDataHolders(doc, Control1).nonEmpty)
+            assert(FormBuilder.findDataHolders(Control1).nonEmpty)
             assert(FormBuilder.findCurrentResourceHolder(Control1).nonEmpty)
           }
 
@@ -454,11 +452,11 @@ class FormBuilderFunctionsTest
           ToolboxOps.cutToClipboard(selectedCell)
 
           // Selected cell hasn't changed
-          assert(FormBuilder.findSelectedCell(doc) contains selectedCell)
+          assert(FormBuilder.findSelectedCell contains selectedCell)
 
           assert(FormBuilder.findControlByName(doc, Control1).isEmpty)
           assert(FormBuilder.findBindByName(doc, Control1).isEmpty)
-          assert(FormBuilder.findDataHolders(doc, Control1).isEmpty)
+          assert(FormBuilder.findDataHolders(Control1).isEmpty)
           assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
           ToolboxOps.pasteFromClipboard(selectedCell)
@@ -485,7 +483,7 @@ class FormBuilderFunctionsTest
           assert(FormBuilder.findContainerById(firstGridId).isEmpty)
           assert(FormBuilder.findControlByName(doc, nestedControlName).isEmpty)
 
-          ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell(doc).get)
+          ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell.get)
 
           assert(FormBuilder.findControlByName(doc, nestedControlName).nonEmpty)
 

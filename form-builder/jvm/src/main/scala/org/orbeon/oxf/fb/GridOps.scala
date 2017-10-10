@@ -66,12 +66,10 @@ trait GridOps extends ContainerOps {
     // things around, otherwise if the XForms document is recreated new automatic ids
     // are generated for objects without id.
 
-    val bodyElement = findFRBodyElem(ctx.rootElem)
-
-    annotateGridsAndCells(bodyElement)
+    annotateGridsAndCells(ctx.bodyElem)
 
     // 2. Select the first td if any
-    bodyElement descendant GridTest descendant CellTest take 1 foreach selectCell
+    ctx.bodyElem descendant GridTest descendant CellTest take 1 foreach selectCell
   }
 
   // Get the first enclosing repeated grid or legacy repeat
@@ -83,7 +81,7 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-    debugDumpDocumentForGrids("insert row below, before", gridElem)
+    debugDumpDocumentForGrids("insert row below, before")
 
     // Increment height of origin cells that don't end at the current row
     collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
@@ -123,7 +121,7 @@ trait GridOps extends ContainerOps {
 
     val result = insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption
 
-    debugDumpDocumentForGrids("insert row below, after", gridElem)
+    debugDumpDocumentForGrids("insert row below, after")
     result orNull // bad, but insert() is not always able to return the inserted item at this time
   }
 
@@ -200,7 +198,7 @@ trait GridOps extends ContainerOps {
         }
 
       // Find the new cell to select if we are removing the currently selected cell
-      val newCellToSelect = findNewCellToSelect(gridElem, cellsToDelete)
+      val newCellToSelect = findNewCellToSelect(cellsToDelete)
 
       // Delete all controls in the row
       cellsToDelete foreach (deleteControlWithinCell(_))
@@ -214,7 +212,7 @@ trait GridOps extends ContainerOps {
       // Adjust selected cell if needed
       newCellToSelect foreach selectCell
 
-      debugDumpDocumentForGrids("delete row", gridElem)
+      debugDumpDocumentForGrids("delete row")
     }
   }
 
@@ -227,8 +225,8 @@ trait GridOps extends ContainerOps {
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("selected-cell")
 
   // Find the currently selected grid cell if any
-  def findSelectedCell(inDoc: NodeInfo): Option[NodeInfo] =
-    findInViewTryIndex(inDoc, selectedCellVar.stringValue)
+  def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    findInViewTryIndex(ctx.rootElem, selectedCellVar.stringValue)
 
   //@XPathFunction
   def selectCellForControlId(inDoc: NodeInfo, controlId: String): Unit =
@@ -241,12 +239,12 @@ trait GridOps extends ContainerOps {
   // Whether a call to ensureEmptyCell() will succeed
   // For now say we'll always succeed as we'll fill gaps and insert a row as needed.
   // TODO: Remove once no longer needed.
-  def willEnsureEmptyCellSucceed(inDoc: NodeInfo): Boolean =
-    findSelectedCell(inDoc).isDefined
+  def willEnsureEmptyCellSucceed(implicit ctx: FormBuilderDocContext): Boolean =
+    findSelectedCell.isDefined
 
   // Try to ensure that there is an empty cell after the current location, inserting a new row if possible
-  def ensureEmptyCell(inDoc: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    findSelectedCell(inDoc) flatMap { currentCellNode ⇒
+  def ensureEmptyCell()(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    findSelectedCell flatMap { currentCellNode ⇒
       if (currentCellNode.hasChildElement) {
         // There is an element in the current cell, figure out what to do
 
@@ -323,12 +321,11 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  //@XPathFunction
-  def expandCellRight(cellElem: NodeInfo, amount: Int): Unit = {
+  def expandCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
     if (Cell.spaceToExtendCell(cells, cellElem, Direction.Right) >= amount) {
 
-      debugDumpDocumentForGrids("expandCellRight before", cellElem)
+      debugDumpDocumentForGrids("expandCellRight before")
 
       Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
         NodeInfoCellOps.updateW(originCell.td, originCell.w + amount)
@@ -344,20 +341,17 @@ trait GridOps extends ContainerOps {
         }
       }
 
-      debugDumpDocumentForGrids("expandCellRight after", cellElem)
+      debugDumpDocumentForGrids("expandCellRight after")
     }
   }
 
-  //@XPathFunction
-  def shrinkCellRight(cellElem: NodeInfo, amount: Int): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  def shrinkCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
     cellOpt filter (_.w - amount >= 1) foreach { cell ⇒
-      debugDumpDocumentForGrids("shrinkCellRight before", cellElem)
+      debugDumpDocumentForGrids("shrinkCellRight before")
 
       val newCellW = cell.w - amount
 
@@ -373,20 +367,17 @@ trait GridOps extends ContainerOps {
           h={cell.h.toString}/>: NodeInfo
 
       val result = insert(into = Nil, after = cell.td, origin = newCell).headOption
-      debugDumpDocumentForGrids("shrinkCellRight after", cellElem)
+      debugDumpDocumentForGrids("shrinkCellRight after")
     }
   }
 
-  //@XPathFunction
-  def expandCellDown(cellElem: NodeInfo, amount: Int): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  def expandCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
 
     if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount) {
 
-      debugDumpDocumentForGrids("expandCellDown before", cellElem)
+      debugDumpDocumentForGrids("expandCellDown before")
 
       Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
         NodeInfoCellOps.updateH(originCell.td, originCell.h + amount)
@@ -402,20 +393,17 @@ trait GridOps extends ContainerOps {
         }
       }
 
-      debugDumpDocumentForGrids("expandCellDown after", cellElem)
+      debugDumpDocumentForGrids("expandCellDown after")
     }
   }
 
-  //@XPathFunction
-  def shrinkCellDown(cellElem: NodeInfo, amount: Int): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
     cellOpt filter (_.h - amount >= 1) foreach { cell ⇒
-      debugDumpDocumentForGrids("shrinkCellDown before", cellElem)
+      debugDumpDocumentForGrids("shrinkCellDown before")
 
       val newCellH = cell.h - amount
 
@@ -434,7 +422,7 @@ trait GridOps extends ContainerOps {
       val insertCell = cell
 
       val result = insert(into = Nil, after = insertCell.td, origin = newCell).headOption
-      debugDumpDocumentForGrids("shrinkCellDown after", cellElem)
+      debugDumpDocumentForGrids("shrinkCellDown after")
     }
   }
 
@@ -453,8 +441,8 @@ trait GridOps extends ContainerOps {
   }
 
   // Find the new td to select if we are removing the currently selected td
-  def findNewCellToSelect(inDoc: NodeInfo, cellsToDelete: Seq[NodeInfo]): Option[NodeInfo] =
-    findSelectedCell(inDoc) match {
+  def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    findSelectedCell match {
       case Some(selectedCell) if cellsToDelete contains selectedCell ⇒
 
         def findCells(find: Test ⇒ Seq[NodeInfo], selectedCell: NodeInfo) =

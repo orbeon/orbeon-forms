@@ -39,7 +39,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    ensureEmptyCell(doc) match {
+    ensureEmptyCell() match {
       case Some(gridTd) ⇒
 
         val newControlName = controlNameFromId(nextId("control"))
@@ -138,7 +138,7 @@ object ToolboxOps {
         // This can impact templates
         updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
 
-        debugDumpDocumentForGrids("insert new control", doc)
+        debugDumpDocumentForGrids("insert new control")
 
         Some(newControlName)
 
@@ -151,9 +151,9 @@ object ToolboxOps {
   //@XPathFunction
   def canInsertSection(inDoc: NodeInfo) = inDoc ne null
   //@XPathFunction
-  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedCell(inDoc).isDefined
+  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedCell(FormBuilderDocContext(inDoc)).isDefined
   //@XPathFunction
-  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyCellSucceed(inDoc)
+  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyCellSucceed(FormBuilderDocContext(inDoc))
 
   // Insert a new grid
   //@XPathFunction
@@ -161,7 +161,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after, _) = findGridInsertionPoint(inDoc)
+    val (into, after, _) = findGridInsertionPoint
 
     // Obtain ids first
     val ids = nextIds("tmp", 3).toIterator
@@ -181,7 +181,7 @@ object ToolboxOps {
     // Select first grid cell
     selectFirstCellInContainer(newGridElem)
 
-    debugDumpDocumentForGrids("insert new grid", inDoc)
+    debugDumpDocumentForGrids("insert new grid")
   }
 
   // Insert a new section with optionally a nested grid
@@ -190,7 +190,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after) = findSectionInsertionPoint(inDoc)
+    val (into, after) = findSectionInsertionPoint
 
     val newSectionName = controlNameFromId(nextId("section"))
     val precedingSectionName = after flatMap getControlNameOpt
@@ -240,7 +240,7 @@ object ToolboxOps {
 
     // TODO: Open label editor for newly inserted section
 
-    debugDumpDocumentForGrids("insert new section", inDoc)
+    debugDumpDocumentForGrids("insert new section")
 
     Some(newSectionElem)
   }
@@ -251,7 +251,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after, grid) = findGridInsertionPoint(inDoc)
+    val (into, after, grid) = findGridInsertionPoint
     val newGridName         = controlNameFromId(nextId("grid"))
 
     val ids = nextIds("tmp", 2).toIterator
@@ -294,7 +294,7 @@ object ToolboxOps {
     // Select new td
     selectFirstCellInContainer(newGridElem)
 
-    debugDumpDocumentForGrids("insert new repeat", inDoc)
+    debugDumpDocumentForGrids("insert new repeat")
 
     Some(newGridName)
   }
@@ -455,6 +455,9 @@ object ToolboxOps {
   // Cut control to the clipboard
   //@XPathFunction
   def cutToClipboard(cellElem: NodeInfo): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     copyToClipboard(cellElem)
     deleteControlWithinCell(cellElem, updateTemplates = true)
   }
@@ -597,10 +600,10 @@ object ToolboxOps {
 
     val (into, after) =
       if (FormBuilder.IsGrid(containerControlElem)) {
-        val (into, after, _) = findGridInsertionPoint(inDoc)
+        val (into, after, _) = findGridInsertionPoint
         (into, after)
       } else {
-        findSectionInsertionPoint(inDoc)
+        findSectionInsertionPoint
       }
 
     // TODO: What if pasting after a non-repeated grid without name? We must try to keep the order of things!
@@ -665,7 +668,7 @@ object ToolboxOps {
     xcvElem        : NodeInfo)(implicit
     ctx            : FormBuilderDocContext
   ): Unit =
-    ensureEmptyCell(targetCellElem) foreach { gridCellElem ⇒
+    ensureEmptyCell() foreach { gridCellElem ⇒
 
       implicit val ctx = FormBuilderDocContext()
 
@@ -763,8 +766,8 @@ object ToolboxOps {
         <xf:alert ref=""/>
       </template>
 
-    def findGridInsertionPoint(inDoc: NodeInfo): (NodeInfo, Option[NodeInfo], Option[NodeInfo]) =
-      findSelectedCell(inDoc) match {
+    def findGridInsertionPoint(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[NodeInfo], Option[NodeInfo]) =
+      findSelectedCell match {
         case Some(currentCellElem) ⇒ // A cell is selected
 
           val containers = findAncestorContainersLeafToRoot(currentCellElem)
@@ -781,12 +784,11 @@ object ToolboxOps {
           (grandParentContainer, parentContainer, parentContainer)
 
         case _ ⇒ // No cell is selected, add top-level grid
-          val frBody = findFRBodyElem(inDoc)
-          (frBody, childrenContainers(frBody) lastOption, None)
+          (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption, None)
       }
 
-    def findSectionInsertionPoint(inDoc: NodeInfo): (NodeInfo, Option[NodeInfo]) =
-      findSelectedCell(inDoc) match {
+    def findSectionInsertionPoint(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[NodeInfo]) =
+      findSelectedCell match {
         case Some(currentCellElem) ⇒ // A cell is selected
 
           val containers = findAncestorContainersLeafToRoot(currentCellElem)
@@ -805,8 +807,7 @@ object ToolboxOps {
           }
 
         case _ ⇒ // No cell is selected, add top-level section
-          val frBody = findFRBodyElem(inDoc)
-          (frBody, childrenContainers(frBody) lastOption)
+          (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption)
       }
   }
 }

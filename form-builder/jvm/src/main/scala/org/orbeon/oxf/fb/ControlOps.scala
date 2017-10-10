@@ -52,8 +52,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
            xmlns:xf="http://www.w3.org/2002/xforms"/>
 
   // Find data holders (there can be more than one with repeats)
-  def findDataHolders(inDoc: NodeInfo, controlName: String): List[NodeInfo] =
-    findBindPathHoldersInDocument(inDoc, controlName, Some(formInstanceRoot(inDoc))) flatMap (_.holders) getOrElse Nil
+  def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
+    findBindPathHoldersInDocument(ctx.rootElem, controlName, Some(formInstanceRoot(ctx.rootElem))) flatMap (_.holders) getOrElse Nil
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
 
@@ -140,15 +140,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def iterateSelfAndDescendantHoldersReversed(rootHolder: NodeInfo): Iterator[NodeInfo] =
     (rootHolder descendantOrSelf *).reverseIterator
 
-  //@XPathFunction
-  def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false): Unit = {
+  def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false)(implicit ctx: FormBuilderDocContext): Unit = {
     cellElem / * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)
       self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
   }
 
   // Find all associated elements to delete for a given control element
-  def controlElementsToDelete(control: NodeInfo): List[NodeInfo] = {
+  def controlElementsToDelete(control: NodeInfo)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
 
     val doc = control.getDocumentRoot
 
@@ -158,7 +157,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       val result = mutable.Buffer[NodeInfo]()
 
       result ++=
-        findDataHolders     (doc, controlName) ++=
+        findDataHolders     (controlName) ++=
         findBindByName      (doc, controlName) ++=
         findTemplateInstance(doc, controlName) ++=
         findResourceHolders  (controlName)
@@ -178,12 +177,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (oldName != newName) {
 
-      findDataHolders(ctx.rootElem, oldName) foreach (rename(_, newName))
+      findDataHolders(oldName) foreach (rename(_, newName))
       findResourceHolders(oldName)    foreach (rename(_, newName))
 
-      renameBinds   (ctx.rootElem, oldName, newName)
-      renameControl (ctx.rootElem, oldName, newName)
-      renameTemplate(ctx.rootElem, oldName, newName)
+      renameBinds   (oldName, newName)
+      renameControl (oldName, newName)
+      renameTemplate(oldName, newName)
 
       findControlByName(ctx.rootElem, newName) foreach { newControl ⇒
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
@@ -221,15 +220,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       val newName = newChildElementName getOrElse defaultIterationName(newControlName)
 
       if (oldName != newName) {
-        findDataHolders(ctx.rootElem, oldName) foreach (rename(_, newName))
-        renameBinds(ctx.rootElem, oldName, newName)
+        findDataHolders(oldName) foreach (rename(_, newName))
+        renameBinds(oldName, newName)
         updateTemplates(None)
       }
     }
   }
 
-  def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
-    findControlByName(inDoc, oldName) foreach
+  def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
+    findControlByName(ctx.rootElem, oldName) foreach
       (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
 
   def resourceNamesInUseForControl(controlName: String): Set[String] =
@@ -272,8 +271,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Rename a bind
-  def renameBinds(inDoc: NodeInfo, oldName: String, newName: String): Unit =
-    findBindByName(inDoc, oldName) foreach (renameBindElement(_, newName))
+  def renameBinds(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
+    findBindByName(ctx.rootElem, oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
   private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {

@@ -13,13 +13,15 @@
   */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.FormBuilder.{findSectionsWithTemplates, getControlNameOpt}
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
+import org.orbeon.oxf.xforms.action.XFormsAPI.delete
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 
-// Functions called from `annotate.xpl` and which require a `FormBuilderDocContext` explicitly
-// referring to a given XML document.
+// Functions called from `annotate.xpl` and `model.xml` for annotation, and which require a
+// `FormBuilderDocContext` explicitly referring to a given XML document.
 trait AnnotationOps extends GridOps with ContainerOps with ResourcesOps {
 
   // Find all resource holders and elements which are unneeded because the resources are blank
@@ -52,4 +54,24 @@ trait AnnotationOps extends GridOps with ContainerOps with ResourcesOps {
   def nextIdsXPath(inDoc: NodeInfo, token: String, count: Int): Seq[String] =
     nextIds(token, count)(FormBuilderDocContext(inDoc))
 
+    // See: https://github.com/orbeon/orbeon-forms/issues/633
+  //@XPathFunction
+  def deleteSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {
+
+    implicit val ctx = FormBuilderDocContext(inDoc)
+
+    // Find data holders for all section templates
+    val holders =
+      for {
+        section     ← findSectionsWithTemplates(ctx.bodyElem)
+        controlName ← getControlNameOpt(section).toList
+        holder      ← findDataHolders(controlName)
+      } yield
+        holder
+
+    // Delete all elements underneath those holders
+    holders foreach { holder ⇒
+      delete(holder / *)
+    }
+  }
 }

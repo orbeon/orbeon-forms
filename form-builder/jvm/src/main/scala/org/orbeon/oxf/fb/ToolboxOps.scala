@@ -648,6 +648,7 @@ object ToolboxOps {
     // Update ancestor templates if any
     updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
+    // Make sure new grids and cells are annotated
     annotateGridsAndCells(newContainerElem)
 
     // Select first grid cell

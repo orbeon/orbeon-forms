@@ -48,7 +48,7 @@ trait GridOps extends ContainerOps {
     }
 
     // All grids and grid cells with no existing id
-    val grids = startElem descendant GridTest
+    val grids = startElem descendantOrSelf GridTest
 
     annotate("tmp", grids descendant CellTest filterNot (_.hasId))
     annotate("tmp", grids filterNot (_.hasId))

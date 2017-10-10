@@ -100,7 +100,7 @@ class ClientGridTest extends FunSpec {
         |  DdEeebFff |
         |GgddHh bIiii|
         |    hh J Kkk|
-      """.stripMargin.trim.replaceAllLiterally("|", "")
+      """.stripMargin.trim.replaceAllLiterally("|", "") // use `|` on the right as editors remove spaces
 
     it(s"must must analyze as expected") {
       assert(expectedASCII === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridBodySelector)(0), simplify = false))._1)

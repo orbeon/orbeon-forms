@@ -47,7 +47,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           <message lang="fr" value="Alert for fr"/>
         </alert>
 
-      assertAlertsXML(Array(expected), alertDetails map (a ⇒ a.toXML(currentLang): NodeInfo) toArray)
+      assertAlertsXML(List(expected), alertDetails map (a ⇒ a.toXML(currentLang): NodeInfo))
     }
 
   @Test def warningConstraintAutomaticId(): Unit =
@@ -60,7 +60,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
 
       val expected =
         <validation type="formula" id="validation-3-validation" level="warning" default-alert="false">
@@ -70,7 +70,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
+      assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
     }
 
   @Test def warningConstraintSpecifyId(): Unit =
@@ -83,14 +83,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
-      assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(Control1))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
+      assertAlertsXML(List(newValidation), readConstraintValidationsAsXML(Control1))
     }
 
   @Test def multipleValidations(): Unit =
     withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-      val newValidations = Array(
+      val newValidations = List(
         <validation type="formula" id="length5-constraint" level="error" default-alert="false">
           <constraint expression="string-length() gt 5" argument=""/>
           <alert message="Length must be greater than 5" global="false">
@@ -116,7 +116,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
       locally {
 
-        val twoValidations = Array(
+        val twoValidations = List(
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
             <constraint expression="string-length() gt 5" argument=""/>
             <alert message="Length must be greater than 5" global="false">
@@ -166,7 +166,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
 
       locally {
-        val oneValidation = Array(
+        val oneValidation = List(
           <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
             <alert message="Length must be greater than 10" global="false">
@@ -217,13 +217,13 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
       // Local default alert
       locally {
-        writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Array())
+        writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Nil)
         assert("$form-resources/control-1/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
       }
 
       // Global default alert
       locally {
-        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array())
+        writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Nil)
         assert("$fr-resources/detail/labels/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
       }
     }
@@ -237,7 +237,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           <alert message="" global="false"/>
         </validation>
 
-      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
 
       val expected =
         <validation type="formula" id="" level="error" default-alert="true">
@@ -245,7 +245,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           <alert message="" global="false"/>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
+      assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
 
       // No elements inserted under the bind
       val bind = findBindByName(ctx.rootElem, Control1).toList
@@ -263,7 +263,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Array(newValidation))
+      writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
 
       val expected =
         <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -273,7 +273,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
           </alert>
         </validation>
 
-      assertAlertsXML(Array(expected), readConstraintValidationsAsXML(Control1))
+      assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
 
       // One element inserted under the bind
       val bind = findBindByName(ctx.rootElem, Control1).toList
@@ -286,7 +286,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       val bind = findBindByName(ctx.rootElem, Control1).toList
 
       locally {
-        val newValidations = Array(
+        val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
             <alert message="" global="false"/>
@@ -310,7 +310,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
 
       locally {
-        val newValidations = Array(
+        val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>false()</required>
             <alert message="" global="false"/>
@@ -333,7 +333,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
 
       locally {
-        val newValidations = Array(
+        val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
             <alert message="" global="false"/>
@@ -356,7 +356,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
 
       locally {
-        val newValidations = Array(
+        val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>../foo = 'bar'</required>
             <alert message="" global="false"/>
@@ -369,7 +369,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
 
       locally {
-        val newValidations = Array(
+        val newValidations = List(
           <validation type="required" level="error" default-alert="false">
             <required>true()</required>
             <alert message="This is required!" global="false">
@@ -427,7 +427,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
       val bind = findBindByName(ctx.rootElem, Control1).toList
 
-      val newValidations = Array(
+      val newValidations = List(
         <validation type="required" level="error" default-alert="true">
           <required>true()</required>
           <alert message="" global="false"/>
@@ -457,7 +457,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
       val bind = findBindByName(ctx.rootElem, Control1).toList
 
-      val newValidations = Array(
+      val newValidations = List(
         <validation type="required" level="error" default-alert="true">
           <required>true()</required>
           <alert message="" global="false"/>
@@ -489,7 +489,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     ConstraintValidation.fromForm(controlName) map
     (a ⇒ a.toXML(currentLang): NodeInfo) toArray
 
-  private def assertAlertsXML(left: Array[sx.Elem], right: Array[NodeInfo]): Unit = {
+  private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 
     left zip right foreach {
       case (l, r) ⇒ assertXMLDocumentsIgnoreNamespacesInScope(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))

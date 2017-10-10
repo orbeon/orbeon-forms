@@ -69,11 +69,15 @@ trait AlertsAndConstraintsOps extends ControlOps {
   }
 
   // Return all validations as XML for the given control
-  def readValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext): Array[NodeInfo] =
+  //@XPathFunction
+  def readValidationsAsXMLXPath(controlName: String): Array[NodeInfo] =
+    readValidationsAsXML(controlName)(FormBuilderDocContext()).toArray
+
+  def readValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
     RequiredValidation.fromForm(controlName)    ::
     DatatypeValidation.fromForm(controlName)    ::
     ConstraintValidation.fromForm(controlName)  map
-    (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
+    (v ⇒ elemToNodeInfo(v.toXML(currentLang)))
 
   // Write back everything
   //@XPathFunction
@@ -94,7 +98,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     controlName      : String,
     newAppearance    : String,
     defaultAlertElem : NodeInfo,
-    validationElems  : Array[NodeInfo])(implicit
+    validationElems  : Seq[NodeInfo])(implicit
     ctx              : FormBuilderDocContext
   ): Unit = {
 

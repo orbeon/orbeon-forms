@@ -117,7 +117,7 @@
                 <!-- Read required, datatype, and constraint validations -->
                 <xf:insert
                     context="$validations"
-                    origin="fbf:readValidationsAsXML($form, $i/control-name)"/>
+                    origin="fbf:readValidationsAsXMLXPath($i/control-name)"/>
 
                 <!--  Insert an empty `formula` validation in the end to make it more discoverable by the user -->
                 <xf:insert

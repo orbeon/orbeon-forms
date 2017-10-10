@@ -30,113 +30,107 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object SectionGridEditor {
 
-  lazy val sectionGridEditorContainer               = $(".fb-section-grid-editor")
+  lazy val sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
+  var currentSectionGridOpt           : Option[Block] = None
 
-  var currentSectionGridOpt : Option[Block] = None
-
-  sealed trait ContainerEditor extends EnumEntry with Hyphencase {
-    def className = s".fb-$entryName"
-  }
-  object ContainerEditor extends Enum[ContainerEditor] {
-    val values = findValues
-    case object SectionDelete        extends ContainerEditor
-    case object SectionEditHelp      extends ContainerEditor
-    case object SectionMoveUp        extends ContainerEditor
-    case object SectionMoveDown      extends ContainerEditor
-    case object SectionMoveRight     extends ContainerEditor
-    case object SectionMoveLeft      extends ContainerEditor
-    case object GridDelete           extends ContainerEditor
-    case object ContainerEditDetails extends ContainerEditor
-    case object ContainerCopy        extends ContainerEditor
-    case object ContainerCut         extends ContainerEditor
-  }
-
-  import ContainerEditor._
-
-  private val AlwaysVisibleIcons =
-    List(
-      ContainerEditDetails,
-      SectionDelete, // TODO: not when last of container
-      SectionEditHelp,
-      ContainerCopy,
-      ContainerCut   // TODO: not when last of container
-    )
-
-  // Position editor when block becomes current
-  Position.currentContainerChanged(
-    containerCache = BlockCache.sectionGridCache,
-    wasCurrent = (sectionGridBody: Block) ⇒ {
-      if (sectionGridBody.el.is(BlockCache.GridBodySelector))
-        sectionGridBody.el.parent.removeClass("fb-hover")
-    },
-    becomesCurrent = (sectionGridBody: Block) ⇒ {
-      currentSectionGridOpt = Some(sectionGridBody)
-
-      // Position the editor
-      sectionGridEditorContainer.show()
-      Offset.offset(
-        sectionGridEditorContainer,
-        Offset(
-          // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-          left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
-          top  = sectionGridBody.top - Position.scrollTop()
-        )
-      )
-
-      // Start by hiding all the icons
-      sectionGridEditorContainer.children().hide()
-
-      // Update triggers relevance for section
-      if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
-
-        // Icons which are always visible
-        sectionGridEditorContainer.children(AlwaysVisibleIcons map (_.className) mkString ",").show()
-
-        // Hide/show section move icons
-        val container = sectionGridBody.el.children(".fr-section-container")
-        Direction.values foreach { direction ⇒
-
-          val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
-          val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
-
-          if (relevant)
-            trigger.show()
-        }
-
-        // Hide/show delete icon
-        val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
-        if (container.is(".fb-can-delete"))
-          deleteTrigger.show()
-      }
-
-      // Update triggers relevance for repeated grid only
-      if (sectionGridBody.el.is(BlockCache.GridSelector)) {
-
-        if (sectionGridBody.el.children(".fr-grid").is(".fr-repeat"))
-          sectionGridEditorContainer.children(".fb-grid-edit-details").show()
-
-        sectionGridEditorContainer.children(".fb-grid-delete").show()   // TODO: not when last of container
-        sectionGridEditorContainer.children(".fb-container-copy").show()
-        sectionGridEditorContainer.children(".fb-container-cut").show() // TODO: not when last of container
-
-        sectionGridBody.el.parent.addClass("fb-hover")
-      }
-    }
-  )
-
-  BlockCache.onExitFbMainOrOffsetMayHaveChanged { () ⇒
-    sectionGridEditorContainer.hide()
-    currentSectionGridOpt = None
-  }
-
-  def gridFromGridBody(block: Block): JQuery = {
-    assert(block.el.is(BlockCache.GridBodySelector))
-    block.el.closest(BlockCache.GridSelector)
-  }
-
-  // Register listener on editor icons
   locally {
 
+    sealed trait ContainerEditor extends EnumEntry with Hyphencase {
+      def className = s".fb-$entryName"
+    }
+    object ContainerEditor extends Enum[ContainerEditor] {
+      val values = findValues
+      case object SectionDelete        extends ContainerEditor
+      case object SectionEditHelp      extends ContainerEditor
+      case object SectionMoveUp        extends ContainerEditor
+      case object SectionMoveDown      extends ContainerEditor
+      case object SectionMoveRight     extends ContainerEditor
+      case object SectionMoveLeft      extends ContainerEditor
+      case object GridDelete           extends ContainerEditor
+      case object ContainerEditDetails extends ContainerEditor
+      case object ContainerCopy        extends ContainerEditor
+      case object ContainerCut         extends ContainerEditor
+    }
+
+    import ContainerEditor._
+
+    val AlwaysVisibleIcons =
+      List(
+        ContainerEditDetails,
+        SectionDelete, // TODO: not when last of container
+        SectionEditHelp,
+        ContainerCopy,
+        ContainerCut   // TODO: not when last of container
+      )
+
+    // Position editor when block becomes current
+    Position.currentContainerChanged(
+      containerCache = BlockCache.sectionGridCache,
+      wasCurrent = (sectionGridBody: Block) ⇒ {
+        if (sectionGridBody.el.is(BlockCache.GridBodySelector))
+          sectionGridBody.el.parent.removeClass("fb-hover")
+      },
+      becomesCurrent = (sectionGridBody: Block) ⇒ {
+        currentSectionGridOpt = Some(sectionGridBody)
+
+        // Position the editor
+        sectionGridEditorContainer.show()
+        Offset.offset(
+          sectionGridEditorContainer,
+          Offset(
+            // Use `.fr-body` left rather than the section left to account for sub-sections indentation
+            left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
+            top  = sectionGridBody.top - Position.scrollTop()
+          )
+        )
+
+        // Start by hiding all the icons
+        sectionGridEditorContainer.children().hide()
+
+        // Update triggers relevance for section
+        if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
+
+          // Icons which are always visible
+          sectionGridEditorContainer.children(AlwaysVisibleIcons map (_.className) mkString ",").show()
+
+          // Hide/show section move icons
+          val container = sectionGridBody.el.children(".fr-section-container")
+          Direction.values foreach { direction ⇒
+
+            val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
+            val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
+
+            if (relevant)
+              trigger.show()
+          }
+
+          // Hide/show delete icon
+          val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
+          if (container.is(".fb-can-delete"))
+            deleteTrigger.show()
+        }
+
+        // Update triggers relevance for repeated grid only
+        if (sectionGridBody.el.is(BlockCache.GridSelector)) {
+
+          if (sectionGridBody.el.children(".fr-grid").is(".fr-repeat"))
+            sectionGridEditorContainer.children(".fb-grid-edit-details").show()
+
+          sectionGridEditorContainer.children(".fb-grid-delete").show()   // TODO: not when last of container
+          sectionGridEditorContainer.children(".fb-container-copy").show()
+          sectionGridEditorContainer.children(".fb-container-cut").show() // TODO: not when last of container
+
+          sectionGridBody.el.parent.addClass("fb-hover")
+        }
+      }
+    )
+
+    BlockCache.onExitFbMainOrOffsetMayHaveChanged { () ⇒
+      sectionGridEditorContainer.hide()
+      currentSectionGridOpt = None
+    }
+
+    // Register listener on editor icons
     ContainerEditor.values foreach { editor ⇒
 
       val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")

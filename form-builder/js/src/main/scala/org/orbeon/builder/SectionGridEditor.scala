@@ -31,10 +31,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object SectionGridEditor {
 
   lazy val sectionGridEditorContainer               = $(".fb-section-grid-editor")
-  lazy val rowEditorContainer                       = $(".fb-row-editor")
 
-  var currentSectionGridBodyOpt : Option[Block] = None
-  var currentRowPosOpt          : Option[Int]   = None
+  var currentSectionGridOpt : Option[Block] = None
 
   sealed trait ContainerEditor extends EnumEntry with Hyphencase {
     def className = s".fb-$entryName"
@@ -55,18 +53,6 @@ object SectionGridEditor {
 
   import ContainerEditor._
 
-  sealed abstract class RowEditor extends EnumEntry with Hyphencase {
-    def className = s".fb-row-$entryName"
-  }
-  object RowEditor extends Enum[RowEditor] {
-    val values = findValues
-    case object InsertAbove extends RowEditor
-    case object Delete      extends RowEditor
-    case object InsertBelow extends RowEditor
-  }
-
-  import RowEditor._
-
   private val AlwaysVisibleIcons =
     List(
       ContainerEditDetails,
@@ -78,13 +64,13 @@ object SectionGridEditor {
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
-    containerCache = BlockCache.sectionGridBodyCache,
+    containerCache = BlockCache.sectionGridCache,
     wasCurrent = (sectionGridBody: Block) ⇒ {
       if (sectionGridBody.el.is(BlockCache.GridBodySelector))
         sectionGridBody.el.parent.removeClass("fb-hover")
     },
     becomesCurrent = (sectionGridBody: Block) ⇒ {
-      currentSectionGridBodyOpt = Some(sectionGridBody)
+      currentSectionGridOpt = Some(sectionGridBody)
 
       // Position the editor
       sectionGridEditorContainer.show()
@@ -124,9 +110,9 @@ object SectionGridEditor {
       }
 
       // Update triggers relevance for repeated grid only
-      if (sectionGridBody.el.is(BlockCache.GridBodySelector)) {
+      if (sectionGridBody.el.is(BlockCache.GridSelector)) {
 
-        if (sectionGridBody.el.closest(".fr-grid").is(".fr-repeat"))
+        if (sectionGridBody.el.children(".fr-grid").is(".fr-repeat"))
           sectionGridEditorContainer.children(".fb-grid-edit-details").show()
 
         sectionGridEditorContainer.children(".fb-grid-delete").show()   // TODO: not when last of container
@@ -138,100 +124,15 @@ object SectionGridEditor {
     }
   )
 
-  // Hide editor when the pointer gets out of the Form Builder main area
-  Position.currentContainerChanged(
-    containerCache = BlockCache.fbMainCache,
-    wasCurrent = (_: Block) ⇒ hideSideEditors(),
-    becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
-  )
-
-  // Also hide when blocks may have moved, e.g. on Ajax response, say after a row was added,
-  // to avoid inappropriately positioned editors
-  Position.onOffsetMayHaveChanged(hideSideEditors _)
-
-  def hideSideEditors(): Unit = {
+  BlockCache.onExitFbMainOrOffsetMayHaveChanged { () ⇒
     sectionGridEditorContainer.hide()
-    rowEditorContainer.hide()
-    currentSectionGridBodyOpt = None
-    currentRowPosOpt          = None
-  }
-
-  // Position row editor
-  Position.onUnderPointerChange {
-    withCurrentGridBody((currentGridBody) ⇒ {
-
-      // Get the height of each row track
-      val rowsHeight =
-        currentGridBody.el
-          .css("grid-template-rows")
-          .splitTo[List]()
-          .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
-          .map(_.toDouble)
-
-      case class TopBottom(top: Double, bottom: Double)
-
-      // For each row track, find its top/bottom
-      val rowsTopBottom = {
-        val gridBodyTop = currentGridBody.top
-        val zero = List(TopBottom(0, gridBodyTop))
-        rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
-          val lastBottom = soFar.last.bottom
-          val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)
-          soFar :+ newTopBottom
-        }.drop(1)
-      }
-
-      // Find top/bottom of the row track the pointer is on
-      val pointerRowTopBottomIndexOpt = {
-        val pointerTop = Position.pointerPos.top + Position.scrollTop()
-        rowsTopBottom.zipWithIndex.find { case (topBottom, _) ⇒
-          topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
-        }
-      }
-
-      // Find where to position the row editor on the left
-      val containerLeft = Offset(gridFromGridBody(currentGridBody)).left
-
-      // Position row editor
-      pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
-        rowEditorContainer.show()
-        rowEditorContainer.children().hide()
-
-        val rowTop    = pointerRowTopBottom._1.top
-        val rowBottom = pointerRowTopBottom._1.bottom
-        val rowHeight = rowBottom - rowTop
-        val rowIndex  = pointerRowTopBottom._2
-
-        def positionElWithClass(selector: String, topOffset: (JQuery) ⇒ Double): Unit = {
-          val elem = rowEditorContainer.children(selector)
-          elem.show()
-          Offset.offset(
-            el = elem,
-            offset = Offset(
-              left = containerLeft,
-              top  = topOffset(elem) - Position.scrollTop()
-            )
-          )
-        }
-
-        currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(RowEditor.InsertAbove.className, (_) ⇒ rowTop)
-        positionElWithClass(RowEditor.Delete.className,      (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(RowEditor.InsertBelow.className, (e) ⇒ rowBottom - e.height())
-      })
-    })
+    currentSectionGridOpt = None
   }
 
   def gridFromGridBody(block: Block): JQuery = {
     assert(block.el.is(BlockCache.GridBodySelector))
     block.el.closest(BlockCache.GridSelector)
   }
-
-  def withCurrentGridBody(fn: Block ⇒ Unit): Unit =
-    currentSectionGridBodyOpt.foreach((currentSectionGridBody) ⇒
-      if (currentSectionGridBody.el.is(BlockCache.GridBodySelector))
-        fn(currentSectionGridBody)
-    )
 
   // Register listener on editor icons
   locally {
@@ -241,17 +142,9 @@ object SectionGridEditor {
       val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
 
       iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
-        currentSectionGridBodyOpt foreach { currentSectionGridBody ⇒
+        currentSectionGridOpt foreach { currentSectionGrid ⇒
 
-          val isSection = currentSectionGridBody.el.is(BlockCache.SectionSelector)
-
-          val sectionGrid =
-            if (isSection)
-              currentSectionGridBody.el
-            else
-              gridFromGridBody(currentSectionGridBody)
-
-          val sectionGridId = sectionGrid.attr("id").get
+          val sectionGridId = currentSectionGrid.el.attr("id").get
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
@@ -265,25 +158,6 @@ object SectionGridEditor {
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
             case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()
-          }
-        }
-      })
-    }
-
-    RowEditor.values foreach { rowEditor ⇒
-      val iconEl = rowEditorContainer.children(rowEditor.className)
-      iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
-        withCurrentGridBody { currentGridBody ⇒
-          currentRowPosOpt foreach { currentRowPos ⇒
-
-            val controlId = gridFromGridBody(currentGridBody).attr("id").get
-            val client    = RpcClient[FormBuilderRpcApi]
-
-            rowEditor match {
-              case InsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()
-              case Delete      ⇒ client.rowDelete     (controlId, currentRowPos).call()
-              case InsertBelow ⇒ client.rowInsertBelow(controlId, currentRowPos).call()
-            }
           }
         }
       })

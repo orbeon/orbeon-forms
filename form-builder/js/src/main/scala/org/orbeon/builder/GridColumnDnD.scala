@@ -14,77 +14,76 @@
 package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
-import org.orbeon.builder.ControlDnD.{CopyClass, MoveClass, drake, shiftPressed}
-import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 
 import scala.scalajs.js
 
-private object GridColumnDnD {
+object GridColumnDnD {
 
-  if (false) {
+  private object Private {
+    if (false) {
 
-    val FbMainClass          = "fb-main"
-    val ColumnContainerClass = "fb-grid-dnd-column-container"
-    val ColumnHandleClass    = "fb-grid-dnd-column-handle"
-    val FbMain               = $(s".$FbMainClass")
+      val FbMainClass          = "fb-main"
+      val ColumnContainerClass = "fb-grid-dnd-column-container"
+      val ColumnHandleClass    = "fb-grid-dnd-column-handle"
+      val FbMain               = $(s".$FbMainClass")
 
-    Position.currentContainerChanged(
-      containerCache = BlockCache.cellCache,
-      wasCurrent     = (_: Block   ) ⇒ hideDndContainers(),
-      becomesCurrent = (cell: Block) ⇒ showDndContainers(cell)
-    )
+      Position.currentContainerChanged(
+        containerCache = BlockCache.cellCache,
+        wasCurrent     = (_: Block   ) ⇒ hideDndContainers(),
+        becomesCurrent = (cell: Block) ⇒ showDndContainers(cell)
+      )
 
-    def showDndContainers(cell: Block): Unit = {
+      def showDndContainers(cell: Block): Unit = {
 
-      val gridBody   = cell.el.parents(".fr-grid-body").first()
+        val gridBody   = cell.el.parents(".fr-grid-body").first()
 
-      def addContainer(index: Int): Unit = {
-        val dndContainer = $(s"""<div class="$ColumnContainerClass">""")
-        val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
-        dndContainer.append(dndHandle)
-        FbMain.append(dndContainer)
-        Offset.offset(dndContainer, Offset(
-          left = Offset(gridBody).left + (gridBody.width() - dndContainer.width()) / 12 * index,
-          top  = cell.top
-        ))
-        dndContainer.height(cell.height)
+        def addContainer(index: Int): Unit = {
+          val dndContainer = $(s"""<div class="$ColumnContainerClass">""")
+          val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
+          dndContainer.append(dndHandle)
+          FbMain.append(dndContainer)
+          Offset.offset(dndContainer, Offset(
+            left = Offset(gridBody).left + (gridBody.width() - dndContainer.width()) / 12 * index,
+            top  = cell.top
+          ))
+          dndContainer.height(cell.height)
+        }
+
+        for (i ← 6 to 12)
+          addContainer(i)
       }
 
-      for (i ← 6 to 12)
-        addContainer(i)
-    }
-
-    def hideDndContainers(): Unit = {
-      FbMain.find(s".$ColumnContainerClass").remove()
-    }
-
-    val drake = Dragula(
-      js.Array(),
-      new DragulaOptions {
-        override def isContainer(el: html.Element): Boolean = {
-          scala.scalajs.js.Dynamic.global.console.log("isContainer", el)
-          el.classList.contains(ColumnContainerClass)
-        }
-        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
-          scala.scalajs.js.Dynamic.global.console.log("moves", handle)
-          handle.classList.contains(ColumnHandleClass)
-        }
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
-          target.classList.contains(ColumnContainerClass)
+      def hideDndContainers(): Unit = {
+        FbMain.find(s".$ColumnContainerClass").remove()
       }
-    )
 
-    drake.onDrag((el: html.Element, source: html.Element) ⇒
-      println("drag")
-    )
+      val drake = Dragula(
+        js.Array(),
+        new DragulaOptions {
+          override def isContainer(el: html.Element): Boolean = {
+            scala.scalajs.js.Dynamic.global.console.log("isContainer", el)
+            el.classList.contains(ColumnContainerClass)
+          }
+          override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
+            scala.scalajs.js.Dynamic.global.console.log("moves", handle)
+            handle.classList.contains(ColumnHandleClass)
+          }
+          override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
+            target.classList.contains(ColumnContainerClass)
+        }
+      )
 
-    drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
-      scala.scalajs.js.Dynamic.global.console.log("Drop")
-    })
+      drake.onDrag((el: html.Element, source: html.Element) ⇒
+        println("drag")
+      )
+
+      drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
+        scala.scalajs.js.Dynamic.global.console.log("Drop")
+      })
+    }
   }
 }

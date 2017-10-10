@@ -43,68 +43,81 @@ object BlockCache {
     val cols: js.Array[Block] = js.Array()
   }
 
-  val sectionGridBodyCache = js.Array[Block]()
+  val sectionGridCache     = js.Array[Block]()
+  val gridBodyCache        = js.Array[Block]()
   val fbMainCache          = js.Array[Block]()
   val cellCache            = js.Array[Block]()
 
-  // Keep caches current
-  Position.onOffsetMayHaveChanged(() ⇒ {
-
-    locally {
-      sectionGridBodyCache.length = 0
-      $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
-        val section = $(domSection)
-
-        val mostOuterSection =
-          section.parents(SectionSelector).last()
-            .pipe(Option(_)).filter(_.is("*"))
-            .getOrElse(section)
-
-        val titleAnchor = section.find("a")
-
-        sectionGridBodyCache.unshift(new Block {
-          override val el          = section
-          override val top         = Position.adjustedOffset(section).top
-          override val left        = Position.adjustedOffset(mostOuterSection).left
-          override val height      = titleAnchor.height()
-          override val width       = mostOuterSection.width()
-          override val titleOffset = Offset(titleAnchor)
-        })
-
-      })
-      val gridEls = $(
-        """.xbl-fr-grid > .fr-grid.fr-editable >                             .fr-grid-body,
-          |.xbl-fr-grid > .fr-grid.fr-editable > .fr-grid-repeat-iteration > .fr-grid-body
-        """.stripMargin
-      )
-      gridEls.each((grid: dom.Element) ⇒
-        addToCache(sectionGridBodyCache, $(grid))
-      )
-    }
-
-    locally {
-      fbMainCache.length = 0
-      val fbMain = $(".fb-main-inner")
-      addToCache(fbMainCache, fbMain)
-    }
-
-    locally {
-      cellCache.length = 0
-      val cells = $(".fr-grid.fr-editable .fr-grid-td")
-      cells.each((cell: dom.Element) ⇒ addToCache(cellCache, $(cell)))
-    }
-  })
-
-  private def addToCache(cache: js.Array[Block], elem: JQuery): Unit = {
-    val elemOffset = Position.adjustedOffset(elem)
-    cache.unshift(new Block {
-      override val el          = elem
-      override val top         = elemOffset.top
-      override val left        = elemOffset.left
-      override val height      = elem.outerHeight()
-      override val width       = elem.outerWidth()
-      override val titleOffset = null
-    })
+  def onExitFbMainOrOffsetMayHaveChanged(fn: () ⇒ Unit): Unit = {
+    Position.onOffsetMayHaveChanged(fn)
+    Position.currentContainerChanged(
+      containerCache = BlockCache.fbMainCache,
+      wasCurrent     = (_: Block) ⇒ fn(),
+      becomesCurrent = (_: Block) ⇒ ()
+    )
   }
 
+  locally {
+
+    // Keep caches current
+    Position.onOffsetMayHaveChanged(() ⇒ {
+
+      locally {
+        sectionGridCache.length = 0
+        $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
+          val section = $(domSection)
+
+          val mostOuterSection =
+            section.parents(SectionSelector).last()
+              .pipe(Option(_)).filter(_.is("*"))
+              .getOrElse(section)
+
+          val titleAnchor = section.find("a")
+
+          sectionGridCache.unshift(new Block {
+            override val el          = section
+            override val top         = Position.adjustedOffset(section).top
+            override val left        = Position.adjustedOffset(mostOuterSection).left
+            override val height      = titleAnchor.height()
+            override val width       = mostOuterSection.width()
+            override val titleOffset = Offset(titleAnchor)
+          })
+
+        })
+        $(GridSelector).each((grid: dom.Element) ⇒
+          addToCache(sectionGridCache, $(grid))
+        )
+      }
+
+      locally {
+        gridBodyCache.length = 0
+        val gridBodies = $(".fr-grid-body")
+        gridBodies.each((gridBody: dom.Element) ⇒ addToCache(gridBodyCache, $(gridBody)))
+      }
+
+      locally {
+        fbMainCache.length = 0
+        val fbMain = $(".fb-main-inner")
+        addToCache(fbMainCache, fbMain)
+      }
+
+      locally {
+        cellCache.length = 0
+        val cells = $(".fr-grid.fr-editable .fr-grid-td")
+        cells.each((cell: dom.Element) ⇒ addToCache(cellCache, $(cell)))
+      }
+    })
+
+    def addToCache(cache: js.Array[Block], elem: JQuery): Unit = {
+      val elemOffset = Position.adjustedOffset(elem)
+      cache.unshift(new Block {
+        override val el          = elem
+        override val top         = elemOffset.top
+        override val left        = elemOffset.left
+        override val height      = elem.outerHeight()
+        override val width       = elem.outerWidth()
+        override val titleOffset = null
+      })
+    }
+  }
 }

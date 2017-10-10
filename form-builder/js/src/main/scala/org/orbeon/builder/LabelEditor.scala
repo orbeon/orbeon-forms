@@ -46,7 +46,7 @@ object LabelEditor {
 
     if (eventName == "DOMActivate" && inSectionEditor)
       addProperties(js.Dictionary(
-        "section-id" → SectionGridEditor.currentSectionGridBodyOpt.get.el.attr("id").get
+        "section-id" → SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
       ))
   })
 
@@ -54,7 +54,7 @@ object LabelEditor {
 
     val newLabelValue    = labelInputOpt.get.value().asInstanceOf[String]
     val labelInputOffset = Position.adjustedOffset(labelInputOpt.get)
-    val section          = Position.findInCache(BlockCache.sectionGridBodyCache, labelInputOffset.top, labelInputOffset.left).get
+    val section          = Position.findInCache(BlockCache.sectionGridCache, labelInputOffset.top, labelInputOffset.left).get
     val sectionId        = section.el.attr("id").get
 
     section.el.find(SectionLabelSelector).text(newLabelValue)
@@ -94,7 +94,7 @@ object LabelEditor {
 
       // From the section title, get the anchor element, which contains the title
       val labelAnchor = {
-          val section = Position.findInCache(BlockCache.sectionGridBodyCache, interceptorOffset.top, interceptorOffset.left).get
+          val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
           section.el.find(SectionLabelSelector)
       }
 
@@ -132,7 +132,7 @@ object LabelEditor {
   )                  : Unit = {
 
     val offset  = Position.adjustedOffset(clickInterceptor)
-    val section = Position.findInCache(BlockCache.sectionGridBodyCache, offset.top, offset.left)
+    val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left)
     val sectionTitle = section.get.el.find(SectionTitleSelector)
     updateClass("hover", sectionTitle)
   }
@@ -140,7 +140,7 @@ object LabelEditor {
   // Show textual indication user can click on empty section title
   def showClickHintIfTitleEmpty(clickInterceptor: JQuery): Unit = {
     val interceptorOffset = Position.adjustedOffset(clickInterceptor)
-    val section = Position.findInCache(BlockCache.sectionGridBodyCache, interceptorOffset.top, interceptorOffset.left).get
+    val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
     val labelAnchor = section.el.find(SectionLabelSelector)
     if (labelAnchor.text() == "") {
       val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")

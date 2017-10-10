@@ -28,6 +28,7 @@ object FormBuilderApp {
       ControlDnD
       BlockCache
       SectionGridEditor
+      RowEditor
       LabelEditor
       ControlEditor
       ControlLabelHintTextEditor

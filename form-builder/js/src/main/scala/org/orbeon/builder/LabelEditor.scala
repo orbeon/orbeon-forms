@@ -127,7 +127,7 @@ object LabelEditor {
 
   // Update highlight of section title, as a hint users can click to edit
   def updateHighlight(
-    updateClass      : js.Function2[String, JQuery, Unit],
+    updateClass      : (String, JQuery) ⇒ Unit,
     clickInterceptor : JQuery
   )                  : Unit = {
 

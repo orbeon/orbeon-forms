@@ -41,107 +41,105 @@ object ToolboxOps {
 
     ensureEmptyCell() match {
       case Some(gridTd) ⇒
+        withDebugGridOperation("insert new control") {
+          val newControlName = controlNameFromId(nextId("control"))
 
-        val newControlName = controlNameFromId(nextId("control"))
+          // Insert control template
+          val newControlElem: NodeInfo =
+            findViewTemplate(binding) match {
+              case Some(viewTemplate) ⇒
+                // There is a specific template available
+                val controlElem = insert(into = gridTd, origin = viewTemplate).head
+                // xf:help might be in the template, but we don't need it as it is created on demand
+                delete(controlElem / "help")
+                controlElem
+              case _ ⇒
+                // No specific, create simple element with LHHA
+                val controlElem =
+                  insert(
+                    into   = gridTd,
+                    origin = elementInfo(bindingFirstURIQualifiedName(binding))
+                  ).head
 
-        // Insert control template
-        val newControlElem: NodeInfo =
-          findViewTemplate(binding) match {
-            case Some(viewTemplate) ⇒
-              // There is a specific template available
-              val controlElem = insert(into = gridTd, origin = viewTemplate).head
-              // xf:help might be in the template, but we don't need it as it is created on demand
-              delete(controlElem / "help")
-              controlElem
-            case _ ⇒
-              // No specific, create simple element with LHHA
-              val controlElem =
                 insert(
-                  into   = gridTd,
-                  origin = elementInfo(bindingFirstURIQualifiedName(binding))
-                ).head
+                  into   = controlElem,
+                  origin = lhhaTemplate / *
+                )
 
-              insert(
-                into   = controlElem,
-                origin = lhhaTemplate / *
-              )
-
-              controlElem
-          }
-
-        // Set default pointer to resources if there is an xf:alert
-        setvalue(newControlElem / "*:alert" /@ "ref", OldStandardAlertRef)
-
-        // Data holder may contain file attributes
-        val dataHolder = newDataHolder(newControlName, binding)
-
-        // Create resource holder for all form languages
-        val resourceHolders = {
-          val formLanguages = FormRunnerResourcesOps.allLangs(ctx.resourcesRootElem)
-          formLanguages map { formLang ⇒
-
-            // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
-            val lhhaResourceEls = {
-              val lhhaNames = newControlElem / * map (_.localname) filter LHHAResourceNamesToInsert
-              lhhaNames map (elementInfo(_))
+                controlElem
             }
 
-            // Resource holders from XBL metadata
-            val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
+          // Set default pointer to resources if there is an xf:alert
+          setvalue(newControlElem / "*:alert" /@ "ref", OldStandardAlertRef)
 
-            // Template items, if needed
-            val itemsResourceEls =
-              if (hasEditor(newControlElem, "static-itemset")) {
-                val fbResourceInFormLang = FormRunnerLang.formResourcesInLang(formLang)
-                val originalTemplateItems = fbResourceInFormLang / "template" / "items" / "item"
-                if (hasEditor(newControlElem, "item-hint")) {
-                  // Supports hint: keep hint we have in the resources.xml
-                  originalTemplateItems
-                }  else {
-                  // Hint not supported: <hint> in each <item>
-                  originalTemplateItems map { item ⇒
-                    val newLHHA = (item / *) filter (_.localname != "hint")
-                    elementInfo("item", newLHHA)
-                  }
-                }
-              } else {
-                Nil
+          // Data holder may contain file attributes
+          val dataHolder = newDataHolder(newControlName, binding)
+
+          // Create resource holder for all form languages
+          val resourceHolders = {
+            val formLanguages = FormRunnerResourcesOps.allLangs(ctx.resourcesRootElem)
+            formLanguages map { formLang ⇒
+
+              // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
+              val lhhaResourceEls = {
+                val lhhaNames = newControlElem / * map (_.localname) filter LHHAResourceNamesToInsert
+                lhhaNames map (elementInfo(_))
               }
 
-            val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
-            formLang → List(elementInfo(newControlName, resourceEls))
+              // Resource holders from XBL metadata
+              val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
+
+              // Template items, if needed
+              val itemsResourceEls =
+                if (hasEditor(newControlElem, "static-itemset")) {
+                  val fbResourceInFormLang = FormRunnerLang.formResourcesInLang(formLang)
+                  val originalTemplateItems = fbResourceInFormLang / "template" / "items" / "item"
+                  if (hasEditor(newControlElem, "item-hint")) {
+                    // Supports hint: keep hint we have in the resources.xml
+                    originalTemplateItems
+                  }  else {
+                    // Hint not supported: <hint> in each <item>
+                    originalTemplateItems map { item ⇒
+                      val newLHHA = (item / *) filter (_.localname != "hint")
+                      elementInfo("item", newLHHA)
+                    }
+                  }
+                } else {
+                  Nil
+                }
+
+              val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
+              formLang → List(elementInfo(newControlName, resourceEls))
+            }
           }
+
+          // Insert data and resource holders
+          insertHolders(
+            controlElement       = newControlElem,
+            dataHolders          = List(dataHolder),
+            resourceHolders      = resourceHolders,
+            precedingControlName = precedingControlNameInSectionForControl(newControlElem)
+          )
+
+          // Adjust bindings on newly inserted control, done after the control is added as
+          // renameControlByElement() expects resources to be present
+          renameControlByElement(newControlElem, newControlName, resourceNamesInUseForControl(newControlName))
+
+          // Insert the bind element
+          val bind = ensureBinds(findContainerNamesForModel(gridTd) :+ newControlName)
+
+          // Make sure there is a @bind instead of a @ref on the control
+          delete(newControlElem /@ "ref")
+          ensureAttribute(newControlElem, "bind", bind /@ "id" stringValue)
+
+          // Set bind attributes if any
+          insert(into = bind, origin = findBindAttributesTemplate(binding))
+
+          // This can impact templates
+          updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
+
+          Some(newControlName)
         }
-
-        // Insert data and resource holders
-        insertHolders(
-          controlElement       = newControlElem,
-          dataHolders          = List(dataHolder),
-          resourceHolders      = resourceHolders,
-          precedingControlName = precedingControlNameInSectionForControl(newControlElem)
-        )
-
-        // Adjust bindings on newly inserted control, done after the control is added as
-        // renameControlByElement() expects resources to be present
-        renameControlByElement(newControlElem, newControlName, resourceNamesInUseForControl(newControlName))
-
-        // Insert the bind element
-        val bind = ensureBinds(findContainerNamesForModel(gridTd) :+ newControlName)
-
-        // Make sure there is a @bind instead of a @ref on the control
-        delete(newControlElem /@ "ref")
-        ensureAttribute(newControlElem, "bind", bind /@ "id" stringValue)
-
-        // Set bind attributes if any
-        insert(into = bind, origin = findBindAttributesTemplate(binding))
-
-        // This can impact templates
-        updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
-
-        debugDumpDocumentForGrids("insert new control")
-
-        Some(newControlName)
-
       case _ ⇒
         // no empty td found/created so NOP
         None
@@ -161,27 +159,28 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after, _) = findGridInsertionPoint
+    withDebugGridOperation("insert new grid") {
 
-    // Obtain ids first
-    val ids = nextIds("tmp", 3).toIterator
+      val (into, after, _) = findGridInsertionPoint
 
-    // The grid template
-    val gridTemplate: NodeInfo =
-      <fr:grid edit-ref="" id={ids.next()} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
-      </fr:grid>
+      // Obtain ids first
+      val ids = nextIds("tmp", 3).toIterator
 
-    // Insert after current level 2 if found, otherwise into level 1
-    val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
+      // The grid template
+      val gridTemplate: NodeInfo =
+        <fr:grid edit-ref="" id={ids.next()} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
+        </fr:grid>
 
-    // This can impact templates
-    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
+      // Insert after current level 2 if found, otherwise into level 1
+      val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
 
-    // Select first grid cell
-    selectFirstCellInContainer(newGridElem)
+      // This can impact templates
+      updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
-    debugDumpDocumentForGrids("insert new grid")
+      // Select first grid cell
+      selectFirstCellInContainer(newGridElem)
+    }
   }
 
   // Insert a new section with optionally a nested grid
@@ -190,59 +189,60 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after) = findSectionInsertionPoint
+    withDebugGridOperation("insert new section") {
 
-    val newSectionName = controlNameFromId(nextId("section"))
-    val precedingSectionName = after flatMap getControlNameOpt
+      val (into, after) = findSectionInsertionPoint
 
-    // Obtain ids first
-    val ids = nextIds("tmp", 3).toIterator
+      val newSectionName = controlNameFromId(nextId("section"))
+      val precedingSectionName = after flatMap getControlNameOpt
 
-    // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
-    val sectionTemplate: NodeInfo =
-      <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
-            xmlns:xh="http://www.w3.org/1999/xhtml"
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
-        if (withGrid)
-          <fr:grid edit-ref="" id={ids.next()}>
-            <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
-          </fr:grid>
-      }</fr:section>
+      // Obtain ids first
+      val ids = nextIds("tmp", 3).toIterator
 
-    val newSectionElem = insert(into = into, after = after.toList, origin = sectionTemplate).head
+      // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
+      val sectionTemplate: NodeInfo =
+        <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
+              xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
+          if (withGrid)
+            <fr:grid edit-ref="" id={ids.next()}>
+              <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
+            </fr:grid>
+        }</fr:section>
 
-    // Create and insert holders
-    val resourceHolder = {
-      val elemContent = List(elementInfo("label"), elementInfo("help"))
-      elementInfo(newSectionName, elemContent)
+      val newSectionElem = insert(into = into, after = after.toList, origin = sectionTemplate).head
+
+      // Create and insert holders
+      val resourceHolder = {
+        val elemContent = List(elementInfo("label"), elementInfo("help"))
+        elementInfo(newSectionName, elemContent)
+      }
+
+      insertHolderForAllLang(
+        controlElement       = newSectionElem,
+        dataHolder           = elementInfo(newSectionName),
+        resourceHolder       = resourceHolder,
+        precedingControlName = precedingSectionName
+      )
+
+      // Insert the bind element
+      ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
+
+      // This can impact templates
+      updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
+
+      // Select first grid cell
+      if (withGrid)
+        selectFirstCellInContainer(newSectionElem)
+
+      // TODO: Open label editor for newly inserted section
+
+      Some(newSectionElem)
     }
-
-    insertHolderForAllLang(
-      controlElement       = newSectionElem,
-      dataHolder           = elementInfo(newSectionName),
-      resourceHolder       = resourceHolder,
-      precedingControlName = precedingSectionName
-    )
-
-    // Insert the bind element
-    ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
-
-    // This can impact templates
-    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
-
-    // Select first grid cell
-    if (withGrid)
-      selectFirstCellInContainer(newSectionElem)
-
-    // TODO: Open label editor for newly inserted section
-
-    debugDumpDocumentForGrids("insert new section")
-
-    Some(newSectionElem)
   }
 
   // Insert a new repeat
@@ -251,52 +251,53 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val (into, after, grid) = findGridInsertionPoint
-    val newGridName         = controlNameFromId(nextId("grid"))
+    withDebugGridOperation("insert new repeat") {
 
-    val ids = nextIds("tmp", 2).toIterator
+      val (into, after, grid) = findGridInsertionPoint
+      val newGridName         = controlNameFromId(nextId("grid"))
 
-    // The grid template
-    val gridTemplate: NodeInfo =
-      <fr:grid
-         edit-ref=""
-         id={gridId(newGridName)}
-         bind={bindId(newGridName)}
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
-      </fr:grid>
+      val ids = nextIds("tmp", 2).toIterator
 
-    // Insert grid
-    val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
+      // The grid template
+      val gridTemplate: NodeInfo =
+        <fr:grid
+           edit-ref=""
+           id={gridId(newGridName)}
+           bind={bindId(newGridName)}
+           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
+        </fr:grid>
 
-    // Insert instance holder (but no resource holders)
-    insertHolders(
-      controlElement       = newGridElem,
-      dataHolders          = List(elementInfo(newGridName)),
-      resourceHolders      = Nil,
-      precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
-    )
+      // Insert grid
+      val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
 
-    // Make sure binds are created
-    ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
+      // Insert instance holder (but no resource holders)
+      insertHolders(
+        controlElement       = newGridElem,
+        dataHolders          = List(elementInfo(newGridName)),
+        resourceHolders      = Nil,
+        precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
+      )
 
-    // This takes care of all the repeat-related items
-    setRepeatProperties(
-      controlName          = newGridName,
-      repeat               = true,
-      min                  = "1",
-      max                  = "",
-      iterationNameOrEmpty = "",
-      applyDefaults        = true,
-      initialIterations    = "first"
-    )
+      // Make sure binds are created
+      ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
 
-    // Select new td
-    selectFirstCellInContainer(newGridElem)
+      // This takes care of all the repeat-related items
+      setRepeatProperties(
+        controlName          = newGridName,
+        repeat               = true,
+        min                  = "1",
+        max                  = "",
+        iterationNameOrEmpty = "",
+        applyDefaults        = true,
+        initialIterations    = "first"
+      )
 
-    debugDumpDocumentForGrids("insert new repeat")
+      // Select new td
+      selectFirstCellInContainer(newGridElem)
 
-    Some(newGridName)
+      Some(newGridName)
+    }
   }
 
   private def selectFirstCellInContainer(container: NodeInfo): Unit =

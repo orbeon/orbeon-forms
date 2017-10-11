@@ -58,54 +58,50 @@ trait GridOps extends ContainerOps {
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
-  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
+  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo =
+    withDebugGridOperation("insert row below") {
 
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
-    val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
+      val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+      val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-    debugDumpDocumentForGrids("insert row below, before")
-
-    // Increment height of origin cells that don't end at the current row
-    collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
-      NodeInfoCellOps.updateH(cell.td, cell.h + 1)
-    }
-
-    // Increment the position of all cells on subsequent rows
-    allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
-      case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
-      case _ ⇒
-    }
-
-    // Insert a cell in the new row
-    // NOTE: This is not very efficient. We should be able to just iterate back in the grid.
-    val precedingCellOpt = allCells.slice(0, adjustedRowPos + 1).flatten.reverse collectFirst {
-      case Cell(Some(u), None, _, _, _, _) ⇒ u
-    }
-
-    // Cells that end at the current row
-    val distinctCellsEndingAtCurrentRow =
-      allCells(adjustedRowPos) collect {
-        case c @ Cell(Some(u), _, _, _, 1, _) ⇒ c
-      } keepDistinctBy (_.u)
-
-    val idsIt =
-      nextIds("tmp", distinctCellsEndingAtCurrentRow.size).iterator
-
-    val newCells =
-      distinctCellsEndingAtCurrentRow map { cell ⇒
-        <fr:c
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          id={idsIt.next()}
-          x={cell.x.toString}
-          y={adjustedRowPos + 2 toString}
-          w={cell.w.toString}/>: NodeInfo
+      // Increment height of origin cells that don't end at the current row
+      collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
+        NodeInfoCellOps.updateH(cell.td, cell.h + 1)
       }
 
-    val result = insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption
+      // Increment the position of all cells on subsequent rows
+      allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
+        case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
+        case _ ⇒
+      }
 
-    debugDumpDocumentForGrids("insert row below, after")
-    result orNull // bad, but insert() is not always able to return the inserted item at this time
-  }
+      // Insert a cell in the new row
+      // NOTE: This is not very efficient. We should be able to just iterate back in the grid.
+      val precedingCellOpt = allCells.slice(0, adjustedRowPos + 1).flatten.reverse collectFirst {
+        case Cell(Some(u), None, _, _, _, _) ⇒ u
+      }
+
+      // Cells that end at the current row
+      val distinctCellsEndingAtCurrentRow =
+        allCells(adjustedRowPos) collect {
+          case c @ Cell(Some(u), _, _, _, 1, _) ⇒ c
+        } keepDistinctBy (_.u)
+
+      val idsIt =
+        nextIds("tmp", distinctCellsEndingAtCurrentRow.size).iterator
+
+      val newCells =
+        distinctCellsEndingAtCurrentRow map { cell ⇒
+          <fr:c
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            id={idsIt.next()}
+            x={cell.x.toString}
+            y={adjustedRowPos + 2 toString}
+            w={cell.w.toString}/>: NodeInfo
+        }
+
+      insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption.orNull // bad, but insert() is not always able to return the inserted item at this time
+    }
 
   def rowInsertAbove(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
@@ -161,41 +157,40 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
-    if (allCells.size > 1 && adjustedRowPos < allCells.size) {
+    if (allCells.size > 1 && adjustedRowPos < allCells.size)
+      withDebugGridOperation("delete row") {
 
-      // Reduce height of cells which start on a previous row
-      val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
+        // Reduce height of cells which start on a previous row
+        val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
 
-      distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
+        distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
 
-      // Decrement the position of all cells on subsequent rows
-      allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
-        case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
-        case _ ⇒
-      }
-
-      val cellsToDelete =
-        allCells(adjustedRowPos) collect {
-          case Cell(Some(u), None, _, _, _, _) ⇒ u
+        // Decrement the position of all cells on subsequent rows
+        allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
+          case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
+          case _ ⇒
         }
 
-      // Find the new cell to select if we are removing the currently selected cell
-      val newCellToSelect = findNewCellToSelect(cellsToDelete)
+        val cellsToDelete =
+          allCells(adjustedRowPos) collect {
+            case Cell(Some(u), None, _, _, _, _) ⇒ u
+          }
 
-      // Delete all controls in the row
-      cellsToDelete foreach (deleteControlWithinCell(_))
+        // Find the new cell to select if we are removing the currently selected cell
+        val newCellToSelect = findNewCellToSelect(cellsToDelete)
 
-      // Delete row and its content
-      delete(cellsToDelete)
+        // Delete all controls in the row
+        cellsToDelete foreach (deleteControlWithinCell(_))
 
-      // Update templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
+        // Delete row and its content
+        delete(cellsToDelete)
 
-      // Adjust selected cell if needed
-      newCellToSelect foreach selectCell
+        // Update templates
+        updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to[Set])
 
-      debugDumpDocumentForGrids("delete row")
-    }
+        // Adjust selected cell if needed
+        newCellToSelect foreach selectCell
+      }
   }
 
   // Whether this is the last grid in the section
@@ -294,26 +289,22 @@ trait GridOps extends ContainerOps {
 
   def expandCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Right) >= amount) {
+    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Right) >= amount)
+      withDebugGridOperation("expand cell right") {
+        Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
+          NodeInfoCellOps.updateW(originCell.td, originCell.w + amount)
 
-      debugDumpDocumentForGrids("expandCellRight before")
-
-      Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
-        NodeInfoCellOps.updateW(originCell.td, originCell.w + amount)
-
-        findDistinctOriginCellsToTheRight(cells, cellElem) foreach {
-          case Cell(Some(u), _, x, _, _, w) if w > 1 ⇒
-            NodeInfoCellOps.updateX(u, x + 1)
-            NodeInfoCellOps.updateW(u, w - 1)
-          case Cell(Some(u), _, _, _, _, _) ⇒
-            deleteControlWithinCell(u)
-            delete(u)
-          case _ ⇒
+          findDistinctOriginCellsToTheRight(cells, cellElem) foreach {
+            case Cell(Some(u), _, x, _, _, w) if w > 1 ⇒
+              NodeInfoCellOps.updateX(u, x + 1)
+              NodeInfoCellOps.updateW(u, w - 1)
+            case Cell(Some(u), _, _, _, _, _) ⇒
+              deleteControlWithinCell(u)
+              delete(u)
+            case _ ⇒
+          }
         }
       }
-
-      debugDumpDocumentForGrids("expandCellRight after")
-    }
   }
 
   def shrinkCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
@@ -322,50 +313,44 @@ trait GridOps extends ContainerOps {
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
     cellOpt filter (_.w - amount >= 1) foreach { cell ⇒
-      debugDumpDocumentForGrids("shrinkCellRight before")
+      withDebugGridOperation("shrink cell right") {
 
-      val newCellW = cell.w - amount
+        val newCellW = cell.w - amount
 
-      NodeInfoCellOps.updateW(cell.td, newCellW)
+        NodeInfoCellOps.updateW(cell.td, newCellW)
 
-      val newCell: NodeInfo =
-        <fr:c
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          id={nextId("tmp")}
-          x={(cell.x + newCellW).toString}
-          y={cell.y.toString}
-          w={amount.toString}
-          h={cell.h.toString}/>: NodeInfo
+        val newCell: NodeInfo =
+          <fr:c
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            id={nextId("tmp")}
+            x={(cell.x + newCellW).toString}
+            y={cell.y.toString}
+            w={amount.toString}
+            h={cell.h.toString}/>: NodeInfo
 
-      val result = insert(into = Nil, after = cell.td, origin = newCell).headOption
-      debugDumpDocumentForGrids("shrinkCellRight after")
+        val result = insert(into = Nil, after = cell.td, origin = newCell).headOption
+      }
     }
   }
 
   def expandCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount)
+      withDebugGridOperation("expand cell down") {
+        Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
+          NodeInfoCellOps.updateH(originCell.td, originCell.h + amount)
 
-    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount) {
-
-      debugDumpDocumentForGrids("expandCellDown before")
-
-      Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
-        NodeInfoCellOps.updateH(originCell.td, originCell.h + amount)
-
-        Cell.findDistinctOriginCellsBelow(cells, cellElem) foreach {
-          case Cell(Some(u), _, _, y, h, _) if h > 1 ⇒
-            NodeInfoCellOps.updateY(u, y + 1)
-            NodeInfoCellOps.updateW(u, h - 1)
-          case Cell(Some(u), _, _, _, _, _) ⇒
-            deleteControlWithinCell(u)
-            delete(u)
-          case _ ⇒
+          Cell.findDistinctOriginCellsBelow(cells, cellElem) foreach {
+            case Cell(Some(u), _, _, y, h, _) if h > 1 ⇒
+              NodeInfoCellOps.updateY(u, y + 1)
+              NodeInfoCellOps.updateW(u, h - 1)
+            case Cell(Some(u), _, _, _, _, _) ⇒
+              deleteControlWithinCell(u)
+              delete(u)
+            case _ ⇒
+          }
         }
       }
-
-      debugDumpDocumentForGrids("expandCellDown after")
-    }
   }
 
   def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
@@ -374,26 +359,26 @@ trait GridOps extends ContainerOps {
     val cellOpt = Cell.findOriginCell(cells, cellElem)
 
     cellOpt filter (_.h - amount >= 1) foreach { cell ⇒
-      debugDumpDocumentForGrids("shrinkCellDown before")
+      withDebugGridOperation("shrink cell down") {
 
-      val newCellH = cell.h - amount
+        val newCellH = cell.h - amount
 
-      NodeInfoCellOps.updateH(cell.td, newCellH)
+        NodeInfoCellOps.updateH(cell.td, newCellH)
 
-      val newCell: NodeInfo =
-        <fr:c
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          id={nextId("tmp")}
-          x={cell.x.toString}
-          y={(cell.y + newCellH).toString}
-          w={cell.w.toString}
-          h={amount.toString}/>: NodeInfo
+        val newCell: NodeInfo =
+          <fr:c
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            id={nextId("tmp")}
+            x={cell.x.toString}
+            y={(cell.y + newCellH).toString}
+            w={cell.w.toString}
+            h={amount.toString}/>: NodeInfo
 
-      // TODO: find placement
-      val insertCell = cell
+        // TODO: find placement
+        val insertCell = cell
 
-      val result = insert(into = Nil, after = insertCell.td, origin = newCell).headOption
-      debugDumpDocumentForGrids("shrinkCellDown after")
+        insert(into = Nil, after = insertCell.td, origin = newCell).headOption
+      }
     }
   }
 

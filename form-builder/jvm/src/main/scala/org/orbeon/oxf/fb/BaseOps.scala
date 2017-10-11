@@ -131,6 +131,13 @@ trait BaseOps extends Logging {
 
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 
+  def withDebugGridOperation[T](message: String)(body: ⇒ T)(implicit ctx: FormBuilderDocContext): T = {
+    debugDumpDocumentForGrids(s"before $message")
+    val result = body
+    debugDumpDocumentForGrids(s"after $message")
+    result
+  }
+
   def debugDumpDocumentForGrids(message: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
       debugDumpDocument(message)

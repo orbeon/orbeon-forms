@@ -491,41 +491,6 @@
                                     <!--</xf:input>-->
                                 <!--</xf:group>-->
 
-                                <!--
-                                    Upload control for static image
-                                        Binding
-                                            The upload is bound to the node bound to the current control. To find it, we use xxf:binding($id)
-                                            instead of building an XPath expression to the node, as this wouldn't work when using a custom
-                                            instance. When the control is in a repeat, the upload control needs to be bound to the node
-                                            corresponding to the current iteration, so we need the control effective id. The control effective
-                                            id is constructed from the effective id of the cell and the static id of the control by
-                                            xformsUtils:getRelatedEffectiveId().
-                                        Two upload controls
-                                            We have two upload controls: one is guaranteed not to be empty and other is guaranteed to be empty.
-                                            They are bound to the current node first, and if that node is not empty/non-empty, they are bound
-                                            instead to a dummy empty/non-empty node. This is because we want the upload to be bound to the
-                                            current node when user interact with it, but we also need to be able to show empty/non-empty
-                                            versions of the upload when user mouse over other cells.
-                                -->
-                                <!--
-                                <xf:var name="control-absolute-id" value="fbf:buildFormBuilderControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
-                                <xf:var name="bound-item" value="if ($control-absolute-id) then xxf:binding($control-absolute-id) else ()"/>
-                                <xf:upload
-                                    class="fb-static-upload"
-                                    id="fb-static-upload-empty"
-                                    ref="$bound-item[xxf:is-blank()], instance('fb-static-upload')/empty">
-                                    <xf:filename  ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                </xf:upload>
-                                <xf:upload
-                                    class="fb-static-upload"
-                                    id="fb-static-upload-non-empty"
-                                    ref="$bound-item[xxf:non-blank()], instance('fb-static-upload')/non-empty">
-                                    <xf:filename  ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                </xf:upload>
-                                -->
-
                             </xh:div>
 
                             <xh:div class="fb-section-grid-editor">

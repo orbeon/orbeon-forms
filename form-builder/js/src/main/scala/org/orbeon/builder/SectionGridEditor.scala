@@ -30,6 +30,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object SectionGridEditor {
 
+  scala.scalajs.js.Dynamic.global.console.log("SectionGridEditor")
+
   lazy val sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
   var currentSectionGridOpt           : Option[Block] = None
 

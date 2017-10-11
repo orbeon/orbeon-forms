@@ -18,25 +18,18 @@ import org.scalajs.jquery.JQuery
 import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
 
-@ScalaJSDefined
-class Offset(val left: Double, val top: Double) extends js.Object {
-  override def toString() = s"Offset($left, $top)"
-}
+case class Offset(left: Double, top: Double)
 
 object Offset {
 
-  def apply(left: Double, top: Double): Offset =
-    new Offset(left, top)
-
   def apply(v: JQuery): Offset = {
     val dyn = v.offset().asInstanceOf[js.Dynamic]
-
-    if (js.isUndefined(dyn.left))
-      scala.scalajs.js.special.debugger()
-
     Offset(dyn.left.asInstanceOf[Double], dyn.top.asInstanceOf[Double])
   }
 
   def offset(el: JQuery, offset: Offset): Unit =
-    el.offset(offset)
+    el.offset(js.Dictionary(
+      "left" → offset.left,
+      "top"  → offset.top
+    ))
 }

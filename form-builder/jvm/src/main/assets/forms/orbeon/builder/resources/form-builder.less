@@ -212,12 +212,25 @@ div.orbeon.orbeon-portlet-div {
     .gu-mirror { padding-right: 28px }
 
     //
-     .fb-grid-dnd-column-container {
+    .fb-grid-dnd-column-container {
+
         width: 7px;
         position: absolute;
         background-color: #eee;
-        cursor: col-resize;
         &:hover { background-color: #ddd }
+
+        .fb-grid-dnd-column-handle {
+            height: 100%;
+        }
+    }
+
+    .fb-grid-dnd-column-handle {
+        cursor: col-resize;
+    }
+    .fb-grid-dnd-column-shadow {
+        position: absolute;
+        background-color: #ddd;
+        border: 1px solid orange;
     }
 
     // ***** Toolbox ***************************************************************************************************

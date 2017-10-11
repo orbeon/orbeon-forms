@@ -17,22 +17,27 @@ import org.orbeon.builder.BlockCache.Block
 import org.orbeon.jquery.Offset
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
-import org.scalajs.dom.html
+import org.orbeon.xforms.facade.JQueryTooltip
+import org.scalajs.dom.{document, html}
+import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 
 object GridColumnDnD {
 
-  if (false) locally {
+  locally {
 
     val FbMainClass          = "fb-main"
     val ColumnContainerClass = "fb-grid-dnd-column-container"
     val ColumnHandleClass    = "fb-grid-dnd-column-handle"
+    val ColumnShadowClass    = "fb-grid-dnd-column-shadow"
     val FbMain               = $(s".$FbMainClass")
+
+    var dndShadowOpt: Option[JQuery] = None
 
     Position.currentContainerChanged(
       containerCache = BlockCache.cellCache,
-      wasCurrent     = (_: Block   ) ⇒ hideDndContainers(),
+      wasCurrent     = (_   : Block) ⇒ hideDndContainers(),
       becomesCurrent = (cell: Block) ⇒ showDndContainers(cell)
     )
 
@@ -64,11 +69,9 @@ object GridColumnDnD {
       js.Array(),
       new DragulaOptions {
         override def isContainer(el: html.Element): Boolean = {
-          scala.scalajs.js.Dynamic.global.console.log("isContainer", el)
           el.classList.contains(ColumnContainerClass)
         }
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
-          scala.scalajs.js.Dynamic.global.console.log("moves", handle)
           handle.classList.contains(ColumnHandleClass)
         }
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
@@ -76,12 +79,37 @@ object GridColumnDnD {
       }
     )
 
-    drake.onDrag((el: html.Element, source: html.Element) ⇒
-      println("drag")
-    )
+    drake.onDrag { (el: html.Element, source: html.Element) ⇒
+
+      // Create shadow element
+      val dndShadow = $(s"""<div class="$ColumnShadowClass">""")
+      FbMain.append(dndShadow)
+      dndShadowOpt = Some(dndShadow)
+
+      // Position shadow over source container
+      val container = $(source)
+      Offset.offset(dndShadow, Offset(container))
+      dndShadow.width(container.width())
+      dndShadow.height(container.height())
+
+      scala.scalajs.js.Dynamic.global.console.log("drag", dndShadow)
+    }
+
+    Position.onUnderPointerChange {
+      scala.scalajs.js.Dynamic.global.console.log("pointer change")
+      dndShadowOpt.foreach { (dndShadow) ⇒
+        val newShadowOffset = Offset(dndShadow).copy(left = Position.pointerPos.left)
+        Offset.offset(dndShadow, newShadowOffset)
+        scala.scalajs.js.Dynamic.global.console.log("adjusting left", Position.pointerPos.left)
+      }
+    }
 
     drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
       scala.scalajs.js.Dynamic.global.console.log("Drop")
     })
+
+    drake.onDragend((el: html.Element) ⇒
+      dndShadowOpt = None
+    )
   }
 }

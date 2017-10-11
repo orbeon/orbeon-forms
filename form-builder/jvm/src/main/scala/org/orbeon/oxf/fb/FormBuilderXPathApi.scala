@@ -142,7 +142,7 @@ object FormBuilderXPathApi {
   // Set the control's items for all languages
   //@XPathFunction
   def setControlItems(controlName: String, items: NodeInfo): Unit =
-    FormBuilder.setControlItems(controlName, items)
+    FormBuilder.setControlItems(controlName, items)(FormBuilderDocContext())
 
   // For a given control, set the mediatype on the itemset labels to be HTML or plain text
   //@XPathFunction
@@ -310,8 +310,10 @@ object FormBuilderXPathApi {
 
   // From a control element (say `<fr:autocomplete>`), returns the corresponding `<xbl:binding>`
   //@XPathFunction
-  def bindingForControlElementOrEmpty(controlElement: NodeInfo): NodeInfo =
-    FormBuilder.bindingForControlElement(controlElement, FormBuilder.componentBindings).orNull
+  def bindingForControlElementOrEmpty(controlElement: NodeInfo): NodeInfo = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.bindingForControlElement(controlElement, ctx.componentBindings).orNull
+  }
 
   //@XPathFunction
   def containerById(containerId: String): NodeInfo =
@@ -430,7 +432,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] =
-    FormBuilder.getControlItemsGroupedByValue(controlName)
+    FormBuilder.getControlItemsGroupedByValue(controlName)(FormBuilderDocContext())
 
   //@XPathFunction
   def resourcesRoot: NodeInfo =
@@ -454,7 +456,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
-    FormBuilder.hasEditor(controlElement, editor)
+    FormBuilder.hasEditor(controlElement, editor)(FormBuilderDocContext())
 
   //@XPathExpression
   def MinimalIEVersion: Int =

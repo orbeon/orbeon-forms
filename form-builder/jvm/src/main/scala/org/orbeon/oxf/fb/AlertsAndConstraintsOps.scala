@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
@@ -335,7 +334,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue = XMLUtils.buildQName(datatypeQName.getNamespacePrefix, datatypeQName.getName)
 
     // Rename control element if needed when the datatype changes
-    def renameControlIfNeeded(controlName: String, newAppearanceOpt: Option[String])(implicit ctx: FormBuilderDocContext): Unit = {
+    def renameControlIfNeeded(
+      controlName      : String,
+      newAppearanceOpt : Option[String])(implicit
+      ctx              : FormBuilderDocContext
+    ): Unit = {
       val newDatatype = datatypeQName
       for {
         controlElem    ← findControlByName(ctx.rootElem, controlName)
@@ -347,7 +350,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           oldAppearances,
           newDatatype,
           newAppearanceOpt,
-          componentBindings
+          ctx.componentBindings
         )
       } locally {
         // Q: If binding changes, what about instance and bind templates? Should also be updated? Not a

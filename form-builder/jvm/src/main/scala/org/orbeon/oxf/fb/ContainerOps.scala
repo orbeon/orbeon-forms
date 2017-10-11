@@ -249,7 +249,7 @@ trait ContainerOps extends ControlOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
 
         // Ensure new template rooted at iteration
-        ensureTemplateReplaceContent(controlName, createTemplateContentFromBind(iterationBind.head, componentBindings))
+        ensureTemplateReplaceContent(controlName, createTemplateContentFromBind(iterationBind.head, ctx.componentBindings))
 
       } else if (wasRepeat && ! repeat) {
         // Remove bind, holders and template
@@ -431,7 +431,7 @@ trait ContainerOps extends ControlOps {
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
       iterationName    ← findRepeatIterationName(ctx.rootElem, repeatName)
-      template         ← createTemplateContentFromBindName(iterationName, componentBindings)
+      template         ← createTemplateContentFromBindName(iterationName, ctx.componentBindings)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)
     }

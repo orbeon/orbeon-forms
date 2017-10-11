@@ -36,8 +36,7 @@ trait BindingOps {
     ctx               : FormBuilderDocContext
   ): List[NodeInfo] = {
 
-    val bindings    = FormBuilder.componentBindings
-    val descriptors = getAllRelevantDescriptors(bindings)
+    val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
     val lang        = FormBuilder.currentLang
 
     for {
@@ -60,7 +59,7 @@ trait BindingOps {
           // first appearance listed as current.
           appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
           lang                    = lang,
-          bindings                = bindings
+          bindings                = ctx.componentBindings
         )
     } yield
       appearanceElem

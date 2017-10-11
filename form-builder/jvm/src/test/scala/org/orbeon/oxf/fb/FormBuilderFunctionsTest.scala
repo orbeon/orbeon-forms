@@ -373,7 +373,7 @@ class FormBuilderFunctionsTest
         )
 
         for ((expected, id) ← expected)
-          assert(expected === buildFormBuilderControlAbsoluteIdOrEmpty(doc, id))
+          assert(expected === buildFormBuilderControlAbsoluteIdOrEmpty(id))
       }
     }
   }

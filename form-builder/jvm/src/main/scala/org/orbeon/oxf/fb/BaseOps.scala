@@ -34,7 +34,6 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
   lazy val formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
-
   val modelElem        = findModelElem(rootElem)
   val topLevelBindElem = findTopLevelBindFromModelElem(modelElem)
   val bodyElem         = findFRBodyElem(rootElem)
@@ -72,15 +71,9 @@ trait BaseOps extends Logging {
   def getFormDoc: DocumentInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
 
-  // All xbl:binding elements available
-  // TODO: remove once `FormBuilderDocContext` is used
-  def componentBindings: Seq[NodeInfo] =
-    asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
-
   // Return fb-form-instance
   // TODO: remove once `FormBuilderDocContext` is used
-  def fbFormInstance: XFormsInstance =
-    topLevelInstance("fr-form-model", "fb-form-instance").get
+
 
   // Find the top-level form model of the form being edited
   def getFormModel: XFormsModel =
@@ -113,7 +106,7 @@ trait BaseOps extends Logging {
 
       // TODO: also get from xcv instance
 
-      val fbInstance = fbFormInstance
+      val fbInstance = ctx.formInstance.get
 
       def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
       def elementIdsFromXPath = (root descendant *).ids filter (_.endsWith(suffix)) iterator

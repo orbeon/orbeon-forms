@@ -215,7 +215,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     currentResources.child(controlName).child(*).map(_.localname).to[Set]
 
   // Rename the control (but NOT its holders, binds, etc.)
-  def renameControlByElement(controlElement: NodeInfo, newName: String, resourcesNames: Set[String]): Unit = {
+  def renameControlByElement(
+    controlElement : NodeInfo,
+    newName        : String,
+    resourcesNames : Set[String])(implicit
+    ctx            : FormBuilderDocContext
+  ): Unit = {
 
     // Set @id in any case, @ref value if present, @bind value if present
     ensureAttribute(controlElement, "id",   controlId(newName))
@@ -435,8 +440,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
-  def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
-    FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, componentBindings)
+  def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =
+    FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, ctx.componentBindings)
 
   // Find a given static control by name
   def findStaticControlByName(controlName: String): Option[ElementAnalysis] = {
@@ -545,7 +550,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     findInViewTryIndex(ctx.rootElem, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
   // Set the control's items for all languages
-  def setControlItems(controlName: String, items: NodeInfo): Unit = {
+  def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val addHints = FormBuilder.hasItemHintEditor(controlName)
 

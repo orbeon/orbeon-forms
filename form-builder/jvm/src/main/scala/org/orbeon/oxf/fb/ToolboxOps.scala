@@ -650,7 +650,7 @@ object ToolboxOps {
 
       ensureTemplateReplaceContent(
         controlName = newControlName,
-        content     = createTemplateContentFromBind(bindElem firstChild * head, componentBindings))
+        content     = createTemplateContentFromBind(bindElem firstChild * head, ctx.componentBindings))
     }
 
     // Update ancestor templates if any

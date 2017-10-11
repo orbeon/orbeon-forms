@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fb.XMLNames._
+import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
@@ -28,22 +28,20 @@ import org.orbeon.scaxon.SimplePath._
 
 trait BindingOps {
 
-  //@XPathFunction
   def possibleAppearancesByControlNameAsXML(
     controlName       : String,
     isInitialLoad     : Boolean,
     builtinDatatype   : String,
-    desiredAppearance : String    // relevant only if isInitialLoad == false
-  ): Array[NodeInfo] = {
-
-    implicit val ctx = FormBuilderDocContext()
+    desiredAppearance : String)(implicit // relevant only if isInitialLoad == false
+    ctx               : FormBuilderDocContext
+  ): List[NodeInfo] = {
 
     val bindings    = FormBuilder.componentBindings
     val descriptors = getAllRelevantDescriptors(bindings)
     val lang        = FormBuilder.currentLang
 
     for {
-      controlElem                  ← findControlByName(ctx.rootElem, controlName).to[Array]
+      controlElem                  ← findControlByName(ctx.rootElem, controlName).toList
       originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
       (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
           elemName    = controlElem.uriQualifiedName,
@@ -68,7 +66,7 @@ trait BindingOps {
       appearanceElem
   }
 
-  private def possibleAppearancesWithLabelAsXML(
+  def possibleAppearancesWithLabelAsXML(
     elemName                : QName,
     builtinType             : QName,
     appearancesForSelection : Set[String],
@@ -193,10 +191,6 @@ trait BindingOps {
         attributeInfo(qname, value)
     }
   }
-
-  // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-  def bindingForControlElementOrEmpty(controlElement: NodeInfo) =
-    bindingForControlElement(controlElement, FormBuilder.componentBindings).orNull
 
   // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
   def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {

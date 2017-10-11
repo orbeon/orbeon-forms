@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
-import org.orbeon.oxf.fr.FormRunner.findInViewTryIndex
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}

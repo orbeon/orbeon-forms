@@ -107,7 +107,7 @@
 
                 <!-- All unneeded help elements -->
                 <xsl:variable
-                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                     name="unneeded-elements"
                     select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
 
@@ -121,9 +121,9 @@
                     select="$model//xf:bind[@constraint and @id = $ids-of-alert-validations]/@id/string()"/>
 
                 <xsl:variable
-                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                     name="new-validation-ids"
-                    select="fbf:nextIdsXPath(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
+                    select="fbf:nextIds(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
 
                 <!-- Temporarily mark read-only instances as read-write -->
                 <xsl:template match="xf:model/xf:instance/@xxf:readonly[. = 'true']" mode="within-model">
@@ -222,7 +222,7 @@
                             event="fr-iteration-added fr-iteration-removed"
                             class="fb-annotation"
                             type="xpath"
-                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
                             fbf:updateTemplatesFromDynamicIterationChange(event('target'))
                         </xf:action>
 
@@ -474,11 +474,14 @@
                               mode="within-model">
                     <xsl:copy>
                         <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:element name="xf:bind" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+                        <xsl:element
+                            name="xf:bind"
+                            xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
                             <xsl:variable  name="grid-name"      select="fbf:getBindNameOrEmpty(.)"/>
                             <xsl:variable  name="iteration-name" select="fbf:defaultIterationName($grid-name)"/>
 
-                            <xsl:attribute name="id"             select="fbf:bindId($iteration-name)"/>
+                            <xsl:attribute name="id"             select="frf:bindId($iteration-name)"/>
                             <xsl:attribute name="ref"            select="$iteration-name"/>
                             <xsl:attribute name="name"           select="$iteration-name"/>
 
@@ -514,19 +517,22 @@
                             <xsl:when test="generate-id() = $legacy-grid-binds-templates">
                                 <xsl:variable
                                     name="iteration-name"
-                                    select="fbf:defaultIterationName(fbf:controlNameFromId(@id))"
-                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                                    select="fbf:defaultIterationName(frf:controlNameFromId(@id))"
+                                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
                                 <xsl:element name="{$iteration-name}">
                                     <xsl:copy-of
-                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                                        select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/(@*, *)"/>
+                                        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                        select="fbf:createTemplateContentFromBindName(/, frf:controlNameFromId(@id), $bindings)/(@*, *)"/>
                                 </xsl:element>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:variable
                                     name="new-template"
-                                    select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/*[1]"
-                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                                    select="fbf:createTemplateContentFromBindName(/, frf:controlNameFromId(@id), $bindings)/*[1]"
+                                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
 
                                 <xsl:choose>
                                     <xsl:when test="exists($new-template/self::*)">
@@ -535,7 +541,7 @@
                                     <xsl:otherwise>
                                         <!--
                                             Handle further cases where form author manually added template instances, in which case we might not get any
-                                            elements to copy. So the assumption is that `createTemplateContentFromBindNameXPath()` will not return a node
+                                            elements to copy. So the assumption is that `createTemplateContentFromBindName()` will not return a node
                                             containing elements if generating the template fail.
                                         -->
                                         <xsl:apply-templates select="node()"/>

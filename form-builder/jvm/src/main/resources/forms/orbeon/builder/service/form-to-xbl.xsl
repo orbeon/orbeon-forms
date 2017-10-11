@@ -23,7 +23,7 @@
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -131,7 +131,7 @@
         <!-- TODO: for now consider any component in the "fr" namespace, but need to do better -->
 
         <!-- Section name -->
-        <xsl:variable name="section-name" select="fbf:controlNameFromId(@id)" as="xs:string"/>
+        <xsl:variable name="section-name" select="frf:controlNameFromId(@id)" as="xs:string"/>
 
         <!-- Section bind -->
         <xsl:variable name="section-bind" select="$fr-form-model//xf:bind[@id = concat($section-name, '-bind')]" as="element(xf:bind)"/>
@@ -150,7 +150,7 @@
 
         <!-- ==== Repeats ========================================================================================== -->
 
-        <xsl:variable name="repeat-ids" select="$fr-section//*[frf:isRepeat(.)]/fbf:templateId(fbf:controlNameFromId(@id))"/>
+        <xsl:variable name="repeat-ids" select="$fr-section//*[frf:isRepeat(.)]/frf:templateId(frf:controlNameFromId(@id))"/>
         <xsl:variable name="repeat-templates" select="$fr-form-model/xf:instance[@id = $repeat-ids]" as="element()*"/>
 
         <!-- ==== Actions and services ============================================================================= -->
@@ -239,7 +239,7 @@
                                 <xsl:variable name="lang" select="@xml:lang" as="xs:string"/>
 
                                 <resource xml:lang="{$lang}">
-                                    <xsl:copy-of select="fbf:iterateSelfAndDescendantBindsResourceHoldersXPath($section-bind, $lang, $resources)"/>
+                                    <xsl:copy-of select="fbf:iterateSelfAndDescendantBindsResourceHolders($section-bind, $lang, $resources)"/>
                                 </resource>
                             </xsl:for-each>
                         </resources>

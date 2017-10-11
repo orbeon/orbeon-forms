@@ -14,19 +14,23 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.fb.FormBuilderXPathApi.resourcesRoot
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -34,8 +38,6 @@ import org.orbeon.xforms.XFormsId
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 /*
  * Form Builder: operations on controls.
@@ -89,17 +91,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Ensure that a tree of bind exists
-  def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
+  def ensureBinds(names: Seq[String])(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
     // Insert bind container if needed
-    val model = findModelElem(inDoc)
-    val topLevelBind = findTopLevelBind(inDoc) match {
+    val topLevelBind = ctx.topLevelBindElem match {
       case Some(bind) ⇒
         bind
       case None ⇒
         insert(
-          into   = model,
-          after  = model / XFInstanceTest filter (_.hasIdValue("fr-form-instance")),
+          into   = ctx.modelElem,
+          after  = ctx.modelElem / XFInstanceTest filter (_.hasIdValue("fr-form-instance")), // TODO xxx use ctx.???
           origin = topLevelBindTemplate
         ).head
     }
@@ -169,10 +170,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     control :: holders
   }
 
-  //@XPathFunction
-  def renameControlIfNeededXPath(oldName: String, newName: String): Unit =
-    renameControlIfNeeded(oldName, newName)(FormBuilderDocContext())
-
   // Rename a control with its holders, binds, etc. but *not* its nested iteration if any
   def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (oldName != newName) {
@@ -188,23 +185,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
     }
-
-  // Rename a control's nested iteration if any
-  //@XPathFunction
-  def renameControlIterationIfNeededXPath(
-    inDoc                      : NodeInfo,
-    oldControlName             : String,
-    newControlName             : String,
-    oldChildElementNameOrBlank : String,
-    newChildElementNameOrBlank : String
-  ): Unit =
-    renameControlIterationIfNeeded(
-      oldControlName,
-      newControlName,
-      oldChildElementNameOrBlank.trimAllToOpt,
-      newChildElementNameOrBlank.trimAllToOpt
-    )(FormBuilderDocContext())
-
 
   def renameControlIterationIfNeeded(
     oldControlName      : String,
@@ -358,16 +338,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
-  // @XPathFunction
-  def updateMipAsAttributeOnly(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
+  def updateMipAsAttributeOnly(controlName: String, mipName: String, mipValue: String)(implicit ctx: FormBuilderDocContext): Unit = {
 
     require(Model.AllMIPNames(mipName))
     val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
-    findControlByName(inDoc, controlName) foreach { control ⇒
+    findControlByName(ctx.rootElem, controlName) foreach { control ⇒
 
       // Get or create the bind element
-      val bind = ensureBinds(inDoc, findContainerNamesForModel(control) :+ controlName)
+      val bind = ensureBinds(findContainerNamesForModel(control) :+ controlName)
 
       // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
       // expressions and types could use it. So for now the mapping is never garbage collected.
@@ -395,7 +374,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Return None if no namespace mapping is required OR none can be created
-  def valueNamespaceMappingScopeIfNeeded(bind: NodeInfo, qNameValue: String): Option[(String, String)] = {
+  def valueNamespaceMappingScopeIfNeeded(
+    bind       : NodeInfo,
+    qNameValue : String)(implicit
+    ctx        : FormBuilderDocContext
+  ): Option[(String, String)] = {
 
     val (prefix, _) = parseQName(qNameValue)
 
@@ -413,7 +396,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           None
 
       newURI map { uri ⇒
-        insert(into = findTopLevelBind(bind).toList, origin = namespaceInfo(prefix, uri))
+        insert(into = ctx.topLevelBindElem.toList, origin = namespaceInfo(prefix, uri))
         prefix → uri
       }
     }
@@ -432,10 +415,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipAttQName)
   }
 
-  // XForms callers: find the value of a MIP or null (the empty sequence)
-  def readMipAsAttributeOnlyOrEmpty(inDoc: NodeInfo, controlName: String, mipName: String): String =
-    readMipAsAttributeOnly(inDoc, controlName, mipName).orNull
-
   // Return (attQName, elemQName)
   def mipToFBMIPQNames(mip: Model.MIP): (QName, QName) =
     RewrittenMIPs.get(mip) match {
@@ -450,20 +429,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None           ⇒ (ctx.rootElem descendantOrSelf * ids) toSet
     }
 
-  // For XForms callers
-  //@XPathFunction
-  def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = {
-    implicit val ctx = FormBuilderDocContext()
-    getAllControlNames.iterator map stringToStringValue
-  }
-
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
     findFRBodyElem(inDoc) descendant * filter
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
-  //@XPathFunction
   def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
     FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, componentBindings)
 
@@ -489,42 +460,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       control
   }
 
-  // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
-  def findControlBoundNodeByName(controlName: String): Option[NodeInfo] = (
-    findConcreteControlByName(controlName)
-    collect { case c: XFormsSingleNodeControl ⇒ c }
-    flatMap (_.boundNode)
-  )
-
   // Find a control's LHHA (there can be more than one for alerts)
   def getControlLHHA(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
     findControlByName(ctx.rootElem, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
 
-  // Set the control help and add/remove help element and placeholders as needed
-  //@XPathFunction
-  def setControlHelp(controlName: String,  value: String): Seq[NodeInfo] = {
-
-    implicit val ctx = FormBuilderDocContext()
-
-    setControlResource(controlName, "help", value.trimAllToEmpty)
-
-    if (hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, "help"))
-      removeLHHAElementAndResources(controlName, "help")
-    else
-      ensureCleanLHHAElements(controlName, "help")
-  }
-
-  //@XPathFunction
-  def isControlLHHAHTMLMediatypeXPath(controlName: String, lhha: String): Boolean =
-    isControlLHHAHTMLMediatype(controlName, lhha)(FormBuilderDocContext())
-
   // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
     hasHTMLMediatype(getControlLHHA(controlName, lhha))
-
-  //@XPathFunction
-  def setControlLHHAMediatypeXPath(controlName: String, lhha: String, isHTML: Boolean): Unit =
-    setControlLHHAMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Unit =
@@ -532,18 +474,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       setHTMLMediatype(getControlLHHA(controlName, lhha), isHTML)
 
   // For a given control, whether the mediatype on itemset labels is HTML
-  def isItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String): Boolean =
-    hasHTMLMediatype(findControlByName(inDoc, controlName).toList child "itemset" child "label")
+  def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
+    hasHTMLMediatype(findControlByName(ctx.rootElem, controlName).toList child "itemset" child "label")
 
-  // For a given control, set the mediatype on the itemset labels to be HTML or plain text
-  def setItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String, isHTML: Boolean): Unit =
-    if (isHTML != isItemsetHTMLMediatype(inDoc, controlName)) {
-      val itemsetEl = findControlByName(inDoc, controlName).toList child "itemset"
-      val labelHintEls = Seq("label", "hint") flatMap (itemsetEl.child(_))
-      setHTMLMediatype(labelHintEls, isHTML)
-    }
-
-  private def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
+  def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
     nodes foreach { lhhaElement ⇒
       if (isHTML)
         insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
@@ -591,7 +525,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       Nil
   }
 
-  private def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext) = {
+  def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext) = {
 
     val inDoc = ctx.rootElem
 
@@ -603,17 +537,38 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     removedHolders ++ removedLHHA
   }
 
-  // XForms callers: build an effective id for a given static id or return null (the empty sequence)
-  //@XPathFunction
-  def buildFormBuilderControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String): String =
-    buildFormBuilderControlEffectiveId(inDoc, staticId) map XFormsId.effectiveIdToAbsoluteId orNull
+  // Build an effective id for a given static id or return null (the empty sequence)
+  def buildFormBuilderControlAbsoluteIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String =
+    buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
-  //@XPathFunction
-  def buildFormBuilderControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String): String =
-    buildFormBuilderControlEffectiveId(inDoc, staticId).orNull
+  def buildFormBuilderControlEffectiveId(staticId: String)(implicit ctx: FormBuilderDocContext): Option[String] =
+    findInViewTryIndex(ctx.rootElem, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
-  private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String): Option[String] =
-    findInViewTryIndex(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+  // Set the control's items for all languages
+  def setControlItems(controlName: String, items: NodeInfo): Unit = {
+
+    val addHints = FormBuilder.hasItemHintEditor(controlName)
+
+    for ((lang, holder) ← FormRunner.findResourceHoldersWithLang(controlName, resourcesRoot)) {
+
+      delete(holder / "item")
+
+      val newItemElems =
+        for (item ← items / "item")
+        yield {
+          <item>
+            <label>{item / "label" filter (_.attValue("lang") == lang) stringValue}</label>
+            {
+              if (addHints)
+                <hint>{ item / "hint"  filter (_.attValue("lang") == lang) stringValue}</hint>
+            }
+            <value>{item / "value" stringValue}</value>
+          </item>
+        }
+
+      insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo toList)
+    }
+  }
 
   // Build an effective id for a given static id
   //
@@ -636,34 +591,5 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
 
     prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
-  }
-
-  //@XPathFunction
-  def findNextControlId(inDoc: NodeInfo, controlName: String, previousOrNext: String): Option[String] = {
-    findControlByName(inDoc, controlName) flatMap { control ⇒
-
-      val currentCell = control parent CellTest
-
-      val cells =
-        previousOrNext match {
-          case "previous" ⇒ currentCell preceding CellTest
-          case "next"     ⇒ currentCell following CellTest
-        }
-
-      val cellWithChild = cells find (_.hasChildElement)
-
-      cellWithChild flatMap (_ child * map (_.id) headOption)
-    }
-  }
-
-  //@XPathFunction
-  def findNextContainer(inDoc: NodeInfo, controlName: String, previousOrNext: String): Option[NodeInfo] = {
-
-    val allContainersWithSettings = getAllContainerControlsWithIds(inDoc) filter hasContainerSettings
-
-    previousOrNext match {
-      case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ getControlName(n) != controlName) lastOption
-      case "next"     ⇒ allContainersWithSettings dropWhile (n ⇒ getControlName(n) != controlName) drop 1 headOption
-    }
   }
 }

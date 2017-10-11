@@ -22,7 +22,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
          xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"
 
          xmlns:array="http://www.w3.org/2005/xpath-functions/array"

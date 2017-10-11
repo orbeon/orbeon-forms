@@ -14,44 +14,17 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om._
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 
 import scala.util.control.NonFatal
 
 object DataModel {
 
-  private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
-    { case bind if (bind /@ "name").nonEmpty ⇒ bind }
-
-  private def childrenBindsWithNames(bind: NodeInfo) =
-    bind / (XF → "bind") collect bindWithName
-
-  private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any): Unit = {
-    def update(bind: NodeInfo): Unit = {
-      childrenBindsWithNames(bind) foreach { child ⇒
-        op(child)
-        update(child)
-      }
-    }
-
-    findTopLevelBind(inDoc) foreach update
-  }
-
-  // Update binds for automatic mode
-  def updateBindsForAutomatic(inDoc: NodeInfo): Unit =
-    foreachBindWithName(inDoc) { child ⇒
-      ensureAttribute(child, "ref", child attValue "name")
-    }
-
-  // Leave public for unit tests
   def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
 
     def evaluateBoundItem(namespaces: NamespaceMapping) =

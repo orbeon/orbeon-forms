@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -24,7 +25,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike
 
 import scala.{xml ⇒ sx}
-
 class AlertsAndConstraintsTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -49,7 +49,7 @@ class AlertsAndConstraintsTest
             <message lang="fr" value="Alert for fr"/>
           </alert>
 
-        assertAlertsXML(List(expected), alertDetails map (a ⇒ a.toXML(currentLang): NodeInfo))
+        assertAlertsXML(List(expected), alertDetails map (a ⇒ a.toXML(FormBuilder.currentLang): NodeInfo))
       }
     }
   }
@@ -128,7 +128,7 @@ class AlertsAndConstraintsTest
     it("two validations and one validation") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
         locally {
 
@@ -230,7 +230,7 @@ class AlertsAndConstraintsTest
     it("must use local default alert") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
         writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Nil)
         assert("$form-resources/control-1/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
@@ -240,7 +240,7 @@ class AlertsAndConstraintsTest
     it("must use global default alert") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Nil)
         assert("$fr-resources/detail/labels/alert" === (getControlLHHA(Control1, "alert") att "ref" stringValue))
@@ -542,12 +542,12 @@ class AlertsAndConstraintsTest
     }
   }
 
-  private def globalAlert      = AlertDetails(None, List(currentLang → ""), global = true)
-  private def globalAlertAsXML = globalAlert.toXML(currentLang)
+  private def globalAlert      = AlertDetails(None, List(FormBuilder.currentLang → ""), global = true)
+  private def globalAlertAsXML = globalAlert.toXML(FormBuilder.currentLang)
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =
     ConstraintValidation.fromForm(controlName) map
-    (a ⇒ a.toXML(currentLang): NodeInfo) toArray
+    (a ⇒ a.toXML(FormBuilder.currentLang): NodeInfo) toArray
 
   private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 

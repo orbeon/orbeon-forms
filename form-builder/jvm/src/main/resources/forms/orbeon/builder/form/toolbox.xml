@@ -22,7 +22,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
       class="fb-toolbox">
@@ -227,7 +227,7 @@
                                         </xf:action>
                                         <xf:var
                                             name="effective-id"
-                                            value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                            value="fbf:buildFormBuilderControlEffectiveIdOrEmpty($selected-cell)"/>
                                         <xf:action type="javascript">
                                             <xf:param
                                                 name="effectiveId"

@@ -14,18 +14,15 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils, UserAgent}
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import spray.json.DefaultJsonProtocol._
-import spray.json._
 
 import scala.collection.immutable
 
@@ -37,7 +34,10 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
   lazy val formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
-  val bodyElem = findFRBodyElem(rootElem)
+
+  val modelElem        = findModelElem(rootElem)
+  val topLevelBindElem = findTopLevelBindFromModelElem(modelElem)
+  val bodyElem         = findFRBodyElem(rootElem)
 
 }
 
@@ -146,13 +146,6 @@ trait BaseOps extends Logging {
 
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 
-  // Whether the browser is supported
-  // Concretely, we only return false if the browser is an "old" version of IE
-  def isBrowserSupported: Boolean = {
-    val request = NetUtils.getExternalContext.getRequest
-    ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
-  }
-
   def debugDumpDocumentForGrids(message: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
       debugDumpDocument(message)
@@ -167,11 +160,5 @@ trait BaseOps extends Logging {
     val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
 
     insert(into = into, after = elementsBefore, origin = origin)
-  }
-
-  //@XPathExpression
-  def alwaysShowRoles: List[String] = {
-    val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
-    rolesJsonOpt.to[List].flatMap(_.parseJson.convertTo[List[String]])
   }
 }

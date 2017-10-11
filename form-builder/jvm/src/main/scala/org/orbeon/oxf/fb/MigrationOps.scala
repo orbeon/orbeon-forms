@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
@@ -72,7 +73,7 @@ object MigrationOps {
       case Some(bindingsDocument) ⇒
         (
           findSectionsWithTemplates(findFRBodyElem(outerDocument)),
-          FormBuilder.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
+          sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
         )
       case None ⇒
         (

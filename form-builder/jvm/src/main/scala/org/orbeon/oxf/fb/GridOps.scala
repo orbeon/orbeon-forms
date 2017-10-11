@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.fr.Cell
+import org.orbeon.oxf.fr.{Cell, FormRunner}
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -52,24 +52,6 @@ trait GridOps extends ContainerOps {
 
     annotate("tmp", grids descendant CellTest filterNot (_.hasId))
     annotate("tmp", grids filterNot (_.hasId))
-  }
-
-  //@XPathFunction
-  def initializeGrids(doc: NodeInfo): Unit = {
-
-    // Create context explicitly based on the document passed, as the node might not be
-    // in the main Form Builder instance yet.
-    implicit val ctx = FormBuilderDocContext(doc)
-
-    // 1. Annotate all the grid and grid cells of the given document with unique ids,
-    // if they don't have them already. We do this so that ids are stable as we move
-    // things around, otherwise if the XForms document is recreated new automatic ids
-    // are generated for objects without id.
-
-    annotateGridsAndCells(ctx.bodyElem)
-
-    // 2. Select the first td if any
-    ctx.bodyElem descendant GridTest descendant CellTest take 1 foreach selectCell
   }
 
   // Get the first enclosing repeated grid or legacy repeat
@@ -228,10 +210,6 @@ trait GridOps extends ContainerOps {
   def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findInViewTryIndex(ctx.rootElem, selectedCellVar.stringValue)
 
-  //@XPathFunction
-  def selectCellForControlId(inDoc: NodeInfo, controlId: String): Unit =
-    findControlByName(inDoc, controlNameFromId(controlId)).to[List] flatMap (_ parent CellTest) foreach selectCell
-
   // Make the given grid cell selected
   def selectCell(newCellElem: NodeInfo): Unit =
     setvalue(selectedCellVar, newCellElem.id)
@@ -282,15 +260,10 @@ trait GridOps extends ContainerOps {
   // curly brackets are absent or escaped within the AVT.
   private val SimpleAVTRegex = """^\{(.+)\}$""".r
 
-  private def trimSimpleAVT(s: String) = s match {
+  def trimSimpleAVT(s: String): String = s match {
     case SimpleAVTRegex(v) ⇒ v.replaceAllLiterally("{{", "{").replaceAllLiterally("}}", "}")
     case v                 ⇒ v
   }
-
-  // NOTE: Value can be a simple AVT
-  //@XPathFunction
-  def getNormalizedMin(doc: NodeInfo, gridName: String): String =
-    findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
 
   private val NoMaximum = Set("none", "unbounded")
 
@@ -298,10 +271,8 @@ trait GridOps extends ContainerOps {
   def getNormalizedMax(doc: NodeInfo, gridName: String): Option[String] =
     findControlByName(doc, gridName) flatMap (_ attValueOpt "max") filterNot NoMaximum map trimSimpleAVT
 
-  // XForms callers: get the grid's normalized max attribute, the empty sequence if no maximum
-  //@XPathFunction
-  def getNormalizedMaxOrEmpty(doc: NodeInfo, gridName: String): String =
-    getNormalizedMax(doc, gridName).orNull
+  def getNormalizedMin(doc: NodeInfo, gridName: String): String =
+    FormRunner.findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
 
   // Convert a min/max value to a value suitable to be written to the @min/@max attributes.
   //
@@ -431,14 +402,6 @@ trait GridOps extends ContainerOps {
 
   def canDeleteGrid(gridElem: NodeInfo): Boolean =
     canDeleteContainer(gridElem)
-
-   // Return all classes that need to be added to an editable grid
-  // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
-  //@XPathFunction
-  def gridCanDoClasses(gridId: String): List[String] = {
-    implicit val ctx = FormBuilderDocContext()
-    "fr-editable" :: (canDeleteGrid(containerById(gridId)) list "fb-can-delete-grid")
-  }
 
   // Find the new td to select if we are removing the currently selected td
   def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =

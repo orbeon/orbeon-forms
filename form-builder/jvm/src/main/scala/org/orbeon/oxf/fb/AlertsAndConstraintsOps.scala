@@ -46,53 +46,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
-  // Return the first default alert for the given control, or a blank template if none exists
-  //@XPathFunction
-  def readDefaultAlertAsXML(controlName: String): NodeInfo = (
-    AlertDetails.fromForm(controlName)(FormBuilderDocContext())
-    find      (_.default)
-    getOrElse AlertDetails(None, List(currentLang → ""), global = true)
-    toXML     currentLang
-  )
-
-  //@XPathFunction
-  def isValidListOfMediatypeRanges(s: String): Boolean = {
-
-    val mediatypeRanges =
-      s.splitTo[List](" ,") flatMap { token ⇒
-        token.trimAllToOpt
-      } map { trimmed ⇒
-          MediatypeRange.unapply(trimmed).isDefined
-      }
-
-    mediatypeRanges forall identity
-  }
-
-  // Return all validations as XML for the given control
-  //@XPathFunction
-  def readValidationsAsXMLXPath(controlName: String): Array[NodeInfo] =
-    readValidationsAsXML(controlName)(FormBuilderDocContext()).toArray
-
   def readValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
     RequiredValidation.fromForm(controlName)    ::
     DatatypeValidation.fromForm(controlName)    ::
     ConstraintValidation.fromForm(controlName)  map
     (v ⇒ elemToNodeInfo(v.toXML(currentLang)))
-
-  // Write back everything
-  //@XPathFunction
-  def writeAlertsAndValidationsAsXMLXPath(
-    controlName      : String,
-    newAppearance    : String,
-    defaultAlertElem : NodeInfo,
-    validationElems  : Array[NodeInfo]
-  ): Unit =
-    writeAlertsAndValidationsAsXML(
-      controlName,
-      newAppearance,
-      defaultAlertElem,
-      validationElems
-    )(FormBuilderDocContext())
 
   def writeAlertsAndValidationsAsXML(
     controlName      : String,
@@ -186,7 +144,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
         // NOTE: We could optimize further by taking this branch if there is no type or required validation.
-        updateMipAsAttributeOnly(inDoc, controlName, mip.name, value)
+        updateMipAsAttributeOnly(controlName, mip.name, value)
         delete(existingElementValidations)
       case _ ⇒
         val nestedValidations =
@@ -453,7 +411,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
       validationElem : NodeInfo,
       newIds         : Iterator[String],
       inDoc          : NodeInfo,
-      controlName    : String
+      controlName    : String)(implicit
+      ctx            : FormBuilderDocContext
     ): Option[DatatypeValidation] = {
       require(validationElem /@ "type" === "datatype")
 

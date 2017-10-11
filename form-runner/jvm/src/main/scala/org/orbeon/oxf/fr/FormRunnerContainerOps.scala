@@ -97,7 +97,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     } toMap
   }
 
-  // XForms callers: get the name for a section or grid element or null (the empty sequence)
+  // Get the name for a section or grid element or null (the empty sequence)
+  //@XPathFunction
   def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
 
   // Find ancestor sections and grids (including non-repeated grids)

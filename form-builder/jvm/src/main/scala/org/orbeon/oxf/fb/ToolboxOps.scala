@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.CoreUtils._
@@ -25,7 +26,6 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-
 /*
  * Form Builder: toolbox operations.
  */
@@ -126,7 +126,7 @@ object ToolboxOps {
         renameControlByElement(newControlElem, newControlName, resourceNamesInUseForControl(newControlName))
 
         // Insert the bind element
-        val bind = ensureBinds(doc, findContainerNamesForModel(gridTd) :+ newControlName)
+        val bind = ensureBinds(findContainerNamesForModel(gridTd) :+ newControlName)
 
         // Make sure there is a @bind instead of a @ref on the control
         delete(newControlElem /@ "ref")
@@ -229,7 +229,7 @@ object ToolboxOps {
     )
 
     // Insert the bind element
-    ensureBinds(inDoc, findContainerNamesForModel(newSectionElem, includeSelf = true))
+    ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
 
     // This can impact templates
     updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
@@ -278,7 +278,7 @@ object ToolboxOps {
     )
 
     // Make sure binds are created
-    ensureBinds(inDoc, findContainerNamesForModel(newGridElem, includeSelf = true))
+    ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
 
     // This takes care of all the repeat-related items
     setRepeatProperties(
@@ -507,7 +507,7 @@ object ToolboxOps {
     val xcvElem     = readXcvFromClipboard
     val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-    if (FormBuilder.IsGrid(controlElem) || FormBuilder.IsSection(controlElem))
+    if (IsGrid(controlElem) || IsSection(controlElem))
       pasteSectionGridFromXcv(targetCellElem, xcvElem)
     else
       pasteSingleControlFromXcv(targetCellElem, xcvElem)
@@ -599,7 +599,7 @@ object ToolboxOps {
     }
 
     val (into, after) =
-      if (FormBuilder.IsGrid(containerControlElem)) {
+      if (IsGrid(containerControlElem)) {
         val (into, after, _) = findGridInsertionPoint
         (into, after)
       } else {
@@ -628,7 +628,7 @@ object ToolboxOps {
     )
 
     // Insert the bind element
-    val newBindOrNot = ensureBinds(inDoc, findContainerNamesForModel(newContainerElem, includeSelf = true))
+    val newBindOrNot = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
 
     val newBindElem =
       if (newContainerElem attValueOpt "bind" nonEmpty) {
@@ -710,7 +710,7 @@ object ToolboxOps {
       )
 
       // Create the bind and copy all attributes and content
-      val bind = ensureBinds(gridCellElem, findContainerNamesForModel(gridCellElem) :+ name)
+      val bind = ensureBinds(findContainerNamesForModel(gridCellElem) :+ name)
       (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }

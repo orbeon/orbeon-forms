@@ -20,7 +20,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding id="fb-dialog-http-services" element="fb|dialog-http-services" xxbl:mode="binding">
         <xbl:handlers>

@@ -398,7 +398,7 @@
                     </xf:action>
                 </xf:action>
                 <xf:action
-                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                     event="fr-iteration-added fr-iteration-removed"
                     class="fb-annotation"
                     type="xpath">fbf:updateTemplatesFromDynamicIterationChange(event('target'))</xf:action>

@@ -80,9 +80,6 @@ trait ResourcesOps extends BaseOps {
     }
   }
 
-  def getControlHelpOrEmpty(controlName: String): String =
-    getControlResourceOrEmpty(controlName, "help")
-
   def hasItemHintEditor(controlName: String): Boolean =
     findControlByName(getFormDoc, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
 
@@ -144,32 +141,6 @@ trait ResourcesOps extends BaseOps {
       if (newItemElems.nonEmpty) newItemElems else List(emptyItemElem)
 
     itemElemsToReturn map elemToNodeInfo
-  }
-
-  // Set the control's items for all languages
-  def setControlItems(controlName: String, items: NodeInfo): Unit = {
-
-    val addHints = hasItemHintEditor(controlName)
-
-    for ((lang, holder) ← findResourceHoldersWithLang(controlName, resourcesRoot)) {
-
-      delete(holder / "item")
-
-      val newItemElems =
-        for (item ← items / "item")
-        yield {
-          <item>
-            <label>{item / "label" filter (_.attValue("lang") == lang) stringValue}</label>
-            {
-              if (addHints)
-                <hint>{ item / "hint"  filter (_.attValue("lang") == lang) stringValue}</hint>
-            }
-            <value>{item / "value" stringValue}</value>
-          </item>
-        }
-
-      insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo toList)
-    }
   }
 
   // Set a control's current resource for the current language
@@ -240,14 +211,6 @@ trait ResourcesOps extends BaseOps {
       holder   ← findResourceHolderForLang(bindName, lang, resourcesRootElem)
     } yield
       holder
-
-  //@XPathFunction
-  def iterateSelfAndDescendantBindsResourceHoldersXPath(
-    rootBind          : NodeInfo,
-    lang              : String,
-    resourcesRootElem : NodeInfo
-  ): SequenceIterator =
-    iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
 
   def lhhaHoldersForAllLangsUseDoc(
     controlName : String,

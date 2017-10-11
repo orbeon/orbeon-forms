@@ -21,7 +21,7 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
         <xbl:resources>
@@ -32,12 +32,12 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="(items, template)/item"/>           <!-- Clear local items and template -->
 
-                <xf:var name="control-name"      value="fbf:controlNameFromId(event('control-element')/@id)"/>
+                <xf:var name="control-name"      value="frf:controlNameFromId(event('control-element')/@id)"/>
                 <xf:setvalue ref="control-name"  value="$control-name"/>
                 <xf:setvalue ref="control-type"  value="event('control-element')/local-name()"/>
                 <xf:setvalue ref="control-value" value="fbf:findControlBoundNodeByName($control-name)"/>
                 <xf:setvalue ref="appearance"    value="event('control-element')/@appearance"/>
-                <xf:setvalue ref="html"          value="fbf:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
+                <xf:setvalue ref="html"          value="fbf:isItemsetHTMLMediatype($control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
 
@@ -73,7 +73,7 @@
             <!-- Save on click on save -->
             <xbl:handler event="DOMActivate" observer="save-trigger" type="xpath">
                 fbf:setControlItems($i/control-name, $i/items),
-                fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $i/control-name, $i/html)
+                fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="save-trigger">
                 <xf:setvalue ref="fbf:findControlBoundNodeByName($i/control-name)" value="$i/control-value"/>
@@ -165,7 +165,7 @@
                     </fr:checkbox-input>
 
                     <xf:group ref="$i/items">
-                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty(fbf:getFormDoc(), $i/control-name)"/>
+                        <xf:var name="control-element" value="frf:findControlByNameOrEmpty(fbf:getFormDoc(), $i/control-name)"/>
                         <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                              decide to remove support for legacy mode. -->
                         <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item">

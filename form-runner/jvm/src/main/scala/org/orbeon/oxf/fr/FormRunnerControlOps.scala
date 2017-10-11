@@ -81,7 +81,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findControlIdByName(inDoc: NodeInfo, controlName: String): Option[String] =
     findControlByName(inDoc, controlName) map (_.id)
 
-  // XForms callers: find a control element by name or null (the empty sequence)
+  // Find a control element by name or null (the empty sequence)
+  //@XPathFunction
   def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String): NodeInfo =
     findControlByName(inDoc, controlName).orNull
 
@@ -102,7 +103,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
     findInBindsTryIndex(inDoc, bindId(name))
 
-  // XForms callers: find a bind by name or null (the empty sequence)
+  // Find a bind by name or null (the empty sequence)
+  //@XPathFunction
   def findBindByNameOrEmpty(inDoc: NodeInfo, name: String): NodeInfo =
     findBindByName(inDoc, name).orNull
 
@@ -111,7 +113,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind.hasIdValue(bindId(name)) || bindRefOpt(bind).contains(name) // also check ref/nodeset in case id is not present
 
   // Canonical way: use the `name` attribute
-  //@XPathFunction
   def getBindNameOrEmpty(bind: NodeInfo): String =
     bind attValue "name"
 

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -83,23 +82,12 @@ trait SectionOps extends ContainerOps {
   def canMoveLeft(container: NodeInfo): Boolean =
     canDeleteSection(container) && findAncestorContainersLeafToRoot(container).size >= 2
 
-  private val DirectionCheck = List(
+  val DirectionCheck = List(
     "up"    → canMoveUp _,
     "right" → canMoveRight _,
     "down"  → canMoveDown _,
     "left"  → canMoveLeft _
   )
-
-  // Return all classes that need to be added to an editable section
-  def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
-    val directionClasses =
-      DirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction }
-
-    val deleteClasses =
-      canDeleteSection(container) list "fb-can-delete"
-
-    "fr-section-container" :: deleteClasses ::: directionClasses
-  }
 
   private def precedingSection(container: NodeInfo) =
     container precedingSibling "*:section" headOption

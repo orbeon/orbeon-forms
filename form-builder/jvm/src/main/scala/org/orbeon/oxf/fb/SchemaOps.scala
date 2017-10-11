@@ -23,9 +23,6 @@ trait SchemaOps {
   def findSchema(inDoc: NodeInfo) =
     findModelElem(inDoc) / (XS → "schema") headOption
 
-  def findSchemaOrEmpty(inDoc: NodeInfo) =
-    findSchema(inDoc).orNull
-
   def findSchemaNamespace(inDoc: NodeInfo) =
     for {
       schema          ← findSchema(inDoc)
@@ -40,7 +37,4 @@ trait SchemaOps {
       prefix          ← schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
     } yield
       prefix
-
-  def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
-    findSchemaPrefix(inDoc).orNull
 }

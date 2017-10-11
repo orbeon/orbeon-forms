@@ -20,7 +20,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -91,7 +91,7 @@
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
                     <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRootOpt($form)"/>
+                    <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
                 <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
@@ -122,7 +122,7 @@
                 <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
                     <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRootOpt($form)"/>
+                    <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
                 <!-- Dispatch event with result -->

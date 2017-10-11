@@ -131,7 +131,7 @@ trait FormBuilderSupport extends XFormsSupport {
                   )"
               />
 
-              <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+              <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
                 fbf:initializeGrids($temp)
               </xf:action>
 

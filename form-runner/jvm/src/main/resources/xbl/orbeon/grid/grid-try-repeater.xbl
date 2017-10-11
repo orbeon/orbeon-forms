@@ -23,7 +23,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
 
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -123,7 +123,7 @@
                         <!-- Grid table -->
                         <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
                                           (: Control name might not be available (unclear why normalize-space() is needed) :)
-                                          for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
+                                          for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                           if ($is-repeat)
                                                 then ('table', 'table-bordered', 'table-condensed', 'fr-repeat',
                                                       if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')

@@ -14,8 +14,8 @@
 package org.orbeon.builder.rpc
 
 import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps}
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -31,7 +31,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     val staticControlId = XFormsId.getStaticIdFromId(controlId)
 
     // The target might the control itself, or for grids with LHH in headers, an `xf:output` added to edit the LHH
-    val controlName = FormBuilder.controlNameFromId(
+    val controlName = FormRunner.controlNameFromId(
       if (staticControlId.startsWith(EditorIdPrefix))
         staticControlId.substring(EditorIdPrefix.size)
       else
@@ -117,7 +117,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit =
-    XFormsAPI.setvalue(FormBuilder.currentResources / FormBuilder.controlNameFromId(sectionId) / "label", label)
+    XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / "label", label)
 
   def containerEditDetails(containerId: String): Unit =
     XFormsAPI.dispatch(
@@ -167,12 +167,12 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
     val containerElem = FormBuilder.containerById(containerId)
 
-    if (FormBuilder.IsGrid(containerElem) && FormBuilder.canDeleteGrid(containerElem) ||
-      FormBuilder.IsSection(containerElem) && FormBuilder.canDeleteSection(containerElem)) {
+    if (FormRunner.IsGrid(containerElem) && FormBuilder.canDeleteGrid(containerElem) ||
+      FormRunner.IsSection(containerElem) && FormBuilder.canDeleteSection(containerElem)) {
 
       containerCopy(containerId)
 
-      if (FormBuilder.IsGrid(FormBuilder.containerById(containerId)))
+      if (FormRunner.IsGrid(FormBuilder.containerById(containerId)))
         FormBuilder.deleteGridById(containerId)
       else
         FormBuilder.deleteSectionById(containerId)
@@ -180,5 +180,5 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    FormBuilder.findInViewTryIndex(ctx.rootElem, XFormsId.getStaticIdFromId(id))
+    FormRunner.findInViewTryIndex(ctx.rootElem, XFormsId.getStaticIdFromId(id))
 }

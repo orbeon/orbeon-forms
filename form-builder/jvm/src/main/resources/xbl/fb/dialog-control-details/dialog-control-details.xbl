@@ -21,7 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -32,16 +32,16 @@
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <xf:action type="xpath">fbf:selectCellForControlId($form, event('control-id'))</xf:action>
+                <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="$i/original-control-name" value="fbf:controlNameFromId(event('control-id'))"/>
+                <xf:setvalue ref="$i/original-control-name" value="frf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
+                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllControlNames(), ' ')"/>
 
-                <xf:var name="control"                      value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="control"                      value="frf:findControlByNameOrEmpty($form, $i/control-name)"/>
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
@@ -117,7 +117,7 @@
                 <!-- Read required, datatype, and constraint validations -->
                 <xf:insert
                     context="$validations"
-                    origin="fbf:readValidationsAsXMLXPath($i/control-name)"/>
+                    origin="fbf:readValidationsAsXML($i/control-name)"/>
 
                 <!--  Insert an empty `formula` validation in the end to make it more discoverable by the user -->
                 <xf:insert
@@ -165,14 +165,13 @@
                     value="fbf:getControlHelpOrEmpty($i/control-name)"/>
                 <xf:setvalue
                     ref="$i/help/@isHTML"
-                    value="if (fbf:isControlLHHAHTMLMediatypeXPath($i/control-name, 'help')) then 'true' else ''"/>
+                    value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, 'help')) then 'true' else ''"/>
 
                 <!-- Set prev/next buttons -->
                 <xf:setvalue
                     ref="$i/prev-control-id"
                     value="
                         fbf:findNextControlId(
-                            $form,
                             $i/control-name,
                             'previous'
                         )"/>
@@ -180,7 +179,6 @@
                     ref="$i/next-control-id"
                     value="
                         fbf:findNextControlId(
-                            $form,
                             $i/control-name,
                             'next'
                         )"/>
@@ -188,7 +186,7 @@
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
-                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+                <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <xxf:show dialog="dialog"/>
 
@@ -196,10 +194,10 @@
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
                     <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance"     value="fbf:metadataInstanceRootOpt($form)"/>
+                    <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="original-control-id"   value="event('control-id')"/>
                     <xf:property name="original-control-name" value="$i/original-control-name"/>
-                    <xf:property name="data-holders"          value="fbf:findDataHolders($form, $i/original-control-name)"/>
+                    <xf:property name="data-holders"          value="fbf:findDataHolders($i/original-control-name)"/>
                 </xf:dispatch>
 
                 <xf:setvalue
@@ -233,7 +231,7 @@
                 <xf:action if="instance('modified')/@* = true()">
 
                     <xf:var name="old-name" value="$i/original-control-name/string()"/>
-                    <xf:var name="control"  value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
+                    <xf:var name="control"  value="frf:findControlByNameOrEmpty($form, $old-name)"/>
 
                     <xf:var
                         name="control-details"
@@ -258,7 +256,7 @@
 
                         <!-- Rename if needed -->
                         <xf:action type="xpath">
-                            fbf:renameControlIfNeeded($form, $old-name, $new-name)
+                            fbf:renameControlIfNeeded($old-name, $new-name)
                         </xf:action>
                         <!-- Write classes -->
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
@@ -267,7 +265,7 @@
 
                         <xf:action type="xpath">
                             (: Write alerts and constraints :)
-                            fbf:writeAlertsAndValidationsAsXMLXPath(
+                            fbf:writeAlertsAndValidationsAsXML(
                                 $i/control-name,
                                 $i/appearances/@selection,
                                 $i/default-alert/alert,
@@ -275,10 +273,10 @@
                             ),
                             (: Write MIPs :)
                             for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
-                                fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
+                                fbf:updateMipAsAttributeOnly($i/control-name, $mip, $i/*[name() = $mip]),
                             (: Write help :)
                             fbf:setControlHelp($i/control-name, $i/help),
-                            fbf:setControlLHHAMediatypeXPath($i/control-name, 'help', $i/help/@isHTML = 'true')
+                            fbf:setControlLHHAMediatype($i/control-name, 'help', $i/help/@isHTML = 'true')
                         </xf:action>
                     </xf:action>
                 </xf:action>
@@ -287,9 +285,9 @@
                 <xf:dispatch name="fb-apply" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
                     <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance"     value="fbf:metadataInstanceRootOpt($form)"/>
+                    <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="control-name"          value="$i/control-name"/>
-                    <xf:property name="data-holders"          value="fbf:findDataHolders($form, $i/control-name)"/>
+                    <xf:property name="data-holders"          value="fbf:findDataHolders($i/control-name)"/>
                 </xf:dispatch>
 
             </xbl:handler>
@@ -358,7 +356,6 @@
                         context="$appearances"
                         origin="
                             fbf:possibleAppearancesByControlNameAsXML(
-                                xxf:binding('fb-dialog-control-details'),
                                 $i/control-name,
                                 $is-initial-load,
                                 $i/validations/validation[@type = 'datatype']/builtin-type,

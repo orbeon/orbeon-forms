@@ -22,7 +22,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding id="fb-dialog-container-details" element="fb|dialog-container-details" xxbl:mode="binding">
         <xbl:handlers>
@@ -35,7 +35,7 @@
                 <xf:var name="control" value="event('container')"/>
 
                 <xf:setvalue ref="$i/container-type"                 value="local-name($control)"/>
-                <xf:setvalue ref="$i/original-control-name"          value="fbf:getContainerNameOrEmpty($control)"/>
+                <xf:setvalue ref="$i/original-control-name"          value="frf:getContainerNameOrEmpty($control)"/>
                 <xf:setvalue ref="$i/control-name"                   value="$i/original-control-name"/>
 
                 <xf:action if="$i/container-type = 'section'">
@@ -46,13 +46,13 @@
                     <xf:setvalue ref="$i/initially-open"             value="false()"/>
                 </xf:action>
 
-                <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(fbf:findControlByNameOrEmpty($form, $i/control-name))"/>
+                <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(frf:findControlByNameOrEmpty($form, $i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
-                <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
                 <xf:setvalue ref="$i/is-custom-iteration-name"       value="$i/was-custom-iteration-name"/>
 
-                <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then fbf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
+                <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then frf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
@@ -61,9 +61,9 @@
                 <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
 
-                <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
+                <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNames(), ' ')"/>
 
-                <xf:var name="control"                               value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="control"                               value="frf:findControlByNameOrEmpty($form, $i/control-name)"/>
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>
 
                 <xf:var name="standard-classes"                      value="$resources/dialog-container-details/options/item/value/string()"/>
@@ -78,14 +78,13 @@
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
-                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+                <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <!-- Set prev/next buttons -->
                 <xf:setvalue
                     ref="$i/prev-control-id"
                     value="
                         fbf:findNextContainer(
-                            $form,
                             $i/control-name,
                             'previous'
                         )/@id"/>
@@ -93,7 +92,6 @@
                     ref="$i/next-control-id"
                     value="
                         fbf:findNextContainer(
-                            $form,
                             $i/control-name,
                             'next'
                         )/@id"/>
@@ -136,8 +134,7 @@
 
                     <xf:action type="xpath">
                         if ($remains-repeat) then
-                            fbf:renameControlIterationIfNeededXPath(
-                                $form,
+                            fbf:renameControlIterationIfNeeded(
                                 $old-name,
                                 $new-name,
                                 $i/original-custom-iteration-name/string(),
@@ -145,10 +142,10 @@
                             )
                         else
                             (),
-                        fbf:renameControlIfNeededXPath($old-name, $new-name),
-                        fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
-                        fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
-                        fbf:setRepeatPropertiesXPath(
+                        fbf:renameControlIfNeeded($old-name, $new-name),
+                        fbf:updateMipAsAttributeOnly($new-name, 'relevant', $i/relevant),
+                        fbf:updateMipAsAttributeOnly($new-name, 'readonly', $i/readonly),
+                        fbf:setRepeatProperties(
                             $new-name,
                             $i/is-repeat = true(),
                             $i/min-repeat,
@@ -160,7 +157,7 @@
                     </xf:action>
 
                     <!-- Write classes -->
-                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $new-name)"/>
+                    <xf:var name="control" value="frf:findControlByNameOrEmpty($form, $new-name)"/>
 
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>

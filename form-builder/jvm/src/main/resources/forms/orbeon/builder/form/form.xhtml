@@ -21,7 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
     <xh:head>
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"    xxi:omit-xml-base="true"/>
@@ -486,7 +486,7 @@
 
                                 <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
                                 <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
-                                    <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = fbf:controlNameFromId($control-id)]/label">-->
+                                    <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = frf:controlNameFromId($control-id)]/label">-->
                                         <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
                                     <!--</xf:input>-->
                                 <!--</xf:group>-->

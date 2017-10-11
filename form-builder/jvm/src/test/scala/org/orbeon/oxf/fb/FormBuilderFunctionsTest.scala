@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -119,12 +120,12 @@ class FormBuilderFunctionsTest
 
         val doc = ctx.rootElem
 
-        ensureBinds(doc, List(Section1, Control2))
+        ensureBinds(List(Section1, Control2))
 
         assert(findBindByName(doc, Control2).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
         assert(findBindByName(doc, Control2).get.hasIdValue(bindId(Control2)))
 
-        ensureBinds(doc, List(Section2, "grid-1", Control3))
+        ensureBinds(List(Section2, "grid-1", Control3))
 
         assert(findBindByName(doc, Control3).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
         assert(findBindByName(doc, Control3).get.hasIdValue(bindId(Control3)))
@@ -416,9 +417,9 @@ class FormBuilderFunctionsTest
         val selectedCell = FormBuilder.findSelectedCell.get
 
         def assertPresent() = {
-          assert(Control1 === FormBuilder.getControlName(selectedCell / * head))
-          assert(FormBuilder.findControlByName(doc, Control1).nonEmpty)
-          assert(FormBuilder.findBindByName(doc, Control1).nonEmpty)
+          assert(Control1 === FormRunner.getControlName(selectedCell / * head))
+          assert(FormRunner.findControlByName(doc, Control1).nonEmpty)
+          assert(FormRunner.findBindByName(doc, Control1).nonEmpty)
           assert(FormBuilder.findDataHolders(Control1).nonEmpty)
           assert(FormBuilder.findCurrentResourceHolder(Control1).nonEmpty)
         }
@@ -430,8 +431,8 @@ class FormBuilderFunctionsTest
         // Selected cell hasn't changed
         assert(FormBuilder.findSelectedCell contains selectedCell)
 
-        assert(FormBuilder.findControlByName(doc, Control1).isEmpty)
-        assert(FormBuilder.findBindByName(doc, Control1).isEmpty)
+        assert(FormRunner.findControlByName(doc, Control1).isEmpty)
+        assert(FormRunner.findBindByName(doc, Control1).isEmpty)
         assert(FormBuilder.findDataHolders(Control1).isEmpty)
         assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
@@ -450,19 +451,19 @@ class FormBuilderFunctionsTest
         val nestedControlName = FormBuilder.findContainerById(firstGridId).toList flatMap findNestedControls flatMap getControlNameOpt head
 
         assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
-        assert(FormBuilder.findControlByName(doc, nestedControlName).nonEmpty)
+        assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
 
         FormBuilderRpcApiImpl.containerCut(firstGridId)
 
         assert(FormBuilder.findContainerById(firstGridId).isEmpty)
-        assert(FormBuilder.findControlByName(doc, nestedControlName).isEmpty)
+        assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
 
         ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell.get)
 
-        assert(FormBuilder.findControlByName(doc, nestedControlName).nonEmpty)
+        assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
 
         // The newly-inserted grid can have a different temporary id but make sure there is one
-        val newGrid = findAncestorContainersLeafToRoot(FormBuilder.findControlByName(doc, nestedControlName).get, includeSelf = false).head
+        val newGrid = findAncestorContainersLeafToRoot(FormRunner.findControlByName(doc, nestedControlName).get, includeSelf = false).head
         assert(newGrid.id.startsWith("tmp-"))
       }
     }

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.XMLNames._
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
@@ -62,17 +62,6 @@ trait ContainerOps extends ControlOps {
   def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
 
   def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = findFRBodyElem(inDoc) descendant * filter IsContainer
-
-  // Various counts
-  def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count IsSection
-  def countAllGrids        (inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count IsGrid
-  def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count isRepeat
-  def countSectionTemplates(inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count isSectionTemplateContent
-
-  def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot IsContainer size
-  def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
-  def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
   // A container can be removed if it's not the last one at that level
   def canDeleteContainer(containerElem: NodeInfo): Boolean =
@@ -192,31 +181,8 @@ trait ContainerOps extends ControlOps {
   def canMoveInto(containerElem: NodeInfo): Boolean =
     IsSection(containerElem) && ! (containerElem / * exists isSectionTemplateContent)
 
-  def hasCustomIterationName(inDoc: NodeInfo, controlName: String): Boolean =
-    findRepeatIterationName(inDoc, controlName) exists (isCustomIterationName(controlName, _))
-
   def isCustomIterationName(controlName: String, iterationName: String): Boolean =
     defaultIterationName(controlName) != iterationName
-
-  //@XPathFunction
-  def setRepeatPropertiesXPath(
-    controlName          : String,
-    repeat               : Boolean,
-    min                  : String,
-    max                  : String,
-    iterationNameOrEmpty : String,
-    applyDefaults        : Boolean,
-    initialIterations    : String
-  ): Unit =
-    setRepeatProperties(
-      controlName          = controlName,
-      repeat               = repeat,
-      min                  = min,
-      max                  = max,
-      iterationNameOrEmpty = iterationNameOrEmpty,
-      applyDefaults        = applyDefaults,
-      initialIterations    = initialIterations
-    )(FormBuilderDocContext())
 
   def setRepeatProperties(
     controlName          : String,
@@ -263,7 +229,7 @@ trait ContainerOps extends ControlOps {
 
         // Insert nested iteration bind
         findControlByName(inDoc, controlName) foreach { control ⇒
-          ensureBinds(inDoc, findContainerNamesForModel(control) :+ controlName :+ iterationName)
+          ensureBinds(findContainerNamesForModel(control) :+ controlName :+ iterationName)
         }
 
         val controlBind   = findBindByName(inDoc, controlName)
@@ -473,17 +439,4 @@ trait ContainerOps extends ControlOps {
   // Update templates but only those which might contain one of specified names
   def updateTemplatesCheckContainers(ancestorContainerNames: Set[String])(implicit ctx: FormBuilderDocContext): Unit =
     updateTemplates(Some(ancestorContainerNames))
-
-  // This is called when the user adds/removes an iteration, as we want to update the templates in this case in order
-  // to adjust the default number of iterations. See https://github.com/orbeon/orbeon-forms/issues/2379
-  //@XPathFunction
-  def updateTemplatesFromDynamicIterationChange(controlName: String): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
-
-    findControlByName(ctx.rootElem, controlNameFromId(controlName)) foreach { controlElem ⇒
-      assert(isRepeat(controlElem))
-      updateTemplatesCheckContainers(findAncestorRepeatNames(controlElem).to[Set])
-    }
-  }
 }

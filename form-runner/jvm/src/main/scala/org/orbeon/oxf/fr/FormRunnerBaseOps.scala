@@ -51,7 +51,6 @@ trait FormRunnerBaseOps {
   def controlId (controlName: String): String = controlName + "-control"
   def templateId(gridName: String)   : String = gridName    + TemplateSuffix
 
-  //@XPathFunction
   def defaultIterationName(repeatName: String): String =
     repeatName + DefaultIterationSuffix
 
@@ -142,7 +141,10 @@ trait FormRunnerBaseOps {
 
   // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
   def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
-    findModelElem(inDoc) / XFBindTest find {
+    findTopLevelBindFromModelElem(findModelElem(inDoc))
+
+  def findTopLevelBindFromModelElem(modelElem: NodeInfo): Option[NodeInfo] =
+    modelElem / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
       bind ⇒ TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }

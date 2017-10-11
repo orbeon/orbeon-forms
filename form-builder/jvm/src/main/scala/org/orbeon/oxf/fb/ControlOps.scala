@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fb.FormBuilderXPathApi.resourcesRoot
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -65,12 +64,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     assert(cell.localname == "c")
     assert(grid.localname == "grid")
 
-    val precedingCellsInGrid = cell precedingSibling  "*:c"
+    val precedingCellsInGrid = cell precedingSibling CellTest
 
     def fromPrecedingNamesInGrid = precedingCellsInGrid flatMap (_ child * flatMap getControlNameOpt) headOption
     def fromGridNameOpt          = getControlNameOpt(grid)
 
-    fromPrecedingNamesInGrid orElse fromGridNameOpt orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
+    fromPrecedingNamesInGrid orElse
+      fromGridNameOpt        orElse
+      precedingControlNameInSectionForGrid(grid, includeSelf = false)
   }
 
   def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean): Option[String] = {
@@ -82,7 +83,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // with a name (there might not be one).
     val controlsWithName =
       precedingOrSelfContainers flatMap {
-        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant "*:c" child * filter hasName lastOption
+        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant CellTest child * filter hasName lastOption
         case other                                   ⇒ Some(other)
       }
 
@@ -100,7 +101,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None ⇒
         insert(
           into   = ctx.modelElem,
-          after  = ctx.modelElem / XFInstanceTest filter (_.hasIdValue("fr-form-instance")), // TODO xxx use ctx.???
+          after  = ctx.dataInstanceElem,
           origin = topLevelBindTemplate
         ).head
     }
@@ -141,7 +142,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def iterateSelfAndDescendantHoldersReversed(rootHolder: NodeInfo): Iterator[NodeInfo] =
     (rootHolder descendantOrSelf *).reverseIterator
 
-  def deleteControlWithinCell(cellElem: NodeInfo, updateTemplates: Boolean = false)(implicit ctx: FormBuilderDocContext): Unit = {
+  def deleteControlWithinCell(
+    cellElem        : NodeInfo,
+    updateTemplates : Boolean = false)(implicit
+    ctx             : FormBuilderDocContext
+  ): Unit = {
     cellElem / * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)
       self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
@@ -345,7 +350,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
-  def updateMipAsAttributeOnly(controlName: String, mipName: String, mipValue: String)(implicit ctx: FormBuilderDocContext): Unit = {
+  def updateMipAsAttributeOnly(
+    controlName : String,
+    mipName     : String,
+    mipValue    : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Unit = {
 
     require(Model.AllMIPNames(mipName))
     val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
@@ -589,7 +599,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val staticId = control.id
 
     // Ancestors from root to leaf except fb-body group if present
-    val ancestorContainers = findAncestorContainersLeafToRoot(control, includeSelf = false).reverse filterNot isFBBody
+    val ancestorContainers =
+      findAncestorContainersLeafToRoot(control, includeSelf = false).reverse filterNot isFBBody
 
     val containerIds = ancestorContainers map (_.id)
     val repeatDepth  = ancestorContainers count isRepeat

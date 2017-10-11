@@ -68,7 +68,11 @@ trait ContainerOps extends ControlOps {
     containerElem sibling FRContainerTest nonEmpty
 
   // Delete the entire container and contained controls
-  def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String)(implicit ctx: FormBuilderDocContext): Unit = {
+  def deleteContainerById(
+    canDelete   : NodeInfo ⇒ Boolean,
+    containerId : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Unit = {
     val container = containerById(containerId)
     if (canDelete(container))
       deleteContainer(container)
@@ -249,7 +253,10 @@ trait ContainerOps extends ControlOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
 
         // Ensure new template rooted at iteration
-        ensureTemplateReplaceContent(controlName, createTemplateContentFromBind(iterationBind.head, ctx.componentBindings))
+        ensureTemplateReplaceContent(
+          controlName,
+          createTemplateContentFromBind(iterationBind.head, ctx.componentBindings)
+        )
 
       } else if (wasRepeat && ! repeat) {
         // Remove bind, holders and template
@@ -300,7 +307,11 @@ trait ContainerOps extends ControlOps {
   def findTemplateInstance(doc: NodeInfo, controlName: String): Option[NodeInfo] =
     instanceElem(doc, templateId(controlName))
 
-  def ensureTemplateReplaceContent(controlName: String, content: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
+  def ensureTemplateReplaceContent(
+    controlName : String,
+    content     : NodeInfo)(implicit
+    ctx         : FormBuilderDocContext
+  ): Unit = {
 
     val templateInstanceId = templateId(controlName)
     val modelElement = findModelElem(ctx.rootElem)

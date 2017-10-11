@@ -463,6 +463,12 @@
 
     <target name="test-unit" depends="init">
         <exec executable="sbt" failonerror="true">
+            <arg value="-verbose"/>
+            <arg value="-J-Xmx3G"/>
+            <arg value="-J-Xss1M"/>
+            <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->
+            <arg value="-J-XX:+CMSClassUnloadingEnabled"/>
+            <arg value="-J-XX:+UseConcMarkSweepGC"/>
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
@@ -598,6 +604,12 @@
 
                 <!-- Run sbt tests -->
                 <exec executable="sbt" failonerror="true">
+                    <arg value="-verbose"/>
+                    <arg value="-J-Xmx3G"/>
+                    <arg value="-J-Xss1M"/>
+                    <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->
+                    <arg value="-J-XX:+CMSClassUnloadingEnabled"/>
+                    <arg value="-J-XX:+UseConcMarkSweepGC"/>
                     <arg value="-Dorbeon.version=${release.number}"/>
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project root"/>

@@ -41,7 +41,7 @@
 
                 <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllControlNames(), ' ')"/>
 
-                <xf:var name="control"                      value="frf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="control"                      value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
@@ -153,11 +153,11 @@
                     value="'true()'"/>
 
                 <!-- Read MIPs -->
-                <xf:setvalue ref="$i/relevant"   value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"   value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
-                <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'calculate')"/>
-                <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'default')"/>
-                <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'whitespace')"/>
+                <xf:setvalue ref="$i/relevant"   value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"   value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'calculate')"/>
+                <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'default')"/>
+                <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'whitespace')"/>
 
                 <!-- Read help -->
                 <xf:setvalue
@@ -193,7 +193,7 @@
                 <!-- Tell custom settings to initialize -->
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
-                    <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
+                    <xf:property name="form-instance"         value="fbf:formInstanceRoot()"/>
                     <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="original-control-id"   value="event('control-id')"/>
                     <xf:property name="original-control-name" value="$i/original-control-name"/>
@@ -231,7 +231,7 @@
                 <xf:action if="instance('modified')/@* = true()">
 
                     <xf:var name="old-name" value="$i/original-control-name/string()"/>
-                    <xf:var name="control"  value="frf:findControlByNameOrEmpty($form, $old-name)"/>
+                    <xf:var name="control"  value="fbf:findControlByNameOrEmpty($old-name)"/>
 
                     <xf:var
                         name="control-details"
@@ -284,7 +284,7 @@
                 <!-- Tell custom settings to apply changes -->
                 <xf:dispatch name="fb-apply" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
-                    <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
+                    <xf:property name="form-instance"         value="fbf:formInstanceRoot()"/>
                     <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="control-name"          value="$i/control-name"/>
                     <xf:property name="data-holders"          value="fbf:findDataHolders($i/control-name)"/>

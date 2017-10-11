@@ -55,7 +55,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
-    findBindPathHoldersInDocument(ctx.rootElem, controlName, Some(formInstanceRoot(ctx.rootElem))) flatMap (_.holders) getOrElse Nil
+    findBindPathHoldersInDocument(ctx.rootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
 
@@ -260,7 +260,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     findBindByName(ctx.rootElem, oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
-  private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
+  private def ensureDataHolder(rootElem: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
     @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() ⇒ NodeInfo, Option[String])]): Seq[NodeInfo] =
       if (names.hasNext) {
@@ -289,7 +289,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       } else
         parents
 
-    ensure(Seq(root), holders.toIterator)
+    ensure(Seq(rootElem), holders.toIterator)
   }
 
   // Insert data and resource holders for all languages
@@ -297,11 +297,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     controlElement       : NodeInfo,
     dataHolder           : NodeInfo,
     resourceHolder       : NodeInfo,
-    precedingControlName : Option[String]
+    precedingControlName : Option[String])(implicit
+    ctx                  : FormBuilderDocContext
   ): Unit = {
 
     // Create one holder per existing language
-    val resourceHolders = (formResourcesRoot / "resource" /@ "*:lang") map (_.stringValue → List(resourceHolder))
+    val resourceHolders = (allResources(ctx.resourcesRootElem) /@ "*:lang") map (_.stringValue → List(resourceHolder))
     insertHolders(controlElement, List(dataHolder), resourceHolders, precedingControlName)
   }
 
@@ -310,7 +311,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     controlElement       : NodeInfo,
     dataHolders          : Seq[NodeInfo],
     resourceHolders      : Seq[(String, Seq[NodeInfo])],
-    precedingControlName : Option[String]
+    precedingControlName : Option[String])(implicit
+    ctx                  : FormBuilderDocContext
   ): Unit = {
 
     val doc            = controlElement.getDocumentRoot
@@ -321,7 +323,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // names. In practice, the ancestor holders should already exist.
     dataHolders foreach { dataHolder ⇒
       ensureDataHolder(
-        formInstanceRoot(doc),
+        ctx.dataRootElem,
         (containerNames map (name ⇒ (() ⇒ elementInfo(name), None))) :+ (() ⇒ dataHolder, precedingControlName)
       )
     }
@@ -329,7 +331,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Insert resources placeholders for all languages
     if (resourceHolders.nonEmpty) {
       val resourceHoldersMap = resourceHolders.toMap
-      formResourcesRoot / "resource" foreach { resource ⇒
+      allResources(ctx.resourcesRootElem) foreach { resource ⇒
         val lang    = (resource /@ "*:lang").stringValue
         val holders = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
         insert(
@@ -413,11 +415,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Get the value of a MIP attribute if present
-  def readMipAsAttributeOnly(inDoc: NodeInfo, controlName: String, mipName: String): Option[String] = {
+  def readMipAsAttributeOnly(controlName: String, mipName: String)(implicit ctx: FormBuilderDocContext): Option[String] = {
     require(Model.AllMIPNames(mipName))
     val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
-    findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipAttQName)
+    findBindByName(ctx.rootElem, controlName) flatMap (_ attValueOpt mipAttQName)
   }
 
   // Return (attQName, elemQName)
@@ -444,11 +446,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, ctx.componentBindings)
 
   // Find a given static control by name
-  def findStaticControlByName(controlName: String): Option[ElementAnalysis] = {
+  def findStaticControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[ElementAnalysis] = {
     val model = getFormModel
     val part = model.getStaticModel.part
     for {
-      controlId ← findControlIdByName(getFormDoc, controlName)
+      controlId ← findControlIdByName(ctx.rootElem, controlName)
       prefixedId = part.startScope.prefixedIdForStaticId(controlId)
       control ← Option(part.getControlAnalysis(prefixedId))
     } yield
@@ -456,10 +458,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Find the control by name (resolved from the top-level form model `fr-form-model`)
-  def findConcreteControlByName(controlName: String): Option[XFormsControl] = {
+  def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
     val model = getFormModel
     for {
-      controlId ← findControlIdByName(getFormDoc, controlName)
+      controlId ← findControlIdByName(ctx.rootElem, controlName)
       control   ← model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
     } yield
       control

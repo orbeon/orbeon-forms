@@ -77,7 +77,7 @@ object ToolboxOps {
 
         // Create resource holder for all form languages
         val resourceHolders = {
-          val formLanguages = FormRunnerResourcesOps.allLangs(formResourcesRoot)
+          val formLanguages = FormRunnerResourcesOps.allLangs(ctx.resourcesRootElem)
           formLanguages map { formLang ⇒
 
             // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
@@ -359,7 +359,7 @@ object ToolboxOps {
     case object Bind      extends XcvEntry
   }
 
-  def controlOrContainerElemToXcv(containerElem: NodeInfo): NodeInfo = {
+  def controlOrContainerElemToXcv(containerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
     val inDoc             = containerElem.getDocumentRoot
     val resourcesRootElem = resourcesRoot
@@ -368,7 +368,7 @@ object ToolboxOps {
       searchControlBindPathHoldersInDoc(
         controlElems   = List(containerElem),
         inDoc          = inDoc,
-        contextItemOpt = Some(formInstanceRoot(inDoc)),
+        contextItemOpt = Some(ctx.dataRootElem),
         predicate      = _ ⇒ true
       ).headOption
 
@@ -408,7 +408,7 @@ object ToolboxOps {
           val nestedControlDetails = searchControlBindPathHoldersInDoc(
             controlElems   = findNestedControls(containerElem),
             inDoc          = inDoc,
-            contextItemOpt = Some(formInstanceRoot(inDoc)),
+            contextItemOpt = Some(ctx.dataRootElem),
             predicate      = _ ⇒ true
           )
 
@@ -438,19 +438,20 @@ object ToolboxOps {
     result
   }
 
-  private def controlElementsInCellToXcv(cellElem: NodeInfo): Option[NodeInfo] = {
-
-    val inDoc = cellElem.getDocumentRoot
+  private def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val name  = getControlName(cellElem / * head)
-
-    findControlByName(inDoc, name) map controlOrContainerElemToXcv
+    findControlByName(ctx.rootElem, name) map controlOrContainerElemToXcv
   }
 
   // Copy control to the clipboard
   //@XPathFunction
-  def copyToClipboard(cellElem: NodeInfo): Unit =
+  def copyToClipboard(cellElem: NodeInfo): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     controlElementsInCellToXcv(cellElem)
       .foreach(writeXcvToClipboard)
+  }
 
   // Cut control to the clipboard
   //@XPathFunction

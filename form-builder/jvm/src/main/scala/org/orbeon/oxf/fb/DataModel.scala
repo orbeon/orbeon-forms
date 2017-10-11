@@ -25,6 +25,7 @@ import scala.util.control.NonFatal
 
 object DataModel {
 
+  // Unused as of 2017-10-11
   def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
 
     def evaluateBoundItem(namespaces: NamespaceMapping) =
@@ -40,7 +41,8 @@ object DataModel {
   }
 
   // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
-  def isAllowedBoundItem(controlName: String, itemOption: Option[Item]): Boolean = {
+  // Unused as of 2017-10-11
+  def isAllowedBoundItem(controlName: String, itemOption: Option[Item])(implicit ctx: FormBuilderDocContext): Boolean = {
     for {
       item    ← itemOption
       control ← findStaticControlByName(controlName)

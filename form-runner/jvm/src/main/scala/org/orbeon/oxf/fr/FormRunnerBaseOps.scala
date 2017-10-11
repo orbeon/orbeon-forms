@@ -121,7 +121,10 @@ trait FormRunnerBaseOps {
 
   // Find an xf:instance element
   def instanceElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findModelElem(inDoc) / XFInstanceTest find (_.hasIdValue(id))
+    instanceElemFromModelElem(findModelElem(inDoc), id)
+
+  def instanceElemFromModelElem(modelElem: NodeInfo, id: String): Option[NodeInfo] =
+    modelElem / XFInstanceTest find (_.hasIdValue(id))
 
   // Find an inline instance's root element
   def inlineInstanceRootElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =

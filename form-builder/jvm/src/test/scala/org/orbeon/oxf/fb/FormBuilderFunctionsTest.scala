@@ -56,7 +56,7 @@ class FormBuilderFunctionsTest
       }
 
       it("must find the instance") {
-        assert((formInstanceRoot(doc) parent * head).name === "xf:instance")
+        assert((ctx.dataRootElem parent * head).name === "xf:instance")
       }
 
       it("must find the body group") {
@@ -195,7 +195,7 @@ class FormBuilderFunctionsTest
         assert(controlBind.hasIdValue(bindId(newControlName)))
         assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-        assert(formResourcesRoot / "resource" / newControlName nonEmpty)
+        assert(allResources(ctx.resourcesRootElem) / newControlName nonEmpty)
 
       }
     }
@@ -295,7 +295,7 @@ class FormBuilderFunctionsTest
           assert(controlBind.hasIdValue(bindId(newControlName)))
           assert((controlBind parent * head).hasIdValue(bindId(newRepeatIterationName)))
 
-          assert(formResourcesRoot / "resource" / newControlName nonEmpty)
+          assert(allResources(ctx.resourcesRootElem) / newControlName nonEmpty)
 
           val templateHolder = templateRoot(newRepeatName).get / newControlName headOption
 

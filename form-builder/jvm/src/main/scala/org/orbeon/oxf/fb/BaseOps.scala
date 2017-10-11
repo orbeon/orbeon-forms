@@ -14,13 +14,14 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -34,10 +35,14 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
   lazy val formResourcesRoot: NodeInfo =
     topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
-  val modelElem        = findModelElem(rootElem)
-  val topLevelBindElem = findTopLevelBindFromModelElem(modelElem)
-  val bodyElem         = findFRBodyElem(rootElem)
+  lazy val modelElem             = findModelElem(rootElem)
+  lazy val dataInstanceElem      = instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val resourcesInstanceElem = instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val topLevelBindElem      = findTopLevelBindFromModelElem(modelElem)
+  lazy val bodyElem              = findFRBodyElem(rootElem)
 
+  lazy val dataRootElem          = dataInstanceElem      / * head
+  lazy val resourcesRootElem     = resourcesInstanceElem / * head
 }
 
 object FormBuilderDocContext {
@@ -66,23 +71,10 @@ trait BaseOps extends Logging {
   // Id of the xxf:dynamic control holding the edited form
   val DynamicControlId = "fb"
 
-  // Find the form document being edited
-  // TODO: remove once `FormBuilderDocContext` is used
-  def getFormDoc: DocumentInfo =
-    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
-
-  // Return fb-form-instance
-  // TODO: remove once `FormBuilderDocContext` is used
-
-
   // Find the top-level form model of the form being edited
   def getFormModel: XFormsModel =
-    inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model")
+    inScopeContainingDocument.getObjectByEffectiveId(s"$DynamicControlId${COMPONENT_SEPARATOR}fr-form-model")
       .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
-
-  // TODO: remove once `FormBuilderDocContext` is used
-  def formResourcesRoot: NodeInfo =
-    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
   def templateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     inlineInstanceRootElem(ctx.rootElem, templateId(repeatName))
@@ -114,7 +106,7 @@ trait BaseOps extends Logging {
       def canUseIndex = fbInstanceOpt exists (_.documentInfo == root)
 
       val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-      val instanceIds = formInstanceRoot(root) descendant * map (_.localname + suffix)
+      val instanceIds = ctx.dataRootElem descendant * map (_.localname + suffix)
 
       elementIds ++ instanceIds
     }

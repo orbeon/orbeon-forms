@@ -60,7 +60,7 @@ class RepeatedSectionsTest
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(ctx.dataRootElem))
       }
     }
 
@@ -95,7 +95,7 @@ class RepeatedSectionsTest
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(ctx.dataRootElem))
       }
     }
 
@@ -129,7 +129,7 @@ class RepeatedSectionsTest
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(ctx.dataRootElem))
       }
     }
 
@@ -197,7 +197,7 @@ class RepeatedSectionsTest
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(ctx.dataRootElem))
       }
     }
 
@@ -229,7 +229,7 @@ class RepeatedSectionsTest
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(ctx.dataRootElem))
 
         assert("0" === getNormalizedMin(doc, "foo"))
         assert(None === getNormalizedMax(doc, "foo"))

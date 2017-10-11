@@ -70,8 +70,8 @@ object FormBuilderXPathApi {
 
   // Find the value of a MIP or null (the empty sequence)
   //@XPathFunction
-  def readMipAsAttributeOnlyOrEmpty(inDoc: NodeInfo, controlName: String, mipName: String): String =
-    FormBuilder.readMipAsAttributeOnly(inDoc, controlName, mipName).orNull
+  def readMipAsAttributeOnlyOrEmpty(controlName: String, mipName: String): String =
+    FormBuilder.readMipAsAttributeOnly(controlName, mipName)(FormBuilderDocContext()).orNull
 
   //@XPathFunction
   def updateMipAsAttributeOnly(controlName: String, mipName: String, mipValue: String): Unit =
@@ -363,8 +363,8 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def formInstanceRoot(inDoc: NodeInfo): NodeInfo =
-    FormRunner.inlineInstanceRootElem(inDoc, FormInstance).get
+  def formInstanceRoot: NodeInfo =
+    FormBuilderDocContext().dataRootElem
 
   // Find data holders (there can be more than one with repeats)
   //@XPathFunction
@@ -421,7 +421,7 @@ object FormBuilderXPathApi {
   // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
   //@XPathFunction
   def findControlBoundNodeByName(controlName: String): Option[NodeInfo] = (
-    findConcreteControlByName(controlName)
+    findConcreteControlByName(controlName)(FormBuilderDocContext())
     collect { case c: XFormsSingleNodeControl ⇒ c }
     flatMap (_.boundNode)
   )
@@ -495,4 +495,10 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def buildFormBuilderControlEffectiveIdOrEmpty(staticId: String): String =
     FormBuilder.buildFormBuilderControlEffectiveId(staticId)(FormBuilderDocContext()).orNull
+
+  //@XPathFunction
+  def findControlByNameOrEmpty(controlName: String): NodeInfo = {
+    implicit val ctx = FormBuilderDocContext()
+    FormRunner.findControlByNameOrEmpty(ctx.rootElem, controlName)
+  }
 }

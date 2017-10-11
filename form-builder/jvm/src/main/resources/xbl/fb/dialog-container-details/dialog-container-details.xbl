@@ -46,7 +46,7 @@
                     <xf:setvalue ref="$i/initially-open"             value="false()"/>
                 </xf:action>
 
-                <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(frf:findControlByNameOrEmpty($form, $i/control-name))"/>
+                <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(fbf:findControlByNameOrEmpty($i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
@@ -58,12 +58,12 @@
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
 
-                <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly')"/>
 
                 <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNames(), ' ')"/>
 
-                <xf:var name="control"                               value="frf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="control"                               value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>
 
                 <xf:var name="standard-classes"                      value="$resources/dialog-container-details/options/item/value/string()"/>
@@ -157,7 +157,7 @@
                     </xf:action>
 
                     <!-- Write classes -->
-                    <xf:var name="control" value="frf:findControlByNameOrEmpty($form, $new-name)"/>
+                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($new-name)"/>
 
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>

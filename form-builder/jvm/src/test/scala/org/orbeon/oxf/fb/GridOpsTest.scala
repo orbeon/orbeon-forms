@@ -36,48 +36,46 @@ class GridOpsTest
 
   describe("Row insertion below") {
     it("must insert as expected") {
-      withTestExternalContext { _ ⇒
-        withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
-          def gridNode =
-            ctx.rootElem descendant NodeInfoCell.GridTest head
+        def gridNode =
+          ctx.rootElem descendant NodeInfoCell.GridTest head
 
-          import NodeInfoCell._
+        import NodeInfoCell._
 
-          // Keep updating mapping so that initial cells keep their letter names
-          var mapping = {
-            val expected =
-              """
-                |ABC
-                |DbE
-                |dFG
-              """.stripMargin.trim
-
-            val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true))
-            assert(expected === actual)
-            newMapping
-          }
-
-          // Insert one row below each existing row
-
-          for (rowPos ← List(0, 2, 4)) {
-            rowInsertBelow(gridNode, rowPos)
-            val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)
-            mapping = newMapping
-          }
-
-          val after =
+        // Keep updating mapping so that initial cells keep their letter names
+        var mapping = {
+          val expected =
             """
               |ABC
-              |HbI
               |DbE
-              |dJK
               |dFG
-              |LMN
             """.stripMargin.trim
 
-         assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)._1)
+          val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true))
+          assert(expected === actual)
+          newMapping
         }
+
+        // Insert one row below each existing row
+
+        for (rowPos ← List(0, 2, 4)) {
+          rowInsertBelow(gridNode, rowPos)
+          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)
+          mapping = newMapping
+        }
+
+        val after =
+          """
+            |ABC
+            |HbI
+            |DbE
+            |dJK
+            |dFG
+            |LMN
+          """.stripMargin.trim
+
+       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)._1)
       }
     }
   }
@@ -132,20 +130,18 @@ class GridOpsTest
 
       // For before/after cell ids: create a doc, call the delete function, and assert the resulting selected cell
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
-        withTestExternalContext { _ ⇒
-          withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
 
-            val doc = ctx.rootElem
+          val doc = ctx.rootElem
 
-            findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
-              selectCell(beforeCell)
-              delete(beforeCell)
-            }
-
-            val actualSelectedCellId = findSelectedCell map (_.id)
-
-            assert(actualSelectedCellId === Some(afterCellId))
+          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
+            selectCell(beforeCell)
+            delete(beforeCell)
           }
+
+          val actualSelectedCellId = findSelectedCell map (_.id)
+
+          assert(actualSelectedCellId === Some(afterCellId))
         }
 
       // Test all
@@ -198,27 +194,25 @@ class GridOpsTest
 
   describe("Last grid in section") {
     it("must allow inserting a new grid") {
-      withTestExternalContext { _ ⇒
-        withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-          val doc = ctx.rootElem
+        val doc = ctx.rootElem
 
-          // Initially can insert all
-          assert(canInsertSection(doc) === true)
-          assert(canInsertGrid(doc)    === true)
-          assert(canInsertControl(doc) === true)
+        // Initially can insert all
+        assert(canInsertSection(doc) === true)
+        assert(canInsertGrid(doc)    === true)
+        assert(canInsertControl(doc) === true)
 
-          // Remove everything (assume top-level section with a single grid inside)
-          childrenContainers(ctx.bodyElem).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
-            assert(isLastGridInSection(childrenGrids(section).head) === true)
-            deleteContainer(section)
-          }
-
-          // After everything is removed we can only insert a section (later: can also insert grid)
-          assert(canInsertSection(doc) === true)
-          assert(canInsertGrid(doc)    === false)
-          assert(canInsertControl(doc) === false)
+        // Remove everything (assume top-level section with a single grid inside)
+        childrenContainers(ctx.bodyElem).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
+          assert(isLastGridInSection(childrenGrids(section).head) === true)
+          deleteContainer(section)
         }
+
+        // After everything is removed we can only insert a section (later: can also insert grid)
+        assert(canInsertSection(doc) === true)
+        assert(canInsertGrid(doc)    === false)
+        assert(canInsertControl(doc) === false)
       }
     }
   }

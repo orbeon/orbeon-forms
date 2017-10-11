@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.fb
 
-import org.junit.Test
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
@@ -25,9 +24,13 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
+class BindingDescriptorTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike
+     with FormBuilderSupport {
 
   import BindingDescriptor._
 
@@ -108,7 +111,7 @@ class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
 
   val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
 
-  @Test def testNewElementName(): Unit = {
+  describe("New element name") {
 
     def assertVaryTypes(
       oldControlName : QName,
@@ -117,14 +120,15 @@ class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
       newDatatype    : QName,
       newAppearance  : Option[String])(
       expected       : Option[(QName, Option[String])]
-    ) = {
-      for {
-        oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
-        newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
-      } locally {
-        assert(expected === newElementName(oldControlName, oldT, oldAppearance.to[Set], newT, newAppearance, Bindings))
+    ) =
+      it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
+        for {
+          oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
+          newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
+        } locally {
+          assert(expected === newElementName(oldControlName, oldT, oldAppearance.to[Set], newT, newAppearance, Bindings))
+        }
       }
-    }
 
     assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "decimal", None                     )(Some((FR → "number"      , None)))
     assertVaryTypes(FR → "number"       , XS → "string" , None                     , XS → "string" , None                     )(None)
@@ -151,19 +155,20 @@ class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
     assertVaryTypes(XF → "input"        , XS → "string" , Some("character-counter"), XS → "double" , Some("character-counter"))(None)
   }
 
-  @Test def testPossibleAppearancesWithLabel(): Unit = {
+  describe("Possible appearances with label") {
 
     def assertVaryTypes(
       elemName : QName,
       dataType : QName)(
       expected : Seq[(Option[String], String)]
-    ) = {
-      for {
-        newT ← List(dataType, Model.getVariationTypeOrKeep(dataType))
-      } locally {
-        assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t ⇒ t._1 → t._2)))
+    ) =
+      it(s"must pass with $elemName/$dataType") {
+        for {
+          newT ← List(dataType, Model.getVariationTypeOrKeep(dataType))
+        } locally {
+          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t ⇒ t._1 → t._2)))
+        }
       }
-    }
 
     assertVaryTypes(XF → "input"   , XS → "string" )(Seq(None         → "Input Field"  , Some("character-counter") → "With Character Counter"))
     assertVaryTypes(XF → "textarea", XS → "string" )(Seq(None         → "Text Area"    , Some("character-counter") → "With Character Counter"))

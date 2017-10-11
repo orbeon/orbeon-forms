@@ -30,12 +30,14 @@ trait FormBuilderSupport extends XFormsSupport {
 
   // Run the body in the action context of a form which simulates the main Form Builder model
   def withActionAndFBDoc[T](url: String)(body: FormBuilderDocContext ⇒ T): T =
-    withActionAndFBDoc(formBuilderContainingDocument(url))(body)
+    withTestExternalContext { _ ⇒
+      withActionAndFBDoc(formBuilderContainingDocument(url))(body)
+    }
 
   private def formBuilderContainingDocument(url: String) =
     setupDocument(formBuilderDoc(url))
 
-  def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: FormBuilderDocContext ⇒ T): T =
+  private def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: FormBuilderDocContext ⇒ T): T =
     withActionAndDoc(doc) {
       body(
         doc.models

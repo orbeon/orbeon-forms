@@ -91,7 +91,7 @@ object BlockCache {
 
       locally {
         gridBodyCache.length = 0
-        val gridBodies = $(".fr-grid-body")
+        val gridBodies = $(".fr-grid.fr-editable .fr-grid-body")
         gridBodies.each((gridBody: dom.Element) ⇒ addToCache(gridBodyCache, $(gridBody)))
       }
 

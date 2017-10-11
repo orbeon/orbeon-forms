@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.fr.{Cell, FormRunner}
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
+import org.orbeon.oxf.fr.{Cell, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -100,33 +100,51 @@ trait GridOps extends ContainerOps {
             w={cell.w.toString}/>: NodeInfo
         }
 
-      insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption.orNull // bad, but insert() is not always able to return the inserted item at this time
+      insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption.orNull
+      // `.orNull` is bad, but `insert()` is not always able to return the inserted item at this time
     }
 
-  def rowInsertAbove(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
+  def rowInsertAbove(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
-    val gridElem       = containerById(gridId)
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
-    // TODO
-    null
+    if (adjustedRowPos >= 1)
+      rowInsertBelow(gridElem, rowPos - 1)
+    else
+      withDebugGridOperation("insert first row above") {
+
+        // Move all cells down one notch
+        allCells.iterator.flatten foreach {
+          case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
+          case _ ⇒
+        }
+
+        // Insert new first row
+        val cellsStartingOnFirstRow =
+          allCells.head collect {
+            case c @ Cell(Some(u), None, _, _, _, _) ⇒ c
+          }
+
+        val idsIt =
+          nextIds("tmp", cellsStartingOnFirstRow.size).iterator
+
+        val newCells =
+          cellsStartingOnFirstRow map { cell ⇒
+            <fr:c
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+              id={idsIt.next()}
+              x={cell.x.toString}
+              y="1"
+              w={cell.w.toString}/>: NodeInfo
+          }
+
+        val firstCellOpt = allCells.iterator.flatten.nextOption() flatMap (_.u)
+
+        insert(into = List(gridElem), before = firstCellOpt.toList, origin = newCells).headOption.orNull
+        // `.orNull` is bad, but `insert()` is not always able to return the inserted item at this time
+      }
   }
-
-
-//  def insertRowAbove(tr: NodeInfo): NodeInfo =
-//    tr precedingSibling TrTest headOption match {
-//      case Some(prevRow) ⇒
-//        // Do as if this was an insert below the previous row
-//        // This makes things simpler as we can reuse insertRowBelow, but maybe another logic could make sense too
-//        insertRowBelow(prevRow)
-//      case None ⇒
-//        // Insert as first row of the table
-//        val grid = getContainingGrid(tr)
-//        val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
-//        debugDumpDocumentForGrids("insert row above", grid)
-//        result
-//    }
 
   private def collectDistinctOriginCellsSpanningAfter[Underlying](cells: List[List[Cell[Underlying]]], rowPos: Int): List[Cell[Underlying]] =
     cells(rowPos) collect {

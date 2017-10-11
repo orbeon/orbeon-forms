@@ -77,7 +77,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def rowInsertAbove(controlId: String, position: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.rowInsertAbove(controlId, position - 1)
+    FormBuilder.rowInsertAbove(FormBuilder.containerById(controlId), position - 1)
   }
 
   def rowDelete(controlId: String, position: Int): Unit = {

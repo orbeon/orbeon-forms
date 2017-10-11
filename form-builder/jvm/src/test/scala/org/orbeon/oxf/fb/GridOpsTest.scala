@@ -34,34 +34,36 @@ class GridOpsTest
   val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
   val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"
 
+  def createAndAssertInitialGrid(gridElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Map[NodeInfo, Char] = {
+
+    val expected =
+      """
+        |ABC
+        |DbE
+        |dFG
+      """.stripMargin.trim
+
+    val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true))
+    assert(expected === actual)
+    newMapping
+  }
+
   describe("Row insertion below") {
     it("must insert as expected") {
       withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
-        def gridNode =
+        val gridElem =
           ctx.rootElem descendant NodeInfoCell.GridTest head
 
         import NodeInfoCell._
 
         // Keep updating mapping so that initial cells keep their letter names
-        var mapping = {
-          val expected =
-            """
-              |ABC
-              |DbE
-              |dFG
-            """.stripMargin.trim
-
-          val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true))
-          assert(expected === actual)
-          newMapping
-        }
+        var mapping = createAndAssertInitialGrid(gridElem)
 
         // Insert one row below each existing row
-
         for (rowPos ← List(0, 2, 4)) {
-          rowInsertBelow(gridNode, rowPos)
-          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)
+          rowInsertBelow(gridElem, rowPos)
+          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
           mapping = newMapping
         }
 
@@ -75,7 +77,41 @@ class GridOpsTest
             |LMN
           """.stripMargin.trim
 
-       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridNode, simplify = true), mapping)._1)
+       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)._1)
+      }
+    }
+  }
+
+  describe("Row insertion above") {
+    it("must insert as expected") {
+      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+
+        val gridElem =
+          ctx.rootElem descendant NodeInfoCell.GridTest head
+
+        import NodeInfoCell._
+
+        // Keep updating mapping so that initial cells keep their letter names
+        var mapping = createAndAssertInitialGrid(gridElem)
+
+        // Insert one row above each existing row
+        for (rowPos ← List(0, 2, 4)) {
+          rowInsertAbove(gridElem, rowPos)
+          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
+          mapping = newMapping
+        }
+
+        val after =
+          """
+            |HIJ
+            |ABC
+            |KbL
+            |DbE
+            |dMN
+            |dFG
+          """.stripMargin.trim
+
+       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)._1)
       }
     }
   }

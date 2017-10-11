@@ -106,12 +106,12 @@ trait BaseOps extends Logging {
 
       // TODO: also get from xcv instance
 
-      val fbInstance = ctx.formInstance.get
+      val fbInstanceOpt = ctx.formInstance
 
-      def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
+      def elementIdsFromIndex = fbInstanceOpt.iterator flatMap (_.idsIterator) filter (_.endsWith(suffix))
       def elementIdsFromXPath = (root descendant *).ids filter (_.endsWith(suffix)) iterator
 
-      def canUseIndex = fbInstance.documentInfo == root
+      def canUseIndex = fbInstanceOpt exists (_.documentInfo == root)
 
       val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
       val instanceIds = formInstanceRoot(root) descendant * map (_.localname + suffix)

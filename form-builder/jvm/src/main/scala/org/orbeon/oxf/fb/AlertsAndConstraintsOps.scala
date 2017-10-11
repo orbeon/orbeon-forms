@@ -437,7 +437,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val nsURI = Model.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
           // Namespace mapping must be in scope
-          val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
+          val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
 
           QName.get(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
         }

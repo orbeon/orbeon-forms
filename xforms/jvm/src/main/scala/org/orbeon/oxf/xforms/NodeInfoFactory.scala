@@ -29,7 +29,7 @@ object NodeInfoFactory {
   // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
   private val Wrapper = new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
 
-  def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
+  def elementInfo(qName: QName, content: Seq[Item] = Nil): NodeInfo = {
     val newElement = Wrapper.wrap(DocumentFactory.createElement(qName))
     XFormsAPI.insert(into = Seq(newElement), origin = content)
     newElement

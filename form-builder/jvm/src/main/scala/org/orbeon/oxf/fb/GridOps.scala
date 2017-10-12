@@ -371,31 +371,69 @@ trait GridOps extends ContainerOps {
       }
   }
 
+  private def insertCellAtBestPosition(
+    cells : List[List[Cell[NodeInfo]]],
+    id    : String,
+    x     : Int,
+    y     : Int,
+    w     : Int,
+    h     : Int
+  ): Option[NodeInfo] = {
+
+    val originCells = Cell.originCells(cells)
+
+    require(originCells.nonEmpty)
+
+    def lt(x1: Int, y1: Int, x2: Int, y2: Int) =
+      y1 < y2 || (y1 == y2 && x1 < x2)
+
+    val newCell: NodeInfo =
+      <fr:c
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        id={id}
+        x={x.toString}
+        y={y.toString}
+        w={w.toString}
+        h={h.toString}/>
+
+    val firstCell = originCells.head
+    val lastCell  = originCells.last
+
+    if (lt(x, y, firstCell.x, firstCell.y)) {
+      // Insert before the first cell
+      insert(into = Nil, before = firstCell.u.toList, origin = newCell).headOption
+    } else if (lt(lastCell.x, lastCell.y, x, y)) {
+      // Insert after the last cell
+      insert(into = Nil, after = lastCell.u.toList, origin = newCell).headOption
+    } else {
+      // Insert between two cells
+
+      // If we get here and the size is 1, it means that `firstCell.x == x && firstCell.y == y`, which
+      // is not allowed as there cannot be two cells originating at the same coordinate.
+      require(originCells.size > 1)
+
+      val afterCellOpt =
+        originCells.sliding(2) collectFirst {
+          case Seq(c1, c2)  if lt(c1.x, c1.y, x, y) && lt(x, y, c2.x, c2.y) ⇒ c1
+        }
+
+      insert(into = Nil, after = (afterCellOpt flatMap (_.u)).toList, origin = newCell).headOption
+    }
+  }
+
   def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
 
-    val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
-    val cellOpt = Cell.findOriginCell(cells, cellElem)
+    val cells         = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
+    val originCellOpt = Cell.findOriginCell(cells, cellElem)
 
-    cellOpt filter (_.h - amount >= 1) foreach { cell ⇒
+    originCellOpt filter (_.h - amount >= 1) foreach { originCell ⇒
       withDebugGridOperation("shrink cell down") {
 
-        val newCellH = cell.h - amount
+        val existingCellUpdatedH = originCell.h - amount
 
-        NodeInfoCellOps.updateH(cell.td, newCellH)
+        NodeInfoCellOps.updateH(originCell.td, existingCellUpdatedH)
 
-        val newCell: NodeInfo =
-          <fr:c
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-            id={nextId("tmp")}
-            x={cell.x.toString}
-            y={(cell.y + newCellH).toString}
-            w={cell.w.toString}
-            h={amount.toString}/>: NodeInfo
-
-        // TODO: find placement
-        val insertCell = cell
-
-        insert(into = Nil, after = insertCell.td, origin = newCell).headOption
+        insertCellAtBestPosition(cells, nextId("tmp"), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
       }
     }
   }

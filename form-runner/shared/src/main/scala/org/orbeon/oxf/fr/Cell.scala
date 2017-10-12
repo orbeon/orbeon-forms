@@ -175,13 +175,15 @@ object Cell {
       xyToList(xy, StandardGridWidth)
   }
 
+  def originCells[Underlying](cells: List[List[Cell[Underlying]]]): List[Cell[Underlying]] =
+    cells.iterator.flatten collect {
+      case c @ Cell(Some(_), None, _, _, _, _) ⇒ c
+    } toList
+
   def findOriginCell[Underlying](cells: List[List[Cell[Underlying]]], u: Underlying): Option[Cell[Underlying]] =
     cells.iterator.flatten collectFirst {
       case c @ Cell(Some(`u`), None, _, _, _, _) ⇒ c
     }
-
-//  def findCoordinates[Underlying](cells: List[List[Cell[Underlying]]], u: Underlying): Option[(Int, Int)] =
-//    findOriginCell(cells, u) map (c ⇒ c.x → c.y)
 
   def selfCellOrOrigin[Underlying](cell: Cell[Underlying]): Cell[Underlying] = cell match {
     case c @ Cell(_, None, _, _, _, _)     ⇒ c

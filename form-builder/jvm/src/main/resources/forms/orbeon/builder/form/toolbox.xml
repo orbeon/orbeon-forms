@@ -246,7 +246,11 @@
         </xf:repeat>
 
         <!-- Advanced -->
-        <xh:div class="fb-tools">
+        <xf:group
+            xxf:element="div"
+            class="fb-tools"
+            ref="instance('fb-metadata-instance')/toolbox/(schema | pdf)[xxf:relevant()]">
+
             <xf:group>
                 <xf:label value="$form-resources/advanced/label"/>
                 <xh:div class="fb-tool">
@@ -278,7 +282,7 @@
                     </xf:group>
                 </xh:div>
             </xf:group>
-        </xh:div>
+        </xf:group>
 
         <!-- Services -->
         <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/http">

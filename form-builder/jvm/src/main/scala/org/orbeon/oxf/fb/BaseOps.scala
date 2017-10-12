@@ -37,11 +37,13 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
 
   lazy val modelElem             = findModelElem(rootElem)
   lazy val dataInstanceElem      = instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val metadataInstanceElem  = instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
   lazy val resourcesInstanceElem = instanceElemFromModelElem(modelElem, Names.FormResources).get
   lazy val topLevelBindElem      = findTopLevelBindFromModelElem(modelElem)
   lazy val bodyElem              = findFRBodyElem(rootElem)
 
   lazy val dataRootElem          = dataInstanceElem      / * head
+  lazy val metadataRootElem      = metadataInstanceElem  / * head
   lazy val resourcesRootElem     = resourcesInstanceElem / * head
 }
 

@@ -29,6 +29,7 @@ import scala.scalajs.js
 
 object GridColumnDnD {
 
+  if (false)
   locally {
 
     val FbMainClass          = "fb-main"

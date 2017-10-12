@@ -500,6 +500,7 @@
                                         <xf:input ref="name" id="fb-service-name-input" incremental="true">
                                             <xf:label ref="$resources/dialog-http-services/service-name/label"/>
                                             <xf:hint ref="$resources/dialog-http-services/service-name/hint"/>
+                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
@@ -508,6 +509,7 @@
                                         <xf:input ref="$request/resource" id="fb-service-resource" incremental="true">
                                             <xf:label ref="$resources/dialog-http-services/resource/label"/>
                                             <xf:hint ref="$resources/dialog-http-services/resource/hint"/>
+                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
@@ -577,11 +579,13 @@
                                                     <xh:td>
                                                         <xf:input ref="@name">
                                                             <xf:label value="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
+                                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
                                                     <xh:td>
                                                         <xf:input ref="@value">
                                                             <xf:label value="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
+                                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
                                                 </xh:tr>
@@ -591,6 +595,7 @@
                                         <xf:textarea ref="$request/body[$has-body]" id="fb-service-body" incremental="true" class="fb-service-request-body">
                                             <xf:label ref="$resources/dialog-http-services/request-body/label"/>
                                             <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
+                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
@@ -624,9 +629,11 @@
                                     <xh:td>
                                         <xf:input ref="$request/username" incremental="true">
                                             <xf:label ref="$resources/dialog-http-services/username/label"/>
+                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:input>
                                         <xf:secret ref="$request/password" incremental="true">
                                             <xf:label ref="$resources/dialog-http-services/password/label"/>
+                                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:secret>
                                     </xh:td>
                                 </xh:tr>

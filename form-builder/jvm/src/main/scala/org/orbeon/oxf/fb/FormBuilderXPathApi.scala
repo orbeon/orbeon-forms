@@ -321,12 +321,15 @@ object FormBuilderXPathApi {
 
   // Return the first default alert for the given control, or a blank template if none exists
   //@XPathFunction
-  def readDefaultAlertAsXML(controlName: String): NodeInfo = (
-    AlertDetails.fromForm(controlName)(FormBuilderDocContext())
-    find      (_.default)
-    getOrElse AlertDetails(None, List(FormBuilder.currentLang → ""), global = true)
-    toXML     FormBuilder.currentLang
-  )
+  def readDefaultAlertAsXML(controlName: String): NodeInfo = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    AlertDetails.fromForm(controlName)(FormBuilderDocContext())             find
+      (_.default)                                                           getOrElse
+      AlertDetails(None, List(FormBuilder.currentLang → ""), global = true) toXML
+      FormBuilder.currentLang
+  }
 
   // Return all validations as XML for the given control
   //@XPathFunction
@@ -335,7 +338,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getControlHelpOrEmpty(controlName: String): String =
-    FormBuilder.getControlResourceOrEmpty(controlName, "help")
+    FormBuilder.getControlResourceOrEmpty(controlName, "help")(FormBuilderDocContext())
 
   //@XPathFunction
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String): Boolean =
@@ -428,7 +431,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def currentLang: String =
-    FormBuilder.currentLang
+    FormBuilder.currentLang(FormBuilderDocContext())
 
   //@XPathFunction
   def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] =
@@ -436,7 +439,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def resourcesRoot: NodeInfo =
-    FormBuilder.resourcesRoot
+    FormBuilder.resourcesRoot(FormBuilderDocContext())
 
   //@XPathFunction
   def iterateSelfAndDescendantBindsResourceHolders(

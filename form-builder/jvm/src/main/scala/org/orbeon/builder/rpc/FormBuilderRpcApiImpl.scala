@@ -116,8 +116,10 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.deleteSectionById(sectionId)
   }
 
-  def sectionUpdateLabel(sectionId: String, label: String): Unit =
+  def sectionUpdateLabel(sectionId: String, label: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
     XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / "label", label)
+  }
 
   def containerEditDetails(containerId: String): Unit =
     XFormsAPI.dispatch(

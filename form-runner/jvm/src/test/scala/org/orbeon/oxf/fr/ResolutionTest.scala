@@ -189,7 +189,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def resolveTarget(): Unit =
     withActionAndDoc(setupDocument(source)) {
 
-      val model = resolveObject[XFormsModel]("fr-form-model").get
+      val model = resolveObject[XFormsModel](Names.FormModel).get
 
       XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, Some(model), null)) {
 

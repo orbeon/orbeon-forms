@@ -17,7 +17,7 @@ import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, FormRunner}
+import org.orbeon.oxf.fr.{Cell, FormRunner, Names}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -216,15 +216,15 @@ trait GridOps extends ContainerOps {
   def isLastGridInSection(grid: NodeInfo): Boolean =
     childrenGrids(findAncestorContainersLeafToRoot(grid).head).size == 1
 
-  private def selectedCellVar =
-    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("selected-cell")
+  private def selectedCellVar(implicit ctx: FormBuilderDocContext) =
+    ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("selected-cell")
 
   // Find the currently selected grid cell if any
   def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findInViewTryIndex(ctx.rootElem, selectedCellVar.stringValue)
 
   // Make the given grid cell selected
-  def selectCell(newCellElem: NodeInfo): Unit =
+  def selectCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     setvalue(selectedCellVar, newCellElem.id)
 
   // Whether a call to ensureEmptyCell() will succeed
@@ -332,21 +332,9 @@ trait GridOps extends ContainerOps {
 
     cellOpt filter (_.w - amount >= 1) foreach { cell ⇒
       withDebugGridOperation("shrink cell right") {
-
         val newCellW = cell.w - amount
-
         NodeInfoCellOps.updateW(cell.td, newCellW)
-
-        val newCell: NodeInfo =
-          <fr:c
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-            id={nextId("tmp")}
-            x={(cell.x + newCellW).toString}
-            y={cell.y.toString}
-            w={amount.toString}
-            h={cell.h.toString}/>: NodeInfo
-
-        val result = insert(into = Nil, after = cell.td, origin = newCell).headOption
+        insertCellAtBestPosition(cells, nextId("tmp"), cell.x + newCellW, cell.y, amount, cell.h)
       }
     }
   }
@@ -370,6 +358,45 @@ trait GridOps extends ContainerOps {
         }
       }
   }
+
+  def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val cells         = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
+    val originCellOpt = Cell.findOriginCell(cells, cellElem)
+
+    originCellOpt filter (_.h - amount >= 1) foreach { originCell ⇒
+      withDebugGridOperation("shrink cell down") {
+        val existingCellUpdatedH = originCell.h - amount
+        NodeInfoCellOps.updateH(originCell.td, existingCellUpdatedH)
+        insertCellAtBestPosition(cells, nextId("tmp"), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
+      }
+    }
+  }
+
+  def deleteGridById(gridId: String)(implicit ctx: FormBuilderDocContext): Unit =
+    deleteContainerById(canDeleteGrid, gridId)
+
+  def canDeleteGrid(gridElem: NodeInfo): Boolean =
+    canDeleteContainer(gridElem)
+
+  // Find the new td to select if we are removing the currently selected td
+  def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    findSelectedCell match {
+      case Some(selectedCell) if cellsToDelete contains selectedCell ⇒
+
+        def findCells(find: Test ⇒ Seq[NodeInfo], selectedCell: NodeInfo) =
+          find(CellTest)                                                            intersect
+          (findAncestorContainersLeafToRoot(selectedCell).last descendant CellTest) filterNot
+          (cellsToDelete contains _)                                                headOption
+
+        // Prefer trying following before preceding, as things move up and left when deleting
+        // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
+        // stay in section, etc.
+        findCells(selectedCell following _, selectedCell) orElse
+          findCells(selectedCell preceding  _, selectedCell)
+      case _ ⇒
+        None
+    }
 
   private def insertCellAtBestPosition(
     cells : List[List[Cell[NodeInfo]]],
@@ -420,46 +447,4 @@ trait GridOps extends ContainerOps {
       insert(into = Nil, after = (afterCellOpt flatMap (_.u)).toList, origin = newCell).headOption
     }
   }
-
-  def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-
-    val cells         = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
-    val originCellOpt = Cell.findOriginCell(cells, cellElem)
-
-    originCellOpt filter (_.h - amount >= 1) foreach { originCell ⇒
-      withDebugGridOperation("shrink cell down") {
-
-        val existingCellUpdatedH = originCell.h - amount
-
-        NodeInfoCellOps.updateH(originCell.td, existingCellUpdatedH)
-
-        insertCellAtBestPosition(cells, nextId("tmp"), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
-      }
-    }
-  }
-
-  def deleteGridById(gridId: String)(implicit ctx: FormBuilderDocContext): Unit =
-    deleteContainerById(canDeleteGrid, gridId)
-
-  def canDeleteGrid(gridElem: NodeInfo): Boolean =
-    canDeleteContainer(gridElem)
-
-  // Find the new td to select if we are removing the currently selected td
-  def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    findSelectedCell match {
-      case Some(selectedCell) if cellsToDelete contains selectedCell ⇒
-
-        def findCells(find: Test ⇒ Seq[NodeInfo], selectedCell: NodeInfo) =
-          find(CellTest)                                                            intersect
-          (findAncestorContainersLeafToRoot(selectedCell).last descendant CellTest) filterNot
-          (cellsToDelete contains _)                                                headOption
-
-        // Prefer trying following before preceding, as things move up and left when deleting
-        // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
-        // stay in section, etc.
-        findCells(selectedCell following _, selectedCell) orElse
-          findCells(selectedCell preceding  _, selectedCell)
-      case _ ⇒
-        None
-    }
 }

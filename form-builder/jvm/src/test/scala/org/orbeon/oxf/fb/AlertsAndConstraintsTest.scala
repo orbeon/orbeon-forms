@@ -542,8 +542,8 @@ class AlertsAndConstraintsTest
     }
   }
 
-  private def globalAlert      = AlertDetails(None, List(FormBuilder.currentLang → ""), global = true)
-  private def globalAlertAsXML = globalAlert.toXML(FormBuilder.currentLang)
+  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, List(FormBuilder.currentLang → ""), global = true)
+  private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML(FormBuilder.currentLang)
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =
     ConstraintValidation.fromForm(controlName) map

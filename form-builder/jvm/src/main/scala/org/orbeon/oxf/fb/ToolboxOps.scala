@@ -146,6 +146,7 @@ object ToolboxOps {
     }
   }
 
+  // TODO: Review these. They are probably not needed as of 2017-10-12.
   //@XPathFunction
   def canInsertSection(inDoc: NodeInfo) = inDoc ne null
   //@XPathFunction
@@ -300,7 +301,7 @@ object ToolboxOps {
     }
   }
 
-  private def selectFirstCellInContainer(container: NodeInfo): Unit =
+  private def selectFirstCellInContainer(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     (container descendant Cell.CellTestName headOption) foreach selectCell
 
   // Insert a new section template
@@ -464,22 +465,22 @@ object ToolboxOps {
     deleteControlWithinCell(cellElem, updateTemplates = true)
   }
 
-  private def clipboardXcvRootElem: NodeInfo =
-    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
+  private def clipboardXcvRootElem(implicit ctx: FormBuilderDocContext): NodeInfo =
+    ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("xcv")
 
-  def readXcvFromClipboard: NodeInfo = {
+  def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): NodeInfo = {
     val clipboard = clipboardXcvRootElem
     val clone = elementInfo("xcv", Nil)
     insert(into = clone, origin = clipboard / *)
     clone
   }
 
-  def clearClipboard(): Unit =
+  def clearClipboard()(implicit ctx: FormBuilderDocContext): Unit =
     XcvEntry.values
       .map(_.entryName)
       .foreach(entryName ⇒ delete(clipboardXcvRootElem / entryName))
 
-  def writeXcvToClipboard(xcv: NodeInfo): Unit = {
+  def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
     clearClipboard()
     insert(into = clipboardXcvRootElem, origin = xcv / *)
   }

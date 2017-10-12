@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -27,29 +27,34 @@ trait ResourcesOps extends BaseOps {
 
   val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
-  def currentResources: NodeInfo = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
-  def currentLang: String        = currentResources attValue "*:lang"
-  def resourcesRoot: NodeInfo    = currentResources.parentUnsafe
+  def currentResources(implicit ctx: FormBuilderDocContext): NodeInfo = ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("current-resources")
+  def currentLang     (implicit ctx: FormBuilderDocContext): String   = currentResources attValue "*:lang"
+  def resourcesRoot   (implicit ctx: FormBuilderDocContext): NodeInfo = currentResources.parentUnsafe
 
-  def resourcesInLang(lang: String): NodeInfo =
+  def resourcesInLang(lang: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
     allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
 
   // Find the current resource holder for the given name
-  def findCurrentResourceHolder(controlName: String): Option[NodeInfo] =
+  def findCurrentResourceHolder(controlName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     currentResources child controlName headOption
 
   // Get the control's resource value or blank
-  def getControlResourceOrEmpty(controlName: String, resourceName: String): String =
+  def getControlResourceOrEmpty(controlName: String, resourceName: String)(implicit ctx: FormBuilderDocContext): String =
     findCurrentResourceHolder(controlName) flatMap
       (n ⇒ n / resourceName map (_.stringValue) headOption) getOrElse ""
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
-  def getControlResources(controlName: String, resourceName: String): List[NodeInfo] =
+  def getControlResources(controlName: String, resourceName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
     findCurrentResourceHolder(controlName).toList flatMap
       (n ⇒ n / resourceName)
 
   // NOTE: Doesn't enforce that the same number of e.g. <alert> elements are present per lang
-  def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs(resourcesRoot)): Seq[(String, Seq[NodeInfo])] = {
+  def getControlResourcesWithLang(
+    controlName  : String,
+    resourceName : String,
+    langs        : Seq[String])(implicit
+    ctx          : FormBuilderDocContext
+  ): Seq[(String, Seq[NodeInfo])] = {
     val langsSet = langs.toSet
     findResourceHoldersWithLang(controlName, resourcesRoot) collect {
       case (lang, holder) if langsSet(lang) ⇒ lang → (holder child resourceName)
@@ -61,7 +66,12 @@ trait ResourcesOps extends BaseOps {
   // - simplicity and consistency, all existing resources are first deleted
   // - the maximum number of values across langs is determined to create a consistent number of resources
   // - if values are missing for a given lang, the remaining resources will exist bug be empty
-  def setControlResourcesWithLang(controlName: String, resourceName: String, langValues: Seq[(String, Seq[String])]): Unit = {
+  def setControlResourcesWithLang(
+    controlName  : String,
+    resourceName : String,
+    langValues   : Seq[(String, Seq[String])])(implicit
+    ctx          : FormBuilderDocContext
+  ): Unit = {
 
     val maxResources = if (langValues.nonEmpty) langValues map (_._2.size) max else 0
     val langs        = langValues map (_._1)
@@ -144,30 +154,50 @@ trait ResourcesOps extends BaseOps {
   }
 
   // Set a control's current resource for the current language
-  def setControlResource(controlName: String, resourceName: String, value: String): Option[NodeInfo] = {
+  def setControlResource(
+    controlName  : String,
+    resourceName : String,
+    value        : String
+  )(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val resourceHolder = ensureResourceHolder(controlName, resourceName)
     setvalue(resourceHolder, value)
   }
 
   // Delete existing control resources and set new resource values
-  def setControlResources(controlName: String, resourceName: String, values: Seq[String]): Unit = {
-    // For simplicity and consistency, delete and recreate
-    delete(getControlResources(controlName, resourceName))
-    val resourceHolders = ensureResourceHoldersForCurrentLang(controlName, resourceName, values.size)
-    resourceHolders zip values foreach { case (holder, value) ⇒ setvalue(holder, value) }
-  }
+  // Unused as of 2017-10-12.
+//  def setControlResources(controlName: String, resourceName: String, values: Seq[String]): Unit = {
+//    // For simplicity and consistency, delete and recreate
+//    delete(getControlResources(controlName, resourceName))
+//    val resourceHolders = ensureResourceHoldersForCurrentLang(controlName, resourceName, values.size)
+//    resourceHolders zip values foreach { case (holder, value) ⇒ setvalue(holder, value) }
+//  }
 
   // Ensure the existence of the resource holder for the current language
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHolder(controlName: String, resourceName: String): NodeInfo =
+  def ensureResourceHolder(
+    controlName  : String,
+    resourceName : String)(implicit
+    ctx          : FormBuilderDocContext
+  ): NodeInfo =
     ensureResourceHoldersForCurrentLang(controlName, resourceName, 1).head
 
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHoldersForCurrentLang(controlName: String, resourceName: String, count: Int): Seq[NodeInfo] =
+  def ensureResourceHoldersForCurrentLang(
+    controlName  : String,
+    resourceName : String,
+    count        : Int)(implicit
+    ctx          : FormBuilderDocContext
+  ): Seq[NodeInfo] =
     ensureResourceHoldersForLang(controlName, resourceName, count, currentLang)
 
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHoldersForLang(controlName: String, resourceName: String, count: Int, lang: String): Seq[NodeInfo] = {
+  def ensureResourceHoldersForLang(
+    controlName  : String,
+    resourceName : String,
+    count        : Int,
+    lang         : String)(implicit
+    ctx          : FormBuilderDocContext
+  ): Seq[NodeInfo] = {
     val controlHolder = findResourceHolderForLang(controlName, lang, resourcesRoot).get
 
     val existing = controlHolder child resourceName
@@ -190,21 +220,30 @@ trait ResourcesOps extends BaseOps {
     controlName  : String,
     resourceName : String,
     count        : Int = 1,
-    langs        : Seq[String] = allLangs(resourcesRoot)
+    langs        : Seq[String])(implicit
+    ctx          : FormBuilderDocContext
   ): Seq[(String, Seq[NodeInfo])] =
     allLangs(resourcesRoot) map
       (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
-  def findResourceHolderForLang(controlName: String, lang: String, resourcesRootElem: NodeInfo): Option[NodeInfo] =
+  def findResourceHolderForLang(
+    controlName       : String,
+    lang              : String,
+    resourcesRootElem : NodeInfo
+  ): Option[NodeInfo] =
     findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resourcesRootElem) collectFirst
       { case (`lang`, holder) ⇒ holder }
 
   // Find control resource holders
-  def findResourceHolders(controlName: String): Seq[NodeInfo] =
+  def findResourceHolders(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
     findResourceHoldersWithLang(controlName, resourcesRoot) map (_._2)
 
   // For the given bind and lang, find all associated resource holders
-  def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resourcesRootElem: NodeInfo): Iterator[NodeInfo] =
+  def iterateSelfAndDescendantBindsResourceHolders(
+    rootBind          : NodeInfo,
+    lang              : String,
+    resourcesRootElem : NodeInfo
+  ): Iterator[NodeInfo] =
     for {
       bindNode ← FormBuilder.iterateSelfAndDescendantBinds(rootBind)
       bindName ← findBindName(bindNode)

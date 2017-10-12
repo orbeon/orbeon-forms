@@ -18,7 +18,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
+import org.orbeon.oxf.fr.{FormRunner, Names, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -52,7 +52,7 @@ class FormBuilderFunctionsTest
 
       it("must find the model") {
         assert(findModelElem(doc).getDisplayName === "xf:model")
-        assert(findModelElem(doc).hasIdValue("fr-form-model"))
+        assert(findModelElem(doc).hasIdValue(Names.FormModel))
       }
 
       it("must find the instance") {

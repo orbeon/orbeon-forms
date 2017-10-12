@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.TransformerUtils
@@ -41,8 +42,7 @@ trait FormBuilderSupport extends XFormsSupport {
     withActionAndDoc(doc) {
       body(
         doc.models
-        find    (_.getId == "fr-form-model")
-        flatMap (m ⇒ Option(m.getInstance("fb-form-instance")))
+        find    (_.getId == Names.FormModel)
         map     FormBuilderDocContext.apply
         orNull
       )

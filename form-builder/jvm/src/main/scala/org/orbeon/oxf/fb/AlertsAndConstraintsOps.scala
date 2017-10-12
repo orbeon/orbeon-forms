@@ -250,7 +250,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue : String
     def alert       : Option[AlertDetails]
 
-    def toXML(forLang: String): sx.Elem
+    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem
   }
 
   object Validation {
@@ -274,7 +274,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def level       = ErrorLevel
     def stringValue = eitherToXPath(required)
 
-    def toXML(forLang: String): sx.Elem =
+    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem =
       <validation type={Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <required>{eitherToXPath(required)}</required>
         {alertOrPlaceholder(alert, forLang)}
@@ -292,7 +292,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       } getOrElse
         DefaultRequireValidation
 
-    def fromXML(validationElem: NodeInfo, newIds: Iterator[String]): Option[RequiredValidation] = {
+    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[RequiredValidation] = {
       require(validationElem /@ "type" === Required.name)
 
       val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
@@ -360,7 +360,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       }
     }
 
-    def toXML(forLang: String): sx.Elem = {
+    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val builtinTypeString = datatype match {
         case Left((name, _)) ⇒ name.getName
@@ -476,7 +476,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def stringValue = expression
 
-    def toXML(forLang: String): sx.Elem = {
+    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val analyzed = ValidationFunction.analyzeKnownConstraint(
         expression,
@@ -505,7 +505,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
 
-    def fromXML(validationElem: NodeInfo, newIds: Iterator[String]) = {
+    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext) = {
 
       def normalizedAttOpt(attName: String) =
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
@@ -562,7 +562,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val inDoc = ctx.rootElem
 
       val controlElem                = findControlByName(inDoc, controlName).get
-      val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert")
+      val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert", allLangs(resourcesRoot))
 
       def alertFromElement(e: NodeInfo) = {
 
@@ -606,7 +606,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       controlElem child "alert" flatMap alertFromElement toList
     }
 
-    def fromXML(alertElem: NodeInfo, forValidationId: Option[String]) = {
+    def fromXML(alertElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
 
       val messageAtt = alertElem attValue "message"
 
@@ -619,7 +619,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       AlertDetails(forValidationId, (currentLang, messageAtt) :: messagesElems, isGlobal)
     }
 
-    def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String]) = {
+    def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
 
       val useDefaultAlert = validationElem /@ "default-alert" === "true"
 
@@ -673,6 +673,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
   private def mipAtts (bind: NodeInfo, mip: MIP) = bind /@ mipToFBMIPQNames(mip)._1
   private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
 
-  private def alertOrPlaceholder(alert: Option[AlertDetails], forLang: String) =
+  private def alertOrPlaceholder(alert: Option[AlertDetails], forLang: String)(implicit ctx: FormBuilderDocContext) =
     alert orElse Some(AlertDetails(None, List(currentLang → ""), global = false)) map (_.toXML(forLang)) get
 }

@@ -193,7 +193,7 @@
                 <!-- Tell custom settings to initialize -->
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
-                    <xf:property name="form-instance"         value="fbf:formInstanceRoot()"/>
+                    <xf:property name="form-instance"         value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="original-control-id"   value="event('control-id')"/>
                     <xf:property name="original-control-name" value="$i/original-control-name"/>
@@ -284,7 +284,7 @@
                 <!-- Tell custom settings to apply changes -->
                 <xf:dispatch name="fb-apply" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
-                    <xf:property name="form-instance"         value="fbf:formInstanceRoot()"/>
+                    <xf:property name="form-instance"         value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
                     <xf:property name="control-name"          value="$i/control-name"/>
                     <xf:property name="data-holders"          value="fbf:findDataHolders($i/control-name)"/>

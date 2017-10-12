@@ -702,7 +702,7 @@
     </xf:bind>
 
     <!-- Cut/copy/paste instance -->
-    <xf:instance id="fb-xcv-instance">
+    <xf:instance id="fb-xcv-instance" xxf:index="id">
         <xcv>
             <control/>
             <holder/>

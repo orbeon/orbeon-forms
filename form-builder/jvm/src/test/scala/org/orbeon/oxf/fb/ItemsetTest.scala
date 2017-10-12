@@ -175,7 +175,7 @@ class ItemsetTest
 
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         // Add a new radio control, and return the resources that were created for that control
         def resourceForNewControl(): Elem = {

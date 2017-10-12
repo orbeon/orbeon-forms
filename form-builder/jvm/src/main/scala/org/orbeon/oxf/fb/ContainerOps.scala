@@ -40,7 +40,7 @@ trait ContainerOps extends ControlOps {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // XFormsUtils.getStaticIdFromId every time)
     val staticId = XFormsId.getStaticIdFromId(containerId)
-    findInViewTryIndex(ctx.rootElem, staticId) filter IsContainer
+    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) filter IsContainer
   }
 
   def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
@@ -200,7 +200,7 @@ trait ContainerOps extends ControlOps {
   ): Unit = {
 
     // TODO: Remove once `ctx` is used everywhere
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     findControlByName(inDoc, controlName) foreach { control ⇒
 
@@ -314,7 +314,7 @@ trait ContainerOps extends ControlOps {
   ): Unit = {
 
     val templateInstanceId = templateId(controlName)
-    val modelElement = findModelElem(ctx.rootElem)
+    val modelElement = findModelElem(ctx.formDefinitionRootElem)
     modelElement / XFInstanceTest find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content
@@ -341,7 +341,7 @@ trait ContainerOps extends ControlOps {
     bindings : Seq[NodeInfo])(implicit
     ctx      : FormBuilderDocContext
   ): Option[NodeInfo] =
-    findBindByName(ctx.rootElem, bindName) map (createTemplateContentFromBind(_, bindings))
+    findBindByName(ctx.formDefinitionRootElem, bindName) map (createTemplateContentFromBind(_, bindings))
 
   private val AttributeRe = "@(.+)".r
 
@@ -438,10 +438,10 @@ trait ContainerOps extends ControlOps {
 
   def updateTemplates(ancestorContainerNames: Option[Set[String]])(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      templateInstance ← templateInstanceElements(ctx.rootElem)
+      templateInstance ← templateInstanceElements(ctx.formDefinitionRootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
-      iterationName    ← findRepeatIterationName(ctx.rootElem, repeatName)
+      iterationName    ← findRepeatIterationName(ctx.formDefinitionRootElem, repeatName)
       template         ← createTemplateContentFromBindName(iterationName, ctx.componentBindings)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)

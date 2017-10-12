@@ -40,7 +40,7 @@ trait BindingOps {
     val lang        = FormBuilder.currentLang
 
     for {
-      controlElem                  ← findControlByName(ctx.rootElem, controlName).toList
+      controlElem                  ← findControlByName(ctx.formDefinitionRootElem, controlName).toList
       originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
       (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
           elemName    = controlElem.uriQualifiedName,

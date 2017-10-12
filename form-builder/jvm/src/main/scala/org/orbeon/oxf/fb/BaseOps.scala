@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.ToolboxOps.XcvEntry
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -27,20 +28,31 @@ import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.immutable
 
-case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XFormsInstance]) {
+case class FormBuilderDocContext(
+  explicitFormDefinitionInstance : Option[NodeInfo],   // for annotating the form definition outside of an instance
+  formBuilderModel               : Option[XFormsModel] // always present at runtime, but missing for annotation tests
+) {
+
+  lazy val formDefinitionInstance = formBuilderModel flatMap (_.findInstance("fb-form-instance"))
+  lazy val xcvInstance            = formBuilderModel flatMap (_.findInstance("fb-xcv-instance"))
+
+  lazy val formDefinitionRootElem = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
 
   lazy val componentBindings: Seq[NodeInfo] =
-    asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+    asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+
+  lazy val clipboardXcvRootElem =
+    formBuilderModel.get.unsafeGetVariableAsNodeInfo("xcv")
 
   lazy val formResourcesRoot: NodeInfo =
-    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
+    formBuilderModel.get.unsafeGetVariableAsNodeInfo("resources")
 
-  lazy val modelElem             = findModelElem(rootElem)
+  lazy val modelElem             = findModelElem(formDefinitionRootElem)
   lazy val dataInstanceElem      = instanceElemFromModelElem(modelElem, Names.FormInstance).get
   lazy val metadataInstanceElem  = instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
   lazy val resourcesInstanceElem = instanceElemFromModelElem(modelElem, Names.FormResources).get
   lazy val topLevelBindElem      = findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              = findFRBodyElem(rootElem)
+  lazy val bodyElem              = findFRBodyElem(formDefinitionRootElem)
 
   lazy val dataRootElem          = dataInstanceElem      / * head
   lazy val metadataRootElem      = metadataInstanceElem  / * head
@@ -49,16 +61,15 @@ case class FormBuilderDocContext(rootElem: NodeInfo, formInstance: Option[XForms
 
 object FormBuilderDocContext {
 
+  // Create with a specific form definition document, but still pass a model to provide access to variables
   def apply(inDoc: NodeInfo): FormBuilderDocContext =
-    FormBuilderDocContext(inDoc.rootElement, None)
+    FormBuilderDocContext(Some(inDoc.rootElement), topLevelModel(Names.FormModel))
 
-  def apply(formInstance: XFormsInstance): FormBuilderDocContext =
-    FormBuilderDocContext(formInstance.rootElement, Some(formInstance ensuring (_ ne null)))
+  def apply(formBuilderModel: XFormsModel): FormBuilderDocContext =
+    FormBuilderDocContext(None, Some(formBuilderModel))
 
   def apply(): FormBuilderDocContext =
-    FormBuilderDocContext(
-      topLevelInstance("fr-form-model", "fb-form-instance") getOrElse (throw new IllegalStateException)
-    )
+    FormBuilderDocContext(topLevelModel(Names.FormModel) getOrElse (throw new IllegalStateException))
 }
 
 trait BaseOps extends Logging {
@@ -79,11 +90,45 @@ trait BaseOps extends Logging {
       .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
   def templateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    inlineInstanceRootElem(ctx.rootElem, templateId(repeatName))
+    inlineInstanceRootElem(ctx.formDefinitionRootElem, templateId(repeatName))
 
   // Find the next available id for a given token
   def nextId(token: String)(implicit ctx: FormBuilderDocContext): String =
     nextIds(token, 1).head
+
+  // The idea is that we can search ids in the following ways:
+  //
+  // - looking for `id` attributes in a document, whether via an index or XPath
+  // - looking for element names in a another, optional document
+  //
+  // The resulting `Iterator` can contain duplicates.
+  //
+  def iterateIdsWithSuffix(
+    docWithIdsInstanceOrElem : XFormsInstance Either NodeInfo,
+    dataElemOpt              : Option[NodeInfo],
+    suffix                   : String
+  ): Iterator[String] = {
+
+    val formDefinitionDoc = docWithIdsInstanceOrElem match {
+      case Left(instance)  ⇒ instance.root
+      case Right(formElem) ⇒ formElem.root
+    }
+
+    def elementIdsFromIndexOpt =
+      for {
+        formDefinitionInstance ← docWithIdsInstanceOrElem.left.toOption
+        if formDefinitionHasIndex(formDefinitionDoc)
+      } yield
+        formDefinitionInstance.idsIterator
+
+    def elementIdsFromXPath =
+      (formDefinitionDoc descendant *).ids.iterator
+
+    val idsFromIndex  = elementIdsFromIndexOpt getOrElse elementIdsFromXPath filter (_.endsWith(suffix))
+    val idsFromData   = dataElemOpt.toList descendant * map (_.localname + suffix)
+
+    idsFromIndex ++ idsFromData
+  }
 
   // Find a series of next available ids for a given token
   // Return ids of the form "foo-123-foo", where "foo" is the token
@@ -92,31 +137,26 @@ trait BaseOps extends Logging {
     val prefix = token + "-"
     val suffix = "-" + token
 
-    def findAllIds = {
+    val allIds =
+      collection.mutable.Set() ++
+        // Ids coming from the form definition
+        iterateIdsWithSuffix(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem), suffix) ++ {
+        // Ids coming from the special cut/copy/paste instance, if present
+        ctx.xcvInstance match {
+          case Some(xcvInstance) ⇒
 
-      val root = ctx.rootElem.root
+            val dataElemOpt =
+              ctx.xcvInstance flatMap (_.rootElement / XcvEntry.Holder.entryName headOption)
 
-      // Use id index when possible, otherwise use plain XPath
+            iterateIdsWithSuffix(Left(xcvInstance), dataElemOpt, suffix)
+          case None ⇒ Nil
+        }
+      }
 
-      // TODO: also get from xcv instance
-
-      val fbInstanceOpt = ctx.formInstance
-
-      def elementIdsFromIndex = fbInstanceOpt.iterator flatMap (_.idsIterator) filter (_.endsWith(suffix))
-      def elementIdsFromXPath = (root descendant *).ids filter (_.endsWith(suffix)) iterator
-
-      def canUseIndex = fbInstanceOpt exists (_.documentInfo == root)
-
-      val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-      val instanceIds = ctx.dataRootElem descendant * map (_.localname + suffix)
-
-      elementIds ++ instanceIds
-    }
-
-    val allIds = collection.mutable.Set() ++ findAllIds
     var guess = allIds.size + 1
 
-    def nextId = {
+    def nextId(): String = {
+
       def buildId(i: Int) = prefix + i + suffix
 
       while (allIds(buildId(guess)))
@@ -128,7 +168,7 @@ trait BaseOps extends Logging {
     }
 
     for (_ ← 1 to count)
-      yield nextId
+      yield nextId()
   }
 
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"

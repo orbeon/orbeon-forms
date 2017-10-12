@@ -69,7 +69,9 @@ object XFormsAPI {
   def inScopeActionInterpreter = actionInterpreterDyn.value.get
 
   // Return the containing document
-  def inScopeContainingDocument = containingDocumentDyn.value.get
+  def inScopeContainingDocument = inScopeContainingDocumentOpt.get
+
+  def inScopeContainingDocumentOpt: Option[XFormsContainingDocument] = containingDocumentDyn.value
 
   // xf:setvalue
   // @return the node whose value was set, if any
@@ -235,13 +237,13 @@ object XFormsAPI {
 
   // Return an instance within a top-level model
   def topLevelInstance(modelId: String, instanceId: String) =
-    topLevelModel(modelId) flatMap (m ⇒ Option(m.getInstance(instanceId)))
+    topLevelModel(modelId) flatMap (_.findInstance(instanceId))
 
   // Return a top-level model by static id
   // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
   // 2013-04-03: Unsure if we still need this for mocking
-  def topLevelModel(modelId: String) =
-    inScopeContainingDocument.models find (_.getId == modelId)
+  def topLevelModel(modelId: String): Option[XFormsModel] =
+    inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
 
   def context[T](xpath: String)(body: ⇒ T): T = ???
   def context[T](item: Item)(body: ⇒ T): T = ???

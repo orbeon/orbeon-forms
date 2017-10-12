@@ -48,7 +48,7 @@ class FormBuilderFunctionsTest
   describe("Model instance body elements") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-      val doc = ctx.rootElem
+      val doc = ctx.formDefinitionRootElem
 
       it("must find the model") {
         assert(findModelElem(doc).getDisplayName === "xf:model")
@@ -68,7 +68,7 @@ class FormBuilderFunctionsTest
   describe("Name and id") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-      val doc = ctx.rootElem
+      val doc = ctx.formDefinitionRootElem
 
       it("must return the control names") {
         assert(controlNameFromId(controlId(Control1)) === Control1)
@@ -85,7 +85,7 @@ class FormBuilderFunctionsTest
   describe("Control elements") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-      val doc = ctx.rootElem
+      val doc = ctx.formDefinitionRootElem
 
       it("must find the bind element") {
         assert(findBindByName(doc, Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
@@ -105,7 +105,7 @@ class FormBuilderFunctionsTest
   describe("Section name") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-      val doc = ctx.rootElem
+      val doc = ctx.formDefinitionRootElem
 
       it("must find the section name") {
         assert(findSectionName(doc, Control1).get === Section1)
@@ -118,7 +118,7 @@ class FormBuilderFunctionsTest
     it("must find the newly-created binds") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         ensureBinds(List(Section1, Control2))
 
@@ -167,7 +167,7 @@ class FormBuilderFunctionsTest
     it("must insert all elements in the right places") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         // Insert a new control into the next empty td
         selectFirstCell()
@@ -205,7 +205,7 @@ class FormBuilderFunctionsTest
     it("must insert all elements in the right places") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         // Insert explanation control
         val frExplanation = {
@@ -238,7 +238,7 @@ class FormBuilderFunctionsTest
     it("must insert all elements in the right places") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         // Insert a new repeated grid after the current grid
         selectFirstCell()
@@ -363,7 +363,7 @@ class FormBuilderFunctionsTest
     it("must return the expected statics ids") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         val expected = Map(
           "|fb≡section-1-section≡tmp-13-tmp≡control-1-control|"                      → "control-1-control",
@@ -412,7 +412,7 @@ class FormBuilderFunctionsTest
     it("Simple cut/paste must remove and restore the control, bind, holders, and resources") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         val selectedCell = FormBuilder.findSelectedCell.get
 
@@ -445,7 +445,7 @@ class FormBuilderFunctionsTest
     it("Non-repeated grid cut/paste must remove and restore nested control, bind, holders, and resources") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         val firstGridId       = (doc descendant FRGridTest head).id
         val nestedControlName = FormBuilder.findContainerById(firstGridId).toList flatMap findNestedControls flatMap getControlNameOpt head

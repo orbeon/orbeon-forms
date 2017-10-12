@@ -269,7 +269,7 @@ class AlertsAndConstraintsTest
         assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
 
         // No elements inserted under the bind
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
         assert(bind child * isEmpty)
       }
     }
@@ -300,7 +300,7 @@ class AlertsAndConstraintsTest
         assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
 
         // One element inserted under the bind
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
         assert(1 ===(bind child * size))
       }
     }
@@ -310,7 +310,7 @@ class AlertsAndConstraintsTest
     it("required string") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
@@ -339,7 +339,7 @@ class AlertsAndConstraintsTest
     it("optional decimal") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
@@ -367,7 +367,7 @@ class AlertsAndConstraintsTest
     it("required decimal") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
@@ -395,7 +395,7 @@ class AlertsAndConstraintsTest
     it("formula for required") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>../foo = 'bar'</required>
@@ -412,7 +412,7 @@ class AlertsAndConstraintsTest
     it("required decimal and custom alert") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         locally {
           val newValidations = List(
@@ -474,7 +474,7 @@ class AlertsAndConstraintsTest
     it("must read back the XML Schema datatype") {
       withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
@@ -501,7 +501,7 @@ class AlertsAndConstraintsTest
   describe("Schema prefix") {
     it("must find the schema prefix") {
       withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
-        assert(Some("foo") === findSchemaPrefix(ctx.rootElem))
+        assert(Some("foo") === findSchemaPrefix(ctx.formDefinitionRootElem))
       }
     }
   }
@@ -510,7 +510,7 @@ class AlertsAndConstraintsTest
     it("must set a datatype without prefix") {
       withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
 
-        val bind = findBindByName(ctx.rootElem, Control1).toList
+        val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
@@ -537,7 +537,7 @@ class AlertsAndConstraintsTest
   describe("Schema prefix without namespace") {
     it("must not find an XML Schema prefix") {
       withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
-        assert(None === findSchemaPrefix(ctx.rootElem))
+        assert(None === findSchemaPrefix(ctx.formDefinitionRootElem))
       }
     }
   }

@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
 import scala.util.Try
@@ -66,12 +66,15 @@ trait FormRunnerBaseOps {
   def findInBindsTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)
 
+  // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
+  // only called from the functions above, which search in a form's view, model, or binds, which implies the
+  // existence of a form model.
+  def formDefinitionHasIndex(doc: DocumentInfo): Boolean =
+    doc.selectID(FormModel) ne null
+
   private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
 
-    // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
-    // only called from the functions above, which search in a form's view, model, or binds, which implies the
-    // existence of a form model.
-    val hasIndex = inDoc.getDocumentRoot.selectID(FormModel) ne null
+    val hasIndex = formDefinitionHasIndex(inDoc.getDocumentRoot)
 
     def isUnder(node: NodeInfo) =
       if (includeSelf)
@@ -135,6 +138,7 @@ trait FormRunnerBaseOps {
     findModelElem(inDoc) / XFInstanceTest filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
+  //@XPathFunction
   def formInstanceRoot(inDoc: NodeInfo): NodeInfo = inlineInstanceRootElem(inDoc, FormInstance).get
 
   //@XPathFunction

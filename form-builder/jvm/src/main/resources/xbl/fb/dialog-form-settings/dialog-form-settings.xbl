@@ -90,7 +90,7 @@
                 <!-- Tell custom settings to initialize -->
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
-                    <xf:property name="form-instance"     value="fbf:formInstanceRoot()"/>
+                    <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
@@ -121,7 +121,7 @@
                 <!-- Tell custom settings to apply changes -->
                 <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
-                    <xf:property name="form-instance"     value="fbf:formInstanceRoot()"/>
+                    <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 

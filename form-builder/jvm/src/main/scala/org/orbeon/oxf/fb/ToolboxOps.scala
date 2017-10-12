@@ -442,7 +442,7 @@ object ToolboxOps {
 
   private def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val name  = getControlName(cellElem / * head)
-    findControlByName(ctx.rootElem, name) map controlOrContainerElemToXcv
+    findControlByName(ctx.formDefinitionRootElem, name) map controlOrContainerElemToXcv
   }
 
   // Copy control to the clipboard
@@ -465,11 +465,8 @@ object ToolboxOps {
     deleteControlWithinCell(cellElem, updateTemplates = true)
   }
 
-  private def clipboardXcvRootElem(implicit ctx: FormBuilderDocContext): NodeInfo =
-    ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("xcv")
-
   def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): NodeInfo = {
-    val clipboard = clipboardXcvRootElem
+    val clipboard = ctx.clipboardXcvRootElem
     val clone = elementInfo("xcv", Nil)
     insert(into = clone, origin = clipboard / *)
     clone
@@ -478,11 +475,11 @@ object ToolboxOps {
   def clearClipboard()(implicit ctx: FormBuilderDocContext): Unit =
     XcvEntry.values
       .map(_.entryName)
-      .foreach(entryName ⇒ delete(clipboardXcvRootElem / entryName))
+      .foreach(entryName ⇒ delete(ctx.clipboardXcvRootElem / entryName))
 
   def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
     clearClipboard()
-    insert(into = clipboardXcvRootElem, origin = xcv / *)
+    insert(into = ctx.clipboardXcvRootElem, origin = xcv / *)
   }
 
   def dndControl(
@@ -522,7 +519,7 @@ object ToolboxOps {
     ctx            : FormBuilderDocContext): Unit = {
 
     // TODO: Remove once `ctx` is used everywhere
-    val inDoc                = ctx.rootElem
+    val inDoc                = ctx.formDefinitionRootElem
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
 
     // Rename if needed

@@ -59,7 +59,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ctx              : FormBuilderDocContext
   ): Unit = {
 
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     // Current resolutions, which could be lifted in the future:
     //
@@ -126,7 +126,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ctx         : FormBuilderDocContext
   ): Unit = {
 
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     val bind = findBindByName(inDoc, controlName).get
 
@@ -341,7 +341,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ): Unit = {
       val newDatatype = datatypeQName
       for {
-        controlElem    ← findControlByName(ctx.rootElem, controlName)
+        controlElem    ← findControlByName(ctx.formDefinitionRootElem, controlName)
         oldDatatype    = DatatypeValidation.fromForm(controlName).datatypeQName
         oldAppearances = controlElem attTokens APPEARANCE_QNAME
         (newElemName, newAppearanceAttOpt) ← BindingDescriptor.newElementName(
@@ -389,7 +389,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // Create from a control name
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): DatatypeValidation = {
 
-      val inDoc = ctx.rootElem
+      val inDoc = ctx.formDefinitionRootElem
 
       val bind = findBindByName(inDoc, controlName).get // require the bind
 
@@ -559,7 +559,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // - alerts returned are either global (no validation/level specified) or for a single specific validation
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[AlertDetails] = {
 
-      val inDoc = ctx.rootElem
+      val inDoc = ctx.formDefinitionRootElem
 
       val controlElem                = findControlByName(inDoc, controlName).get
       val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert", allLangs(resourcesRoot))
@@ -635,7 +635,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   private def findMIPs(controlName: String, mip: MIP)(implicit ctx: FormBuilderDocContext) = {
 
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     val bind            = findBindByName(inDoc, controlName).get // require the bind
     val supportedAlerts = AlertDetails.fromForm(controlName)

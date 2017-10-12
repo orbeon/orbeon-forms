@@ -91,7 +91,7 @@ trait ResourcesOps extends BaseOps {
   }
 
   def hasItemHintEditor(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    findControlByName(ctx.rootElem, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
+    findControlByName(ctx.formDefinitionRootElem, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
   def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {
@@ -257,7 +257,7 @@ trait ResourcesOps extends BaseOps {
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] =
     for {
-      (_, controlHolder) ← findResourceHoldersWithLangUseDoc(ctx.rootElem, controlName)
+      (_, controlHolder) ← findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName)
       lhhaHolder         ← controlHolder child lhha
     } yield
       lhhaHolder
@@ -267,6 +267,6 @@ trait ResourcesOps extends BaseOps {
     lhha        : String)(implicit
     ctx         : FormBuilderDocContext
   ): Boolean =
-    findResourceHoldersWithLangUseDoc(ctx.rootElem, controlName) forall
+    findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall
       { case (_, holder) ⇒ (holder child lhha stringValue).isBlank }
 }

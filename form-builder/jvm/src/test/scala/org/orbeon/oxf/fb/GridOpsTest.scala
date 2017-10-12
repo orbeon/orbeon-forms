@@ -53,7 +53,7 @@ class GridOpsTest
       withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
         val gridElem =
-          ctx.rootElem descendant NodeInfoCell.GridTest head
+          ctx.formDefinitionRootElem descendant NodeInfoCell.GridTest head
 
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)
@@ -85,7 +85,7 @@ class GridOpsTest
       withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
         val gridElem =
-          ctx.rootElem descendant NodeInfoCell.GridTest head
+          ctx.formDefinitionRootElem descendant NodeInfoCell.GridTest head
 
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)
@@ -164,7 +164,7 @@ class GridOpsTest
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
         withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
 
-          val doc = ctx.rootElem
+          val doc = ctx.formDefinitionRootElem
 
           findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
             selectCell(beforeCell)
@@ -228,7 +228,7 @@ class GridOpsTest
     it("must allow inserting a new grid") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
 
-        val doc = ctx.rootElem
+        val doc = ctx.formDefinitionRootElem
 
         // Initially can insert all
         assert(canInsertSection(doc) === true)

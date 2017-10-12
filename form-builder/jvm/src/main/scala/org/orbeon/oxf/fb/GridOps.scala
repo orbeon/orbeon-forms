@@ -17,7 +17,7 @@ import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, FormRunner, Names}
+import org.orbeon.oxf.fr.{Cell, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -221,7 +221,7 @@ trait GridOps extends ContainerOps {
 
   // Find the currently selected grid cell if any
   def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    findInViewTryIndex(ctx.rootElem, selectedCellVar.stringValue)
+    findInViewTryIndex(ctx.formDefinitionRootElem, selectedCellVar.stringValue)
 
   // Make the given grid cell selected
   def selectCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =

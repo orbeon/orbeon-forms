@@ -288,6 +288,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         return instancesMap.get(instanceStaticId);
     }
 
+    public scala.Option<XFormsInstance> findInstance(String instanceStaticId) {
+        return scala.Option.apply(getInstance(instanceStaticId));
+    }
+
     /**
      * Return the XFormsInstance object containing the given node.
      */

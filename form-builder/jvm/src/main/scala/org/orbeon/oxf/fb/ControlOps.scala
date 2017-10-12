@@ -54,7 +54,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
-    findBindPathHoldersInDocument(ctx.rootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
+    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
 
@@ -186,7 +186,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       renameControl (oldName, newName)
       renameTemplate(oldName, newName)
 
-      findControlByName(ctx.rootElem, newName) foreach { newControl ⇒
+      findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl ⇒
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
     }
@@ -199,7 +199,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx                 : FormBuilderDocContext
   ): Unit = {
 
-    if (findControlByName(ctx.rootElem, oldControlName) exists controlRequiresNestedIterationElement) {
+    if (findControlByName(ctx.formDefinitionRootElem, oldControlName) exists controlRequiresNestedIterationElement) {
 
       val oldName = oldChildElementName getOrElse defaultIterationName(oldControlName)
       val newName = newChildElementName getOrElse defaultIterationName(newControlName)
@@ -213,7 +213,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
-    findControlByName(ctx.rootElem, oldName) foreach
+    findControlByName(ctx.formDefinitionRootElem, oldName) foreach
       (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
 
   def resourceNamesInUseForControl(controlName: String)(implicit ctx: FormBuilderDocContext): Set[String] =
@@ -262,7 +262,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Rename a bind
   def renameBinds(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
-    findBindByName(ctx.rootElem, oldName) foreach (renameBindElement(_, newName))
+    findBindByName(ctx.formDefinitionRootElem, oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
   private def ensureDataHolder(rootElem: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
@@ -360,7 +360,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     require(Model.AllMIPNames(mipName))
     val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
-    findControlByName(ctx.rootElem, controlName) foreach { control ⇒
+    findControlByName(ctx.formDefinitionRootElem, controlName) foreach { control ⇒
 
       // Get or create the bind element
       val bind = ensureBinds(findContainerNamesForModel(control) :+ controlName)
@@ -429,7 +429,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     require(Model.AllMIPNames(mipName))
     val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
-    findBindByName(ctx.rootElem, controlName) flatMap (_ attValueOpt mipAttQName)
+    findBindByName(ctx.formDefinitionRootElem, controlName) flatMap (_ attValueOpt mipAttQName)
   }
 
   // Return (attQName, elemQName)
@@ -441,9 +441,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Get all control names by inspecting all elements with an id that converts to a valid name
   def getAllControlNames(implicit ctx: FormBuilderDocContext): Set[String] =
-    ctx.formInstance match {
+    ctx.formDefinitionInstance match {
       case Some(instance) ⇒ instance.idsIterator flatMap controlNameFromIdOpt toSet
-      case None           ⇒ (ctx.rootElem descendantOrSelf * ids) toSet
+      case None           ⇒ (ctx.formDefinitionRootElem descendantOrSelf * ids) toSet
     }
 
   // Return all the controls in the view
@@ -460,7 +460,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val model = getFormModel
     val part = model.getStaticModel.part
     for {
-      controlId ← findControlIdByName(ctx.rootElem, controlName)
+      controlId ← findControlIdByName(ctx.formDefinitionRootElem, controlName)
       prefixedId = part.startScope.prefixedIdForStaticId(controlId)
       control ← Option(part.getControlAnalysis(prefixedId))
     } yield
@@ -471,7 +471,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
     val model = getFormModel
     for {
-      controlId ← findControlIdByName(ctx.rootElem, controlName)
+      controlId ← findControlIdByName(ctx.formDefinitionRootElem, controlName)
       control   ← model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
     } yield
       control
@@ -479,7 +479,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Find a control's LHHA (there can be more than one for alerts)
   def getControlLHHA(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
-    findControlByName(ctx.rootElem, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
+    findControlByName(ctx.formDefinitionRootElem, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
 
   // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -492,7 +492,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // For a given control, whether the mediatype on itemset labels is HTML
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    hasHTMLMediatype(findControlByName(ctx.rootElem, controlName).toList child "itemset" child "label")
+    hasHTMLMediatype(findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset" child "label")
 
   def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
     nodes foreach { lhhaElement ⇒
@@ -510,7 +510,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     val control  = findControlByName(inDoc, controlName).get
     val existing = getControlLHHA(controlName, lhha)
@@ -544,7 +544,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext) = {
 
-    val inDoc = ctx.rootElem
+    val inDoc = ctx.formDefinitionRootElem
 
     val control = findControlByName(inDoc, controlName).get
 
@@ -559,7 +559,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
   def buildFormBuilderControlEffectiveId(staticId: String)(implicit ctx: FormBuilderDocContext): Option[String] =
-    findInViewTryIndex(ctx.rootElem, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
   // Set the control's items for all languages
   def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {

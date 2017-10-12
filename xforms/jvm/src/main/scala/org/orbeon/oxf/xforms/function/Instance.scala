@@ -54,7 +54,7 @@ class Instance extends XFormsFunction {
           // example with model variables.
 
           def dynamicInstanceOpt = instanceId match {
-            case Some(instanceId) ⇒ Option(model.getInstance(instanceId))
+            case Some(instanceId) ⇒ model.findInstance(instanceId)
             case None             ⇒ model.defaultInstanceOpt
           }
 

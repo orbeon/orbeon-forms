@@ -458,7 +458,7 @@ trait ContainerResolver {
   // Locally find the instance with the specified id, searching in any relevant model
   def findInstance(instanceStaticId: String): Option[XFormsInstance] =
     if (isRelevant && models.nonEmpty)
-      models.iterator map (_.getInstance(instanceStaticId)) find (_ ne null)
+      models.iterator flatMap (_.findInstance(instanceStaticId)) nextOption()
     else
       None
 

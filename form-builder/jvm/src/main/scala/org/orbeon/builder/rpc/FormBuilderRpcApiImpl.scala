@@ -182,5 +182,5 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    FormRunner.findInViewTryIndex(ctx.rootElem, XFormsId.getStaticIdFromId(id))
+    FormRunner.findInViewTryIndex(ctx.formDefinitionRootElem, XFormsId.getStaticIdFromId(id))
 }

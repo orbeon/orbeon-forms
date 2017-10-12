@@ -17,7 +17,6 @@ import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.{controlNameFromId, createFormDataBasePath, createFormDefinitionBasePath, getControlName, putWithAttachments, _}
-import org.orbeon.oxf.fr.Names.FormInstance
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.util.CoreUtils._
@@ -32,6 +31,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
+import scala.util.Try
 import scala.util.control.NonFatal
 
 object FormBuilderXPathApi {
@@ -43,7 +43,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.rootElem, controlNameFromId(controlName)) foreach { controlElem ⇒
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlNameFromId(controlName)) foreach { controlElem ⇒
       assert(isRepeat(controlElem))
       updateTemplatesCheckContainers(findAncestorRepeatNames(controlElem).to[Set])
     }
@@ -102,7 +102,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.rootElem, controlNameFromId(controlId)).to[List] flatMap
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlNameFromId(controlId)).to[List] flatMap
       (_ parent CellTest) foreach selectCell
   }
 
@@ -151,7 +151,7 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     if (isHTML != FormBuilder.isItemsetHTMLMediatype(controlName)) {
-      val itemsetEl = FormRunner.findControlByName(ctx.rootElem, controlName).toList child "itemset"
+      val itemsetEl = FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset"
       val labelHintEls = Seq("label", "hint") flatMap (itemsetEl.child(_))
       setHTMLMediatype(labelHintEls, isHTML)
     }
@@ -247,7 +247,7 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext(inDoc)
 
     val allHelpElements =
-      ctx.rootElem.root descendant ((if (lhha=="text") FR else XF) → lhha) map
+      ctx.formDefinitionRootElem.root descendant ((if (lhha=="text") FR else XF) → lhha) map
       (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
       { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
 
@@ -276,7 +276,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def hasCustomIterationName(controlName: String): Boolean = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findRepeatIterationName(ctx.rootElem, controlName) exists (isCustomIterationName(controlName, _))
+    FormRunner.findRepeatIterationName(ctx.formDefinitionRootElem, controlName) exists (isCustomIterationName(controlName, _))
   }
 
   // NOTE: Value can be a simple AVT
@@ -300,7 +300,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val allContainersWithSettings = getAllContainerControlsWithIds(ctx.rootElem) filter hasContainerSettings
+    val allContainersWithSettings = getAllContainerControlsWithIds(ctx.formDefinitionRootElem) filter hasContainerSettings
 
     previousOrNext match {
       case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ getControlName(n) != controlName) lastOption
@@ -349,7 +349,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.rootElem, controlName) flatMap { control ⇒
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) flatMap { control ⇒
 
       val currentCell = control parent CellTest
 
@@ -502,6 +502,6 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findControlByNameOrEmpty(controlName: String): NodeInfo = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findControlByNameOrEmpty(ctx.rootElem, controlName)
+    FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
   }
 }

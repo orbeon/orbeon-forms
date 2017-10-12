@@ -55,8 +55,6 @@ class GridOpsTest
         val gridElem =
           ctx.rootElem descendant NodeInfoCell.GridTest head
 
-        import NodeInfoCell._
-
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)
 
@@ -88,8 +86,6 @@ class GridOpsTest
 
         val gridElem =
           ctx.rootElem descendant NodeInfoCell.GridTest head
-
-        import NodeInfoCell._
 
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)

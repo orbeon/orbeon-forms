@@ -35,7 +35,12 @@ private object ControlDnD {
 
     $(document).on(
       "keyup keydown",
-      (event: JQueryEventObject) ⇒ shiftPressed = event.asInstanceOf[KeyboardEvent].shiftKey
+      (event: JQueryEventObject) ⇒ {
+        // Surprisingly, `event.shiftKey` can be `undefined`
+        val keyboardEventDyn = event.asInstanceOf[js.Dynamic]
+        val shiftKeyOpt      = keyboardEventDyn.shiftKey.asInstanceOf[js.UndefOr[Boolean]]
+        shiftPressed         = shiftKeyOpt.getOrElse(false)
+      }
     )
 
     val drake = Dragula(

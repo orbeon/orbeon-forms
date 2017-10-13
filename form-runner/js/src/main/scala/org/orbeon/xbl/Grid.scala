@@ -31,6 +31,8 @@ object Grid {
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
   val globalMenuElem: js.UndefOr[html.Element] = $(".fr-grid-dropdown-menu")(0)
 
+  val ListenerSuffix = ".orbeon.grid"
+
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
     val values = findValues
@@ -48,12 +50,12 @@ object Grid {
   // Initialization
   globalMenuElem foreach { _ ⇒
     // Click on our own button moves and shows the menu
-    $(document).on("click.orbeon.grid",   ".fr-grid-dropdown-button", moveAndShowMenu _)
-    $(document).on("keydown.orbeon.grid", ".fr-grid-dropdown-button", delegateKeyEventToBootstrapButton _)
+    $(document).on(s"click$ListenerSuffix",   ".fr-grid-dropdown-button", moveAndShowMenu _)
+    $(document).on(s"keydown$ListenerSuffix", ".fr-grid-dropdown-button", delegateKeyEventToBootstrapButton _)
 
     // Listeners for all menu actions
     Operation.values foreach { op ⇒
-      $(document).on("click.orbeon.grid", s".fr-grid-dropdown-menu .fr-${op.entryName}", actionFunction(op))
+      $(document).on(s"click$ListenerSuffix", s".fr-grid-dropdown-menu .fr-${op.entryName}", actionFunction(op))
     }
   }
 
@@ -75,7 +77,7 @@ object Grid {
   }
 
   // Move the menu just below the button
-  def moveMenu(e: JQueryEventObject): Boolean = {
+  def moveMenu(e: JQueryEventObject): Unit = {
     val dropdown = $(e.target).closest(".dropdown")
 
     val dropdownOffset = Offset(dropdown)
@@ -94,20 +96,18 @@ object Grid {
       case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
     }
 
-    // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
-    // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
-    // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
-    // running.
-    false
+    // See comment about propagation in other handler above.
+    e.preventDefault()
+    e.stopPropagation()
   }
 
   // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
   def delegateKeyEventToBootstrapButton(e: JQueryEventObject): Unit = {
     moveMenu(e)
     $(globalMenuElem).find(".dropdown-toggle").trigger(
-      $.asInstanceOf[js.Dynamic].Event(
+      $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade
         e.`type`,
-        new js.Object { // `Event` constructor is not present in the jQuery facade
+        new js.Object {
           val charCode = e.asInstanceOf[KeyboardEvent].charCode
 
           // Putting these to be complete, but `charCode` above does the trick for the menu

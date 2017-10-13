@@ -20,6 +20,7 @@
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding id="fb-dialog-help" element="fb|dialog-help">

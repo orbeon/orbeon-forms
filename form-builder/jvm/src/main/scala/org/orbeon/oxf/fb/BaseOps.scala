@@ -185,8 +185,7 @@ trait BaseOps extends Logging {
       debugDumpDocument(message)
 
   def debugDumpDocument(message: String)(implicit ctx: FormBuilderDocContext): Unit =
-    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(ctx.rootElem)))
-//    println(Seq(message → TransformerUtils.tinyTreeToString(ctx.rootElem)))
+    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(ctx.formDefinitionRootElem)))
 
   def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
     val name            = origin.head.localname

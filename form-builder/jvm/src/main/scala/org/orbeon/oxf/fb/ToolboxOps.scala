@@ -21,7 +21,9 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -498,6 +500,103 @@ object ToolboxOps {
     xcv foreach (pasteSingleControlFromXcv(targetCellElem, _))
   }
 
+  def containerMerge(containerId: String)(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val containerElem = containerById(containerId)
+
+    // Check this is a section template section
+    if (IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)) {
+
+      val head = ctx.formDefinitionRootElem / XHHeadTest head
+
+      xblBindingForSection(head, containerElem) foreach { bindingDoc ⇒
+
+        val bindingElem = bindingDoc.rootElement
+
+        val containerName       = getControlName(containerElem)
+        val sectionTemplateName = bindingFirstURIQualifiedName(bindingElem).localName
+
+        val model = bindingElem / XBLImplementationTest / XFModelTest
+
+        val resourcesWithLangElems = {
+
+          val sectionLangResources    = findResourceHoldersWithLang(containerName, resourcesRoot)
+          val sectionLangResourcesMap = sectionLangResources.toMap
+
+          val nestedResources = {
+
+            val resourcesInstanceElem = model / XFInstanceTest find (_.hasIdValue(Names.FormResources))
+            val resourceElems         = resourcesInstanceElem.toList flatMap (_ child * child *)
+
+            // NOTE: For some reason, there is a resource with the name of the section template. That should
+            // be fixed, but in the meanwhile we need to remove those.
+            XFormsAPI.delete(resourceElems / * filter (_.localname == sectionTemplateName))
+
+            resourceElems map (e ⇒ (e attValue XMLLangQName) → (e / *))
+          }
+
+          val nestedResourcesMap = nestedResources.toMap
+
+          allResources(ctx.resourcesRootElem) map { resource ⇒
+
+            val lang = resource attValue XMLLangQName
+
+            val sectionHolderForLang = sectionLangResourcesMap.getOrElse(lang, sectionLangResources.head._2)
+            val otherHoldersForLang  = nestedResourcesMap.getOrElse(lang, nestedResources.head._2)
+
+            elementInfo(
+              "resource",
+              attributeInfo(XMLLangQName, lang) ++ sectionHolderForLang ++ otherHoldersForLang
+            )
+          }
+        }
+
+        val newSectionControlElem = {
+
+          val nestedContainers = bindingDoc.rootElement / XBLTemplateTest / * / * filter IsContainer
+
+          val newElem = TransformerUtils.extractAsMutableDocument(containerElem).rootElement
+          XFormsAPI.delete(newElem / * filter isSectionTemplateContent)
+          XFormsAPI.insert(into = newElem, after = newElem / *, origin = nestedContainers)
+          newElem
+        }
+
+        val newDataHolderElem = {
+
+          val dataTemplateInstanceElem = model / XFInstanceTest find (_.hasIdValue("fr-form-template"))
+          val nestedDataHolderElems    = dataTemplateInstanceElem.toList flatMap (_ child * take 1 child *)
+
+          val newElem = elementInfo(containerName)
+          XFormsAPI.insert(into = newElem, origin = nestedDataHolderElems)
+          newElem
+        }
+
+        val newBindElem = {
+
+          val nestedBindElems =  model / XFBindTest / *
+
+          val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(ctx.formDefinitionRootElem, containerName).get).rootElement
+          XFormsAPI.delete(newElem / *)
+          XFormsAPI.insert(into = newElem, origin = nestedBindElems)
+          newElem
+        }
+
+        val xcvContent =
+          XcvEntry.values map {
+            case e @ XcvEntry.Control   ⇒ e → List(newSectionControlElem)
+            case e @ XcvEntry.Holder    ⇒ e → List(newDataHolderElem)
+            case e @ XcvEntry.Resources ⇒ e → resourcesWithLangElems
+            case e @ XcvEntry.Bind      ⇒ e → List(newBindElem)
+          }
+
+        val xcv = elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+        deleteSectionById(containerId)
+        pasteSectionGridFromXcv(xcv)
+      }
+
+    }
+  }
+
   // Paste control from the clipboard
   //@XPathFunction
   def pasteFromClipboard(targetCellElem: NodeInfo): Unit = {
@@ -508,15 +607,16 @@ object ToolboxOps {
     val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
     if (IsGrid(controlElem) || IsSection(controlElem))
-      pasteSectionGridFromXcv(targetCellElem, xcvElem)
+      pasteSectionGridFromXcv(xcvElem)
     else
       pasteSingleControlFromXcv(targetCellElem, xcvElem)
   }
 
+  private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"
+
   private def pasteSectionGridFromXcv(
-    targetCellElem : NodeInfo,
-    xcvElem        : NodeInfo)(implicit
-    ctx            : FormBuilderDocContext): Unit = {
+    xcvElem : NodeInfo)(implicit
+    ctx     : FormBuilderDocContext): Unit = {
 
     // TODO: Remove once `ctx` is used everywhere
     val inDoc                = ctx.formDefinitionRootElem
@@ -544,7 +644,7 @@ object ToolboxOps {
           val oldName = controlNameFromId(controlElem.id)
 
           oldToNewNames.get(oldName) foreach { newName ⇒
-            renameControlByElement(controlElem, newName, Set("label", "help", "hint", "alert", "itemset"))
+            renameControlByElement(controlElem, newName, ControlResourceNames)
           }
         }
 

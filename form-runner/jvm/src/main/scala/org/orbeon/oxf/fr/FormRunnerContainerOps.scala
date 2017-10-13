@@ -76,11 +76,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
-  def bindingFirstURIQualifiedName(binding: NodeInfo): URIQualifiedName = {
-    val firstElementCSSName = (binding /@ "element" stringValue) split "," head
+  def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
+    val firstElementCSSName = (bindingElem attValue "element") split "," head
     val elementQName        = firstElementCSSName.replace('|', ':')
 
-    binding.resolveURIQualifiedName(elementQName)
+    bindingElem.resolveURIQualifiedName(elementQName)
   }
 
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {

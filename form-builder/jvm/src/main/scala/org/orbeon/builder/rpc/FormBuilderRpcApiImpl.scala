@@ -181,6 +181,12 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
+
+  def containerMerge(containerId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    ToolboxOps.containerMerge(containerId)
+  }
+
   private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     FormRunner.findInViewTryIndex(ctx.formDefinitionRootElem, XFormsId.getStaticIdFromId(id))
 }

@@ -123,8 +123,8 @@ private object FlatView {
     import FormRunner._
 
     val root = document.rootElement
-    val head = root.child(XH → "head").head
-    val body = root.child(XH → "body").head
+    val head = root.child(XHHeadTest).head
+    val body = root.child(XHBodyTest).head
     val xblMappings = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
 
 

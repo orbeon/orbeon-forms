@@ -28,6 +28,9 @@ object XMLNames {
   val XS  = XSD_URI
   val XBL = XBL_NAMESPACE_URI
 
+  val XHHeadTest             : Test      = XH → "head"
+  val XHBodyTest             : Test      = XH → "body"
+
   val XBLXBLTest             : Test      = XBL → "xbl"
   val XBLBindingTest         : Test      = XBL → "binding"
   val XBLTemplateTest        : Test      = XBL → "template"

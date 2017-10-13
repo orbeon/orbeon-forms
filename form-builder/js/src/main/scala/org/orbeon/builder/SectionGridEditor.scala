@@ -52,11 +52,12 @@ object SectionGridEditor {
       case object ContainerEditDetails extends ContainerEditor
       case object ContainerCopy        extends ContainerEditor
       case object ContainerCut         extends ContainerEditor
+      case object ContainerMerge       extends ContainerEditor
     }
 
     import ContainerEditor._
 
-    val AlwaysVisibleIcons =
+    val SectionAlwaysVisibleIcons =
       List(
         ContainerEditDetails,
         SectionDelete, // TODO: not when last of container
@@ -89,11 +90,11 @@ object SectionGridEditor {
         // Start by hiding all the icons
         sectionGridEditorContainer.children().hide()
 
-        // Update triggers relevance for section
+        // Sections
         if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
 
           // Icons which are always visible
-          sectionGridEditorContainer.children(AlwaysVisibleIcons map (_.className) mkString ",").show()
+          sectionGridEditorContainer.children(SectionAlwaysVisibleIcons map (_.className) mkString ",").show()
 
           // Hide/show section move icons
           val container = sectionGridBody.el.children(".fr-section-container")
@@ -107,20 +108,23 @@ object SectionGridEditor {
           }
 
           // Hide/show delete icon
-          val deleteTrigger = sectionGridEditorContainer.children(".delete-section-trigger")
           if (container.is(".fb-can-delete"))
-            deleteTrigger.show()
+            sectionGridEditorContainer.children(SectionDelete.className).show()
+
+          if (container.find(".fr-section-component").length > 0)
+            sectionGridEditorContainer.children(ContainerMerge.className).show()
+
         }
 
-        // Update triggers relevance for repeated grid only
+        // Grids
         if (sectionGridBody.el.is(BlockCache.GridSelector)) {
 
           if (sectionGridBody.el.children(".fr-grid").is(".fr-repeat"))
-            sectionGridEditorContainer.children(".fb-grid-edit-details").show()
+            sectionGridEditorContainer.children(ContainerEditDetails.className).show()
 
-          sectionGridEditorContainer.children(".fb-grid-delete").show()   // TODO: not when last of container
-          sectionGridEditorContainer.children(".fb-container-copy").show()
-          sectionGridEditorContainer.children(".fb-container-cut").show() // TODO: not when last of container
+          sectionGridEditorContainer.children(GridDelete.className).show()   // TODO: not when last of container
+          sectionGridEditorContainer.children(ContainerCopy.className).show()
+          sectionGridEditorContainer.children(ContainerCut.className).show() // TODO: not when last of container
 
           sectionGridBody.el.parent.addClass("fb-hover")
         }
@@ -154,6 +158,7 @@ object SectionGridEditor {
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
             case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()
+            case ContainerMerge       ⇒ client.containerMerge      (sectionGridId).call()
           }
         }
       })

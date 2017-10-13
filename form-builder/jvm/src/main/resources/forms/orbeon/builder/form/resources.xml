@@ -53,6 +53,9 @@
         <paste>
             <label>Paste</label>
         </paste>
+        <merge-section>
+            <label>Merge Section Template</label>
+        </merge-section>
         <form-structure>
             <label>Form Structure</label>
         </form-structure>
@@ -1047,6 +1050,9 @@
         <paste>
             <label>Coller</label>
         </paste>
+        <merge-section>
+            <label>Intégrer modèle de section</label>
+        </merge-section>
         <form-structure>
             <label>Structure du formulaire</label>
         </form-structure>
@@ -2043,6 +2049,9 @@
         <paste>
             <label>Lim inn</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label todo="true">[Form Structure]</label>
         </form-structure>
@@ -3067,6 +3076,9 @@
         <paste>
             <label>Вставить</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label todo="true">[Form Structure]</label>
         </form-structure>
@@ -4091,6 +4103,9 @@
         <paste>
             <label>Incolla</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Struttura del modulo</label>
         </form-structure>
@@ -5107,6 +5122,9 @@
         <paste>
             <label>Einfügen</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Struktur des Formulars</label>
         </form-structure>
@@ -6125,6 +6143,9 @@
         <paste>
             <label>Liitä</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Lomakerakenne</label>
         </form-structure>
@@ -7143,6 +7164,9 @@
         <paste>
             <label>Pegar</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Estructura del Formulario</label>
         </form-structure>
@@ -8160,6 +8184,9 @@
         <paste>
             <label>Colar</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Estrutura do Formulário</label>
         </form-structure>
@@ -9183,6 +9210,9 @@
         <paste>
             <label>Klistra in</label>
         </paste>
+        <merge-section>
+            <label todo="true">[Merge Section Template]</label>
+        </merge-section>
         <form-structure>
             <label>Struktur</label>
         </form-structure>

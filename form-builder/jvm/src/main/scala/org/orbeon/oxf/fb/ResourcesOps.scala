@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
@@ -28,23 +29,31 @@ trait ResourcesOps extends BaseOps {
   val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
   def currentResources(implicit ctx: FormBuilderDocContext): NodeInfo = ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("current-resources")
-  def currentLang     (implicit ctx: FormBuilderDocContext): String   = currentResources attValue "*:lang"
+  def currentLang     (implicit ctx: FormBuilderDocContext): String   = currentResources attValue XMLLangQName
   def resourcesRoot   (implicit ctx: FormBuilderDocContext): NodeInfo = currentResources.parentUnsafe
 
   def resourcesInLang(lang: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
-    allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
+    allResources(resourcesRoot) find (_.attValue(XMLLangQName) == lang) getOrElse currentResources
 
   // Find the current resource holder for the given name
   def findCurrentResourceHolder(controlName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     currentResources child controlName headOption
 
   // Get the control's resource value or blank
-  def getControlResourceOrEmpty(controlName: String, resourceName: String)(implicit ctx: FormBuilderDocContext): String =
+  def getControlResourceOrEmpty(
+    controlName  : String,
+    resourceName : String)(implicit
+    ctx          : FormBuilderDocContext
+  ): String =
     findCurrentResourceHolder(controlName) flatMap
       (n ⇒ n / resourceName map (_.stringValue) headOption) getOrElse ""
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
-  def getControlResources(controlName: String, resourceName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
+  def getControlResources(
+    controlName  : String,
+    resourceName : String)(implicit
+    ctx          : FormBuilderDocContext
+  ): List[NodeInfo] =
     findCurrentResourceHolder(controlName).toList flatMap
       (n ⇒ n / resourceName)
 
@@ -62,10 +71,12 @@ trait ResourcesOps extends BaseOps {
   }
 
   // Set a control's resources given lang/values
+  //
   // - only touches the specified languages
   // - simplicity and consistency, all existing resources are first deleted
   // - the maximum number of values across langs is determined to create a consistent number of resources
   // - if values are missing for a given lang, the remaining resources will exist bug be empty
+  //
   def setControlResourcesWithLang(
     controlName  : String,
     resourceName : String,

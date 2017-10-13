@@ -44,4 +44,5 @@ trait FormBuilderRpcApi {
   def containerEditDetails(containerId: String): Unit
   def containerCopy       (containerId: String): Unit
   def containerCut        (containerId: String): Unit
+  def containerMerge      (containerId: String): Unit
 }

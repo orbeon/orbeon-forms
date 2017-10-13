@@ -155,20 +155,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Find all associated elements to delete for a given control element
   def controlElementsToDelete(control: NodeInfo)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
 
-    val doc = control.getDocumentRoot
-
     // Holders, bind, templates, resources if the control has a name
     val holders = getControlNameOpt(control).toList flatMap { controlName ⇒
 
-      val result = mutable.Buffer[NodeInfo]()
+      val buffer = mutable.ListBuffer[NodeInfo]()
 
-      result ++=
+      buffer ++=
         findDataHolders     (controlName) ++=
-        findBindByName      (doc, controlName) ++=
-        findTemplateInstance(doc, controlName) ++=
-        findResourceHolders  (controlName)
+        findBindByName      (ctx.formDefinitionRootElem, controlName) ++=
+        findTemplateInstance(ctx.formDefinitionRootElem, controlName) ++=
+        findResourceHolders (controlName)
 
-      result.toList
+      buffer.result
     }
 
     // Prepend control element
@@ -307,7 +305,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Unit = {
 
     // Create one holder per existing language
-    val resourceHolders = (allResources(ctx.resourcesRootElem) /@ "*:lang") map (_.stringValue → List(resourceHolder))
+    val resourceHolders = (allResources(ctx.resourcesRootElem) attValue XMLLangQName) map (_ → List(resourceHolder))
     insertHolders(controlElement, List(dataHolder), resourceHolders, precedingControlName)
   }
 
@@ -320,7 +318,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx                  : FormBuilderDocContext
   ): Unit = {
 
-    val doc            = controlElement.getDocumentRoot
     val containerNames = findContainerNamesForModel(controlElement)
 
     // Insert hierarchy of data holders
@@ -337,7 +334,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     if (resourceHolders.nonEmpty) {
       val resourceHoldersMap = resourceHolders.toMap
       allResources(ctx.resourcesRootElem) foreach { resource ⇒
-        val lang    = (resource /@ "*:lang").stringValue
+        val lang    = resource attValue XMLLangQName
         val holders = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
         insert(
           into   = resource,
@@ -542,7 +539,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       Nil
   }
 
-  def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext) = {
+  def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {
 
     val inDoc = ctx.formDefinitionRootElem
 

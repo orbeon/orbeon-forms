@@ -32,10 +32,10 @@ class EmailTest
 
     val formDoc = readURLAsImmutableXMLDocument(FormWithEmailControls)
 
-    val head     = formDoc.rootElement / (XH → "head") head
+    val head     = formDoc.rootElement / XHHeadTest head
     val model    = head / XFModelTest head
     val instance = model descendant XFInstanceTest filter (_.id == "fr-form-instance") head
-    val body     = formDoc.rootElement / (XH → "body") head
+    val body     = formDoc.rootElement / XHBodyTest head
 
     val data =
       TransformerUtils.extractAsMutableDocument(instance child * head)

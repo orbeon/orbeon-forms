@@ -229,6 +229,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     } yield
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
+  def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
+    val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
+    sectionTemplateBindingName(section) flatMap mapping.get
+  }
+
   private object Private {
 
     val FBLangPredicate         = "[@xml:lang = $fb-lang]"
@@ -253,10 +258,5 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             bindRef
         )
       } toList
-
-    def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
-      val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
-      sectionTemplateBindingName(section) flatMap mapping.get
-    }
   }
 }

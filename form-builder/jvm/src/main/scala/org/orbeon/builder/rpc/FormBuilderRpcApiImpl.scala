@@ -181,7 +181,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
-
   def containerMerge(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.containerMerge(containerId)

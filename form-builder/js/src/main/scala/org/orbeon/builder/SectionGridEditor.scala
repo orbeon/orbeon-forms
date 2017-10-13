@@ -111,7 +111,6 @@ object SectionGridEditor {
 
           if (container.find(".fr-section-component").length > 0)
             sectionGridEditorContainer.children(ContainerMerge.className).show()
-
         }
 
         // Grids

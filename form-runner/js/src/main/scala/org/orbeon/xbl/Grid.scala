@@ -34,11 +34,11 @@ object Grid {
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
     val values = findValues
-    case object MoveUp          extends Operation
-    case object MoveDown        extends Operation
-    case object MoveInsertAbove extends Operation
-    case object MoveInsertBelow extends Operation
-    case object Remove          extends Operation
+    case object MoveUp      extends Operation
+    case object MoveDown    extends Operation
+    case object InsertAbove extends Operation
+    case object InsertBelow extends Operation
+    case object Remove      extends Operation
   }
 
   case class CurrentGrid(currentGridId: String, currentGridIteration: Int)

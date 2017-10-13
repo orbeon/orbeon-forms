@@ -116,13 +116,6 @@ object ControlEditor {
       val className = s"fb-arrow-$directionName"
       val iconEl = controlEditorLeft.find(s".$className")
 
-      val eventName = direction match {
-        case Direction.Up    ⇒ "fb-shrink-down"
-        case Direction.Right ⇒ "fb-expand-right"
-        case Direction.Down  ⇒ "fb-expand-down"
-        case Direction.Left  ⇒ "fb-shrink-right"
-      }
-
       iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
         if (! iconEl.is(".disabled"))
           for {

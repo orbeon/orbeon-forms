@@ -556,6 +556,14 @@ object ToolboxOps {
           val nestedContainers = bindingDoc.rootElement / XBLTemplateTest / * / * filter IsContainer
 
           val newElem = TransformerUtils.extractAsMutableDocument(containerElem).rootElement
+
+          // NOTE: This duplicates some annotations done in `annotate.xpl`.
+          nestedContainers ++ newElem foreach { containerElem ⇒
+            XFormsAPI.ensureAttribute(containerElem, "edit-ref", "")
+            if (IsSection(containerElem))
+              XFormsAPI.ensureAttribute(containerElem, XXF → "update", "full")
+          }
+
           XFormsAPI.delete(newElem / * filter isSectionTemplateContent)
           XFormsAPI.insert(into = newElem, after = newElem / *, origin = nestedContainers)
           newElem

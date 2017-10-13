@@ -25,6 +25,7 @@ object XMLNames {
 
   val XH  = XHTML_NAMESPACE_URI
   val XF  = XFORMS_NAMESPACE_URI
+  val XXF = XXFORMS_NAMESPACE_URI
   val XS  = XSD_URI
   val XBL = XBL_NAMESPACE_URI
 

@@ -13,14 +13,18 @@
  */
 package org.orbeon.builder
 
+import autowire._
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
-import org.orbeon.xforms.facade.JQueryTooltip
-import org.scalajs.dom.{document, html}
+import org.orbeon.xforms.rpc.RpcClient
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
 object GridColumnDnD {
@@ -33,36 +37,87 @@ object GridColumnDnD {
     val ColumnShadowClass    = "fb-grid-dnd-column-shadow"
     val FbMain               = $(s".$FbMainClass")
 
-    var dndShadowOpt: Option[JQuery] = None
+    Cell.listenOnChange()
 
-    Position.currentContainerChanged(
-      containerCache = BlockCache.cellCache,
-      wasCurrent     = (_   : Block) ⇒ hideDndContainers(),
-      becomesCurrent = (cell: Block) ⇒ showDndContainers(cell)
-    )
+    object Cell {
 
-    def showDndContainers(cell: Block): Unit = {
+      var currentOpt: Option[Block] = None
 
-      val gridBody   = cell.el.parents(".fr-grid-body").first()
-
-      def addContainer(index: Int): Unit = {
-        val dndContainer = $(s"""<div class="$ColumnContainerClass">""")
-        val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
-        dndContainer.append(dndHandle)
-        FbMain.append(dndContainer)
-        Offset.offset(dndContainer, Offset(
-          left = Offset(gridBody).left + (gridBody.width() - dndContainer.width()) / 12 * index,
-          top  = cell.top
-        ))
-        dndContainer.height(cell.height)
+      def listenOnChange(): Unit = {
+        Position.currentContainerChanged(
+          containerCache = BlockCache.cellCache,
+          wasCurrent     = (_   : Block) ⇒
+            if (! DndShadow.isDragging) {
+              currentOpt = None
+              DndContainers.hideAll()
+            },
+          becomesCurrent = (cell: Block) ⇒
+            if (! DndShadow.isDragging) {
+              scala.scalajs.js.Dynamic.global.console.log("new cell", cell.el.attr("id").get)
+              currentOpt = Some(cell)
+              DndContainers.show(Cell.x(cell) + Cell.w(cell) - 1)
+            }
+        )
       }
 
-      for (i ← 6 to 12)
-        addContainer(i)
+      def x(cell: Block) = cell.el.attr("data-fr-x").get.toInt
+      def w(cell: Block) = cell.el.attr("data-fr-w").get.toInt
     }
 
-    def hideDndContainers(): Unit = {
-      FbMain.find(s".$ColumnContainerClass").remove()
+    // Blocks signaling where cell borders can be dragged from and to
+    object DndContainers {
+
+      def show(index: Int): Unit = {
+        Cell.currentOpt.foreach { (currentCell) ⇒
+          val gridBody     = currentCell.el.parents(".fr-grid-body").first()
+          val dndContainer = $(s"""<div class="$ColumnContainerClass" data-index="$index">""")
+          val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
+          dndContainer.append(dndHandle)
+          FbMain.append(dndContainer)
+          Offset.offset(dndContainer, Offset(
+            left = Offset(gridBody).left + (gridBody.width() - dndContainer.width()) / 12 * index,
+            top  = currentCell.top
+          ))
+          dndContainer.height(currentCell.height)
+        }
+      }
+
+      def hideAll(): Unit =
+        FbMain.find(s".$ColumnContainerClass").remove()
+    }
+
+    // Block showing during the dragging operation
+    object DndShadow {
+
+      var dndShadowOpt: Option[JQuery] = None
+
+      def isDragging: Boolean = dndShadowOpt.isDefined
+
+      def show(containerEl: html.Element): Unit = {
+
+        // Create shadow element
+        val dndShadow = $(s"""<div class="$ColumnShadowClass">""")
+        FbMain.append(dndShadow)
+        dndShadowOpt = Some(dndShadow)
+
+        // Position and size  the shadow over source container
+        val container = $(containerEl)
+        Offset.offset(dndShadow, Offset(container))
+        dndShadow.width(container.width())
+        dndShadow.height(container.height())
+      }
+
+      def hide(): Unit = {
+        dndShadowOpt.foreach(_.detach())
+        dndShadowOpt = None
+      }
+
+      Position.onUnderPointerChange {
+        dndShadowOpt.foreach { (dndShadow) ⇒
+          val newShadowOffset = Offset(dndShadow).copy(left = Position.pointerPos.left)
+          Offset.offset(dndShadow, newShadowOffset)
+        }
+      }
     }
 
     val drake = Dragula(
@@ -80,36 +135,27 @@ object GridColumnDnD {
     )
 
     drake.onDrag { (el: html.Element, source: html.Element) ⇒
-
-      // Create shadow element
-      val dndShadow = $(s"""<div class="$ColumnShadowClass">""")
-      FbMain.append(dndShadow)
-      dndShadowOpt = Some(dndShadow)
-
-      // Position shadow over source container
-      val container = $(source)
-      Offset.offset(dndShadow, Offset(container))
-      dndShadow.width(container.width())
-      dndShadow.height(container.height())
-
-      scala.scalajs.js.Dynamic.global.console.log("drag", dndShadow)
+      scala.scalajs.js.Dynamic.global.console.log("drag, storing shadow")
+      DndShadow.show(source)
+      DndContainers.hideAll()
+      for (i ← (1 to 5) ++ (6 to 11))
+        DndContainers.show(i)
     }
 
-    Position.onUnderPointerChange {
-      scala.scalajs.js.Dynamic.global.console.log("pointer change")
-      dndShadowOpt.foreach { (dndShadow) ⇒
-        val newShadowOffset = Offset(dndShadow).copy(left = Position.pointerPos.left)
-        Offset.offset(dndShadow, newShadowOffset)
-        scala.scalajs.js.Dynamic.global.console.log("adjusting left", Position.pointerPos.left)
+    drake.onDrop {(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒
+      Cell.currentOpt.foreach { (currentCell) ⇒
+        val sourceIndex  = Cell.x(currentCell) + Cell.w(currentCell) - 1
+        val targetIndex  = target.getAttribute("data-index").toInt
+        val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
+        scala.scalajs.js.Dynamic.global.console.log(sourceIndex, targetIndex, direction.toString)
+        for (i ← 1 to Math.abs(targetIndex - sourceIndex))
+          ControlEditor.resizeCell(currentCell, direction)
       }
     }
 
-    drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
-      scala.scalajs.js.Dynamic.global.console.log("Drop")
-    })
-
-    drake.onDragend((el: html.Element) ⇒
-      dndShadowOpt = None
-    )
+    drake.onDragend {(el: html.Element) ⇒
+      scala.scalajs.js.Dynamic.global.console.log("drag end")
+      DndShadow.hide()
+    }
   }
 }

@@ -30,6 +30,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object ControlEditor {
 
+  def resizeCell(cell: Block, direction: Direction): Unit = {
+    val cellId = cell.el.attr("id").get
+    direction match {
+      case Direction.Up    ⇒ RpcClient[FormBuilderRpcApi].shrinkDown (cellId).call()
+      case Direction.Right ⇒ RpcClient[FormBuilderRpcApi].expandRight(cellId).call()
+      case Direction.Down  ⇒ RpcClient[FormBuilderRpcApi].expandDown (cellId).call()
+      case Direction.Left  ⇒ RpcClient[FormBuilderRpcApi].shrinkRight(cellId).call()
+    }
+  }
+
   locally {
 
     val ControlActionNames            = List("delete", "edit-details", "edit-items")
@@ -118,17 +128,7 @@ object ControlEditor {
 
       iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
         if (! iconEl.is(".disabled"))
-          for {
-            currentCell ← currentCellOpt
-            cellId      = currentCell.el.attr("id").get
-          } locally {
-            direction match {
-              case Direction.Up    ⇒ RpcClient[FormBuilderRpcApi].shrinkDown (cellId).call()
-              case Direction.Right ⇒ RpcClient[FormBuilderRpcApi].expandRight(cellId).call()
-              case Direction.Down  ⇒ RpcClient[FormBuilderRpcApi].expandDown (cellId).call()
-              case Direction.Left  ⇒ RpcClient[FormBuilderRpcApi].shrinkRight(cellId).call()
-            }
-          }
+          currentCellOpt.foreach(resizeCell(_, direction))
       })
     }
   }

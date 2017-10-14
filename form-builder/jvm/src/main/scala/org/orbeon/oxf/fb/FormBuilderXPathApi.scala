@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.MediatypeRange
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.FormBuilder.{containerById, _}
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.{controlNameFromId, createFormDataBasePath, createFormDefinitionBasePath, getControlName, putWithAttachments, _}
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.value.ObjectValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -175,7 +176,11 @@ object FormBuilderXPathApi {
     // things around, otherwise if the XForms document is recreated new automatic ids
     // are generated for objects without id.
 
+    debugDumpDocument("before")
+
     FormBuilder.annotateGridsAndCells(ctx.bodyElem)
+
+    debugDumpDocument("after")
 
     // 2. Select the first td if any
     ctx.bodyElem descendant GridTest descendant CellTest take 1 foreach selectCell
@@ -507,14 +512,8 @@ object FormBuilderXPathApi {
     FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
   }
 
-  //@XPathFunction
-  def idsToRenameForMergingSectionTemplate(
-    containerId : String,
-    prefix      : String,
-    suffix      : String
-  ): SequenceIterator = {
-    implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.idsToRenameForMergingSectionTemplate(containerId, prefix, suffix).toList.flatten map {
+  private def renamingDetails(renamingDetails: Option[Seq[(String, String, Boolean)]]): List[ObjectValue] =
+    renamingDetails.toList.flatten map {
       case (oldId, newId, isAutomaticId) ⇒
         ArrayFunctions.createValue(
           Vector(
@@ -524,6 +523,24 @@ object FormBuilderXPathApi {
           )
         )
     }
+
+  //@XPathFunction
+  def namesToRenameForMergingSectionTemplate(
+    containerId : String,
+    prefix      : String,
+    suffix      : String
+  ): SequenceIterator = {
+    implicit val ctx = FormBuilderDocContext()
+    renamingDetails(ToolboxOps.namesToRenameForMergingSectionTemplate(containerId, prefix, suffix))
+  }
+
+  //@XPathFunction
+  def namesToRenameForClipboard(
+    prefix      : String,
+    suffix      : String
+  ): SequenceIterator = {
+    implicit val ctx = FormBuilderDocContext()
+    renamingDetails(ToolboxOps.namesToRenameForClipboard(prefix, suffix))
   }
 
   //@XPathFunction
@@ -534,5 +551,14 @@ object FormBuilderXPathApi {
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.containerMerge(containerId, prefix, suffix)
+  }
+
+  //@XPathFunction
+  def pasteSectionGridFromClipboard(
+    prefix      : String,
+    suffix      : String
+  ): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    ToolboxOps.pasteSectionGridFromXcv(ToolboxOps.readXcvFromClipboard, prefix, suffix)
   }
 }

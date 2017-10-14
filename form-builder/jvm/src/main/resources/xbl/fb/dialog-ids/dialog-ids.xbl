@@ -30,6 +30,7 @@
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="container-id" value="event('container-id')"/>
+                <xf:setvalue ref="action"       value="event('action')"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="cancel-trigger" >
@@ -37,7 +38,10 @@
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i)">
                 <xf:action type="xpath">
-                    fbf:containerMerge($i/container-id, string($i/prefix), string($i/suffix))
+                    if ($i/action = 'merge') then
+                        fbf:containerMerge($i/container-id, string($i/prefix), string($i/suffix))
+                    else
+                        fbf:pasteSectionGridFromClipboard(string($i/prefix), string($i/suffix))
                 </xf:action>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
@@ -52,6 +56,7 @@
                 <xf:instance id="i">
                     <local>
                         <container-id/>
+                        <action/>
                         <prefix/>
                         <suffix/>
                     </local>
@@ -107,7 +112,15 @@
                                 </xh:tr>
                             </xh:thead>
                             <xh:tbody>
-                                <xf:repeat ref="if (valid($i)) then fbf:idsToRenameForMergingSectionTemplate($i/container-id, string($i/prefix), string($i/suffix)) else ()">
+                                <xf:repeat
+                                    ref="
+                                        if (valid($i)) then
+                                            if ($i/action = 'merge') then
+                                                fbf:namesToRenameForMergingSectionTemplate($i/container-id, string($i/prefix), string($i/suffix))
+                                            else
+                                                fbf:namesToRenameForClipboard(string($i/prefix), string($i/suffix))
+                                        else
+                                            ()">
                                     <xh:tr class="{if (array:get(., 3)) then 'warning' else 'success'}">
                                         <xh:td><xf:output value="array:get(., 1)"/></xh:td>
                                         <xh:td><xf:output value="array:get(., 2)"/></xh:td>

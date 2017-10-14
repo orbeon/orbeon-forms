@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.FormRunner.IsSection
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
@@ -65,8 +66,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def controlRequiresNestedIterationElement(node: NodeInfo) =
     isRepeat(node)
 
-  def isSectionTemplateContent(container: NodeInfo) =
-    (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
+  def isSectionWithTemplateContent(containerElem: NodeInfo): Boolean =
+    IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)
+
+  def isSectionTemplateContent(containerElem: NodeInfo): Boolean =
+    (containerElem parent * exists IsSection) && ComponentURI.findFirstIn(containerElem.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption

@@ -186,7 +186,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-ids",
-      properties = Map("container-id" → Some(containerId))
+      properties = Map("container-id" → Some(containerId), "action" → Some("merge"))
     )
   }
 

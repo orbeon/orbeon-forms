@@ -183,7 +183,11 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def containerMerge(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.containerMerge(containerId)
+    XFormsAPI.dispatch(
+      name       = "fb-show-dialog",
+      targetId   = "dialog-ids",
+      properties = Map("container-id" → Some(containerId))
+    )
   }
 
   private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =

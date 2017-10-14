@@ -23,15 +23,17 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils.encodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, UserAgent}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.util.Try
 import scala.util.control.NonFatal
 
 object FormBuilderXPathApi {
@@ -503,5 +505,34 @@ object FormBuilderXPathApi {
   def findControlByNameOrEmpty(controlName: String): NodeInfo = {
     implicit val ctx = FormBuilderDocContext()
     FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
+  }
+
+  //@XPathFunction
+  def idsToRenameForMergingSectionTemplate(
+    containerId : String,
+    prefix      : String,
+    suffix      : String
+  ): SequenceIterator = {
+    implicit val ctx = FormBuilderDocContext()
+    ToolboxOps.idsToRenameForMergingSectionTemplate(containerId, prefix, suffix).toList.flatten map {
+      case (oldId, newId, isAutomaticId) ⇒
+        ArrayFunctions.createValue(
+          Vector(
+            SaxonUtils.fixStringValue(oldId),
+            SaxonUtils.fixStringValue(newId),
+            isAutomaticId
+          )
+        )
+    }
+  }
+
+  //@XPathFunction
+  def containerMerge(
+    containerId : String,
+    prefix      : String,
+    suffix      : String
+  ): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    ToolboxOps.containerMerge(containerId, prefix, suffix)
   }
 }

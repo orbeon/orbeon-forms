@@ -28,6 +28,10 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+
+import scala.collection.mutable
+
+
 /*
  * Form Builder: toolbox operations.
  */
@@ -500,7 +504,40 @@ object ToolboxOps {
     xcv foreach (pasteSingleControlFromXcv(targetCellElem, _))
   }
 
-  def containerMerge(containerId: String)(implicit ctx: FormBuilderDocContext): Unit = {
+  def idsToRenameForMergingSectionTemplate(
+    containerId : String,
+    prefix      : String,
+    suffix      : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Option[Seq[(String, String, Boolean)]] =
+    xcvFromSectionWithTemplate(containerId) map { xcvElem ⇒
+      idsToRenameForPaste(xcvElem, prefix, suffix)
+    }
+
+  def idsToRenameForPaste(
+    xcvElem : NodeInfo,
+    prefix  : String,
+    suffix  : String)(implicit
+    ctx     : FormBuilderDocContext
+  ): Seq[(String, String, Boolean)] = {
+
+    val xcvNames                 = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
+    val xcvNamesWithPrefixSuffix = xcvNames map (prefix + _ + suffix)
+
+    val needRenameWithAutomaticIds         = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllControlNames
+    val newControlNamesWithAutomaticIds    = nextIds(XcvEntry.Control.entryName, needRenameWithAutomaticIds.size) map controlNameFromId
+    val newControlNamesWithAutomaticIdsMap = needRenameWithAutomaticIds.iterator.zip(newControlNamesWithAutomaticIds.iterator).toMap
+
+    xcvNames map { xcvName ⇒
+      val withPrefixSuffix = prefix + xcvName + suffix
+
+      val automaticIdOpt = newControlNamesWithAutomaticIdsMap.get(withPrefixSuffix)
+
+      (xcvName, automaticIdOpt getOrElse withPrefixSuffix, automaticIdOpt.isDefined)
+    }
+  }
+
+  def xcvFromSectionWithTemplate(containerId: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
 
     val containerElem = containerById(containerId)
 
@@ -509,7 +546,7 @@ object ToolboxOps {
 
       val head = ctx.formDefinitionRootElem / XHHeadTest head
 
-      xblBindingForSection(head, containerElem) foreach { bindingDoc ⇒
+      xblBindingForSection(head, containerElem) map { bindingDoc ⇒
 
         val bindingElem = bindingDoc.rootElement
 
@@ -597,13 +634,22 @@ object ToolboxOps {
             case e @ XcvEntry.Bind      ⇒ e → List(newBindElem)
           }
 
-        val xcv = elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
-        deleteSectionById(containerId)
-        pasteSectionGridFromXcv(xcv)
+        elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
       }
-
-    }
+    } else
+      None
   }
+
+  def containerMerge(
+    containerId : String,
+    prefix      : String,
+    suffix      : String)(implicit
+    ctx         : FormBuilderDocContext
+  ): Unit =
+    xcvFromSectionWithTemplate(containerId) foreach { xcvElem ⇒
+      deleteSectionById(containerId)
+      pasteSectionGridFromXcv(xcvElem, prefix, suffix)
+    }
 
   // Paste control from the clipboard
   //@XPathFunction
@@ -615,7 +661,7 @@ object ToolboxOps {
     val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
     if (IsGrid(controlElem) || IsSection(controlElem))
-      pasteSectionGridFromXcv(xcvElem)
+      pasteSectionGridFromXcv(xcvElem, "", "")
     else
       pasteSingleControlFromXcv(targetCellElem, xcvElem)
   }
@@ -623,28 +669,21 @@ object ToolboxOps {
   private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"
 
   private def pasteSectionGridFromXcv(
-    xcvElem : NodeInfo)(implicit
+    xcvElem : NodeInfo,
+    prefix  : String,
+    suffix  : String)(implicit
     ctx     : FormBuilderDocContext): Unit = {
 
-    // TODO: Remove once `ctx` is used everywhere
-    val inDoc                = ctx.formDefinitionRootElem
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
 
     // Rename if needed
     locally {
 
-      def findXcvNames           = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
-      def existingUniqueNamesSet = getAllControlNames
+      val oldToNewNames = idsToRenameForPaste(xcvElem, prefix, suffix) map (t ⇒ (t._1, t._2)) toMap
 
-      val needRename = collection.mutable.LinkedHashSet() ++ findXcvNames intersect existingUniqueNamesSet
-
-      if (needRename.nonEmpty) {
-
-        val newControlNames = nextIds(XcvEntry.Control.entryName, needRename.size) map controlNameFromId
-        val oldToNewNames   = needRename.iterator.zip(newControlNames.iterator).toMap
+      if (oldToNewNames.nonEmpty) {
 
         // Rename self control, nested sections and grids, and nested controls
-
         (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
           findNestedContainers(containerControlElem).iterator                             ++
           findNestedControls(containerControlElem).iterator foreach { controlElem ⇒
@@ -754,7 +793,7 @@ object ToolboxOps {
       findNestedContainers(containerControlElem).iterator filter isRepeat foreach  { containerElem ⇒
 
       val newControlName = getControlName(containerElem)
-      val bindElem       = findBindByName(inDoc, newControlName).get
+      val bindElem       = findBindByName(ctx.formDefinitionRootElem, newControlName).get
 
       ensureTemplateReplaceContent(
         controlName = newControlName,

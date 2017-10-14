@@ -597,6 +597,21 @@
                 <label>Help Message</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label>Control Names</label>
+            <prefix>
+                <label>Prefix</label>
+            </prefix>
+            <suffix>
+                <label>Suffix</label>
+            </suffix>
+            <original-name>
+                <label>Original Name</label>
+            </original-name>
+            <new-name>
+                <label>New Name</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publish Form</label>
             <publish>Publish</publish>
@@ -1594,6 +1609,21 @@
                 <label>Message d'aide</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label>Nom des Contrôles</label>
+            <prefix>
+                <label>Préfixe</label>
+            </prefix>
+            <suffix>
+                <label>Suffixe</label>
+            </suffix>
+            <original-name>
+                <label>Nom d'origine</label>
+            </original-name>
+            <new-name>
+                <label>Nouveau nom</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publier le formulaire</label>
             <publish>Publier</publish>
@@ -2594,6 +2624,21 @@
                 <label>Hjelpetekst</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publiser skjema</label>
             <publish>Publiser</publish>
@@ -3620,6 +3665,21 @@
                 <label>Сообщение справки</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Публикация формы</label>
             <publish>Опубликовать</publish>
@@ -4647,6 +4707,21 @@
                 <label>Messaggio d'aiuto</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Pubblica modulo</label>
             <publish>Pubblica</publish>
@@ -5666,6 +5741,21 @@
                 <label>Hilfsnachricht</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Formular veröffentlichen</label>
             <publish>Veröffentlichen</publish>
@@ -6688,6 +6778,21 @@
                 <label>Ohjeviesti</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Julkaise lomake</label>
             <publish>Julkaise</publish>
@@ -7708,6 +7813,21 @@
                 <label>Mensaje de Ayuda</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publicar Formulario</label>
             <publish>Publicar</publish>
@@ -8728,6 +8848,21 @@
                 <label>Mensagem de Ajuda</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publicar Formulário</label>
             <publish>Publicar</publish>
@@ -9754,6 +9889,21 @@
                 <label>Anvisning</label>
             </help-message>
         </dialog-help>
+        <dialog-ids>
+            <label todo="true">[Control Names]</label>
+            <prefix>
+                <label todo="true">[Prefix]</label>
+            </prefix>
+            <suffix>
+                <label todo="true">[Suffix]</label>
+            </suffix>
+            <original-name>
+                <label todo="true">[Original Name]</label>
+            </original-name>
+            <new-name>
+                <label todo="true">[New Name]</label>
+            </new-name>
+        </dialog-ids>
         <dialog-publish>
             <label>Publicera formuläret</label>
             <publish>Publicera</publish>

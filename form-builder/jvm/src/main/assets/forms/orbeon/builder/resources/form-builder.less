@@ -521,12 +521,17 @@ div.orbeon.orbeon-portlet-div {
                         box-sizing: border-box;
                     }
 
-                    @optionsWidth : 705px;
+                    @optionsWidth : 702px;
                     @2colWidth    : @optionsWidth/2;
                     @3colWidth    : @optionsWidth/3;
                     .fb-action-option-2-col-span-1 { width: @2colWidth }
                     .fb-action-option-3-col-span-1 { width: @3colWidth }
-                    .fb-action-option-3-col-span-2 { width: @3colWidth*2 }
+                    .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
+
+                    // We use `appearance="minimal"` on labels
+                    .xforms-label {
+                        display: none;
+                    }
                 }
 
                 // On the right, the buttons to reorder, remove, and add rows

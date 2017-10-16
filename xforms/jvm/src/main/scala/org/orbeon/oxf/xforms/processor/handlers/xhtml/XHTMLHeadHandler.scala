@@ -582,7 +582,7 @@ object XHTMLHeadHandler {
     Controls.ControlsIterator(startControl, includeSelf = false) foreach {
       case c: XFormsInputControl ⇒
         // Special case of placeholders (useful only for IE9 as of 2017-06-02)
-        PlaceHolderInfo.placeHolderValueOpt(c.containingDocument, c) foreach { _ ⇒
+        PlaceHolderInfo.placeHolderValueOpt(c.containingDocument, c.staticControl, Some(c)) foreach { _ ⇒
           placeholders += c.getEffectiveId
         }
       case c: XFormsValueComponentControl ⇒

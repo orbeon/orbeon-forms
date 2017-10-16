@@ -53,7 +53,7 @@ class XFormsInputHandler(
   ) with HandlerSupport {
 
   private val placeHolderInfo: Option[PlaceHolderInfo] =
-    currentControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(containingDocument, _))
+    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(containingDocument, _, currentControlOpt))
 
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
     currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate
@@ -114,7 +114,7 @@ class XFormsInputHandler(
         val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
 
         // Main input field
-        {
+        locally {
           val inputIdName = getFirstInputEffectiveId(getEffectiveId)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)

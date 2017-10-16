@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 
@@ -29,24 +30,28 @@ object PlaceHolderInfo {
   // - `Some(placeHolderValue)` otherwise
   def placeHolderValueOpt(
     containingDocument : XFormsContainingDocument,
-    control            : XFormsControl
+    staticControl      : ElementAnalysis,
+    controlOpt         : Option[XFormsControl]
   ): Option[PlaceHolderInfo] = {
 
-    val elementAnalysis = control.staticControl
-
-    val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label")
-    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint")
+    val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(staticControl, "label")
+    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(staticControl, "hint")
 
     (isLabelPlaceholder || isHintPlaceholder) option {
       val placeholderValue =
-        if (control.isRelevant) {
-          if (isLabelPlaceholder)
-            control.getLabel
-          else
-            control.getHint
-        } else {
-          ""
+        controlOpt match {
+          case Some(control) ⇒
+            if (control.isRelevant) {
+              if (isLabelPlaceholder)
+                control.getLabel
+              else
+                control.getHint
+            } else {
+              ""
+            }
+          case None ⇒ ""
         }
+
 
       PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
     }

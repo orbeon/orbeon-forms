@@ -71,9 +71,8 @@ abstract class XFormsControlLifecyleHandler(
       containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
       (! _.contains(null))
 
-  def currentControlOrNull = currentControlOpt.orNull
-
-  def staticControlOpt = currentControlOpt map (_.staticControl)
+  def staticControlOpt     = containingDocument.getStaticOps.findControlAnalysis(getPrefixedId)
+  def currentControlOrNull = currentControlOpt.orNull // legacy
 
   // By default, controls are enclosed with a <span>
   protected def getContainingElementName = "span"

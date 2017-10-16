@@ -643,7 +643,21 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 },
                 // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
                 // Support separators: ".", "/", "-", and single space
-                {   re: /^(\d{1,2})[./\-\s](\d{1,2})[./\-\s](\d{2,4})$/,
+                {   re: /^(\d{1,2})[./\-\s]?(\d{1,2})[./\-\s]?(\d{2,4})$/,
+                    handler: function(bits) {
+                        var d;
+                        if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
+                            // Day first
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                        } else {
+                            // Month first
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
+                        }
+                        return d;
+                    }
+                },
+                // mmddyyyy (American style) or ddmmyyyy (European style)
+                {   re: /^(\d{2})(\d{2})(\d{4})$/,
                     handler: function(bits) {
                         var d;
                         if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {

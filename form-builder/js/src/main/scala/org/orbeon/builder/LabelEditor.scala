@@ -155,7 +155,9 @@ object LabelEditor {
     locally {
       val labelClickInterceptors = js.Array[JQuery]()
       Position.onOffsetMayHaveChanged(() ⇒ {
-        val sections = $(".xbl-fr-section:visible:not(.xforms-disabled)")
+        val sections = BlockCache.sectionGridCache
+          .map(_.el)
+          .filter($(_).is(BlockCache.SectionSelector))
 
         // Create interceptor divs, so we have enough to cover all the sections
         for (_ ← 1 to sections.length - labelClickInterceptors.length) {

@@ -62,30 +62,36 @@ object BlockCache {
     // Keep caches current
     Position.onOffsetMayHaveChanged(() ⇒ {
 
+      def ifNotInSectionTemplate(domEl: dom.Element, f: (JQuery ⇒ Unit)): Unit = {
+        val el = $(domEl)
+        val parentSectionTemplate = el.parents(".fr-section-component")
+        if (! parentSectionTemplate.is("*"))
+          f(el)
+      }
+
       locally {
         sectionGridCache.length = 0
         $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
-          val section = $(domSection)
+          ifNotInSectionTemplate(domSection, (section) ⇒ {
+            val mostOuterSection =
+              section.parents(SectionSelector).last()
+                .pipe(Option(_)).filter(_.is("*"))
+                .getOrElse(section)
 
-          val mostOuterSection =
-            section.parents(SectionSelector).last()
-              .pipe(Option(_)).filter(_.is("*"))
-              .getOrElse(section)
+            val titleAnchor = section.find("a")
 
-          val titleAnchor = section.find("a")
-
-          sectionGridCache.unshift(new Block {
-            override val el          = section
-            override val top         = Position.adjustedOffset(section).top
-            override val left        = Position.adjustedOffset(mostOuterSection).left
-            override val height      = titleAnchor.height()
-            override val width       = mostOuterSection.width()
-            override val titleOffset = Offset(titleAnchor)
+            sectionGridCache.unshift(new Block {
+              override val el          = section
+              override val top         = Position.adjustedOffset(section).top
+              override val left        = Position.adjustedOffset(mostOuterSection).left
+              override val height      = titleAnchor.height()
+              override val width       = mostOuterSection.width()
+              override val titleOffset = Offset(titleAnchor)
+            })
           })
-
         })
-        $(GridSelector).each((grid: dom.Element) ⇒
-          addToCache(sectionGridCache, $(grid))
+        $(s"$GridSelector:visible").each((grid: dom.Element) ⇒
+          ifNotInSectionTemplate(grid, addToCache(sectionGridCache, _))
         )
       }
 

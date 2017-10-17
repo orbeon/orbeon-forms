@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import java.util
+
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
-import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.xforms.XFormsId
@@ -32,7 +34,7 @@ object Controls {
     containingDocument : XFormsContainingDocument,
     controlIndex       : ControlIndex,
     state              : Option[Map[String, ControlState]]
-  ) = {
+  ): Option[XFormsControl] = {
 
     val bindingContext = containingDocument.getContextStack.resetBindingContext()
     val rootControl    = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
@@ -55,7 +57,7 @@ object Controls {
     controlIndex       : ControlIndex,
     repeatControl      : XFormsRepeatControl,
     iterationIndex     : Int
-  ) = {
+  ): XFormsRepeatIterationControl = {
 
     val idSuffix = XFormsId.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
 
@@ -93,7 +95,7 @@ object Controls {
     containerControl : XFormsContainerControl,
     rootAnalysis     : ElementAnalysis,
     state            : Option[Map[String, ControlState]]
-  ) = {
+  ): Option[XFormsControl] = {
 
     val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
     val bindingContext = containerControl.bindingContextForChild
@@ -278,7 +280,7 @@ object Controls {
     allIndexes map (indexes ⇒ targetPrefixedId + buildSuffix(indexes))
   }
 
-  def buildSuffix(iterations: List[Int]) =
+  def buildSuffix(iterations: List[Int]): String =
     if (iterations.isEmpty)
       ""
     else
@@ -288,7 +290,7 @@ object Controls {
     ops               : StaticStateGlobalOps,
     sourceEffectiveId : String,
     targetPrefixedId  : String
-  ) = {
+  ): (Option[String], List[Int], List[String]) = {
     // Check preconditions
     require(sourceEffectiveId ne null, "Source effective id is required.")
 
@@ -312,7 +314,7 @@ object Controls {
   }
 
   // Update the container's and all its descendants' bindings
-  def updateBindings(control: XFormsContainerControl) = {
+  def updateBindings(control: XFormsContainerControl): BindingUpdater = {
     val xpathDependencies = control.containingDocument.getXPathDependencies
     xpathDependencies.bindingUpdateStart()
 
@@ -329,7 +331,7 @@ object Controls {
   }
 
   // Update the bindings for the entire tree of controls
-  def updateBindings(containingDocument: XFormsContainingDocument) = {
+  def updateBindings(containingDocument: XFormsContainingDocument): BindingUpdater = {
     val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
     visitAllControls(containingDocument, updater)
 
@@ -354,16 +356,16 @@ object Controls {
     private var relevanceChangeLevel = -1
 
     private var _visitedCount = 0
-    def visitedCount = _visitedCount
+    def visitedCount: Int = _visitedCount
 
     private var _updatedCount = 0
-    def updatedCount = _updatedCount
+    def updatedCount: Int = _updatedCount
 
     private var _optimizedCount = 0
-    def optimizedCount = _optimizedCount
+    def optimizedCount: Int = _optimizedCount
 
     var _partialFocusRepeatOption: Option[XFormsRepeatControl] = None
-    def partialFocusRepeat = _partialFocusRepeatOption
+    def partialFocusRepeat: Option[XFormsRepeatControl] = _partialFocusRepeatOption
 
     def startVisitControl(control: XFormsControl): Boolean = {
 
@@ -446,7 +448,7 @@ object Controls {
       true
     }
 
-    def endVisitControl(control: XFormsControl) = {
+    def endVisitControl(control: XFormsControl): Unit = {
 
       // Check if we are exiting the level of a container whose content relevance has changed
       if (relevanceChangeLevel == level)
@@ -466,8 +468,8 @@ object Controls {
   // Iterator over a control's ancestors
   class AncestorOrSelfIterator(start: XFormsControl) extends Iterator[XFormsControl] {
     private var _next = start
-    def hasNext = _next ne null
-    def next() = {
+    def hasNext: Boolean = _next ne null
+    def next(): XFormsControl = {
       val result = _next
       _next = _next.parent
       result
@@ -481,7 +483,7 @@ object Controls {
 
   class XFormsControlVisitorAdapter extends XFormsControlVisitorListener {
     def startVisitControl(control: XFormsControl) = true
-    def endVisitControl(control: XFormsControl) = ()
+    def endVisitControl(control: XFormsControl): Unit = ()
   }
 
   // Visit all the controls
@@ -524,13 +526,13 @@ object Controls {
       else
         findNext()
 
-    def next() = {
+    def next(): XFormsControl = {
       val result = current
       current = findNext()
       result
     }
 
-    def hasNext = current ne null
+    def hasNext: Boolean = current ne null
   }
 
   object ControlsIterator {
@@ -538,21 +540,21 @@ object Controls {
   }
 
   // Evaluate the body with InstancesControls in scope
-  def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: ⇒ T) =
+  def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: ⇒ T): T =
     instancesControlsToRestore.withValue((instancesControls, topLevel))(body)
 
   // Evaluate the body with InstancesControls in scope (Java callers)
-  def withDynamicStateToRestoreJava(instancesControls: InstancesControls, runnable: Runnable) =
+  def withDynamicStateToRestoreJava(instancesControls: InstancesControls, runnable: Runnable): Unit =
     withDynamicStateToRestore(instancesControls, topLevel = true)(runnable.run())
 
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value
-  def restoringInstanceControls     = restoringDynamicState map (_._1)
-  def restoringControls             = restoringInstanceControls map (_.controls)
-  def restoringInstancesJava        = restoringInstanceControls map (_.instancesJava) orNull
+  def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState map (_._1)
+  def restoringControls         : Option[Map[String, ControlState]] = restoringInstanceControls map (_.controls)
+  def restoringInstancesJava    : util.List[InstanceState]          = restoringInstanceControls map (_.instancesJava) orNull
 
   // Whether we are restoring state
-  def isRestoringDynamicState = restoringDynamicState exists (_._2)
+  def isRestoringDynamicState: Boolean = restoringDynamicState exists (_._2)
 
   // ThreadLocal for dynamic state restoration
   private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]

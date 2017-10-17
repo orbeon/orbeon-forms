@@ -37,7 +37,7 @@ class XFormsLHHAHandler(
   override def start(): Unit = {
 
     // Find control ids based on @for attribute
-    val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
+    val lhhaPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
     val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
     containingDocument.getStaticOps.getControlAnalysis(lhhaPrefixedId) match {

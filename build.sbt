@@ -491,7 +491,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fastOptJS in Compile in formBuilderJS).value.data, FormBuilderResourcesPathInWar)
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
@@ -515,7 +515,6 @@ lazy val formBuilderJS: Project = formBuilder.js
 
     test in Test := {},
 
-    scalaJSLinkerConfig                     ~= { _.withOptimizer(false) },
     scalaJSUseMainModuleInitializer in Compile := true,
     scalaJSUseMainModuleInitializer in Test    := false,
 

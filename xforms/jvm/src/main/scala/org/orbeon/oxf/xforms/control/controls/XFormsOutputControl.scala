@@ -16,17 +16,17 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.controls.OutputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -52,7 +52,7 @@ class XFormsOutputControl(
   private def format = Option(staticControl) flatMap (_.format)
 
   // Value attribute
-  private val valueAttribute = element.attributeValue(VALUE_QNAME)
+  private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)
   // TODO: resolve statically
   private val urlNorewrite = XFormsUtils.resolveUrlNorewrite(element)
 
@@ -69,12 +69,14 @@ class XFormsOutputControl(
   override def evaluateValue(): Unit = {
     val bc = bindingContext
     val value =
-      if (valueAttribute eq null)
-        // Get value from single-node binding
-        bc.singleItemOpt map DataModel.getValue
-      else
-        // Value comes from the XPath expression within the value attribute
-        evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
+      valueAttributeOpt match {
+        case Some(valueAttribute) ⇒
+          // Value comes from the XPath expression within the value attribute
+          evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
+        case None ⇒
+          // Get value from single-node binding
+          bc.singleItemOpt map DataModel.getValue
+      }
 
     setValue(value getOrElse "")
   }
@@ -98,12 +100,14 @@ class XFormsOutputControl(
         internalValue
       } else {
         // Other mediatypes
-        if (valueAttribute eq null)
-          // There is a single-node binding, so the format may be used
-          getValueUseFormat(format) getOrElse internalValue
-        else
-          // There is a @value attribute, don't use format
-          internalValue
+        valueAttributeOpt match {
+          case Some(valueAttribute) ⇒
+            // There is a @value attribute, don't use format
+            internalValue
+          case None ⇒
+            // There is a single-node binding, so the format may be used
+            getValueUseFormat(format) getOrElse internalValue
+        }
       }
 
     setExternalValue(updatedValue)

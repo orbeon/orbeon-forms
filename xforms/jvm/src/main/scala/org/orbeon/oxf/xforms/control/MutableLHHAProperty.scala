@@ -131,7 +131,8 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
             lhhaElement,
             supportsHTML,
             lhhaAnalysis.defaultToHTML,
-            tempContainsHTML)
+            tempContainsHTML
+          )
         )
         contextStack.popBinding()
         result

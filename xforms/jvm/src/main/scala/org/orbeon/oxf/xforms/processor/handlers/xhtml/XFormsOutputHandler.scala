@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
@@ -58,7 +58,6 @@ class XFormsOutputDefaultHandler(
 
     val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val contentHandler = xformsHandlerContext.getController.getOutput
 
     val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
 
@@ -72,7 +71,7 @@ class XFormsOutputDefaultHandler(
         val mediatypeValue = attributes.getValue("mediatype")
         val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
         if ((textValue ne null) && textValue.nonEmpty)
-          contentHandler.characters(textValue.toCharArray, 0, textValue.length)
+          xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
       }
     }
   }
@@ -167,14 +166,14 @@ class XFormsOutputTextHandler(
 
   override protected def handleControlStart(): Unit = {
 
-    val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
+    val outputControl     = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val contentHandler = xformsHandlerContext.getController.getOutput
+    val xmlReceiver       = xformsHandlerContext.getController.getOutput
 
     if (isConcreteControl) {
       val externalValue = outputControl.getExternalValue
       if ((externalValue ne null) && externalValue.nonEmpty)
-        contentHandler.characters(externalValue.toCharArray, 0, externalValue.length)
+        xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
     }
   }
 

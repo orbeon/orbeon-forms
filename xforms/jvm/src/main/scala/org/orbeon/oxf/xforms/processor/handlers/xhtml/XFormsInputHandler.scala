@@ -15,17 +15,20 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
-import org.xml.sax.Attributes
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.Attributes
 
 
 /**
@@ -161,6 +164,8 @@ class XFormsInputHandler(
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
           handleAccessibilityAttributes(attributes, reusableAttributes)
+          handleAriaLabelledBy(reusableAttributes)
+
           if (isDateMinimal) {
             val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")
             reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
@@ -232,7 +237,7 @@ class XFormsInputHandler(
 
   // Do as if this was in a component, noscript has to handle that
   private def getFirstInputEffectiveId(effectiveId: String): String =
-    ! isBoolean option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-1")) orNull
+    ! isBoolean option XFormsInputHandler.firstInputEffectiveId(effectiveId)(containingDocument) orNull
 
   // Do as if this was in a component, noscript has to handle that
   private def getSecondInputEffectiveId(effectiveId: String): String =
@@ -248,4 +253,11 @@ class XFormsInputHandler(
   protected override def handleHint(): Unit =
     if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
       super.handleHint()
+}
+
+object XFormsInputHandler {
+
+  def firstInputEffectiveId(effectiveId: String)(containingDocument: XFormsContainingDocument): String =
+    namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-1"))
+
 }

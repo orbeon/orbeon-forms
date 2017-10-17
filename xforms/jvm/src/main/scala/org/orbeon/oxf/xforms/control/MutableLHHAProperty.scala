@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
-import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
-import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
+import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.xforms.XFormsId
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
@@ -137,49 +138,10 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
         contextStack.popBinding()
         result
       } else {
-        // LHHA is somewhere else, assumed as a child of xf:* or xxf:*
-
-        // TODO: This whole code sounds insanely complicated.
-        // LHHA elements should be present in the tree and we should 1) resolve them and 2) obtain their context.
-
-        // Find context object for XPath evaluation
-        val contextElement = lhhaElement.getParent
-        val contextStaticId = XFormsUtils.getElementId(contextElement)
-        val contextEffectiveId =
-          if ((contextStaticId eq null) || contextStaticId == "#document") {
-            // Assume we are at the top-level
-            contextStack.resetBindingContext()
-            control.container.getFirstControlEffectiveId
-          } else {
-            // Not at top-level, find containing object
-            val ancestorContextControl =
-              findAncestorContextControl(contextStaticId, XFormsUtils.getElementId(lhhaElement))
-            if (ancestorContextControl ne null) {
-              contextStack.setBinding(ancestorContextControl.bindingContext)
-              ancestorContextControl.effectiveId
-            } else
-              null
-          }
-
-        if (contextEffectiveId ne null) {
-          // Push binding relative to context established above and evaluate
-          contextStack.pushBinding(lhhaElement, contextEffectiveId, lhhaAnalysis.scope)
-          val result = Option(
-            XFormsUtils.getElementValue(
-              control.container,
-              contextStack,
-              control.effectiveId,
-              lhhaElement,
-              supportsHTML,
-              lhhaAnalysis.defaultToHTML,
-              tempContainsHTML
-            )
-          )
-          contextStack.popBinding()
-          result
-        } else
-          // Do as if there was no LHHA
-          None
+        // LHHA is somewhere else. We resolve the control and ask for its value.
+        Option(control.containingDocument.getControls.resolveObjectById(control.effectiveId, lhhaAnalysis.staticId, null)) collect {
+          case control: XFormsLHHAControl ⇒ control.getValue
+        }
       }
 
     result map (_ → tempContainsHTML(0))

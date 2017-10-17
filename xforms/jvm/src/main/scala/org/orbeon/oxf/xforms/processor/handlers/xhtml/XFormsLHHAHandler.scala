@@ -16,10 +16,12 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
-
 import org.xml.sax.Attributes
 
 /**
@@ -32,18 +34,38 @@ class XFormsLHHAHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false) {
+) extends XFormsBaseHandlerXHTML2(uri, localname, qName, attributes, matched, handlerContext, false, false) {
 
   override def start(): Unit = {
 
-    // Find control ids based on @for attribute
-    val lhhaPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
+    val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
     val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-    containingDocument.getStaticOps.getControlAnalysis(lhhaPrefixedId) match {
-      case lhhaAnalysis: LHHAAnalysis if ! lhhaAnalysis.isLocal ⇒
+    val lhhaType = LHHAC.valueOf(localname.toUpperCase)
 
-        lhhaAnalysis.targetControl match {
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
+
+    // TODO: handle template
+
+    (currentControlOpt, staticControlOpt) match {
+      case (Some(currentControl: XFormsLHHAControl), Some(staticControl: LHHAAnalysis)) if staticControl.isForRepeat ⇒
+        // Special case where the LHHA has a dynamic representation and is in a lower nesting of repeats
+
+        val containerAtts =
+          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
+
+        withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
+          val mediatypeValue = staticControl.element.attributeValueOpt("mediatype")
+          currentControl.externalValueOpt filter (_.nonEmpty) foreach { textValue ⇒
+            xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
+          }
+        }
+
+      case (_, Some(lhhaAnalysis: LHHAAnalysis)) if ! lhhaAnalysis.isLocal ⇒
+
+        // Find control ids based on @for attribute
+
+        lhhaAnalysis.targetControlOpt match {
           case Some(targetControl) ⇒
 
             val isTemplate = xformsHandlerContext.isTemplate
@@ -51,7 +73,7 @@ class XFormsLHHAHandler(
             // Find concrete control if possible, to retrieve the concrete LHHA values
             val xformsControlOpt =
               if (! isTemplate) {
-                Option(containingDocument.getControls.resolveObjectById(lhhaEffectiveId, targetControl.staticId, null)) match {
+                containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, targetControl.staticId, null) match {
                   case Some(control: XFormsControl) ⇒ Some(control)
                   case Some(otherObject) ⇒
                     // TODO: Better/more consistent error handling
@@ -74,8 +96,6 @@ class XFormsLHHAHandler(
             // https://github.com/orbeon/orbeon-forms/issues/241
             val targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
 
-            val lhhaType = LHHAC.valueOf(localname.toUpperCase)
-
             val forEffectiveIdOpt =
               if (lhhaType == LHHAC.LABEL)
                 XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, targetControl, targetControlEffectiveId)
@@ -97,6 +117,7 @@ class XFormsLHHAHandler(
             // Don't output markup for the LHHA
             // Can happen if the @for points to a non-existing control
         }
+
       case _ ⇒
         // Don't output markup for the LHHA
         // This can happen if the author forgot a @for attribute, but also for xf:group/xf:label[not(@for)]
@@ -113,7 +134,7 @@ object XFormsLHHAHandler {
     targetControlEffectiveId : String
   ): Option[String] = {
 
-    // The purpose of this code is to identity the id of the target of the `for` attribute for the given target
+    // The purpose of this code is to identify the id of the target of the `for` attribute for the given target
     // control. In order to do that, we:
     //
     // - find which handler will process that control

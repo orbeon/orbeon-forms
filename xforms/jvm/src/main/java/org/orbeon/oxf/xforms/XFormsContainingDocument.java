@@ -333,6 +333,10 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         return xformsControls.getObjectByEffectiveId(effectiveId);
     }
 
+    public scala.Option<XFormsControl> findControlByEffectiveId(String effectiveId) {
+        return scala.Option.apply(getControlByEffectiveId(effectiveId));
+    }
+
     /**
      * Return dependencies implementation.
      */

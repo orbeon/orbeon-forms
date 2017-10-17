@@ -81,6 +81,7 @@ class XFormsUploadHandler(
           (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
 
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
+        handleAriaLabelledBy(reusableAttributes)
         element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
       }
 

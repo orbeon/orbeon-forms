@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
@@ -107,29 +109,6 @@ trait ControlAjaxSupport {
     added
   }
 
-  // Output an xxf:attribute element for the given name and value extractor if the value has changed
-  final def outputAttributeElement(
-    previousControlOpt : Option[XFormsControl],
-    name               : String,
-    value              : XFormsControl ⇒ String)(
-    ch                 : XMLReceiverHelper
-  ): Unit = {
-
-    val value1 = previousControlOpt map value
-    val value2 = Some(this)         map value
-
-    if (value1 != value2) {
-      val attributeValue = value2 getOrElse ""
-      val attributesImpl = new AttributesImpl
-
-      addAttributeIfNeeded(attributesImpl, "for",  XFormsUtils.namespaceId(containingDocument, effectiveId), isNewRepeatIteration = false, isDefaultValue = false)
-      addAttributeIfNeeded(attributesImpl, "name", name,                                                     isNewRepeatIteration = false, isDefaultValue = false)
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
-      ch.text(attributeValue)
-      ch.endElement()
-    }
-  }
-
   def writeMIPs(write: (String, String) ⇒ Unit): Unit =
     write("relevant", isRelevant.toString)
 
@@ -204,7 +183,58 @@ object ControlAjaxSupport {
     if (isNewRepeatIteration && isDefaultValue) {
       false
     } else {
-      attributesImpl.addAttribute("", name, name, CDATA, value)
+      addAttribute(attributesImpl, name, value)
       true
     }
+
+  def addAttribute(
+    attributesImpl       : AttributesImpl,
+    name                 : String,
+    value                : String
+  ): Unit =
+    attributesImpl.addAttribute("", name, name, CDATA, value)
+
+  def findLabelledBy(
+    lhhaSupport        : StaticLHHASupport,
+    controlOpt         : Option[XFormsControl],
+    lhhaType           : LHHA)(
+    containingDocument : XFormsContainingDocument
+  ): Option[String] = {
+    lhhaSupport.lhh(lhhaType.name) filter (_.isForRepeat) map { lhhaAnalysis ⇒
+
+      val labelValueOpt = controlOpt flatMap { currentControl ⇒
+        containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {
+          case control: XFormsLHHAControl ⇒ control.effectiveId
+        }
+      }
+
+      labelValueOpt getOrElse ""
+    }
+  }
+
+  // Output an `xxf:attribute` element for the given name and value extractor if the value has changed
+  def outputAttributeElement(
+    previousControlOpt : Option[XFormsControl],
+    currentControl     : XFormsControl,
+    effectiveId        : String,
+    name               : String,
+    value              : XFormsControl ⇒ String)(
+    ch                 : XMLReceiverHelper,
+    containingDocument : XFormsContainingDocument
+  ): Unit = {
+
+    val value1 = previousControlOpt   map value
+    val value2 = Some(currentControl) map value
+
+    if (value1 != value2) {
+      val attributeValue = value2 getOrElse ""
+      val attributesImpl = new AttributesImpl
+
+      addAttribute(attributesImpl, "for",  XFormsUtils.namespaceId(containingDocument, effectiveId))
+      addAttribute(attributesImpl, "name", name)
+      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
+      ch.text(attributeValue)
+      ch.endElement()
+    }
+  }
 }

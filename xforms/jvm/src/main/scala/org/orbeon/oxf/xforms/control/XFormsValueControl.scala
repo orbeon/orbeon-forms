@@ -21,6 +21,8 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModelBinds}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
@@ -275,7 +277,35 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       previousControl,
       hasNestedContent option outputNestedContent
     )
+
+    outputLabelledBy(previousValue, previousControl, ch)
   }
+
+  // This logic applies only when a control comes into existence. At that point, we must tell the client, when
+  //
+ final def outputLabelledBy(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl],
+    ch              : XMLReceiverHelper
+  ): Unit =
+    if (previousControl.isEmpty && ! isStaticReadonly) {
+      for {
+        value                 ← ControlAjaxSupport.findLabelledBy(staticControlOpt.get, Some(this), LHHA.label)(containingDocument)
+        labelledByEffectiveId ← findLabelledByEffectiveId
+      } locally {
+        ControlAjaxSupport.outputAttributeElement(
+          previousControl,
+          this,
+          labelledByEffectiveId,
+          "aria-labelledby",
+          _ ⇒ value
+        )(ch, containingDocument)
+      }
+    }
+
+  // Can be overridden by subclasses
+  def findLabelledByEffectiveId: Option[String] =
+    Some(XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL)))
 
   protected def outputValueElement(
     attributesImpl : AttributesImpl,

@@ -71,4 +71,6 @@ class XFormsRangeControl(
       }
     setExternalValue(updatedValue)
   }
+
+  override def findLabelledByEffectiveId = None
 }

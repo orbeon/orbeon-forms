@@ -250,6 +250,15 @@ class XFormsOutputControl(
       case _ ⇒ false
     }
 
+  override def findLabelledByEffectiveId =
+    if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) ||
+        appearances(XXFORMS_TEXT_APPEARANCE_QNAME)     ||
+        (mediatype exists (_.startsWith("image/")))    ||
+        (mediatype contains "text/html"))
+      None
+    else
+      super.findLabelledByEffectiveId
+
   override def getBackCopy: AnyRef = {
     val cloned = super.getBackCopy.asInstanceOf[XFormsOutputControl]
     updateFileMetadataCopy(cloned)

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import controls._
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{ValueTrait, ComponentControl}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, ValueTrait}
+import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 /**
  * Factory for all existing XForms controls including built-in controls, XBL controls, and actions.
@@ -102,20 +102,30 @@ object XFormsControlFactory {
   private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
-    (false, false) → (new XFormsComponentControl(_, _, _, _)                         ),
-    (false, true)  → (new XFormsComponentControl(_, _, _, _)      with FocusableTrait),
+    (false, false) → (new XFormsComponentControl     (_, _, _, _)                         ),
+    (false, true)  → (new XFormsComponentControl     (_, _, _, _) with FocusableTrait),
     (true,  false) → (new XFormsValueComponentControl(_, _, _, _)                    ),
     (true,  true)  → (new XFormsValueComponentControl(_, _, _, _) with FocusableTrait)
   )
 
   // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
   // control, or a custom component.
-  def createXFormsControl(container: XBLContainer, parent: XFormsControl, staticElement: ElementAnalysis, effectiveId: String) = {
+  def createXFormsControl(
+    container     : XBLContainer,
+    parent        : XFormsControl,
+    staticElement : ElementAnalysis,
+    effectiveId   : String
+  ): Option[XFormsControl] = {
 
     val factory =
       staticElement match {
         case component: ComponentControl ⇒
           ComponentFactories.get(component.isInstanceOf[ValueTrait], component.binding.abstractBinding.modeFocus)
+        case lhhaAnalysis: LHHAAnalysis ⇒
+          if (! lhhaAnalysis.isLocal)
+            Some(new XFormsLHHAControl(_, _, _, _))
+          else
+            None
         case _ ⇒
           ControlOrActionFactory(staticElement.element.getQName)
       }
@@ -125,6 +135,7 @@ object XFormsControlFactory {
 
   // TODO: Move this to ControlAnalysisFactory
   private def getQName(controlURI: String, controlName: String) = QName.get(controlName, Namespace("", controlURI))
+
   def isContainerControl(controlURI: String, controlName: String) = ContainerControls(getQName(controlURI, controlName))
   def isCoreControl(controlURI: String, controlName: String)      = CoreControls.contains(getQName(controlURI, controlName))
   def isBuiltinControl(controlURI: String, controlName: String)   = BuiltinControls.contains(getQName(controlURI, controlName))

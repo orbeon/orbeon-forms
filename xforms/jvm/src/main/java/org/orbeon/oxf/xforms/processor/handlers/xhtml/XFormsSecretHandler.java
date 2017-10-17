@@ -52,6 +52,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(getAttributes(), containerAttributes);
+                handleAriaLabelledBy(containerAttributes);
 
                 // Output all extension attributes
                 if (isConcreteControl) {

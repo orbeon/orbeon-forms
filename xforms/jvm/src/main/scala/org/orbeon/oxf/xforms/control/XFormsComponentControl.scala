@@ -77,6 +77,9 @@ class XFormsValueComponentControl(
       case _ ⇒
         false
     }
+
+  // TODO
+  override def findLabelledByEffectiveId = None
 }
 
 // A component control with or without a value

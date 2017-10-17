@@ -61,8 +61,8 @@ class XFormsTextareaHandler(
       val textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea")
       htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
 
-      // Handle accessibility attributes
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, htmlTextareaAttributes)
+      handleAriaLabelledBy(htmlTextareaAttributes)
 
       // Output all extension attributes
       if (isConcreteControl) {

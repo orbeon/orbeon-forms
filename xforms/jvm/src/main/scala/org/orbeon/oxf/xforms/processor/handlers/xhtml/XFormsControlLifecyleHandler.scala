@@ -13,9 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
-
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
@@ -23,7 +22,6 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.CoreUtils._
 
 import scala.xml.SAXException
 
@@ -49,7 +47,7 @@ abstract class XFormsControlLifecyleHandler(
   repeating      : Boolean,
   forwarding     : Boolean
 ) extends
-  XFormsBaseHandlerXHTML(
+  XFormsBaseHandlerXHTML2(
     uri,
     localname,
     qName,
@@ -61,18 +59,6 @@ abstract class XFormsControlLifecyleHandler(
   ) {
 
   import Private._
-
-  val isTemplate     = xformsHandlerContext.isTemplate
-  val getPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
-  val getEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
-
-  val currentControlOpt: Option[XFormsControl] =
-    ! xformsHandlerContext.isTemplate                            option
-      containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
-      (! _.contains(null))
-
-  def staticControlOpt     = containingDocument.getStaticOps.findControlAnalysis(getPrefixedId)
-  def currentControlOrNull = currentControlOpt.orNull // legacy
 
   // By default, controls are enclosed with a <span>
   protected def getContainingElementName = "span"
@@ -90,7 +76,7 @@ abstract class XFormsControlLifecyleHandler(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName,
-          getContainerAttributes(uri, localname, attributes)
+          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
         )
 
       // 2012-12-17: Removed nested `<a name="effective-id">` because the enclosing `<span`> for the control has the
@@ -134,8 +120,6 @@ abstract class XFormsControlLifecyleHandler(
   // May be overridden by subclasses
   protected def isMustOutputControl(control: XFormsControl)                         = true
   protected def isMustOutputContainerElement                                        = true
-  protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
-  protected def isDefaultIncremental                                                = false
 
   @throws[SAXException]
   protected def handleLabel(): Unit =
@@ -240,40 +224,5 @@ abstract class XFormsControlLifecyleHandler(
         case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
         case _                          ⇒ false
       }
-
-    def getContainerAttributes(
-      uri        : String,
-      localname  : String,
-      attributes : Attributes
-    ): AttributesImpl = {
-      // NOTE: Only reason we do not use the class members directly is to handle boolean xf:input, which delegates
-      // its output to xf:select1. Should be improved some day.
-      val prefixedId    = getPrefixedId
-      val effectiveId   = getEffectiveId
-      val xformsControl = currentControlOrNull
-
-      // Get classes
-      // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
-      val classes =
-        getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
-
-      // All MIP-related classes
-      handleMIPClasses(classes, prefixedId, xformsControl)
-
-      // Static classes
-      containingDocument.getStaticOps.appendClasses(classes, prefixedId)
-
-      // Dynamic classes added by the control
-      addCustomClasses(classes, xformsControl)
-
-      // Get attributes
-      val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId)
-
-      // Add extension attributes in no namespace if possible
-      if (xformsControl ne null)
-        xformsControl.addExtensionAttributesExceptClassAndAcceptForHandler(newAttributes, "")
-
-      newAttributes
-    }
   }
 }

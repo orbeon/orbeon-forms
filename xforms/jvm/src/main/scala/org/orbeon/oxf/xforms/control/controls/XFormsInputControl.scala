@@ -18,11 +18,13 @@ import java.util.{Calendar, GregorianCalendar}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.{CalendarValue, DateValue, TimeValue}
@@ -229,6 +231,10 @@ class XFormsInputControl(
 
     added
   }
+
+  // Input needs to point to another element
+  override def findLabelledByEffectiveId =
+    getBuiltinTypeName != "boolean" option XFormsInputHandler.firstInputEffectiveId(effectiveId)(containingDocument)
 }
 
 object XFormsInputControl {

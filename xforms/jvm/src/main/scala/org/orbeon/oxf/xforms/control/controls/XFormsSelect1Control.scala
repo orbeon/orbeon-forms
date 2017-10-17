@@ -264,6 +264,13 @@ class XFormsSelect1Control(
     )
   }
 
+  // For full appearance we don't put a @for attribute so that selecting the main label doesn't
+  override def findLabelledByEffectiveId =
+    if (staticControl.isFull)
+      super.findLabelledByEffectiveId
+    else
+      None
+
   // Don't accept focus if we have the internal appearance
   override def focusableControls =
     if (! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME))

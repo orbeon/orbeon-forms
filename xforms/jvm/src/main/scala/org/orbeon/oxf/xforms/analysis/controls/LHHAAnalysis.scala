@@ -34,6 +34,8 @@ class LHHAAnalysis(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+   with SingleNodeTrait
+   with OptionalSingleNode
    with AppearanceTrait {
 
   self ⇒
@@ -45,6 +47,7 @@ class LHHAAnalysis(
   val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
   val isLocal           = forStaticIdOption.isEmpty
   val defaultToHTML     = LHHAAnalysis.isHTML(element)
+  var isForRepeat       = false // updated in `attachToControl()`
 
   val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
   val hasLocalFullAppearance    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
@@ -72,7 +75,7 @@ class LHHAAnalysis(
       Set.empty[ValidationLevel]
 
   // Find the target control if any
-  def targetControl = (
+  def targetControlOpt = (
     forStaticIdOption
     map (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)))
     orElse parent
@@ -80,9 +83,10 @@ class LHHAAnalysis(
   )
 
   // Attach this LHHA to its target control if any
-  def attachToControl() = targetControl match {
-    case Some(lhhaControl) ⇒
-      lhhaControl.attachLHHA(self)
+  def attachToControl() = targetControlOpt match {
+    case Some(targetControl) ⇒
+      self.isForRepeat = ! self.isLocal && targetControl.ancestorRepeats.size > self.ancestorRepeats.size
+      targetControl.attachLHHA(self)
     case None if ! isLocal ⇒
       part.getIndentedLogger.logWarning("", "cannot attach external LHHA to control",
         Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
@@ -93,6 +97,8 @@ class LHHAAnalysis(
   //
   // - output static value in HTML markup and repeat templates
   // - if has static value, don't attempt to compare values upon diff, and never send new related information to client
+  // - 2017-10-17: Now using this in `XFormsLHHAControl`.
+  //
   val (staticValue, containsHTML) =
     if (LHHAAnalysis.hasStaticValue(staticStateContext, element)) {
       // TODO: figure out whether to allow HTML or not (could default to true?)

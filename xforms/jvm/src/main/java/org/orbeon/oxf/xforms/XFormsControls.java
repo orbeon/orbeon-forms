@@ -254,6 +254,10 @@ public class XFormsControls implements XFormsObjectResolver {
         return Controls.resolveObjectByIdJava(containingDocument, sourceControlEffectiveId, targetStaticId);
     }
 
+    public scala.Option<XFormsObject> resolveObjectByIdOpt(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
+        return scala.Option.apply(resolveObjectById(sourceControlEffectiveId, targetStaticId, contextItem));
+    }
+
     /**
      * Get the items for a given control id. This is not an effective id, but an original control id.
      *

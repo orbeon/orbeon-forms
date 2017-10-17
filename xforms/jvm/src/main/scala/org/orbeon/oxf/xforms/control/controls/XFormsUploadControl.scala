@@ -20,12 +20,10 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.Multipart._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -33,9 +31,11 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
@@ -226,6 +226,14 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
     added
   }
+
+  override def findLabelledByEffectiveId =
+    Some(
+      XFormsUtils.namespaceId(
+        containingDocument,
+        XFormsId.appendToEffectiveId(getEffectiveId, COMPONENT_SEPARATOR + "xforms-input")
+      )
+    )
 
   override def getBackCopy: AnyRef = {
     val cloned = super.getBackCopy.asInstanceOf[XFormsUploadControl]

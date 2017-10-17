@@ -68,8 +68,8 @@ object SectionGridEditor {
     Position.currentContainerChanged(
       containerCache = BlockCache.sectionGridCache,
       wasCurrent = (sectionGridBody: Block) ⇒ {
-        if (sectionGridBody.el.is(BlockCache.GridBodySelector))
-          sectionGridBody.el.parent.removeClass("fb-hover")
+        if (sectionGridBody.el.is(BlockCache.GridSelector))
+          sectionGridBody.el.children(".fr-grid").removeClass("fb-hover")
       },
       becomesCurrent = (sectionGridBody: Block) ⇒ {
         currentSectionGridOpt = Some(sectionGridBody)
@@ -117,14 +117,16 @@ object SectionGridEditor {
         // Grids
         if (sectionGridBody.el.is(BlockCache.GridSelector)) {
 
-          if (sectionGridBody.el.children(".fr-grid").is(".fr-repeat"))
+          val frGridEl = sectionGridBody.el.children(".fr-grid")
+          frGridEl.addClass("fb-hover")
+          if (frGridEl.is(".fr-repeat")) {
             sectionGridEditorContainer.children(ContainerEditDetails.className).show()
+          }
 
           sectionGridEditorContainer.children(GridDelete.className).show()   // TODO: not when last of container
           sectionGridEditorContainer.children(ContainerCopy.className).show()
           sectionGridEditorContainer.children(ContainerCut.className).show() // TODO: not when last of container
 
-          sectionGridBody.el.parent.addClass("fb-hover")
         }
       }
     )

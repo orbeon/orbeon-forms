@@ -15,7 +15,7 @@
 @darkBlue: #004B92;
 @lightBlue: #DEF;
 @yellow: #ffffd3;
-@cellSelectColor: rgba(23,146, 0, 0.7);
+@cellSelectColor: #4285f4;
 
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
@@ -832,15 +832,13 @@ div.orbeon.orbeon-portlet-div {
     .fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                         // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
-    .fb-selected {                                                                      // Selected cell in grids
-        box-shadow: 0 0 3px 3px @cellSelectColor inset;                                 // Highlight current cell with "halo"
-        border-radius: 4px;
-    }
-
-    .fr-grid-td { border: 1px solid transparent }                                       // So that we can show the grid border on hover changing the border size
 
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
+
+        .fb-selected {                                                                  // Selected cell in grids
+            border-left: 3px solid @cellSelectColor;                                    // Highlight current cell, Inbox-like (also cursor-like)
+        }
 
         &.fr-repeat.fr-repeat-single-row .fr-grid-body .fr-grid-td > * {
             &> .xforms-label,
@@ -850,9 +848,9 @@ div.orbeon.orbeon-portlet-div {
             }
         }
 
-        &.fr-norepeat {                                                                                             // For non-repeat grid (`table` to override collapse in FR.less)
-            border-collapse: collapse;
-            &.fb-hover .fr-grid-td { border: 1px solid @lightBlue }
+        &.fr-norepeat {
+            .fr-grid-body { grid-gap: 1px }
+            &.fb-hover .fr-grid-td { box-shadow: 0 0 0 1px @lightBlue }
         }
 
         // Enough space to hold row icons so hovering doesn't cause the row to expand

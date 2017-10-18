@@ -47,8 +47,8 @@
         as="xs:string*"/>
 
     <xsl:variable
-        name="select1-classes"
-        select="'xbl-fr-autocomplete'"
+        name="select1-components"
+        select="'xbl-fr-autocomplete', 'fr-yesno-input', 'fr-databound-select1'"
         as="xs:string*"/>
 
     <xsl:variable
@@ -154,22 +154,14 @@
                                         </image>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <field acro-field-name="'{$pdf-field-name}'">
-                                            <xsl:attribute
-                                                name="{
-                                                    if ($classes = $select1-classes)
-                                                    then 'export-value'
-                                                    else 'value'
-                                                }"
-                                                select="concat('''', replace($value, '''', ''''''), '''')"/>
-                                        </field>
+                                        <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>
                         </xsl:if>
 
                         <!-- Selection controls: also produce export values -->
-                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1') or $component-name = 'fr-yesno-input'">
+                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1') or $component-name = $select1-components">
                             <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
                             <xsl:if test="$expression">
                                 <xsl:for-each select="$control/saxon:evaluate(string($expression))">

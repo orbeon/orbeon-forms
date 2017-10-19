@@ -1535,6 +1535,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                     jItem.toggleClass('xforms-selected',     selected);
                     jItem.toggleClass('xforms-deselected', ! selected);
                 });
+            } else if (jControl.is('.xforms-label, .xforms-hint, .xforms-help')) {
+                // External LHH
+                if (jControl.is(".xforms-mediatype-text-html")) {
+                    jControl[0].innerHTML = newControlValue;
+                } else {
+                    ORBEON.util.Dom.setStringValue(jControl[0], newControlValue);   
+                }
             } else if (jControl.is('.xforms-output') || isStaticReadonly) {
                 // XForms output or other field in "static readonly" mode
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();

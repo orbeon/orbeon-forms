@@ -249,9 +249,9 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
 
         // Search binds
         if (_modelBindsOpt.isDefined()) {
-            final RuntimeBind bind = _modelBindsOpt.get().resolveBind(targetStaticId, contextItemOpt);
-            if (bind != null)
-                return bind;
+            final scala.Option<RuntimeBind> bindOpt = _modelBindsOpt.get().resolveBind(targetStaticId, contextItemOpt);
+            if (bindOpt.isDefined())
+                return bindOpt.get();
         }
 
         return null;

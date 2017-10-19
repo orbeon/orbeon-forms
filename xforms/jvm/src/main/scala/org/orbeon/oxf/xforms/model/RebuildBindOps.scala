@@ -84,12 +84,12 @@ trait RebuildBindOps {
   // From among the bind objects associated with the target bind element, if there exists a bind object created with
   // the same in-scope evaluation context node as the source object, then that bind object is the desired target bind
   // object. Otherwise, the IDREF resolution produced a null search result."
-  def resolveBind(bindId: String, contextItemOpt: Option[Item]): RuntimeBind =
+  def resolveBind(bindId: String, contextItemOpt: Option[Item]): Option[RuntimeBind] =
     singleNodeContextBinds.get(bindId) match {
-      case Some(singleNodeContextBind) ⇒
+      case some @ Some(singleNodeContextBind) ⇒
         // This bind has a single-node context (incl. top-level bind), so ignore context item and just return
         // the bind nodeset
-        singleNodeContextBind
+        some
       case None ⇒
         // Nested bind: use context item
 
@@ -105,7 +105,7 @@ trait RebuildBindOps {
           } yield
             childBind
 
-        it.nextOption().orNull
+        it.nextOption()
     }
 
   private object Private {

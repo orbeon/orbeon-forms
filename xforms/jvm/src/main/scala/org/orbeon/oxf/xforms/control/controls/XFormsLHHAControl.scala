@@ -62,4 +62,10 @@ class XFormsLHHAControl(
 
     super.setValue(staticControl.staticValue orElse fromDynamicContent getOrElse "")
   }
+
+  override def getRelevantEscapedExternalValue: String =
+    if (mediatype contains "text/html")
+      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
+    else
+      getExternalValue
 }

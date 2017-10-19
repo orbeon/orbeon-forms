@@ -144,7 +144,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
             // Handle accessibility attributes
             handleAccessibilityAttributes(attributes, containerAttributes);
-            handleAriaLabelledBy(containerAttributes);
+            handleAriaByAtts(containerAttributes);
             if (xformsControl != null)
                 xformsControl.addExtensionAttributesExceptClassAndAcceptForHandler
                         (containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);

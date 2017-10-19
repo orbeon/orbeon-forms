@@ -265,9 +265,9 @@ class XFormsSelect1Control(
   }
 
   // For full appearance we don't put a @for attribute so that selecting the main label doesn't
-  override def findLabelledByEffectiveId =
+  override def findAriaByControlEffectiveId =
     if (staticControl.isFull)
-      super.findLabelledByEffectiveId
+      super.findAriaByControlEffectiveId
     else
       None
 

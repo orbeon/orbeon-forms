@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
@@ -194,24 +195,6 @@ object ControlAjaxSupport {
   ): Unit =
     attributesImpl.addAttribute("", name, name, CDATA, value)
 
-  def findLabelledBy(
-    lhhaSupport        : StaticLHHASupport,
-    controlOpt         : Option[XFormsControl],
-    lhhaType           : LHHA)(
-    containingDocument : XFormsContainingDocument
-  ): Option[String] = {
-    lhhaSupport.lhh(lhhaType.name) filter (_.isForRepeat) map { lhhaAnalysis ⇒
-
-      val labelValueOpt = controlOpt flatMap { currentControl ⇒
-        containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {
-          case control: XFormsLHHAControl ⇒ control.effectiveId
-        }
-      }
-
-      labelValueOpt getOrElse ""
-    }
-  }
-
   // Output an `xxf:attribute` element for the given name and value extractor if the value has changed
   def outputAttributeElement(
     previousControlOpt : Option[XFormsControl],
@@ -236,5 +219,31 @@ object ControlAjaxSupport {
       ch.text(attributeValue)
       ch.endElement()
     }
+  }
+
+  val LhhaWithAriaAttName = List(
+    LHHA.label → "aria-labelledby",
+    LHHA.hint  → "aria-describedby",
+    LHHA.help  → "aria-details"
+  )
+
+  def findAriaBy(
+    staticControl      : ElementAnalysis,
+    controlOpt         : Option[XFormsControl],
+    lhhaType           : LHHA)(
+    containingDocument : XFormsContainingDocument
+  ): Option[String] = staticControl match {
+    case lhhaSupport: StaticLHHASupport ⇒
+      lhhaSupport.lhh(lhhaType.name) filter (_.isForRepeat) map { lhhaAnalysis ⇒
+
+        val labelValueOpt = controlOpt flatMap { currentControl ⇒
+          containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {
+            case control: XFormsLHHAControl ⇒ control.effectiveId
+          }
+        }
+
+        labelValueOpt getOrElse ""
+      }
+    case _ ⇒ None
   }
 }

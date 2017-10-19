@@ -16,8 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.LHHA
-import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.Attributes
@@ -96,11 +94,12 @@ class XFormsBaseHandlerXHTML2 (
     newAttributes
   }
 
-  final protected def handleAriaLabelledBy(atts: AttributesImpl): Unit =
+  final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
-      staticControl ← staticControlOpt collect { case c: StaticLHHASupport ⇒ c }
-      labelledBy    ← ControlAjaxSupport.findLabelledBy(staticControl, currentControlOpt, LHHA.label)(containingDocument)
+      staticControl   ← staticControlOpt
+      (lhha, attName) ← ControlAjaxSupport.LhhaWithAriaAttName
+      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha)(containingDocument)
     } locally {
-      atts.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelledBy)
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, value)
     }
 }

@@ -63,7 +63,7 @@ class XFormsOutputDefaultHandler(
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
-    handleAriaLabelledBy(containerAttributes)
+    handleAriaByAtts(containerAttributes)
 
     val elementName = if (getStaticLHHA(getPrefixedId, LHHAC.LABEL) ne null) "output" else "span"
 

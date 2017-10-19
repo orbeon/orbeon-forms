@@ -2776,4 +2776,89 @@
             </controls>
         </output>
     </test>
+
+    <test description="#241: external LHH pointing to repeated built-in controls" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model>
+                        <xf:instance>
+                            <rows>
+                                <row>
+                                    <input>input 1</input>
+                                    <textarea>textarea 1</textarea>
+                                </row>
+                                <row>
+                                    <input>input 2</input>
+                                    <textarea>textarea 2</textarea>
+                                </row>
+                            </rows>
+                        </xf:instance>
+                        <xf:bind ref="row/input" required="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:label for="my-input"    id="my-input-label"   >Name</xf:label>
+                    <xf:label for="my-textarea" id="my-textarea-label" mediatype="text/html"><i>Description</i></xf:label>
+                    <xf:hint  for="my-input"    id="my-input-hint"    >Name Hint</xf:hint>
+                    <xf:hint  for="my-textarea" id="my-textarea-hint" mediatype="text/html"><i>Description Hint</i></xf:hint>
+                    <xf:help  for="my-input"    id="my-input-help"    >Name Help</xf:help>
+                    <xf:help  for="my-textarea" id="my-textarea-help" mediatype="text/html"><i>Description Help</i></xf:help>
+                    <xf:repeat ref="row" id="my-repeat">
+                        <xf:input    ref="input"    id="my-input"/>
+                        <xf:textarea ref="textarea" id="my-textarea"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="my-input-label" class="xforms-control xforms-label">Name</xh:span>
+                <xh:span id="my-textarea-label" class="xforms-control xforms-label xforms-mediatype-text-html xforms-mediatype-text">
+                    <xh:i>Description</xh:i>
+                </xh:span>
+                <xh:span id="my-input-hint" class="xforms-control xforms-hint">Name Hint</xh:span>
+                <xh:span id="my-textarea-hint" class="xforms-control xforms-hint xforms-mediatype-text-html xforms-mediatype-text">
+                    <xh:i>Description Hint</xh:i>
+                </xh:span>
+                <xh:span id="my-input-help" class="xforms-control xforms-help">Name Help</xh:span>
+                <xh:span id="my-textarea-help" class="xforms-control xforms-help xforms-mediatype-text-html xforms-mediatype-text">
+                    <xh:i>Description Help</xh:i>
+                </xh:span>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span id="my-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-repeat-selected-item-1">
+                    <xh:input id="my-input≡xforms-input-1⊙1" type="text" name="my-input≡xforms-input-1⊙1" value="input 1" class="xforms-input-input" aria-labelledby="my-input-label" aria-describedby="my-input-hint" aria-details="my-input-help" aria-required="true"/>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span id="my-textarea⊙1" class="xforms-control xforms-textarea xforms-repeat-selected-item-1">
+                    <xh:textarea id="my-textarea≡≡c⊙1" name="my-textarea⊙1" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 1</xh:textarea>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span/>
+                <xh:span id="my-input⊙2" class="xforms-control xforms-input xforms-required xforms-filled">
+                    <xh:input id="my-input≡xforms-input-1⊙2" type="text" name="my-input≡xforms-input-1⊙2" value="input 2" class="xforms-input-input" aria-labelledby="my-input-label" aria-describedby="my-input-hint" aria-details="my-input-help" aria-required="true"/>
+                </xh:span>
+                <xh:span/>
+                <xh:span id="my-textarea⊙2" class="xforms-control xforms-textarea">
+                    <xh:textarea id="my-textarea≡≡c⊙2" name="my-textarea⊙2" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 2</xh:textarea>
+                </xh:span>
+                <xh:span/>
+                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:span class="xforms-repeat-template"/>
+                <xh:span id="my-input" class="xforms-control xforms-input xforms-repeat-template">
+                    <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input" aria-labelledby="" aria-describedby="" aria-details=""/>
+                </xh:span>
+                <xh:span class="xforms-repeat-template"/>
+                <xh:span id="my-textarea" class="xforms-control xforms-textarea xforms-repeat-template">
+                    <xh:textarea id="my-textarea≡≡c" name="my-textarea" aria-labelledby="" aria-describedby="" aria-details=""/>
+                </xh:span>
+                <xh:span class="xforms-repeat-template"/>
+                <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
+            </controls>
+        </output>
+    </test>
 </group>

@@ -278,33 +278,34 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       hasNestedContent option outputNestedContent
     )
 
-    outputLabelledBy(previousValue, previousControl, ch)
+    outputAriaByAtts(previousValue, previousControl, ch)
   }
 
   // This logic applies only when a control comes into existence. At that point, we must tell the client, when
   //
- final def outputLabelledBy(
+ final def outputAriaByAtts(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
     ch              : XMLReceiverHelper
   ): Unit =
     if (previousControl.isEmpty && ! isStaticReadonly) {
       for {
-        value                 ← ControlAjaxSupport.findLabelledBy(staticControlOpt.get, Some(this), LHHA.label)(containingDocument)
-        labelledByEffectiveId ← findLabelledByEffectiveId
+        (lhha, attName)          ← ControlAjaxSupport.LhhaWithAriaAttName
+        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, Some(this), lhha)(containingDocument)
+        ariaByControlEffectiveId ← findAriaByControlEffectiveId
       } locally {
         ControlAjaxSupport.outputAttributeElement(
           previousControl,
           this,
-          labelledByEffectiveId,
-          "aria-labelledby",
+          ariaByControlEffectiveId,
+          attName,
           _ ⇒ value
         )(ch, containingDocument)
       }
     }
 
   // Can be overridden by subclasses
-  def findLabelledByEffectiveId: Option[String] =
+  def findAriaByControlEffectiveId: Option[String] =
     Some(XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL)))
 
   protected def outputValueElement(

@@ -79,7 +79,7 @@ class XFormsValueComponentControl(
     }
 
   // TODO
-  override def findLabelledByEffectiveId = None
+  override def findAriaByControlEffectiveId = None
 }
 
 // A component control with or without a value

@@ -62,7 +62,7 @@ class XFormsTextareaHandler(
       htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
 
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, htmlTextareaAttributes)
-      handleAriaLabelledBy(htmlTextareaAttributes)
+      handleAriaByAtts(htmlTextareaAttributes)
 
       // Output all extension attributes
       if (isConcreteControl) {

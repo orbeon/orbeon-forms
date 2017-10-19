@@ -227,7 +227,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     added
   }
 
-  override def findLabelledByEffectiveId =
+  override def findAriaByControlEffectiveId =
     Some(
       XFormsUtils.namespaceId(
         containingDocument,

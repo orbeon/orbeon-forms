@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;
@@ -52,7 +51,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(getAttributes(), containerAttributes);
-                handleAriaLabelledBy(containerAttributes);
+                handleAriaByAtts(containerAttributes);
 
                 // Output all extension attributes
                 if (isConcreteControl) {

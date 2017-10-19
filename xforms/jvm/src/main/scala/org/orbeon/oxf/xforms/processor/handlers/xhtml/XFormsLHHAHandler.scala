@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsLHHAControl, XFormsOutputControl}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
@@ -55,9 +56,12 @@ class XFormsLHHAHandler(
           getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
 
         withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
-          val mediatypeValue = staticControl.element.attributeValueOpt("mediatype")
-          currentControl.externalValueOpt filter (_.nonEmpty) foreach { textValue ⇒
-            xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
+          currentControl.externalValueOpt filter (_.nonEmpty) foreach { value ⇒
+            if (staticControl.element.attributeValueOpt("mediatype") contains "text/html") {
+              XFormsUtils.streamHTMLFragment(xmlReceiver, value, currentControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
+            } else {
+              xmlReceiver.characters(value.toCharArray, 0, value.length)
+            }
           }
         }
 

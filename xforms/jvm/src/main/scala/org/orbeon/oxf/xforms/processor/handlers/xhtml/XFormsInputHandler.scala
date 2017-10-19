@@ -164,7 +164,7 @@ class XFormsInputHandler(
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
           handleAccessibilityAttributes(attributes, reusableAttributes)
-          handleAriaLabelledBy(reusableAttributes)
+          handleAriaByAtts(reusableAttributes)
 
           if (isDateMinimal) {
             val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")

@@ -72,11 +72,11 @@ object ControlLabelHintTextEditor {
           if (resourceEditorCurrentControl ne null) resourceEditorEndEdit()
           resourceEditorCurrentLabelHint = $(event.currentTarget)
           // Find control for this label
-          val th = resourceEditorCurrentLabelHint.parents("th")
+          val th = resourceEditorCurrentLabelHint.parents(".fr-grid-th")
           resourceEditorCurrentControl =
             if (th.is("*")) {
               // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-              resourceEditorCurrentLabelHint.parents(ControlSelector).first()
+              resourceEditorCurrentLabelHint
             } else {
               val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
               val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()

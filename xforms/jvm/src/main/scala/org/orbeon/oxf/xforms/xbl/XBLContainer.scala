@@ -209,11 +209,19 @@ trait ModelContainer {
 
   def getAllModelsJava = allModels.toList.asJava
 
+  def searchContainedModelsInScope(sourceEffectiveId: String, staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] = {
+
+    val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId): String
+    val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
+
+    resolutionScopeContainer.searchContainedModels(staticId, contextItemOpt)
+  }
+
   // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
   // slower than using an Iterator (profiler).
-  def searchContainedModels(staticId: String, contextItem: Item): Option[XFormsObject] =
+  def searchContainedModels(staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] =
     if (isRelevant && models.nonEmpty)
-      models.iterator map (_.resolveObjectById(staticId, contextItem)) find (_ ne null)
+      models.iterator map (_.resolveObjectById(staticId, contextItemOpt)) find (_ ne null)
     else
       None
 
@@ -355,12 +363,12 @@ trait ContainerResolver {
   def resolveObjectByIdInScope(
     sourceEffectiveId  : String,
     staticOrAbsoluteId : String,
-    contextItem        : Option[Item] = None
+    contextItemOpt     : Option[Item] = None
   ): Option[XFormsObject] = {
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
 
-    Option(resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItem.orNull))
+    Option(resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt))
   }
 
   /**
@@ -369,10 +377,10 @@ trait ContainerResolver {
    * @param sourceEffectiveId   effective id of the source (control, model, instance, submission, ...) (can be null
    *                            only for absolute ids)
    * @param staticOrAbsoluteId  static or absolute id of the object
-   * @param contextItem         context item, or null (used for bind resolution only)
+   * @param contextItemOpt      context item, or null (used for bind resolution only)
    * @return                    object, or null if not found
    */
-  def resolveObjectById(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
+  def resolveObjectById(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItemOpt: Option[Item]): XFormsObject = {
 
     def isEffectiveIdResolvableByThisContainer(effectiveId: String) =
       self eq findScopeRoot(XFormsId.getPrefixedId(effectiveId))
@@ -395,7 +403,7 @@ trait ContainerResolver {
       return containingDocument.getControlByEffectiveId(effectiveId)
 
     // 2. Search in directly contained models
-    val resultModelObject = searchContainedModels(staticOrAbsoluteId, contextItem)
+    val resultModelObject = searchContainedModels(staticOrAbsoluteId, contextItemOpt)
     if (resultModelObject.isDefined)
       return resultModelObject.get
 
@@ -411,7 +419,7 @@ trait ContainerResolver {
     val sourceControlEffectiveId = {
 
       val tempModelObject =
-        searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItem)
+        searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItemOpt)
 
       if (tempModelObject.isDefined) {
         // Source is a model object, so get first control instead
@@ -429,8 +437,7 @@ trait ContainerResolver {
     val result =
       containingDocument.getControls.resolveObjectById(
         sourceControlEffectiveId,
-        staticOrAbsoluteId,
-        contextItem
+        staticOrAbsoluteId
       ).asInstanceOf[XFormsControl]
 
     // If result is provided, make sure it is within the resolution scope of this container

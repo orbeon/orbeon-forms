@@ -208,7 +208,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
         }
 
         // Find by static id
-        return resolveObjectById(XFormsId.getStaticIdFromId(effectiveId), null);
+        return resolveObjectById(XFormsId.getStaticIdFromId(effectiveId), scala.Option.<Item>apply(null));
     }
 
     /**
@@ -216,10 +216,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
      * repeat or a component.
      *
      * @param targetStaticId     static id of the target
-     * @param contextItem        context item, or null (used for bind resolution only)
+     * @param contextItemOpt     context item, or null (used for bind resolution only)
      * @return                   object, or null if not found
      */
-    public XFormsObject resolveObjectById(String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String targetStaticId, scala.Option<Item> contextItemOpt) {
 
         if (XFormsId.isEffectiveId(targetStaticId) || XFormsId.isAbsoluteId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
@@ -249,7 +249,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
 
         // Search binds
         if (_modelBindsOpt.isDefined()) {
-            final RuntimeBind bind = _modelBindsOpt.get().resolveBind(targetStaticId, contextItem);
+            final RuntimeBind bind = _modelBindsOpt.get().resolveBind(targetStaticId, contextItemOpt);
             if (bind != null)
                 return bind;
         }

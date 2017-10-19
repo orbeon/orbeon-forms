@@ -247,15 +247,14 @@ public class XFormsControls {
      *
      * @param sourceControlEffectiveId  effective id of the source control
      * @param targetStaticId            static id of the target
-     * @param contextItem               context item, or null (used for bind resolution only)
      * @return                          object, or null if not found
      */
-    public XFormsObject resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String sourceControlEffectiveId, String targetStaticId) {
         return Controls.resolveObjectByIdJava(containingDocument, sourceControlEffectiveId, targetStaticId);
     }
 
     public scala.Option<XFormsObject> resolveObjectByIdOpt(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
-        return scala.Option.apply(resolveObjectById(sourceControlEffectiveId, targetStaticId, contextItem));
+        return scala.Option.apply(resolveObjectById(sourceControlEffectiveId, targetStaticId));
     }
 
     /**

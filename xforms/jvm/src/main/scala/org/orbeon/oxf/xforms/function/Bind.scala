@@ -25,7 +25,7 @@ class Bind extends XFormsFunction {
 
     val bindId = stringArgument(0)
 
-    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, bindingContext.singleItemOpt) match {
+    XFormsFunction.context.container.searchContainedModelsInScope(getSourceEffectiveId, bindId, bindingContext.singleItemOpt) match {
       case Some(bind: RuntimeBind) ⇒ new ListIterator(bind.items)
       case _                       ⇒ EmptyIterator.getInstance
     }

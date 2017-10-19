@@ -17,9 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
-/**
- * xf:textarea control
- */
+
 class XFormsTextareaControl(
   container : XBLContainer,
   parent    : XFormsControl,

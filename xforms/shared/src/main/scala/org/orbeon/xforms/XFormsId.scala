@@ -216,7 +216,7 @@ object XFormsId {
   /**
     * Compute an effective id based on an existing effective id and a static id. E.g.:
     *
-    * `foo$bar.1-2` and `myStaticId` ⇒ `foo$myStaticId.1-2`
+    * `foo$bar.1-2` and `baz` ⇒ `foo$baz.1-2`
     *
     * @param baseEffectiveId base effective id
     * @param staticId        static id

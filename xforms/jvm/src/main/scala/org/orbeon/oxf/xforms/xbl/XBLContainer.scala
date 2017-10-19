@@ -55,8 +55,7 @@ class XBLContainer(
   val innerScope           : Scope
 ) extends ModelContainer
   with RefreshSupport
-  with ContainerResolver
-  with XFormsObjectResolver {
+  with ContainerResolver {
 
   self ⇒
 
@@ -212,9 +211,9 @@ trait ModelContainer {
 
   // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
   // slower than using an Iterator (profiler).
-  def searchContainedModels(sourceEffectiveId: String, staticId: String, contextItem: Item): Option[XFormsObject] =
+  def searchContainedModels(staticId: String, contextItem: Item): Option[XFormsObject] =
     if (isRelevant && models.nonEmpty)
-      models.iterator map (_.resolveObjectById(sourceEffectiveId, staticId, contextItem)) find (_ ne null)
+      models.iterator map (_.resolveObjectById(staticId, contextItem)) find (_ ne null)
     else
       None
 
@@ -396,8 +395,7 @@ trait ContainerResolver {
       return containingDocument.getControlByEffectiveId(effectiveId)
 
     // 2. Search in directly contained models
-    // NOTE: As of 2011-11, models don't use sourceEffectiveId
-    val resultModelObject = searchContainedModels(sourceEffectiveId, staticOrAbsoluteId, contextItem)
+    val resultModelObject = searchContainedModels(staticOrAbsoluteId, contextItem)
     if (resultModelObject.isDefined)
       return resultModelObject.get
 
@@ -413,7 +411,7 @@ trait ContainerResolver {
     val sourceControlEffectiveId = {
 
       val tempModelObject =
-        searchContainedModels(null, XFormsId.getStaticIdFromId(sourceEffectiveId), contextItem)
+        searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItem)
 
       if (tempModelObject.isDefined) {
         // Source is a model object, so get first control instead

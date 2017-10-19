@@ -52,7 +52,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel extends XFormsModelBase implements XFormsEventObserver, XFormsObjectResolver {
+public class XFormsModel extends XFormsModelBase implements XFormsEventObserver {
 
     public static final String LOGGING_CATEGORY = "model";
 
@@ -208,19 +208,18 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Find by static id
-        return resolveObjectById(null, XFormsId.getStaticIdFromId(effectiveId), null);
+        return resolveObjectById(XFormsId.getStaticIdFromId(effectiveId), null);
     }
 
     /**
      * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
      * repeat or a component.
      *
-     * @param sourceEffectiveId  effective id of the source, or null
      * @param targetStaticId     static id of the target
      * @param contextItem        context item, or null (used for bind resolution only)
      * @return                   object, or null if not found
      */
-    public XFormsObject resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String targetStaticId, Item contextItem) {
 
         if (XFormsId.isEffectiveId(targetStaticId) || XFormsId.isAbsoluteId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);

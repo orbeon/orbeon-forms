@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
  */
-public class XFormsControls implements XFormsObjectResolver {
+public class XFormsControls {
 
     public static final String LOGGING_CATEGORY = "control";
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);

@@ -19,8 +19,8 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
-import org.xml.sax.{Attributes, Locator}
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.{Attributes, Locator}
 
 class XXFormsComponentHandler(
   uri            : String,
@@ -90,28 +90,28 @@ class XXFormsComponentHandler(
   protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
-  // TODO: Most of this should be done statically, not dynamically. See also `findTargetControlFor`.
-  override def getForEffectiveId(effectiveId: String) = {
+  // TODO: Most of this should be done statically, not dynamically. See also `findTargetControlForEffectiveId`.
+  override def getForEffectiveId(effectiveId: String): String = {
 
     val labelForStaticIdOpt = binding.abstractBinding.labelFor
 
-    val staticTargetAndLabelForPrefixedIdOpt =
+    val staticTargetOpt =
       for {
         labelForStaticId   ← labelForStaticIdOpt
         labelForPrefixedId ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
         staticTarget       ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
       } yield
-        (staticTarget, labelForPrefixedId)
+        staticTarget
 
-    staticTargetAndLabelForPrefixedIdOpt match {
-      case Some((staticTarget, labelForPrefixedId)) ⇒
+    staticTargetOpt match {
+      case Some(staticTarget) ⇒
         // `label-for` is known statically
         for {
           currentControl   ← currentControlOpt // can be missing if we are in template
           targetControlFor ← {
             // Assume the target is within the same repeat iteration
             val suffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-            val labelForEffectiveId = labelForPrefixedId + suffix
+            val labelForEffectiveId = staticTarget.prefixedId + suffix
 
             // Push/pop component context so that handler resolution works
             xformsHandlerContext.pushComponentContext(getPrefixedId)

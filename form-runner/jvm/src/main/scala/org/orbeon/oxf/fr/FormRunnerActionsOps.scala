@@ -167,16 +167,16 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   }
 
   //@XPathFunction
-  def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String) = {
+  def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String): List[String] = {
 
-    val controls =
+    val controlsIt =
       Controls.iterateAllRepeatedControlsForTarget(
         XFormsFunction.context.containingDocument,
         XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
         controlId(targetControlName)
       )
 
-    controls map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId toList
+    controlsIt map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId toList
   }
 
   //@XPathFunction

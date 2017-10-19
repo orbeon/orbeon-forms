@@ -3296,6 +3296,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:control id="my-foo≡gaga-label">
+                            <xxf:value>My label</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-foo≡gaga" label="My label">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
@@ -3348,6 +3351,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:control id="my-foo≡gaga-label">
+                            <xxf:value>My label</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-foo≡gaga" label="My label">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
@@ -3395,6 +3401,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:control id="gaga-label">
+                            <xxf:value>My label</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-foo≡gaga" label="My label">
                             <xxf:value>42</xxf:value>
                         </xxf:control>

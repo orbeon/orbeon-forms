@@ -177,6 +177,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     if (oldName != newName) {
 
+      require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
+
       findDataHolders(oldName) foreach (rename(_, newName))
       findResourceHolders(oldName)    foreach (rename(_, newName))
 

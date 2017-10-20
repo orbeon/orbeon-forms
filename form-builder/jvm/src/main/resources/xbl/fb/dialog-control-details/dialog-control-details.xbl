@@ -442,7 +442,12 @@
                     type="xs:NCName"
                     xxf:whitespace="trim"
                     readonly="false()"
-                    constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
+                     constraint="
+                        . = $i/original-control-name or
+                        not(
+                            ends-with(., '-iteration') or
+                            . = xxf:split($i/control-names)
+                        )"/>
 
                 <xf:bind ref="default-alert">
                     <xf:bind

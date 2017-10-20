@@ -285,7 +285,12 @@
                     xxf:whitespace="trim"
                     readonly="false()"
                     required="true()"
-                    constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
+                    constraint="
+                        . = $i/original-control-name or
+                        not(
+                            ends-with(., '-iteration') or
+                            . = xxf:split($i/control-names)
+                        )"/>
 
                 <xf:bind
                     ref="relevant | readonly"

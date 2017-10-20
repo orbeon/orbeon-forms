@@ -256,6 +256,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   def getBuiltinOrCustomTypeCSSClassOpt =
     (getBuiltinTypeNameOpt map ("xforms-type-" +)) orElse (getTypeLocalNameOpt map ("xforms-type-custom-" +))
 
+  // 1 Java caller
   def getBuiltinOrCustomTypeCSSClassOrNull =
     getBuiltinOrCustomTypeCSSClassOpt.orNull
 

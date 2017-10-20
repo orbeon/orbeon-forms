@@ -22,7 +22,8 @@ import org.orbeon.xforms.XFormsId
 
 object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
-  private val EditorIdPrefix = "fb-lhh-editor-for-"
+  private val EditorIdPrefix   = "fb-lhh-editor-for-"
+  private val EditorIdPrefixes = List("label", "hint") map (EditorIdPrefix + _ + '-')
 
   def controlUpdateLHHA(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
 
@@ -32,10 +33,10 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
     // The target might the control itself, or for grids with LHH in headers, an `xf:output` added to edit the LHH
     val controlName = FormRunner.controlNameFromId(
-      if (staticControlId.startsWith(EditorIdPrefix))
-        staticControlId.substring(EditorIdPrefix.size)
-      else
-        staticControlId
+      EditorIdPrefixes find staticControlId.startsWith match {
+        case Some(prefix) ⇒ staticControlId.substring(prefix.size)
+        case None         ⇒ staticControlId
+      }
     )
 
     XFormsAPI.setvalue(FormBuilder.currentResources / controlName / lhha, value)

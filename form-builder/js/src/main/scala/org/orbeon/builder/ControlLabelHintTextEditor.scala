@@ -20,14 +20,13 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.rpc.RpcClient
 
 object ControlLabelHintTextEditor {
 

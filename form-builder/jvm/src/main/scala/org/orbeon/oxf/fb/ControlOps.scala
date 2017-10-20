@@ -79,11 +79,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val precedingOrSelfContainers =
       (includeSelf list grid) ++ (grid precedingSibling * filter IsContainer)
 
-    // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
+    // If a container has a `bind`, then use its name, otherwise it is an unbound grid so find its last control
     // with a name (there might not be one).
     val controlsWithName =
       precedingOrSelfContainers flatMap {
-        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant CellTest child * filter hasName lastOption
+        case grid if grid attValueOpt "bind" isEmpty ⇒ grid descendant CellTest child * filter hasName lastOption
         case other                                   ⇒ Some(other)
       }
 
@@ -438,12 +438,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None     ⇒ mip.aName → mip.eName
     }
 
-  // Get all control names by inspecting all elements with an id that converts to a valid name
-  def getAllControlNames(implicit ctx: FormBuilderDocContext): Set[String] =
-    ctx.formDefinitionInstance match {
-      case Some(instance) ⇒ instance.idsIterator flatMap controlNameFromIdOpt toSet
-      case None           ⇒ (ctx.formDefinitionRootElem descendantOrSelf * ids) toSet
-    }
+  def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
+    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem)).to[Set]
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =

@@ -61,7 +61,7 @@
                 <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly')"/>
 
-                <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNames(), ' ')"/>
+                <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
                 <xf:var name="control"                               value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>

@@ -96,6 +96,29 @@ trait BaseOps extends Logging {
   def nextId(token: String)(implicit ctx: FormBuilderDocContext): String =
     nextIds(token, 1).head
 
+  def nextTmpId()(implicit ctx: FormBuilderDocContext): String =
+    nextTmpIds(1).head
+
+  private def idsIterator(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] = {
+
+    val formDefinitionRootElem = docWithIdsInstanceOrElem match {
+      case Left(instance)  ⇒ instance.rootElement
+      case Right(formElem) ⇒ formElem
+    }
+
+    def elementIdsFromIndexOpt =
+      for {
+        formDefinitionInstance ← docWithIdsInstanceOrElem.left.toOption
+        if formDefinitionHasIndex(formDefinitionRootElem.root)
+      } yield
+        formDefinitionInstance.idsIterator
+
+    def elementIdsFromXPath =
+      (formDefinitionRootElem descendantOrSelf *).ids.iterator
+
+    elementIdsFromIndexOpt getOrElse elementIdsFromXPath
+  }
+
   // The idea is that we can search ids in the following ways:
   //
   // - looking for `id` attributes in a document, whether via an index or XPath
@@ -103,31 +126,48 @@ trait BaseOps extends Logging {
   //
   // The resulting `Iterator` can contain duplicates.
   //
-  def iterateIdsWithSuffix(
+  // NOTE: We consider that an `-iteration` suffix is not allowed as a control name,
+  // and always used only as a suffix of a repeated grid or section name.
+  //
+  def iterateNamesInUse(
     docWithIdsInstanceOrElem : XFormsInstance Either NodeInfo,
-    dataElemOpt              : Option[NodeInfo],
-    suffix                   : String
+    dataElemOpt              : Option[NodeInfo]
   ): Iterator[String] = {
 
-    val formDefinitionDoc = docWithIdsInstanceOrElem match {
-      case Left(instance)  ⇒ instance.root
-      case Right(formElem) ⇒ formElem.root
+    val namesFromIndexIt = idsIterator(docWithIdsInstanceOrElem) flatMap controlNameFromIdOpt
+    val namesFromDataIt  = dataElemOpt.toList descendant * map (_.localname)
+
+    namesFromIndexIt ++ namesFromDataIt filterNot (_.endsWith(DefaultIterationSuffix))
+  }
+
+  // Special id namespace for `tmp-n-tmp` ids. We don't care if those are used in data as element names, or
+  // if they are in the clipboard.
+  def nextTmpIds(count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
+
+    val allIdsIt = idsIterator(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get))
+
+    val prefix = "tmp-"
+    val suffix = "-tmp"
+
+    val allTmpIdsInUse =
+      collection.mutable.Set() ++ allIdsIt filter (id ⇒ id.startsWith(prefix) && id.endsWith(suffix))
+
+    var guess = 1
+
+    def nextId(): String = {
+
+      def buildName(i: Int) = prefix + i + suffix
+
+      while (allTmpIdsInUse(buildName(guess)))
+        guess += 1
+
+      val result = buildName(guess)
+      allTmpIdsInUse += result
+      result
     }
 
-    def elementIdsFromIndexOpt =
-      for {
-        formDefinitionInstance ← docWithIdsInstanceOrElem.left.toOption
-        if formDefinitionHasIndex(formDefinitionDoc)
-      } yield
-        formDefinitionInstance.idsIterator
-
-    def elementIdsFromXPath =
-      (formDefinitionDoc descendant *).ids.iterator
-
-    val idsFromIndex  = elementIdsFromIndexOpt getOrElse elementIdsFromXPath filter (_.endsWith(suffix))
-    val idsFromData   = dataElemOpt.toList descendant * map (_.localname + suffix)
-
-    idsFromIndex ++ idsFromData
+    for (_ ← 1 to count)
+      yield nextId()
   }
 
   // Find a series of next available ids for a given token
@@ -137,10 +177,10 @@ trait BaseOps extends Logging {
     val prefix = token + "-"
     val suffix = "-" + token
 
-    val allIds =
+    val allNamesInUse =
       collection.mutable.Set() ++
         // Ids coming from the form definition
-        iterateIdsWithSuffix(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem), suffix) ++ {
+        iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem)) ++ {
         // Ids coming from the special cut/copy/paste instance, if present
         ctx.xcvInstance match {
           case Some(xcvInstance) ⇒
@@ -148,23 +188,23 @@ trait BaseOps extends Logging {
             val dataElemOpt =
               ctx.xcvInstance flatMap (_.rootElement / XcvEntry.Holder.entryName headOption)
 
-            iterateIdsWithSuffix(Left(xcvInstance), dataElemOpt, suffix)
+            iterateNamesInUse(Left(xcvInstance), dataElemOpt)
           case None ⇒ Nil
         }
       }
 
-    var guess = allIds.size + 1
+    var guess = 1
 
     def nextId(): String = {
 
-      def buildId(i: Int) = prefix + i + suffix
+      def buildName(i: Int) = prefix + i
 
-      while (allIds(buildId(guess)))
+      while (allNamesInUse(buildName(guess)))
         guess += 1
 
-      val result = buildId(guess)
-      allIds += result
-      result
+      val result = buildName(guess)
+      allNamesInUse += result
+      result + suffix
     }
 
     for (_ ← 1 to count)

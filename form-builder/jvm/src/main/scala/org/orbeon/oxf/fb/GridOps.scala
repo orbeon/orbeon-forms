@@ -39,19 +39,21 @@ trait GridOps extends ContainerOps {
     // things around, otherwise if the XForms document is recreated new automatic ids
     // are generated for objects without id.
 
-    def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
-      // Get as many fresh ids as there are tds
-      val ids = nextIds(token, elements.size).toIterator
-
-      // Add the missing ids
-      elements foreach (ensureAttribute(_, "id", ids.next()))
-    }
-
-    // All grids and grid cells with no existing id
     val grids = startElem descendantOrSelf GridTest
 
-    annotate("tmp", grids descendant CellTest filterNot (_.hasId))
-    annotate("tmp", grids filterNot (_.hasId))
+    // Annotate cells
+    locally {
+      val toAnnotate = grids descendant CellTest filterNot (_.hasId)
+      val ids        = nextTmpIds(toAnnotate.size).toIterator
+      toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
+    }
+
+    // Annotate grids
+    locally {
+      val toAnnotate = grids filterNot (_.hasId)
+      val ids        = nextIds("grid", toAnnotate.size).toIterator
+      toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
+    }
   }
 
   // Get the first enclosing repeated grid or legacy repeat
@@ -88,7 +90,7 @@ trait GridOps extends ContainerOps {
         } keepDistinctBy (_.u)
 
       val idsIt =
-        nextIds("tmp", distinctCellsEndingAtCurrentRow.size).iterator
+        nextTmpIds(distinctCellsEndingAtCurrentRow.size).iterator
 
       val newCells =
         distinctCellsEndingAtCurrentRow map { cell ⇒
@@ -127,7 +129,7 @@ trait GridOps extends ContainerOps {
           }
 
         val idsIt =
-          nextIds("tmp", cellsStartingOnFirstRow.size).iterator
+          nextTmpIds(cellsStartingOnFirstRow.size).iterator
 
         val newCells =
           cellsStartingOnFirstRow map { cell ⇒
@@ -334,7 +336,7 @@ trait GridOps extends ContainerOps {
       withDebugGridOperation("shrink cell right") {
         val newCellW = cell.w - amount
         NodeInfoCellOps.updateW(cell.td, newCellW)
-        insertCellAtBestPosition(cells, nextId("tmp"), cell.x + newCellW, cell.y, amount, cell.h)
+        insertCellAtBestPosition(cells, nextTmpId(), cell.x + newCellW, cell.y, amount, cell.h)
       }
     }
   }
@@ -368,7 +370,7 @@ trait GridOps extends ContainerOps {
       withDebugGridOperation("shrink cell down") {
         val existingCellUpdatedH = originCell.h - amount
         NodeInfoCellOps.updateH(originCell.td, existingCellUpdatedH)
-        insertCellAtBestPosition(cells, nextId("tmp"), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
+        insertCellAtBestPosition(cells, nextTmpId(), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
       }
     }
   }

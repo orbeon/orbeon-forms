@@ -324,11 +324,11 @@ class RepeatedSectionsTest
               <my-grid>
                 <my-grid-iteration>
                   <my-textarea/>
-                  <control-9/>
+                  <control-1/>
                 </my-grid-iteration>
                 <my-grid-iteration>
                   <my-textarea/>
-                  <control-9/>
+                  <control-1/>
                 </my-grid-iteration>
               </my-grid>
             </my-section-iteration>

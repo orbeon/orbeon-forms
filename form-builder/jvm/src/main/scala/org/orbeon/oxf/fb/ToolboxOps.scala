@@ -171,11 +171,11 @@ object ToolboxOps {
       val (into, after, _) = findGridInsertionPoint
 
       // Obtain ids first
-      val ids = nextIds("tmp", 3).toIterator
+      val ids = nextTmpIds(2).toIterator
 
       // The grid template
       val gridTemplate: NodeInfo =
-        <fr:grid edit-ref="" id={ids.next()} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <fr:grid edit-ref="" id={nextId("grid")} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
           <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
         </fr:grid>
 
@@ -204,7 +204,7 @@ object ToolboxOps {
       val precedingSectionName = after flatMap getControlNameOpt
 
       // Obtain ids first
-      val ids = nextIds("tmp", 3).toIterator
+      val ids = nextTmpIds(2).toIterator
 
       // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
       val sectionTemplate: NodeInfo =
@@ -216,7 +216,7 @@ object ToolboxOps {
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
           <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
           if (withGrid)
-            <fr:grid edit-ref="" id={ids.next()}>
+            <fr:grid edit-ref="" id={nextId("grid")}>
               <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
             </fr:grid>
         }</fr:section>
@@ -263,7 +263,7 @@ object ToolboxOps {
       val (into, after, grid) = findGridInsertionPoint
       val newGridName         = controlNameFromId(nextId("grid"))
 
-      val ids = nextIds("tmp", 2).toIterator
+      val ids = nextTmpIds(2).toIterator
 
       // The grid template
       val gridTemplate: NodeInfo =
@@ -529,15 +529,20 @@ object ToolboxOps {
     ctx     : FormBuilderDocContext
   ): Seq[(String, String, Boolean)] = {
 
-    val xcvNames                 = xcvElem / XcvEntry.Bind.entryName descendant XFBindTest flatMap findBindName
-    val xcvNamesWithPrefixSuffix = xcvNames map (prefix + _ + suffix)
+    val xcvNamesInUse =
+      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem), xcvElem / XcvEntry.Holder.entryName / * headOption) toList
 
-    val needRenameWithAutomaticIds         = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllControlNames
+    def toNameWithPrefixSuffix(name: String) = prefix + name + suffix
+
+    val xcvNamesWithPrefixSuffix = xcvNamesInUse map toNameWithPrefixSuffix
+
+    val needRenameWithAutomaticIds         = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllNamesInUse
     val newControlNamesWithAutomaticIds    = nextIds(XcvEntry.Control.entryName, needRenameWithAutomaticIds.size) map controlNameFromId
     val newControlNamesWithAutomaticIdsMap = needRenameWithAutomaticIds.iterator.zip(newControlNamesWithAutomaticIds.iterator).toMap
 
-    xcvNames map { xcvName ⇒
-      val withPrefixSuffix = prefix + xcvName + suffix
+    xcvNamesInUse map { xcvName ⇒
+
+      val withPrefixSuffix = toNameWithPrefixSuffix(xcvName)
 
       val automaticIdOpt = newControlNamesWithAutomaticIdsMap.get(withPrefixSuffix)
 

@@ -136,8 +136,8 @@ class FormBuilderFunctionsTest
   describe("Find the next id") {
     it("must find ids without collisions") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
-        assert(nextId("control") === "control-3-control")
-        assert(nextId("section") === "section-3-section")
+        assert(nextId("control") === "control-2-control")
+        assert(nextId("section") === "section-2-section")
       }
       // TODO: test more collisions
     }
@@ -174,7 +174,7 @@ class FormBuilderFunctionsTest
         val newControlNameOption = insertNewControl(doc, <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
         // Check the control's name
-        assert(newControlNameOption === Some("control-3"))
+        assert(newControlNameOption === Some("control-2"))
         val newControlName = newControlNameOption.get
 
         // Test result
@@ -244,7 +244,7 @@ class FormBuilderFunctionsTest
         selectFirstCell()
         val newRepeatNameOption = insertNewRepeatedGrid(doc)
 
-        assert(newRepeatNameOption === Some("grid-3"))
+        assert(newRepeatNameOption === Some("grid-2"))
         val newRepeatName          = newRepeatNameOption.get
         val newRepeatIterationName = defaultIterationName(newRepeatName)
 
@@ -265,13 +265,13 @@ class FormBuilderFunctionsTest
           assert(controlBind.hasIdValue(bindId(newRepeatName)))
           assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-          assert(findModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-3-template")))
+          assert(findModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-2-template")))
         }
 
         // Insert a new control
         val newControlNameOption = insertNewControl(doc, <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
-        assert(newControlNameOption === Some("control-5"))
+        assert(newControlNameOption === Some("control-2"))
         val newControlName = newControlNameOption.get
 
         // Test result
@@ -366,9 +366,9 @@ class FormBuilderFunctionsTest
         val doc = ctx.formDefinitionRootElem
 
         val expected = Map(
-          "|fb≡section-1-section≡tmp-13-tmp≡control-1-control|"                      → "control-1-control",
+          "|fb≡section-1-section≡grid-1-grid≡control-1-control|"                     → "control-1-control",
           "|fb≡section-1-section≡grid-4-grid≡control-5-control⊙1|"                   → "control-5-control",
-          "|fb≡section-1-section≡section-3-section≡tmp-14-tmp≡control-6-control|"    → "control-6-control",
+          "|fb≡section-1-section≡section-3-section≡grid-2-grid≡control-6-control|"   → "control-6-control",
           "|fb≡section-1-section≡section-3-section≡grid-7-grid≡control-8-control⊙1|" → "control-8-control"
         )
 
@@ -464,7 +464,7 @@ class FormBuilderFunctionsTest
 
         // The newly-inserted grid can have a different temporary id but make sure there is one
         val newGrid = findAncestorContainersLeafToRoot(FormRunner.findControlByName(doc, nestedControlName).get, includeSelf = false).head
-        assert(newGrid.id.startsWith("tmp-"))
+        assert(newGrid.id.startsWith("grid-"))
       }
     }
   }

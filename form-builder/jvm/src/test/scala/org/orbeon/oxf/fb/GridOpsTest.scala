@@ -119,7 +119,7 @@ class GridOpsTest
       <fr:grid>
         <fr:c><xf:input id="control-11-control"/></fr:c>
       </fr:grid>
-      <fr:grid id="grid-2-grid">
+      <fr:grid bind="grid-2-bind" id="grid-2-grid">
         <fr:c><xf:input id="control-21-control"/></fr:c>
       </fr:grid>
       <fr:grid>

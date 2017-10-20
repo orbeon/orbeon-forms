@@ -39,7 +39,7 @@
                 <xf:setvalue ref="$i/original-control-name" value="frf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllControlNames(), ' ')"/>
+                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
                 <xf:var name="control"                      value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>

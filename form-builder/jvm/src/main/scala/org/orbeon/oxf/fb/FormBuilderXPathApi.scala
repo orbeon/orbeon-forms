@@ -295,9 +295,9 @@ object FormBuilderXPathApi {
     FormBuilder.getNormalizedMax(doc, gridName).orNull
 
   //@XPathFunction
-  def getAllControlNames: SequenceIterator = {
+  def getAllNamesInUse: SequenceIterator = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.getAllControlNames.iterator map stringToStringValue
+    FormBuilder.getAllNamesInUse.iterator map stringToStringValue
   }
 
   //@XPathFunction

@@ -122,6 +122,7 @@
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/*[p:has-class('fb-annotation')]"/>
 
                 <!-- Remove automatic grid and td ids -->
+                <!-- NOTE: Grids are now annotated with a `-grid` suffix and those ids won't be removed. -->
                 <xsl:template match="xh:body//fr:grid/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
                 <xsl:template match="xh:body//fr:grid//*:c/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
 

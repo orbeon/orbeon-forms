@@ -69,7 +69,7 @@ class AlertsAndConstraintsTest
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
 
         val expected =
-          <validation type="formula" id="validation-3-validation" level="warning" default-alert="false">
+          <validation type="formula" id="validation-1-validation" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
             <alert message="Length must be greater than 10" global="false">
               <message lang="fr" value="Longueur doit être plus grande que 10"/>
@@ -438,11 +438,11 @@ class AlertsAndConstraintsTest
 
           val expectedRequiredValidation =
             RequiredValidation(
-              Some("validation-3-validation"),
+              Some("validation-1-validation"),
               Left(true),
               Some(
                 AlertDetails(
-                  Some("validation-3-validation"),
+                  Some("validation-1-validation"),
                   List("en" → "This is required!", "fr" → "Ce champ est requis !"),
                   global = false
                 )

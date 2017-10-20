@@ -58,14 +58,16 @@
                         <container-id/>
                         <action/>
                         <prefix/>
+                        <ncname-suffix/>
                         <suffix/>
                     </local>
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
 
-                <xf:bind ref="prefix" type="xf:NCName" xxf:whitespace="trim"/>
-                <xf:bind ref="suffix" type="xf:NCName" xxf:whitespace="trim"/>
+                <xf:bind ref="prefix"        type="xf:NCName" xxf:whitespace="trim"/>
+                <xf:bind ref="ncname-suffix" type="xf:NCName" xxf:whitespace="trim" calculate="concat('a', ../suffix)"/>
+                <xf:bind ref="suffix"                         xxf:whitespace="trim" constraint="valid(../ncname-suffix)"/>
 
             </xf:model>
         </xbl:implementation>

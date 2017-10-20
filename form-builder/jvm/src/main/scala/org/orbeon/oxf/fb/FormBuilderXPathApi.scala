@@ -14,16 +14,14 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.MediatypeRange
-import org.orbeon.oxf.fb.FormBuilder.{containerById, _}
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.fr.FormRunner.{controlNameFromId, createFormDataBasePath, createFormDefinitionBasePath, getControlName, putWithAttachments, _}
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils.encodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, UserAgent}
-import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xml.SaxonUtils
@@ -46,9 +44,9 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlNameFromId(controlName)) foreach { controlElem ⇒
-      assert(isRepeat(controlElem))
-      updateTemplatesCheckContainers(findAncestorRepeatNames(controlElem).to[Set])
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlName)) foreach { controlElem ⇒
+      assert(FormRunner.isRepeat(controlElem))
+      updateTemplatesCheckContainers(FormRunner.findAncestorRepeatNames(controlElem).to[Set])
     }
   }
 
@@ -105,7 +103,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlNameFromId(controlId)).to[List] flatMap
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).to[List] flatMap
       (_ parent CellTest) foreach selectCell
   }
 
@@ -203,9 +201,9 @@ object FormBuilderXPathApi {
     // Find data holders for all section templates
     val holders =
       for {
-        section     ← findSectionsWithTemplates(ctx.bodyElem)
-        controlName ← getControlNameOpt(section).toList
-        holder      ← findDataHolders(controlName)
+        section     ← FormRunner.findSectionsWithTemplates(ctx.bodyElem)
+        controlName ← FormRunner.getControlNameOpt(section).toList
+        holder      ← FormBuilder.findDataHolders(controlName)
       } yield
         holder
 
@@ -221,11 +219,11 @@ object FormBuilderXPathApi {
 
     try {
       val (beforeURLs, _, publishedVersion) =
-        putWithAttachments(
+        FormRunner.putWithAttachments(
           data              = xhtml.root,
           toBaseURI         = "", // local publish
-          fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
-          toBasePath        = createFormDefinitionBasePath(app, form),
+          fromBasePath      = FormRunner.createFormDataBasePath("orbeon", "builder", isDraft = false, document),
+          toBasePath        = FormRunner.createFormDefinitionBasePath(app, form),
           filename          = "form.xhtml",
           commonQueryString = encodeSimpleQuery(List("document" → document)),
           forceAttachments  = false,
@@ -307,11 +305,11 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val allContainersWithSettings = getAllContainerControlsWithIds(ctx.formDefinitionRootElem) filter hasContainerSettings
+    val allContainersWithSettings = getAllContainerControlsWithIds(ctx.formDefinitionRootElem) filter FormRunner.hasContainerSettings
 
     previousOrNext match {
-      case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ getControlName(n) != controlName) lastOption
-      case "next"     ⇒ allContainersWithSettings dropWhile (n ⇒ getControlName(n) != controlName) drop 1 headOption
+      case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ FormRunner.getControlName(n) != controlName) lastOption
+      case "next"     ⇒ allContainersWithSettings dropWhile (n ⇒ FormRunner.getControlName(n) != controlName) drop 1 headOption
     }
   }
 
@@ -418,13 +416,13 @@ object FormBuilderXPathApi {
 
   // Various counts
   //@XPathFunction
-  def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count IsSection
-  def countAllGrids        (inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count IsGrid
-  def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)       count isRepeat
-  def countSectionTemplates(inDoc: NodeInfo): Int = findFRBodyElem(inDoc) descendant * count isSectionTemplateContent
+  def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.IsSection
+  def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.findFRBodyElem(inDoc) descendant * count FormRunner.IsGrid
+  def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.isRepeat
+  def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.findFRBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot IsContainer size
+  def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot FormRunner.IsContainer size
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 

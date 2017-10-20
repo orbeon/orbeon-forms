@@ -108,8 +108,8 @@
                             </xh:colgroup>
                             <xh:thead>
                                 <xh:tr>
-                                    <xh:th><xf:output value="$resources/dialog-ids/original-name/label"/></xh:th>
-                                    <xh:th><xf:output value="$resources/dialog-ids/new-name/label"/></xh:th>
+                                    <xh:th><xf:label value="$resources/dialog-ids/original-name/label" for="original-name-output"/></xh:th>
+                                    <xh:th><xf:label value="$resources/dialog-ids/new-name/label"      for="new-name-output"/></xh:th>
                                     <xh:th/>
                                 </xh:tr>
                             </xh:thead>
@@ -124,8 +124,8 @@
                                         else
                                             ()">
                                     <xh:tr class="{if (array:get(., 3)) then 'warning' else 'success'}">
-                                        <xh:td><xf:output value="array:get(., 1)"/></xh:td>
-                                        <xh:td><xf:output value="array:get(., 2)"/></xh:td>
+                                        <xh:td><xf:output id="original-name-output" value="array:get(., 1)"/></xh:td>
+                                        <xh:td><xf:output id="new-name-output"      value="array:get(., 2)"/></xh:td>
                                         <xh:td><xh:i class="fa fa-{if (array:get(., 3)) then 'ban' else 'check'} fa-fw"/></xh:td>
                                     </xh:tr>
                                 </xf:repeat>

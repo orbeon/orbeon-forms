@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -281,14 +282,16 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       { case switch: XFormsSwitchControl if switch.isRelevant ⇒ switch.getEffectiveId → switch.controlState.get } toMap
 
   // If more than one change touches a given id, processed it once using the last element
-  private def groupChanges(changes: Seq[(String, Element)]) =
-    changes groupBy (_._1) mapValues (_ map (_._2) last) toList // mapValues ok because of toList
+  private def groupChanges(changes: Seq[(String, Element)]): List[(String, Element)] =
+    changes groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) ⇒
+      prefixedId → (prefixedIdsToElemsInSource map (_._2) last)
+    }
 
   private def processXBLUpdates(): Unit = {
 
     val tree = containingDocument.getControls.getCurrentControlTree
 
-    for ((prefixedId, elementInSource) ← groupChanges(xblChanges)) {
+    for ((prefixedId, elemInSource) ← groupChanges(xblChanges)) {
       tree.findControl(prefixedId) match { // TODO: should use effective id if in repeat and process all
         case Some(componentControl: XFormsComponentControl) ⇒
           // Update and restore switch state
@@ -307,7 +310,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             componentControl.clearChildren()
 
             // Update the shadow tree
-            val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, elementInSource)
+            val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, elemInSource)
 
             // Create the new models and new concrete subtree rooted at xbl:template
             componentControl.recreateNestedContainer()

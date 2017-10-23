@@ -513,8 +513,12 @@ object ToolboxOps {
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
-    xcvFromSectionWithTemplate(containerId) map
-      (namesToRenameForPaste(_, prefix, suffix))
+    for {
+      xcvElem     ← xcvFromSectionWithTemplate(containerId)
+      sectionElem ← xcvElem / XcvEntry.Control.entryName firstChildOpt *
+      sectionName ← getControlNameOpt(sectionElem)
+    } yield
+      namesToRenameForPaste(xcvElem, prefix, suffix) filter (_._1 != sectionName)
 
   def namesToRenameForClipboard(
     prefix      : String,

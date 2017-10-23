@@ -317,9 +317,10 @@ object SimplePath {
 
     def namespaceNodes: Seq[NodeInfo] = seq flatMap (_.namespaceNodes)
 
-    def att(attName: String)   = /@(attName)
-    def att(test: Test)        = /@(test)
-    def child(test: Test)      = /(test)
+    def att(attName: String)      = /@(attName)
+    def att(test: Test)           = /@(test)
+    def child(test: Test)         = /(test)
+    def firstChildOpt(test: Test) = /(test).headOption
 
     def attValue(attName: String) = /@(attName) map (_.stringValue)
     def attValue(attName: QName)  = /@(attName) map (_.stringValue)

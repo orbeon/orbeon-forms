@@ -173,12 +173,7 @@ object FormBuilderXPathApi {
     // if they don't have them already. We do this so that ids are stable as we move
     // things around, otherwise if the XForms document is recreated new automatic ids
     // are generated for objects without id.
-
-    debugDumpDocument("before")
-
     FormBuilder.annotateGridsAndCells(ctx.bodyElem)
-
-    debugDumpDocument("after")
 
     // 2. Select the first td if any
     ctx.bodyElem descendant GridTest descendant CellTest take 1 foreach selectCell
@@ -510,7 +505,7 @@ object FormBuilderXPathApi {
     FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
   }
 
-  private def renamingDetails(renamingDetails: Option[Seq[(String, String, Boolean)]]): List[ObjectValue] =
+  private def renamingDetailsToXPath(renamingDetails: Option[Seq[(String, String, Boolean)]]): SequenceIterator =
     renamingDetails.toList.flatten map {
       case (oldId, newId, isAutomaticId) ⇒
         ArrayFunctions.createValue(
@@ -529,7 +524,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): SequenceIterator = {
     implicit val ctx = FormBuilderDocContext()
-    renamingDetails(ToolboxOps.namesToRenameForMergingSectionTemplate(containerId, prefix, suffix))
+    renamingDetailsToXPath(ToolboxOps.namesToRenameForMergingSectionTemplate(containerId, prefix, suffix))
   }
 
   //@XPathFunction
@@ -538,7 +533,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): SequenceIterator = {
     implicit val ctx = FormBuilderDocContext()
-    renamingDetails(ToolboxOps.namesToRenameForClipboard(prefix, suffix))
+    renamingDetailsToXPath(ToolboxOps.namesToRenameForClipboard(prefix, suffix))
   }
 
   //@XPathFunction

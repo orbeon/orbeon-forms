@@ -557,6 +557,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.pasteSectionGridFromXcv(ToolboxOps.readXcvFromClipboard, prefix, suffix)
+    ToolboxOps.readXcvFromClipboard foreach
+      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix))
   }
 }

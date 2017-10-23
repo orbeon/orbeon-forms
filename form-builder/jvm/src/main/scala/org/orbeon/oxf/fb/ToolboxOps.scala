@@ -471,12 +471,14 @@ object ToolboxOps {
     deleteControlWithinCell(cellElem, updateTemplates = true)
   }
 
-  // TODO: Return `Option[NodeInfo]`
-  def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): NodeInfo = {
-    val clipboard = ctx.clipboardXcvRootElem
-    val clone = elementInfo("xcv", Nil)
-    insert(into = clone, origin = clipboard / *)
-    clone
+  def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
+    val xcvElem = ctx.clipboardXcvRootElem
+
+    (xcvElem / XcvEntry.Control.entryName / * nonEmpty) option {
+      val clone = elementInfo("xcv", Nil)
+      insert(into = clone, origin = xcvElem / *)
+      clone
+    }
   }
 
   def clearClipboard()(implicit ctx: FormBuilderDocContext): Unit =
@@ -511,16 +513,16 @@ object ToolboxOps {
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
-    xcvFromSectionWithTemplate(containerId) map { xcvElem ⇒
-      namesToRenameForPaste(xcvElem, prefix, suffix)
-    }
+    xcvFromSectionWithTemplate(containerId) map
+      (namesToRenameForPaste(_, prefix, suffix))
 
   def namesToRenameForClipboard(
     prefix      : String,
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
-    Some(namesToRenameForPaste(readXcvFromClipboard, prefix, suffix))
+    readXcvFromClipboard map
+      (namesToRenameForPaste(_, prefix, suffix))
 
   private def namesToRenameForPaste(
     xcvElem : NodeInfo,
@@ -670,21 +672,23 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val xcvElem     = readXcvFromClipboard
-    val controlElem = xcvElem / XcvEntry.Control.entryName / * head
+    readXcvFromClipboard foreach { xcvElem ⇒
 
-    if (IsGrid(controlElem) || IsSection(controlElem)) {
+      val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-      if (namesToRenameForPaste(xcvElem, "", "") forall (! _._3))
-        pasteSectionGridFromXcv(xcvElem, "", "")
-      else
-        XFormsAPI.dispatch(
-          name       = "fb-show-dialog",
-          targetId   = "dialog-ids",
-          properties = Map("container-id" → Some(controlElem.id), "action" → Some("paste"))
-        )
-    } else
-      pasteSingleControlFromXcv(targetCellElem, xcvElem)
+      if (IsGrid(controlElem) || IsSection(controlElem)) {
+
+        if (namesToRenameForPaste(xcvElem, "", "") forall (! _._3))
+          pasteSectionGridFromXcv(xcvElem, "", "")
+        else
+          XFormsAPI.dispatch(
+            name       = "fb-show-dialog",
+            targetId   = "dialog-ids",
+            properties = Map("container-id" → Some(controlElem.id), "action" → Some("paste"))
+          )
+      } else
+        pasteSingleControlFromXcv(targetCellElem, xcvElem)
+    }
   }
 
   private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"

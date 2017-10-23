@@ -536,11 +536,35 @@ object ToolboxOps {
 
     def toNameWithPrefixSuffix(name: String) = prefix + name + suffix
 
-    val xcvNamesWithPrefixSuffix = xcvNamesInUse map toNameWithPrefixSuffix
+    val newControlNamesWithAutomaticIdsMap = {
 
-    val needRenameWithAutomaticIds         = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllNamesInUse
-    val newControlNamesWithAutomaticIds    = nextIds(XcvEntry.Control.entryName, needRenameWithAutomaticIds.size) map controlNameFromId
-    val newControlNamesWithAutomaticIdsMap = needRenameWithAutomaticIds.iterator.zip(newControlNamesWithAutomaticIds.iterator).toMap
+      val xcvNamesWithPrefixSuffix   = xcvNamesInUse map toNameWithPrefixSuffix
+      val needRenameWithAutomaticIds = mutable.LinkedHashSet() ++ xcvNamesWithPrefixSuffix intersect getAllNamesInUse
+
+      // These names are both subsets of `getAllNamesInUse`
+      val (allSectionNamesInUse, allGridNamesInUse) = {
+
+        val (allSections, allGrids) =
+          findNestedContainers(ctx.bodyElem) partition IsSection
+
+        (allSections flatMap getControlNameOpt toSet, allGrids flatMap getControlNameOpt toSet)
+      }
+
+      val newControlNamesIt = nextIds("control", needRenameWithAutomaticIds.size).iterator map controlNameFromId
+      val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size).iterator map controlNameFromId
+      val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size).iterator map controlNameFromId
+
+      // Produce `section-` and `grid-` for sections and grids when we can
+      def newName(name: String) =
+        if (allSectionNamesInUse(name))
+          newSectionNamesIt.next()
+        else if (allGridNamesInUse(name))
+          newGridNamesIt.next()
+        else
+          newControlNamesIt.next()
+
+      needRenameWithAutomaticIds.iterator.map(name ⇒ name → newName(name)).toMap
+    }
 
     xcvNamesInUse map { xcvName ⇒
 

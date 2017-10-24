@@ -148,6 +148,31 @@
                         <!--title="{$form-resources/clipboard/label}"-->
                         <!--class="fb-clipboard fa fa-clipboard fa-fw"/>-->
                 <!--</xf:group>-->
+
+                <xf:trigger appearance="minimal" ref="$undo/undo-trigger" id="undo-trigger">
+                    <xf:label>
+                        <!-- TODO: i18n -->
+                        <xh:i
+                            title="{$form-resources/undo/label}"
+                            class="fa fa-undo fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate" type="xpath">
+                        fbf:undoAction()
+                    </xf:action>
+                </xf:trigger>
+
+                <xf:trigger appearance="minimal" ref="$undo/redo-trigger" id="redo-trigger">
+                    <xf:label>
+                        <!-- TODO: i18n -->
+                        <xh:i
+                            title="{$form-resources/redo/label}"
+                            class="fa fa-repeat fa-fw"/>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate" type="xpath">
+                        fbf:redoAction()
+                    </xf:action>
+                </xf:trigger>
+
             </xf:group>
         </xh:div>
 

@@ -144,7 +144,7 @@ object DataMigration {
     dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
 
   def migrationMapFromMetadata(metadataRootElement: NodeInfo): Option[String] =
-    metadataRootElement firstChild "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
+    metadataRootElement firstChildOpt "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
 
   def migrateDataTo(data: DocumentInfo, jsonMigrationMap: String): DocumentWrapper = {
 

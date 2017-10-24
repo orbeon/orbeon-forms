@@ -375,7 +375,7 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  def deleteGridById(gridId: String)(implicit ctx: FormBuilderDocContext): Unit =
+  def deleteGridById(gridId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     deleteContainerById(canDeleteGrid, gridId)
 
   def canDeleteGrid(gridElem: NodeInfo): Boolean =

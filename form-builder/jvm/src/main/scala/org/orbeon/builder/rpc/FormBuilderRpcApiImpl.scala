@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder.rpc
 
-import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps}
+import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps, Undo}
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
@@ -114,7 +114,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def sectionDelete(sectionId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteSectionById(sectionId)
+    FormBuilder.deleteSectionById(sectionId) foreach Undo.pushUndoAction
   }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
@@ -156,8 +156,10 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.moveSectionLeft(FormBuilder.containerById(sectionId))
   }
 
-  def gridDelete(gridId: String): Unit =
-    FormBuilder.deleteGridById(gridId)(FormBuilderDocContext())
+  def gridDelete(gridId: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.deleteGridById(gridId) foreach Undo.pushUndoAction
+  }
 
   def containerCopy(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()

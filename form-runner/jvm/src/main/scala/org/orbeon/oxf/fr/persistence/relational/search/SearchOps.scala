@@ -53,7 +53,7 @@ object SearchOps {
 
       def childValue(name: String): Option[String] =
         Option(metadataOrNullEl)
-          .flatMap(_.firstChild(name))
+          .flatMap(_.firstChildOpt(name))
           .map(_.stringValue)
           .flatMap(_.trimAllToOpt)
 
@@ -61,7 +61,7 @@ object SearchOps {
       val groupname    = childValue("groupname")
       val organization = {
         val levels = Option(metadataOrNullEl)
-          .flatMap(_.firstChild("organization"))
+          .flatMap(_.firstChildOpt("organization"))
           .map(_.child("level").to[List].map(_.stringValue))
         levels.map(Organization.apply)
       }

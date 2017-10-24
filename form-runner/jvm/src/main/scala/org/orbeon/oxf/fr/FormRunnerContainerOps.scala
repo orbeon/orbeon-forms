@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.FormRunner.IsSection
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.saxon.om.NodeInfo
@@ -104,6 +104,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   // Get the name for a section or grid element or null (the empty sequence)
   //@XPathFunction
   def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
+
+  def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): List[NodeInfo] =
+      (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
 
   // Find ancestor sections and grids (including non-repeated grids)
   def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =

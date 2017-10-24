@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -553,6 +553,29 @@ object FormBuilderXPathApi {
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.readXcvFromClipboard foreach
-      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix))
+      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None))
+  }
+
+  //@XPathFunction
+  def undoAction(): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+
+    Undo.popUndoAction() foreach {
+      case UndoAction.UndoDelete(position, xcv) ⇒
+
+        val xcvElem = TransformerUtils.extractAsMutableDocument(xcv).rootElement
+
+        println("xxx: undoAction:")
+        println(TransformerUtils.tinyTreeToString(xcvElem))
+
+        ToolboxOps.pasteSectionGridFromXcv(xcvElem, "", "", Some(position))
+    }
+
+  }
+
+  //@XPathFunction
+  def redoAction(): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    ???
   }
 }

@@ -35,14 +35,15 @@ case class FormBuilderDocContext(
 
   lazy val formDefinitionInstance = formBuilderModel flatMap (_.findInstance("fb-form-instance"))
   lazy val xcvInstance            = formBuilderModel flatMap (_.findInstance("fb-xcv-instance"))
+  lazy val undoInstance           = formBuilderModel flatMap (_.findInstance("fb-undo-instance"))
 
   lazy val formDefinitionRootElem = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
 
   lazy val componentBindings: Seq[NodeInfo] =
     asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-  lazy val clipboardXcvRootElem =
-    formBuilderModel.get.unsafeGetVariableAsNodeInfo("xcv")
+  lazy val clipboardXcvRootElem = xcvInstance.get.rootElement
+  lazy val undoRootElem         = undoInstance.get.rootElement
 
   lazy val formResourcesRoot: NodeInfo =
     formBuilderModel.get.unsafeGetVariableAsNodeInfo("resources")
@@ -214,15 +215,11 @@ trait BaseOps extends Logging {
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 
   def withDebugGridOperation[T](message: String)(body: ⇒ T)(implicit ctx: FormBuilderDocContext): T = {
-    debugDumpDocumentForGrids(s"before $message")
+    debugDumpDocument(s"before $message")
     val result = body
-    debugDumpDocumentForGrids(s"after $message")
+    debugDumpDocument(s"after $message")
     result
   }
-
-  def debugDumpDocumentForGrids(message: String)(implicit ctx: FormBuilderDocContext): Unit =
-    if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
-      debugDumpDocument(message)
 
   def debugDumpDocument(message: String)(implicit ctx: FormBuilderDocContext): Unit =
     debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(ctx.formDefinitionRootElem)))

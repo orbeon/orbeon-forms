@@ -721,4 +721,20 @@
         <xf:bind ref="paste-trigger" readonly="not(exists(../control/*))"/>
     </xf:bind>
 
+    <!-- Undo stack -->
+    <xf:instance id="fb-undo-instance">
+        <undo>
+            <undos/>
+            <redos/>
+            <undo-trigger/>
+            <redo-trigger/>
+        </undo>
+    </xf:instance>
+    <xf:var name="undo" value="instance('fb-undo-instance')"/>
+
+    <xf:bind ref="$undo">
+        <xf:bind ref="undo-trigger" readonly="empty($undo/undos/*)"/>
+        <xf:bind ref="redo-trigger" readonly="empty($undo/redos/*)"/>
+    </xf:bind>
+
 </xf:model>

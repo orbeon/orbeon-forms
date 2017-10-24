@@ -49,8 +49,8 @@ trait SearchRequest {
           form           = form,
           username       = username,
           group          = group,
-          pageSize       = searchElement.firstChild("page-size")  .get.stringValue.toInt,
-          pageNumber     = searchElement.firstChild("page-number").get.stringValue.toInt,
+          pageSize       = searchElement.firstChildOpt("page-size")  .get.stringValue.toInt,
+          pageNumber     = searchElement.firstChildOpt("page-number").get.stringValue.toInt,
           freeTextSearch =
             queryEls
               // Free text is in the first <query>

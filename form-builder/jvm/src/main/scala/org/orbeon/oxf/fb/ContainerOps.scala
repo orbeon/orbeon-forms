@@ -28,6 +28,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.oxf.util.CoreUtils._
 
 trait ContainerOps extends ControlOps {
 
@@ -72,10 +73,23 @@ trait ContainerOps extends ControlOps {
     canDelete   : NodeInfo ⇒ Boolean,
     containerId : String)(implicit
     ctx         : FormBuilderDocContext
-  ): Unit = {
+  ): Option[UndoAction] = {
     val container = containerById(containerId)
-    if (canDelete(container))
+    canDelete(container) option {
+
+      val undo =
+        UndoAction.UndoDelete(
+          InsertPosition(
+            findAncestorContainersLeafToRoot(container).headOption flatMap getControlNameOpt, // top-level container doesn't have a name
+            precedingSiblingOrSelfContainers(container).headOption map getControlName
+          ),
+          ToolboxOps.controlOrContainerElemToXcv(container)
+        )
+
       deleteContainer(container)
+
+      undo
+    }
   }
 
   def deleteContainer(containerElem: NodeInfo): Unit = {

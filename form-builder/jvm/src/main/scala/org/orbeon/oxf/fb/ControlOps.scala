@@ -76,13 +76,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean): Option[String] = {
 
-    val precedingOrSelfContainers =
-      (includeSelf list grid) ++ (grid precedingSibling * filter IsContainer)
-
     // If a container has a `bind`, then use its name, otherwise it is an unbound grid so find its last control
     // with a name (there might not be one).
     val controlsWithName =
-      precedingOrSelfContainers flatMap {
+      precedingSiblingOrSelfContainers(grid, includeSelf) flatMap {
         case grid if grid attValueOpt "bind" isEmpty ⇒ grid descendant CellTest child * filter hasName lastOption
         case other                                   ⇒ Some(other)
       }

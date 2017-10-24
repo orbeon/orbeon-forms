@@ -498,13 +498,21 @@ object ToolboxOps {
     ctx            : FormBuilderDocContext
   ): Unit = {
 
-    val xcv = controlElementsInCellToXcv(sourceCellElem)
+    val xcvElemOpt = controlElementsInCellToXcv(sourceCellElem)
 
+    xcvElemOpt foreach { x ⇒
+      println(TransformerUtils.tinyTreeToString(x))
+    }
+
+    withDebugGridOperation("dnd delete") {
     if (! copy)
       deleteControlWithinCell(sourceCellElem, updateTemplates = true)
+    }
 
+    withDebugGridOperation("dnd paste") {
     selectCell(targetCellElem)
-    xcv foreach (pasteSingleControlFromXcv(targetCellElem, _))
+    xcvElemOpt foreach (pasteSingleControlFromXcv(targetCellElem, _))
+    }
   }
 
   def namesToRenameForMergingSectionTemplate(
@@ -534,6 +542,8 @@ object ToolboxOps {
     suffix  : String)(implicit
     ctx     : FormBuilderDocContext
   ): Seq[(String, String, Boolean)] = {
+
+    require(xcvElem.isElement)
 
     val xcvNamesInUse =
       mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem), xcvElem / XcvEntry.Holder.entryName / * headOption) toList
@@ -691,7 +701,7 @@ object ToolboxOps {
   ): Unit =
     xcvFromSectionWithTemplate(containerId) foreach { xcvElem ⇒
       deleteSectionById(containerId)
-      pasteSectionGridFromXcv(xcvElem, prefix, suffix)
+      pasteSectionGridFromXcv(xcvElem, prefix, suffix, None)
     }
 
   // Paste control from the clipboard
@@ -707,7 +717,7 @@ object ToolboxOps {
       if (IsGrid(controlElem) || IsSection(controlElem)) {
 
         if (namesToRenameForPaste(xcvElem, "", "") forall (! _._3))
-          pasteSectionGridFromXcv(xcvElem, "", "")
+          pasteSectionGridFromXcv(xcvElem, "", "", None)
         else
           XFormsAPI.dispatch(
             name       = "fb-show-dialog",
@@ -722,11 +732,14 @@ object ToolboxOps {
   private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"
 
   def pasteSectionGridFromXcv(
-    xcvElem : NodeInfo,
-    prefix  : String,
-    suffix  : String)(implicit
-    ctx     : FormBuilderDocContext
+    xcvElem        : NodeInfo,
+    prefix         : String,
+    suffix         : String,
+    insertPosition : Option[InsertPosition])(implicit
+    ctx            : FormBuilderDocContext
   ): Unit = {
+
+    require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
 
@@ -799,19 +812,33 @@ object ToolboxOps {
       }
     }
 
-    val (into, after) =
-      if (IsGrid(containerControlElem)) {
-        val (into, after, _) = findGridInsertionPoint
-        (into, after)
-      } else {
-        findSectionInsertionPoint
+    val (intoContainerElem, afterElemOpt) =
+      insertPosition match {
+        case Some(InsertPosition(into, after)) ⇒
+
+          val intoContainerElem     = into  flatMap (findControlByName(ctx.formDefinitionRootElem, _))
+          val afterContainerElemOpt = after flatMap (findControlByName(ctx.formDefinitionRootElem, _))
+
+          // Tricky: Within the `fb-body` top-level container, we need to insert after the `<xf:var>`.
+          val afterElemOpt =
+            if (intoContainerElem.isEmpty)
+              afterContainerElemOpt orElse (ctx.bodyElem lastChildOpt "*:var")
+            else
+              afterContainerElemOpt
+
+          (intoContainerElem getOrElse ctx.bodyElem, afterElemOpt)
+        case None if IsGrid(containerControlElem) ⇒
+          val (into, after, _) = findGridInsertionPoint
+          (into, after)
+        case None ⇒
+          findSectionInsertionPoint
       }
 
-    // TODO: What if pasting after a non-repeated grid without name? We must try to keep the order of things!
-    val precedingContainerName = after flatMap getControlNameOpt
+    // NOTE: Now non-repeated grids also have a control name.
+    val precedingContainerNameOpt = afterElemOpt flatMap getControlNameOpt
 
     val newContainerElem =
-      insert(into = into, after = after.toList, origin = containerControlElem).head
+      insert(into = intoContainerElem, after = afterElemOpt.toList, origin = containerControlElem).head
 
     val resourceHolders =
       for {
@@ -825,7 +852,7 @@ object ToolboxOps {
       controlElement       = newContainerElem, // in order to find containers
       dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
       resourceHolders      = resourceHolders,
-      precedingControlName = precedingContainerName
+      precedingControlName = precedingContainerNameOpt
     )
 
     // Insert the bind element
@@ -851,11 +878,11 @@ object ToolboxOps {
 
       ensureTemplateReplaceContent(
         controlName = newControlName,
-        content     = createTemplateContentFromBind(bindElem firstChild * head, ctx.componentBindings))
+        content     = createTemplateContentFromBind(bindElem firstChildOpt * head, ctx.componentBindings))
     }
 
     // Update ancestor templates if any
-    updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(intoContainerElem, includeSelf = true).to[Set])
 
     // Make sure new grids and cells are annotated
     annotateGridsAndCells(newContainerElem)

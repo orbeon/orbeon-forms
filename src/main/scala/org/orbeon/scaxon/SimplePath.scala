@@ -124,7 +124,8 @@ object SimplePath {
 
     def /(test: Test) = find(Axis.CHILD, test)
 
-    def firstChild(test: Test) = /(test).headOption
+    def firstChildOpt(test: Test) = /(test).headOption
+    def lastChildOpt(test: Test)  = /(test).lastOption
 
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
@@ -321,6 +322,7 @@ object SimplePath {
     def att(test: Test)           = /@(test)
     def child(test: Test)         = /(test)
     def firstChildOpt(test: Test) = /(test).headOption
+    def lastChildOpt(test: Test)  = /(test).lastOption
 
     def attValue(attName: String) = /@(attName) map (_.stringValue)
     def attValue(attName: QName)  = /@(attName) map (_.stringValue)

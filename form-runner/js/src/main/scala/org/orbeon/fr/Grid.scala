@@ -13,7 +13,7 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.datatypes.{Coordinate, Direction}
+import org.orbeon.datatypes.{Coordinate1, Direction}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.oxf.fr.Cell
 import org.scalajs.dom.html
@@ -29,7 +29,7 @@ object Grid {
     ???
   }
 
-  def canMoveToCoordinate(cellElem: html.Element, coordinate: Coordinate): Boolean = {
+  def canMoveToCoordinate(cellElem: html.Element, coordinate: Coordinate1): Boolean = {
 
     val cells = Cell.analyze12ColumnGridAndFillHoles(cellElem.parentElement, simplify = false)
 

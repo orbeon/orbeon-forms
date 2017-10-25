@@ -560,14 +560,18 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     Undo.popUndoAction() foreach {
-      case UndoAction.UndoDelete(position, xcv) ⇒
-
-        val xcvElem = TransformerUtils.extractAsMutableDocument(xcv).rootElement
-
-        println("xxx: undoAction:")
-        println(TransformerUtils.tinyTreeToString(xcvElem))
-
-        ToolboxOps.pasteSectionGridFromXcv(xcvElem, "", "", Some(position))
+      case UndoAction.UndoDeleteContainer(position, xcvElem) ⇒
+        ToolboxOps.pasteSectionGridFromXcv(
+          TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+          "",
+          "",
+          Some(position)
+        )
+      case UndoAction.UndoDeleteControl(position, xcvElem) ⇒
+        ToolboxOps.pasteSingleControlFromXcv(
+          TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+          Some(position)
+        )
     }
 
   }

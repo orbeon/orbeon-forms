@@ -13,6 +13,6 @@
   */
 package org.orbeon.datatypes
 
-case class Coordinate(x: Int, y: Int) {
+case class Coordinate1(x: Int, y: Int) {
   require(x > 0 && y > 0)
 }

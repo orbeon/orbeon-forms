@@ -134,7 +134,7 @@ class GridOpsTest
         val controls =
           sectionWithGridAndControls descendant NodeInfoCell.CellTest child * filter (_ /@ "id" nonEmpty)
 
-        val actual = controls map precedingControlNameInSectionForControl
+        val actual = controls map precedingBoundControlNameInSectionForControl
 
         assert(actual === List(None, Some("grid-2"), Some("grid-2")))
       }
@@ -149,7 +149,7 @@ class GridOpsTest
         val grids = section descendant NodeInfoCell.GridTest
 
         val expected = List(Some("control-11"), Some("grid-2"), Some("control-31"))
-        val actual = grids map (precedingControlNameInSectionForGrid(_, includeSelf = true))
+        val actual = grids map (precedingBoundControlNameInSectionForGrid(_, includeSelf = true))
 
         assert(actual === expected)
       }

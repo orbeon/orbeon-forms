@@ -44,12 +44,11 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def controlDelete(controlId: String): Unit = {
-
     implicit val ctx = FormBuilderDocContext()
-
-    resolveId(controlId) foreach { controlElem ⇒
+    resolveId(controlId) flatMap { controlElem ⇒
       FormBuilder.deleteControlWithinCell(controlElem.parentUnsafe, updateTemplates = true)
-    }
+    } foreach
+      Undo.pushUndoAction
   }
 
   def controlEditDetails(controlId: String): Unit =

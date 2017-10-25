@@ -436,7 +436,7 @@ class FormBuilderFunctionsTest
         assert(FormBuilder.findDataHolders(Control1).isEmpty)
         assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
-        ToolboxOps.pasteFromClipboard(selectedCell)
+        ToolboxOps.pasteFromClipboard()
 
         assertPresent()
       }
@@ -458,7 +458,7 @@ class FormBuilderFunctionsTest
         assert(FormBuilder.findContainerById(firstGridId).isEmpty)
         assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
 
-        ToolboxOps.pasteFromClipboard(FormBuilder.findSelectedCell.get)
+        ToolboxOps.pasteFromClipboard()
 
         assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
 

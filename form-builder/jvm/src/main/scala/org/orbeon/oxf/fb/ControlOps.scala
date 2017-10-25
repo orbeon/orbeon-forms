@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -58,9 +58,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
     findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
 
-  def precedingControlNameInSectionForControl(controlElement: NodeInfo): Option[String] = {
+  def precedingBoundControlNameInSectionForControl(controlElem: NodeInfo): Option[String] = {
 
-    val cell = controlElement parent CellTest head
+    val cell = controlElem parent CellTest head
     val grid = findAncestorContainersLeafToRoot(cell).head
 
     assert(cell.localname == "c")
@@ -68,26 +68,29 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     val precedingCellsInGrid = cell precedingSibling CellTest
 
-    def fromPrecedingNamesInGrid = precedingCellsInGrid flatMap (_ child * flatMap getControlNameOpt) headOption
-    def fromGridNameOpt          = getControlNameOpt(grid)
+    def fromPrecedingNamesInGrid = precedingCellsInGrid flatMap (_ firstChildOpt * flatMap getControlNameOpt) headOption
 
-    fromPrecedingNamesInGrid orElse
-      fromGridNameOpt        orElse
-      precedingControlNameInSectionForGrid(grid, includeSelf = false)
+    def fromPrecedingGrids =
+      if (grid.hasAtt("bind"))
+        None
+      else
+        precedingBoundControlNameInSectionForGrid(grid, includeSelf = false)
+
+    fromPrecedingNamesInGrid orElse fromPrecedingGrids
   }
 
-  def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean): Option[String] = {
+  def precedingBoundControlNameInSectionForGrid(gridElem: NodeInfo, includeSelf: Boolean): Option[String] = {
 
     // If a container has a `bind`, then use its name, otherwise it is an unbound grid so find its last control
     // with a name (there might not be one).
-    val controlsWithName =
-      precedingSiblingOrSelfContainers(grid, includeSelf) flatMap {
+    val boundControls =
+      precedingSiblingOrSelfContainers(gridElem, includeSelf) flatMap {
         case grid if ! grid.hasAtt("bind") ⇒ grid descendant CellTest child * filter hasName lastOption
-        case other                         ⇒ Some(other)
+        case boundSectionOrGrid            ⇒ Some(boundSectionOrGrid)
       }
 
     // Take the first result
-    controlsWithName.headOption flatMap getControlNameOpt
+    boundControls.headOption flatMap getControlNameOpt
   }
 
   // Ensure that a tree of bind exists
@@ -106,10 +109,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert a bind into one level
-    @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
+    @tailrec def ensureBind(containerElem: NodeInfo, names: Iterator[String]): NodeInfo = {
       if (names.hasNext) {
         val bindName = names.next()
-        val bind = container / XFBindTest filter (isBindForName(_, bindName)) match {
+        val bind = containerElem / XFBindTest filter (isBindForName(_, bindName)) match {
           case Seq(bind: NodeInfo, _*) ⇒ bind
           case _ ⇒
 
@@ -120,11 +123,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                 name={bindName}
                 xmlns:xf="http://www.w3.org/2002/xforms"/>
 
-            insert(into = container, after = container / XFBindTest, origin = newBind).head
+            insert(into = containerElem, after = containerElem / XFBindTest, origin = newBind).head
         }
         ensureBind(bind, names)
       } else
-        container
+        containerElem
     }
 
     // Start with top-level
@@ -146,17 +149,31 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     cellElem        : NodeInfo,
     updateTemplates : Boolean = false)(implicit
     ctx             : FormBuilderDocContext
-  ): Unit = {
-    cellElem / * flatMap controlElementsToDelete foreach (delete(_))
-    if (updateTemplates)
-      self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
-  }
+  ): Option[UndoAction] =
+    cellElem firstChildOpt * map { controlElem ⇒
+
+      val undo =
+        UndoAction.UndoDeleteControl(
+          ControlPosition(
+            gridName   = findAncestorContainersLeafToRoot(controlElem, includeSelf = false).headOption flatMap getControlNameOpt get,
+            coordinate = Coordinate1(NodeInfoCellOps.x(cellElem).get, NodeInfoCellOps.y(cellElem).get)
+          ),
+          ToolboxOps.controlOrContainerElemToXcv(controlElem)
+        )
+
+      controlElementsToDelete(controlElem) foreach (delete(_))
+
+      if (updateTemplates)
+        self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
+
+      undo
+    }
 
   // Find all associated elements to delete for a given control element
-  def controlElementsToDelete(control: NodeInfo)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
+  def controlElementsToDelete(controlElem: NodeInfo)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
 
     // Holders, bind, templates, resources if the control has a name
-    val holders = getControlNameOpt(control).toList flatMap { controlName ⇒
+    val holders = getControlNameOpt(controlElem).toList flatMap { controlName ⇒
 
       val buffer = mutable.ListBuffer[NodeInfo]()
 
@@ -170,7 +187,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Prepend control element
-    control :: holders
+    controlElem :: holders
   }
 
   // Rename a control with its holders, binds, etc. but *not* its nested iteration if any

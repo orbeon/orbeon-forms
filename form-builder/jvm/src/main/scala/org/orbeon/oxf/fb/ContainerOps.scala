@@ -78,8 +78,8 @@ trait ContainerOps extends ControlOps {
     canDelete(container) option {
 
       val undo =
-        UndoAction.UndoDelete(
-          InsertPosition(
+        UndoAction.UndoDeleteContainer(
+          ContainerPosition(
             findAncestorContainersLeafToRoot(container).headOption flatMap getControlNameOpt, // top-level container doesn't have a name
             precedingSiblingOrSelfContainers(container).headOption map getControlName
           ),

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
+import org.orbeon.datatypes.Coordinate1
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
@@ -29,6 +30,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import NodeInfoCell._
 
 import scala.collection.mutable
 
@@ -125,7 +127,7 @@ object ToolboxOps {
             controlElement       = newControlElem,
             dataHolders          = List(dataHolder),
             resourceHolders      = resourceHolders,
-            precedingControlName = precedingControlNameInSectionForControl(newControlElem)
+            precedingControlName = precedingBoundControlNameInSectionForControl(newControlElem)
           )
 
           // Adjust bindings on newly inserted control, done after the control is added as
@@ -284,7 +286,7 @@ object ToolboxOps {
         controlElement       = newGridElem,
         dataHolders          = List(elementInfo(newGridName)),
         resourceHolders      = Nil,
-        precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
+        precedingControlName = grid flatMap (precedingBoundControlNameInSectionForGrid(_, includeSelf = true))
       )
 
       // Make sure binds are created
@@ -368,15 +370,15 @@ object ToolboxOps {
     case object Bind      extends XcvEntry
   }
 
-  def controlOrContainerElemToXcv(containerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
-    val inDoc             = containerElem.getDocumentRoot
+  def controlOrContainerElemToXcv(controlOrContainerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): NodeInfo = {
+
     val resourcesRootElem = resourcesRoot
 
     val controlDetailsOpt =
       searchControlBindPathHoldersInDoc(
-        controlElems   = List(containerElem),
-        inDoc          = inDoc,
+        controlElems   = List(controlOrContainerElem),
+        inDoc          = ctx.formDefinitionRootElem,
         contextItemOpt = Some(ctx.dataRootElem),
         predicate      = _ ⇒ true
       ).headOption
@@ -415,8 +417,8 @@ object ToolboxOps {
           // In this case, we use the grid control as a source of truth and find the nested controls.
 
           val nestedControlDetails = searchControlBindPathHoldersInDoc(
-            controlElems   = findNestedControls(containerElem),
-            inDoc          = inDoc,
+            controlElems   = findNestedControls(controlOrContainerElem),
+            inDoc          = ctx.formDefinitionRootElem,
             contextItemOpt = Some(ctx.dataRootElem),
             predicate      = _ ⇒ true
           )
@@ -430,7 +432,7 @@ object ToolboxOps {
           }
 
           XcvEntry.values map {
-            case e @ XcvEntry.Control   ⇒ e → List(containerElem)
+            case e @ XcvEntry.Control   ⇒ e → List(controlOrContainerElem)
             case e @ XcvEntry.Holder    ⇒ e → (nestedControlDetails flatMap (_.holders flatMap (_.headOption)))
             case e @ XcvEntry.Resources ⇒ e → resourcesWithLang.toList
             case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
@@ -447,7 +449,7 @@ object ToolboxOps {
     result
   }
 
-  private def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
+  def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val name  = getControlName(cellElem / * head)
     findControlByName(ctx.formDefinitionRootElem, name) map controlOrContainerElemToXcv
   }
@@ -512,7 +514,7 @@ object ToolboxOps {
 
     withDebugGridOperation("dnd paste") {
     selectCell(targetCellElem)
-    xcvElemOpt foreach (pasteSingleControlFromXcv(targetCellElem, _))
+    xcvElemOpt foreach (pasteSingleControlFromXcv(_, None))
     }
   }
 
@@ -707,7 +709,7 @@ object ToolboxOps {
 
   // Paste control from the clipboard
   //@XPathFunction
-  def pasteFromClipboard(targetCellElem: NodeInfo): Unit = {
+  def pasteFromClipboard(): Unit = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -726,7 +728,7 @@ object ToolboxOps {
             properties = Map("container-id" → Some(controlElem.id), "action" → Some("paste"))
           )
       } else
-        pasteSingleControlFromXcv(targetCellElem, xcvElem)
+        pasteSingleControlFromXcv(xcvElem, None)
     }
   }
 
@@ -736,7 +738,7 @@ object ToolboxOps {
     xcvElem        : NodeInfo,
     prefix         : String,
     suffix         : String,
-    insertPosition : Option[InsertPosition])(implicit
+    insertPosition : Option[ContainerPosition])(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 
@@ -856,7 +858,7 @@ object ToolboxOps {
 
     val (intoContainerElem, afterElemOpt) =
       insertPosition match {
-        case Some(InsertPosition(into, after)) ⇒
+        case Some(ContainerPosition(into, after)) ⇒
 
           val intoContainerElem     = into  flatMap (findControlByName(ctx.formDefinitionRootElem, _))
           val afterContainerElemOpt = after flatMap (findControlByName(ctx.formDefinitionRootElem, _))
@@ -932,12 +934,26 @@ object ToolboxOps {
     selectFirstCellInContainer(newContainerElem)
   }
 
-  private def pasteSingleControlFromXcv(
-    targetCellElem : NodeInfo,
-    xcvElem        : NodeInfo)(implicit
+  def pasteSingleControlFromXcv(
+    xcvElem        : NodeInfo,
+    insertPosition : Option[ControlPosition])(implicit
     ctx            : FormBuilderDocContext
-  ): Unit =
-    ensureEmptyCell() foreach { gridCellElem ⇒
+  ): Unit = {
+
+    val insertCellElemOpt =
+      insertPosition match {
+        case Some(ControlPosition(gridName, Coordinate1(x, y))) ⇒
+
+
+
+          findControlByName(ctx.formDefinitionRootElem, gridName).toList descendant CellTest collectFirst {
+            case cell if NodeInfoCellOps.x(cell).contains(x) && NodeInfoCellOps.y(cell).contains(y) ⇒ cell
+          }
+
+        case None ⇒ ensureEmptyCell()
+      }
+
+     insertCellElemOpt foreach { incertCellElem ⇒
 
       implicit val ctx = FormBuilderDocContext()
 
@@ -949,9 +965,9 @@ object ToolboxOps {
       val name = {
         val requestedName = getControlName(controlElem)
 
-        // Check if id is already in use
-        if (findInViewTryIndex(targetCellElem, controlId(requestedName)).isDefined) {
-          // If so create new id
+        // Check if name is already in use
+        if (findInViewTryIndex(ctx.formDefinitionRootElem, controlId(requestedName)).isDefined) {
+          // If so create new name
           val newName = controlNameFromId(nextId(XcvEntry.Control.entryName))
 
           // Rename everything
@@ -969,17 +985,17 @@ object ToolboxOps {
       }
 
       // Insert control and holders
-      val newControlElem = insert(into = gridCellElem, origin = controlElem).head
+      val newControlElem = insert(into = incertCellElem, origin = controlElem).head
 
       insertHolders(
         controlElement       = newControlElem,
         dataHolders          = dataHolders,
         resourceHolders      = xcvElem / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
-        precedingControlName = precedingControlNameInSectionForControl(newControlElem)
+        precedingControlName = precedingBoundControlNameInSectionForControl(newControlElem)
       )
 
       // Create the bind and copy all attributes and content
-      val bind = ensureBinds(findContainerNamesForModel(gridCellElem) :+ name)
+      val bind = ensureBinds(findContainerNamesForModel(incertCellElem) :+ name)
       (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }
@@ -1018,8 +1034,9 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(targetCellElem).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(incertCellElem).to[Set])
     }
+  }
 
   private object Private {
 

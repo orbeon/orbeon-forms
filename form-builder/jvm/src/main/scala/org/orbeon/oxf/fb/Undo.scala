@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 
+import org.orbeon.datatypes.Coordinate1
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -23,14 +24,16 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 
-case class InsertPosition(into: Option[String], after: Option[String])
+case class ControlPosition  (gridName: String,     coordinate: Coordinate1)
+case class ContainerPosition(into: Option[String], after: Option[String])
 
 sealed trait UndoAction
 
 object UndoAction {
 //  case class UndoInsert(controlName: String)              extends UndoAction
 //  case class UndoRename(oldName: String, newName: String) extends UndoAction
-  case class UndoDelete(position: InsertPosition, xcv: NodeInfo) extends UndoAction
+  case class UndoDeleteControl  (position: ControlPosition,   xcv: NodeInfo) extends UndoAction
+  case class UndoDeleteContainer(position: ContainerPosition, xcv: NodeInfo) extends UndoAction
 //  case class UndoMoveContainer() extends UndoAction
 //  case class UndoUpdateSettings() extends UndoAction
 }

@@ -214,8 +214,9 @@ def jUnitTestOptions =
     baseDirectory     in Test          := Path.absolute(baseDirectory.value / "..")
   )
 
-lazy val DatabaseTest = config("db")         extend Test
-lazy val DebugTest    = config("debug-test") extend Test
+lazy val DebugTest         = config("debug-test") extend Test
+lazy val DatabaseTest      = config("db")         extend Test
+lazy val DebugDatabaseTest = config("debug-db")   extend Test
 
 lazy val unmanagedJarsSettings = Seq(
 
@@ -417,14 +418,18 @@ lazy val formRunnerJVM = formRunner.jvm
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
-  .configs(DatabaseTest, DebugTest)
+  .configs(DatabaseTest, DebugDatabaseTest, DebugTest)
   .settings(commonSettings: _*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
+  .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings): _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(jUnitTestOptions: _*)
   .settings(
     sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
-    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
+
+    sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
+    javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
     libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
   )

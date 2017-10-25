@@ -20,18 +20,14 @@ import org.scalajs.dom
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefined}
 
-@JSExportTopLevel("ORBEON.builder.BlockCache")
-@JSExportAll
 object BlockCache {
 
   val SectionSelector  = ".xbl-fr-section"
   val GridSelector     = ".xbl-fr-grid"
   val GridBodySelector = ".fr-grid-body"
 
-  @ScalaJSDefined
-  class Block extends js.Object {
+  class Block {
 
     val el: JQuery = null
     val left: Double = 0

@@ -211,7 +211,6 @@ div.orbeon.orbeon-portlet-div {
     // So the cursor is inside the element, and picking the cursor works
     .gu-mirror { padding-right: 28px }
 
-    //
     .fb-grid-dnd-column-container {
 
         width: 7px;
@@ -248,6 +247,17 @@ div.orbeon.orbeon-portlet-div {
             padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
             overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
             .box-sizing(border-box);
+
+            .xbl-fr-tabbable .nav-tabs > li:not(.active) > a {
+
+                background-color: white;
+                color: #aaa;
+
+                &:hover {
+                    background-color: #aaa;
+                    color: #ddd;
+                }
+            }
 
             .fb-tools {
                 .fr-border();

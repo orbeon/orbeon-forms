@@ -48,9 +48,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName.get(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
 
-  private val topLevelBindTemplate: NodeInfo =
-    <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
-           xmlns:xf="http://www.w3.org/2002/xforms"/>
+  private val TopLevelBindTemplate: NodeInfo =
+    <xf:bind
+      id="fr-form-binds"
+      ref="instance('fr-form-instance')"
+      xmlns:xf="http://www.w3.org/2002/xforms"/>
 
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
@@ -80,8 +82,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // with a name (there might not be one).
     val controlsWithName =
       precedingSiblingOrSelfContainers(grid, includeSelf) flatMap {
-        case grid if grid attValueOpt "bind" isEmpty ⇒ grid descendant CellTest child * filter hasName lastOption
-        case other                                   ⇒ Some(other)
+        case grid if ! grid.hasAtt("bind") ⇒ grid descendant CellTest child * filter hasName lastOption
+        case other                         ⇒ Some(other)
       }
 
     // Take the first result
@@ -99,7 +101,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         insert(
           into   = ctx.modelElem,
           after  = ctx.dataInstanceElem,
-          origin = topLevelBindTemplate
+          origin = TopLevelBindTemplate
         ).head
     }
 
@@ -112,10 +114,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           case _ ⇒
 
             val newBind: Seq[NodeInfo] =
-              <xf:bind id={bindId(bindName)}
-                     ref={bindName}
-                     name={bindName}
-                     xmlns:xf="http://www.w3.org/2002/xforms"/>
+              <xf:bind
+                id={bindId(bindName)}
+                ref={bindName}
+                name={bindName}
+                xmlns:xf="http://www.w3.org/2002/xforms"/>
 
             insert(into = container, after = container / XFBindTest, origin = newBind).head
         }

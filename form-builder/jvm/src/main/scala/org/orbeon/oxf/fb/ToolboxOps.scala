@@ -747,7 +747,10 @@ object ToolboxOps {
     // Rename control names if needed
     locally {
 
-      val oldToNewNames = namesToRenameForPaste(xcvElem, prefix, suffix) map (t ⇒ (t._1, t._2)) toMap
+      val oldToNewNames =
+        namesToRenameForPaste(xcvElem, prefix, suffix) collect {
+          case (oldName, newName, _) if oldName != newName ⇒ oldName → newName
+        } toMap
 
       if (oldToNewNames.nonEmpty) {
 
@@ -893,20 +896,19 @@ object ToolboxOps {
       resourceHolders      = resourceHolders,
       precedingControlName = precedingContainerNameOpt
     )
+    val xcvBinds = xcvElem / XcvEntry.Bind.entryName / *
 
-    // Insert the bind element
-    val newBindOrNot = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
-
-    val newBindElem =
-      if (newContainerElem attValueOpt "bind" nonEmpty) {
-        // Element has a `bind` so the bind is newly-created
-        val result = insert(after = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *)
-        delete(newBindOrNot)
-        result.head
-      } else {
-        // Element doesn't have a `bind` so the bind was already there
-        insert(into = newBindOrNot, origin = xcvElem / XcvEntry.Bind.entryName / *).head
-      }
+    if (newContainerElem.hasAtt("bind")) {
+      // Insert the bind element for the container and descendants
+      val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
+      insert(after = tmpBind, origin = xcvBinds)
+      delete(tmpBind)
+    } else if (xcvBinds.nonEmpty) {
+      // There are descendant binds (case of an unbound non-repeated grid containing at least one control)
+      val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = false) :+ getControlName(xcvBinds.head))
+      insert(after = tmpBind, origin = xcvBinds)
+      delete(tmpBind)
+    }
 
     // Insert template for repeated grids/sections
     (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++

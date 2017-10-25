@@ -129,7 +129,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // Repeated sections add an intermediary iteration element
     val namesFromLeaf =
       namesWithContainers flatMap {
-        case (name, container) ⇒
+        case (name, _) ⇒
           findRepeatIterationName(descendant, name).toList ::: name :: Nil
       }
 

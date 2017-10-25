@@ -15,9 +15,9 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils.encodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
@@ -28,7 +28,6 @@ import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.saxon.value.ObjectValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._

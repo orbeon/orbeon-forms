@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
+import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
@@ -171,7 +172,7 @@ object ToolboxOps {
       val (into, after, _) = findGridInsertionPoint
 
       // Obtain ids first
-      val ids = nextTmpIds(2).toIterator
+      val ids = nextTmpIds(count = 2).toIterator
 
       // The grid template
       val gridTemplate: NodeInfo =
@@ -204,7 +205,7 @@ object ToolboxOps {
       val precedingSectionName = after flatMap getControlNameOpt
 
       // Obtain ids first
-      val ids = nextTmpIds(2).toIterator
+      val ids = nextTmpIds(count = 2).toIterator
 
       // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
       val sectionTemplate: NodeInfo =
@@ -263,7 +264,7 @@ object ToolboxOps {
       val (into, after, grid) = findGridInsertionPoint
       val newGridName         = controlNameFromId(nextId("grid"))
 
-      val ids = nextTmpIds(2).toIterator
+      val ids = nextTmpIds(count = 2).toIterator
 
       // The grid template
       val gridTemplate: NodeInfo =
@@ -743,7 +744,7 @@ object ToolboxOps {
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-    // Rename if needed
+    // Rename control names if needed
     locally {
 
       val oldToNewNames = namesToRenameForPaste(xcvElem, prefix, suffix) map (t ⇒ (t._1, t._2)) toMap
@@ -808,6 +809,44 @@ object ToolboxOps {
           oldToNewNames.get(oldNameAdjusted) foreach { newName ⇒
             renameBindElement(bindElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
           }
+        }
+      }
+    }
+
+    // Rename validation ids if needed
+    // NOTE: These are not names so do not really need to be stable.
+    locally {
+
+      // Rename nested element ids and alert ids
+      val nestedBindElemsWithValidationId =
+        for {
+          nestedElem   ← xcvElem / XcvEntry.Bind.entryName descendant XFBindTest child NestedBindElemTest
+          validationId ← nestedElem.idOpt
+        } yield
+          nestedElem → validationId
+
+      val oldIdToNewId =
+        nestedBindElemsWithValidationId map (_._2) zip nextTmpIds(token = Names.Validation, count = nestedBindElemsWithValidationId.size) toMap
+
+      // Update nested element ids, in particular xf:constraint/@id
+      nestedBindElemsWithValidationId foreach { case (nestedElem, oldId) ⇒
+        setvalue(nestedElem att "id", oldIdToNewId(oldId))
+      }
+
+      val alertsWithValidationId =
+        for {
+          alertElem    ← xcvElem / XcvEntry.Control.entryName descendant (XF → "alert")
+          validationId ← alertElem attValueOpt Names.Validation
+        } yield
+          alertElem → validationId
+
+      // Update xf:alert/@validation and xf:constraint/@id
+      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
+
+        val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
+
+        newValidationIdOpt foreach { newValidationId ⇒
+          setvalue(alertWithValidation att Names.Validation, newValidationId)
         }
       }
     }
@@ -943,8 +982,6 @@ object ToolboxOps {
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }
 
-      import org.orbeon.oxf.fr.Names._
-
       // Rename nested element ids and alert ids
       val nestedElemsWithId =
         for {
@@ -954,7 +991,7 @@ object ToolboxOps {
           nestedElem → id
 
       val oldIdToNewId =
-        nestedElemsWithId map (_._2) zip nextIds(Validation, nestedElemsWithId.size) toMap
+        nestedElemsWithId map (_._2) zip nextTmpIds(token = Names.Validation, count = nestedElemsWithId.size) toMap
 
       // Update nested element ids, in particular xf:constraint/@id
       nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
@@ -964,7 +1001,7 @@ object ToolboxOps {
       val alertsWithValidationId =
         for {
           alertElem    ← newControlElem / (XF → "alert")
-          validationId ← alertElem attValueOpt Validation
+          validationId ← alertElem attValueOpt Names.Validation
         } yield
           alertElem → validationId
 
@@ -974,7 +1011,7 @@ object ToolboxOps {
         val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
 
         newValidationIdOpt foreach { newValidationId ⇒
-          setvalue(alertWithValidation att Validation, newValidationId)
+          setvalue(alertWithValidation att Names.Validation, newValidationId)
         }
       }
 

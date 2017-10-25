@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -70,7 +71,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Extract from XML
     val allValidations = {
-      val idsIterator = nextIds("validation", validationElemsSeq.size).toIterator
+      val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).toIterator
       validationElemsSeq map (v ⇒ v → (v attValue "type")) flatMap {
         case (e, Required.name)   ⇒ RequiredValidation.fromXML(e, idsIterator)
         case (e, "datatype")      ⇒ DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)

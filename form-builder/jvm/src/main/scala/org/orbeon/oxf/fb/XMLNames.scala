@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI ⇒ XF}
 import org.orbeon.scaxon.SimplePath.Test
 
 object XMLNames {
@@ -28,10 +29,16 @@ object XMLNames {
   val FBViewTest        : Test  = FB → "view"
   val FBDatatypeTest    : Test  = FB → "datatype"
   val FBBindTest        : Test  = FB → "bind"
+  val FBConstraintTest  : Test  = FB → "constraint"
   val FBEditorsTest     : Test  = FB → "editors"
   val FBDisplayNameTest : Test  = FB → "display-name"
   val FBIconTest        : Test  = FB → "icon"
   val FBSmallIconTest   : Test  = FB → "small-icon"
 
   val InitialIterations : QName = QName.get("initial-iterations", FBPrefix, FB)
+
+  val XFTypeTest        : Test = XF → "type"
+  val XFRequiredTest    : Test = XF → "required"
+
+  val NestedBindElemTest: Test = FBConstraintTest || XFTypeTest || XFRequiredTest
 }

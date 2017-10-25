@@ -98,7 +98,7 @@ trait BaseOps extends Logging {
     nextIds(token, 1).head
 
   def nextTmpId()(implicit ctx: FormBuilderDocContext): String =
-    nextTmpIds(1).head
+    nextTmpIds(count = 1).head
 
   private def idsIterator(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] = {
 
@@ -143,12 +143,12 @@ trait BaseOps extends Logging {
 
   // Special id namespace for `tmp-n-tmp` ids. We don't care if those are used in data as element names, or
   // if they are in the clipboard.
-  def nextTmpIds(count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
+  def nextTmpIds(token: String = "tmp", count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
 
     val allIdsIt = idsIterator(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get))
 
-    val prefix = "tmp-"
-    val suffix = "-tmp"
+    val prefix = token + "-"
+    val suffix = "-" + token
 
     val allTmpIdsInUse =
       collection.mutable.Set() ++ allIdsIt filter (id ⇒ id.startsWith(prefix) && id.endsWith(suffix))

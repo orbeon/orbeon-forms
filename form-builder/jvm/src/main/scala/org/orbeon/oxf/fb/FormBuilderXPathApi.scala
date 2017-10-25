@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.util.CoreUtils._
@@ -261,8 +261,8 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def nextIds(inDoc: NodeInfo, token: String, count: Int): Seq[String] =
-    FormBuilder.nextIds(token, count)(FormBuilderDocContext(inDoc))
+  def nextValidationIds(inDoc: NodeInfo, count: Int): Seq[String] =
+    FormBuilder.nextTmpIds(token = Names.Validation, count = count)(FormBuilderDocContext(inDoc))
 
   // Canonical way: use the `name` attribute
   //@XPathFunction

@@ -44,7 +44,7 @@ trait GridOps extends ContainerOps {
     // Annotate cells
     locally {
       val toAnnotate = grids descendant CellTest filterNot (_.hasId)
-      val ids        = nextTmpIds(toAnnotate.size).toIterator
+      val ids        = nextTmpIds(count = toAnnotate.size).toIterator
       toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
     }
 
@@ -90,7 +90,7 @@ trait GridOps extends ContainerOps {
         } keepDistinctBy (_.u)
 
       val idsIt =
-        nextTmpIds(distinctCellsEndingAtCurrentRow.size).iterator
+        nextTmpIds(count = distinctCellsEndingAtCurrentRow.size).iterator
 
       val newCells =
         distinctCellsEndingAtCurrentRow map { cell ⇒
@@ -129,7 +129,7 @@ trait GridOps extends ContainerOps {
           }
 
         val idsIt =
-          nextTmpIds(cellsStartingOnFirstRow.size).iterator
+          nextTmpIds(count = cellsStartingOnFirstRow.size).iterator
 
         val newCells =
           cellsStartingOnFirstRow map { cell ⇒

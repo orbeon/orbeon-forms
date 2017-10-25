@@ -140,7 +140,7 @@
                             class="fa fa-paste fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:pasteFromClipboard($current-td)
+                        toolboxOps:pasteFromClipboard()
                     </xf:action>
                 </xf:trigger>
                 <!--<xf:group ref=".[exists($xcv/control/*/@id)]">-->

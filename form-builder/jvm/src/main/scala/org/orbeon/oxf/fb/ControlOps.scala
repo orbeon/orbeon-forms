@@ -15,10 +15,12 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
+import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -153,7 +155,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     cellElem firstChildOpt * map { controlElem ⇒
 
       val undo =
-        UndoAction.UndoDeleteControl(
+        UndoDeleteControl(
           ControlPosition(
             gridName   = findAncestorContainersLeafToRoot(controlElem, includeSelf = false).headOption flatMap getControlNameOpt get,
             coordinate = Coordinate1(NodeInfoCellOps.x(cellElem).get, NodeInfoCellOps.y(cellElem).get)
@@ -191,13 +193,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Rename a control with its holders, binds, etc. but *not* its nested iteration if any
-  def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
-    if (oldName != newName) {
+  def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Option[UndoRename] =
+    oldName != newName option {
 
       require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
 
-      findDataHolders(oldName) foreach (rename(_, newName))
-      findResourceHolders(oldName)    foreach (rename(_, newName))
+      findDataHolders(oldName)     foreach (rename(_, newName))
+      findResourceHolders(oldName) foreach (rename(_, newName))
 
       renameBinds   (oldName, newName)
       renameControl (oldName, newName)
@@ -206,6 +208,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl ⇒
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
+
+      UndoRename(oldName, newName)
     }
 
   def renameControlIterationIfNeeded(

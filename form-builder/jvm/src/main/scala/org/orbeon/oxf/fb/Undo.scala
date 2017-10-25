@@ -31,7 +31,7 @@ sealed trait UndoAction
 
 object UndoAction {
 //  case class UndoInsert(controlName: String)              extends UndoAction
-//  case class UndoRename(oldName: String, newName: String) extends UndoAction
+  case class UndoRename(oldName: String, newName: String)                    extends UndoAction
   case class UndoDeleteControl  (position: ControlPosition,   xcv: NodeInfo) extends UndoAction
   case class UndoDeleteContainer(position: ContainerPosition, xcv: NodeInfo) extends UndoAction
 //  case class UndoMoveContainer() extends UndoAction
@@ -43,10 +43,8 @@ object Undo {
   def pushUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val encoded = JsonConverter.encode(action)
+    val undos   = ctx.undoRootElem / "undos"
 
-    println(s"xxx pushUndoAction: encoded = $encoded")
-
-    val undos = ctx.undoRootElem / "undos"
     XFormsAPI.insert(into = undos, after = undos / *, origin = elementInfo("undo", List(encoded)))
   }
 
@@ -54,11 +52,8 @@ object Undo {
     ctx.undoRootElem / "undos" lastChildOpt * flatMap { lastUndo ⇒
 
       val encoded = lastUndo.stringValue
+      val result  = JsonConverter.decode(encoded).toOption
 
-      println(s"xxx popUndoAction: encoded = $encoded")
-
-      val result = JsonConverter.decode(encoded).toOption
-      println(s"xxx popUndoAction: result = $result")
       // TODO: Add to redo actions.
       XFormsAPI.delete(lastUndo)
       result
@@ -67,10 +62,9 @@ object Undo {
 
   object JsonConverter {
 
-    import io.circe.generic.auto._
-    import io.circe.parser
     import cats.syntax.either._
-    import io.circe._
+    import io.circe.generic.auto._
+    import io.circe.{parser, _}
     import io.circe.syntax._
 
     import scala.util.{Failure, Success, Try}

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.fr.{FormRunner, Names}
@@ -65,8 +66,11 @@ object FormBuilderXPathApi {
     )(FormBuilderDocContext())
 
   //@XPathFunction
-  def renameControlIfNeeded(oldName: String, newName: String): Unit =
-    FormBuilder.renameControlIfNeeded(oldName, newName)(FormBuilderDocContext())
+  def renameControlIfNeeded(oldName: String, newName: String): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.renameControlIfNeeded(oldName, newName) foreach
+      Undo.pushUndoAction
+  }
 
   // Find the value of a MIP or null (the empty sequence)
   //@XPathFunction
@@ -99,9 +103,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def selectCellForControlId(controlId: String): Unit = {
-
     implicit val ctx = FormBuilderDocContext()
-
     FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).to[List] flatMap
       (_ parent CellTest) foreach selectCell
   }
@@ -557,21 +559,24 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def undoAction(): Unit = {
+
     implicit val ctx = FormBuilderDocContext()
 
     Undo.popUndoAction() foreach {
-      case UndoAction.UndoDeleteContainer(position, xcvElem) ⇒
+      case UndoDeleteContainer(position, xcvElem) ⇒
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           "",
           "",
           Some(position)
         )
-      case UndoAction.UndoDeleteControl(position, xcvElem) ⇒
+      case UndoDeleteControl(position, xcvElem) ⇒
         ToolboxOps.pasteSingleControlFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           Some(position)
         )
+      case UndoRename(oldName, newName) ⇒
+        FormBuilder.renameControlIfNeeded(newName, oldName)
     }
 
   }

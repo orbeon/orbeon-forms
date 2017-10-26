@@ -35,7 +35,7 @@
             <xf:group>
 
                 <!-- Form settings -->
-                <xf:trigger appearance="minimal" class="" id="open-form-settings-trigger">
+                <xf:trigger appearance="minimal" class="fb-form-settings-button">
                     <xf:label><xh:i class="fa fa-cogs fa-fw" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                     <xf:action ev:event="DOMActivate">
                         <!-- Open the dialog in "edit" mode -->
@@ -58,13 +58,13 @@
                 </xf:trigger>
 
                 <!-- Edit Source -->
-                <xf:trigger appearance="minimal" class="" ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                <xf:trigger appearance="minimal" class="fb-edit-source-button" ref="instance('fb-metadata-instance')/toolbox/edit-source">
                     <xf:label><xh:i class="fa fa-code fa-fw" title="{$form-resources/edit-source/label}"/></xf:label>
                     <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
                 </xf:trigger>
 
                 <!-- Reload components -->
-                <xf:trigger appearance="minimal" class="fb-reload-components-trigger" xxf:modal="true">
+                <xf:trigger appearance="minimal" class="fb-reload-components-button" xxf:modal="true">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/reload-components/label}"
@@ -86,7 +86,7 @@
                 <xf:trigger
                     ref="instance('fb-metadata-instance')/toolbox/workflow"
                     appearance="minimal"
-                    id="fb-workflow-button">
+                    class="fb-workflow-button">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/dialog-workflow/label}"
@@ -100,7 +100,7 @@
                 <xf:trigger
                     ref=".[instance('fb-metadata-instance')/toolbox/permissions]"
                     appearance="minimal"
-                    id="fb-permissions-button">
+                    class="fb-permissions-button">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/dialog-permissions/label}"
@@ -113,7 +113,7 @@
                 </xf:trigger>
 
                 <!-- Clipboard operations -->
-                <xf:trigger appearance="minimal" ref="$xcv/cut-trigger" id="cut-trigger">
+                <xf:trigger appearance="minimal" class="fb-cut-button" ref="$xcv/cut-trigger" id="cut-trigger">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/cut/label}"
@@ -123,7 +123,7 @@
                         toolboxOps:cutToClipboard($current-td)
                     </xf:action>
                 </xf:trigger>
-                <xf:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
+                <xf:trigger appearance="minimal" class="fb-copy-button" ref="$xcv/copy-trigger">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/copy/label}"
@@ -133,7 +133,7 @@
                         toolboxOps:copyToClipboard($current-td)
                     </xf:action>
                 </xf:trigger>
-                <xf:trigger appearance="minimal" ref="$xcv/paste-trigger" id="paste-trigger">
+                <xf:trigger appearance="minimal" class="fb-paste-button" ref="$xcv/paste-trigger">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/paste/label}"
@@ -149,7 +149,7 @@
                         <!--class="fb-clipboard fa fa-clipboard fa-fw"/>-->
                 <!--</xf:group>-->
 
-                <xf:trigger appearance="minimal" ref="$undo/undo-trigger" id="undo-trigger">
+                <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger">
                     <xf:label>
                         <!-- TODO: i18n -->
                         <xh:i
@@ -161,7 +161,7 @@
                     </xf:action>
                 </xf:trigger>
 
-                <xf:trigger appearance="minimal" ref="$undo/redo-trigger" id="redo-trigger">
+                <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger">
                     <xf:label>
                         <!-- TODO: i18n -->
                         <xh:i

@@ -279,6 +279,22 @@ div.orbeon.orbeon-portlet-div {
                     .fa-code {
                         font-weight: bold;
                     }
+
+                    &> .xforms-group {
+                        display: grid;
+                        grid-template-columns: repeat(6, 1fr);
+
+                        .fb-form-settings-button     { grid-row-start: 1;  }
+                        .fb-edit-source-button       { grid-row-start: 1;  }
+                        .fb-reload-components-button { grid-row-start: 1;  }
+                        .fb-workflow-button          { grid-row-start: 1;  }
+                        .fb-permissions-button       { grid-row-start: 1;  }
+                        .fb-cut-button               { grid-row-start: 2;  }
+                        .fb-copy-button              { grid-row-start: 2;  }
+                        .fb-paste-button             { grid-row-start: 2;  }
+                        .fb-undo-button              { grid-row-start: 1; grid-column-start: 6; }
+                        .fb-redo-button              { grid-row-start: 2; grid-column-start: 6; }
+                    }
                 }
 
                 margin-bottom: @fbGutter;

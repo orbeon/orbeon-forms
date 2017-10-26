@@ -15,7 +15,9 @@
 @darkBlue: #004B92;
 @lightBlue: #DEF;
 @yellow: #ffffd3;
-@cellSelectColor: #4285f4;
+@cellSelectColorBorder     : rgba(63, 159, 216, 1.0);
+@cellSelectColorBackground : rgba(63, 159, 216, 0.1);
+@hoverBackground           : #eee;
 
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
@@ -858,8 +860,14 @@ div.orbeon.orbeon-portlet-div {
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
-        .fb-selected {                                                                  // Selected cell in grids
-            border-left: 3px solid @cellSelectColor;                                    // Highlight current cell, Inbox-like (also cursor-like)
+        .fr-grid-td {
+            &.fb-selected {                                                             // Selected cell in grids
+                border: 3px solid @cellSelectColorBorder;                               // Highlight current cell
+                background-color: @cellSelectColorBackground;
+            }
+            &:hover:not(.fb-selected) {
+                background-color: @hoverBackground;
+            }
         }
 
         &.fr-repeat.fr-repeat-single-row .fr-grid-body .fr-grid-td > * {
@@ -872,7 +880,7 @@ div.orbeon.orbeon-portlet-div {
 
         &.fr-norepeat {
             .fr-grid-body { grid-gap: 1px }
-            &.fb-hover .fr-grid-td { box-shadow: 0 0 0 1px @lightBlue }
+            &.fb-hover .fr-grid-td { box-shadow: 0 0 0 1px @grayLighter }
         }
 
         // Enough space to hold row icons so hovering doesn't cause the row to expand
@@ -889,7 +897,7 @@ div.orbeon.orbeon-portlet-div {
         .generateMinHeight(20);
 
         .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
-            &:hover { background-color: #eee }                                                                      // Indicate the value can be edited
+            &:hover { background-color: @hoverBackground }                                                          // Indicate the value can be edited
         }
         // Make click area with the grey background larger, as it will typically contain a longer text
         .xforms-text .xforms-output-output { min-height: 50px; display: block; }

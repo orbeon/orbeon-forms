@@ -37,8 +37,10 @@ object XMLNames {
 
   val InitialIterations : QName = QName.get("initial-iterations", FBPrefix, FB)
 
+  val XFConstraintTest  : Test = XF → "constraint"
   val XFTypeTest        : Test = XF → "type"
   val XFRequiredTest    : Test = XF → "required"
 
-  val NestedBindElemTest: Test = FBConstraintTest || XFTypeTest || XFRequiredTest
+  // NOTE: `fb:constraint` when annotated and `xf:constraint` when not (eg. coming from a section template)
+  val NestedBindElemTest: Test = FBConstraintTest || XFConstraintTest || XFTypeTest || XFRequiredTest
 }

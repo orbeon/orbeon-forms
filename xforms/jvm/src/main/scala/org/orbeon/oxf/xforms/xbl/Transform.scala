@@ -26,12 +26,13 @@ import org.orbeon.scaxon.NodeConversions
 object Transform {
 
   // Create a transformation pipeline configuration for processing XBL templates
-  def createTransformConfig(transformQName: QName, transform: Element, lastModified: Long) = {
+  def createTransformConfig(transformQName: QName, transform: Element, lastModified: Long): (PipelineConfig, DOMGenerator) = {
     // Create reusable pipeline config
     val pipelineConfig = {
       val pipeline = NodeConversions.elemToDom4j(
-        <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-              xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        <p:config
+          xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
           <p:param type="input" name="transform"/>
           <p:param type="input" name="data"/>
@@ -64,7 +65,7 @@ object Transform {
   }
 
   // Run a transformation created above on a bound element
-  def transformBoundElement(pipelineConfig: PipelineConfig, domGeneratorConfig: DOMGenerator, boundElement: Element) = {
+  def transformBoundElement(pipelineConfig: PipelineConfig, domGeneratorConfig: DOMGenerator, boundElement: Element): Document = {
     val pipeline = new PipelineProcessor(pipelineConfig)
     PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
 
@@ -143,7 +144,7 @@ object Transform {
   }
 
   // Transform an XBL document using XSLT if it is an XSLT document
-  def transformXBLDocumentIfNeeded(path: String, sourceXBL: Document, lastModified: Long) = {
+  def transformXBLDocumentIfNeeded(path: String, sourceXBL: Document, lastModified: Long): Document = {
     // Support /xsl:* or /*[@xsl:version = '2.0']
     val isXSLT = {
       val rootElement = sourceXBL.getRootElement

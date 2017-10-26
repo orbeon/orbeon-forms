@@ -128,7 +128,7 @@ case class AbstractBinding(
       Transform.createTransformConfig(transformQName, templateRoot, lastModified)
 
   // A transform cannot be reused, so this creates a new one when called, based on the config
-  def newTransform(boundElement: Element) = transformConfig map {
+  def newTransform(boundElement: Element): Option[Document] = transformConfig map {
     case (pipelineConfig, domGenerator) ⇒
       // Run the transformation
       val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGenerator, boundElement)
@@ -143,7 +143,7 @@ case class AbstractBinding(
       generatedDocument
   }
 
-  def selectorsNamespaces =
+  def selectorsNamespaces: Map[String, String] =
     Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
 }
 

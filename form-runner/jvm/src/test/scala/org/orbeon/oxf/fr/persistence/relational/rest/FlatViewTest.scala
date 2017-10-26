@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}

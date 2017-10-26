@@ -727,7 +727,7 @@
         <class name="org.orbeon.oxf.fr.persistence.relational.index.ReindexProcessor"/>
     </processor>
     <processor name="fr:relational-crud">
-        <class name="org.orbeon.oxf.fr.persistence.relational.crud.CRUD"/>
+        <class name="org.orbeon.oxf.fr.persistence.relational.rest.CRUD"/>
     </processor>
     <processor name="fr:relational-search">
         <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>

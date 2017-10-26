@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.crud.{OrganizationId, OrganizationSupport}
+import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchPermissions, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.util.CollectionUtils._

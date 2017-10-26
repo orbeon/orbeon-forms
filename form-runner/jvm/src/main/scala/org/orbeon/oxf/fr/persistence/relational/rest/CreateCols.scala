@@ -11,12 +11,12 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.sql.{PreparedStatement, Timestamp}
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
-import org.orbeon.oxf.fr.persistence.relational.crud.{OrganizationSupport ⇒ _}
+import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport ⇒ _}
 
 trait CreateCols extends RequestResponse with Common {
 

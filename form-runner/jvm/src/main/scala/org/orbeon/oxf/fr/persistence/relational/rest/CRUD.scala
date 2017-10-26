@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -23,7 +23,8 @@ class CRUD
     with RequestResponse
     with Common
     with Read
-    with CreateUpdateDelete {
+    with CreateUpdateDelete
+    with Lease {
 
   override def start(pipelineContext: PipelineContext): Unit =
     try {
@@ -33,6 +34,8 @@ class CRUD
         case HttpMethod.GET    ⇒ get(req)
         case HttpMethod.PUT    ⇒ change(req, delete = false)
         case HttpMethod.DELETE ⇒ change(req, delete = true)
+        case HttpMethod.LOCK   ⇒ lock(req)
+        case HttpMethod.UNLOCK ⇒ unlock(req)
         case _                 ⇒ httpResponse.setStatus(405)
       }
     } catch {

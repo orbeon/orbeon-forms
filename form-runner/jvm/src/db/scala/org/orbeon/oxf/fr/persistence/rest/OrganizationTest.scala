@@ -18,7 +18,7 @@ import java.sql.Connection
 import org.junit.Test
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.relational.crud
+import org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.fr.persistence.rest.OrganizationTest.{CA, SF}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.IOUtils._
@@ -53,8 +53,8 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   @Test def createAndRead(): Unit = {
     Connect.withOrbeonTables("create and read") { (connection, provider) ⇒
       List(CA, SF).foreach { writtenOrganization ⇒
-        val orgId = crud.OrganizationSupport.createIfNecessary(connection, provider, writtenOrganization)
-        val readOrganization = crud.OrganizationSupport.read(connection, orgId)
+        val orgId = rest.OrganizationSupport.createIfNecessary(connection, provider, writtenOrganization)
+        val readOrganization = rest.OrganizationSupport.read(connection, orgId)
         assert(readOrganization.get === writtenOrganization)
       }
     }
@@ -62,8 +62,8 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
 
   @Test def readEmptyWhenNotFound(): Unit = {
     Connect.withOrbeonTables("create and read") { (connection, provider) ⇒
-      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
-      val read = crud.OrganizationSupport.read(connection, crud.OrganizationId(42))
+      rest.OrganizationSupport.createIfNecessary(connection, provider, CA)
+      val read = rest.OrganizationSupport.read(connection, rest.OrganizationId(42))
       assert(read.isEmpty)
     }
   }
@@ -72,11 +72,11 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   @Test def orgReuse(): Unit = {
     Connect.withOrbeonTables("create read") { (connection, provider) ⇒
 
-      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
+      rest.OrganizationSupport.createIfNecessary(connection, provider, CA)
       assertRecordsCountIs(connection, 2)
 
       // Testing the "if necessary" part
-      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
+      rest.OrganizationSupport.createIfNecessary(connection, provider, CA)
       assertRecordsCountIs(connection, 2)
     }
   }

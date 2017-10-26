@@ -77,7 +77,7 @@ private object FormRunnerPersistenceProxy {
 
   val FRRelevantQName                = QName.get("relevant", XMLNames.FRNamespace)
 
-  val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST)
+  val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
   // Proxy the request to the appropriate persistence implementation

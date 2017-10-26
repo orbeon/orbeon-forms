@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Credentials ⇒ _, _}
 import org.orbeon.oxf.test.TestHttpClient
@@ -98,6 +99,10 @@ private object HttpRequest {
     def close(): Unit = httpResponse.disconnect()
   }
 
+  private val FormName = "my-form"
+  def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/$FormName/"
+  def metadataURL  (provider: Provider) = s"form/${provider.name}/$FormName"
+
   def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
     useAndClose(request(url, PUT, version, Some(body), credentials))(_.httpResponse.statusCode)
 
@@ -122,4 +127,10 @@ private object HttpRequest {
 
       (statusCode, headers, body)
     }
+
+  def lock(url: String, lockInfo: LockInfo)(implicit logger: IndentedLogger): Int = {
+    val body = Some(XML(LockInfo.toDom4j(lockInfo)))
+    useAndClose(request(url, LOCK, Unspecified, body, None))(_.httpResponse.statusCode)
+  }
+
 }

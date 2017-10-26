@@ -20,6 +20,7 @@ import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
@@ -53,16 +54,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Read, Create)))))
   val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Create)))))
 
-  private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/$FormName/"
-  private def metadataURL  (provider: Provider) = s"form/${provider.name}/$FormName"
-
   /**
    * Test new form versioning introduced in 4.5, for form definitions.
    */
   @Test def formDefinitionVersionTest(): Unit = {
     Connect.withOrbeonTables("form definition") { (connection, provider) ⇒
 
-      val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
+      val FormURL = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
 
       // First time we put with "latest" (AKA unspecified)
       val first = HttpRequest.XML(<gaga1/>)
@@ -115,7 +113,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def formDataVersionTest(): Unit = {
     Connect.withOrbeonTables("form data version") { (connection, provider) ⇒
-      val FirstDataURL = crudURLPrefix(provider) + "data/123/data.xml"
+      val FirstDataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
 
       // Storing for specific form version
       val first = <gaga1/>
@@ -147,9 +145,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def formForDataTest(): Unit = {
     Connect.withOrbeonTables("form data") { (connection, provider) ⇒
-      val FormURL       = crudURLPrefix(provider) + "form/form.xhtml"
-      val FirstDataURL  = crudURLPrefix(provider) + "data/123/data.xml"
-      val SecondDataURL = crudURLPrefix(provider) + "data/456/data.xml"
+      val FormURL       = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
+      val FirstDataURL  = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+      val SecondDataURL = HttpRequest.crudURLPrefix(provider) + "data/456/data.xml"
       val first         = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first"))
       val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
       val data          = <gaga/>
@@ -192,7 +190,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
     Connect.withOrbeonTables("permissions") { (connection, provider) ⇒
 
-      val formURL = crudURLPrefix(provider) + "form/form.xhtml"
+      val formURL = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
       val guest   = None
       val clerk   = Some(Credentials("tom", Some("clerk")  , List(SimpleRole("clerk"  )), Nil))
@@ -200,7 +198,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val admin   = Some(Credentials("tim", Some("admin")  , List(SimpleRole("admin"  )), Nil))
 
       {
-        val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
+        val DataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
 
         // Anonymous: no permission defined
         HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
@@ -216,7 +214,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
       }
       {
-        val DataURL = crudURLPrefix(provider) + "data/456/data.xml"
+        val DataURL = HttpRequest.crudURLPrefix(provider) + "data/456/data.xml"
 
         // More complex permissions based on roles
         HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
@@ -257,7 +255,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def organizationPermissions(): Unit =
     Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) ⇒
 
-      val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
+      val formURL   = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
 
       // Users
       val c1User   = Some(Credentials("c1User"  , None, Nil, List(Organization(List("a", "b", "c")))))
@@ -266,7 +264,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val bManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "b")), Nil))
       val dManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "d")), Nil))
 
-      val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
+      val dataURL   = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
       val dataBody  = HttpRequest.XML(<gaga/>)
 
       // User can read their own data, as well as their managers
@@ -295,7 +293,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     Connect.withOrbeonTables("attachments") { (connection, provider) ⇒
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
         val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
-        val url = crudURLPrefix(provider) + "data/123/file" + position.toString
+        val url = HttpRequest.crudURLPrefix(provider) + "data/123/file" + position.toString
         HttpAssert.put(url, Specific(1), bytes, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
       }
@@ -311,7 +309,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val text = DocumentFactory.createText(new String(string))
         val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
         val document = DocumentFactory.createDocument |!> (_.add(element)) |> HttpRequest.XML
-        val url = crudURLPrefix(provider) + s"data/$position/data.xml"
+        val url = HttpRequest.crudURLPrefix(provider) + s"data/$position/data.xml"
         HttpAssert.put(url, Specific(1), document, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))
       }
@@ -323,8 +321,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       // Draft and non-draft are different
       val first  = HttpRequest.XML(<gaga1/>)
       val second = HttpRequest.XML(<gaga2/>)
-      val DataURL  = crudURLPrefix(provider) + "data/123/data.xml"
-      val DraftURL = crudURLPrefix(provider) + "draft/123/data.xml"
+      val DataURL  = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+      val DraftURL = HttpRequest.crudURLPrefix(provider) + "draft/123/data.xml"
       HttpAssert.put(DataURL,  Specific(1), first, 201)
       HttpAssert.put(DraftURL, Unspecified, second, 201)
       HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))
@@ -335,8 +333,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def extractMetadata(): Unit =
     Connect.withOrbeonTables("extract metadata") { (connection, provider) ⇒
 
-      val currentFormURL        = crudURLPrefix(provider) + "form/form.xhtml"
-      val currentMetadataURL    = metadataURL(provider)
+      val currentFormURL        = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
+      val currentMetadataURL    = HttpRequest.metadataURL(provider)
       val formDefinition        = buildFormDefinition(provider, AnyoneCanCreateAndRead)
 
       HttpAssert.put(currentFormURL, Unspecified, HttpRequest.XML(formDefinition), 201)

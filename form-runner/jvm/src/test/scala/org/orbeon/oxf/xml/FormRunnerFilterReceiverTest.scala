@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader
+import org.orbeon.oxf.fr.persistence.relational.rest.RequestReader
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.JXQName._
 import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._

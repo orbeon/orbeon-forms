@@ -222,6 +222,8 @@ object HttpMethod extends Enum[HttpMethod] {
   case object HEAD    extends HttpMethod
   case object OPTIONS extends HttpMethod
   case object TRACE   extends HttpMethod
+  case object LOCK    extends HttpMethod
+  case object UNLOCK  extends HttpMethod
 }
 
 trait HttpClient {

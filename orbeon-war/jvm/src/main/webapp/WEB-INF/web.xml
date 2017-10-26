@@ -216,7 +216,7 @@
         <!--Set supported methods-->
         <init-param>
             <param-name>oxf.http.accept-methods</param-name>
-            <param-value>get,post,head,put,delete</param-value>
+            <param-value>get,post,head,put,delete,lock,unlock</param-value>
         </init-param>
         <!--Set servlet initialization and destruction listeners-->
         <!-- Uncomment this for the servlet listener processors -->

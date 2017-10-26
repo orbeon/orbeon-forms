@@ -24,7 +24,7 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod.{GET, POST, PUT}
+import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
@@ -393,7 +393,7 @@ object Connection extends Logging {
       pathQuery
   }
 
-  private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT)
+  private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT, LOCK, UNLOCK)
   def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)
 
   private def schemeRequiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)

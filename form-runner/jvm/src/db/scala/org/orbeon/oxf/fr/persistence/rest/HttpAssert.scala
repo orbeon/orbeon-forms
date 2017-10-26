@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.Version
+import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
@@ -102,6 +103,16 @@ private object HttpAssert extends XMLSupport {
     logger       : IndentedLogger
   ): Unit = {
     val actualCode = HttpRequest.del(url, version, credentials)
+    assert(actualCode === expectedCode)
+  }
+
+  def lock(
+    url          : String,
+    lockInfo     : LockInfo,
+    expectedCode : Int)(implicit
+    logger       : IndentedLogger
+  )              : Unit = {
+    val actualCode = HttpRequest.lock(url, lockInfo)
     assert(actualCode === expectedCode)
   }
 }

@@ -71,11 +71,19 @@
             <!-- Save current value of @open as @fb:open -->
             <xsl:if test="@open"><xsl:attribute name="fb:open" select="@open"/></xsl:if>
             <!-- If "many" controls close all sections but the first -->
-            <xsl:if test="$many-controls and preceding::fr:section">
-                <xsl:attribute name="open" select="'false'"/>
-            </xsl:if>
-            <!-- TODO: check @open if set above! -->
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:choose>
+                <xsl:when test="$many-controls and empty(preceding::fr:section)">
+                    <xsl:attribute name="open" select="'true'"/>
+                </xsl:when>
+                <xsl:when test="$many-controls and exists(preceding::fr:section)">
+                    <xsl:attribute name="open" select="'false'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="@open"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:apply-templates select="@* except @open | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

@@ -71,6 +71,9 @@
         <advanced>
             <label>Advanced</label>
         </advanced>
+        <attachments>
+            <label>Attachments</label>
+        </attachments>
         <services-actions>
             <label>Services &amp; Actions</label>
         </services-actions>
@@ -1083,6 +1086,9 @@
         <advanced>
             <label>Avancé</label>
         </advanced>
+        <attachments>
+            <label>Fichiers joints</label>
+        </attachments>
         <services-actions>
             <label>Services &amp; actions</label>
         </services-actions>
@@ -2097,6 +2103,9 @@
         <advanced>
             <label>Avansert</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Tjenester &amp; Actions</label>
         </services-actions>
@@ -3139,6 +3148,9 @@
         <advanced>
             <label>Дополнительно</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Сервисы и действия</label>
         </services-actions>
@@ -4181,6 +4193,9 @@
         <advanced>
             <label>Avanzato</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Servizi &amp; azioni</label>
         </services-actions>
@@ -5215,6 +5230,9 @@
         <advanced>
             <label>Erweitert</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Dienste &amp; Aktionen</label>
         </services-actions>
@@ -6251,6 +6269,9 @@
         <advanced>
             <label>Kehittynyt</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Palvelut &amp; Toiminnot</label>
         </services-actions>
@@ -7287,6 +7308,9 @@
         <advanced>
             <label>Advanzado</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Servicios &amp; Acciones</label>
         </services-actions>
@@ -8322,6 +8346,9 @@
         <advanced>
             <label>Avançado</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Serviços &amp; Acções</label>
         </services-actions>
@@ -9363,6 +9390,9 @@
         <advanced>
             <label>Avancerat</label>
         </advanced>
+        <attachments>
+            <label todo="true">[Attachments]</label>
+        </attachments>
         <services-actions>
             <label>Funktioner &amp; kommandon</label>
         </services-actions>

@@ -284,8 +284,9 @@
                     class="fb-tools"
                     ref="instance('fb-metadata-instance')/toolbox/(schema | pdf)[xxf:relevant()]">
 
+                    <!-- Attachments -->
                     <xf:group>
-                        <xf:label value="$form-resources/advanced/label"/>
+                        <xf:label value="$form-resources/attachments/label"/>
                         <xh:div class="fb-tool">
                             <xf:group ref="instance('fb-metadata-instance')/toolbox/schema">
                                 <!-- Upload XML Schema -->

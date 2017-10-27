@@ -455,7 +455,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def gridCanDoClasses(gridId: String): List[String] = {
     implicit val ctx = FormBuilderDocContext()
-    "fr-editable" :: (canDeleteGrid(containerById(gridId)) list "fb-can-delete-grid")
+    "fr-editable" :: (canDeleteGrid(containerById(gridId)) list "fb-can-delete")
   }
 
   //@XPathFunction

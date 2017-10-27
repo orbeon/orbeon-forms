@@ -58,10 +58,8 @@ object SectionGridEditor {
     val SectionAlwaysVisibleIcons =
       List(
         ContainerEditDetails,
-        SectionDelete, // TODO: not when last of container
         SectionEditHelp,
-        ContainerCopy,
-        ContainerCut   // TODO: not when last of container
+        ContainerCopy
       )
 
     // Position editor when block becomes current
@@ -105,9 +103,7 @@ object SectionGridEditor {
               trigger.show()
           }
 
-          // Hide/show delete icon
-          if (container.is(".fb-can-delete"))
-            sectionGridEditorContainer.children(SectionDelete.className).show()
+          hideShowCutDeleteIcons(container, SectionDelete)
 
           if (container.find(".fr-section-component").length > 0)
             sectionGridEditorContainer.children(ContainerMerge.className).show()
@@ -122,11 +118,19 @@ object SectionGridEditor {
             sectionGridEditorContainer.children(ContainerEditDetails.className).show()
           }
 
-          sectionGridEditorContainer.children(GridDelete.className).show()   // TODO: not when last of container
+          hideShowCutDeleteIcons(frGridEl, GridDelete)
           sectionGridEditorContainer.children(ContainerCopy.className).show()
-          sectionGridEditorContainer.children(ContainerCut.className).show() // TODO: not when last of container
-
         }
+
+        def hideShowCutDeleteIcons(
+          container       : JQuery,
+          containerDelete : ContainerEditor
+        )                 : Unit =
+          if (container.is(".fb-can-delete"))
+            Set(containerDelete, ContainerCut)
+              .map(_.className)
+              .map(sectionGridEditorContainer.children(_))
+              .foreach(_.show())
       }
     )
 

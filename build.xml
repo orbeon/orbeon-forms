@@ -463,7 +463,6 @@
 
     <target name="test-unit" depends="init">
         <exec executable="sbt" failonerror="true">
-            <arg value="-verbose"/>
             <arg value="-J-Xmx3G"/>
             <arg value="-J-Xss1M"/>
             <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->
@@ -604,7 +603,6 @@
 
                 <!-- Run sbt tests -->
                 <exec executable="sbt" failonerror="true">
-                    <arg value="-verbose"/>
                     <arg value="-J-Xmx3G"/>
                     <arg value="-J-Xss1M"/>
                     <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->

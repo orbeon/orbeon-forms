@@ -289,7 +289,7 @@ public class XFormsModelSchemaValidator {
                 final String dataTypeName = xsDatatype.getName();
 
                 if (dataTypeName != null && !dataTypeName.equals(""))
-                    InstanceData.setSchemaType(node, QName.get(dataTypeName, "", dataTypeURI));
+                    InstanceData.setSchemaType(node, QName.apply(dataTypeName, "", dataTypeURI));
             }
         }
     }
@@ -311,8 +311,8 @@ public class XFormsModelSchemaValidator {
         final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false);
         if (xsiType != null) {
             // Honor xsi:type
-            elementURI = xsiType.getNamespaceURI();
-            elementName = xsiType.getName();
+            elementURI = xsiType.namespace().uri();
+            elementName = xsiType.name();
         } else {
             // Use element name
             elementURI = element.getNamespaceURI();

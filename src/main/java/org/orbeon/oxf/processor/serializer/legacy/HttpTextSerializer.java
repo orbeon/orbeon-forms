@@ -86,7 +86,7 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
                 try {
                     // Start document
                     final AttributesImpl attributes = new AttributesImpl();
-                    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
+                    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.qualifiedName());
                     if (contentType != null)
                         attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType + "; charset=" + encoding);
 

@@ -66,7 +66,7 @@ object XFormsControlFactory {
 
   private val ControlFactory = Map[QName, ControlFactory](
     // Root control
-    QName.get("root")             → (new XXFormsRootControl(_, _, _, _)),
+    QName("root")                 → (new XXFormsRootControl(_, _, _, _)),
     XBL_TEMPLATE_QNAME            → (new XXFormsComponentRootControl(_, _, _, _)),
     // Built-in standard controls
     XFORMS_CASE_QNAME             → (new XFormsCaseControl(_, _, _, _)),
@@ -134,7 +134,7 @@ object XFormsControlFactory {
   }
 
   // TODO: Move this to ControlAnalysisFactory
-  private def getQName(controlURI: String, controlName: String) = QName.get(controlName, Namespace("", controlURI))
+  private def getQName(controlURI: String, controlName: String) = QName(controlName, Namespace("", controlURI))
 
   def isContainerControl(controlURI: String, controlName: String) = ContainerControls(getQName(controlURI, controlName))
   def isCoreControl(controlURI: String, controlName: String)      = CoreControls.contains(getQName(controlURI, controlName))

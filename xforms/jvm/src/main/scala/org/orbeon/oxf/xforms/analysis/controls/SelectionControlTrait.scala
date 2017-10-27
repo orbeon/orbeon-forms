@@ -214,7 +214,7 @@ extends InputValueControl
 
           if (required && nestedElementOpt.isEmpty)
             throw new ValidationException(
-              s"${XFORMS_ITEM_QNAME.getQualifiedName} must contain an ${qName.getQualifiedName} element.",
+              s"${XFORMS_ITEM_QNAME.qualifiedName} must contain an ${qName.qualifiedName} element.",
               ElementAnalysis.createLocationData(element)
             )
 

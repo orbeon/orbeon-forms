@@ -114,7 +114,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         else
             sb.append(" xforms-disable-hint-as-tooltip");
 
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb,  "help", QName.get(containingDocument.getHelpAppearance()));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb,  "help", QName.apply(containingDocument.getHelpAppearance()));
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
@@ -317,8 +317,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.name());
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName().equals(appearanceAttributeValue);
             }
         });
 
@@ -337,8 +337,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.name());
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName().equals(appearanceAttributeValue);
             }
         });
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", ANY_MATCHER);

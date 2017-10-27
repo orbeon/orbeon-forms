@@ -35,7 +35,7 @@ import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 
 object XFormsExtractor {
-  val LastIdQName = QName.get("last-id")
+  val LastIdQName = QName("last-id")
 }
 
 /**
@@ -180,7 +180,7 @@ class XFormsExtractor(
         if (isTopLevel) {
           // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
           element(
-            localName = XFormsExtractor.LastIdQName.getName,
+            localName = XFormsExtractor.LastIdQName.name,
             atts      = List("id" → metadata.idGenerator.nextSequenceNumber.toString)
           )
 
@@ -262,7 +262,7 @@ class XFormsExtractor(
 
       // xxbl:scope
       val newScope =
-        Option(attributes.getValue(XXBL_SCOPE_QNAME.getNamespaceURI, XXBL_SCOPE_QNAME.getName)) match {
+        Option(attributes.getValue(XXBL_SCOPE_QNAME.namespace.uri, XXBL_SCOPE_QNAME.name)) match {
           case Some(xblScopeAttribute) ⇒ XXBLScope.valueOf(xblScopeAttribute)
           case None                    ⇒ parentElementDetails.scope
         }
@@ -330,7 +330,7 @@ class XFormsExtractor(
 
       // TODO: Just warn?
       if (isXXForms) {
-        if (! ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName.get(localname, XXFORMS_NAMESPACE)))
+        if (! ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
           throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
       } else if (isEXForms) {
         if (! ALLOWED_EXFORMS_ELEMENTS.contains(localname))

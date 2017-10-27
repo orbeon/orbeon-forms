@@ -48,7 +48,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
-  private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName.get(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
+  private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
 
   private val TopLevelBindTemplate: NodeInfo =
     <xf:bind

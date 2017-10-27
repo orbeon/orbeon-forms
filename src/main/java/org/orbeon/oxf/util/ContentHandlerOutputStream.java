@@ -63,7 +63,7 @@ public class ContentHandlerOutputStream extends OutputStream {
         if (doStartEndDocument && ! documentStarted) {
             // Start document
             AttributesImpl attributes = new AttributesImpl();
-            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType);
             if (statusCode != null)

@@ -30,7 +30,7 @@ import scala.xml.{Elem, XML}
 object Dom4j {
 
   implicit class QNameOps(val q: QName) extends AnyVal {
-    def uriQualifiedName = XMLUtils.buildURIQualifiedName(q.getNamespaceURI, q.getName)
+    def uriQualifiedName = XMLUtils.buildURIQualifiedName(q.namespace.uri, q.name)
   }
 
   /**
@@ -124,11 +124,11 @@ object Dom4j {
   // Ordering on QName, comparing first by namespace URI then by local name
   implicit object QNameOrdering extends Ordering[QName] {
     def compare(x: QName, y: QName) = {
-      val nsOrder = x.getNamespaceURI compareTo y.getNamespaceURI
+      val nsOrder = x.namespace.uri compareTo y.namespace.uri
       if (nsOrder != 0)
         nsOrder
       else
-        x.getName compareTo y.getName
+        x.name compareTo y.name
     }
   }
 

@@ -23,7 +23,7 @@ class ConcreteElement(var qname: QName)
   import ConcreteElement._
 
   def this(name: String) =
-    this(DocumentFactory.createQName(name))
+    this(QName(name))
 
   def getQName: QName = qname
   def setQName(name: QName) = this.qname = name
@@ -62,7 +62,7 @@ class ConcreteElement(var qname: QName)
         val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
         if (myPrefix == parentNamespace) { // ORBEON TODO: comparing unrelated!
           val myNm = nyNamespace.getName
-          val newNm = QName.get(myNm)
+          val newNm = QName(myNm)
           setQName(newNm)
         }
       }
@@ -105,11 +105,11 @@ class ConcreteElement(var qname: QName)
   }
 
   override def setName(name: String): Unit = {
-    setQName(DocumentFactory.createQName(name))
+    setQName(QName(name))
   }
 
   def setNamespace(namespace: Namespace): Unit = {
-    setQName(DocumentFactory.createQName(getName, namespace))
+    setQName(QName(getName, namespace))
   }
 
   def accept(visitor: Visitor): Unit = {
@@ -132,12 +132,12 @@ class ConcreteElement(var qname: QName)
      result + " userData: " + getData
   }
 
-  override def getName   : String    = getQName.getName
+  override def getName   : String    = getQName.name
 
-  def getNamespace       : Namespace = getQName.getNamespace
-  def getNamespacePrefix : String    = getQName.getNamespacePrefix
-  def getNamespaceURI    : String    = getQName.getNamespaceURI
-  def getQualifiedName   : String    = getQName.getQualifiedName
+  def getNamespace       : Namespace = getQName.namespace
+  def getNamespacePrefix : String    = getQName.namespace.prefix
+  def getNamespaceURI    : String    = getQName.namespace.uri
+  def getQualifiedName   : String    = getQName.qualifiedName
 
   override def node(index: Int): Node = {
     if (index >= 0) {
@@ -188,7 +188,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def element(name: String, namespace: Namespace): Element =
-    element(DocumentFactory.createQName(name, namespace))
+    element(QName(name, namespace))
 
   def elements: ju.List[Element] = {
     val list = internalContent
@@ -237,7 +237,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def elements(name: String, namespace: Namespace): ju.List[Element] = {
-    elements(DocumentFactory.createQName(name, namespace))
+    elements(QName(name, namespace))
   }
 
   def elementIterator(): ju.Iterator[Element] = elements.iterator()
@@ -288,7 +288,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def attribute(name: String, namespace: Namespace): Attribute = {
-    attribute(DocumentFactory.createQName(name, namespace))
+    attribute(QName(name, namespace))
   }
 
   def setAttributes(attributes: Attributes, namespaceStack: NamespaceStack, noNamespaceAttributes: Boolean): Unit = {
@@ -449,7 +449,7 @@ class ConcreteElement(var qname: QName)
     }
     var node: Element = null
     if (namespace ne null) {
-      val qname = DocumentFactory.createQName(localName, namespace)
+      val qname = QName(localName, namespace)
       node = DocumentFactory.createElement(qname)
     } else {
       node = DocumentFactory.createElement(name)
@@ -671,9 +671,9 @@ class ConcreteElement(var qname: QName)
     }
     val namespace = getNamespaceForPrefix(prefix)
     if (namespace ne null) {
-      DocumentFactory.createQName(localName, namespace)
+      QName(localName, namespace)
     } else {
-      DocumentFactory.createQName(localName)
+      QName(localName)
     }
   }
 

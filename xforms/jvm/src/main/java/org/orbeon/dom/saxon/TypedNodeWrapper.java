@@ -128,8 +128,8 @@ public class TypedNodeWrapper extends org.orbeon.dom.saxon.NodeWrapper {
             return getUntypedType();
         } else {
             // Extract QName
-            String uri = nodeType.getNamespaceURI();
-            final String localname = nodeType.getName();
+            String uri = nodeType.namespace().uri();
+            final String localname = nodeType.name();
 
             // For type annotation purposes, xforms:integer is translated into xs:integer. This is because XPath has no
             // knowledge of the XForms union types.

@@ -166,7 +166,7 @@ object XFormsModelSubmissionBase {
                 name → {
                   value.trimAllToOpt map
                     (Dom4jUtils.extractTextValueQName(namespaceContext.asJava, _, true)) getOrElse
-                    QName.get(name, XXFORMS_NAMESPACE_SHORT)
+                    QName(name, XXFORMS_NAMESPACE_SHORT)
                 }
               case None ⇒
                 throw new IllegalArgumentException(s"invalid format for `xxf:annotate` value: `$annotateWith`")

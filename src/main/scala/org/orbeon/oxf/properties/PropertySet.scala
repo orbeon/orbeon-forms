@@ -191,7 +191,7 @@ class PropertySet {
     def checkType(p: Property) =
       if ((typ ne null) && typ != p.typ)
         throw new OXFException(
-          s"Invalid attribute type requested for property `$name`: expected `${typ.getQualifiedName}`, found `${p.typ.getQualifiedName}`"
+          s"Invalid attribute type requested for property `$name`: expected `${typ.qualifiedName}`, found `${p.typ.qualifiedName}`"
         )
       else
         p
@@ -227,7 +227,7 @@ class PropertySet {
       case p: String ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
       case p: URI    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
       case null      ⇒ null
-      case _         ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.getQualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.getQualifiedName}`")
+      case _         ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
     }
 
   def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =

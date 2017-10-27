@@ -98,14 +98,14 @@ trait ControlAjaxSupport {
 
     for {
       avtAttributeQName ← staticControl.extensionAttributes.keys
-      if avtAttributeQName.getNamespaceURI == XXFORMS_NAMESPACE_URI || avtAttributeQName == ACCEPT_QNAME // only keep xxf:* attributes which are defined statically
+      if avtAttributeQName.namespace.uri == XXFORMS_NAMESPACE_URI || avtAttributeQName == ACCEPT_QNAME // only keep xxf:* attributes which are defined statically
       value1 = previousControlOpt flatMap (_.extensionAttributeValue(avtAttributeQName))
       value2 = self.extensionAttributeValue(avtAttributeQName)
       if value1 != value2
       attributeValue = value2 getOrElse ""
     } yield
       // NOTE: For now we use the local name; may want to use a full name?
-      added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
+      added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.name, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 
     added
   }

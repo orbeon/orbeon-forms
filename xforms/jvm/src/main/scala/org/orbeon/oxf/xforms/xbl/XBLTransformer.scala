@@ -32,9 +32,9 @@ import scala.collection.JavaConverters._
 
 object XBLTransformer {
 
-  val XBLAttrQName = QName.get("attr", XBL_NAMESPACE)
-  val XBLContentQName = QName.get("content", XBL_NAMESPACE)
-  val XXBLAttrQName = QName.get("attr", XXBL_NAMESPACE)
+  val XBLAttrQName    = QName("attr",    XBL_NAMESPACE)
+  val XBLContentQName = QName("content", XBL_NAMESPACE)
+  val XXBLAttrQName   = QName("attr",    XXBL_NAMESPACE)
 
   /**
     * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
@@ -170,7 +170,7 @@ object XBLTransformer {
               if (equalIndex == -1) {
                 // No a=b pair, just a single QName
                 val valueQName = Dom4jUtils.extractTextValueQName(element, currentValue, true)
-                if (valueQName.getNamespaceURI != XBL_NAMESPACE_URI) {
+                if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
                   // This is not xbl:text, copy the attribute
                   val attributeValue = boundElement.attributeValue(valueQName)
                   if (attributeValue ne null)
@@ -190,8 +190,8 @@ object XBLTransformer {
                   Dom4jUtils.extractTextValueQName(element, rightSide, true)
                 }
 
-                val isLeftSideXBLText  = leftSideQName.getNamespaceURI  == XBL_NAMESPACE_URI
-                val isRightSideXBLText = rightSideQName.getNamespaceURI == XBL_NAMESPACE_URI
+                val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI
+                val isRightSideXBLText = rightSideQName.namespace.uri == XBL_NAMESPACE_URI
 
                 val (rightSideValue, namespaceElement) =
                   if (! isRightSideXBLText) {

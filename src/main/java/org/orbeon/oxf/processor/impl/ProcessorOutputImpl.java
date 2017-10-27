@@ -430,7 +430,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
             helper.startElement("input", new String[] {
                     "name", input.getName(),
                     "processor-class", input.getProcessorClass() != null ? input.getProcessorClass().getName() : null,
-                    "processor-name", input.getProcessor(pipelineContext) != null && input.getProcessor(pipelineContext).getName() != null ? input.getProcessor(pipelineContext).getName().getQualifiedName() : null,
+                    "processor-name", input.getProcessor(pipelineContext) != null && input.getProcessor(pipelineContext).getName() != null ? input.getProcessor(pipelineContext).getName().qualifiedName() : null,
                     "processor-object", input.getProcessor(pipelineContext) != null ? Integer.toString(input.getProcessor(pipelineContext).getSequenceNumber()) : null,
 
                     "system-id", (input.getLocationData() != null) ? input.getLocationData().file() : null,
@@ -445,7 +445,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
 
                 "name", getName(),
                 "processor-class", getProcessorClass() != null ? getProcessorClass().getName() : null,
-                "processor-name", getProcessor(pipelineContext) != null && getProcessor(pipelineContext).getName() != null ? getProcessor(pipelineContext).getName().getQualifiedName() : null,
+                "processor-name", getProcessor(pipelineContext) != null && getProcessor(pipelineContext).getName() != null ? getProcessor(pipelineContext).getName().qualifiedName() : null,
                 "processor-object", getProcessor(pipelineContext) != null ? Integer.toString(getProcessor(pipelineContext).getSequenceNumber()) : null,
 
                 "system-id", (getLocationData() != null) ? getLocationData().file() : null,

@@ -222,7 +222,7 @@ class NamespaceStack {
     if ((prefix eq null) || (prefix.length == 0)) {
       _defaultNamespace = null
     }
-    DocumentFactory.createQName(localName, namespace)
+    QName(localName, namespace)
   }
 
   /**

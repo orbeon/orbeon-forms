@@ -75,7 +75,7 @@ private object FormRunnerPersistenceProxy {
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = AllowedDataFormatVersions + RawDataFormatVersion
 
-  val FRRelevantQName                = QName.get("relevant", XMLNames.FRNamespace)
+  val FRRelevantQName                = QName("relevant", XMLNames.FRNamespace)
 
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
@@ -165,7 +165,7 @@ private object FormRunnerPersistenceProxy {
           new ElementFilterXMLReceiver(
             xmlReceiver = receiver,
             filter      = (_, _, _, atts) ⇒
-              atts.getValue(FRRelevantQName.getNamespaceURI, FRRelevantQName.getName) != "false"
+              atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.name) != "false"
           ),
           XMLParsing.ParserConfiguration.PLAIN,
           true

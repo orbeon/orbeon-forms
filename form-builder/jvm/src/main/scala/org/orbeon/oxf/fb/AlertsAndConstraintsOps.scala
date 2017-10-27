@@ -153,7 +153,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             value.trimAllToOpt match {
               case Some(nonEmptyValue) ⇒
 
-                val prefix = mipElemQName.getNamespaceURI match {
+                val prefix = mipElemQName.namespace.uri match {
                   case XMLNames.FB ⇒ XMLNames.FBPrefix // also covers the case of `xxf:default` (Form Builder names here)
                   case XF          ⇒ "xf" // case of `xf:type`, `xf:required`
                 }
@@ -166,7 +166,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     xmlns:xf={XF}
                     xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
-                List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.getName): NodeInfo)
+                List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.name): NodeInfo)
               case None ⇒
                 Nil
             }
@@ -332,7 +332,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val datatypeQName = datatype.fold(_._1, identity)
 
     def level       = ErrorLevel
-    def stringValue = XMLUtils.buildQName(datatypeQName.getNamespacePrefix, datatypeQName.getName)
+    def stringValue = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.name)
 
     // Rename control element if needed when the datatype changes
     def renameControlIfNeeded(
@@ -364,7 +364,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val builtinTypeString = datatype match {
-        case Left((name, _)) ⇒ name.getName
+        case Left((name, _)) ⇒ name.name
         case _               ⇒ ""
       }
 
@@ -376,7 +376,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       <validation type="datatype" id={idOpt.orNull} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <builtin-type>{builtinTypeString}</builtin-type>
         <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
-        <schema-type>{datatype.right.toOption map (_.getQualifiedName) getOrElse ""}</schema-type>
+        <schema-type>{datatype.right.toOption map (_.qualifiedName) getOrElse ""}</schema-type>
         {alertOrPlaceholder(alert, forLang)}
       </validation>
     }
@@ -396,10 +396,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       def builtinOrSchemaType(typ: String): Either[(QName, Boolean), QName] = {
         val qName         = bind.resolveQName(typ)
-        val isBuiltinType = Set(XF, XS)(qName.getNamespaceURI)
+        val isBuiltinType = Set(XF, XS)(qName.namespace.uri)
 
         if (isBuiltinType)
-          Left(qName → (qName.getNamespaceURI == XS))
+          Left(qName → (qName.namespace.uri == XS))
         else
           Right(qName)
       }
@@ -440,7 +440,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
 
-          QName.get(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
+          QName(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
         }
 
         def schemaTypeQName: QName = {
@@ -452,7 +452,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
             { case (prefix, uri) ⇒ Namespace(prefix, uri) } getOrElse
             Namespace.EmptyNamespace
-          QName.get(localname, namespace)
+          QName(localname, namespace)
         }
 
         Either.cond(schemaTypeOpt.isDefined, schemaTypeQName, builtinTypeQName)

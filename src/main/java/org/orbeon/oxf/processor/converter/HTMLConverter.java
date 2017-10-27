@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 public class HTMLConverter extends TextConverterBase {
 
     public static final String DEFAULT_CONTENT_TYPE = "text/html";
-    public static final QName DEFAULT_METHOD = QName.get("html");
+    public static final QName DEFAULT_METHOD = QName.apply("html");
 
     public HTMLConverter() {}
 

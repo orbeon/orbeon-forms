@@ -97,7 +97,7 @@ object Transform {
           <p:param type="input"  name="data"/>
           <p:param type="output" name="data"/>
 
-          <p:processor name={transformQName.getQualifiedName}><!-- namespace for QName might not be in scope! -->
+          <p:processor name={transformQName.qualifiedName}><!-- namespace for QName might not be in scope! -->
             <p:input   name="config" href="#transform"/>
             <p:input   name="data"   href="#data"/>
             <p:output  name="data"   ref="data"/>

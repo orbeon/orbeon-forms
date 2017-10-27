@@ -35,8 +35,8 @@ trait ActionTrait extends SimpleElementAnalysis {
 
 private object ActionTrait {
 
-  val Namespaces    = Seq(Namespace.EmptyNamespace, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
-  def makeQName(s: String) = QName.get(s, _: Namespace)
+  val Namespaces           = Seq(Namespace.EmptyNamespace, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
+  def makeQName(s: String) = QName(s, _: Namespace)
 
   val IfQNames      = Namespaces map makeQName("if")
   val WhileQNames   = Namespaces map makeQName("while")

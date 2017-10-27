@@ -165,7 +165,7 @@ public class XFormsActionInterpreter {
             _actionXPathContext.popBinding();
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                    new String[]{"action name", actionElement.getQName().getQualifiedName()}));
+                    new String[]{"action name", actionElement.getQName().qualifiedName()}));
         }
     }
 
@@ -177,13 +177,13 @@ public class XFormsActionInterpreter {
         while (true) {
             // Check if the conditionAttribute attribute exists and stop if false
             if (ifConditionAttribute != null) {
-                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.getQualifiedName(), ifConditionAttribute, "if", contextItem);
+                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.qualifiedName(), ifConditionAttribute, "if", contextItem);
                 if (!result)
                     break;
             }
             // Check if the iterationAttribute attribute exists and stop if false
             if (whileIterationAttribute != null) {
-                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.getQualifiedName(), whileIterationAttribute, "while", contextItem);
+                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.qualifiedName(), whileIterationAttribute, "while", contextItem);
                 if (!result)
                     break;
             }
@@ -191,7 +191,7 @@ public class XFormsActionInterpreter {
             // We are executing the action
             if (_indentedLogger.isDebugEnabled()) {
                 _indentedLogger.startHandleOperation("interpreter", "executing",
-                    "action name", actionQName.getQualifiedName(),
+                    "action name", actionQName.qualifiedName(),
                     "while iteration", (whileIterationAttribute != null) ? Integer.toString(whileIteration) : null
                 );
             }
@@ -227,7 +227,7 @@ public class XFormsActionInterpreter {
 
             if (_indentedLogger.isDebugEnabled()) {
                 _indentedLogger.endHandleOperation(
-                    "action name", actionQName.getQualifiedName(),
+                    "action name", actionQName.qualifiedName(),
                     "while iteration", (whileIterationAttribute != null) ? Integer.toString(whileIteration) : null);
             }
 

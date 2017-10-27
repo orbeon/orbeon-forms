@@ -186,7 +186,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                 if (templateSAXStore != null) {
                     // Remember mark if xxf:update="full"
-                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.namespace().uri(), XFormsConstants.XXFORMS_UPDATE_QNAME.name());
                     if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                         // Remember this subtree has a full update
                         putMark(xformsElementId);
@@ -214,7 +214,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Handle full update annotation
                 if (templateSAXStore != null) {
                     // Remember mark if xxf:update="full"
-                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.namespace().uri(), XFormsConstants.XXFORMS_UPDATE_QNAME.name());
                     if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                         // Remember this subtree has a full update
                         putMark(xformsElementId);
@@ -235,15 +235,15 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Append the new xxf:separator appearance
                     final String existingAppearance = attributes.getValue("appearance");
                     // See: https://github.com/orbeon/orbeon-forms/issues/418
-                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
-                            (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.name(),
+                            (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName());
                     stackElement.startElement(uri, localname, qName, attributes);
                 } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                     // Add separator appearance
                     if (doesClosestXHTMLRequireSeparatorAppearance()) {
                         final String existingAppearance = attributes.getValue("appearance");
-                        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
-                                (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.name(),
+                                (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName());
                     }
 
                     // Start xf:repeat

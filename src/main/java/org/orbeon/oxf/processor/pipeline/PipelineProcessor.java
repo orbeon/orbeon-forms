@@ -287,7 +287,7 @@ public class PipelineProcessor extends ProcessorImpl {
                                 final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(transform);
                                 if (processorFactory == null) {
                                     throw new ValidationException("Cannot find processor factory with JNDI name \""
-                                            + transform.getQualifiedName() + "\"", inputLocationData);
+                                            + transform.qualifiedName() + "\"", inputLocationData);
                                 }
                                 transformProcessor = processorFactory.createInstance();
                             }

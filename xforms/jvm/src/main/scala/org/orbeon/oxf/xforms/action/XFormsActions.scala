@@ -27,8 +27,8 @@ object XFormsActions {
   val LOGGING_CATEGORY = "action"
   val logger = LoggerFactory.createLogger(XFormsActions.getClass)
 
-  private def xformsQName(name: String) = QName.get(name, XFORMS_NAMESPACE)
-  private def xxformsQName(name: String) = QName.get(name, XXFORMS_NAMESPACE)
+  private def xformsQName(name: String)  = QName(name, XFORMS_NAMESPACE)
+  private def xxformsQName(name: String) = QName(name, XXFORMS_NAMESPACE)
 
   private val Actions = Map(
     // Standard XForms actions
@@ -89,5 +89,5 @@ object XFormsActions {
 
   // Whether the element is xf:action
   def isDispatchAction(qName: QName) =
-    qName.getNamespaceURI == XFORMS_NAMESPACE_URI && qName.getName == "dispatch"
+    qName.namespace.uri == XFORMS_NAMESPACE_URI && qName.name == "dispatch"
 }

@@ -115,7 +115,7 @@ public class OPS {
         // 5. Build processor definition from command-line parameters
         if (otherArgs != null && otherArgs.length == 1) {
             // Assume the pipeline processor and a config input
-            processorDefinition = new ProcessorDefinition(QName.get("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
+            processorDefinition = new ProcessorDefinition(QName.apply("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
 
             final String configURL;
             if (!NetUtils.urlHasProtocol(otherArgs[0])) {

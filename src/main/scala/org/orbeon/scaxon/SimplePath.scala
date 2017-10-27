@@ -39,7 +39,7 @@ object SimplePath {
   implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
   // Passing a QName as test means to test on the qualified name of an element or attribute
-  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.getNamespaceURI, attName.getName))
+  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.namespace.uri, attName.name))
 
   // Qualified name can also be passed as a pair of strings
   implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
@@ -130,7 +130,7 @@ object SimplePath {
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
     def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-    def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+    def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.name), Some(Type.ATTRIBUTE)))
     def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
     def /@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 
@@ -245,7 +245,7 @@ object SimplePath {
 
     def resolveQName(lexicalQName: String): QName = {
       val structuredQName = resolveStructuredQName(lexicalQName)
-      QName.get(lexicalQName, structuredQName.getNamespaceURI)
+      QName(structuredQName.getLocalName, structuredQName.getPrefix, structuredQName.getNamespaceURI)
     }
 
     // Return a qualified name as a (namespace uri, local name) pair

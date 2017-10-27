@@ -202,7 +202,7 @@ object XMLOutput extends XMLReceiverSupport {
 
       val extensionAttributes =
         c.evaluatedExtensionAttributes.iterator collect {
-          case (name, value) if name.getNamespaceURI == "" ⇒ name.getName → value
+          case (name, value) if name.namespace.uri == "" ⇒ name.name → value
         }
 
       withElement("control", atts = baseAttributes ++ mediatypeAttribute ++ extensionAttributes) {

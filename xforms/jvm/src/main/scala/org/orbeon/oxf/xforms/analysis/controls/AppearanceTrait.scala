@@ -36,7 +36,7 @@ object AppearanceTrait {
   private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI → "xxforms", XFORMS_NAMESPACE_URI → "xforms")
 
   def encodeAndAppendAppearances(sb: jl.StringBuilder, lhha: String, appearances: Set[String]): Unit =
-    appearances map QName.get foreach (encodeAndAppendAppearance(sb, lhha, _))
+    appearances map QName.apply foreach (encodeAndAppendAppearance(sb, lhha, _))
 
   def encodeAndAppendAppearance(sb: jl.StringBuilder, lhha: String, appearance: QName): Unit = {
     if (sb.length > 0)
@@ -49,16 +49,16 @@ object AppearanceTrait {
 
   def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName) = {
     // Names in a namespace may get a prefix
-    val uri = appearance.getNamespaceURI
+    val uri = appearance.namespace.uri
     if (uri.nonEmpty) {
       // Try standard prefixes or else use the QName prefix
-      val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.getNamespacePrefix)
+      val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.namespace.prefix)
       if (prefix.nonEmpty) {
         sb.append(prefix)
         sb.append("-")
       }
     }
-    sb.append(appearance.getName)
+    sb.append(appearance.name)
     sb
   }
 }

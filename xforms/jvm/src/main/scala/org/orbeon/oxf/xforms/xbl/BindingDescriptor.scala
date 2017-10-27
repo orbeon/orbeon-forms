@@ -155,7 +155,7 @@ object BindingDescriptor {
 
   private def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: Map[String, String]) =
     selectorOpt collect {
-      case TypeSelector(Some(Some(prefix)), localname) ⇒ QName.get(localname, prefix, ns(prefix))
+      case TypeSelector(Some(Some(prefix)), localname) ⇒ QName(localname, prefix, ns(prefix))
     }
 
   // Example: fr|number, xf|textarea
@@ -170,7 +170,7 @@ object BindingDescriptor {
         Nil) ⇒
 
       BindingDescriptor(
-        Some(QName.get(localname, prefix, ns(prefix))),
+        Some(QName(localname, prefix, ns(prefix))),
         None,
         None
       )(binding)
@@ -189,7 +189,7 @@ object BindingDescriptor {
         Nil) ⇒
 
       BindingDescriptor(
-        Some(QName.get(localname, prefix, ns(prefix))),
+        Some(QName(localname, prefix, ns(prefix))),
         datatype.trimAllToOpt map (extractTextValueQName(ns.asJava, _, true)),
         None
       )(binding)
@@ -213,7 +213,7 @@ object BindingDescriptor {
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
         None,
-        Some(BindingAttributeDescriptor(QName.get(attName), attPredicate, attValue))// TODO: QName for attName
+        Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
       )(binding)
   }
 
@@ -235,7 +235,7 @@ object BindingDescriptor {
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
         datatype.trimAllToOpt map (extractTextValueQName(ns.asJava, _, true)),
-        Some(BindingAttributeDescriptor(QName.get(attName), attPredicate, attValue))// TODO: QName for attName
+        Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
       )(binding)
   }
 

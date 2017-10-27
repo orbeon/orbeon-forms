@@ -66,7 +66,7 @@ class DefaultsTest extends DocumentTestBase with XFormsSupport with AssertionsFo
       def insertOne(requireDefaultValues: Boolean) =
         insert(
           after                = instance.rootElement / "value",
-          origin               = NodeInfoFactory.elementInfo(QName.get("value")),
+          origin               = NodeInfoFactory.elementInfo(QName("value")),
           requireDefaultValues = requireDefaultValues
         )
 

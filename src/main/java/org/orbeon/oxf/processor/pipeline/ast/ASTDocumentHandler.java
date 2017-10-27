@@ -26,7 +26,7 @@ public class ASTDocumentHandler implements ASTHandler {
     private Stack href;
 
     public boolean startPipeline(ASTPipeline pipeline) {
-        currentElement = DocumentFactory.createElement(QName.get("config", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = DocumentFactory.createElement(QName.apply("config", PipelineProcessor.PIPELINE_NAMESPACE));
         document.setRootElement(currentElement);
         return true;
     }
@@ -35,15 +35,15 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void param(ASTParam param) {
-        Element paramElement = currentElement.addElement(QName.get("param", PipelineProcessor.PIPELINE_NAMESPACE));
+        Element paramElement = currentElement.addElement(QName.apply("param", PipelineProcessor.PIPELINE_NAMESPACE));
         paramElement.addAttribute("type", param.getType() == ASTParam.INPUT ? "input" : "output");
         paramElement.addAttribute("name", param.getName());
     }
 
     public boolean startProcessorCall(ASTProcessorCall processorCall) {
-        currentElement = currentElement.addElement(QName.get("processor", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = currentElement.addElement(QName.apply("processor", PipelineProcessor.PIPELINE_NAMESPACE));
         if (processorCall.getName() != null) {
-            currentElement.addAttribute("name", processorCall.getName().getQualifiedName());
+            currentElement.addAttribute("name", processorCall.getName().qualifiedName());
         } else {
             currentElement.addAttribute("class", processorCall.getProcessor().getClass().getName());
         }
@@ -60,7 +60,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void endInput(ASTInput input) {
-        Element inputElement = currentElement.addElement(QName.get("input", PipelineProcessor.PIPELINE_NAMESPACE));
+        Element inputElement = currentElement.addElement(QName.apply("input", PipelineProcessor.PIPELINE_NAMESPACE));
         inputElement.addAttribute("name", input.getName());
         if (!href.isEmpty())
             inputElement.addAttribute("href", (String) href.pop());
@@ -74,7 +74,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void output(ASTOutput output) {
-        Element outputElement = currentElement.addElement(QName.get("output", PipelineProcessor.PIPELINE_NAMESPACE));
+        Element outputElement = currentElement.addElement(QName.apply("output", PipelineProcessor.PIPELINE_NAMESPACE));
         outputElement.addAttribute("name", output.getName());
         if (output.getRef() != null)
             outputElement.addAttribute("ref", output.getRef());
@@ -125,7 +125,7 @@ public class ASTDocumentHandler implements ASTHandler {
 
     public boolean startChoose(ASTChoose choose) {
         href = new Stack();
-        currentElement = currentElement.addElement(QName.get("choose", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = currentElement.addElement(QName.apply("choose", PipelineProcessor.PIPELINE_NAMESPACE));
         return true;
     }
 
@@ -135,7 +135,7 @@ public class ASTDocumentHandler implements ASTHandler {
 
     public boolean startForEach(ASTForEach forEach) {
         href = new Stack();
-        currentElement = currentElement.addElement(QName.get("for-each", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = currentElement.addElement(QName.apply("for-each", PipelineProcessor.PIPELINE_NAMESPACE));
         if (forEach.getId() != null)
             currentElement.addAttribute("id", forEach.getId());
         if (forEach.getRef() != null)
@@ -156,9 +156,9 @@ public class ASTDocumentHandler implements ASTHandler {
             currentElement.addAttribute("href", (String) href.pop());
         }
         if (when.getTest() == null) {
-            currentElement = currentElement.addElement(QName.get("otherwise", PipelineProcessor.PIPELINE_NAMESPACE));
+            currentElement = currentElement.addElement(QName.apply("otherwise", PipelineProcessor.PIPELINE_NAMESPACE));
         } else {
-            currentElement = currentElement.addElement(QName.get("when", PipelineProcessor.PIPELINE_NAMESPACE));
+            currentElement = currentElement.addElement(QName.apply("when", PipelineProcessor.PIPELINE_NAMESPACE));
             currentElement.addAttribute("test", when.getTest());
         }
         return true;

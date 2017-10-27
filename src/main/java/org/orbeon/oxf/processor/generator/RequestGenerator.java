@@ -77,6 +77,7 @@ public class RequestGenerator extends ProcessorImpl {
 
     public static final String REQUEST_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-config";
     private static final String REQUEST_PRIVATE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-private";
+    private static final Namespace REQUEST_PRIVATE_NAMESPACE = Namespace$.MODULE$.apply("request", REQUEST_PRIVATE_NAMESPACE_URI);
 
     // Maximum upload size
     private static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
@@ -89,7 +90,8 @@ public class RequestGenerator extends ProcessorImpl {
     private static final String INCLUDE_ELEMENT = "include";
     private static final String EXCLUDE_ELEMENT = "exclude";
 
-    private static final String FILE_ITEM_ELEMENT = "request:file-item";
+    private static final String FILE_ITEM_ELEMENT_NAME = "file-item";
+    private static final String FILE_ITEM_ELEMENT_QUALIFIED_NAME = REQUEST_PRIVATE_NAMESPACE.prefix() + ":" + FILE_ITEM_ELEMENT_NAME;
     private static final String PARAMETER_NAME_ATTRIBUTE = "parameter-name";
     private static final String PARAMETER_POSITION_ATTRIBUTE = "parameter-position";
     private static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context";
@@ -114,7 +116,7 @@ public class RequestGenerator extends ProcessorImpl {
                         try {
                             if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri)) {
                                 // Special treatment for this element
-                                if (FILE_ITEM_ELEMENT.equals(qName)) {
+                                if (FILE_ITEM_ELEMENT_QUALIFIED_NAME.equals(qName)) {
                                     // Marker for file item
 
                                     final String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
@@ -125,7 +127,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                     super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
+                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName(): XMLConstants.XS_ANYURI_QNAME.qualifiedName());
                                     super.startElement("", "value", "value", newAttributes);
                                     writeFileItem(pipelineContext, fileItem, state.isSessionScope, useBase64(pipelineContext, fileItem), getXMLReceiver());
                                     super.endElement("", "value", "value");
@@ -164,7 +166,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                     super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
+                                            useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName(): XMLConstants.XS_ANYURI_QNAME.qualifiedName());
                                     super.startElement(uri, localname, qName, newAttributes);
                                     final String uriOrNull = writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, useBase64(pipelineContext, context.bodyFileItem), getXMLReceiver());
                                     super.endElement(uri, localname, qName);
@@ -210,7 +212,7 @@ public class RequestGenerator extends ProcessorImpl {
                     // Try to find stream-type attribute
                     final QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
                     if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
-                        throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.getQualifiedName());
+                        throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.qualifiedName());
                     state.requestedStreamType = streamTypeQName;
                     state.isSessionScope = "session".equals(config.getRootElement().attributeValue("stream-scope"));
 
@@ -538,7 +540,11 @@ public class RequestGenerator extends ProcessorImpl {
 
                         if (!isFileItemEmpty(fileItem)) {
                             // Create private placeholder element with parameter name as attribute
-                            final Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
+                            final Element fileItemElement = parameterElement.addElement(QName$.MODULE$.apply(
+                                FILE_ITEM_ELEMENT_NAME,
+                                REQUEST_PRIVATE_NAMESPACE,
+                                FILE_ITEM_ELEMENT_QUALIFIED_NAME
+                            ));
                             fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
                             fileItemElement.addAttribute(PARAMETER_POSITION_ATTRIBUTE, Integer.toString(j));
                         } else {

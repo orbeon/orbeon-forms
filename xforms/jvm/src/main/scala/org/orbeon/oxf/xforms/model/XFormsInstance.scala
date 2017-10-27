@@ -620,7 +620,7 @@ object XFormsInstance extends Logging {
         parentInfoElement.addAttribute("required", InstanceData.getRequired(node).toString)
         parentInfoElement.addAttribute("valid", InstanceData.getValid(node).toString)
         val typeQName = InstanceData.getType(node)
-        parentInfoElement.addAttribute("type", Option(typeQName) map (_.getQualifiedName) getOrElse "")
+        parentInfoElement.addAttribute("type", Option(typeQName) map (_.qualifiedName) getOrElse "")
       }
     })
 

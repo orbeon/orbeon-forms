@@ -28,10 +28,10 @@ class ConcreteAttribute(qname: QName, var value: String)
   def accept(visitor: Visitor): Unit =
     visitor.visit(this)
 
-  def getNamespace       = getQName.getNamespace
-  def getNamespacePrefix = getQName.getNamespacePrefix
-  def getNamespaceURI    = getQName.getNamespaceURI
+  def getNamespace       = getQName.namespace
+  def getNamespacePrefix = getQName.namespace.prefix
+  def getNamespaceURI    = getQName.namespace.uri
 
-  override def getName   = getQName.getName
-  def getQualifiedName   = getQName.getQualifiedName
+  override def getName   = getQName.name
+  def getQualifiedName   = getQName.qualifiedName
 }

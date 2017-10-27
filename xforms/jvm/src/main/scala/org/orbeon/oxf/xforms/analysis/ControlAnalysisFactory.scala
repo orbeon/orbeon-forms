@@ -217,8 +217,8 @@ object ControlAnalysisFactory {
 
     // Extension attributes depend on the name of the element
     override protected val allowedExtensionAttributes =
-      if ((elementQName ne null) && Set("td", "th")(elementQName.getName))
-        Set(QName.get("rowspan"), QName.get("colspan"))
+      if ((elementQName ne null) && Set("td", "th")(elementQName.name))
+        Set(QName("rowspan"), QName("colspan"))
       else
         Set.empty[QName]
 

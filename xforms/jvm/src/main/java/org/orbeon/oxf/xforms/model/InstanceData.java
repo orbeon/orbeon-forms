@@ -299,7 +299,7 @@ public class InstanceData {// rename to DataNodeProperties once done
 
                     // No prefix
                     if (parts[0].equals("")) {
-                        return QName.get(parts[1]);
+                        return QName.apply(parts[1]);
                     }
 
                     // There is a prefix, resolve it
@@ -311,7 +311,7 @@ public class InstanceData {// rename to DataNodeProperties once done
                         }
                         final String prefix = currentNamespaceNode.getLocalPart();
                         if (prefix.equals(parts[0])) {
-                            return QName.get(parts[1], "", currentNamespaceNode.getStringValue());
+                            return QName.apply(parts[1], "", currentNamespaceNode.getStringValue());
                         }
                     }
                 } catch (Exception e) {

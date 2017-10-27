@@ -56,12 +56,6 @@ trait Branch extends Node {
   def addElement(qname: QName): Element
 
   /**
-   * Adds a new `Element` node with the given qualified name and
-   * namespace URI to this branch and returns a reference to the new node.
-   */
-  def addElement(qualifiedName: String, namespaceURI: String): Element
-
-  /**
    * Adds the given `Node` or throws `IllegalAddException`
    * if the given node is not of a valid type. This is a polymorphic method
    * which will call the typesafe method for the node type such as

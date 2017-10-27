@@ -223,9 +223,9 @@ class XFormsOutputDownloadHandler(
 
         // Specify resource URL type for proxy portlet
         containerAttributes.addAttribute(
-          FORMATTING_URL_TYPE_QNAME.getNamespaceURI,
-          FORMATTING_URL_TYPE_QNAME.getName,
-          XMLUtils.buildQName(formattingPrefix, FORMATTING_URL_TYPE_QNAME.getName),
+          FORMATTING_URL_TYPE_QNAME.namespace.uri,
+          FORMATTING_URL_TYPE_QNAME.name,
+          XMLUtils.buildQName(formattingPrefix, FORMATTING_URL_TYPE_QNAME.name),
           CDATA, "resource")
 
         // Add _blank target in order to prevent:

@@ -33,7 +33,7 @@ class XFormsGroupDefaultHandler(
   override def getContainingElementName =
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
-        control.elementQName.getName
+        control.elementQName.name
       case _ ⇒
         super.getContainingElementName
     }
@@ -41,7 +41,7 @@ class XFormsGroupDefaultHandler(
   override def getContainingElementQName =
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
-        control.elementQName.getQualifiedName
+        control.elementQName.qualifiedName
       case _ ⇒
         super.getContainingElementQName
     }

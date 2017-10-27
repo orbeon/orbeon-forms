@@ -448,7 +448,7 @@ public class Dom4jUtils {
                 throw new OXFException("No namespace declaration found for prefix: " + prefix);
             }
         }
-        return QName.get(localName, Namespace$.MODULE$.apply(prefix, namespaceURI));
+        return QName.apply(localName, Namespace$.MODULE$.apply(prefix, namespaceURI));
     }
 
     /**
@@ -458,11 +458,11 @@ public class Dom4jUtils {
         int openIndex = qName.indexOf("{");
 
         if (openIndex == -1)
-            return QName.get(qName);
+            return QName.apply(qName);
 
         String namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"));
         String localName = qName.substring(qName.indexOf("}") + 1);
-        return QName.get(localName, Namespace$.MODULE$.apply("p1", namespaceURI));
+        return QName.apply(localName, Namespace$.MODULE$.apply("p1", namespaceURI));
     }
 
     // TODO ORBEON: remove uses, just use DocumentFactory
@@ -719,12 +719,12 @@ public class Dom4jUtils {
      * Encode a QName to an exploded QName (also known as a "Clark name") String.
      */
     public static String qNameToExplodedQName(QName qName) {
-        return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
+        return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.namespace().uri(), qName.name());
     }
 
     // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
     public static String buildURIQualifiedName(QName qName) {
-        return XMLUtils.buildURIQualifiedName(qName.getNamespaceURI(), qName.getName());
+        return XMLUtils.buildURIQualifiedName(qName.namespace().uri(), qName.name());
     }
 
     public interface VisitorListener {

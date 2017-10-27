@@ -104,7 +104,7 @@ object BinaryTextSupport {
   ): Unit = {
 
     val attributes = new AttributesImpl
-    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", xsiType.getQualifiedName)
+    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", xsiType.qualifiedName)
     if (contentType ne null)
       attributes.addAttribute("", Headers.ContentTypeLower, Headers.ContentTypeLower, "CDATA", contentType)
     if (fileName ne null)

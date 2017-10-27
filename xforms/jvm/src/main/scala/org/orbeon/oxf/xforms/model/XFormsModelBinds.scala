@@ -60,7 +60,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
       eventsToDispatch += event
 
     def makeQNameValue(qName: QName) =
-      new QNameValue(qName.getNamespacePrefix, qName.getNamespaceURI, qName.getName, null)
+      new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.name, null)
 
     def hasSuccessfulErrorConstraints =
       bind.staticBind.constraintsByLevel.nonEmpty option {
@@ -74,7 +74,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
     def evaluateCustomMIPByName(mipType: QName) =
       evaluateCustomMIP(
         bindNode,
-        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.getQualifiedName)).head,
+        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.qualifiedName)).head,
         collector
       )
 

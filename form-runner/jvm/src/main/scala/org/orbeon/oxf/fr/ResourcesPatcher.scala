@@ -99,7 +99,7 @@ object ResourcesPatcher {
       lang                          ← findConcreteLanguages(langOrWildcard)
       rootForLang                   ← resourceElementsForLang(lang)
     } locally {
-      Dom4j.ensurePath(rootForLang, path split "/" map QName.get).setText(value)
+      Dom4j.ensurePath(rootForLang, path split "/" map QName.apply).setText(value)
     }
   }
 }

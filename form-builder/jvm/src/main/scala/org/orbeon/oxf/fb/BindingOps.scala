@@ -165,14 +165,14 @@ trait BindingOps {
       val typeFromDatatype =
         for (elem ← datatypeMetadataOpt.to[List])
         yield
-          (elem, QName.get("type"), elem.stringValue)
+          (elem, QName("type"), elem.stringValue)
 
       val bindAttributes = {
         for {
           elem ← bindMetadataOpt.to[List]
           att  ← elem /@ @*
         } yield
-          (elem, QName.get(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
+          (elem, QName(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
       }
 
       typeFromDatatype ::: bindAttributes
@@ -181,8 +181,8 @@ trait BindingOps {
     allAttributes collect {
       case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
         // Some attributes must be prefixed before being inserted into the edited form
-        QName.get(qname.getName, "fb", XMLNames.FB) → value
-      case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
+        QName(qname.name, "fb", XMLNames.FB) → value
+      case (elem, qname, value) if !(qname.name == "type" && elem.resolveQName(value).name == "string") ⇒
         // Exclude `type="*:string"`
         qname → value
     } map {

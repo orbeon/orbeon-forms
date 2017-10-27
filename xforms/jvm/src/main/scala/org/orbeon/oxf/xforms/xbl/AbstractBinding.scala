@@ -140,7 +140,7 @@ case class AbstractBinding(
 
       // Repackage the result
       val generatedRootElement = generatedDocument.getRootElement.detach().asInstanceOf[Element]
-      generatedDocument.addElement(QName.get("template", XBL_NAMESPACE, "xbl:template"))
+      generatedDocument.addElement(QName("template", XBL_NAMESPACE))
       val newRoot = generatedDocument.getRootElement
       newRoot.add(XBL_NAMESPACE)
       newRoot.add(generatedRootElement)
@@ -211,7 +211,7 @@ object AbstractBinding {
 
     // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
     val cssName =
-      directName map (_.getQualifiedName) map (_.replace(':', '-'))
+      directName map (_.qualifiedName) map (_.replace(':', '-'))
 
     AbstractBinding(
       selectors,

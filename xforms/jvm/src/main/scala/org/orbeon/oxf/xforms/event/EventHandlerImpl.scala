@@ -290,7 +290,7 @@ object EventHandlerImpl extends Logging {
 
   // Whether the element is an event handler (a known action element with @*:event)
   def isEventHandler(element: Element) =
-    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName) ne null)
+    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.name) ne null)
 
   // Given a static handler, and concrete observer and target, try to find the concrete handler
   def resolveHandler(

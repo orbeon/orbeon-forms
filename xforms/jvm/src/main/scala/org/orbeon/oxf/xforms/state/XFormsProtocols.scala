@@ -139,15 +139,15 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
   implicit object QNameFormat extends Format[QName] {
     def writes(out: Output, value: QName): Unit = {
-      write(out, value.getName)
-      write(out, value.getNamespace.prefix)
-      write(out, value.getNamespace.uri)
-      write(out, value.getQualifiedName)
+      write(out, value.name)
+      write(out, value.namespace.prefix)
+      write(out, value.namespace.uri)
+      write(out, value.qualifiedName)
 
     }
 
     def reads(in: Input) =
-      QName.get(
+      QName(
         read[String](in),
         Namespace(read[String](in), read[String](in)),
         read[String](in)

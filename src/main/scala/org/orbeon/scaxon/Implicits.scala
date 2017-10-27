@@ -23,9 +23,9 @@ import scala.collection.{Iterator, Seq}
 
 object Implicits {
 
-  implicit def stringToQName                       (v: String)             : QName            = QName.get(v ensuring ! v.contains(':'))
-  implicit def tupleToQName                        (v: (String, String))   : QName            = QName.get(v._2, "", v._1)
-  implicit def uriQualifiedNameToQName             (v: URIQualifiedName)   : QName            = QName.get(v.localName, "", v.uri)
+  implicit def stringToQName                       (v: String)             : QName            = QName(v ensuring ! v.contains(':'))
+  implicit def tupleToQName                        (v: (String, String))   : QName            = QName(v._2, "", v._1)
+  implicit def uriQualifiedNameToQName             (v: URIQualifiedName)   : QName            = QName(v.localName, "", v.uri)
 
   implicit def intToIntegerValue                   (v: Int)                : IntegerValue     = Int64Value.makeIntegerValue(v)
   implicit def doubleToDoubleValue                 (v: Double)             : DoubleValue      = new DoubleValue(v)

@@ -44,8 +44,8 @@ class XXFormsComponentParam extends XFormsFunction {
         concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt map stringToStringValue
 
       def propertyName =
-        concreteBinding.abstractBinding.directName map { name ⇒
-          List("oxf.xforms.xbl", name.getNamespacePrefix, name.getName, paramName) mkString "."
+        concreteBinding.abstractBinding.directName map { qName ⇒
+          List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) mkString "."
         }
 
       def fromProperties =

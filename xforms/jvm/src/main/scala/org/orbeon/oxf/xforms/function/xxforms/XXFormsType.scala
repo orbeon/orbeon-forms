@@ -42,8 +42,8 @@ class XXFormsType extends XXFormsMIPFunction {
           case Some(typeQName) ⇒
             new QNameValue(
               "",
-              typeQName.getNamespaceURI,
-              typeQName.getName,
+              typeQName.namespace.uri,
+              typeQName.name,
               null
             )
           case _ ⇒

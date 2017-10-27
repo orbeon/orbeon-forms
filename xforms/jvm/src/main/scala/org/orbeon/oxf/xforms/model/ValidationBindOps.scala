@@ -162,8 +162,8 @@ trait ValidationBindOps extends Logging {
       // NOTE: xf:bind/@type is a literal type value, and it is the same that applies to all nodes pointed to by xf:bind/@ref
       val typeQName = staticBind.dataType.get
 
-      val typeNamespaceURI = typeQName.getNamespaceURI
-      val typeLocalname    = typeQName.getName
+      val typeNamespaceURI = typeQName.namespace.uri
+      val typeLocalname    = typeQName.name
 
       // Get value to validate if not already computed above
 
@@ -178,7 +178,7 @@ trait ValidationBindOps extends Logging {
 
       // TODO: Check what XForms event must be dispatched.
       def throwError() =
-        throw new ValidationException(s"Invalid schema type `${typeQName.getQualifiedName}`", staticBind.locationData)
+        throw new ValidationException(s"Invalid schema type `${typeQName.qualifiedName}`", staticBind.locationData)
 
       if (isBuiltInXFormsType && nodeValue.isEmpty) {
         // Don't consider the node invalid if the string is empty with xf:* types
@@ -194,7 +194,7 @@ trait ValidationBindOps extends Logging {
           nodeValue,
           typeNamespaceURI,
           typeLocalname,
-          typeQName.getQualifiedName,
+          typeQName.qualifiedName,
           staticBind.locationData
         )
         validationError eq null
@@ -281,7 +281,7 @@ trait ValidationBindOps extends Logging {
           nodeValue,
           typeNamespaceURI,
           typeLocalname,
-          typeQName.getQualifiedName,
+          typeQName.qualifiedName,
           staticBind.locationData
         )
 

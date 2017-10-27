@@ -67,9 +67,9 @@ trait ControlExtensionAttributesSupport {
   final def addExtensionAttributesExceptClassAndAcceptForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
     for {
       (name, value) ← evaluatedExtensionAttributes
-      if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
       if value ne null
-      localName = name.getName
+      localName = name.name
     } attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
 
   final def addExtensionAttributesExceptClassAndAcceptForAjax(
@@ -79,13 +79,13 @@ trait ControlExtensionAttributesSupport {
   ): Unit =
     for {
       name ← staticControl.extensionAttributes.keys
-      if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
     } locally {
       ControlAjaxSupport.outputAttributeElement(
         previousControlOpt,
         this,
         effectiveId,
-        name.getName,
+        name.name,
         _.extensionAttributeValue(name).orNull
       )(ch, containingDocument)
     }

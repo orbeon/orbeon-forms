@@ -75,8 +75,8 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
         // Output attribute
         final QName attributeQName = getQName(getDocumentLocator(), attributeName, getInterpreterContext().getPrefixesMap());
-        getInterpreterContext().getOutput().startPrefixMapping(attributeQName.getName(), attributeQName.getNamespaceURI());// NOTE: we may have to check that the mapping does not exist yet
-        getInterpreterContext().getOutput().addAttribute(attributeQName.getNamespaceURI(), attributeQName.getName(), attributeName, contentString);
+        getInterpreterContext().getOutput().startPrefixMapping(attributeQName.name(), attributeQName.namespace().uri());// NOTE: we may have to check that the mapping does not exist yet
+        getInterpreterContext().getOutput().addAttribute(attributeQName.namespace().uri(), attributeQName.name(), attributeName, contentString);
 
         // Clear state
         savedOutput = null;
@@ -88,7 +88,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
         final int colonIndex = qNameString.indexOf(':');
         if (colonIndex == -1)
-            return QName.get(qNameString);
+            return QName.apply(qNameString);
         if (colonIndex == 0)
             throw new ValidationException("Invalid QName:" + qNameString, new LocationData(locator));
 
@@ -98,7 +98,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         if (prefixesMap.get(prefix) == null) {
             throw new ValidationException("Undeclared prefix for QName:" + qNameString, new LocationData(locator));
         } else {
-            return QName.get(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
+            return QName.apply(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
         }
     }
 }

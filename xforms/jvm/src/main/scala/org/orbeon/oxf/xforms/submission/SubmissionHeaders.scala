@@ -46,7 +46,7 @@ object SubmissionHeaders {
         def getElementValue(name: QName) = {
           val element = headerElement.element(name)
           if (element eq null)
-            throw new OXFException(s"Missing <${name.getQualifiedName}> child element of <header> element")
+            throw new OXFException(s"Missing <${name.qualifiedName}> child element of <header> element")
 
           val scope =
             xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))

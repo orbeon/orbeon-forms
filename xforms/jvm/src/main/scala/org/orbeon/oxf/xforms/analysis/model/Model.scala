@@ -234,9 +234,9 @@ trait ModelBinds {
     import ElementAnalysis.attQNameSet
 
     def canBeCustomMIP(qName: QName) =
-      qName.getNamespacePrefix.nonEmpty &&
-      ! qName.getNamespacePrefix.startsWith("xml") &&
-      (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.getNamespaceURI))
+      qName.namespace.prefix.nonEmpty &&
+      ! qName.namespace.prefix.startsWith("xml") &&
+      (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.namespace.uri))
 
     Option(selfModel.element.attribute(XXFORMS_CUSTOM_MIPS_QNAME)) match {
       case Some(_) ⇒
@@ -317,9 +317,9 @@ object Model {
   val ChildrenElementsQNames = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
 
   // MIP enumeration
-  sealed trait MIP         { def name: String; val aName: QName;                                     val eName: QName }
-  trait StdMIP extends MIP { val name: String; val aName = QName.get(name);                          val eName = QName.get(name, XFORMS_NAMESPACE_SHORT) }
-  trait ExtMIP extends MIP { val name: String; val aName = QName.get(name, XXFORMS_NAMESPACE_SHORT); val eName = QName.get(name, XXFORMS_NAMESPACE_SHORT) }
+  sealed trait MIP         { def name: String; val aName: QName;                                 val eName: QName }
+  trait StdMIP extends MIP { val name: String; val aName = QName(name);                          val eName = QName(name, XFORMS_NAMESPACE_SHORT) }
+  trait ExtMIP extends MIP { val name: String; val aName = QName(name, XXFORMS_NAMESPACE_SHORT); val eName = QName(name, XXFORMS_NAMESPACE_SHORT) }
 
   trait ComputedMIP extends MIP
   trait ValidateMIP extends MIP
@@ -372,11 +372,11 @@ object Model {
 
   // NOTE: If changed, QName returned has an empty prefix.
   def getVariationTypeOrKeep(datatype: QName) =
-    if (XFormsVariationTypeNames(datatype.getName))
-      if (datatype.getNamespaceURI == XFORMS_NAMESPACE_URI)
-        QName.get(datatype.getName, "", XSD_URI)
-      else if (datatype.getNamespaceURI == XSD_URI)
-        QName.get(datatype.getName, "", XFORMS_NAMESPACE_URI)
+    if (XFormsVariationTypeNames(datatype.name))
+      if (datatype.namespace.uri == XFORMS_NAMESPACE_URI)
+        QName(datatype.name, "", XSD_URI)
+      else if (datatype.namespace.uri == XSD_URI)
+        QName(datatype.name, "", XFORMS_NAMESPACE_URI)
       else
         datatype
     else
@@ -390,7 +390,7 @@ object Model {
 
   // NOTE: QName returned has an empty prefix.
   def qNameForBuiltinTypeName(builtinTypeString: String, required: Boolean) =
-    QName.get(builtinTypeString, "", uriForBuiltinTypeName(builtinTypeString, required))
+    QName(builtinTypeString, "", uriForBuiltinTypeName(builtinTypeString, required))
 
   val XFormsSchemaTypeNames = Set(
     "dayTimeDuration",

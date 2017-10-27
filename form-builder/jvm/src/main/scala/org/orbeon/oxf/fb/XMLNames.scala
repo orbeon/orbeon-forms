@@ -35,7 +35,7 @@ object XMLNames {
   val FBIconTest        : Test  = FB → "icon"
   val FBSmallIconTest   : Test  = FB → "small-icon"
 
-  val InitialIterations : QName = QName.get("initial-iterations", FBPrefix, FB)
+  val InitialIterations : QName = QName("initial-iterations", FBPrefix, FB)
 
   val XFConstraintTest  : Test = XF → "constraint"
   val XFTypeTest        : Test = XF → "type"

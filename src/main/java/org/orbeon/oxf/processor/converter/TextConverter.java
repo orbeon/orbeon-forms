@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 public class TextConverter extends TextConverterBase {
 
     public static String DEFAULT_CONTENT_TYPE = "text/plain";
-    public static QName DEFAULT_METHOD = QName.get("text");
+    public static QName DEFAULT_METHOD = QName.apply("text");
 
     public TextConverter() {}
 

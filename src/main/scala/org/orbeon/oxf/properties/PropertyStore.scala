@@ -51,7 +51,7 @@ class PropertyStore(propertiesDocument: Document) {
         val typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as")
 
         if (! PropertyStore.SupportedTypes.contains(typeQName))
-          throw new ValidationException(s"Invalid `as` attribute: ${typeQName.getQualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
+          throw new ValidationException(s"Invalid `as` attribute: ${typeQName.qualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
 
         val name = propertyElement.attributeValue("name")
 

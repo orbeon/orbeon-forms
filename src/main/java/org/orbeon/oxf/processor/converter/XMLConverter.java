@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 public class XMLConverter extends TextConverterBase {
 
     public static final String DEFAULT_CONTENT_TYPE = "application/xml";
-    public static final QName DEFAULT_METHOD = QName.get("xml");
+    public static final QName DEFAULT_METHOD = QName.apply("xml");
     public static final String DEFAULT_VERSION = "1.0";
 
     public XMLConverter() {

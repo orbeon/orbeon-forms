@@ -191,10 +191,10 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
 object Itemset {
   def getAttributeName(name: QName): String =
-    if (name.getNamespace == Namespace.EmptyNamespace)
-      name.getName
-    else if (name.getNamespace == XFormsConstants.XXFORMS_NAMESPACE)
-      "xxforms-" + name.getName
+    if (name.namespace == Namespace.EmptyNamespace)
+      name.name
+    else if (name.namespace == XFormsConstants.XXFORMS_NAMESPACE)
+      "xxforms-" + name.name
     else
-      throw new IllegalStateException("Invalid attribute on item: " + name.getName)
+      throw new IllegalStateException("Invalid attribute on item: " + name.name)
 }

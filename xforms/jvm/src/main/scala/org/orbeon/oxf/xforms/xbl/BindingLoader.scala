@@ -64,7 +64,7 @@ trait BindingLoader extends Logging {
 
         def pathsForQNames(qNames: Set[QName]) =
           qNames flatMap { qName ⇒
-            findBindingPathByNameUseMappings(urlMappings, qName.getNamespaceURI, qName.getName)
+            findBindingPathByNameUseMappings(urlMappings, qName.namespace.uri, qName.name)
           } partition (_._2) match {
             case (found, notFound) ⇒ (found map (_._1), notFound map (_._1))
           }
@@ -154,7 +154,7 @@ trait BindingLoader extends Logging {
 
     def findFromAlreadyLoadedBindings: Option[IndexableBinding] = {
 
-      val qName   = QName.get(localname, "", uri)
+      val qName   = QName(localname, "", uri)
       val attsSeq = convertAttributes(atts)
 
       BindingIndex.findMostSpecificBinding(currentIndex, qName, attsSeq) match {
@@ -367,7 +367,7 @@ trait BindingLoader extends Logging {
 
   private def convertAttributes(atts: Attributes) =
     for (i ← 0 until atts.getLength)
-      yield QName.get(atts.getLocalName(i), "", atts.getURI(i)) → atts.getValue(i)
+      yield QName(atts.getLocalName(i), "", atts.getURI(i)) → atts.getValue(i)
 }
 
 object BindingLoader extends BindingLoader {

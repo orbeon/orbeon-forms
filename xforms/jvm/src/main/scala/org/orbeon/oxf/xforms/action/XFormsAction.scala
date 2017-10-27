@@ -119,7 +119,7 @@ object XFormsAction {
         // Get and check attributes
         name =
           Option(Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(element, NAME_QNAME))) getOrElse
-            (throw new OXFException(XXFORMS_CONTEXT_QNAME.getQualifiedName + " element must have a \"name\" attribute."))
+            (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {
           case Some(value) ⇒

@@ -41,8 +41,6 @@ object RpcClient
     lastSequenceNumber += 1
     val id = lastSequenceNumber
 
-    println(s"RPC: dispatching request for id: $id (${pathValue.length + argsValue.length} bytes)")
-
     DocumentAPI.dispatchEvent(
       targetId   = "#document",
       eventName  = "xxforms-rpc-request",
@@ -65,7 +63,6 @@ object RpcClient
   def processResponse(id: String, response: String): Unit = {
     pending.get(id.toInt) match {
       case Some(promise) ⇒
-        println(s"RPC: got correct id in response: $id (${response.length} bytes)")
         pending -= id.toInt
         promise.complete(Success(parse(URIUtils.decodeURIComponent(response)).right.get))
       case None ⇒

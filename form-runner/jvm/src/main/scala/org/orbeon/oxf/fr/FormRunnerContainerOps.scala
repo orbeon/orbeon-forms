@@ -24,7 +24,8 @@ import org.orbeon.scaxon.SimplePath._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
-  import Private._
+  val MatchesComponentUriLibraryRegex = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
+  val MatchesSectionTemplateUriRegex  = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
   def isFBBody(node: NodeInfo): Boolean =
     (node self XFGroupTest effectiveBooleanValue) && node.attClasses("fb-body")
@@ -70,7 +71,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)
 
   def isSectionTemplateContent(containerElem: NodeInfo): Boolean =
-    (containerElem parent * exists IsSection) && ComponentURI.findFirstIn(containerElem.namespaceURI).nonEmpty
+    (containerElem parent * exists IsSection) && MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
@@ -171,7 +172,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
 
     def matchesComponentURI(uri: String) =
-      ComponentNS.findFirstIn(uri).isDefined
+      MatchesComponentUriLibraryRegex.findFirstIn(uri).isDefined
 
     // Find the concrete section template component (component:foo)
     // A bit tricky because there might not be an id on the component element:
@@ -183,13 +184,5 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     sectionTemplateElementOpt flatMap
       (e ⇒ frSectionComponent.resolve(e.staticId)) flatMap
       collectByErasedType[XFormsComponentControl]
-  }
-
-  private object Private {
-
-    val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
-
-    // Namespace URL a section template component must match
-    val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
   }
 }

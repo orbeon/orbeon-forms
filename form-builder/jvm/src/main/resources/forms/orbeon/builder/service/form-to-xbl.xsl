@@ -28,8 +28,18 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <!-- Namespace URI e.g. http://orbeon.org/oxf/xml/form-builder/component/APP/FORM -->
-    <xsl:variable name="component-namespace" as="xs:string"
-                  select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
+    <xsl:variable
+        name="component-namespace"
+        as="xs:string"
+        select="
+        string-join(
+            (
+                'http://orbeon.org/oxf/xml/form-builder/component',
+                doc('input:parameters')/*/app,
+                doc('input:parameters')/*/form
+            ),
+            '/'
+        )"/>
 
     <!-- Global stuff -->
     <xsl:variable name="fr-form-model"         select="/xh:html/xh:head//xf:model[@id = 'fr-form-model']"       as="element(xf:model)*"/>

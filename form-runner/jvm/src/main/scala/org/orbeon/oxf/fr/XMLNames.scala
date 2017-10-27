@@ -37,6 +37,8 @@ object XMLNames {
   val XBLTemplateTest        : Test      = XBL → "template"
   val XBLImplementationTest  : Test      = XBL → "implementation"
 
+  val XSSchemaTest           : Test      = XS → "schema"
+
   val FRBodyTest             : Test      = FR → "body"
 
   val FRGridTest             : Test      = FR → "grid"

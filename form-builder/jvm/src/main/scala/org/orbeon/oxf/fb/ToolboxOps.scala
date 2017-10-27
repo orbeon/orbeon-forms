@@ -318,24 +318,27 @@ object ToolboxOps {
 
   // Insert a new section template
   //@XPathFunction
-  def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo): Unit =
+  def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
     // Insert new section first
     insertNewSection(inDoc, withGrid = false) foreach { section ⇒
 
-      val selector = binding /@ "element" stringValue
+      val selector = binding attValue "element"
 
-      val model = findModelElem(inDoc)
-      val xbl = model followingSibling (XBL → "xbl")
-      val existingBindings = xbl child (XBL → "binding")
+      val xbl              = ctx.modelElem followingSibling XBLXBLTest
+      val existingBindings = xbl child XBLBindingTest
 
       // Insert binding into form if needed
       if (! (existingBindings /@ "element" === selector))
-        insert(after = model +: xbl, origin = binding parent * )
+        insert(after = ctx.modelElem +: xbl, origin = binding parent * )
 
       // Insert template into section
       findViewTemplate(binding) foreach
         (template ⇒ insert(into = section, after = section / *, origin = template))
     }
+  }
 
   /* Example layout:
   <xcv>

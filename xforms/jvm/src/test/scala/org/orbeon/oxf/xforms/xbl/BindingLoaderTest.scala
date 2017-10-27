@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.dom.Document
 import org.junit.Test
+import org.orbeon.dom.Document
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument

@@ -333,13 +333,13 @@ trait BindingLoader extends Logging {
 
   private def readXBLResource(xblPath: String) = {
 
-    val lastModified = BindingLoader.lastModifiedByPath(xblPath)
+    val lastModified = lastModifiedByPath(xblPath)
 
     (
       Transform.readDocumentOrSimplifiedStylesheet(
         Transform.InlineReadDocument(
           xblPath,
-          BindingLoader.contentAsDOM4J(xblPath),
+          contentAsDOM4J(xblPath),
           lastModified
         )
       ).getRootElement,

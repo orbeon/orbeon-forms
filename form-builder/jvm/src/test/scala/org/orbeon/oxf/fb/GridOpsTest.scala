@@ -132,7 +132,7 @@ class GridOpsTest
       withTestExternalContext { _ ⇒
 
         val controls =
-          sectionWithGridAndControls descendant NodeInfoCell.CellTest child * filter (_ /@ "id" nonEmpty)
+          sectionWithGridAndControls descendant NodeInfoCell.CellTest child * filter (_.idOpt.nonEmpty)
 
         val actual = controls map precedingBoundControlNameInSectionForControl
 

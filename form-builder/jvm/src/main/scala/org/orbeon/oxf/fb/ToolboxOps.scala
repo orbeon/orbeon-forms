@@ -142,7 +142,7 @@ object ToolboxOps {
 
           // Make sure there is a @bind instead of a @ref on the control
           delete(newControlElem /@ "ref")
-          ensureAttribute(newControlElem, "bind", bind /@ "id" stringValue)
+          ensureAttribute(newControlElem, "bind", bind.id)
 
           // Set bind attributes if any
           insert(into = bind, origin = findBindAttributesTemplate(binding))

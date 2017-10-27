@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.{Document, Element, QName}
+import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
@@ -232,9 +233,9 @@ trait BindingLoader extends Logging {
 
     val newBindings =
       for {
-        path                 ← paths.to[List]
-        (elem, lastModified) = readXBLResource(path)
-        newBinding           ← extractXBLBindings(Some(path), lastModified, elem)
+        xblPath              ← paths.to[List]
+        (elem, lastModified) = readXBLResource(xblPath)
+        newBinding           ← extractXBLBindings(Some(xblPath), lastModified, elem)
       } yield
         newBinding
 
@@ -330,12 +331,20 @@ trait BindingLoader extends Logging {
   private def findBindingPathByName(uri: String, localname: String) =
     findBindingPathByNameUseMappings(readURLMappingsCacheAgainstProperty, uri, localname)
 
-  private def readXBLResource(path: String) = {
+  private def readXBLResource(xblPath: String) = {
 
-    val sourceXBL    = contentAsDOM4J(path)
-    val lastModified = lastModifiedByPath(path)
+    val lastModified = BindingLoader.lastModifiedByPath(xblPath)
 
-    (Transform.transformXBLDocumentIfNeeded(path, sourceXBL, lastModified).getRootElement, lastModified)
+    (
+      Transform.readDocumentOrSimplifiedStylesheet(
+        Transform.InlineReadDocument(
+          xblPath,
+          BindingLoader.contentAsDOM4J(xblPath),
+          lastModified
+        )
+      ).getRootElement,
+      lastModified
+    )
   }
 
   private def extractXBLBindings(

@@ -17,7 +17,10 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.Transform
+import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
@@ -123,18 +126,20 @@ case class AbstractBinding(
   private lazy val transformConfig =
     for {
       transformQName ← transformQNameOption
-      templateRoot ← templateRootOption
+      templateRoot   ← templateRootOption
     } yield
-      Transform.createTransformConfig(transformQName, templateRoot, lastModified)
+      Transform.createPipelineConfig(transformQName, lastModified) →
+        AbstractBinding.createTransformDomGenerator(templateRoot, lastModified)
 
   // A transform cannot be reused, so this creates a new one when called, based on the config
   def newTransform(boundElement: Element): Option[Document] = transformConfig map {
     case (pipelineConfig, domGenerator) ⇒
       // Run the transformation
-      val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGenerator, boundElement)
+      val generatedDocument =
+        Transform.transformFromPipelineConfig(pipelineConfig, domGenerator, boundElement)
 
       // Repackage the result
-      val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]
+      val generatedRootElement = generatedDocument.getRootElement.detach().asInstanceOf[Element]
       generatedDocument.addElement(QName.get("template", XBL_NAMESPACE, "xbl:template"))
       val newRoot = generatedDocument.getRootElement
       newRoot.add(XBL_NAMESPACE)
@@ -148,6 +153,18 @@ case class AbstractBinding(
 }
 
 object AbstractBinding {
+
+  // Create transform input separately to help with namespaces (easier with a separate document)
+  // NOTE: We don't create and connect the pipeline here because we don't yet have the data input. Ideally we
+  // should have something similar to what the pipeline processor does, with the ability to dynamically connect
+  // pipeline inputs and inputs while still allowing caching of the pipeline itself.
+  private def createTransformDomGenerator(transform: Element, lastModified: Long): DOMGenerator =
+    PipelineUtils.createDOMGenerator(
+      Dom4jUtils.createDocumentCopyParentNamespaces(transform),
+      "xbl-transform-config",
+      lastModified,
+      Dom4jUtils.makeSystemId(transform)
+    )
 
   def fromBindingElement(
     bindingElement : Element,
@@ -170,14 +187,14 @@ object AbstractBinding {
     val handlers =
       for {
         handlersElement ← Option(bindingElement.element(XBL_HANDLERS_QNAME)).toSeq
-        handlerElement ← Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
+        handlerElement  ← Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
       } yield
         handlerElement
 
     val modelElements =
       for {
         implementationElement ← Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
-        modelElement ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
+        modelElement          ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
       } yield
         modelElement
 

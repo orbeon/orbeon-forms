@@ -15,9 +15,8 @@
 @darkBlue: #004B92;
 @lightBlue: #DEF;
 @yellow: #ffffd3;
-@cellSelectColorBorder     : rgba(63, 159, 216, 1.0);
-@cellSelectColorBackground : rgba(63, 159, 216, 0.1);
-@hoverBackground           : #eee;
+@cellSelectColorBorder     : rgba(66, 133, 244, 1.0);
+@cellSelectColorBackground : rgba(66, 133, 244, 0.05);
 
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
@@ -863,10 +862,9 @@ div.orbeon.orbeon-portlet-div {
         .fr-grid-td {
             &.fb-selected {                                                             // Selected cell in grids
                 border: 3px solid @cellSelectColorBorder;                               // Highlight current cell
-                background-color: @cellSelectColorBackground;
             }
             &:hover:not(.fb-selected) {
-                background-color: @hoverBackground;
+                background-color: #eee;
             }
         }
 
@@ -897,7 +895,11 @@ div.orbeon.orbeon-portlet-div {
         .generateMinHeight(20);
 
         .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
-            &:hover { background-color: @hoverBackground }                                                          // Indicate the value can be edited
+            &:hover {
+                // Indicate the value can be edited
+                background-color: #ddd;
+                cursor: pointer;
+            }
         }
         // Make click area with the grey background larger, as it will typically contain a longer text
         .xforms-text .xforms-output-output { min-height: 50px; display: block; }

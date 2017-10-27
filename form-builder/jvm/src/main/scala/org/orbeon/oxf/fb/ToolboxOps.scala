@@ -16,21 +16,24 @@ package org.orbeon.oxf.fb
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.datatypes.Coordinate1
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import NodeInfoCell._
 
 import scala.collection.mutable
 
@@ -674,7 +677,7 @@ object ToolboxOps {
 
         val newBindElem = {
 
-          val nestedBindElems =  model / XFBindTest / *
+          val nestedBindElems = model / XFBindTest / *
 
           val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(ctx.formDefinitionRootElem, containerName).get).rootElement
           XFormsAPI.delete(newElem / *)
@@ -690,7 +693,24 @@ object ToolboxOps {
             case e @ XcvEntry.Bind      ⇒ e → List(newBindElem)
           }
 
-        elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+        new DocumentWrapper(
+          Transform.transformDocument(
+            Transform.FileReadDocument("/forms/orbeon/builder/form/annotate-xcv.xsl"),
+            Some(
+              Transform.InlineReadDocument(
+                "",
+                TransformerUtils.tinyTreeToDom4j(
+                  elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+                ),
+                0L
+              )
+            ),
+            XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME
+          ),
+          null,
+          XPath.GlobalConfiguration
+        ).rootElement
+
       }
     } else
       None

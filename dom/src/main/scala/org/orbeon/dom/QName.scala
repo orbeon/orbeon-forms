@@ -80,6 +80,9 @@ object QName {
 //
 // Ideally we would like this to be a case class, and equality to be distinct.
 //
+// Also, we don't like that this stores the qualified name. Storing `prefix: Option[String]`
+// would be better.
+//
 class QName private (val name: String, val namespace: Namespace, val qualifiedName: String) {
 
   private var _hashCode: Int = _

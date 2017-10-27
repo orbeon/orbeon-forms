@@ -136,7 +136,7 @@ class GridOpsTest
 
         val actual = controls map precedingBoundControlNameInSectionForControl
 
-        assert(actual === List(None, Some("grid-2"), Some("grid-2")))
+        assert(actual === List(None, None, Some("grid-2")))
       }
     }}
 

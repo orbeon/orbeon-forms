@@ -861,7 +861,7 @@ div.orbeon.orbeon-portlet-div {
 
         .fr-grid-td {
             &.fb-selected {                                                             // Selected cell in grids
-                border: 3px solid @cellSelectColorBorder;                               // Highlight current cell
+                box-shadow: inset 0 0 2px 2px @cellSelectColorBorder !important;        // Highlight current cell
             }
             &:hover:not(.fb-selected) {
                 background-color: #eee;

@@ -174,7 +174,7 @@ object Transform {
 
       // Create pipeline config
       val pipeline =
-        new PipelineProcessor()
+        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified))
 
       val nullDoc =
         NodeConversions.elemToDom4j(

@@ -438,13 +438,29 @@
                                                 <xsl:if test="empty($control/self::xf:trigger) and exists($control/@id)">
 
                                                     <!-- Evaluate to the binding of the control in the first iteration, assuming
-                                                         only `bind` is supported. We could avoid that if we had a `bind() function
+                                                         only `bind` is supported. We could avoid that if we had a `bind()` function
                                                          or similar which resolved to the closest iterations like variables. -->
-                                                    <xsl:if test="exists($control/@bind) and exists($control/xf:label)">
+
+                                                    <!-- NOTE: Support `@ref` for `permissions.xbl` in particular -->
+                                                    <xsl:variable
+                                                        name="can-support-required-class"
+                                                        select="exists($control/xf:label) and (exists($control/@bind) or exists($control/@ref))"/>
+
+                                                    <xsl:if test="$can-support-required-class">
                                                         <xf:var
                                                             xxbl:scope="outer"
-                                                            name="control-bindings-or-empty"
-                                                            value="({$repeat-expression}){$repeat-expression-suffix}/bind('{$control/@bind}')"/>
+                                                            name="control-bindings-or-empty">
+                                                            <xsl:choose>
+                                                                <xsl:when test="exists($control/@bind)">
+                                                                    <xxf:value value="({$repeat-expression}){$repeat-expression-suffix}/bind('{$control/@bind}')"/>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <xf:value value=".">
+                                                                        <xsl:copy-of select="$control/(@model | @context | @ref)"/>
+                                                                    </xf:value>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
+                                                        </xf:var>
                                                     </xsl:if>
 
                                                     <!-- Create external LHH pointing to the control -->
@@ -454,7 +470,7 @@
                                                             <xsl:attribute name="for" select="$control/@id"/>
 
                                                             <xsl:choose>
-                                                                <xsl:when test="local-name() = 'label' and exists(../@bind)">
+                                                                <xsl:when test="$can-support-required-class and local-name() = 'label'">
                                                                     <!-- Place an `xforms-required` class if the control in the first iteration exists
                                                                          AND is required. -->
                                                                     <xsl:attribute
@@ -466,7 +482,7 @@
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
 
-                                                            <xsl:if test="local-name() = ('label', 'hint') ">
+                                                            <xsl:if test="$is-editable and local-name() = ('label', 'hint') ">
                                                                 <!-- Keep control id info in id of the editor, used for `controlUpdateLHHA` -->
                                                                 <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', local-name(), '-', $control/@id)"/>
                                                             </xsl:if>
@@ -635,7 +651,7 @@
                                                                     |
                                                                     (
                                                                         node() except (
-                                                                            if ($lhh-in-header) then
+                                                                            if ($lhh-in-header and exists(@id)) then
                                                                                 (xf:label, xf:hint, xf:help)
                                                                             else
                                                                                 ()
@@ -655,14 +671,6 @@
                                                       the new grid format doesn't have explicit rows, this would be only for
                                                       backward compatibility. -->
                                                 <xsl:attribute name="class" select="'fr-grid-tr'"/>
-                                                <!--<xsl:choose>-->
-                                                    <!--<xsl:when test="$is-repeat and $static-row-pos = 1">-->
-                                                        <!--<xsl:attribute name="class" select="'fr-grid-tr', '{$can-classes}'"/>-->
-                                                    <!--</xsl:when>-->
-                                                    <!--<xsl:otherwise>-->
-                                                        <!---->
-                                                    <!--</xsl:otherwise>-->
-                                                <!--</xsl:choose>-->
                                                 <xsl:if test="$left-column and $static-row-pos = 1">
                                                     <xsl:copy-of select="$side-block"/>
                                                 </xsl:if>
@@ -682,6 +690,16 @@
                             </xsl:variable><!-- $rows-content -->
 
                             <xsl:variable name="maybe-repeated-content">
+
+                                <!-- Place all grid `<xf:var>`s here for now -->
+                                <!-- See discussion in https://github.com/orbeon/orbeon-forms/issues/2738  -->
+                                <xsl:apply-templates
+                                    select="
+                                        ($root/*:body | $root/self::*)/
+                                        (*:tr | self::*)/
+                                        xf:var
+                                "/>
+
                                 <xsl:choose>
                                     <xsl:when test="not($use-css-grids-output) and $is-repeat">
                                         <xsl:copy-of select="$rows-content"/>
@@ -706,7 +724,7 @@
                                         </xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
-                            </xsl:variable><!-- $maybe-repeated-content -->
+                            </xsl:variable>
 
                             <xsl:choose>
                                 <xsl:when test="$is-repeat">
@@ -921,9 +939,9 @@
                     </xf:group>
                 </xsl:template>
 
-                <!-- Allow xf:var within xh:tr/xh:td but must add outer scope -->
-                <!-- TODO: Restore backward compatibility support for `xf:var`? Do we use it internally for example in Form Builder?-->
-                <xsl:template match="xf:var" mode="grid-content">
+                <!-- Allow `<xf:var>` within grid but must add outer scope -->
+                <!-- See discussion in https://github.com/orbeon/orbeon-forms/issues/2738  -->
+                <xsl:template match="xf:var">
                     <xsl:copy>
                         <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
                         <xsl:apply-templates select="@* | node()"/>

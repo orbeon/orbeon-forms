@@ -228,7 +228,7 @@
                                 <xf:var name="is-anyone"      value="empty(role) and empty(@for)"/>
                                 <xf:var name="is-owner-group" value="exists(@for)"/>
                                 <!-- Role name or "anyone" -->
-                                <xh:td class="fb-role">
+                                <xh:td class="fb-role" colspan="4">
                                     <xf:output
                                         ref=".[$is-anyone or $is-owner-group]"
                                         value="
@@ -248,8 +248,10 @@
                                     </xf:group>
                                 </xh:td>
                                 <!-- Checkboxes for operations -->
-                                <xh:td>
+                                <!-- NOTE: Put `id` on controls as `grid.xbl` needs this -->
+                                <xh:td colspan="2">
                                     <xf:select
+                                        id="fb-permissions-create-checkbox"
                                         ref="
                                             if ($is-owner-group) then
                                                 ()
@@ -266,9 +268,10 @@
                                         </xf:item>
                                     </xf:select>
                                 </xh:td>
-                                <xh:td>
+                                <xh:td colspan="2">
                                     <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
                                     <xf:select
+                                        id="fb-permissions-read-checkbox"
                                         ref="
                                             if ((not($is-anyone) and $anyone-operations = 'read') or (xxf:split(operations) = 'update')) then
                                                 $ui/readonly-checked
@@ -283,8 +286,9 @@
                                         </xf:item>
                                     </xf:select>
                                 </xh:td>
-                                <xh:td>
+                                <xh:td colspan="2">
                                     <xf:select
+                                        id="fb-permissions-update-checkbox"
                                         ref="
                                             if (not($is-anyone) and $anyone-operations = 'update') then
                                                 $ui/readonly-checked
@@ -299,8 +303,9 @@
                                         </xf:item>
                                     </xf:select>
                                 </xh:td>
-                                <xh:td>
+                                <xh:td colspan="2">
                                     <xf:select
+                                        id="fb-permissions-delete-checkbox"
                                         ref="
                                             if (not($is-anyone) and $anyone-operations = 'delete') then
                                                 $ui/readonly-checked

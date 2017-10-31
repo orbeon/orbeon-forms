@@ -85,8 +85,18 @@ trait FormBuilderSupport extends XFormsSupport {
                   <copy-trigger/>
                   <paste-trigger/>
               </xcv>
-          </xf:instance>
-          <xf:var name="xcv" value="instance('fb-xcv-instance')"/>
+            </xf:instance>
+            <xf:var name="xcv" value="instance('fb-xcv-instance')"/>
+
+            <xf:instance id="fb-undo-instance">
+                <undo>
+                    <undos/>
+                    <redos/>
+                    <undo-trigger/>
+                    <redo-trigger/>
+                </undo>
+            </xf:instance>
+            <xf:var name="undo" value="instance('fb-undo-instance')"/>
 
             <xf:instance id="fb-components-instance">
               <components/>

@@ -46,26 +46,29 @@ class XFormsLHHAHandler(
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    // TODO: handle template
+    staticControlOpt match {
+      case Some(staticControl: LHHAAnalysis) if staticControl.isForRepeat ⇒
 
-    (currentControlOpt, staticControlOpt) match {
-      case (Some(currentControl: XFormsLHHAControl), Some(staticControl: LHHAAnalysis)) if staticControl.isForRepeat ⇒
         // Special case where the LHHA has a dynamic representation and is in a lower nesting of repeats
 
         val containerAtts =
           getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
 
         withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
-          currentControl.externalValueOpt filter (_.nonEmpty) foreach { value ⇒
+          for {
+            currentLHHAControl ← currentControlOpt collect { case c: XFormsLHHAControl ⇒ c }
+            externalValue      ← currentLHHAControl.externalValueOpt
+            if externalValue.nonEmpty
+          } locally {
             if (staticControl.element.attributeValueOpt("mediatype") contains "text/html") {
-              XFormsUtils.streamHTMLFragment(xmlReceiver, value, currentControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
+              XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
             } else {
-              xmlReceiver.characters(value.toCharArray, 0, value.length)
+              xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
             }
           }
         }
 
-      case (_, Some(lhhaAnalysis: LHHAAnalysis)) if ! lhhaAnalysis.isLocal ⇒
+      case Some(lhhaAnalysis: LHHAAnalysis) if ! lhhaAnalysis.isLocal ⇒
 
         // Find control ids based on @for attribute
 

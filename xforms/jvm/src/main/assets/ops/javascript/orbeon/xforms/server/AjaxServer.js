@@ -605,166 +605,106 @@
 
     AjaxServer.handleResponseAjax = function(o) {
 
-        var responseXML = o.responseXML;
-        if (! _.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
+        var responseXML                  = o.responseXML;
+        var responseXmlIsHTML            = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
+        var formID                       = o.argument.formId;
+        var isResponseToBackgroundUpload = o.responseText && (! responseXML || responseXmlIsHTML);
 
-            if (window.dojox && dojox.html && dojox.html.set) {
-                // Parse content we receive into a new div we create just for that purpose
-                var temporaryContainer = document.createElement("div");
-                temporaryContainer.innerHTML = o.responseText;
-                var newPortletDiv = ORBEON.util.Dom.getChildElementByIndex(temporaryContainer, 0);
-
-                // Get existing div which is above the form that issued this request
-                var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
-                while (existingPortletDiv != null && existingPortletDiv.className && ! $(existingPortletDiv).is('.orbeon-portlet-div'))
-                    existingPortletDiv = existingPortletDiv.parentNode;
-
-                // Remove top-level event handlers in case the user interacts with newly added elements before
-                // ORBEON.xforms.Init.document() has completed
-                if (ORBEON.xforms.Globals.topLevelListenerRegistered) {
-                    if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
-                        YAHOO.util.Event.removeListener(document, "focusin", ORBEON.xforms.Events.focus);
-                        YAHOO.util.Event.removeListener(document, "focusout", ORBEON.xforms.Events.blur);
-                        YAHOO.util.Event.removeListener(document, "change", ORBEON.xforms.Events.change);
-                    } else {
-                        document.removeEventListener("focus", ORBEON.xforms.Events.focus, true);
-                        document.removeEventListener("blur", ORBEON.xforms.Events.blur, true);
-                        document.removeEventListener("change", ORBEON.xforms.Events.change, true);
-                    }
-
-                    YAHOO.util.Event.removeListener(document, "keypress", ORBEON.xforms.Events.keypress);
-                    YAHOO.util.Event.removeListener(document, "keydown", ORBEON.xforms.Events.keydown);
-                    YAHOO.util.Event.removeListener(document, "keyup", ORBEON.xforms.Events.keyup);
-                    YAHOO.util.Event.removeListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
-                    YAHOO.util.Event.removeListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
-                    YAHOO.util.Event.removeListener(document, "click", ORBEON.xforms.Events.click);
-                    YAHOO.util.Event.removeListener(window, "resize", ORBEON.xforms.Events.resize);
-                    YAHOO.widget.Overlay.windowScrollEvent.unsubscribe(ORBEON.xforms.Events.scrollOrResize);
-                    YAHOO.widget.Overlay.windowResizeEvent.unsubscribe(ORBEON.xforms.Events.scrollOrResize);
-
-                    ORBEON.xforms.Globals.topLevelListenerRegistered = false;
-                }
-
-                // Run custom clean-up function
-                // NOTE: For now, global function, so we don't undefine it after calling it
-                if (typeof xformsPageUnloadedServer != "undefined") {
-                    xformsPageUnloadedServer();
-                }
-
-                // Clear existing custom JavaScript initialization function if any
-                if (typeof xformsPageLoadedServer != "undefined") {
-                    xformsPageLoadedServer = undefined;
-                }
-
-                // Remove content from existing div
-                while (existingPortletDiv.childNodes.length > 0)
-                    existingPortletDiv.removeChild(existingPortletDiv.firstChild);
-
-                // Replace the content and re-initialize XForms
-                // NOTE: renderStyles: false: for now, tell Dojo not to process CSS within content, as this seems to cause JavaScript errors down the line.
-                dojox.html.set(existingPortletDiv, o.responseText, { renderStyles: false, executeScripts: true, adjustPaths: true, referencePath: "/" });
-                ORBEON.xforms.Init.document();
-            }
+        if (isResponseToBackgroundUpload) {
+            // Background uploads
+            //      In this case, the server sends a xxf:event-response embedded in an HTML document:
+            //      <!DOCTYPE HTML><html><body>&lt;xxf:event-response ... </body></html>
+            //      When it happens, responseXML may be the HTML document, so we also test on the root element being 'html'
+            //      But, surprisingly, responseText only contains the text inside the body, i.e. &lt;xxf:event-response ...
+            //      So here we "unescape" the text inside <body>
+            // HOWEVER: If, by any chance, there is some trailing stuff after the closing </html>, as in
+            //      </xhtml><script/>, then, with FF and IE, we get &lt;/xxf:event-response&gt;<script/> and then
+            //      XML parsing fails. Some company proxies might insert scripts this way, so we better make sure
+            //      to parse only xxf:event-response.
+            var fragment =
+                o.responseText.substring(
+                    o.responseText.indexOf("&lt;xxf:event-response"),
+                    o.responseText.indexOf("&lt;/xxf:event-response&gt;") + "&lt;/xxf:event-response&gt;".length);
+            var xmlString = fragment.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+            responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         } else {
-            var responseXmlIsHTML = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
-            var formID = o.argument.formId;
-            var isResponseToBackgroundUpload = o.responseText && (! responseXML || responseXmlIsHTML);
-            if (isResponseToBackgroundUpload) {
-                // Background uploads
-                //      In this case, the server sends a xxf:event-response embedded in an HTML document:
-                //      <!DOCTYPE HTML><html><body>&lt;xxf:event-response ... </body></html>
-                //      When it happens, responseXML may be the HTML document, so we also test on the root element being 'html'
-                //      But, surprisingly, responseText only contains the text inside the body, i.e. &lt;xxf:event-response ...
-                //      So here we "unescape" the text inside <body>
-                // HOWEVER: If, by any chance, there is some trailing stuff after the closing </html>, as in
-                //      </xhtml><script/>, then, with FF and IE, we get &lt;/xxf:event-response&gt;<script/> and then
-                //      XML parsing fails. Some company proxies might insert scripts this way, so we better make sure
-                //      to parse only xxf:event-response.
-                var fragment =
-                    o.responseText.substring(
-                        o.responseText.indexOf("&lt;xxf:event-response"),
-                        o.responseText.indexOf("&lt;/xxf:event-response&gt;") + "&lt;/xxf:event-response&gt;".length);
-                var xmlString = fragment.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-                responseXML = ORBEON.util.Dom.stringToDom(xmlString);
-            } else {
-                // Regular Ajax response
+            // Regular Ajax response
 
-                // For IE, don't rely on the browser's XML parsing, as IE8 and IE9 doesn't preserve white spaces (but IE10+ does)
-                // See https://github.com/orbeon/orbeon-forms/issues/682
-                if (o.responseText && _.isObject(window.ActiveXObject))
-                    responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
-            }
+            // For IE, don't rely on the browser's XML parsing, as IE8 and IE9 doesn't preserve white spaces (but IE10+ does)
+            // See https://github.com/orbeon/orbeon-forms/issues/682
+            if (o.responseText && _.isObject(window.ActiveXObject))
+                responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
+        }
 
-            if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+        if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
-                // Everything is fine with the response
+            // Everything is fine with the response
 
-                if (! isResponseToBackgroundUpload)
-                    AjaxServer.ajaxResponseReceived.fire();
+            if (! isResponseToBackgroundUpload)
+                AjaxServer.ajaxResponseReceived.fire();
 
-                // If neither of these two conditions is met, hide the modal progress panel:
-                //      a) There is another Ajax request in the queue, which could be the one that triggered the
-                //         display of the modal progress panel, so we don't want to hide before that request ran.
-                //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
-                //         users could start interacting with a page which is going to be replaced shortly.
-                // We remove the modal progress panel before handling DOM response, as script actions may dispatch
-                // events and we don't want them to be filtered. If there are server events, we don't remove the
-                // panel until they have been processed, i.e. the request sending the server events returns.
-                function doHideProgressDialog() {
+            // If neither of these two conditions is met, hide the modal progress panel:
+            //      a) There is another Ajax request in the queue, which could be the one that triggered the
+            //         display of the modal progress panel, so we don't want to hide before that request ran.
+            //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
+            //         users could start interacting with a page which is going to be replaced shortly.
+            // We remove the modal progress panel before handling DOM response, as script actions may dispatch
+            // events and we don't want them to be filtered. If there are server events, we don't remove the
+            // panel until they have been processed, i.e. the request sending the server events returns.
+            function doHideProgressDialog() {
 
-                    return ! (eventQueueHasShowProgressEvent()
-                              || serverSaysToKeepModelProgressPanelDisplayed());
+                return ! (eventQueueHasShowProgressEvent()
+                          || serverSaysToKeepModelProgressPanelDisplayed());
 
-                    function eventQueueHasShowProgressEvent() {
-                        return _.some(ORBEON.xforms.Globals.eventQueue,
-                                      function(event) { return event.showProgress == true; });
-                    }
-
-                    /**
-                     * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
-                     * window and for which the user didn't specify xxf:show-progress="false".
-                     *
-                     * The logic here corresponds to the following XPath:
-                     * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
-                     */
-                    function serverSaysToKeepModelProgressPanelDisplayed() {
-                        if (responseXML && responseXML.documentElement
-                                    && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-                            var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
-                            YAHOO.util.Dom.getElementsBy(function(element) {
-                                var localName = ORBEON.util.Utils.getLocalName(element);
-                                var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
-                                if ((localName  == "submission" || localName == "load")) {
-                                    if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
-                                        foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
-                                }
-                            }, null, responseXML.documentElement);
-                            return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
-                        }
-                        return false;
-                    }
+                function eventQueueHasShowProgressEvent() {
+                    return _.some(ORBEON.xforms.Globals.eventQueue,
+                                  function(event) { return event.showProgress == true; });
                 }
 
-                if (doHideProgressDialog()) {
-                    ORBEON.util.Utils.hideModalProgressPanel();
+                /**
+                 * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
+                 * window and for which the user didn't specify xxf:show-progress="false".
+                 *
+                 * The logic here corresponds to the following XPath:
+                 * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
+                 */
+                function serverSaysToKeepModelProgressPanelDisplayed() {
+                    if (responseXML && responseXML.documentElement
+                                && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+                        var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
+                        YAHOO.util.Dom.getElementsBy(function(element) {
+                            var localName = ORBEON.util.Utils.getLocalName(element);
+                            var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
+                            if ((localName  == "submission" || localName == "load")) {
+                                if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
+                                    foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
+                            }
+                        }, null, responseXML.documentElement);
+                        return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
+                    }
+                    return false;
                 }
-
-                AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formID);
-                // Reset changes, as changes are included in this bach of events
-                ORBEON.xforms.Globals.changedIdsRequest = {};
-                // Notify listeners that we are done processing this request
-                ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(o.argument);
-                // Go ahead with next request, if any
-                ORBEON.xforms.Globals.requestDocument = "";
-                ORBEON.xforms.Globals.executeEventFunctionQueued++;
-                AjaxServer.executeNextRequest(false);
-
-            } else {
-                // Consider this a failure
-                // As if the server returned an error code (5xx), in particular used by the loading indicator
-                YAHOO.util.Connect.failureEvent.fire();
-                AjaxServer.handleFailureAjax(o);
             }
+
+            if (doHideProgressDialog()) {
+                ORBEON.util.Utils.hideModalProgressPanel();
+            }
+
+            AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formID);
+            // Reset changes, as changes are included in this bach of events
+            ORBEON.xforms.Globals.changedIdsRequest = {};
+            // Notify listeners that we are done processing this request
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(o.argument);
+            // Go ahead with next request, if any
+            ORBEON.xforms.Globals.requestDocument = "";
+            ORBEON.xforms.Globals.executeEventFunctionQueued++;
+            AjaxServer.executeNextRequest(false);
+
+        } else {
+            // Consider this a failure
+            // As if the server returned an error code (5xx), in particular used by the loading indicator
+            YAHOO.util.Connect.failureEvent.fire();
+            AjaxServer.handleFailureAjax(o);
         }
     };
 

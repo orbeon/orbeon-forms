@@ -37,7 +37,8 @@ class FormBuilderFunctionsTest
      with FunSpecLike
      with FormBuilderSupport {
 
-  val SectionsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
+  val SectionsRepeatsDoc      = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
+  val SectionsGridsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids-repeats.xhtml"
 
   val Control1 = "control-1"
   val Control2 = "control-2"
@@ -442,30 +443,75 @@ class FormBuilderFunctionsTest
       }
     }
 
-    it("Non-repeated grid cut/paste must remove and restore nested control, bind, holders, and resources") {
-      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+    val containerIds =
+      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+        findNestedContainers(ctx.bodyElem).to[List] map (_.id)
+      }
 
-        val doc = ctx.formDefinitionRootElem
+    containerIds foreach { containerId ⇒
+      it(s"Must be able to cut and paste container `$containerId`") {
+        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
 
-        val firstGridId       = (doc descendant FRGridTest head).id
-        val nestedControlName = FormBuilder.findContainerById(firstGridId).toList flatMap findNestedControls flatMap getControlNameOpt head
+          val doc = ctx.formDefinitionRootElem
 
-        assert(FormBuilder.findContainerById(firstGridId).nonEmpty)
-        assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+          def countContainers = FormBuilderXPathApi.countAllContainers(doc)
 
-        FormBuilderRpcApiImpl.containerCut(firstGridId)
+          ToolboxOps.selectFirstCellInContainer(containerById(containerId))
 
-        assert(FormBuilder.findContainerById(firstGridId).isEmpty)
-        assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
+          val nestedControlName =
+            FormBuilder.findContainerById(containerId).toList flatMap findNestedControls flatMap getControlNameOpt head
 
-        ToolboxOps.pasteFromClipboard()
+          val initialContainerCount = countContainers
 
-        assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+          // Before and after cut
+          locally {
+            assert(FormBuilder.findContainerById(containerId).nonEmpty)
+            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
 
-        // The newly-inserted grid can have a different temporary id but make sure there is one
-        val newGrid = findAncestorContainersLeafToRoot(FormRunner.findControlByName(doc, nestedControlName).get, includeSelf = false).head
-        assert(newGrid.id.startsWith("grid-"))
+            FormBuilderRpcApiImpl.containerCut(containerId)
+
+            assert(FormBuilder.findContainerById(containerId).isEmpty)
+            assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
+
+            assert(initialContainerCount > countContainers)
+          }
+
+          val cutContainersCount = initialContainerCount - countContainers
+
+          // Paste without prefix/suffix (shouldn't conflict)
+          locally {
+            ToolboxOps.pasteFromClipboard()
+            assert(FormBuilder.findContainerById(containerId).nonEmpty)
+            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(initialContainerCount === countContainers)
+          }
+
+          // Paste with prefix
+          locally {
+            val Prefix = "my-"
+            FormBuilderXPathApi.pasteSectionGridFromClipboard(Prefix, "")
+            assert(FormBuilder.findContainerById(Prefix + containerId).nonEmpty)
+            assert(FormRunner.findControlByName(doc, Prefix + nestedControlName).nonEmpty)
+            assert(initialContainerCount + cutContainersCount === countContainers)
+          }
+
+          // Paste with suffix
+          locally {
+            val Suffix = "-nice"
+            FormBuilderXPathApi.pasteSectionGridFromClipboard("", Suffix)
+            assert(findControlByName(ctx.formDefinitionRootElem, controlNameFromId(containerId) + Suffix).nonEmpty)
+            assert(FormRunner.findControlByName(doc, nestedControlName + Suffix).nonEmpty)
+            assert(initialContainerCount + cutContainersCount * 2 === countContainers)
+          }
+
+          // Paste without prefix/suffix (should create automatic ids and not crash)
+          locally {
+            FormBuilderXPathApi.pasteSectionGridFromClipboard("", "")
+            assert(initialContainerCount + cutContainersCount * 3 === countContainers)
+          }
+        }
       }
     }
   }
+
 }

@@ -1,0 +1,308 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <control-111/>
+                        <grid-12>
+                            <grid-12-iteration>
+                                <control-121/>
+                            </grid-12-iteration>
+                        </grid-12>
+                    </section-1>
+                    <section-2>
+                        <control-211/>
+                        <grid-22>
+                            <grid-22-iteration>
+                                <control-212/>
+                            </grid-22-iteration>
+                        </grid-22>
+                    </section-2>
+                    <section-3>
+                        <section-3-iteration>
+                            <control-311/>
+                            <section-33>
+                                <control-3311/>
+                                <grid-332>
+                                    <grid-332-iteration>
+                                        <control-3312/>
+                                    </grid-332-iteration>
+                                </grid-332>
+                            </section-33>
+                        </section-3-iteration>
+                    </section-3>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-111-bind" name="control-111" ref="control-111"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="grid-12-bind" ref="grid-12" name="grid-12">
+                        <xf:bind id="grid-12-iteration-bind" ref="grid-12-iteration" name="grid-12-iteration">
+                            <xf:bind id="control-121-bind" ref="control-121" name="control-121"
+                                     xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
+                    <xf:bind id="grid-22-bind" ref="grid-22" name="grid-22">
+                        <xf:bind id="grid-22-iteration-bind" ref="grid-22-iteration" name="grid-22-iteration">
+                            <xf:bind id="control-212-bind" ref="control-212" name="control-212"
+                                     xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="control-211-bind" ref="control-211" name="control-211"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3">
+                    <xf:bind id="section-3-iteration-bind" ref="section-3-iteration"
+                             name="section-3-iteration">
+                        <xf:bind id="section-33-bind" ref="section-33" name="section-33">
+                            <xf:bind id="control-3311-bind" ref="control-3311" name="control-3311"
+                                     xxf:whitespace="trim"/>
+                            <xf:bind id="grid-332-bind" ref="grid-332" name="grid-332">
+                                <xf:bind id="grid-332-iteration-bind" ref="grid-332-iteration" name="grid-332-iteration">
+                                    <xf:bind id="control-3312-bind" ref="control-3312" name="control-3312"
+                                             xxf:whitespace="trim"/>
+                                </xf:bind>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:bind id="control-311-bind" ref="control-311" name="control-311"
+                                 xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>a</application-name>
+                    <form-name>a</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-3312>
+                            <label>Control 3.3.2.1</label>
+                            <hint/>
+                        </control-3312>
+                        <control-3311>
+                            <label>Control 3.3.1.1</label>
+                            <hint/>
+                        </control-3311>
+                        <control-311>
+                            <label>Control 3.1.1</label>
+                            <hint/>
+                        </control-311>
+                        <control-212>
+                            <label>Control 2.2.1</label>
+                            <hint/>
+                        </control-212>
+                        <control-211>
+                            <label>Control 2.1.1</label>
+                            <hint/>
+                        </control-211>
+                        <control-121>
+                            <label>Control 1.2.1</label>
+                            <hint/>
+                        </control-121>
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                        <section-3>
+                            <label>Section 3</label>
+                            <help/>
+                        </section-3>
+                        <section-33>
+                            <label>Section 3.3</label>
+                            <help/>
+                        </section-33>
+                        <section-2>
+                            <label>Section 2</label>
+                            <help/>
+                        </section-2>
+                        <control-111>
+                            <label>Control 1.1.1</label>
+                            <hint/>
+
+                        </control-111>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-12-template" xxf:exclude-result-prefixes="#all">
+                <grid-12-iteration>
+                    <control-121/>
+                </grid-12-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-22-template" xxf:exclude-result-prefixes="#all">
+                <grid-22-iteration>
+                    <control-212/>
+                </grid-22-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-332-template" xxf:exclude-result-prefixes="#all">
+                <grid-332-iteration>
+                    <control-3312/>
+                </grid-332-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="section-3-template" xxf:exclude-result-prefixes="#all">
+                <section-3-iteration>
+                    <section-33>
+                        <control-3311/>
+                        <grid-332>
+                            <grid-332-iteration>
+                                <control-3312/>
+                            </grid-332-iteration>
+                        </grid-332>
+                    </section-33>
+                    <control-311/>
+                </section-3-iteration>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-11-grid">
+                        <fr:c y="1" x="1" w="6">
+                                <xf:input id="control-111-control" bind="control-111-bind">
+                                    <xf:label ref="$form-resources/control-111/label"/>
+                                    <xf:hint ref="$form-resources/control-111/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="grid-12-grid" bind="grid-12-bind" repeat="content" min="1"
+                             template="instance('grid-12-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-121-control" bind="control-121-bind">
+                                <xf:label ref="$form-resources/control-121/label"/>
+                                <xf:hint ref="$form-resources/control-121/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-21-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-211-control" bind="control-211-bind">
+                                <xf:label ref="$form-resources/control-211/label"/>
+                                <xf:hint ref="$form-resources/control-211/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="grid-22-grid" bind="grid-22-bind" repeat="content" min="1"
+                             template="instance('grid-22-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-212-control" bind="control-212-bind">
+                                <xf:label ref="$form-resources/control-212/label"/>
+                                <xf:hint ref="$form-resources/control-212/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-3-section" bind="section-3-bind" repeat="content" min="1"
+                            template="instance('section-3-template')"
+                            apply-defaults="true"
+                            fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/section-3/label"/>
+                    <fr:grid id="grid-31-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-311-control" bind="control-311-bind">
+                                <xf:label ref="$form-resources/control-311/label"/>
+                                <xf:hint ref="$form-resources/control-311/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:section id="section-33-section" bind="section-33-bind">
+                        <xf:label ref="$form-resources/section-33/label"/>
+                        <fr:grid id="grid-331-grid">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="control-3311-control" bind="control-3311-bind">
+                                    <xf:label ref="$form-resources/control-3311/label"/>
+                                    <xf:hint ref="$form-resources/control-3311/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6"/>
+                        </fr:grid>
+                        <fr:grid id="grid-332-grid" bind="grid-332-bind" repeat="content" min="1"
+                                 template="instance('grid-332-template')"
+                                 apply-defaults="true"
+                                 fb:initial-iterations="first">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="control-3312-control" bind="control-3312-bind">
+                                    <xf:label ref="$form-resources/control-3312/label"/>
+                                    <xf:hint ref="$form-resources/control-3312/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6"/>
+                        </fr:grid>
+                    </fr:section>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

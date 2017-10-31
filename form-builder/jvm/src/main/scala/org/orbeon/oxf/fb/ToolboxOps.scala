@@ -313,8 +313,8 @@ object ToolboxOps {
     }
   }
 
-  private def selectFirstCellInContainer(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    (container descendant Cell.CellTestName headOption) foreach selectCell
+  def selectFirstCellInContainer(containerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
+    (containerElem descendant Cell.CellTestName headOption) foreach selectCell
 
   // Insert a new section template
   //@XPathFunction

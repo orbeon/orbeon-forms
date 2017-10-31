@@ -214,7 +214,7 @@ object ToolboxOps {
 
       // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
       val sectionTemplate: NodeInfo =
-        <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
+        <fr:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
               xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:xf="http://www.w3.org/2002/xforms"
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -577,7 +577,7 @@ object ToolboxOps {
       val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size).iterator map controlNameFromId
       val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size).iterator map controlNameFromId
 
-      // Produce `section-` and `grid-` for sections and grids when we can
+      // Produce `section-` and `grid-` for sections and grids
       def newName(name: String) =
         if (allSectionNamesInUse(name))
           newSectionNamesIt.next()
@@ -592,8 +592,7 @@ object ToolboxOps {
     xcvNamesInUse map { xcvName ⇒
 
       val withPrefixSuffix = toNameWithPrefixSuffix(xcvName)
-
-      val automaticIdOpt = newControlNamesWithAutomaticIdsMap.get(withPrefixSuffix)
+      val automaticIdOpt   = newControlNamesWithAutomaticIdsMap.get(withPrefixSuffix)
 
       (xcvName, automaticIdOpt getOrElse withPrefixSuffix, automaticIdOpt.isDefined)
     }

@@ -48,6 +48,7 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def bindId    (controlName: String): String = controlName + "-bind"
   def gridId    (gridName: String)   : String = gridName    + "-grid"
+  def sectionId (sectionName: String): String = sectionName + "-section"
   def controlId (controlName: String): String = controlName + "-control"
   def templateId(gridName: String)   : String = gridName    + TemplateSuffix
 

@@ -53,12 +53,6 @@ ORBEON.jQuery(function() {
 
         currentRepeaterId = repeaterId(e);
         currentRepeaterIteration = repeaterIteration(e);
-
-        // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
-        // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
-        // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
-        // running.
-        return false;
     }
 
     function removeIteration(e) {

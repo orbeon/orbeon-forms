@@ -50,8 +50,8 @@ object Grid {
   // Initialization
   globalMenuElem foreach { _ ⇒
     // Click on our own button moves and shows the menu
-    $(document).on(s"click$ListenerSuffix",   ".fr-grid-dropdown-button", moveAndShowMenu _)
-    $(document).on(s"keydown$ListenerSuffix", ".fr-grid-dropdown-button", delegateKeyEventToBootstrapButton _)
+    $(document).on(s"click$ListenerSuffix",   ".fr-grid-dropdown-button", moveAndShowMenuHandler _)
+    $(document).on(s"keydown$ListenerSuffix", ".fr-grid-dropdown-button", delegateKeyEventToBootstrapButtonHandler _)
 
     // Listeners for all menu actions
     Operation.values foreach { op ⇒
@@ -59,7 +59,7 @@ object Grid {
     }
   }
 
-  def moveAndShowMenu(e: JQueryEventObject): Unit = {
+  def moveAndShowMenuHandler(e: JQueryEventObject): Unit = {
 
     moveMenu(e)
 
@@ -95,14 +95,10 @@ object Grid {
     gridId(e).zip(findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])) foreach {
       case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
     }
-
-    // See comment about propagation in other handler above.
-    e.preventDefault()
-    e.stopPropagation()
   }
 
   // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
-  def delegateKeyEventToBootstrapButton(e: JQueryEventObject): Unit = {
+  def delegateKeyEventToBootstrapButtonHandler(e: JQueryEventObject): Unit = {
     moveMenu(e)
     $(globalMenuElem).find(".dropdown-toggle").trigger(
       $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade

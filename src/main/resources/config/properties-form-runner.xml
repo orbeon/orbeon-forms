@@ -237,9 +237,11 @@
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >
-        if ("not(property('xxf:noscript'))")
-        then xf:show("fr-clear-confirm-dialog")
-        else xf:dispatch(name = "fr-clear", targetid = "fr-persistence-model")
+        if ("not(property('xxf:noscript'))") then (
+            xf:show("fr-clear-confirm-dialog")
+            then suspend
+        )
+        then xf:dispatch(name = "fr-clear", targetid = "fr-persistence-model")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.close.*.*">
         navigate("oxf.fr.detail.close.uri")

@@ -581,7 +581,7 @@ class PathMapXPathDependencies(
     updateResult.requireUpdate
   }
 
-  def requireLHHAUpdate(control: ElementAnalysis, lhhaName: String, controlEffectiveId: String): Boolean = {
+  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String): Boolean = {
 
     // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
     assert(inRefresh || inBindingUpdate)
@@ -593,8 +593,8 @@ class PathMapXPathDependencies(
         (throw new OXFException(s"Control $controlEffectiveId not found or doesn't support LHHA"))
       }
 
-      lhhaControl.lhhaValueAnalyses(lhhaName) ensuring
-        (_.nonEmpty, s"Control $controlEffectiveId doesn't have LHHA $lhhaName")
+      lhhaControl.lhhaValueAnalyses(lhha) ensuring
+        (_.nonEmpty, s"Control $controlEffectiveId doesn't have LHHA $lhha")
     }
 
     // NOTE: No side-effects except for stats

@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -124,10 +122,10 @@ abstract class XFormsControlLifecyleHandler(
   @throws[SAXException]
   protected def handleLabel(): Unit =
     handleLabelHintHelpAlert(
-      getStaticLHHA(getPrefixedId, LHHAC.LABEL),
+      getStaticLHHA(getPrefixedId, LHHA.Label),
       getEffectiveId,
       getForEffectiveId(getEffectiveId),
-      LHHAC.LABEL,
+      LHHA.Label,
       if (XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) "span" else null,
       currentControlOrNull,
       isTemplate,
@@ -138,10 +136,10 @@ abstract class XFormsControlLifecyleHandler(
   protected def handleAlert(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull))
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHAC.ALERT),
+        getStaticLHHA(getPrefixedId, LHHA.Alert),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
-        LHHAC.ALERT,
+        LHHA.Alert,
         null,
         currentControlOrNull,
         isTemplate,
@@ -152,10 +150,10 @@ abstract class XFormsControlLifecyleHandler(
   protected def handleHint(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHAC.HINT),
+        getStaticLHHA(getPrefixedId, LHHA.Hint),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
-        LHHAC.HINT,
+        LHHA.Hint,
         null,
         currentControlOrNull,
         isTemplate,
@@ -166,10 +164,10 @@ abstract class XFormsControlLifecyleHandler(
   protected def handleHelp(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull))
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHAC.HELP),
+        getStaticLHHA(getPrefixedId, LHHA.Help),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
-        LHHAC.HELP,
+        LHHA.Help,
         null,
         currentControlOrNull,
         isTemplate,
@@ -196,7 +194,7 @@ abstract class XFormsControlLifecyleHandler(
         "id",
         "id",
         XMLReceiverHelper.CDATA,
-        XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL))
+        XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.CONTROL_CODE)
       )
     containerAttributes
   }
@@ -204,7 +202,7 @@ abstract class XFormsControlLifecyleHandler(
   // Return the effective id of the element to which label/@for, etc. must point to.
   // Default: point to `foo$bar$$c.1-2-3`
   def getForEffectiveId(effectiveId: String): String =
-    XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL))
+    XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandler.CONTROL_CODE)
 
   private object Private {
 
@@ -214,12 +212,12 @@ abstract class XFormsControlLifecyleHandler(
       (_.beforeAfterTokensOpt)               getOrElse
       xformsHandlerContext.getDocumentOrder
 
-    def hasLocalLabel = hasLocalLHHA("label")
-    def hasLocalHint  = hasLocalLHHA("hint")
-    def hasLocalHelp  = hasLocalLHHA("help")
-    def hasLocalAlert = hasLocalLHHA("alert")
+    def hasLocalLabel = hasLocalLHHA(LHHA.Label)
+    def hasLocalHint  = hasLocalLHHA(LHHA.Hint)
+    def hasLocalHelp  = hasLocalLHHA(LHHA.Help)
+    def hasLocalAlert = hasLocalLHHA(LHHA.Alert)
 
-    def hasLocalLHHA(lhhaType: String) =
+    def hasLocalLHHA(lhhaType: LHHA) =
       containingDocument.getStaticOps.getControlAnalysis(getPrefixedId) match {
         case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
         case _                          ⇒ false

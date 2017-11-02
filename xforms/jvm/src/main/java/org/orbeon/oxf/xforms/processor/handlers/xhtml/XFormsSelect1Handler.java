@@ -17,6 +17,7 @@ import org.orbeon.dom.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA$;
 import org.orbeon.oxf.xforms.analysis.controls.SelectAppearanceTrait;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
 import org.orbeon.oxf.xforms.control.LHHAValue;
@@ -263,7 +264,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // For accessibility, label the group, since the control label doesn't apply to a single input
         final String role = isMultiple ? "group" : "radiogroup";
         containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, role);
-        final String labelId = getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.LABEL));
+        final String labelId = getLHHACId(containingDocument, effectiveId, LHHA_CODES.get(LHHA$.MODULE$.jLabel()));
         containerAttributes.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelId);
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
 
@@ -441,7 +442,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, isMultiple ? "checkbox" : "radio");
 
                 // No need for @for as the input, if any, is nested
-                outputLabelForStart(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.LABEL, labelName, false);
+                outputLabelForStart(xformsHandlerContextForItem, reusableAttributes, null, null, LHHA$.MODULE$.jLabel(), labelName, false);
             }
 
             {
@@ -496,7 +497,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help");
-                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.HELP, "span", help.label(), help.isHTML(), false);
+                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHA$.MODULE$.jHelp(), "span", help.label(), help.isHTML(), false);
                         }
                     }
 
@@ -508,7 +509,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint");
-                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.HINT, "span", hint.label(), hint.isHTML(), false);
+                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHA$.MODULE$.jHint(), "span", hint.label(), hint.isHTML(), false);
                         }
                     }
                 }
@@ -616,10 +617,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         } else if (isFull) {
             // For radio and checkboxes, produce span with an id
             handleLabelHintHelpAlert(
-                getStaticLHHA(getPrefixedId(), LHHAC.LABEL),
+                getStaticLHHA(getPrefixedId(), LHHA$.MODULE$.jLabel()),
                 getEffectiveId(),
                 null,
-                LHHAC.LABEL,
+                LHHA$.MODULE$.jLabel(),
                 "span",                   // Make element name a span, as a label would need a `for`
                 currentControlOrNull(),
                 isTemplate(),

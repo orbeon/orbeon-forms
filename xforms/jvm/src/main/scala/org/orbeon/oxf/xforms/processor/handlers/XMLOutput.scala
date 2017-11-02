@@ -17,7 +17,7 @@ import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.itemset.Item
@@ -64,11 +64,11 @@ object XMLOutput extends XMLReceiverSupport {
     case c: XFormsControl ⇒
       implicit val _xmlReceiver = xmlReceiver
       for {
-        lhhaType ← XFormsConstants.LHHA.values
+        lhhaType ← LHHA.values
         lhhaProp ← Option(c.lhhaProperty(lhhaType))
-        text     ← Option(lhhaProp.value)
+        text     ← Option(lhhaProp.value())
       } locally {
-        writeTextOrHTML(lhhaType.name, text, lhhaProp.isHTML)
+        writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)
       }
   }
 

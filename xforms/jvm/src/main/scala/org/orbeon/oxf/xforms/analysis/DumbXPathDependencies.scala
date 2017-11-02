@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
@@ -41,7 +41,7 @@ class DumbXPathDependencies extends XPathDependencies {
   def notifyOptimizeItemset() = ()
   def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
   def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
-  def requireLHHAUpdate(control: ElementAnalysis, lhhaName: String, controlEffectiveId: String) = true
+  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String) = true
   def requireItemsetUpdate(control: SelectionControlTrait, controlPrefixedId: String) = true
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true

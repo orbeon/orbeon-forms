@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.lang.StringBuilder
 
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
+import org.orbeon.xforms.XFormsId
 
 class XXFormsComponentHandler(
   uri            : String,
@@ -73,10 +73,10 @@ class XXFormsComponentHandler(
         super.handleLabel()
       } else {
           handleLabelHintHelpAlert(
-            getStaticLHHA(getPrefixedId, LHHAC.LABEL),
+            getStaticLHHA(getPrefixedId, LHHA.Label),
             getEffectiveId,
             getForEffectiveId(getEffectiveId),
-            LHHAC.LABEL,
+            LHHA.Label,
             "span",
             currentControlOrNull,
             isTemplate,

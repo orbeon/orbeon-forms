@@ -54,7 +54,7 @@ class XFormsLHHAControl(
           getContextStack |!> (_.setBinding(bindingContext)),
           effectiveId,
           staticControl.element,
-          LHHASupport.DefaultLHHAHTMLSupport(XFormsConstants.LHHA.valueOf(staticControl.localName).ordinal),
+          true,
           staticControl.defaultToHTML,
           null // Array[Boolean](false)
         )

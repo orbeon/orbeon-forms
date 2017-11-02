@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xforms.XFormsConstants.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 
 // Mix in this trait to prevent the control from trying to handle LHHA
 trait NoLHHATrait extends ControlLHHASupport {

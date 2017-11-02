@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
@@ -65,7 +65,7 @@ class XFormsOutputDefaultHandler(
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
     handleAriaByAtts(containerAttributes)
 
-    val elementName = if (getStaticLHHA(getPrefixedId, LHHAC.LABEL) ne null) "output" else "span"
+    val elementName = if (getStaticLHHA(getPrefixedId, LHHA.Label) ne null) "output" else "span"
 
     withElement(elementName, prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       if (isConcreteControl) {

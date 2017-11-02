@@ -96,12 +96,12 @@ trait PartGlobalOps {
     }
 
   // LHHA
-  def getLHH(prefixedId: String, lhha: String) =
+  def getLHH(prefixedId: String, lhha: LHHA) =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha)) orNull
 
   def getAlerts(prefixedId: String) =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)).toList flatMap (_.alerts)
 
-  def hasLHHA(prefixedId: String, lhha: String) =
+  def hasLHHA(prefixedId: String, lhha: LHHA) =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasLHHA(lhha))
 }

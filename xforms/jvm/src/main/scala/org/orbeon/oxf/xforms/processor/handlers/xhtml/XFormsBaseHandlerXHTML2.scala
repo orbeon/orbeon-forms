@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.Attributes
@@ -102,4 +103,12 @@ class XFormsBaseHandlerXHTML2 (
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, value)
     }
+
+  final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {
+    val globalOps = containingDocument.getStaticOps
+    if (lhha == LHHA.Alert)
+      globalOps.getAlerts(controlPrefixedId).head
+    else // for alerts, take the first one, but does this make sense?
+      globalOps.getLHH(controlPrefixedId, lhha)
+  }
 }

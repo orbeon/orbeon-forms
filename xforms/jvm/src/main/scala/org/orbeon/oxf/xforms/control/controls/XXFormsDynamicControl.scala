@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -414,7 +415,7 @@ object XXFormsDynamicControl {
     else {
 
       val isNodeLHHA =
-        node.isElement && org.orbeon.oxf.xforms.analysis.controls.LHHA.isLHHA(unsafeUnwrapElement(node))
+        node.isElement && LHHA.isLHHA(unsafeUnwrapElement(node))
 
       // Go from root to leaf
       val ancestorsFromRoot = node ancestor * reverse

@@ -46,7 +46,7 @@ class LHHAAnalysis(
 
   val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
   val isLocal           = forStaticIdOption.isEmpty
-  val defaultToHTML     = LHHAAnalysis.isHTML(element)
+  val defaultToHTML     = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
   var isForRepeat       = false // updated in `attachToControl()`
 
   val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
@@ -215,7 +215,7 @@ object LHHAAnalysis {
 
   // Whether the control has a placeholder for the given LHHA type
   // TODO: This should be computed statically.
-  def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String): Boolean =
+  def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: LHHA): Boolean =
     elementAnalysis match {
       case lhhaTrait: StaticLHHASupport ⇒
         lhhaTrait.lhh(lhhaType) match {
@@ -224,7 +224,7 @@ object LHHAAnalysis {
               ! labelOrHint.hasLocalFullAppearance &&
               stringToSet(
                 elementAnalysis.part.staticState.staticStringProperty(
-                  if (lhhaType == "hint") HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+                  if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
                 )
               )(XFORMS_MINIMAL_APPEARANCE_QNAME.name)
           )

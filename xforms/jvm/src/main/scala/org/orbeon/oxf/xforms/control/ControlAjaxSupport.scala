@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
@@ -80,7 +80,7 @@ trait ControlAjaxSupport {
       if value1 != value2
       attributeValue = Option(lhha2.escapedValue()) getOrElse ""
     } yield
-      added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhhaType.name(), attributeValue, previousControlOpt.isEmpty, attributeValue == "")
+      added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhhaType.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 
     added
   }
@@ -222,9 +222,9 @@ object ControlAjaxSupport {
   }
 
   val LhhaWithAriaAttName = List(
-    LHHA.label → "aria-labelledby",
-    LHHA.hint  → "aria-describedby",
-    LHHA.help  → "aria-details"
+    LHHA.Label → "aria-labelledby",
+    LHHA.Hint  → "aria-describedby",
+    LHHA.Help  → "aria-details"
   )
 
   def findAriaBy(
@@ -234,7 +234,7 @@ object ControlAjaxSupport {
     containingDocument : XFormsContainingDocument
   ): Option[String] = staticControl match {
     case lhhaSupport: StaticLHHASupport ⇒
-      lhhaSupport.lhh(lhhaType.name) filter (_.isForRepeat) map { lhhaAnalysis ⇒
+      lhhaSupport.lhh(lhhaType) filter (_.isForRepeat) map { lhhaAnalysis ⇒
 
         val labelValueOpt = controlOpt flatMap { currentControl ⇒
           containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {

@@ -16,9 +16,8 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
@@ -66,8 +65,8 @@ trait FormRunnerMetadata {
       val lhhas =
         for {
           lhha     ← LHHA.values.to[List]
-          lhhaName = lhha.name
-          if staticControl.hasLHHA(lhhaName)
+          if staticControl.hasLHHA(lhha)
+          lhhaName = lhha.entryName
           holder   ← enclosingHolder child lhhaName
         } yield
           <dummy>{holder.stringValue}</dummy>.copy(label = lhhaName)

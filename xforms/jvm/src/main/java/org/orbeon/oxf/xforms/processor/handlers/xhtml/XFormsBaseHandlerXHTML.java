@@ -17,9 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
-import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.*;
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
@@ -230,7 +228,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         LHHAAnalysis lhhaAnalysis,
         String targetControlEffectiveId,
         String forEffectiveId,
-        XFormsBaseHandler.LHHAC lhhaType,
+        LHHA lhha,
         String requestedElementName,
         XFormsControl control,
         boolean isTemplate,
@@ -239,10 +237,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
         final AttributesImpl staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element());
 
-        final boolean isLabel = lhhaType == LHHAC.LABEL;
-        final boolean isHelp  = lhhaType == LHHAC.HELP;
-        final boolean isHint  = lhhaType == LHHAC.HINT;
-        final boolean isAlert = lhhaType == LHHAC.ALERT;
+        final boolean isLabel = lhha == LHHA$.MODULE$.jLabel();
+        final boolean isHelp  = lhha == LHHA$.MODULE$.jHelp();
+        final boolean isHint  = lhha == LHHA$.MODULE$.jHint();
+        final boolean isAlert = lhha == LHHA$.MODULE$.jAlert();
 
         if (staticLHHAAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
@@ -256,7 +254,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     // <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
-                    aAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
+                    aAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHA_CODES.get(LHHA$.MODULE$.jHelp())));
                     aAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help-anchor");
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
@@ -355,7 +353,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 if (classes.length() > 0)
                     classes.append(' ');
                 classes.append("xforms-");
-                classes.append(lhhaType.name().toLowerCase());
+                classes.append(lhha.entryName());
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
                 final Attributes newAttributes = (staticLHHAAttributes != null) ? staticLHHAAttributes : new AttributesImpl();
@@ -367,7 +365,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     getIdClassXHTMLAttributes(newAttributes, classes.toString(), null),
                     targetControlEffectiveId,
                     forEffectiveId,
-                    lhhaType,
+                    lhha,
                     elementName,
                     labelHintHelpAlertValue,
                     mustOutputHTMLFragment,
@@ -382,7 +380,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         Attributes attributes,
         String targetControlEffectiveId,
         String forEffectiveId,
-        XFormsBaseHandler.LHHAC lhha,
+        LHHA lhha,
         String elementName,
         String labelValue,
         boolean mustOutputHTMLFragment,
@@ -398,7 +396,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         Attributes attributes,
         String targetControlEffectiveId,
         String forEffectiveId,
-        XFormsBaseHandler.LHHAC lhha,
+        LHHA lhha,
         String elementName,
         boolean addIds
     ) throws SAXException {
@@ -411,7 +409,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         if (addIds && targetControlEffectiveId != null) {
             // Add or replace existing id attribute
             // NOTE: addIds == true for external LHHA
-            newAttribute = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHAC_CODES.get(lhha)));
+            newAttribute = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHA_CODES.get(lhha)));
         } else {
             // Remove existing id attribute if any
             newAttribute = SAXUtils.removeAttribute(attributes, "", "id");

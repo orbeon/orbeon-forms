@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 
 case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
@@ -34,8 +34,8 @@ object PlaceHolderInfo {
     controlOpt         : Option[XFormsControl]
   ): Option[PlaceHolderInfo] = {
 
-    val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(staticControl, "label")
-    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(staticControl, "hint")
+    val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(staticControl, LHHA.Label)
+    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(staticControl, LHHA.Hint)
 
     (isLabelPlaceholder || isHintPlaceholder) option {
       val placeholderValue =

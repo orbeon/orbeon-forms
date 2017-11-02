@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA$;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.xforms.XFormsId;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+import org.orbeon.xforms.XFormsId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,17 +36,14 @@ import java.util.Map;
  */
 public abstract class XFormsBaseHandler extends ElementHandler {
 
-    public enum LHHAC {
-        LABEL, HELP, HINT, ALERT, CONTROL
-    }
+    public static final String CONTROL_CODE = "c";
 
-    public static final Map<LHHAC, String> LHHAC_CODES = new HashMap<LHHAC, String>();
+    public static final Map<LHHA, String> LHHA_CODES = new HashMap<LHHA, String>();
     static {
-        LHHAC_CODES.put(LHHAC.LABEL,   "l");
-        LHHAC_CODES.put(LHHAC.HELP,    "p");
-        LHHAC_CODES.put(LHHAC.HINT,    "t");
-        LHHAC_CODES.put(LHHAC.ALERT,   "a");
-        LHHAC_CODES.put(LHHAC.CONTROL, "c");
+        LHHA_CODES.put(LHHA$.MODULE$.jLabel(),   "l");
+        LHHA_CODES.put(LHHA$.MODULE$.jHelp(),    "p");
+        LHHA_CODES.put(LHHA$.MODULE$.jHint(),    "t");
+        LHHA_CODES.put(LHHA$.MODULE$.jAlert(),   "a");
     }
 
     private final boolean repeating;
@@ -246,12 +243,4 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
 		return attributes;
 	}
-
-    protected LHHAAnalysis getStaticLHHA(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        if (lhhaType == LHHAC.ALERT)
-            return globalOps.getAlerts(controlPrefixedId).head(); // for alerts, take the first one, but does this make sense?
-        else
-            return globalOps.getLHH(controlPrefixedId, lhhaType.name().toLowerCase());
-    }
 }

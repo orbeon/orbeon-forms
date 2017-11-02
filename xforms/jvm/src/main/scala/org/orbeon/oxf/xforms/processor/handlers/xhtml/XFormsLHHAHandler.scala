@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.{XFormsLHHAControl, XFormsOutputControl}
+import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
+
 import org.xml.sax.Attributes
 
 /**
@@ -42,7 +42,7 @@ class XFormsLHHAHandler(
     val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
     val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-    val lhhaType = LHHAC.valueOf(localname.toUpperCase)
+    val lhhaType = LHHA.withName(localname)
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
@@ -104,7 +104,7 @@ class XFormsLHHAHandler(
             val targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
 
             val forEffectiveIdOpt =
-              if (lhhaType == LHHAC.LABEL)
+              if (lhhaType == LHHA.Label)
                 XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, targetControl, targetControlEffectiveId)
               else
                 None

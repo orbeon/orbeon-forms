@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.xforms.XFormsId
 
-class MutableLHHProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
   protected def evaluateValueImpl =
-    evaluateOne(control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType.name).get)
+    evaluateOne(control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType).get)
 }
 
-class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
   protected def evaluateValueImpl = {
@@ -59,7 +59,7 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: XFormsCon
 }
 
 // Mutable LHHA property
-abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableControlProperty[String]
   with LHHAProperty {
 
@@ -97,7 +97,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
   }
 
   protected def requireUpdate =
-    control.containingDocument.getXPathDependencies.requireLHHAUpdate(control.staticControl, lhhaType.name, control.effectiveId)
+    control.containingDocument.getXPathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, control.effectiveId)
 
   protected def notifyCompute() =
     control.containingDocument.getXPathDependencies.notifyComputeLHHA()

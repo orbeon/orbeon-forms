@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
@@ -21,8 +23,29 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 import scala.collection.mutable
 
-object LHHA {
+sealed trait LHHA extends EnumEntry with Lowercase
+
+object LHHA extends Enum[LHHA] {
+
+  val values = findValues
+
+  case object Label extends LHHA
+  case object Help  extends LHHA
+  case object Hint  extends LHHA
+  case object Alert extends LHHA
+
+  def jLabel = Label
+  def jHelp  = Help
+  def jHint  = Hint
+  def jAlert = Alert
+
+  val size = values.size
+
   val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
+
+  // By default all controls support HTML LHHA
+  val DefaultLHHAHTMLSupport = Array.fill(4)(true)
+
   def isLHHA(e: Element) = LHHAQNames(e.getQName)
 
   def getBeforeAfterOrderTokens(tokens: String): (List[String], List[String]) = {
@@ -49,18 +72,18 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     if (lhhaAnalysis.localName == "alert")
       _alerts :+= lhhaAnalysis
     else
-      _lhh += lhhaAnalysis.localName → lhhaAnalysis
+      _lhh += LHHA.withName(lhhaAnalysis.localName) → lhhaAnalysis
 
-  def lhh(lhhaType: String) = _lhh.get(lhhaType)
-  def alerts                = _alerts
+  def lhh(lhhaType: LHHA) = _lhh.get(lhhaType)
+  def alerts              = _alerts
 
-  def hasLHHA(lhhaType: String) =
-    if (lhhaType == "alert") alerts.nonEmpty else lhh(lhhaType).nonEmpty
+  def hasLHHA(lhhaType: LHHA) =
+    if (lhhaType == LHHA.Alert) alerts.nonEmpty else lhh(lhhaType).nonEmpty
 
-  def hasLocal(lhhaType: String) =
+  def hasLocal(lhhaType: LHHA) =
     lhhaAsList(lhhaType) exists (_.isLocal)
 
-  def lhhaValueAnalyses(lhhaType: String) =
+  def lhhaValueAnalyses(lhhaType: LHHA) =
     lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 
   val beforeAfterTokensOpt: Option[(List[String], List[String])] =
@@ -78,11 +101,11 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
 
     // All LHHA, local or external
     // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
-    val _lhh    = mutable.HashMap.empty[String, LHHAAnalysis]
+    val _lhh    = mutable.HashMap.empty[LHHA, LHHAAnalysis]
     var _alerts = List.empty[LHHAAnalysis]
 
-    def lhhaAsList(lhhaType: String) =
-      if (lhhaType == "alert") alerts else lhh(lhhaType).toList
+    def lhhaAsList(lhhaType: LHHA) =
+      if (lhhaType == LHHA.Alert) alerts else lhh(lhhaType).toList
 
     def allLHHA = _lhh.values ++ _alerts
   }

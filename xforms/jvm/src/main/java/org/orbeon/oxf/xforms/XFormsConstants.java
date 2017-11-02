@@ -37,12 +37,6 @@ public class XFormsConstants {
     public static final Set<String> ALLOWED_XBL_ELEMENTS = new HashSet<String>();
     public static final Set<String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashSet<String>();
 
-    public enum LHHA {
-        label, help, hint, alert
-    }
-
-    public static final int LHHACount = LHHA.values().length;
-
     static {
         // TODO: Keeping this static list is not ideal
         ALLOWED_XXFORMS_ELEMENTS.add("dialog");

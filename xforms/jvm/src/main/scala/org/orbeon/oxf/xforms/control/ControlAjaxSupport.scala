@@ -73,14 +73,14 @@ trait ControlAjaxSupport {
     var added = false
 
     for {
-      lhhaType ← LHHA.values
-      value1 = previousControlOpt.map(_.lhhaProperty(lhhaType).value()).orNull
-      lhha2  = self.lhhaProperty(lhhaType)
+      lhha ← LHHA.values
+      value1 = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
+      lhha2  = self.lhhaProperty(lhha)
       value2 = lhha2.value()
       if value1 != value2
       attributeValue = Option(lhha2.escapedValue()) getOrElse ""
     } yield
-      added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhhaType.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
+      added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhha.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 
     added
   }
@@ -230,11 +230,11 @@ object ControlAjaxSupport {
   def findAriaBy(
     staticControl      : ElementAnalysis,
     controlOpt         : Option[XFormsControl],
-    lhhaType           : LHHA)(
+    lhha               : LHHA)(
     containingDocument : XFormsContainingDocument
   ): Option[String] = staticControl match {
     case lhhaSupport: StaticLHHASupport ⇒
-      lhhaSupport.lhh(lhhaType) filter (_.isForRepeat) map { lhhaAnalysis ⇒
+      lhhaSupport.lhh(lhha) filter (_.isForRepeat) map { lhhaAnalysis ⇒
 
         val labelValueOpt = controlOpt flatMap { currentControl ⇒
           containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {

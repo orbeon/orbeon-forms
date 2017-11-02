@@ -54,6 +54,7 @@ import java.util.*;
 
 public class XFormsUtils {
 
+    //@XPathFunction
     public static String encodeXMLAsDOM(org.w3c.dom.Node node) {
         try {
             return EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState(), true, false);
@@ -95,6 +96,7 @@ public class XFormsUtils {
     }
 
 
+    //@XPathFunction
     public static org.w3c.dom.Document htmlStringToDocumentTagSoup(String value, LocationData locationData) {
         final org.w3c.dom.Document document = XMLParsing.createDocument();
         final DOMResult domResult = new DOMResult(document);
@@ -300,7 +302,7 @@ public class XFormsUtils {
                     childElement
                 )
             );
-            if (acceptHTML && containsHTML != null && !containsHTML[0]) {
+            if (acceptHTML && containsHTML != null && ! containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
                 return XMLUtils.unescapeXMLMinimal(sb.toString());

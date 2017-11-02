@@ -74,8 +74,16 @@ public class XFormsMessageAction extends XFormsAction {
 
             // Get message value
             final String messageValue; {
-                final String elementValue = XFormsUtils.getElementValue(actionInterpreter.container(),
-                    actionInterpreter.actionXPathContext(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, false, null);
+                final String elementValue =
+                    XFormsUtils.getElementValue(
+                    actionInterpreter.container(),
+                    actionInterpreter.actionXPathContext(),
+                    actionInterpreter.getSourceEffectiveId(actionElement),
+                    actionElement,
+                    false,
+                    false,
+                    null
+                );
 
                 // If we got a null consider the message to be an empty string
                 messageValue = elementValue != null ? elementValue : "";

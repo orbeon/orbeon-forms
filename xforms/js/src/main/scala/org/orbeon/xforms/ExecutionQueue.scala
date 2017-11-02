@@ -13,10 +13,10 @@
   */
 package org.orbeon.xforms
 
-import scala.scalajs.js
 import enumeratum._
 
 import scala.concurrent.Future
+import scala.scalajs.js
 
 sealed abstract class ExecutionWait extends EnumEntry
 
@@ -32,9 +32,7 @@ object ExecutionWait extends Enum[ExecutionWait] {
 // executed at once. Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
 
-  private var waitingCompletion = false
-  private var delayFunctions = 0
-  private var events: List[T] = Nil
+  import Private._
 
   // Add an event to the queue and executes all the events in the queue either:
   //
@@ -52,18 +50,25 @@ class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
     }
   }
 
-  // Call the `execute` function to run the events queued up so far.
-  private def executeEvents(): Unit =
-    if (events.nonEmpty) {
-      waitingCompletion = true
-      val localEvents = events
-      events = Nil
+  private object Private {
 
-      import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+    var waitingCompletion = false
+    var delayFunctions    = 0
+    var events: List[T]   = Nil
 
-      execute(localEvents) onComplete { _ ⇒
-        waitingCompletion = false
-        executeEvents()
+    // Call the `execute` function to run the events queued up so far.
+    def executeEvents(): Unit =
+      if (events.nonEmpty) {
+        waitingCompletion = true
+        val localEvents = events
+        events = Nil
+
+        import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+
+        execute(localEvents) onComplete { _ ⇒
+          waitingCompletion = false
+          executeEvents()
+        }
       }
-    }
+  }
 }

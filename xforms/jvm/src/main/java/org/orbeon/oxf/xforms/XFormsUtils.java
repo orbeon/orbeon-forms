@@ -287,8 +287,19 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xf:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(container, contextStack,
-                    sourceEffectiveId, acceptHTML, defaultHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(
+                childElement,
+                new LHHAElementVisitorListener(
+                    container,
+                    contextStack,
+                    sourceEffectiveId,
+                    acceptHTML,
+                    defaultHTML,
+                    containsHTML,
+                    sb,
+                    childElement
+                )
+            );
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later

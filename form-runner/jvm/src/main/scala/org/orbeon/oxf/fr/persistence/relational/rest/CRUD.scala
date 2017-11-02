@@ -24,7 +24,7 @@ class CRUD
     with Common
     with Read
     with CreateUpdateDelete
-    with Lease {
+    with LockUnlock {
 
   override def start(pipelineContext: PipelineContext): Unit =
     try {

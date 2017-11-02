@@ -205,6 +205,7 @@ object StatusCode {
   val NotFound              = 404
   val Gone                  = 410
   val RequestEntityTooLarge = 413
+  val Locked                = 423
   val InternalServerError   = 500
   val ServiceUnavailable    = 503
 }

@@ -111,8 +111,18 @@ private object HttpAssert extends XMLSupport {
     lockInfo     : LockInfo,
     expectedCode : Int)(implicit
     logger       : IndentedLogger
-  )              : Unit = {
-    val actualCode = HttpRequest.lock(url, lockInfo)
+  ): Unit = {
+    val actualCode = HttpRequest.lock(url, lockInfo, 60)
+    assert(actualCode === expectedCode)
+  }
+
+  def unlock(
+    url          : String,
+    lockInfo     : LockInfo,
+    expectedCode : Int)(implicit
+    logger       : IndentedLogger
+  ): Unit = {
+    val actualCode = HttpRequest.unlock(url, lockInfo)
     assert(actualCode === expectedCode)
   }
 }

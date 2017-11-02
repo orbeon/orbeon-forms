@@ -37,6 +37,8 @@ object Headers {
   val Cookie                  = "Cookie"
   val Accept                  = "Accept"
   val SOAPAction              = "SOAPAction"
+  val Timeout                 = "Timeout"
+  val TimeoutValuePrefix      = "Second-"
 
   val OrbeonTokenLower        = OrbeonToken.toLowerCase
   val OrbeonUsernameLower     = OrbeonUsername.toLowerCase
@@ -51,6 +53,7 @@ object Headers {
   val LocationLower           = Location.toLowerCase
   val OrbeonClientLower       = OrbeonClient.toLowerCase
   val CreatedLower            = Created.toLowerCase
+  val TimeoutLower            = Timeout.toLowerCase
 
   val EmbeddedClientValues    = Set("embedded", "portlet")
 

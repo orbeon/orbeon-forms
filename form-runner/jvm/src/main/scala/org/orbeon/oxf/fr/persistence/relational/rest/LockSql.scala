@@ -16,15 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.util.IOUtils.useAndClose
 import java.sql.{Connection, ResultSet}
 
-import org.orbeon.oxf.externalcontext.Credentials
-
-
 object LockSql {
 
   case class Lease(
-    username  : String,
-    groupname : Option[String],
-    expired   : Boolean
+    timeout  : Int,
+    lockInfo : LockInfo
   )
 
   def readLease(
@@ -33,12 +29,7 @@ object LockSql {
   )             : Option[Lease] = {
     val sql =
       s"""SELECT username, groupname,
-         |       CASE
-         |           WHEN expiration <= CURRENT_TIMESTAMP
-         |           THEN 1
-         |           ELSE 0
-         |       END
-         |       AS expired
+         |       datediff(second, CURRENT_TIMESTAMP, expiration) AS timeout
          |  FROM orbeon_form_data_lease (TABLOCKX)
          | WHERE document_id = ?
        """.stripMargin
@@ -47,9 +38,11 @@ object LockSql {
       useAndClose(ps.executeQuery()) { resultSet ⇒
         if (resultSet.next()) {
           Some(Lease(
-            username  = resultSet.getString("username"),
-            groupname = Option(resultSet.getString("groupname")),
-            expired   = resultSet.getInt("expired") == 1
+            timeout  = resultSet.getInt("timeout"),
+            lockInfo = LockInfo(
+              username  = resultSet.getString("username"),
+              groupname = Option(resultSet.getString("groupname"))
+            )
           ))
         } else {
           None
@@ -62,19 +55,20 @@ object LockSql {
     connection  : Connection,
     reqDataPart : DataPart,
     username    : String,
-    groupname   : Option[String]
+    groupname   : Option[String],
+    timeout     : Int
   )             : Unit = {
     val sql =
       s"""UPDATE orbeon_form_data_lease
          |   SET username    = ?,
          |       groupname   = ?,
-         |       expiration  = DATEADD(minute, ?, CURRENT_TIMESTAMP)
+         |       expiration  = DATEADD(second, ?, CURRENT_TIMESTAMP)
          | WHERE document_id = ?
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
       ps.setString(1, username)
       ps.setString(2, groupname.orNull)
-      ps.setInt   (3, 42)
+      ps.setInt   (3, timeout)
       ps.setString(4, reqDataPart.documentId)
       ps.executeUpdate()
     }
@@ -84,7 +78,8 @@ object LockSql {
     connection  : Connection,
     reqDataPart : DataPart,
     username    : String,
-    groupname   : Option[String]
+    groupname   : Option[String],
+    timeout     : Int
   )             : Unit = {
     val sql =
       s"""INSERT
@@ -94,13 +89,29 @@ object LockSql {
          |           groupname,
          |           expiration
          |       )
-         |VALUES (?, ?, ?, DATEADD(minute, ?, CURRENT_TIMESTAMP)) ;
+         |VALUES (?, ?, ?, DATEADD(second, ?, CURRENT_TIMESTAMP)) ;
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
       ps.setString(1, reqDataPart.documentId)
       ps.setString(2, username)
       ps.setString(3, groupname.orNull)
-      ps.setInt   (4, 42)
+      ps.setInt   (4, timeout)
+      ps.executeUpdate()
+    }
+  }
+
+  def removeLease(
+    connection  : Connection,
+    reqDataPart : DataPart
+  )             : Unit = {
+    val sql =
+      s"""DELETE
+         |  FROM orbeon_form_data_lease
+         | WHERE document_id = ?
+         |
+       """.stripMargin
+    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+      ps.setString(1, reqDataPart.documentId)
       ps.executeUpdate()
     }
   }

@@ -41,7 +41,8 @@ private object HttpRequest {
     method      : HttpMethod,
     version     : Version,
     body        : Option[Body],
-    credentials : Option[Credentials])(implicit
+    credentials : Option[Credentials],
+    timeout     : Option[Int] = None)(implicit
     logger      : IndentedLogger
   ): ClosableHttpResponse = {
 
@@ -51,17 +52,19 @@ private object HttpRequest {
 
       import Version._
 
+      val timeoutHeader = timeout.map(t ⇒ Headers.Timeout → List(Headers.TimeoutValuePrefix + t.toString))
       val versionHeader = version match {
-        case Unspecified             ⇒ Headers.EmptyHeaders
-        case Next                    ⇒ Map(OrbeonFormDefinitionVersion → List("next"))
-        case Specific(version)       ⇒ Map(OrbeonFormDefinitionVersion → List(version.toString))
-        case ForDocument(documentId) ⇒ Map(OrbeonForDocumentId         → List(documentId))
+        case Unspecified             ⇒ None
+        case Next                    ⇒ Some(OrbeonFormDefinitionVersion → List("next"))
+        case Specific(version)       ⇒ Some(OrbeonFormDefinitionVersion → List(version.toString))
+        case ForDocument(documentId) ⇒ Some(OrbeonForDocumentId         → List(documentId))
       }
+      val headers = (timeoutHeader.toList ++ versionHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = "http",
         hasCredentials   = false,
-        customHeaders    = versionHeader,
+        customHeaders    = headers,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = _ ⇒ None
@@ -128,9 +131,22 @@ private object HttpRequest {
       (statusCode, headers, body)
     }
 
-  def lock(url: String, lockInfo: LockInfo)(implicit logger: IndentedLogger): Int = {
-    val body = Some(XML(LockInfo.toDom4j(lockInfo)))
-    useAndClose(request(url, LOCK, Unspecified, body, None))(_.httpResponse.statusCode)
-  }
+  def lock(url: String, lockInfo: LockInfo, timeout: Int)(implicit logger: IndentedLogger): Int =
+    Private.lockUnlock(LOCK, url, lockInfo, Some(timeout))
 
+  def unlock(url: String, lockInfo: LockInfo)(implicit logger: IndentedLogger): Int =
+    Private.lockUnlock(UNLOCK, url, lockInfo, None)
+
+  private object Private {
+    def lockUnlock(
+      method   : HttpMethod,
+      url      : String,
+      lockInfo : LockInfo,
+      timeout  : Option[Int])(implicit
+      logger   : IndentedLogger
+    ): Int = {
+      val body = Some(XML(LockInfo.toDom4j(lockInfo)))
+      useAndClose(request(url, method, Unspecified, body, None, timeout))(_.httpResponse.statusCode)
+    }
+  }
 }

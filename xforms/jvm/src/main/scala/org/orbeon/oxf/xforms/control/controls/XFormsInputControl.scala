@@ -86,7 +86,7 @@ class XFormsInputControl(
     setExternalValue(updatedValue)
   }
 
-  override def translateExternalValue(externalValue: String) = {
+  override def translateExternalValue(externalValue: String): Option[String] = {
 
     // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
     // formatted value
@@ -130,7 +130,7 @@ class XFormsInputControl(
   }
 
   // Convenience method for handler: return the value of the first input field.
-  def getFirstValueUseFormat = {
+  def getFirstValueUseFormat: String = {
     val result =
       if (isRelevant) {
         getBuiltinTypeName match {
@@ -145,7 +145,7 @@ class XFormsInputControl(
   }
 
   // Convenience method for handler: return the value of the second input field.
-  def getSecondValueUseFormat = {
+  def getSecondValueUseFormat: String = {
     val result =
       if (isRelevant) {
         getBuiltinTypeName match {
@@ -159,7 +159,7 @@ class XFormsInputControl(
   }
 
   // Convenience method for handler: return a formatted value for read-only output
-  def getReadonlyValue =
+  def getReadonlyValue: String =
     getValueUseFormat(format) getOrElse getExternalValue
 
   private def formatSubValue(valueType: String, value: String) = {
@@ -191,12 +191,12 @@ class XFormsInputControl(
     }
   }
 
-  def getFirstValueType = {
+  def getFirstValueType: String = {
     val typeName = getBuiltinTypeName
     if (typeName == "dateTime") "date" else typeName
   }
 
-  def getSecondValueType =
+  def getSecondValueType: String =
     if (getBuiltinTypeName == "dateTime") "time" else null
 
   override def compareExternalUseExternalValue(
@@ -233,7 +233,7 @@ class XFormsInputControl(
   }
 
   // Input needs to point to another element
-  override def findAriaByControlEffectiveId =
+  override def findAriaByControlEffectiveId: Option[String] =
     getBuiltinTypeName != "boolean" option XFormsInputHandler.firstInputEffectiveId(effectiveId)(containingDocument)
 }
 
@@ -269,8 +269,8 @@ object XFormsInputControl {
     value
   }
 
-  def testParseTimeForNoscript(value: String) = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
-  def testParseDateForNoscript(value: String, dayMonth: Boolean) = parseForNoscript(DateParsePatterns, value, dayMonth)
+  def testParseTimeForNoscript(value: String): String = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
+  def testParseDateForNoscript(value: String, dayMonth: Boolean): String = parseForNoscript(DateParsePatterns, value, dayMonth)
 
   private val DateComponentSeparators = "[./\\-\\s]"
 
@@ -291,19 +291,19 @@ object XFormsInputControl {
     // mm/dd/yyyy (American style)
     // Support separators: ".", "/", "-", and single space
     new ParsePattern(("^(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})" + DateComponentSeparators + "(\\d{2,4})$").r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToDate(result.group(2), result.group(if (dayMonth) 1 else 0), result.group(if (dayMonth) 0 else 1))
     },
     // mm/dd (American style without year)
     // Support separators: ".", "/", "-", and single space
     new ParsePattern(("^(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})$").r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToDate((new GregorianCalendar).get(Calendar.YEAR).toString, result.group(if (dayMonth) 1 else 0), result.group(if (dayMonth) 0 else 1))
     },
     // yyyy-mm-dd (ISO style)
     // But also support separators: ".", "/", "-", and single space
     new ParsePattern(("(\\d{2,4})" + DateComponentSeparators + "(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})(Z|([+-]\\d{2}:\\d{2}))?").r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToDate(result.group(0), result.group(1), result.group(2))
     }
   )
@@ -314,44 +314,44 @@ object XFormsInputControl {
 
     // 12:34:56 p.m.
     new ParsePattern("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(adjustHoursPM(result.group(0)), result.group(1), result.group(2))
     },
     // 12:34 p.m.
     new ParsePattern("^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(adjustHoursPM(result.group(0)), result.group(1), "0")
     },
     // 12 p.m.
     new ParsePattern("^(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(adjustHoursPM(result.group(0)), "0", "0")
     },
     // 12:34:56 (a.m.)
     new ParsePattern("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(result.group(0), result.group(1), result.group(2))
     },
     // 12:34 (a.m.)
     new ParsePattern("^(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(result.group(0), result.group(1), "0")
     },
     // 12 (a.m.)
     new ParsePattern("^(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean) =
+      def apply(result: MatchResult, dayMonth: Boolean): String =
         stringsToTime(result.group(0), "0", "0")
     }
   )
 
   private abstract class ParsePattern(val regex: Regex) extends ((MatchResult, Boolean) ⇒ String) {
-    def stringsToDate(year: String, month: String, day: String) =
+    def stringsToDate(year: String, month: String, day: String): String =
       new DateValue(year.toInt, month.toByte, day.toByte).getStringValue
 
-    def stringsToTime(hours: String, minutes: String, seconds: String) =
+    def stringsToTime(hours: String, minutes: String, seconds: String): String =
       new TimeValue(hours.toByte, minutes.toByte, seconds.toByte, 0, CalendarValue.NO_TIMEZONE).getStringValue
 
-    def adjustHoursPM(hours: String) = {
+    def adjustHoursPM(hours: String): String = {
       val hoursInt = hours.toInt
       if (hoursInt < 12)
         (hoursInt + 12).toString

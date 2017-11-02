@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.{FocusableTrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
@@ -45,5 +46,5 @@ class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, eleme
 }
 
 private object XFormsTriggerControl {
-  val TriggerLhhaHtmlSupport = Array(true, true, false, true) // hint doesn't support HTML
+  val TriggerLhhaHtmlSupport = LHHA.DefaultLHHAHTMLSupport - LHHA.Hint
 }

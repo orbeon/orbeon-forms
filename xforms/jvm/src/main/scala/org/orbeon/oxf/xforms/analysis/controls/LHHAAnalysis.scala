@@ -26,6 +26,8 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.CoreUtils._
 
 class LHHAAnalysis(
   staticStateContext : StaticStateContext,
@@ -47,6 +49,8 @@ class LHHAAnalysis(
   val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
   val isLocal           = forStaticIdOption.isEmpty
   val defaultToHTML     = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
+  val containsHTML      = LHHAAnalysis.containsHTML(element)
+
   var isForRepeat       = false // updated in `attachToControl()`
 
   val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
@@ -99,13 +103,11 @@ class LHHAAnalysis(
   // - if has static value, don't attempt to compare values upon diff, and never send new related information to client
   // - 2017-10-17: Now using this in `XFormsLHHAControl`.
   //
-  val (staticValue, containsHTML) =
-    if (LHHAAnalysis.hasStaticValue(staticStateContext, element)) {
-      // TODO: figure out whether to allow HTML or not (could default to true?)
-      val containsHTML = Array(false)
-      (Option(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, containsHTML)), containsHTML(0))
-    } else
-      (None, false)
+  // TODO: figure out whether to allow HTML or not (could default to true?)
+  //
+  val staticValue =
+    LHHAAnalysis.hasStaticValue(staticStateContext, element) option
+      XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
 
   def debugOut(): Unit =
     if (staticValue.isDefined)
@@ -182,6 +184,25 @@ object LHHAAnalysis {
 
   def isHTML(e: Element)      = e.attributeValue(MEDIATYPE_QNAME) == "text/html"
   def isPlainText(e: Element) = e.attributeValue(MEDIATYPE_QNAME) == "text/plain"
+
+  private def containsHTML(lhhaElement: Element) = {
+
+    val lhhaElem =
+      new DocumentWrapper(
+          lhhaElement.getDocument,
+          null,
+          XPath.GlobalConfiguration
+        ).wrap(lhhaElement)
+
+    val XFOutput = URIQualifiedName(XFORMS_NAMESPACE_URI, "output")
+
+    val descendantOtherElems = lhhaElem descendant * filter (_.uriQualifiedName != XFOutput)
+    val descendantOutputs    = lhhaElem descendant XFOutput
+
+    isHTML(lhhaElement) || descendantOtherElems.nonEmpty || (descendantOutputs exists {
+      _.attValueOpt("mediatype") contains "text/html"
+    })
+  }
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
   private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {

@@ -13,6 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import java.{lang ⇒ jl}
+
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsSingleNodeControl}
@@ -38,29 +40,26 @@ abstract class XFormsGroupHandler(
     forwarding = true
   ) with HandlerSupport {
 
-  protected def getLabelClasses(xformsControl: XFormsSingleNodeControl): String = {
-    val hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId)
-    if (hasLabel) {
+  protected def getLabelClasses(xformsControl: XFormsSingleNodeControl): jl.StringBuilder = {
 
-      val labelClasses = new java.lang.StringBuilder("xforms-label")
+    require(LHHASupport.hasLabel(containingDocument, getPrefixedId))
 
-      // Handle relevance on label
-      if ((xformsControl == null && ! xformsHandlerContext.isTemplate) || (xformsControl != null && ! xformsControl.isRelevant))
-        labelClasses.append(" xforms-disabled")
+    val labelClasses = new jl.StringBuilder("xforms-label")
 
-      // Copy over existing label classes if any
-      val labelClassAttribute =
-        containingDocument.getStaticOps.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsConstants.CLASS_QNAME)
+    // Handle relevance on label
+    if ((xformsControl == null && ! xformsHandlerContext.isTemplate) || (xformsControl != null && ! xformsControl.isRelevant))
+      labelClasses.append(" xforms-disabled")
 
-      if (labelClassAttribute ne null) {
-        labelClasses.append(' ')
-        labelClasses.append(labelClassAttribute)
-      }
+    // Copy over existing label classes if any
+    val labelClassAttribute =
+      containingDocument.getStaticOps.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsConstants.CLASS_QNAME)
 
-      labelClasses.toString
+    if (labelClassAttribute ne null) {
+      labelClasses.append(' ')
+      labelClasses.append(labelClassAttribute)
     }
-    else
-      null
+
+    labelClasses
   }
 
   protected def getLabelValue(xformsControl: XFormsSingleNodeControl): String =

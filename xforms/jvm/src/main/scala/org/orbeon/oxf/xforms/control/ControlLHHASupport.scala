@@ -28,13 +28,13 @@ trait ControlLHHASupport {
   // Label, help, hint and alert (evaluated lazily)
   // 2013-06-19: We support multiple alerts, but only one client-facing alert value at this point.
   // NOTE: var because of cloning
-  private[ControlLHHASupport] var lhha = new Array[LHHAProperty](LHHA.size)
+  private[ControlLHHASupport] var lhhaArray = new Array[LHHAProperty](LHHA.size)
 
   // XBL Container in which dynamic LHHA elements like xf:output and AVTs evaluate
   def lhhaContainer = container
 
   def markLHHADirty(): Unit =
-    for (currentLHHA ← lhha)
+    for (currentLHHA ← lhhaArray)
       if (currentLHHA ne null)
         currentLHHA.handleMarkDirty()
 
@@ -42,75 +42,75 @@ trait ControlLHHASupport {
   // on the control's current validity and validations. Because we don't have yet a way of taking those in as
   // dependencies, we force dirty alerts whenever such validations change upon refresh.
   def forceDirtyAlert(): Unit = {
-    val alert = lhha(LHHA.valuesToIndex(LHHA.Alert))
+    val alert = lhhaArray(LHHA.valuesToIndex(LHHA.Alert))
     if (alert ne null)
       alert.handleMarkDirty(force = true)
   }
 
   def evaluateNonRelevantLHHA(): Unit =
-    for (i ← lhha.indices)
-      lhha(i) = null
+    for (i ← lhhaArray.indices)
+      lhhaArray(i) = null
 
   // Copy LHHA if not null
   def updateLHHACopy(copy: XFormsControl): Unit = {
-    copy.lhha = new Array[LHHAProperty](LHHA.size)
+    copy.lhhaArray = new Array[LHHAProperty](LHHA.size)
     for {
-      i ← lhha.indices
-      currentLHHA = lhha(i)
+      i ← lhhaArray.indices
+      currentLHHA = lhhaArray(i)
       if currentLHHA ne null
     } yield {
       // Evaluate lazy value before copying
       currentLHHA.value()
 
       // Copy
-      copy.lhha(i) = currentLHHA.copy.asInstanceOf[LHHAProperty]
+      copy.lhhaArray(i) = currentLHHA.copy.asInstanceOf[LHHAProperty]
     }
   }
 
-  def lhhaProperty(lhhaType: LHHA) = {
+  def lhhaProperty(lhha: LHHA): LHHAProperty = {
     // TODO: Not great to work by index.
-    val index = LHHA.valuesToIndex(lhhaType)
+    val index = LHHA.valuesToIndex(lhha)
     // Evaluate lazily
-    Option(lhha(index)) getOrElse {
+    Option(lhhaArray(index)) getOrElse {
 
       // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
       val property =
-        if (containingDocument.getStaticOps.hasLHHA(prefixedId, lhhaType) && self.staticControl.isInstanceOf[StaticLHHASupport])
+        if (containingDocument.getStaticOps.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
           self match {
-            case singleNodeControl: XFormsSingleNodeControl if lhhaType == LHHA.Alert ⇒
-              new MutableAlertProperty(singleNodeControl, lhhaType, lhhaHTMLSupport(index))
-            case control: XFormsControl if lhhaType != LHHA.Alert ⇒
-              new MutableLHHProperty(control, lhhaType, lhhaHTMLSupport(index))
+            case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert ⇒
+              new MutableAlertProperty(singleNodeControl, lhha, lhhaHTMLSupport(lhha))
+            case control: XFormsControl if lhha != LHHA.Alert ⇒
+              new MutableLHHProperty(control, lhha, lhhaHTMLSupport(lhha))
             case _ ⇒
               NullLHHA
           }
         else
           NullLHHA
 
-      lhha(index) = property
+      lhhaArray(index) = property
       property
     }
   }
 
   // Whether we support HTML LHHA
-  def lhhaHTMLSupport = LHHA.DefaultLHHAHTMLSupport
+  def lhhaHTMLSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
 
   def compareLHHA(other: XFormsControl) =
-    LHHA.values forall (lhhaType ⇒ lhhaProperty(lhhaType).value() == other.lhhaProperty(lhhaType).value())
+    LHHA.values forall (lhha ⇒ lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
 
   // Convenience accessors
-  final def getLabel          = lhhaProperty(LHHA.Label).value()
-  final def getEscapedLabel   = lhhaProperty(LHHA.Label).escapedValue()
-  final def isHTMLLabel       = lhhaProperty(LHHA.Label).isHTML
-  final def getHelp           = lhhaProperty(LHHA.Help).value()
-  final def getEscapedHelp    = lhhaProperty(LHHA.Help).escapedValue()
-  final def isHTMLHelp        = lhhaProperty(LHHA.Help).isHTML
-  final def getHint           = lhhaProperty(LHHA.Hint).value()
-  final def getEscapedHint    = lhhaProperty(LHHA.Hint).escapedValue()
-  final def isHTMLHint        = lhhaProperty(LHHA.Hint).isHTML
-  final def getAlert          = lhhaProperty(LHHA.Alert).value()
-  final def isHTMLAlert       = lhhaProperty(LHHA.Alert).isHTML
-  final def getEscapedAlert   = lhhaProperty(LHHA.Alert).escapedValue()
+  final def getLabel        = lhhaProperty(LHHA.Label).value()
+  final def getEscapedLabel = lhhaProperty(LHHA.Label).escapedValue()
+  final def isHTMLLabel     = lhhaProperty(LHHA.Label).isHTML
+  final def getHelp         = lhhaProperty(LHHA.Help).value()
+  final def getEscapedHelp  = lhhaProperty(LHHA.Help).escapedValue()
+  final def isHTMLHelp      = lhhaProperty(LHHA.Help).isHTML
+  final def getHint         = lhhaProperty(LHHA.Hint).value()
+  final def getEscapedHint  = lhhaProperty(LHHA.Hint).escapedValue()
+  final def isHTMLHint      = lhhaProperty(LHHA.Hint).isHTML
+  final def getAlert        = lhhaProperty(LHHA.Alert).value()
+  final def isHTMLAlert     = lhhaProperty(LHHA.Alert).isHTML
+  final def getEscapedAlert = lhhaProperty(LHHA.Alert).escapedValue()
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy

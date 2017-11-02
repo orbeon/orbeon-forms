@@ -38,11 +38,9 @@ object SimplePath {
   // Passing a string as test means to test on the local name of an element or attribute
   implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
-  // Passing a QName as test means to test on the qualified name of an element or attribute
   implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.namespace.uri, attName.name))
-
-  // Qualified name can also be passed as a pair of strings
   implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
+  implicit def uriQualifiedNameToTest(name: URIQualifiedName): Test = new NodeQNameTest(name.uri → name.localName)
 
   // Node test
   abstract class Test {

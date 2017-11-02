@@ -44,7 +44,7 @@ object LHHA extends Enum[LHHA] {
   val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
 
   // By default all controls support HTML LHHA
-  val DefaultLHHAHTMLSupport = Array.fill(4)(true)
+  val DefaultLHHAHTMLSupport = values.toSet
 
   def isLHHA(e: Element) = LHHAQNames(e.getQName)
 

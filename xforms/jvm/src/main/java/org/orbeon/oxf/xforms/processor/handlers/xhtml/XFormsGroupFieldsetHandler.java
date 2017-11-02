@@ -51,7 +51,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
             // Handle label classes
             reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl));
+            reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl).toString());
             reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getLHHACId(containingDocument, getEffectiveId(), LHHA_CODES.get(LHHA$.MODULE$.jLabel())));
 
             // Output xhtml:legend with label content

@@ -48,13 +48,27 @@ class XFormsGroupDefaultHandler(
   override protected def handleControlStart() = ()
 
   override protected def handleLabel(): Unit = {
+
     // TODO: check why we output our own label here
+
+    val staticLabelOpt = Option(getStaticLHHA(getPrefixedId, LHHA.Label))
 
     val groupControl = currentControlOrNull.asInstanceOf[XFormsSingleNodeControl]
     val effectiveId = getEffectiveId
 
+    val classes = getLabelClasses(groupControl)
+
+    // For LHH we know this statically
+    val isHtmlLabel = staticLabelOpt.exists(_.containsHTML)
+
+    if (isHtmlLabel) {
+      if (classes.length() > 0)
+        classes.append(' ')
+      classes.append("xforms-mediatype-text-html")
+    }
+
     reusableAttributes.clear()
-    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl))
+    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes.toString)
 
     XFormsBaseHandlerXHTML.outputLabelFor(
       xformsHandlerContext,
@@ -64,7 +78,7 @@ class XFormsGroupDefaultHandler(
       LHHA.Label,
       xformsHandlerContext.getLabelElementName,
       getLabelValue(groupControl),
-      (groupControl ne null) && groupControl.isHTMLLabel,
+      isHtmlLabel,
       false
     )
   }

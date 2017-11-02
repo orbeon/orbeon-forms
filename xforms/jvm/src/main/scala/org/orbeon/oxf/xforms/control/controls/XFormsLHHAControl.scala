@@ -56,7 +56,7 @@ class XFormsLHHAControl(
           staticControl.element,
           true,
           staticControl.defaultToHTML,
-          null // Array[Boolean](false)
+          Array[Boolean](false)
         )
       )
 

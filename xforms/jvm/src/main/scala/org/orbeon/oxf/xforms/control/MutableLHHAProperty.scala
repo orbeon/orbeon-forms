@@ -25,7 +25,11 @@ class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: B
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
   protected def evaluateValueImpl =
-    evaluateOne(control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType).get)
+    for {
+      lhh   ← control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
+      value ← evaluateOne(lhh)
+    } yield
+      value → lhh.containsHTML
 }
 
 class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, supportsHTML: Boolean)
@@ -35,25 +39,25 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, sup
 
     val activeAlertsOpt = LHHASupport.gatherActiveAlerts(control)
 
-    val valuesWithIsHTML =
+    val valuesWithIsHtml =
       for {
         (_, activeAlerts) ← activeAlertsOpt.toList
         activeAlert       ← activeAlerts
         valueWithIsHTML   ← evaluateOne(activeAlert)
       } yield
-        valueWithIsHTML
+        valueWithIsHTML → activeAlert.containsHTML
 
-    if (valuesWithIsHTML.size < 2)
-      valuesWithIsHTML.headOption
+    if (valuesWithIsHtml.size < 2)
+      valuesWithIsHtml.headOption
     else {
       // Combine multiple values as a single HTML value using ul/li
       val combined = (
-        valuesWithIsHTML
+        valuesWithIsHtml
         map { case (value, isHTML) ⇒ if (! isHTML) XMLUtils.escapeXMLMinimal(value) else value }
         mkString ("<ul><li>", "</li><li>", "</li></ul>")
       )
 
-      Some(combined, true)
+      Some(combined → true)
     }
   }
 }
@@ -68,6 +72,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   protected def isRelevant = control.isRelevant
   protected def wasRelevant = control.wasRelevant
 
+  // TODO: `isHTML` now uses the static `containsHTML` except for multiple alerts. Do this more statically?
   protected def evaluateValue() =
     evaluateValueImpl match {
       case Some((value: String, isHTML)) ⇒
@@ -112,12 +117,10 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
 
   // Evaluate the value of a LHHA related to this control
   // Can return null
-  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis) = {
+  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] = {
     val contextStack = control.getContextStack
 
     val lhhaElement = lhhaAnalysis.element
-
-    val tempContainsHTML = Array[Boolean](false)
 
     val result =
       if (lhhaAnalysis.isLocal) {
@@ -132,7 +135,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
             lhhaElement,
             supportsHTML,
             lhhaAnalysis.defaultToHTML,
-            tempContainsHTML
+            Array[Boolean](false)
           )
         )
         contextStack.popBinding()
@@ -144,7 +147,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
         }
       }
 
-    result map (_ → tempContainsHTML(0))
+    result
   }
 
   private def findAncestorContextControl(contextStaticId: String, lhhaStaticId: String): XFormsControl = {

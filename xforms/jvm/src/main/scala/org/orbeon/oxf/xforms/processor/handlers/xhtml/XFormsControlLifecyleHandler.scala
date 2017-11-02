@@ -119,6 +119,7 @@ abstract class XFormsControlLifecyleHandler(
   protected def isMustOutputControl(control: XFormsControl)                         = true
   protected def isMustOutputContainerElement                                        = true
 
+  // TODO: Those should take the static LHHA
   @throws[SAXException]
   protected def handleLabel(): Unit =
     handleLabelHintHelpAlert(

@@ -266,10 +266,9 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 final String labelHintHelpAlertValue;
                 final boolean mustOutputHTMLFragment;
                 if (control != null) {
-                    // Get actual value from control
                     if (isLabel) {
                         labelHintHelpAlertValue = control.getLabel();
-                        mustOutputHTMLFragment = control.isHTMLLabel();
+                        mustOutputHTMLFragment = lhhaAnalysis.containsHTML(); // known statically
                     } else if (isHelp) {
                         // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
                         // case because it is stored as escaped HTML within a <label> element.
@@ -277,17 +276,21 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                         mustOutputHTMLFragment = false;
                     } else if (isHint) {
                         labelHintHelpAlertValue = control.getHint();
-                        mustOutputHTMLFragment = control.isHTMLHint();
+                        mustOutputHTMLFragment = lhhaAnalysis.containsHTML(); // known statically
                     } else if (isAlert) {
                         labelHintHelpAlertValue = control.getAlert();
+                        // Not known statically at this time because it currently depends on the number of active alerts
                         mustOutputHTMLFragment = control.isHTMLAlert();
                     } else {
                         throw new IllegalStateException("Illegal type requested");
                     }
                 } else {
-                    // Placeholder
                     labelHintHelpAlertValue = null;
-                    mustOutputHTMLFragment = false;
+                    if (isLabel || isHint) {
+                        mustOutputHTMLFragment = lhhaAnalysis.containsHTML(); // known statically
+                    } else {
+                        mustOutputHTMLFragment = false;
+                    }
                 }
 
                 final String elementName;
@@ -314,6 +317,14 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     final String userClass = staticLHHAAttributes.getValue("class");
                     if (userClass != null)
                         classes.append(userClass);
+                }
+
+                // For now only place these on label and hint as that's the ones known statically
+                // AND useful for Form Builder.
+                if ((isLabel || isHint) && mustOutputHTMLFragment) {
+                    if (classes.length() > 0)
+                        classes.append(' ');
+                    classes.append("xforms-mediatype-text-html");
                 }
 
                 // Mark alert as active if needed
@@ -435,9 +446,14 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
     }
 
-    public static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean html) throws SAXException {
+    public static void outputLabelText(
+            XMLReceiver xmlReceiver,
+            XFormsControl xformsControl,
+            String value,
+            String xhtmlPrefix,
+            boolean mustOutputHTMLFragment) throws SAXException {
         if (StringUtils.isNotEmpty(value)) {
-            if (html)
+            if (mustOutputHTMLFragment)
                 XFormsUtils.streamHTMLFragment(xmlReceiver, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
             else
                 xmlReceiver.characters(value.toCharArray(), 0, value.length());

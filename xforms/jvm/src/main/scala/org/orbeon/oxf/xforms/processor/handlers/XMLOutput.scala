@@ -65,7 +65,7 @@ object XMLOutput extends XMLReceiverSupport {
       implicit val _xmlReceiver = xmlReceiver
       for {
         lhhaType ← LHHA.values
-        lhhaProp ← Option(c.lhhaProperty(lhhaType))
+        lhhaProp = c.lhhaProperty(lhhaType)
         text     ← Option(lhhaProp.value())
       } locally {
         writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)

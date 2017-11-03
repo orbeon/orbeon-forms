@@ -139,7 +139,16 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean): Unit =
-    FormBuilder.setControlLHHAMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
+    FormBuilder.setControlLHHATMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def setControlLabelOrHintOrText(
+    controlName : String,
+    lht         : String,
+    value       : String,
+    isHTML      : Boolean
+  ): Unit =
+    FormBuilder.setControlLabelOrHintOrText(controlName, lht, value, isHTML)(FormBuilderDocContext())
 
   // Set the control's items for all languages
   //@XPathFunction
@@ -338,12 +347,12 @@ object FormBuilderXPathApi {
     FormBuilder.readValidationsAsXML(controlName)(FormBuilderDocContext()).toArray
 
   //@XPathFunction
-  def getControlHelpOrEmpty(controlName: String): String =
-    FormBuilder.getControlResourceOrEmpty(controlName, "help")(FormBuilderDocContext())
+  def getControlLhhOrEmpty(controlName: String, lhh: String): String =
+    FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
 
   //@XPathFunction
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String): Boolean =
-    FormBuilder.isControlLHHAHTMLMediatype(controlName, lhha)(FormBuilderDocContext())
+    FormBuilder.isControlLHHATHTMLMediatype(controlName, lhha)(FormBuilderDocContext())
 
   //@XPathFunction
   def findNextControlId(controlName: String, previousOrNext: String): Option[String] = {

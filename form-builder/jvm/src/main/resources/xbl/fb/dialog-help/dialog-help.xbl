@@ -30,7 +30,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
                 <xf:setvalue ref="control-name" value="frf:controlNameFromId(event('control-id'))"/>
-                <xf:setvalue ref="help"         value="fbf:getControlHelpOrEmpty(../control-name)"/>
+                <xf:setvalue ref="help"         value="fbf:getControlLhhOrEmpty(../control-name, 'help')"/>
 
                 <xxf:show dialog="dialog"/>
             </xbl:handler>

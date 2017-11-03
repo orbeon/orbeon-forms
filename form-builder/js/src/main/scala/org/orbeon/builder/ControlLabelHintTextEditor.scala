@@ -126,8 +126,8 @@ object ControlLabelHintTextEditor {
       Private.checkbox.tooltip(new JQueryTooltipConfig() {
         val title = $(".fb-message-lhha-checkbox").text()
       })
-      val lhha = Private.lhha
-      Private.textfield.attr("placeholder", $(s".fb-message-type-$lhha").text())
+      val labelTextOrHint = Private.labelOrHintOrText
+      Private.textfield.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
       // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
       resourceEditorCurrentLabelHint.css("visibility", "hidden")
       // Add class telling if this is a label or hint editor
@@ -144,9 +144,9 @@ object ControlLabelHintTextEditor {
         val newValue    = Private.getValue
         val isHTML      = Private.isHTML
 
-        RpcClient[FormBuilderRpcApi].controlUpdateLHHA(
+        RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
           controlId = controlId,
-          lhha      = Private.lhha,
+          lhha      = Private.labelOrHintOrText,
           value     = newValue,
           isHTML    = isHTML
         ).call() // ignoring the `Future` completion
@@ -198,16 +198,16 @@ object ControlLabelHintTextEditor {
         })
       }
 
-      // Read/write class telling us if the label/hint is in HTML, set in grid.xml
-      def lhha: String =
+      // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
+      def labelOrHintOrText: String =
         if      (resourceEditorCurrentLabelHint.is(".xforms-label"))             "label"
         else if (resourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) "text"
         else                                                                     "hint"
 
-      def htmlClass: String = "fb-" + lhha + "-is-html"
+      def htmlClass: String = "fb-" + labelOrHintOrText + "-is-html"
       def isLabelHintHtml: Boolean = resourceEditorCurrentControl.is("." + htmlClass)
       def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControl.toggleClass(htmlClass, isHtml)
-      def annotateWithLhhaClass(add: Boolean) = container.toggleClass("fb-label-editor-for-" + lhha, add)
+      def annotateWithLhhaClass(add: Boolean) = container.toggleClass("fb-label-editor-for-" + labelOrHintOrText, add)
 
       def labelHintValue: String =
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html()
@@ -263,7 +263,7 @@ object ControlLabelHintTextEditor {
       }
 
       def getValue: String =
-        if (lhha == "text") {
+        if (labelOrHintOrText == "text") {
             val content = tinyMceObject.getContent()
             // Workaround to TinyMCE issue, see
             // https://twitter.com/avernet/status/579031182605750272
@@ -273,7 +273,7 @@ object ControlLabelHintTextEditor {
         }
 
       def setValue(newValue: String): Unit =
-        if (lhha == "text") {
+        if (labelOrHintOrText == "text") {
             afterTinyMCEInitialized((_) ⇒ {
               tinyMceObject.setContent(newValue)
               // Workaround for resize not happening with empty values, see
@@ -285,13 +285,13 @@ object ControlLabelHintTextEditor {
           textfield.focus()
         }
 
-      def isHTML: Boolean = lhha == "text" || checkbox.is(":checked")
+      def isHTML: Boolean = labelOrHintOrText == "text" || checkbox.is(":checked")
 
       def startEdit(): Unit = {
         textfield.hide()
         checkbox.hide()
         if (tinyMceObject ne null) tinyMceObject.hide()
-        if (lhha == "text") {
+        if (labelOrHintOrText == "text") {
           setTinyMCEWidth()
           initTinyMCE()
           afterTinyMCEInitialized((_) ⇒ {
@@ -306,7 +306,7 @@ object ControlLabelHintTextEditor {
       }
 
       def endEdit(): Unit =
-        if (lhha == "text")
+        if (labelOrHintOrText == "text")
             // Reset height we might have placed on the explanation element inside the cell
             resourceEditorCurrentLabelHint.css("height", "")
     }

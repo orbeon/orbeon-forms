@@ -15,7 +15,7 @@ package org.orbeon.builder.rpc
 
 trait FormBuilderRpcApi {
 
-  def controlUpdateLHHA (controlId: String, lhha: String, value: String, isHTML: Boolean): Unit
+  def controlUpdateLabelOrHintOrText (controlId: String, lhha: String, value: String, isHTML: Boolean): Unit
 
   def controlDelete       (controlId: String): Unit
   def controlEditDetails  (controlId: String): Unit

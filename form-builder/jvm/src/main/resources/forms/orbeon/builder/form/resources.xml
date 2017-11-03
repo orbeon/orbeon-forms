@@ -324,6 +324,7 @@
             <tab-base><label>Basic Settings</label></tab-base>
             <tab-validations><label>Validations and Alerts</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
+            <tab-label-hint><label>Label and Hint</label></tab-label-hint>
             <tab-help><label>Help Message</label></tab-help>
             <control-name>
                 <label>Control Name</label>
@@ -502,6 +503,12 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
             </calculate>
+            <label>
+                <label>Control Label</label>
+            </label>
+            <hint>
+                <label>Control Hint</label>
+            </hint>
             <help>
                 <label>Help Message</label>
                 <hint>Displayed when help is activated</hint>
@@ -1339,6 +1346,7 @@
             <tab-base><label>Paramètres de base</label></tab-base>
             <tab-validations><label>Validations et alertes</label></tab-validations>
             <tab-formulas><label>Formules</label></tab-formulas>
+            <tab-label-hint><label>Libellé et suggestion</label></tab-label-hint>
             <tab-help><label>Message d'Aide</label></tab-help>
             <control-name>
                 <label>Nom du contrôle</label>
@@ -1517,6 +1525,12 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
             </calculate>
+            <label>
+                <label>Libellé du contrôle</label>
+            </label>
+            <hint>
+                <label>Suggestion associée au contrôle</label>
+            </hint>
             <help>
                 <label>Message d'aide</label>
                 <hint>Affiché lorsque l'aide est activée</hint>
@@ -2356,6 +2370,7 @@
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Elementnavn</label>
@@ -2535,6 +2550,12 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
@@ -3401,6 +3422,7 @@
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Название элемента</label>
@@ -3579,6 +3601,12 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
@@ -4446,6 +4474,7 @@
             <tab-base><label>Impostazioni di base</label></tab-base>
             <tab-validations><label>Convalide e avvisi</label></tab-validations>
             <tab-formulas><label>Formule</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Messaggio d'aiuto</label></tab-help>
             <control-name>
                 <label>Nome del controllo</label>
@@ -4624,6 +4653,12 @@
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Messaggio d'aiuto</label>
                 <hint>Visualizzato quando l'aiuto viene attivato</hint>
@@ -5481,8 +5516,9 @@
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
             <tab-base><label>Grundeinstellungen</label></tab-base>
-        <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
-        <tab-formulas><label>Formeln</label></tab-formulas>
+            <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
+            <tab-formulas><label>Formeln</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Hilfsnachricht</label></tab-help>
             <control-name>
                 <label>Steuerelementname</label>
@@ -5661,6 +5697,12 @@
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>XPath-Ausdruck</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Hilfsnachricht</label>
                 <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
@@ -6523,6 +6565,7 @@
             <tab-base><label>Perusasetukset</label></tab-base>
             <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
             <tab-formulas><label>Kaavat</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Ohjeviesti</label></tab-help>
             <control-name>
                 <label>Kontrollin nimi</label>
@@ -6701,6 +6744,12 @@
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Ohjeviesti</label>
                 <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
@@ -7561,6 +7610,7 @@
             <tab-base><label>Configuración Básica</label></tab-base>
             <tab-validations><label>Validaciones y Alertas</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Mensaje de Ayuda</label></tab-help>
             <control-name>
                 <label>Nombre del Control</label>
@@ -7739,6 +7789,12 @@
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Mensaje de Ayuda</label>
                 <hint>Se muestra cuando se activa la ayuda</hint>
@@ -8599,6 +8655,7 @@
             <tab-base><label>Configurações Básicas</label></tab-base>
             <tab-validations><label>Validações e Alertas</label></tab-validations>
             <tab-formulas><label>Fórmulas</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Mensagem de Ajuda</label></tab-help>
             <control-name>
                 <label>Nome do Controlo</label>
@@ -8777,6 +8834,12 @@
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Mensagem de Ajuda</label>
                 <hint>É mostrada quando a ajuda é activada</hint>
@@ -9643,6 +9706,7 @@
             <tab-base><label>Basinställningar</label></tab-base>
             <tab-validations><label>Valideringar och aviseringar</label></tab-validations>
             <tab-formulas><label>Formler</label></tab-formulas>
+            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
             <tab-help><label>Hjälp</label></tab-help>
             <control-name>
                 <label>Kontrollnamn</label>
@@ -9821,6 +9885,12 @@
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
             </calculate>
+            <label>
+                <label todo="true">[Control Label]</label>
+            </label>
+            <hint>
+                <label todo="true">[Control Hint]</label>
+            </hint>
             <help>
                 <label>Hjälpmeddelande</label>
                 <hint>Visas när hjälp är aktivt</hint>

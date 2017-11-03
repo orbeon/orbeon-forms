@@ -159,13 +159,16 @@
                 <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'default')"/>
                 <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'whitespace')"/>
 
-                <!-- Read help -->
+                <!-- Read Label/Hint/Help -->
                 <xf:setvalue
-                    ref="$i/help"
-                    value="fbf:getControlHelpOrEmpty($i/control-name)"/>
+                    iterate="$i/(label, hint, help)"
+                    ref="."
+                    value="fbf:getControlLhhOrEmpty($i/control-name, local-name())"/>
+
                 <xf:setvalue
-                    ref="$i/help/@isHTML"
-                    value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, 'help')) then 'true' else ''"/>
+                    iterate="$i/(label, hint, help)"
+                    ref="@isHTML"
+                    value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, local-name(..))) then 'true' else ''"/>
 
                 <!-- Set prev/next buttons -->
                 <xf:setvalue
@@ -274,6 +277,8 @@
                             (: Write MIPs :)
                             for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
                                 fbf:updateMipAsAttributeOnly($i/control-name, $mip, $i/*[name() = $mip]),
+                            for $lh in $i/(label, hint) return
+                                fbf:setControlLabelOrHintOrText($i/control-name, local-name($lh), $lh, $lh/@isHTML = 'true'),
                             (: Write help :)
                             fbf:setControlHelp($i/control-name, $i/help),
                             fbf:setControlLHHAMediatype($i/control-name, 'help', $i/help/@isHTML = 'true')
@@ -391,7 +396,9 @@
                         <default/>
                         <whitespace/>
 
-                        <help isHTML=""/>
+                        <label isHTML=""/>
+                        <hint  isHTML=""/>
+                        <help  isHTML=""/>
 
                         <prev-control-id/>
                         <next-control-id/>
@@ -984,6 +991,47 @@
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>
+                        <fr:tab id="label-hint-tab">
+                            <fr:label ref="$resources/dialog-control-details/tab-label-hint/label"/>
+                            <fr:grid id="label-hint-grid">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select ref="label/@isHTML" appearance="full">
+                                            <xf:item>
+                                                <xf:value>true</xf:value>
+                                                <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                            </xf:item>
+                                        </xf:select>
+                                        <xf:var name="is-html" value="label/@isHTML = 'true'"/>
+                                        <fr:tinymce ref="label[$is-html]">
+                                            <xf:label ref="$resources/dialog-control-details/label/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/label/hint"/>
+                                        </fr:tinymce>
+                                        <xf:textarea ref="label[not($is-html)]">
+                                            <xf:label ref="$resources/dialog-control-details/label/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/label/hint"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select ref="hint/@isHTML" appearance="full">
+                                            <xf:item>
+                                                <xf:value>true</xf:value>
+                                                <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                            </xf:item>
+                                        </xf:select>
+                                        <xf:var name="is-html" value="hint/@isHTML = 'true'"/>
+                                        <fr:tinymce ref="hint[$is-html]">
+                                            <xf:label ref="$resources/dialog-control-details/hint/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/hint/hint"/>
+                                        </fr:tinymce>
+                                        <xf:textarea ref="hint[not($is-html)]">
+                                            <xf:label ref="$resources/dialog-control-details/hint/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/hint/hint"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
                         <fr:tab id="help-tab">
                             <fr:label ref="$resources/dialog-control-details/tab-help/label"/>
                             <fr:grid id="help-grid">
@@ -995,7 +1043,6 @@
                                                 <xf:label ref="$resources/dialog-control-details/use-html"/>
                                             </xf:item>
                                         </xf:select>
-                                        <!-- Help message -->
                                         <xf:var name="is-html" value="help/@isHTML = 'true'"/>
                                         <fr:tinymce ref="help[$is-html]">
                                             <xf:label ref="$resources/dialog-control-details/help/label"/>

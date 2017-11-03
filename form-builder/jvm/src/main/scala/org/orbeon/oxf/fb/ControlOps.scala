@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -502,18 +503,29 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       control
   }
 
+  def setControlLabelOrHintOrText(
+    controlName : String,
+    lht         : String,
+    value       : String,
+    isHTML      : Boolean)(implicit
+    ctx         : FormBuilderDocContext
+  ): Unit = {
+    setControlResource(controlName, lht, value.trimAllToEmpty)
+    FormBuilder.setControlLHHATMediatype(controlName, lht, isHTML)
+  }
+
   // Find a control's LHHA (there can be more than one for alerts)
-  def getControlLHHA(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
-    findControlByName(ctx.formDefinitionRootElem, controlName).toList child ((if (lhha=="text") FR else XF) → lhha)
+  def getControlLHHAT(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+    findControlByName(ctx.formDefinitionRootElem, controlName).toList child ((if (lhha == "text") FR else XF) → lhha)
 
   // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
-  def isControlLHHAHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    hasHTMLMediatype(getControlLHHA(controlName, lhha))
+  def isControlLHHATHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
+    hasHTMLMediatype(getControlLHHAT(controlName, lhha))
 
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
-  def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Unit =
-    if (isHTML != isControlLHHAHTMLMediatype(controlName, lhha))
-      setHTMLMediatype(getControlLHHA(controlName, lhha), isHTML)
+  def setControlLHHATMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Unit =
+    if (isHTML != isControlLHHATHTMLMediatype(controlName, lhha))
+      setHTMLMediatype(getControlLHHAT(controlName, lhha), isHTML)
 
   // For a given control, whether the mediatype on itemset labels is HTML
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -538,7 +550,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val inDoc = ctx.formDefinitionRootElem
 
     val control  = findControlByName(inDoc, controlName).get
-    val existing = getControlLHHA(controlName, lhha)
+    val existing = getControlLHHAT(controlName, lhha)
 
     if (replace)
       delete(existing)

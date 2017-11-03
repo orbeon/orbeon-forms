@@ -25,7 +25,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   private val EditorIdPrefix   = "fb-lhh-editor-for-"
   private val EditorIdPrefixes = List("label", "hint") map (EditorIdPrefix + _ + '-')
 
-  def controlUpdateLHHA(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
+  def controlUpdateLabelOrHintOrText(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -39,8 +39,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       }
     )
 
-    XFormsAPI.setvalue(FormBuilder.currentResources / controlName / lhha, value)
-    FormBuilder.setControlLHHAMediatype(controlName, lhha, isHTML)
+    FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML)
   }
 
   def controlDelete(controlId: String): Unit = {

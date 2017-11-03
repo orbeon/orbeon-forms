@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.xml.SAXException
 
@@ -45,7 +46,7 @@ abstract class XFormsControlLifecyleHandler(
   repeating      : Boolean,
   forwarding     : Boolean
 ) extends
-  XFormsBaseHandlerXHTML2(
+  XFormsBaseHandlerXHTML(
     uri,
     localname,
     qName,
@@ -127,10 +128,10 @@ abstract class XFormsControlLifecyleHandler(
       getEffectiveId,
       getForEffectiveId(getEffectiveId),
       LHHA.Label,
-      if (XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) "span" else null,
+      XFormsBaseHandler.isStaticReadonly(currentControlOrNull) option "span",
       currentControlOrNull,
       isTemplate,
-      false
+      isExternal = false
     )
 
   @throws[SAXException]
@@ -141,10 +142,10 @@ abstract class XFormsControlLifecyleHandler(
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Alert,
-        null,
+        None,
         currentControlOrNull,
         isTemplate,
-        false
+        isExternal = false
       )
 
   @throws[SAXException]
@@ -155,10 +156,10 @@ abstract class XFormsControlLifecyleHandler(
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Hint,
-        null,
+        None,
         currentControlOrNull,
         isTemplate,
-        false
+        isExternal = false
       )
 
   @throws[SAXException]
@@ -169,10 +170,10 @@ abstract class XFormsControlLifecyleHandler(
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Help,
-        null,
+        None,
         currentControlOrNull,
         isTemplate,
-        false
+        isExternal = false
       )
 
   // Must be overridden by subclasses

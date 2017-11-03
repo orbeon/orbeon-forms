@@ -35,7 +35,7 @@ class XFormsLHHAHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML2(uri, localname, qName, attributes, matched, handlerContext, false, false) {
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false) {
 
   override def start(): Unit = {
 
@@ -114,10 +114,10 @@ class XFormsLHHAHandler(
               targetControlEffectiveId,
               forEffectiveIdOpt.orNull,
               lhhaType,
-              null,
+              None,
               xformsControlOpt.orNull,
               isTemplate,
-              true
+              isExternal = true
             )
 
           case _ ⇒

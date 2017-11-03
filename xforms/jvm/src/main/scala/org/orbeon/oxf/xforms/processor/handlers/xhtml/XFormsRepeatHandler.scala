@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.appendWithSpace
+import org.orbeon.oxf.xforms.processor.handlers.{OutputInterceptor, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
@@ -40,7 +40,11 @@ class XFormsRepeatHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = true, forwarding = true) {
 
   // Compute user classes only once for all iterations
-  private val userClasses = appendControlUserClasses(attributes, currentControlOrNull, new jl.StringBuilder).toString
+  private val userClasses = {
+    val sb = new jl.StringBuilder
+    appendControlUserClasses(attributes, currentControlOrNull)(sb)
+    sb.toString
+  }
 
   override def isMustOutputContainerElement = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
@@ -93,35 +97,31 @@ class XFormsRepeatHandler(
     // Shortcut function to output the delimiter
     outputDelimiter = outputInterceptor.outputDelimiter(savedOutput, _, _)
 
-    def appendClasses(sb: StringBuilder, classes: String): Unit = {
-      if (classes.nonEmpty) {
-        if (sb.nonEmpty)
-          sb += ' '
-        sb append classes // use append until Scala ++= is optimized
-      }
-    }
+    def appendClasses(classes: String)(implicit sb: jl.StringBuilder): Unit =
+      if (classes.nonEmpty)
+        appendWithSpace(classes)
 
-    def addDnDClasses(sb: StringBuilder): Unit = {
+    def addDnDClasses()(implicit sb: jl.StringBuilder): Unit = {
       val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
       if (Set("vertical", "horizontal")(dndAttribute)) {
 
-        appendClasses(sb, "xforms-dnd xforms-dnd-" + dndAttribute)
+        appendClasses("xforms-dnd xforms-dnd-" + dndAttribute)
 
         if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
-          appendClasses(sb, "xforms-dnd-over")
+          appendClasses("xforms-dnd-over")
       }
     }
 
     var bodyRepeated = false
 
-    def repeatBody(iteration: Int, classes: StringBuilder, generateTemplate: Boolean, repeatSelected: Boolean): Unit = {
+    def repeatBody(iteration: Int, generateTemplate: Boolean, repeatSelected: Boolean)(implicit sb: jl.StringBuilder): Unit = {
 
       if (isMustGenerateDelimiters) {
         // User and DnD classes
-        appendClasses(classes, userClasses)
-        addDnDClasses(classes)
+        appendClasses(userClasses)
+        addDnDClasses()
 
-        outputInterceptor.setAddedClasses(classes.toString)
+        outputInterceptor.setAddedClasses(sb.toString)
       }
 
       xformsHandlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
@@ -151,7 +151,7 @@ class XFormsRepeatHandler(
       val selectedClass = "xforms-repeat-selected-item-" + ((xformsHandlerContext.countParentRepeats % 4) + 1)
       val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
-      val addedClasses = new StringBuilder(200)
+      implicit val addedClasses = new jl.StringBuilder(200)
       for (i ← 1 to repeatControl.getSize) {
         // Delimiter: before repeat entries, except the first one which is output by generateFirstDelimiter()
         if (isMustGenerateDelimiters && i > 1)
@@ -169,10 +169,10 @@ class XFormsRepeatHandler(
         // Q: Could use handleMIPClasses()?
         val relevant = repeatControl.children(i - 1).isRelevant
         if (! relevant)
-          appendClasses(addedClasses, "xforms-disabled")
+          appendClasses("xforms-disabled")
 
         // Apply the content of the body for this iteration
-        repeatBody(i, addedClasses, generateTemplate = false, repeatSelected = selected)
+        repeatBody(i, generateTemplate = false, repeatSelected = selected)
       }
     }
 
@@ -183,10 +183,10 @@ class XFormsRepeatHandler(
         outputDelimiter("xforms-repeat-delimiter", null)
 
       // Determine classes to add on root elements and around root characters
-      val addedClasses = new StringBuilder(if (isTopLevelRepeat) "xforms-repeat-template" else "")
+      implicit val addedClasses = new jl.StringBuilder(if (isTopLevelRepeat) "xforms-repeat-template" else "")
 
       // Apply the content of the body for this iteration
-      repeatBody(0, addedClasses, generateTemplate = true, repeatSelected = false)
+      repeatBody(0, generateTemplate = true, repeatSelected = false)
     }
 
     // 3. Handle case where no delimiter was output by repeat iterations or template
@@ -195,7 +195,7 @@ class XFormsRepeatHandler(
       // the other delimiters)
       outputInterceptor.setForward(false)
       mustOutputFirstDelimiter = false
-      repeatBody(0, new StringBuilder, generateTemplate = true, repeatSelected = false)
+      repeatBody(0, generateTemplate = true, repeatSelected = false)(new jl.StringBuilder)
     }
 
     // Restore output

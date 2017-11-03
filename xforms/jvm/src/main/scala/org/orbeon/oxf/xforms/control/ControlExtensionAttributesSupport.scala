@@ -58,9 +58,6 @@ trait ControlExtensionAttributesSupport {
   def extensionAttributeValue(attributeName: QName) =
     evaluatedExtensionAttributes.get(attributeName)
 
-  final def jExtensionAttributeValue(attributeName: QName) =
-    evaluatedExtensionAttributes.get(attributeName).orNull
-
   // Add all non-null values to the given list of attributes, filtering by namespace URI
   // NOTE: The `class` attribute is excluded because handled separately.
   // NOTE: The `accept` attribute is also handled separately by the handler.

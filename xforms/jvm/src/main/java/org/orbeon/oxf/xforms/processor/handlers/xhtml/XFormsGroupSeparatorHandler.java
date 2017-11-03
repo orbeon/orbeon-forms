@@ -61,7 +61,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 appendControlUserClasses(getAttributes(), currentControlOrNull(), classes);
                 // NOTE: Could also use getInitialClasses(uri, localname, attributes, control), but then we get the
                 // xforms-group-appearance-xxforms-separator class. Is that desirable?
-                handleMIPClasses(classes, getPrefixedId(), currentControlOrNull()); // as of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
+                handleMIPClasses(getPrefixedId(), currentControlOrNull(), classes); // as of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
                 elementClasses = classes.toString();
             }
 

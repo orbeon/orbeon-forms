@@ -85,7 +85,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   private var _customMIPs = Map.empty[String, String]
   def customMIPs: Map[String, String] = _customMIPs
   def customMIPsClasses = customMIPs map { case (k, v) ⇒ k + '-' + v }
-  def jCustomMIPsClassesAsString = customMIPsClasses mkString " "
 
   override def onDestroy(): Unit = {
     super.onDestroy()
@@ -255,11 +254,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   def getBuiltinOrCustomTypeCSSClassOpt =
     (getBuiltinTypeNameOpt map ("xforms-type-" +)) orElse (getTypeLocalNameOpt map ("xforms-type-custom-" +))
-
-  // 1 Java caller
-  def getBuiltinOrCustomTypeCSSClassOrNull =
-    getBuiltinOrCustomTypeCSSClassOpt.orNull
-
   override def computeRelevant: Boolean = {
     // If parent is not relevant then we are not relevant either
     if (! super.computeRelevant)

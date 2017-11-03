@@ -77,10 +77,10 @@ class XXFormsComponentHandler(
             getEffectiveId,
             getForEffectiveId(getEffectiveId),
             LHHA.Label,
-            "span",
+            Some("span"),
             currentControlOrNull,
             isTemplate,
-            false
+            isExternal = false
           )
       }
     }

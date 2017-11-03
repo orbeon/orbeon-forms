@@ -71,8 +71,8 @@ class XFormsCaseHandler(
 
       // Classes on top-level elements and characters and on the first delimiter
       val elementClasses = {
-        val classes = new jl.StringBuilder
-        appendControlUserClasses(attributes, currentControlOrNull, classes)
+        implicit val classes = new jl.StringBuilder
+        appendControlUserClasses(attributes, currentControlOrNull)
         // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
         classes.toString
       }

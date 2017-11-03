@@ -621,10 +621,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 getEffectiveId(),
                 null,
                 LHHA$.MODULE$.jLabel(),
-                "span",                   // Make element name a span, as a label would need a `for`
+                scala.Option.apply("span"), // Make element name a span, as a label would need a `for`
                 currentControlOrNull(),
                 isTemplate(),
-                true                      // Pretend we're "external", so the element gets an id
+                true                        // Pretend we're "external", so the element gets an id
             );
         } else {
             super.handleLabel();

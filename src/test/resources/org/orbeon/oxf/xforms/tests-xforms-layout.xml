@@ -1633,7 +1633,7 @@
         <output name="response">
             <controls>
                 <xh:span id="xf-1" class="xforms-control xforms-input">
-                    <xh:label class="xforms-label" for="xf-1≡xforms-input-1">Foo
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="xf-1≡xforms-input-1">Foo
                         <xh:br/>Bar
                     </xh:label>
                     <xh:input id="xf-1≡xforms-input-1" type="text" name="xf-1≡xforms-input-1" value="" class="xforms-input-input"/>
@@ -2213,7 +2213,7 @@
         <output name="response">
             <controls>
                 <xh:span id="my-output" class="xforms-control xforms-output">
-                    <xh:label class="xforms-label" for="my-output≡≡c">
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="my-output≡≡c">
                         <xh:span>
                             <xh:span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</xh:span>
                             <xh:span>Pellentesque gravida scelerisque leo, vel
@@ -2740,11 +2740,11 @@
                     <xh:input id="my-input-1≡xforms-input-1" type="text" name="my-input-1≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
                 <xh:span id="my-input-2" class="xforms-control xforms-input">
-                    <xh:label class="xforms-label" for="my-input-2≡xforms-input-1">This is a <xh:b>bold</xh:b> value</xh:label>
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="my-input-2≡xforms-input-1">This is a <xh:b>bold</xh:b> value</xh:label>
                     <xh:input id="my-input-2≡xforms-input-1" type="text" name="my-input-2≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
                 <xh:span id="my-input-3" class="xforms-control xforms-input">
-                    <xh:label class="xforms-label" for="my-input-3≡xforms-input-1">"This is a <xh:b>bold</xh:b> value" then "This is a &lt;b&gt;bold&lt;/b&gt; value"</xh:label>
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="my-input-3≡xforms-input-1">"This is a <xh:b>bold</xh:b> value" then "This is a &lt;b&gt;bold&lt;/b&gt; value"</xh:label>
                     <xh:input id="my-input-3≡xforms-input-1" type="text" name="my-input-3≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
             </controls>

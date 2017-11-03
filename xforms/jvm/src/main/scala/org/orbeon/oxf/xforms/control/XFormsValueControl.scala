@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModelBinds}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
@@ -305,7 +306,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   // Can be overridden by subclasses
   def findAriaByControlEffectiveId: Option[String] =
-    Some(XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.CONTROL_CODE))
+    Some(XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode))
 
   protected def outputValueElement(
     attributesImpl : AttributesImpl,

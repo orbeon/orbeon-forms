@@ -33,7 +33,6 @@ import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.xforms.XFormsId;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -264,7 +263,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // For accessibility, label the group, since the control label doesn't apply to a single input
         final String role = isMultiple ? "group" : "radiogroup";
         containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, role);
-        final String labelId = getLHHACId(containingDocument, effectiveId, LHHA_CODES.get(LHHA$.MODULE$.jLabel()));
+        final String labelId = getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML$.MODULE$.LabelCode());
         containerAttributes.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelId);
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
 

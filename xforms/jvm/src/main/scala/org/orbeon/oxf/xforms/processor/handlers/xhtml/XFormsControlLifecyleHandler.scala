@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.CoreUtils._
 
 import scala.xml.SAXException
 
@@ -196,7 +196,7 @@ abstract class XFormsControlLifecyleHandler(
         "id",
         "id",
         XMLReceiverHelper.CDATA,
-        XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandler.CONTROL_CODE)
+        XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
       )
     containerAttributes
   }
@@ -204,7 +204,7 @@ abstract class XFormsControlLifecyleHandler(
   // Return the effective id of the element to which label/@for, etc. must point to.
   // Default: point to `foo$bar$$c.1-2-3`
   def getForEffectiveId(effectiveId: String): String =
-    XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandler.CONTROL_CODE)
+    XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode)
 
   private object Private {
 

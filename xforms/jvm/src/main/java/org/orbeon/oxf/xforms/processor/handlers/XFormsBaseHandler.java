@@ -36,16 +36,6 @@ import java.util.Map;
  */
 public abstract class XFormsBaseHandler extends ElementHandler {
 
-    public static final String CONTROL_CODE = "c";
-
-    public static final Map<LHHA, String> LHHA_CODES = new HashMap<LHHA, String>();
-    static {
-        LHHA_CODES.put(LHHA$.MODULE$.jLabel(),   "l");
-        LHHA_CODES.put(LHHA$.MODULE$.jHelp(),    "p");
-        LHHA_CODES.put(LHHA$.MODULE$.jHint(),    "t");
-        LHHA_CODES.put(LHHA$.MODULE$.jAlert(),   "a");
-    }
-
     private final boolean repeating;
     private final boolean forwarding;
 

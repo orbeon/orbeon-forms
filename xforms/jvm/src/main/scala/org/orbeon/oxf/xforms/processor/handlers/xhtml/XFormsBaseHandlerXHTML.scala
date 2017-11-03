@@ -18,13 +18,13 @@ import java.{lang ⇒ jl}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -389,6 +389,16 @@ abstract class XFormsBaseHandlerXHTML (
 
 object XFormsBaseHandlerXHTML {
 
+  val LHHACodes = Map[LHHA, String](
+    LHHA.Label → "l",
+    LHHA.Help  → "p",
+    LHHA.Hint  → "t",
+    LHHA.Alert → "a"
+  )
+
+  val ControlCode = "c"
+  val LabelCode   = LHHACodes(LHHA.Label)
+
   def appendWithSpace(s: String)(implicit sb: jl.StringBuilder): Unit = {
     if (sb.length > 0)
       sb.append(' ')
@@ -444,7 +454,7 @@ object XFormsBaseHandlerXHTML {
           "",
           "",
           "id",
-          XFormsBaseHandler.getLHHACId(handlerContext.getContainingDocument, targetControlEffectiveId, XFormsBaseHandler.LHHA_CODES.get(lhha))
+          XFormsBaseHandler.getLHHACId(handlerContext.getContainingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
         )
       } else {
         // Remove existing id attribute if any

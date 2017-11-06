@@ -503,16 +503,16 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label>Control Label</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label>Control Hint</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Help Message</label>
                 <hint>Displayed when help is activated</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Alert Message</label>
                 <hint>Displayed when the alert is active</hint>
@@ -1525,16 +1525,16 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label>Libellé du contrôle</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label>Suggestion associée au contrôle</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Message d'aide</label>
                 <hint>Affiché lorsque l'aide est activée</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Message d'alerte</label>
                 <hint>Affiché lorsque l'alerte est active</hint>
@@ -2550,16 +2550,16 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
-            </help>
+            </control-help>
             <alert>
                 <label todo="true">[Feilmelding]</label>
                 <hint todo="true">[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
@@ -3601,16 +3601,16 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
-            </help>
+            </control-help>
             <alert>
                 <label todo="true">[Сообщение об ошибке]</label>
                 <hint todo="true">[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
@@ -4653,16 +4653,16 @@
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Messaggio d'aiuto</label>
                 <hint>Visualizzato quando l'aiuto viene attivato</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Messaggio di avviso</label>
                 <hint>Visualizzato quando l'avviso é attivo</hint>
@@ -5697,16 +5697,16 @@
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>XPath-Ausdruck</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Hilfsnachricht</label>
                 <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Warnmeldung</label>
                 <hint>Wird angezeigt, falls die Warnungen aktiviert wurden</hint>
@@ -6744,16 +6744,16 @@
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>XPath-lauseke</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Ohjeviesti</label>
                 <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Virheviesti</label>
                 <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
@@ -7789,16 +7789,16 @@
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Mensaje de Ayuda</label>
                 <hint>Se muestra cuando se activa la ayuda</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Mensaje de Alerta</label>
                 <hint>Se muestra cuando se activa la alerta</hint>
@@ -8834,16 +8834,16 @@
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Mensagem de Ajuda</label>
                 <hint>É mostrada quando a ajuda é activada</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Mensagem de Alerta</label>
                 <hint>DÉ mostrada quando o alerta está activo</hint>
@@ -9885,16 +9885,16 @@
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>XPath-uttryck</hint>
             </calculate>
-            <label>
+            <control-label>
                 <label todo="true">[Control Label]</label>
-            </label>
-            <hint>
+            </control-label>
+            <control-hint>
                 <label todo="true">[Control Hint]</label>
-            </hint>
-            <help>
+            </control-hint>
+            <control-help>
                 <label>Hjälpmeddelande</label>
                 <hint>Visas när hjälp är aktivt</hint>
-            </help>
+            </control-help>
             <alert>
                 <label>Avisering</label>
                 <hint>Visas när avisering är aktiv</hint>

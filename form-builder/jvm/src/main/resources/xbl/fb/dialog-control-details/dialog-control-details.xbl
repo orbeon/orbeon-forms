@@ -1004,12 +1004,12 @@
                                         </xf:select>
                                         <xf:var name="is-html" value="label/@isHTML = 'true'"/>
                                         <fr:tinymce ref="label[$is-html]">
-                                            <xf:label ref="$resources/dialog-control-details/label/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/label/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-label/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
                                         </fr:tinymce>
                                         <xf:textarea ref="label[not($is-html)]">
-                                            <xf:label ref="$resources/dialog-control-details/label/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/label/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-label/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
@@ -1021,12 +1021,12 @@
                                         </xf:select>
                                         <xf:var name="is-html" value="hint/@isHTML = 'true'"/>
                                         <fr:tinymce ref="hint[$is-html]">
-                                            <xf:label ref="$resources/dialog-control-details/hint/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/hint/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
                                         </fr:tinymce>
                                         <xf:textarea ref="hint[not($is-html)]">
-                                            <xf:label ref="$resources/dialog-control-details/hint/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/hint/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
@@ -1045,12 +1045,12 @@
                                         </xf:select>
                                         <xf:var name="is-html" value="help/@isHTML = 'true'"/>
                                         <fr:tinymce ref="help[$is-html]">
-                                            <xf:label ref="$resources/dialog-control-details/help/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-help/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-help/hint"/>
                                         </fr:tinymce>
                                         <xf:textarea ref="help[not($is-html)]">
-                                            <xf:label ref="$resources/dialog-control-details/help/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
+                                            <xf:label ref="$resources/dialog-control-details/control-help/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-help/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>

@@ -134,6 +134,7 @@
                     name="static-row-count"
                     select="array:size($rows-array)"/>
 
+                <!-- Only used for the CSS class -->
                 <xsl:variable
                     name="static-col-count"
                     select="

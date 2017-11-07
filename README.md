@@ -155,7 +155,6 @@ This product includes software developed by the Apache Software Foundation
 - [Ant](http://ant.apache.org/)
 - [Avalon](http://avalon.apache.org/closed.html)
 - [Axis](http://axis.apache.org/)
-- [Batik](http://xmlgraphics.apache.org/batik/)
 - [Commons](http://commons.apache.org/)
 - [FOP](http://xmlgraphics.apache.org/fop/)
 - [HttpComponents](http://hc.apache.org/)

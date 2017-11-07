@@ -391,7 +391,12 @@
                 }
             }
 
-            // 1/1
+            // Formula obtained by entering values by hand and then matching the curve
+            .setWidth(@x){
+                width: 99.82504% + (-48.05144 - 99.82504)/(1 + pow((@x/0.0121377), 1.099765));
+            }
+
+             // 1/1
             .fr-grid-1 .fr-grid-td,
                 .fr-grid-2  .fr-grid-td[colspan =  "2"],
                 .fr-grid-3  .fr-grid-td[colspan =  "3"],
@@ -403,7 +408,7 @@
                 .fr-grid-9  .fr-grid-td[colspan =  "9"],
                 .fr-grid-10 .fr-grid-td[colspan = "10"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.65%;
+                    .setWidth(1/1);
                 }
             }
 
@@ -414,7 +419,7 @@
                 .fr-grid-8  .fr-grid-td[colspan = "4"],
                 .fr-grid-10 .fr-grid-td[colspan = "5"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 97.4%;
+                    .setWidth(1/2);
                 }
             }
 
@@ -423,7 +428,7 @@
                 .fr-grid-6 .fr-grid-td[colspan = "2"],
                 .fr-grid-9 .fr-grid-td[colspan = "3"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 96%;
+                    .setWidth(1/3);
                 }
             }
 
@@ -431,7 +436,7 @@
             .fr-grid-4,
                 .fr-grid-8 .fr-grid-td[colspan = "2"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 94.6%;
+                    .setWidth(1/4);
                 }
             }
 
@@ -439,7 +444,7 @@
             .fr-grid-4 .fr-grid-td[colspan = "3"],
             .fr-grid-8 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.25%;
+                    .setWidth(3/4);
                 }
             }
 
@@ -447,7 +452,7 @@
             .fr-grid-5,
                 .fr-grid-10 .fr-grid-td[colspan = "2"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 93.3%;
+                    .setWidth(1/5);
                 }
             }
 
@@ -455,7 +460,7 @@
             .fr-grid-5 .fr-grid-td[colspan = "2"],
                 .fr-grid-10 .fr-grid-td[colspan = "4"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 96.7%;
+                    .setWidth(2/5);
                 }
             }
 
@@ -463,7 +468,7 @@
             .fr-grid-5 .fr-grid-td[colspan = "3"],
                 .fr-grid-10 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 97.75%;
+                    .setWidth(3/5);
                 }
             }
 
@@ -471,14 +476,14 @@
             .fr-grid-5 .fr-grid-td[colspan = "4"],
                 .fr-grid-10 .fr-grid-td[colspan = "8"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.35%;
+                    .setWidth(4/5);
                 }
             }
 
             // 1/6
             .fr-grid-6 {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 91.8%;
+                    .setWidth(1/6);
                 }
             }
 
@@ -487,14 +492,14 @@
                 .fr-grid-3 .fr-grid-td[colspan = "2"],
                 .fr-grid-9 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98%;
+                    .setWidth(2/3);
                 }
             }
 
             // 5/6
             .fr-grid-6 .fr-grid-td[colspan = "5"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.45%;
+                    .setWidth(5/6);
                 }
             }
 
@@ -505,58 +510,62 @@
             // 1/8
             .fr-grid-8 {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 89.5%;
+                    .setWidth(1/8);
                 }
             }
 
             // 3/8
             .fr-grid-8 .fr-grid-td[colspan = "3"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 96.7%;
+                    .setWidth(3/8);
                 }
             }
 
             // 5/8
             .fr-grid-8 .fr-grid-td[colspan = "5"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98%;
+                    .setWidth(5/8);
                 }
             }
 
             // 7/8
             .fr-grid-8 .fr-grid-td[colspan = "7"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.6%;
+                    .setWidth(7/8);
                 }
             }
 
             // 1/10
             .fr-grid-10 {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 86.5%;
+                    .setWidth(1/10);
                 }
             }
 
             // 3/10
             .fr-grid-10 .fr-grid-td[colspan = "3"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 95.7%;
+                    .setWidth(3/10);
                 }
             }
 
             // 7/10
             .fr-grid-10 .fr-grid-td[colspan = "7"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.1%;
+                    .setWidth(7/10);
                 }
             }
 
             // 9/10
             .fr-grid-10 .fr-grid-td[colspan = "9"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.5%;
+                    .setWidth(9/10);
                 }
             }
+
+            //.fr-grid-12 .fr-grid-td[colspan = "3"] {
+            //    ???
+            //}
 
             // Bootstrap adds `content: " (" attr(href) ")"` and `content: " (" attr(title) ")"`
             a[href]:after, abbr[title]:after {

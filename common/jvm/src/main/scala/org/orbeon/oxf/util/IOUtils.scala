@@ -22,7 +22,7 @@ object IOUtils {
 
   private val CopyBufferSize = 8192
 
-  def copyStream(in: InputStream, out: OutputStream, progress: Long ⇒ Unit = _ ⇒ ()) = {
+  def copyStream(in: InputStream, out: OutputStream, progress: Long ⇒ Unit = _ ⇒ ()): Unit = {
 
     require(in ne null)
     require(out ne null)
@@ -39,7 +39,7 @@ object IOUtils {
     }
   }
 
-  def copyReader(in: Reader, out: Writer, progress: Long ⇒ Unit = _ ⇒ ()) = {
+  def copyReader(in: Reader, out: Writer, progress: Long ⇒ Unit = _ ⇒ ()): Unit = {
 
     require(in ne null)
     require(out ne null)
@@ -64,7 +64,7 @@ object IOUtils {
     }
 
   // Run a block and swallow any exception. Use only for things like close().
-  def runQuietly(block: ⇒ Unit) =
+  def runQuietly(block: ⇒ Unit): Unit =
     try block
     catch {
       case NonFatal(_) ⇒ // NOP

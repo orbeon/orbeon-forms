@@ -1,0 +1,50 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:script src="/xbl/orbeon/countdown/countdown.js"/>
+    <xbl:binding
+            id="fr-countdown"
+            element="fr|countdown"
+            xxbl:mode="lhha binding">
+
+        <xbl:template>
+            <xf:var name="secTotal" value="xxf:binding('fr-countdown')"/>
+            <xf:var name="min" value="floor($secTotal div 60)"/>
+            <xf:var name="sec" value="$secTotal mod 60"/>
+            <xf:var name="minPart" value="
+                if ($min > 0)
+                then concat(string($min), ':')
+                else ''"/>
+            <xf:var name="secPart" value="
+                if ($sec lt 10)
+                then concat('0', string($sec))
+                else string($sec)"/>
+
+            <xf:output value="concat($minPart, $secPart)">
+                <xf:action type="javascript" event="xforms-enabled">
+                    YAHOO.xbl.fr.Countdown.instance(this);
+                </xf:action>
+            </xf:output>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

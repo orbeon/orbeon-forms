@@ -98,13 +98,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
     val requestMethod =
       method match {
-        case GET     ⇒ new HttpGet(uri)
-        case POST    ⇒ new HttpPost(uri)
-        case HEAD    ⇒ new HttpHead(uri)
-        case OPTIONS ⇒ new HttpOptions(uri)
-        case PUT     ⇒ new HttpPut(uri)
-        case DELETE  ⇒ new HttpDelete(uri)
-        case TRACE   ⇒ new HttpTrace(uri)
+        case GET            ⇒ new HttpGet(uri)
+        case POST           ⇒ new HttpPost(uri)
+        case HEAD           ⇒ new HttpHead(uri)
+        case OPTIONS        ⇒ new HttpOptions(uri)
+        case PUT            ⇒ new HttpPut(uri)
+        case DELETE         ⇒ new HttpDelete(uri)
+        case TRACE          ⇒ new HttpTrace(uri)
+        case LOCK | UNLOCK  ⇒ throw new UnsupportedOperationException
       }
 
     val skipAuthorizationHeader = credentials.isDefined

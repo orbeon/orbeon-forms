@@ -385,7 +385,8 @@ object XFormsModelSubmissionBase {
         case "multipart-post"                                                      ⇒ "multipart/related"
         case "form-data-post"                                                      ⇒ "multipart/form-data"
         case "urlencoded-post"                                                     ⇒ "application/x-www-form-urlencoded"
-        case _ if httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT    ⇒ "application/xml"
+        case _ if httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT ||
+                  httpMethod == HttpMethod.LOCK || httpMethod == HttpMethod.UNLOCK ⇒ "application/xml"
         case _ if httpMethod == HttpMethod.GET  || httpMethod == HttpMethod.DELETE ⇒ "application/x-www-form-urlencoded"
       }
 

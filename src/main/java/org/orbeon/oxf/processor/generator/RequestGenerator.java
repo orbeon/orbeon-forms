@@ -275,30 +275,30 @@ public class RequestGenerator extends ProcessorImpl {
         }
     }
 
-    public static String urlForFileItem(FileItem fileItem) throws SAXException {
+    public static String urlForFileItemCreateIfNeeded(FileItem fileItem, int scope) throws SAXException {
         // Only a reference to the file is output (xs:anyURI)
         final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
-        final String uriExpiringWithRequest;
+        final String resultUri;
         if (!fileItem.isInMemory()) {
             // File must exist on disk since isInMemory() returns false
             final File file = diskFileItem.getStoreLocation();
-            uriExpiringWithRequest = file.toURI().toString();
+            resultUri = file.toURI().toString();
         } else {
             // File does not exist on disk, must convert
             // NOTE: Conversion occurs every time this method is called. Not optimal.
             try {
-                uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE, logger);
+                resultUri = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), scope, logger);
             } catch (IOException e) {
                 throw new OXFException(e);
             }
         }
 
-        return uriExpiringWithRequest;
+        return resultUri;
     }
 
     public static String writeURLFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
 
-        final String uriExpiringWithRequest = urlForFileItem(fileItem);
+        final String uriExpiringWithRequest = urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE);
 
         // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
         final String uriExpiringWithScope;

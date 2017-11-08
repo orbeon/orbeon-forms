@@ -13,23 +13,34 @@
   */
 package org.orbeon.oxf.xforms.upload
 
-import org.apache.commons.fileupload.{FileItem, FileItemHeadersSupport, UploadContext}
+import java.util.ServiceLoader
+
+import org.apache.commons.fileupload.disk.DiskFileItem
+import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
+import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.CollectionUtils.{collectByErasedType, _}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils.runQuietly
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
+import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
+import scala.util.{Failure, Success, Try}
+import scala.util.control.NonFatal
 
 // Separate checking logic for sanity and testing
 trait UploadCheckerLogic {
@@ -136,7 +147,8 @@ object UploaderServer {
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
-      headerEncoding = ExternalContext.StandardHeaderCharacterEncoding
+      headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
+      maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
     )
   }
 
@@ -163,6 +175,7 @@ object UploaderServer {
     // Mutable state
     private var uuidOpt     : Option[String]         = None
     private var progressOpt : Option[UploadProgress] = None
+    private var fileScanOpt : Option[FileScan]       = None
 
     def fieldReceived(name: String, value: String): Unit =
       if (name == "$uuid") {
@@ -177,6 +190,7 @@ object UploaderServer {
 
     def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes)
 
+    // Can throw
     def fileItemStarting(name: String, fileItem: FileItem): Option[MaximumSize] = {
 
       val uuid =
@@ -188,13 +202,20 @@ object UploaderServer {
       val (maxUploadSizeForControl, allowedMediatypeRangesForControl) =
         getUploadConstraintsForControl(uuid, name)
 
+      val headersOpt =
+        for {
+          headersSupport ← collectByErasedType[FileItemHeadersSupport](fileItem)
+          headers        ← Option(headersSupport.getHeaders)
+        } yield
+          headers
+
+
       // Handle max size
       locally {
         // This is `None` with Chrome and Firefox at least
         val untrustedPartContentLengthOpt =
           for {
-            headersSupport      ← collectByErasedType[FileItemHeadersSupport](fileItem)
-            headers             ← Option(headersSupport.getHeaders)
+            headers             ← headersOpt
             contentLengthString ← Option(headers.getHeader(Headers.ContentLength))
             contentLengthLong   ← NumericUtils.parseLong(contentLengthString)
           } yield
@@ -258,14 +279,37 @@ object UploaderServer {
         }
       }
 
+      fileScanProviderOpt foreach { fileScanProvider ⇒
+        fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
+          case Success(fs) ⇒ Some(fs)
+          case Failure(t)  ⇒ throw FileScanException(t.getMessage)
+        }
+      }
+
       Some(maxUploadSizeForControl)
     }
 
-    def updateProgress(current: Long): Unit =
-      progressOpt foreach (_.receivedSize += current)
+    // Can throw
+    def updateProgress(b: Array[Byte], off: Int, len: Int): Unit = {
 
-    def fileItemState(state: UploadState): Unit =
+      progressOpt foreach (_.receivedSize += len)
+
+      fileScanOpt foreach { fileScan ⇒
+        withFileScanCall(fileScan.bytesReceived(b, off, len))
+      }
+    }
+
+    // Can throw
+    def fileItemState(state: UploadState): Unit = {
+
+      state match {
+        case UploadState.Completed(fileItem) ⇒ fileScanOpt foreach (fileScan ⇒ withFileScanCall(fileScan.complete(fileFromFileItemCreateIfNeeded(fileItem))))
+        case UploadState.Interrupted(_)      ⇒ runQuietly(fileScanOpt foreach (_.abort())) // TODO: maybe log?
+        case _ ⇒
+      }
+
       progressOpt foreach (_.state = state)
+    }
 
     def interrupted(): Unit = {
       // - don't remove `UploadProgress` objects from the session
@@ -273,18 +317,20 @@ object UploaderServer {
       for (sessionKey ← sessionKeys)
         runQuietly (
           getUploadProgress(sessionKey)
-          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed ) ⇒ p }
+          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) ⇒ p }
           foreach (_.state = UploadState.Interrupted(None))
         )
     }
 
-    def getUploadProgress(sessionKey: String): Option[UploadProgress] =
+    private def getUploadProgress(sessionKey: String): Option[UploadProgress] =
       session.getAttribute(sessionKey) collect {
         case progress: UploadProgress ⇒ progress
       }
   }
 
   private object Private {
+
+    val Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
 
     val UploadProgressSessionKey = "orbeon.upload.progress."
 
@@ -297,5 +343,39 @@ object UploaderServer {
         if (currentSize > maxSize)
           Multipart.throwSizeLimitExceeded(maxSize, currentSize)
     }
+
+    def convertFileItemHeaders(headers: FileItemHeaders) =
+      for (name ← headers.getHeaderNames.asScala.to[List])
+        yield name → headers.getHeaders(name).asScala.to[List]
+
+    // The file will expire with the request
+    // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first
+    // place, so this should never create a file but just use the one from the `DiskItem`. One unclear
+    // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
+    // is written.
+    def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
+      new java.io.File(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE))
+
+    def withFileScanCall(block: ⇒ FileScanStatus): FileScanStatus =
+      Try(block) match {
+        case Failure(t)                     ⇒ throw FileScanException(t.getMessage)
+        case Success(FileScanStatus.Reject) ⇒ throw FileScanException("File scan rejected uploaded content")
+        case Success(FileScanStatus.Error)  ⇒ throw FileScanException("File scan returned an error")
+        case Success(FileScanStatus.Accept) ⇒ FileScanStatus.Accept
+      }
+
+    lazy val fileScanProviderOpt: Option[FileScanProvider] =
+      try {
+        Option(ServiceLoader.load(classOf[FileScanProvider])) flatMap { serviceLoader ⇒
+          serviceLoader.iterator.asScala.nextOption() |!> { provider ⇒
+            Logger.info(s"Initializing file scan provider `${provider.getClass.getName}`")
+            provider.init()
+          }
+        }
+      } catch {
+        case NonFatal(t) ⇒
+          Logger.error(s"Failed to obtain file scan provider:\n${OrbeonFormatter.format(t)}")
+          None
+      }
   }
 }

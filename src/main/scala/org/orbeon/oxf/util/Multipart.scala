@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.util
 
+import java.io.OutputStream
+
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload._
-import org.apache.commons.fileupload.disk.DiskFileItemFactory
+import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
@@ -31,19 +33,20 @@ import org.orbeon.oxf.util.IOUtils._
 import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal
 
-case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype])
-  extends FileUploadException
+case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends FileUploadException
+case class FileScanException           (message: String)                                           extends FileUploadException
 
 sealed trait Reason
 object Reason {
   case class SizeReason     (permitted: Long,                actual: Long)              extends Reason
   case class MediatypeReason(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends Reason
+  case class FileScanReason (message: String)                                           extends Reason
 }
 
 sealed trait UploadState { def name: String }
 object UploadState {
   case object Started                             extends UploadState { val name = "started" }
-  case object Completed                           extends UploadState { val name = "completed" }
+  case class  Completed(fileItem: DiskFileItem)   extends UploadState { val name = "completed" }
   case class  Interrupted(reason: Option[Reason]) extends UploadState { val name = "interrupted" }
 }
 
@@ -56,10 +59,9 @@ case class UploadProgress(
 )
 
 trait MultipartLifecycle {
-
   def fieldReceived(name: String, value: String)         : Unit
   def fileItemStarting(name: String, fileItem: FileItem) : Option[MaximumSize]
-  def updateProgress(current: Long)                      : Unit
+  def updateProgress(b: Array[Byte], off: Int, len: Int) : Unit
   def fileItemState(state: UploadState)                  : Unit
   def interrupted()                                      : Unit
 }
@@ -88,12 +90,13 @@ object Multipart {
 
     val maxSize = MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse LimitedSize(0)
 
-    parseMultipartRequest(uploadContext, None, maxSize, headerEncoding) match {
+    // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
+    parseMultipartRequest(uploadContext, None, maxSize, headerEncoding, RequestGenerator.getMaxMemorySizeProperty) match {
       case (nameValues, None) ⇒
 
         // Add a listener to destroy file items when the pipeline context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter {
-          override def contextDestroyed(success: Boolean) = quietlyDeleteFileItems(nameValues)
+        pipelineContext.addContextListener(new PipelineContext.ContextListener {
+          def contextDestroyed(success: Boolean) = quietlyDeleteFileItems(nameValues)
         })
 
         combineValues[String, AnyRef, Array](nameValues).toMap
@@ -113,15 +116,12 @@ object Multipart {
     uploadContext  : UploadContext,
     lifecycleOpt   : Option[MultipartLifecycle],
     maxSize        : MaximumSize,
-    headerEncoding : String
+    headerEncoding : String,
+    maxMemorySize  : Int
   ): (List[(String, AnyRef)], Option[Throwable]) = {
 
     require(uploadContext ne null)
     require(headerEncoding ne null)
-
-    // Read properties
-    // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-    val maxMemorySize = RequestGenerator.getMaxMemorySizeProperty
 
     val servletFileUpload = new ServletFileUpload(new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory))
 
@@ -198,7 +198,7 @@ object Multipart {
 
         try {
 
-          val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName)
+          val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName).asInstanceOf[DiskFileItem]
           try {
 
             // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
@@ -210,10 +210,10 @@ object Multipart {
             }
 
             val maxSizeForSpecificFileItemOpt =
-              lifecycleOpt flatMap (_.fileItemStarting(fieldName, fileItem))
+              lifecycleOpt flatMap (_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`
 
             copyStream(
-              in       = maxSizeForSpecificFileItemOpt map (
+              in  = maxSizeForSpecificFileItemOpt map (
                 new LimiterInputStream(
                   fis.openStream,
                   _,
@@ -221,8 +221,22 @@ object Multipart {
                 )
               ) getOrElse
                 fis.openStream,
-              out      = fileItem.getOutputStream,
-              progress = (lifecycleOpt map (l ⇒ l.updateProgress _)) getOrElse (_ ⇒ ())
+              out = new OutputStream {
+
+                val fios = fileItem.getOutputStream
+
+                // We know that this is not called by `copyStream`
+                def write(b: Int) = throw new IllegalStateException
+
+                // We know that this is the only `write` method called by `copyStream`
+                override def write(b: Array[Byte], off: Int, len: Int) = {
+                  lifecycleOpt foreach (_.updateProgress(b, off, len)) // can throw `FileScanException`
+                  fios.write(b, off, len)
+                }
+
+                override def flush() = fios.flush()
+                override def close() = fios.close()
+              }
             )
           } catch {
             // Clean-up FileItem right away in case of failure
@@ -231,7 +245,7 @@ object Multipart {
               throw t
           }
 
-          lifecycleOpt foreach (_.fileItemState(UploadState.Completed))
+          lifecycleOpt foreach (_.fileItemState(UploadState.Completed(fileItem))) // can throw `FileScanException`
           fieldName → fileItem
         } catch {
           case NonFatal(t) ⇒
@@ -239,8 +253,9 @@ object Multipart {
               UploadState.Interrupted(
                Option(Exceptions.getRootThrowable(t))
                collect {
-                 case root: SizeLimitExceededException   ⇒ Reason.SizeReason(root.getPermittedSize, root.getActualSize)
-                 case root: DisallowedMediatypeException ⇒ Reason.MediatypeReason(root.permitted, root.actual)
+                 case root: SizeLimitExceededException                ⇒ Reason.SizeReason(root.getPermittedSize, root.getActualSize)
+                 case DisallowedMediatypeException(permitted, actual) ⇒ Reason.MediatypeReason(permitted, actual)
+                 case FileScanException(message)                      ⇒ Reason.FileScanReason(message)
                }
               )
             ))

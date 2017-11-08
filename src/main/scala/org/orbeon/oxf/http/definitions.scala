@@ -203,6 +203,7 @@ object StatusCode {
   val Forbidden             = 403
   val BadRequest            = 400
   val NotFound              = 404
+  val Conflict              = 409
   val Gone                  = 410
   val RequestEntityTooLarge = 413
   val Locked                = 423

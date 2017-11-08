@@ -524,8 +524,19 @@
                                 'fr-fr-resources'
                             ),
                             (
+                                (: NOTE: As of 2017-11-09 this is not used by the message. :)
                                 event('permitted'),
                                 event('actual')
+                            )
+                        )
+                    else if (event('error-type') = 'file-scan-error') then
+                        xxf:format-message(
+                            xxf:r(
+                                'detail.messages.upload-error-file-scan',
+                                'fr-fr-resources'
+                            ),
+                            (
+                                event('message')
                             )
                         )
                     else

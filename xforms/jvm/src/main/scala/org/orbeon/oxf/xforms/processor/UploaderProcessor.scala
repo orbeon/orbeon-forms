@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileItem
+import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -43,8 +44,14 @@ class UploaderProcessor extends ProcessorImpl {
                   // Get size before renaming below
                   val size = fileItem.getSize
 
+                  // If there is a `FileScanProvider`, a `File` is obtained from the `DiskFileItem` separately. If by
+                  // any chance a new file is created on disk at that time, it will be deleted separately as the request
+                  // completes. Here again we would create a new request-expired file, before renaming it and making
+                  // sure it expires with the session only.
                   val sessionURL =
-                    NetUtils.renameAndExpireWithSession(RequestGenerator.urlForFileItem(fileItem), XFormsServer.logger).toURI.toString
+                    NetUtils.renameAndExpireWithSession(
+                      RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE), XFormsServer.logger
+                    ).toURI.toString
 
                   (name, fileItem, sessionURL, size)
               }
@@ -74,11 +81,19 @@ class UploaderProcessor extends ProcessorImpl {
 
               NodeConversions.elemToSAX(response, xmlReceiver)
 
-            case (nameValues, someThrowable @ Some(_)) ⇒
+            case (nameValues, someThrowable @ Some(t)) ⇒
               // NOTE: There is no point sending a response, see:
               // https://github.com/orbeon/orbeon-forms/issues/985
               Multipart.quietlyDeleteFileItems(nameValues)
-              throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
+
+              t match {
+                case e: FileScanException ⇒
+                  throw HttpStatusCodeException(StatusCode.Conflict, throwable = someThrowable) // unclear which status code makes the most sense
+                case _: SizeLimitExceededException | _: FileSizeLimitExceededException ⇒
+                  throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
+                case _ ⇒
+                  throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)
+              }
           }
         }
       }

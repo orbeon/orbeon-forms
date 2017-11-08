@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, File}
 
+import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, UploadContext}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.LimitedSize
@@ -29,6 +30,7 @@ import org.orbeon.oxf.util.Reason.SizeReason
 import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
+import org.scalactic.Equality
 import org.scalatest.FunSpecLike
 
 import scala.collection.{mutable ⇒ m}
@@ -86,7 +88,8 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
           }
         ),
         MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
-        ExternalContext.StandardHeaderCharacterEncoding
+        ExternalContext.StandardHeaderCharacterEncoding,
+        0
       )
 
     (pairs map { case (a, b) ⇒ a → convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
@@ -110,10 +113,26 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
           assert((expectedPairs, None) === newRead(session, limit))
         }
 
+        implicit val uploadProgressEq =
+          new Equality[UploadProgress] {
+            def areEqual(a: UploadProgress, b: Any) =
+              b match {
+                case b: UploadProgress ⇒
+                  a.fieldName    == b.fieldName    &&
+                  a.expectedSize == b.expectedSize &&
+                  a.receivedSize == b.receivedSize &&
+                  a.state.name   == b.state.name // only check on the state name for now as we can't compare the nested `DiskFileItem`
+                case _ ⇒ false
+              }
+          }
+
+        val DummyFileItem = new DiskFileItem("foo", "image/jpeg", false, "bar.jpg", 10000, null)
+        DummyFileItem.getOutputStream // otherwise `toString` can fail with an NPE
+
         it("must set completed `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed)) ===
-              UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName)
+            UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed(DummyFileItem)) ===
+              UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName).get
           )
         }
       }

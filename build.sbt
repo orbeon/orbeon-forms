@@ -605,6 +605,13 @@ lazy val xformsJS: Project = xforms.js
     )
   )
 
+lazy val fileScanExample = (project in file("file-scan-example"))
+  .dependsOn(xformsJVM)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "file-scan-example"
+  )
+
 lazy val nodeFacades = (project in file("node-facades"))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings: _*)

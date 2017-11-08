@@ -393,10 +393,6 @@
         <class name="org.orbeon.oxf.processor.converter.TextConverter"/>
     </processor>
 
-    <processor name="oxf:xslfo-converter">
-        <class name="org.orbeon.oxf.processor.converter.XSLFOConverter"/>
-    </processor>
-
     <processor name="oxf:qname-converter">
         <class name="org.orbeon.oxf.processor.converter.QNameConverter"/>
     </processor>
@@ -453,10 +449,6 @@
 
     <processor name="oxf:text-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.TextSerializer"/>
-    </processor>
-
-    <processor name="oxf:xslfo-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
     <processor name="oxf:legacy-file-serializer">
@@ -648,11 +640,6 @@
 
     <processor name="oxf:pipeline-trace">
         <class name="org.orbeon.oxf.processor.SessionTraceProcessor"/>
-    </processor>
-
-    <!-- These mappings are kept only for backward compatibility -->
-    <processor name="oxf:pdf-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
     <processor name="oxf:sql-input">

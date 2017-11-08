@@ -260,42 +260,6 @@
                 <p:input name="data" href="#converted"/>
             </p:processor>
         </p:when>
-        <!-- XSL-FO detection. Use the XSL-FO serializer -->
-        <p:when test="p:property('oxf.epilogue.process-xslfo') and /fo:root">
-            <p:processor name="oxf:xslfo-converter">
-                <p:input name="config"><config/></p:input>
-                <p:input name="data" href="#xformed-data"/>
-                <p:output name="data" id="converted"/>
-            </p:processor>
-            <p:processor name="oxf:http-serializer">
-                <p:input name="config">
-                    <config>
-                        <header>
-                            <name>Content-Disposition</name>
-                            <value>attachment; filename=document.pdf</value>
-                        </header>
-                        <!-- NOTE: XSL-FO converter specifies application/pdf content-type -->
-                    </config>
-                </p:input>
-                <p:input name="data" href="#converted"/>
-            </p:processor>
-        </p:when>
-        <!-- SVG detection -->
-        <p:when test="p:property('oxf.epilogue.process-svg') and /svg:svg">
-            <p:processor name="oxf:svg-converter">
-                <p:input name="config"><config/></p:input>
-                <p:input name="data" href="#xformed-data"/>
-                <p:output name="data" id="converted"/>
-            </p:processor>
-            <p:processor name="oxf:http-serializer">
-                <p:input name="config">
-                    <config>
-                        NOTE: SVG converter specifies content-type, usually image/png
-                    </config>
-                </p:input>
-                <p:input name="data" href="#converted"/>
-            </p:processor>
-        </p:when>
         <!-- Atom detection -->
         <p:when test="/atom:feed">
             <p:processor name="oxf:xml-converter">

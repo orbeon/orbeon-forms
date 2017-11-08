@@ -156,11 +156,9 @@ This product includes software developed by the Apache Software Foundation
 - [Avalon](http://avalon.apache.org/closed.html)
 - [Axis](http://axis.apache.org/)
 - [Commons](http://commons.apache.org/)
-- [FOP](http://xmlgraphics.apache.org/fop/)
 - [HttpComponents](http://hc.apache.org/)
 - [log4j](http://logging.apache.org/log4j/)
 - [Mime4j](http://james.apache.org/mime4j/)
-- [POI](http://poi.apache.org/)
 - [Xerces](http://xerces.apache.org/xerces-j/)
 
 In addition, this product includes the following software:
@@ -183,7 +181,6 @@ In addition, this product includes the following software:
 - [ScalaTest](http://www.scalatest.org/)
 - TagSoup
 - [Sun Multi-Schema XML Validator](https://msv.java.net/)
-- [YUI Compressor](https://yui.github.io/yuicompressor/)
 - [YUI Library](http://yuilibrary.com/)
 
 This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided

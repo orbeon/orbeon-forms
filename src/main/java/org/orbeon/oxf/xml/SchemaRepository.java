@@ -19,7 +19,6 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.XQuery.XQueryProcessor;
 import org.orbeon.oxf.processor.converter.QNameConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
-import org.orbeon.oxf.processor.converter.XSLFOConverter;
 import org.orbeon.oxf.processor.execute.ExecuteProcessor;
 import org.orbeon.oxf.processor.file.FileProcessor;
 import org.orbeon.oxf.processor.generator.*;
@@ -82,7 +81,6 @@ public class SchemaRepository {
 
         // Converter schemas
         SCHEMAS.put(XMLConverter.STANDARD_TEXT_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/standard-text-converter-config.rng");
-        SCHEMAS.put(XSLFOConverter.XSLFO_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/xslfo-converter-config.rng");
         SCHEMAS.put(QNameConverter.QNAME_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/qname-converter-config.rng");
 
         SCHEMAS.put(ScopeProcessorBase.ScopeConfigNamespaceUri(), PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");

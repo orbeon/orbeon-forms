@@ -18,7 +18,6 @@ import java.io.{File, OutputStream}
 import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.apache.fop.util.bitmap.JAIMonochromeBitmapConverter
 import org.icepdf.core.pobjects.{Page, Document ⇒ ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
 import org.orbeon.dom.{Element ⇒ DOM4JElement}
@@ -26,6 +25,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.pdf.fop.JAIMonochromeBitmapConverter
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils._
@@ -226,8 +226,7 @@ object PDFToImage {
 
           val imageToWrite =
             if (hasBlackAndWhiteTIFFCompressionType) {
-              // This calls code from Apache FOP. If we don't want the entire FOP dependency we could
-              // easily take over just a few files from Apache FOP.
+              // JAIMonochromeBitmapConverter is copied over from Apache FOP
               val converter = new JAIMonochromeBitmapConverter |!> (_.setHint("quality", "true"))
               val newImage = converter.convertToMonochrome(bufferedImage)
               bufferedImage.flush() // unclear whether needed

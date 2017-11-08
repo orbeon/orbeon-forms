@@ -84,6 +84,30 @@
     </xsl:template>
 
     <xsl:template match="fr:body">
+
+        <xf:var name="lease-enabled"           value="xxf:instance('fr-persistence-instance')/lease-enabled = 'true'"/>
+        <xf:var name="lease-state-elem"        value="xxf:instance('fr-persistence-instance')/lease-state "/>
+        <xf:var name="show-lease-current-user" value="    $lease-enabled  and $lease-state-elem = 'current-user'"/>
+        <xf:var name="show-lease-other-user"   value="    $lease-enabled  and $lease-state-elem = 'other-user'"/>
+        <xf:var name="show-lease-relinquished" value="    $lease-enabled  and $lease-state-elem = 'relinquished'"/>
+        <xf:var name="show-form-data"          value="not($lease-enabled) or  $lease-state-elem = 'current-user'"/>
+
+        <xf:group
+            ref="if ($show-lease-current-user) then . else ()"
+            class="alert alert-info"
+            xxf:element="div"
+        >
+
+            You own a lease on this document for another
+            <fr:countdown ref="42"/>
+            <xf:trigger>
+                <xf:label>Relinquish lease</xf:label>
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Renew lease</xf:label>
+            </xf:trigger>
+        </xf:group>
+
         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
         <xf:group
             id="fr-form-group"
@@ -93,7 +117,10 @@
                 concat('fr-validation-mode-', $validation-mode)
             }"
             model="fr-form-model"
-            ref="instance('fr-form-instance')"
+            ref="
+                if ($show-form-data)
+                then instance('fr-form-instance')
+                else ()"
             xxf:validation-mode="{$validation-mode}"
         >
             <xsl:if test="$is-full-update">

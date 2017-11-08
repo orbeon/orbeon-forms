@@ -158,7 +158,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                         value="false"/>
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
-    <property as="xs:boolean" name="oxf.fr.detail.lease.enabled.*.*"                            value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.lease.enabled.*.*"                            value="false"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                         value="10"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>

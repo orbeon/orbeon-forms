@@ -35,6 +35,7 @@
     <xf:var name="autosave-elem"        value="$persistence-instance/autosave"/>
     <xf:var name="lease-enabled-elem"   value="$persistence-instance/lease-enabled"/>
     <xf:var name="lease-state-elem"     value="$persistence-instance/lease-state"/>
+    <xf:var name="lease-duration-elem"  value="$persistence-instance/lease-duration"/>
 
     <xf:var
         name="autosave-delay"
@@ -172,16 +173,35 @@
 
             <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
             <xf:action if="not($mode = ('new', 'test')) and not($is-new-id) and not($is-submit)">
+
                 <xf:var name="lease-enabled" value="xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.'))"/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">
+
                     <!-- If the lease feature is enabled but we have not user information, issue a 403 -->
                     <xf:action if="xxf:is-blank(xxf:username())" type="xpath">
                         frf:sendError(403)
                     </xf:action>
+
+                    <!-- Keep track of user and lease duration -->
                     <xf:setvalue ref="instance('fr-lockinfo-request')/d:owner/fr:username" value="xxf:username()"/>
+                    <xf:setvalue
+                        ref="$lease-duration-elem"
+                        value="xxf:property(string-join(('oxf.fr.detail.lease.duration.*', $app, $form), '.'))"/>
+                    <xf:action iterate="frf:xpathOrbeonRolesFromCurrentRequest()">
+                        <xf:var name="role" value="."/>
+                        <xf:var
+                            name="role-duration"
+                            value="xxf:property(string-join(('oxf.fr.detail.lease.duration', $role, $app, $form), '.'))"/>
+                        <xf:setvalue
+                            if="$role-duration > $lease-duration-elem"
+                            ref="$lease-duration-elem"
+                            value="$role-duration"/>
+                    </xf:action>
+
                     <xf:send submission="fr-acquire-lease-submission"/>
                 </xf:action>
+
                 <xf:action if="not($lease-enabled)">
                     <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
                 </xf:action>
@@ -553,11 +573,12 @@
     >
         <xf:header>
             <xf:name>Timeout</xf:name>
-            <xf:value>Second-600</xf:value>
+            <xf:value value="concat('Second-', $lease-duration-elem * 60)"/>
         </xf:header>
         <xf:action event="xforms-submit-done">
             <!-- We acquired a lease: proceed with loading the document -->
             <xf:setvalue ref="$lease-state-elem">current-user</xf:setvalue>
+            <xf:setvalue ref="$persistence-instance/lease-acquired-time" value="current-dateTime()"/>
             <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
         </xf:action>
         <xf:action event="xforms-submit-error">
@@ -686,6 +707,8 @@
             <lease-enabled/>
             <!-- When lease-enabled = 'true': other-user | current-user | relinquished -->
             <lease-state/>
+            <lease-duration/>
+            <lease-acquired-time/>
         </save>
     </xf:instance>
 

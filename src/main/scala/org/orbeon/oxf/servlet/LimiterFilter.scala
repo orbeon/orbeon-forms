@@ -119,6 +119,5 @@ class LimiterFilter extends Filter {
 }
 
 private object LimiterFilter {
-  val LoggerName = "org.orbeon.filter.limiter"
-  val Logger     = LoggerFactory.getLogger(LoggerName)
+  val Logger = LoggerFactory.getLogger("org.orbeon.filter.limiter")
 }

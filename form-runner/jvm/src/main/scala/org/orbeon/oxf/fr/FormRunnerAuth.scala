@@ -88,8 +88,7 @@ object FormRunnerAuth {
 
   private object Private {
 
-    val LoggerName = "org.orbeon.auth"
-    val Logger     = LoggerFactory.getLogger(LoggerName)
+    val Logger = LoggerFactory.getLogger("org.orbeon.auth")
 
     val PropertyPrefix                      = "oxf.fr.authentication."
 

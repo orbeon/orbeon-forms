@@ -27,8 +27,7 @@ import scala.annotation.tailrec
 // See also: https://github.com/orbeon/orbeon-forms/issues/2186
 object DependencyAnalyzer {
 
-  val LoggerName = "org.orbeon.xforms.analysis.calculate"
-  val Logger     = LoggerFactory.getLogger(LoggerName)
+  val Logger = LoggerFactory.getLogger("org.orbeon.xforms.analysis.calculate")
 
   private case class BindDetails(staticBind: StaticBind, name: Option[String], refs: Set[String])
 

@@ -22,6 +22,7 @@ import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.LimiterInputStream
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
@@ -366,6 +367,8 @@ object UploaderServer {
 
     lazy val fileScanProviderOpt: Option[FileScanProvider] =
       try {
+        Version.instance.requirePEFeature("File scan API")
+
         Option(ServiceLoader.load(classOf[FileScanProvider])) flatMap { serviceLoader ⇒
           serviceLoader.iterator.asScala.nextOption() |!> { provider ⇒
             Logger.info(s"Initializing file scan provider `${provider.getClass.getName}`")

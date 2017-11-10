@@ -535,7 +535,7 @@ object ToolboxOps {
       sectionElem ← xcvElem / XcvEntry.Control.entryName firstChildOpt *
       sectionName ← getControlNameOpt(sectionElem)
     } yield
-      namesToRenameForPaste(xcvElem, prefix, suffix) filter (_._1 != sectionName)
+      namesToRenameForPaste(xcvElem, prefix, suffix, Set(sectionName))
 
   def namesToRenameForClipboard(
     prefix      : String,
@@ -543,19 +543,20 @@ object ToolboxOps {
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
     readXcvFromClipboard map
-      (namesToRenameForPaste(_, prefix, suffix))
+      (namesToRenameForPaste(_, prefix, suffix, Set.empty))
 
   private def namesToRenameForPaste(
     xcvElem : NodeInfo,
     prefix  : String,
-    suffix  : String)(implicit
+    suffix  : String,
+    ignore  : Set[String])(implicit
     ctx     : FormBuilderDocContext
   ): Seq[(String, String, Boolean)] = {
 
     require(xcvElem.isElement)
 
     val xcvNamesInUse =
-      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem), xcvElem / XcvEntry.Holder.entryName / * headOption) toList
+      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem), xcvElem / XcvEntry.Holder.entryName / * headOption) -- ignore toList
 
     def toNameWithPrefixSuffix(name: String) = prefix + name + suffix
 
@@ -726,7 +727,7 @@ object ToolboxOps {
   ): Unit =
     xcvFromSectionWithTemplate(containerId) foreach { xcvElem ⇒
       deleteSectionById(containerId)
-      pasteSectionGridFromXcv(xcvElem, prefix, suffix, None)
+      pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)))
     }
 
   // Paste control from the clipboard
@@ -741,8 +742,8 @@ object ToolboxOps {
 
       if (IsGrid(controlElem) || IsSection(controlElem)) {
 
-        if (namesToRenameForPaste(xcvElem, "", "") forall (! _._3))
-          pasteSectionGridFromXcv(xcvElem, "", "", None)
+        if (namesToRenameForPaste(xcvElem, "", "", Set.empty) forall (! _._3))
+          pasteSectionGridFromXcv(xcvElem, "", "", None, Set.empty)
         else
           XFormsAPI.dispatch(
             name       = "fb-show-dialog",
@@ -760,7 +761,8 @@ object ToolboxOps {
     xcvElem        : NodeInfo,
     prefix         : String,
     suffix         : String,
-    insertPosition : Option[ContainerPosition])(implicit
+    insertPosition : Option[ContainerPosition],
+    ignore         : Set[String])(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 
@@ -772,7 +774,7 @@ object ToolboxOps {
     locally {
 
       val oldToNewNames =
-        namesToRenameForPaste(xcvElem, prefix, suffix) collect {
+        namesToRenameForPaste(xcvElem, prefix, suffix, ignore) collect {
           case (oldName, newName, _) if oldName != newName ⇒ oldName → newName
         } toMap
 

@@ -530,7 +530,7 @@ object FormBuilderXPathApi {
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.readXcvFromClipboard foreach
-      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None))
+      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty))
   }
 
   //@XPathFunction
@@ -544,7 +544,8 @@ object FormBuilderXPathApi {
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           "",
           "",
-          Some(position)
+          Some(position),
+          Set.empty
         )
       case UndoDeleteControl(position, xcvElem) ⇒
         ToolboxOps.pasteSingleControlFromXcv(

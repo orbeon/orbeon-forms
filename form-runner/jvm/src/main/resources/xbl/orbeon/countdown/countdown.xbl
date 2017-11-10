@@ -27,6 +27,9 @@
             element="fr|countdown"
             xxbl:mode="lhha binding">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/countdown/countdown.css"/>
+        </xbl:resources>
         <xbl:template>
             <xf:var name="secTotal" value="xxf:binding('fr-countdown')"/>
             <xf:var name="min" value="floor($secTotal div 60)"/>

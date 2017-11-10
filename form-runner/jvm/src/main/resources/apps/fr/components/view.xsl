@@ -85,8 +85,9 @@
 
     <xsl:template match="fr:body">
 
-        <xf:var name="lease-enabled"           value="xxf:instance('fr-persistence-instance')/lease-enabled = 'true'"/>
-        <xf:var name="lease-state-elem"        value="xxf:instance('fr-persistence-instance')/lease-state "/>
+        <xf:var name="persistence-instance"    value="xxf:instance('fr-persistence-instance')"/>
+        <xf:var name="lease-enabled"           value="$persistence-instance/lease-enabled = 'true'"/>
+        <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
         <xf:var name="show-lease-current-user" value="    $lease-enabled  and $lease-state-elem = 'current-user'"/>
         <xf:var name="show-lease-other-user"   value="    $lease-enabled  and $lease-state-elem = 'other-user'"/>
         <xf:var name="show-lease-relinquished" value="    $lease-enabled  and $lease-state-elem = 'relinquished'"/>
@@ -95,11 +96,28 @@
         <xf:group
             ref="if ($show-lease-current-user) then . else ()"
             class="alert alert-info"
-            xxf:element="div"
-        >
+            xxf:element="div">
 
-            You own a lease on this document for another
-            <fr:countdown ref="42"/>
+            <xf:var
+                name="time-left-duration"
+                value="
+                    xs:dateTime($persistence-instance/lease-acquired-time) -
+                    current-dateTime() +
+                    xs:dayTimeDuration(concat('PT', $persistence-instance/lease-duration, 'M'))
+                "/>
+            <xf:var
+                name="time-left-seconds"
+                value="
+                    seconds-from-duration($time-left-duration) +
+                    minutes-from-duration($time-left-duration)*60 +
+                    hours-from-duration($time-left-duration)*60*60
+                "/>
+
+            <xh:p>
+                You own a lease on this document for another
+                <fr:countdown ref="round($time-left-seconds)"/>.
+            </xh:p>
+
             <xf:trigger>
                 <xf:label>Relinquish lease</xf:label>
             </xf:trigger>

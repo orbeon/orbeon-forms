@@ -64,10 +64,17 @@
     }, 100);
 
     YAHOO.xbl.fr.Countdown.prototype = {
+
+        outputEl: null,
+
         init: function() {
-            var outputEl = $(this.container).find(".xforms-output-output").get(0);
-            if (! _.contains(outputEls, outputEl))
-                outputEls.push(outputEl);
+            this.outputEl = $(this.container).find(".xforms-output-output").get(0);
+            if (! _.contains(outputEls, this.outputEl))
+                outputEls.push(this.outputEl);
+        },
+
+        durationChanged: function(newValue) {
+            $(this.outputEl).text(newValue);
         }
     };
 })();

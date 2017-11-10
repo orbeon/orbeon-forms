@@ -31,9 +31,23 @@
             <xbl:style src="/xbl/orbeon/countdown/countdown.css"/>
         </xbl:resources>
         <xbl:template>
-            <xf:var name="secTotal" value="xxf:binding('fr-countdown')"/>
-            <xf:var name="min" value="floor($secTotal div 60)"/>
-            <xf:var name="sec" value="$secTotal mod 60"/>
+
+            <xf:var
+                id="end-time"
+                name="end-time"
+                value="xxf:binding('fr-countdown')"/>
+            <xf:var
+                name="time-left-duration"
+                value="$end-time - current-dateTime()"/>
+            <xf:var
+                name="time-left-seconds"
+                value="round(
+                    seconds-from-duration($time-left-duration) +
+                    minutes-from-duration($time-left-duration)*60 +
+                    hours-from-duration($time-left-duration)*60*60
+                )"/>
+            <xf:var name="min" value="floor($time-left-seconds div 60)"/>
+            <xf:var name="sec" value="$time-left-seconds mod 60"/>
             <xf:var name="minPart" value="
                 if ($min > 0)
                 then concat(string($min), ':')
@@ -42,12 +56,22 @@
                 if ($sec lt 10)
                 then concat('0', string($sec))
                 else string($sec)"/>
+            <xf:var name="time-left-min-sec" value="concat($minPart, $secPart)"/>
 
-            <xf:output value="concat($minPart, $secPart)">
-                <xf:action type="javascript" event="xforms-enabled">
+            <xf:output value="$time-left-min-sec">
+                <xf:action event="xforms-enabled" type="javascript">
                     YAHOO.xbl.fr.Countdown.instance(this);
                 </xf:action>
             </xf:output>
+            <xf:output value="$end-time" class="xforms-disabled">
+                <xf:action event="xforms-value-changed" type="javascript">
+                    <xf:param name="newValue" value="$time-left-min-sec"/>
+                    <xf:body>
+                        YAHOO.xbl.fr.Countdown.instance(this).durationChanged(newValue);
+                    </xf:body>
+                </xf:action>
+            </xf:output>
+
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

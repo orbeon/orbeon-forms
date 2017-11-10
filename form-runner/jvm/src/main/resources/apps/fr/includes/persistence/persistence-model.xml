@@ -198,7 +198,7 @@
                             ref="$lease-duration-elem"
                             value="$role-duration"/>
                     </xf:action>
-
+                    <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
                     <xf:send submission="fr-acquire-lease-submission"/>
                 </xf:action>
 
@@ -579,7 +579,10 @@
             <!-- We acquired a lease: proceed with loading the document -->
             <xf:setvalue ref="$lease-state-elem">current-user</xf:setvalue>
             <xf:setvalue ref="$persistence-instance/lease-acquired-time" value="current-dateTime()"/>
-            <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
+            <xf:action if="$persistence-instance/lease-load-document = 'true'">
+                <xf:setvalue ref="$persistence-instance/lease-load-document"/>
+                <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
+            </xf:action>
         </xf:action>
         <xf:action event="xforms-submit-error">
             <!-- We failed to acquire a lease -->
@@ -707,6 +710,7 @@
             <lease-enabled/>
             <!-- When lease-enabled = 'true': other-user | current-user | relinquished -->
             <lease-state/>
+            <lease-load-document/>
             <lease-duration/>
             <lease-acquired-time/>
         </save>

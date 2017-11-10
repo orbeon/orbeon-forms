@@ -99,30 +99,22 @@
             xxf:element="div">
 
             <xf:var
-                name="time-left-duration"
+                name="lease-end-time"
                 value="
-                    xs:dateTime($persistence-instance/lease-acquired-time) -
-                    current-dateTime() +
+                    xs:dateTime($persistence-instance/lease-acquired-time) +
                     xs:dayTimeDuration(concat('PT', $persistence-instance/lease-duration, 'M'))
                 "/>
-            <xf:var
-                name="time-left-seconds"
-                value="
-                    seconds-from-duration($time-left-duration) +
-                    minutes-from-duration($time-left-duration)*60 +
-                    hours-from-duration($time-left-duration)*60*60
-                "/>
-
-            <xh:p>
+            <xh:div>
                 You own a lease on this document for another
-                <fr:countdown ref="round($time-left-seconds)"/>.
-            </xh:p>
+                <fr:countdown ref="$lease-end-time"/>.
+            </xh:div>
 
             <xf:trigger>
                 <xf:label>Relinquish lease</xf:label>
             </xf:trigger>
             <xf:trigger>
                 <xf:label>Renew lease</xf:label>
+                <xf:send event="DOMActivate" submission="fr-acquire-lease-submission"/>
             </xf:trigger>
         </xf:group>
 

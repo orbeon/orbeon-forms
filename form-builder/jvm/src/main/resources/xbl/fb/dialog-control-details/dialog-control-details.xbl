@@ -586,6 +586,10 @@
                     ref="prev-control-id, next-control-id"
                     readonly="xxf:is-blank()"/>
 
+                <xf:bind
+                    ref="label | hint | help"
+                    xxf:whitespace="trim"/>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -1007,10 +1011,10 @@
                                             <xf:label ref="$resources/dialog-control-details/control-label/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
                                         </fr:tinymce>
-                                        <xf:textarea ref="label[not($is-html)]">
+                                        <xf:input ref="label[not($is-html)]">
                                             <xf:label ref="$resources/dialog-control-details/control-label/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
-                                        </xf:textarea>
+                                        </xf:input>
                                     </xh:td>
                                     <xh:td>
                                         <xf:select ref="hint/@isHTML" appearance="full">
@@ -1024,10 +1028,10 @@
                                             <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
                                         </fr:tinymce>
-                                        <xf:textarea ref="hint[not($is-html)]">
+                                        <xf:input ref="hint[not($is-html)]">
                                             <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
-                                        </xf:textarea>
+                                        </xf:input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

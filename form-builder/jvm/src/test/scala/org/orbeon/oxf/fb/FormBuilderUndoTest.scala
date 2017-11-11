@@ -102,9 +102,6 @@ class FormBuilderUndoTest
             assert(initialContainerCount    === countContainers)
             assert(initialNonContainerCount === countNonContainers)
           }
-
-//          debugDumpDocument("xxx")
-
         }
       }
     }

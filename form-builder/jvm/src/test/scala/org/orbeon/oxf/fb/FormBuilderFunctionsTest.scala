@@ -39,6 +39,7 @@ class FormBuilderFunctionsTest
 
   val SectionsRepeatsDoc      = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
   val SectionsGridsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids-repeats.xhtml"
+  val SectionTemplatesDoc     = "oxf:/org/orbeon/oxf/fb/template-with-section-templates.xhtml"
 
   val Control1 = "control-1"
   val Control2 = "control-2"
@@ -512,6 +513,53 @@ class FormBuilderFunctionsTest
         }
       }
     }
+  }
+
+  describe("Section template merging") {
+
+    val SectionNames = 1 to 4 map ("section-" +)
+    val SectionIds = SectionNames map (_ + "-section")
+
+    def assertSectionsKeepName()(implicit ctx: FormBuilderDocContext) =
+      for (sectionName ← SectionNames)
+        assert(findControlByName(ctx.formDefinitionRootElem, sectionName).isDefined)
+
+    it("Must merge all section templates without errors") {
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
+
+        assertSectionsKeepName()
+
+        for (sectionId ← SectionIds)
+          ToolboxOps.containerMerge(sectionId, "", "")
+
+        assertSectionsKeepName()
+      }
+    }
+
+    it("Must merge all section templates using a prefix") {
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
+
+        assertSectionsKeepName()
+
+        // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
+        // section templates and using `my-` would cause conflicts.
+        for (sectionId ← SectionIds)
+          ToolboxOps.containerMerge(sectionId, "my-", "")
+
+        assertSectionsKeepName()
+
+        for ((sectionName, expectedCount) ← SectionNames.zip(List(1, 3, 0, 0))) {
+
+          val nestedControlsStartingWithMyCount =
+            findNestedControls(findControlByName(ctx.formDefinitionRootElem, sectionName).get) flatMap
+            getControlNameOpt count
+            (_ startsWith "my-")
+
+          assert(expectedCount === nestedControlsStartingWithMyCount)
+        }
+      }
+    }
+
   }
 
 }

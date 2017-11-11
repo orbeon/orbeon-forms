@@ -53,7 +53,7 @@ class GridOpsTest
       withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
         val gridElem =
-          ctx.formDefinitionRootElem descendant NodeInfoCell.GridTest head
+          ctx.bodyElem descendant NodeInfoCell.GridTest head
 
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)
@@ -85,7 +85,7 @@ class GridOpsTest
       withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
 
         val gridElem =
-          ctx.formDefinitionRootElem descendant NodeInfoCell.GridTest head
+          ctx.bodyElem descendant NodeInfoCell.GridTest head
 
         // Keep updating mapping so that initial cells keep their letter names
         var mapping = createAndAssertInitialGrid(gridElem)

@@ -18,10 +18,29 @@
 
     <p:param type="output" name="data"/>
 
+    <p:processor name="oxf:identity">
+        <p:input name="data">
+            <request>
+                <app>orbeon</app>
+                <form>library</form>
+                <document/>
+                <mode/>
+            </request>
+        </p:input>
+        <p:output name="data" id="global-parameters"/>
+    </p:processor>
+
+    <p:processor  name="oxf:unsafe-xslt">
+        <p:input  name="config"     href="oxf:/forms/orbeon/builder/service/form-to-xbl.xsl"/>
+        <p:input  name="data"       href="template-global-library.xhtml"/>
+        <p:input  name="parameters" href="#global-parameters"/>
+        <p:output name="data"       id="global-template-xbl"/>
+    </p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="oxf:/forms/orbeon/builder/service/toolbox.xsl"/>
         <p:input name="data"><dummy/></p:input>
-        <p:input name="global-template-xbl"><dummy/></p:input>
+        <p:input name="global-template-xbl" href="#global-template-xbl"/>
         <p:input name="custom-template-xbl"><dummy/></p:input>
         <p:input name="request">
             <request>

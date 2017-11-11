@@ -25,6 +25,7 @@
     <xbl:binding
             id="fr-countdown"
             element="fr|countdown"
+            xxf:external-events="fr-countdown-ended"
             xxbl:mode="lhha binding">
 
         <xbl:resources>
@@ -33,12 +34,11 @@
         <xbl:template>
 
             <xf:var
-                id="end-time"
                 name="end-time"
                 value="xxf:binding('fr-countdown')"/>
             <xf:var
                 name="time-left-duration"
-                value="$end-time - current-dateTime()"/>
+                value="xs:dateTime($end-time) - current-dateTime()"/>
             <xf:var
                 name="time-left-seconds"
                 value="round(
@@ -48,22 +48,19 @@
                 )"/>
             <xf:var name="min" value="floor($time-left-seconds div 60)"/>
             <xf:var name="sec" value="$time-left-seconds mod 60"/>
-            <xf:var name="minPart" value="
-                if ($min > 0)
-                then concat(string($min), ':')
-                else ''"/>
+            <xf:var name="minPart" value="string($min)"/>
             <xf:var name="secPart" value="
                 if ($sec lt 10)
                 then concat('0', string($sec))
                 else string($sec)"/>
-            <xf:var name="time-left-min-sec" value="concat($minPart, $secPart)"/>
+            <xf:var name="time-left-min-sec" value="concat($minPart, ':', $secPart)"/>
 
             <xf:output value="$time-left-min-sec">
                 <xf:action event="xforms-enabled" type="javascript">
                     YAHOO.xbl.fr.Countdown.instance(this);
                 </xf:action>
             </xf:output>
-            <xf:output value="$end-time" class="xforms-disabled">
+            <xf:output value="$end-time" class="fr-countdown-end-time">
                 <xf:action event="xforms-value-changed" type="javascript">
                     <xf:param name="newValue" value="$time-left-min-sec"/>
                     <xf:body>

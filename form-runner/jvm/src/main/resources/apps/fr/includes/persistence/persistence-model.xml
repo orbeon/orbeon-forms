@@ -578,7 +578,12 @@
         <xf:action event="xforms-submit-done">
             <!-- We acquired a lease: proceed with loading the document -->
             <xf:setvalue ref="$lease-state-elem">current-user</xf:setvalue>
-            <xf:setvalue ref="$persistence-instance/lease-acquired-time" value="current-dateTime()"/>
+            <xf:setvalue
+                ref="$persistence-instance/lease-end-time"
+                value="
+                    current-dateTime() +
+                    xs:dayTimeDuration(concat('PT', $persistence-instance/lease-duration, 'M'))
+                "/>
             <xf:action if="$persistence-instance/lease-load-document = 'true'">
                 <xf:setvalue ref="$persistence-instance/lease-load-document"/>
                 <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
@@ -590,6 +595,12 @@
             <xf:setvalue ref="$lease-state-elem">other-user</xf:setvalue>
         </xf:action>
     </xf:submission>
+    <xf:submission
+        id="fr-relinquish-lease-submission"
+        method="unlock"
+        ref="instance('fr-lockinfo-request')"
+        resource="/fr/service/persistence/crud/{$app}/{$form}/data/{$document}/data.xml"
+        replace="none"/>
 
     <!-- Get document -->
     <xf:submission
@@ -712,7 +723,7 @@
             <lease-state/>
             <lease-load-document/>
             <lease-duration/>
-            <lease-acquired-time/>
+            <lease-end-time/>
         </save>
     </xf:instance>
 

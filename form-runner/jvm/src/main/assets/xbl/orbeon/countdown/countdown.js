@@ -40,9 +40,8 @@
     function serializeDuration(secTotal) {
         var min = Math.floor(secTotal / 60);
         var sec = secTotal % 60;
-        var minPart = min > 0 ? min + ":" : "";
         var secPart = sec < 10 ? "0" + sec : sec;
-        return minPart + secPart;
+        return min + ":" + secPart;
     }
 
     setInterval(function() {
@@ -57,6 +56,10 @@
                     if (newSec >= 0) {
                         var newDuration = serializeDuration(newSec);
                         $(outputEl).text(newDuration);
+                    }
+                    if (newSec == 0) {
+                        var containerId = ORBEON.jQuery(outputEl).parents(".xbl-fr-countdown").attr("id");
+                        ORBEON.xforms.Document.dispatchEvent(containerId, "fr-countdown-ended");
                     }
                 }
             });

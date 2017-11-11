@@ -94,28 +94,60 @@
         <xf:var name="show-form-data"          value="not($lease-enabled) or  $lease-state-elem = 'current-user'"/>
 
         <xf:group
-            ref="if ($show-lease-current-user) then . else ()"
-            class="alert alert-info"
-            xxf:element="div">
+            ref="if ($lease-enabled) then . else ()"
+            class="alert alert-info fr-lease"
+            xxf:element="div"
+        >
+            <xh:i class="fa fa-lock" aria-hidden="true"/>
 
-            <xf:var
-                name="lease-end-time"
-                value="
-                    xs:dateTime($persistence-instance/lease-acquired-time) +
-                    xs:dayTimeDuration(concat('PT', $persistence-instance/lease-duration, 'M'))
-                "/>
-            <xh:div>
-                You own a lease on this document for another
-                <fr:countdown ref="$lease-end-time"/>.
+            <xh:div class="fr-lease-message">
+                <xf:switch caseref="$lease-state-elem">
+                    <xf:case value="'current-user'">
+                        <xh:div>
+                            You own a lease on this document for another
+                            <fr:countdown ref="$persistence-instance/lease-end-time">
+                                <xf:setvalue
+                                    event="fr-countdown-ended"
+                                    ref="$lease-state-elem"
+                                    value="'relinquished'"/>
+                            </fr:countdown>.
+                        </xh:div>
+                    </xf:case>
+                    <xf:case value="'relinquished'">
+                        You don't own the lease on this document anymore.
+                    </xf:case>
+                </xf:switch>
             </xh:div>
 
-            <xf:trigger>
-                <xf:label>Relinquish lease</xf:label>
-            </xf:trigger>
-            <xf:trigger>
-                <xf:label>Renew lease</xf:label>
-                <xf:send event="DOMActivate" submission="fr-acquire-lease-submission"/>
-            </xf:trigger>
+            <xh:div class="fr-lease-buttons">
+                <xf:switch caseref="$lease-state-elem">
+                    <xf:case value="'current-user'">
+                        <xf:trigger>
+                            <xf:label>Relinquish lease</xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:send submission="fr-relinquish-lease-submission"/>
+                                <xf:setvalue ref="$lease-state-elem">relinquished</xf:setvalue>
+                            </xf:action>
+                            <xf:send event="DOMActivate" submission="fr-relinquish-lease-submission"/>
+                        </xf:trigger>
+                        <xf:trigger>
+                            <xf:label>Renew lease</xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:send submission="fr-acquire-lease-submission"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xf:case>
+                    <xf:case value="'relinquished'">
+                        <xf:trigger>
+                            <xf:label>Try to acquire lease</xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
+                                <xf:send submission="fr-acquire-lease-submission"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xf:case>
+                </xf:switch>
+            </xh:div>
         </xf:group>
 
         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->

@@ -23,7 +23,8 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:d="DAV:">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
     <xsl:variable name="fluid"          select="$view/@fluid = 'true'"/>
@@ -116,12 +117,20 @@
                     <xf:case value="'relinquished'">
                         You don't own the lease on this document anymore.
                     </xf:case>
+                    <xf:case value="'other-user'">
+                        Another user, with username
+                        <xf:output value="xxf:instance('fr-lockinfo-response')/d:owner/fr:username"/>,
+                        currently owns the lease on this document.
+                    </xf:case>
                 </xf:switch>
             </xh:div>
 
             <xh:div class="fr-lease-buttons">
-                <xf:switch caseref="$lease-state-elem">
-                    <xf:case value="'current-user'">
+                <xf:switch caseref="
+                        if ($lease-state-elem = 'current-user')
+                        then 'has-lease'
+                        else 'does-not-have-lease'">
+                    <xf:case value="'has-lease'">
                         <xf:trigger>
                             <xf:label>Relinquish lease</xf:label>
                             <xf:action event="DOMActivate">
@@ -137,7 +146,7 @@
                             </xf:action>
                         </xf:trigger>
                     </xf:case>
-                    <xf:case value="'relinquished'">
+                    <xf:case value="'does-not-have-lease'">
                         <xf:trigger>
                             <xf:label>Try to acquire lease</xf:label>
                             <xf:action event="DOMActivate">

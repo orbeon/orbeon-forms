@@ -1,5 +1,4 @@
 -J-Xmx3G
 -J-Xss1M
--J-XX:MaxMetaspaceSize=1G
 -J-XX:+CMSClassUnloadingEnabled
 -J-XX:+UseConcMarkSweepGC

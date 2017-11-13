@@ -17,7 +17,7 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
+import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
 // YUI definitions. Eventually this will go away, see:
@@ -59,7 +59,6 @@ trait CustomEvent extends js.Object {
   ): Unit = js.native
 }
 
-@ScalaJSDefined
 trait YUICallback extends js.Object {
   val upload   : js.Function
   val failure  : js.Function

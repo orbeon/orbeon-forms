@@ -87,7 +87,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // "ThisBuild is a Scope encompassing all projects"
-scalaVersion                in ThisBuild := "2.11.8"
+scalaVersion                in ThisBuild := "2.11.11"
 organization                in ThisBuild := "org.orbeon"
 version                     in ThisBuild := orbeonVersionFromProperties.value
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
@@ -292,6 +292,18 @@ lazy val commonSettings = Seq(
   copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains, matchRawJarName = true)
 ) ++ unmanagedJarsSettings
 
+lazy val commonScalaJsSettings = Seq(
+
+  skip in packageJSDependencies  := false,
+
+  scalaJSUseMainModuleInitializer in Compile := true,
+  scalaJSUseMainModuleInitializer in Test    := false,
+
+  scalacOptions ++= {
+    if (scalaJSVersion.startsWith("0.6.")) Seq("-P:scalajs:sjsDefinedByDefault") else Nil
+  }
+)
+
 lazy val assetsSettings = Seq(
 
   // We require node anyway for Scala.js testing
@@ -445,6 +457,7 @@ lazy val formRunnerJS = formRunner.js
     commonJS,
     xformsJS % "test->test;compile->compile"
   )
+  .settings(commonScalaJsSettings)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -452,7 +465,6 @@ lazy val formRunnerJS = formRunner.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
@@ -460,9 +472,6 @@ lazy val formRunnerJS = formRunner.js
 
     // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
     unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
-
-    scalaJSUseMainModuleInitializer in Compile := true,
-    scalaJSUseMainModuleInitializer in Test    := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
@@ -506,6 +515,7 @@ lazy val formBuilderJS: Project = formBuilder.js
     xformsJS % "test->test;compile->compile",
     formRunnerJS
   )
+  .settings(commonScalaJsSettings)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -513,15 +523,11 @@ lazy val formBuilderJS: Project = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
     test in Test := {},
-
-    scalaJSUseMainModuleInitializer in Compile := true,
-    scalaJSUseMainModuleInitializer in Test    := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
@@ -570,6 +576,7 @@ lazy val xformsJVM = xforms.jvm
 
 lazy val xformsJS: Project = xforms.js
   .dependsOn(commonJS % "test->test;compile->compile")
+  .settings(commonScalaJsSettings)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -578,7 +585,6 @@ lazy val xformsJS: Project = xforms.js
       "com.beachape" %%% "enumeratum"     % EnumeratumVersion
     ),
 
-    skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
@@ -586,9 +592,6 @@ lazy val xformsJS: Project = xforms.js
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
-
-    scalaJSUseMainModuleInitializer in Compile := true,
-    scalaJSUseMainModuleInitializer in Test    := false,
 
 //    jsEnv                         := NodeJSEnv().value,
 

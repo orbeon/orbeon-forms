@@ -16,9 +16,7 @@ package org.orbeon.xforms
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 
-@ScalaJSDefined // `loadingIndicator` used by `AjaxServer.js`
 class Form(formElem: html.Element) extends js.Object {
-  val loadingIndicator = new LoadingIndicator
+  val loadingIndicator = new LoadingIndicator // used by `AjaxServer.js`
 }

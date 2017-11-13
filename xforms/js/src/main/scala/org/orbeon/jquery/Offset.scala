@@ -16,7 +16,6 @@ package org.orbeon.jquery
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 
 case class Offset(left: Double, top: Double)
 

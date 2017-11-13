@@ -21,7 +21,7 @@ import org.scalajs.jquery.{JQuery, JQueryCallback}
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
+import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
 @js.native
@@ -115,7 +115,6 @@ trait ItemAttributes extends js.Object {
   val `xxforms-open`        : js.UndefOr[String]         = js.native
 }
 
-@ScalaJSDefined
 class XBLCompanion extends js.Object {
 
   // Lifecycle
@@ -148,7 +147,6 @@ object Controls extends js.Object {
   def setFocus(controlId: String)                                     : Unit               = js.native
 }
 
-@ScalaJSDefined
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object
 
 @JSGlobal("ORBEON.xforms.Events")
@@ -216,7 +214,6 @@ object JQueryTooltip {
     jq.asInstanceOf[JQueryTooltip]
 }
 
-@ScalaJSDefined
 abstract class JQueryTooltipConfig extends js.Object {
   val title: String
 }

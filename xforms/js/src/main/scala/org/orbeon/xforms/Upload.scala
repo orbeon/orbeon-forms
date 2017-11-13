@@ -19,7 +19,6 @@ import org.orbeon.xforms.facade.{Control, Events, Properties}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 
 object Upload {
 
@@ -30,7 +29,6 @@ object Upload {
 }
 
 // Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
-@ScalaJSDefined
 class Upload extends Control {
 
   self ⇒

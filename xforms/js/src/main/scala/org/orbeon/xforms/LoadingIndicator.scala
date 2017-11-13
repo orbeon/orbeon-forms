@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import org.orbeon.xforms.facade.{ConnectCallbackArgument, Events, Globals, Properties}
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
+import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
 @JSGlobal
@@ -26,7 +26,6 @@ object NProgress extends js.Object {
   def done()                        : Unit = js.native
 }
 
-@ScalaJSDefined
 class LoadingIndicator extends js.Object{
 
   private var nextConnectShow = false

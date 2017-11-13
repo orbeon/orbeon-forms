@@ -18,7 +18,6 @@ import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.js.annotation.ScalaJSDefined
 
 // Simple facade for Dragula. See https://github.com/bevacqua/dragula.
 object Dragula {
@@ -28,7 +27,6 @@ object Dragula {
 
 // TODO: Consider moving to trait with `js.UndefOr[Boolean] = js.undefined`, `val`s, see:
 // https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
-@ScalaJSDefined
 abstract class DragulaOptions extends js.Object {
   def isContainer (el: Element)                                                     = false
   def moves       (el: Element, source: Element, handle: Element, sibling: Element) = true

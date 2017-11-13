@@ -433,4 +433,8 @@ trait FormRunnerPersistence {
 
     (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
   }
+
+  //@XPathFunction
+  def userOwnsDocumentLease: Boolean =
+    persistenceInstance.rootElement / "lease-owned-by-current-user" === "true"
 }

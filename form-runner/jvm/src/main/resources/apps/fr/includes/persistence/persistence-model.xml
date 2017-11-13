@@ -724,6 +724,7 @@
             <lease-load-document/>
             <lease-duration/>
             <lease-end-time/>
+            <lease-owned-by-current-user/>
         </save>
     </xf:instance>
 
@@ -740,6 +741,14 @@
     <xf:bind ref="$persistence-instance">
         <xf:bind ref="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
         <xf:bind ref="captcha" constraint=". = 'true'"/>
+        <xf:bind
+            ref="lease-owned-by-current-user"
+            calculate="
+                ../lease-enabled != 'true' or
+                (
+                    ../lease-state = 'current-user' and
+                    current-dateTime() le xs:dateTime(../lease-end-time)
+                )"/>
     </xf:bind>
 
     <!-- Configuration for Saxon serialization -->

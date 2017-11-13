@@ -115,7 +115,7 @@
                         </xh:div>
                     </xf:case>
                     <xf:case value="'relinquished'">
-                        You don't own the lease on this document anymore.
+                        You don't own a lease on this document anymore.
                     </xf:case>
                     <xf:case value="'other-user'">
                         Another user, with username

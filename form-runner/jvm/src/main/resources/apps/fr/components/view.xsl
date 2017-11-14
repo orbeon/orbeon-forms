@@ -119,8 +119,8 @@
                     </xf:case>
                     <xf:case value="'other-user'">
                         Another user, with username
-                        <xf:output value="xxf:instance('fr-lockinfo-response')/d:owner/fr:username"/>,
-                        currently owns the lease on this document.
+                        "<xf:output value="xxf:instance('fr-lockinfo-response')/d:owner/fr:username"/>",
+                        currently owns a lease on this document.
                     </xf:case>
                 </xf:switch>
             </xh:div>

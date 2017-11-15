@@ -1,0 +1,216 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    <xh:head>
+        <!-- This is to help the process engine which assumes the existing of this model and instance -->
+        <xf:model
+            id="fr-parameters-model"
+            xxf:no-updates="true"
+            xxf:xpath-analysis="true"
+            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+            <xf:instance id="fr-parameters-instance" src="input:data"/>
+        </xf:model>
+        <xf:model id="fr-form-model">
+
+            <xf:instance id="fr-form-definition-instance" src="input:instance"/>
+
+            <xf:instance
+                id="fr-response-instance"
+                xxf:exclude-result-prefixes="#all">
+                <response>
+                    <app/>
+                    <form/>
+                </response>
+            </xf:instance>
+
+            <xf:instance id="fr-components-instance"><dummy/></xf:instance>
+
+            <xf:var
+                name="metadata"
+                value="
+                    instance('fr-form-definition-instance')/
+                        xh:head/
+                        xf:model[@id = 'fr-form-model']/
+                        xf:instance[@id = 'fr-form-metadata']/
+                        *"/>
+
+            <xf:var
+                name="app"
+                value="$metadata/application-name"/>
+
+            <xf:var
+                name="form"
+                value="$metadata/form-name"/>
+
+            <xf:var
+                name="form-definition-version"
+                value="xxf:get-request-parameter('form-definition-version')"/>
+
+            <xf:action event="xforms-model-construct-done">
+
+                <xf:var
+                    name="is-form-definition-posted"
+                    value="exists(instance('fr-form-definition-instance')/self::xh:html)"/>
+
+                <xf:action type="xpath" if="$is-form-definition-posted and fr:is-design-time()">
+                    frf:sendError(400)
+                </xf:action>
+
+                <xf:dispatch
+                    if="$is-form-definition-posted"
+                    name="do-read-toolbox"
+                    targetid="fr-form-model"/>
+
+                <xf:send
+                    if="not($is-form-definition-posted)"
+                    submission="read-form-definition-submission"/>
+
+            </xf:action>
+
+            <xf:action event="do-read-toolbox">
+                <!-- Here we have the form definition in `fr-form-definition-instance` -->
+                <xf:send submission="read-toolbox-submission"/>
+            </xf:action>
+
+            <xf:action event="do-publish">
+
+                <!-- Here we have the form definition in `fr-form-definition-instance` and the toolbox in `fr-components-instance` -->
+
+                <xf:action type="xpath">
+                    for $annotated in
+                        xxf:call-xpl(
+                            'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                            (
+                                'data',
+                                'bindings'
+                            ),
+                            (
+                                xxf:call-xpl(
+                                    'oxf:/forms/orbeon/builder/form/add-migration.xpl',
+                                    (
+                                        'data',
+                                        'bindings'
+                                    ),
+                                    (
+                                       xxf:call-xpl(
+                                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                            'data',
+                                            xxf:call-xpl(
+                                                'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                (
+                                                    'data',
+                                                    'bindings'
+                                                ),
+                                                (
+                                                    instance('fr-form-definition-instance'),
+                                                    instance('fr-components-instance')
+                                                ),
+                                                'data'
+                                            ),
+                                            'data'
+                                        ),
+                                        instance('fr-components-instance')
+                                    ),
+                                    'data'
+                                ),
+                                instance('fr-components-instance')
+                            ),
+                            'data'
+                        )
+                    return
+                        frf:publish(
+                            $annotated,
+                            '',
+                            $app,
+                            $form,
+                            (),      (: $username          :)
+                            (),      (: $password          :)
+                            false(), (: $force-attachments :)
+                            $form-definition-version
+                        )
+                </xf:action>
+
+                <xf:setvalue ref="instance('fr-response-instance')/app"  value="$app"/>
+                <xf:setvalue ref="instance('fr-response-instance')/form" value="$form"/>
+
+                <xf:send submission="send-result"/>
+
+            </xf:action>
+
+            <!-- NOTE: It would be nice if this could be done entirely with a process. -->
+            <xf:submission
+                id="read-form-definition-submission"
+                method="get"
+                serialization="none"
+                action="{
+                        frf:createFormDataBasePath('orbeon', 'builder', false(), fr:document-id())
+                    }/data.xml?data-format-version={
+                        (: See also persistence-model.xml :)
+                        (: Probably not needed for reading a form definition though :)
+                        frp:providerDataFormatVersion('orbeon', 'builder')
+                    }"
+                replace="instance"
+                instance="fr-form-definition-instance"
+                xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava">
+
+                <xf:dispatch
+                    event="xforms-submit-done"
+                    name="do-read-toolbox"
+                    targetid="fr-form-model"/>
+
+            </xf:submission>
+
+            <xf:submission
+                id="read-toolbox-submission"
+                serialization="none"
+                method="get"
+                resource="/fr/service/custom/orbeon/builder/toolbox?application={$app}&amp;form={$form}"
+                replace="instance"
+                instance="fr-components-instance"
+                xxf:readonly="true">
+
+                <xf:dispatch
+                    event="xforms-submit-done"
+                    name="do-publish"
+                    targetid="fr-form-model"/>
+
+            </xf:submission>
+
+            <!-- Send result out -->
+            <xf:submission
+                id="send-result"
+                method="post"
+                action="echo:"
+                ref="instance('fr-response-instance')"
+                replace="all"/>
+
+            <xf:action type="xpath" event="xforms-submit-error">
+                frf:sendError(500)
+            </xf:action>
+
+            <xi:include
+                href="../components/universal-submission.xml"
+                xpointer="xpath(/*/*)"
+                xxi:omit-xml-base="true"/>
+        </xf:model>
+    </xh:head>
+</xh:html>

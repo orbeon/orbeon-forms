@@ -153,6 +153,18 @@
              model="detail/detail-model.xpl"
              view="html-view.xpl"/>
 
+    <!-- Publish form definition by retrieving it first -->
+    <service path="/fr/service/orbeon/builder/publish/([^/^.]+)"
+             methods="POST"
+             model="request-parameters.xpl"
+             view="services/publish.xhtml"/>
+
+    <!-- Publish POSTed form definition -->
+    <service path="/fr/service/publish"
+             methods="POST"
+             model="request-parameters.xpl"
+             view="services/publish.xhtml"/>
+
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->

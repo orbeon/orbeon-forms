@@ -421,9 +421,9 @@
             xxf:no-updates="{{
                 (:
                     This covers at least: 'email', 'pdf', 'tiff', 'controls', 'validate', 'import',
-                    'schema', 'duplicate', 'attachments', but also 'new' and 'edit' when used in
-                    background mode, see https://github.com/orbeon/orbeon-forms/issues/3318. The
-                    idea is that all services are non-interactive.
+                    'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when
+                    used in background mode, see https://github.com/orbeon/orbeon-forms/issues/3318.
+                    The idea is that all services are non-interactive.
                 :)
                 starts-with(xxf:get-request-path(), '/fr/service/')
             }}"

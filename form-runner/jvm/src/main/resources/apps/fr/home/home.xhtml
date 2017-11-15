@@ -495,6 +495,7 @@
                                     if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url,
                                     $app,
                                     $form,
+                                    '',
                                     if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username else (),
                                     if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password else (),
                                     $force-attachments,

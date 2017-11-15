@@ -301,8 +301,8 @@
                 <app/>
                 <form/>
 
-                <published-attachments>-1</published-attachments> <!-- set by native `publish()` -->
-                <published-version>-1</published-version>         <!-- set by native `publish()` -->
+                <published-attachments>-1</published-attachments> <!-- set by `fb-publish-submission` -->
+                <published-version>-1</published-version>         <!-- set by `fb-publish-submission` -->
 
                 <existing-version>-1</existing-version>
                 <existing-comment/>

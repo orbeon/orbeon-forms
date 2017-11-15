@@ -579,44 +579,54 @@
 
     <!-- Publish form operation -->
     <xf:action ev:event="fb-publish-form">
+
+        <!-- NOTE: We get an `event('doc')` with the document modified to include the versioning comment and availability.
+             That information is not saved but it is published. -->
+
+        <!-- Save -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
             fr:run-process-by-name('oxf.fr.detail.process', 'save')
         </xf:action>
-        <xf:action type="xpath">
-            for $annotated in
-                xxf:call-xpl(
-                    'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                    (
-                        'data',
-                        'bindings'
-                    ),
-                    (
-                        xxf:call-xpl(
-                            'oxf:/forms/orbeon/builder/form/add-migration.xpl',
-                                (
-                                    'data',
-                                    'bindings'
-                                ),
-                                (
-                                xxf:call-xpl(
-                                    'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                    'data',
-                                    event('doc'),
-                                    'data'
-                                ),
-                                xxf:instance('fb-components-instance')
-                            ),
-                            'data'
-                        ),
-                        xxf:instance('fb-components-instance')
-                    ),
-                    'data'
-                )
-            return
-                fbf:publish($annotated, event('app'), event('form'), event('document'), event('version'))
-        </xf:action>
+
+        <!-- Publish -->
+        <xf:send submission="fb-publish-submission">
+            <xf:property name="doc"      value="event('doc')"/>
+            <xf:property name="document" value="event('document')"/>
+            <xf:property name="version"  value="event('version')"/>
+        </xf:send>
     </xf:action>
+
+    <xf:submission
+        id="fb-publish-submission"
+        ref="event('doc')"
+        serialization="application/xml"
+        method="post"
+        resource="/fr/service/publish?document-id={event('document')}&amp;form-definition-version={event('version')}"
+        replace="instance"
+        instance="fb-publish-response-instance"/>
+
+    <xf:action observer="fb-publish-submission" event="xforms-submit-done">
+
+        <xf:setvalue
+            ref="xxf:instance('fb-publish-instance')/published-attachments"
+            value="instance('fb-publish-response-instance')/published-attachments"/>
+
+        <xf:setvalue
+            ref="xxf:instance('fb-publish-instance')/published-version"
+            value="instance('fb-publish-response-instance')/published-version"/>
+
+        <xf:toggle   case="fb-publish-dialog-success"/>
+        <xf:setfocus control="fb-publish-dialog"/>
+    </xf:action>
+    <xf:action observer="fb-publish-submission" event="xforms-submit-error">
+        <xf:toggle   case="fb-publish-dialog-error"/>
+        <xf:setfocus control="fb-publish-dialog"/>
+    </xf:action>
+
+    <xf:instance id="fb-publish-response-instance">
+        <dummy/>
+    </xf:instance>
 
     <!-- These actions track how many dialogs are open at a given time -->
     <xf:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"

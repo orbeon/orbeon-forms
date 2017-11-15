@@ -16,6 +16,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -39,6 +40,8 @@
                 <response>
                     <app/>
                     <form/>
+                    <published-attachments/>
+                    <published-version/>
                 </response>
             </xf:instance>
 
@@ -60,6 +63,17 @@
             <xf:var
                 name="form"
                 value="$metadata/form-name"/>
+
+            <xf:var
+                name="document-id"
+                value="
+                    for $d in fr:document-id()
+                    return
+                        if (normalize-space($d) != '') then
+                            $d
+                        else
+                            xxf:get-request-parameter('document-id')
+            "/>
 
             <xf:var
                 name="form-definition-version"
@@ -95,62 +109,67 @@
 
                 <!-- Here we have the form definition in `fr-form-definition-instance` and the toolbox in `fr-components-instance` -->
 
-                <xf:action type="xpath">
-                    for $annotated in
-                        xxf:call-xpl(
-                            'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                            (
-                                'data',
-                                'bindings'
-                            ),
-                            (
-                                xxf:call-xpl(
-                                    'oxf:/forms/orbeon/builder/form/add-migration.xpl',
-                                    (
-                                        'data',
-                                        'bindings'
-                                    ),
-                                    (
-                                       xxf:call-xpl(
-                                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                <xf:var
+                    name="result"
+                    value="
+                        for $annotated in
+                            xxf:call-xpl(
+                                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                                (
+                                    'data',
+                                    'bindings'
+                                ),
+                                (
+                                    xxf:call-xpl(
+                                        'oxf:/forms/orbeon/builder/form/add-migration.xpl',
+                                        (
                                             'data',
-                                            xxf:call-xpl(
-                                                'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                (
-                                                    'data',
-                                                    'bindings'
-                                                ),
-                                                (
-                                                    instance('fr-form-definition-instance'),
-                                                    instance('fr-components-instance')
+                                            'bindings'
+                                        ),
+                                        (
+                                           xxf:call-xpl(
+                                                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                                'data',
+                                                xxf:call-xpl(
+                                                    'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                    (
+                                                        'data',
+                                                        'bindings'
+                                                    ),
+                                                    (
+                                                        instance('fr-form-definition-instance'),
+                                                        instance('fr-components-instance')
+                                                    ),
+                                                    'data'
                                                 ),
                                                 'data'
                                             ),
-                                            'data'
+                                            instance('fr-components-instance')
                                         ),
-                                        instance('fr-components-instance')
+                                        'data'
                                     ),
-                                    'data'
+                                    instance('fr-components-instance')
                                 ),
-                                instance('fr-components-instance')
-                            ),
-                            'data'
-                        )
-                    return
-                        frf:publish(
-                            $annotated,
-                            '',
-                            $app,
-                            $form,
-                            (),      (: $username          :)
-                            (),      (: $password          :)
-                            false(), (: $force-attachments :)
-                            $form-definition-version
-                        )
-                </xf:action>
+                                'data'
+                            )
+                        return
+                            frf:publish(
+                                $annotated,
+                                '',
+                                $app,
+                                $form,
+                                $document-id,     (: Might be empty     :)
+                                (),               (: $username          :)
+                                (),               (: $password          :)
+                                false(),          (: $force-attachments :)
+                                $form-definition-version
+                            )
+                "/>
 
-                <xf:setvalue ref="instance('fr-response-instance')/app"  value="$app"/>
-                <xf:setvalue ref="instance('fr-response-instance')/form" value="$form"/>
+                <xf:setvalue ref="instance('fr-response-instance')/app"                   value="$app"/>
+                <xf:setvalue ref="instance('fr-response-instance')/form"                  value="$form"/>
+                <xf:setvalue ref="instance('fr-response-instance')/published-attachments" value="map:get($result, 'published-attachments')"/>
+                <xf:setvalue ref="instance('fr-response-instance')/published-version"     value="map:get($result, 'published-version')"/>
 
                 <xf:send submission="send-result"/>
 
@@ -162,7 +181,7 @@
                 method="get"
                 serialization="none"
                 action="{
-                        frf:createFormDataBasePath('orbeon', 'builder', false(), fr:document-id())
+                        frf:createFormDataBasePath('orbeon', 'builder', false(), $document-id)
                     }/data.xml?data-format-version={
                         (: See also persistence-model.xml :)
                         (: Probably not needed for reading a form definition though :)

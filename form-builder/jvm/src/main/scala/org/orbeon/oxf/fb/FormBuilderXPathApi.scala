@@ -20,7 +20,6 @@ import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils.encodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -32,8 +31,6 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-
-import scala.util.control.NonFatal
 
 object FormBuilderXPathApi {
 
@@ -216,36 +213,6 @@ object FormBuilderXPathApi {
     holders foreach { holder ⇒
       delete(holder / *)
     }
-  }
-
-  // Publish a form and its attachments
-  //@XPathFunction
-  def publish(xhtml: NodeInfo, app: String, form: String, document: String, formVersion: String): Unit = {
-
-    try {
-      val (beforeURLs, _, publishedVersion) =
-        FormRunner.putWithAttachments(
-          data              = xhtml.root,
-          toBaseURI         = "", // local publish
-          fromBasePath      = FormRunner.createFormDataBasePath("orbeon", "builder", isDraft = false, document),
-          toBasePath        = FormRunner.createFormDefinitionBasePath(app, form),
-          filename          = "form.xhtml",
-          commonQueryString = encodeSimpleQuery(List("document" → document)),
-          forceAttachments  = false,
-          // Using "next" for attachments works as attachments are saved first, and the persistence layer
-          // uses the latest version of the published forms (not attachments) to figure what the next
-          // version is
-          formVersion       = formVersion.trimAllToOpt
-        )
-      setvalue(instanceRoot("fb-publish-instance").get / "published-attachments", beforeURLs.size.toString)
-      setvalue(instanceRoot("fb-publish-instance").get / "published-version",     publishedVersion.toString)
-      toggle("fb-publish-dialog-success")
-    } catch {
-      case NonFatal(t) ⇒
-        toggle("fb-publish-dialog-error")
-    }
-
-    setfocus("fb-publish-dialog", includes = Set.empty, excludes = Set.empty)
   }
 
   // Find all resource holders and elements which are unneeded because the resources are blank

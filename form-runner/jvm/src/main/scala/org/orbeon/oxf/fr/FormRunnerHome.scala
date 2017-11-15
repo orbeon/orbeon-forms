@@ -21,12 +21,16 @@ import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.MapFunctions
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator, ValueRepresentation}
+import org.orbeon.saxon.value.{AtomicValue, EmptySequence}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.Try
+import scala.util.control.NonFatal
 
 trait FormRunnerHome {
 
@@ -185,23 +189,41 @@ trait FormRunnerHome {
     toBaseURI        : String,
     app              : String,
     form             : String,
+    documentOrEmpty  : String,
     username         : String,
     password         : String,
     forceAttachments : Boolean,
     formVersion      : String
-  ): Unit =
-    putWithAttachments(
-      data              = xhtml.root,
-      toBaseURI         = toBaseURI,
-      fromBasePath      = createFormDefinitionBasePath(app, form),
-      toBasePath        = createFormDefinitionBasePath(app, form),
-      filename          = "form.xhtml",
-      commonQueryString = "",
-      forceAttachments  = forceAttachments,
-      username          = username.trimAllToOpt,
-      password          = password.trimAllToOpt,
-      formVersion       = formVersion.trimAllToOpt
+  ): Item = {
+
+    val documentOpt = documentOrEmpty.trimAllToOpt
+
+    val fromBasePath = documentOpt match {
+      case Some(document) ⇒ createFormDataBasePath("orbeon", "builder", isDraft = false, document)
+      case None           ⇒ createFormDefinitionBasePath(app, form)
+    }
+
+    val (beforeURLs, _, publishedVersion) =
+      putWithAttachments(
+        data              = xhtml.root,
+        toBaseURI         = toBaseURI,
+        fromBasePath      = fromBasePath,
+        toBasePath        = createFormDefinitionBasePath(app, form),
+        filename          = "form.xhtml",
+        commonQueryString = documentOpt map (document ⇒ encodeSimpleQuery(List("document" → document))) getOrElse "",
+        forceAttachments  = forceAttachments,
+        username          = username.trimAllToOpt,
+        password          = password.trimAllToOpt,
+        formVersion       = formVersion.trimAllToOpt
+      )
+
+    MapFunctions.createValue(
+      Map[AtomicValue, ValueRepresentation](
+        (SaxonUtils.fixStringValue("published-attachments"), beforeURLs.size),
+        (SaxonUtils.fixStringValue("published-version"),     publishedVersion)
+      )
     )
+  }
 
   // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
   // serialization. Here we juggle between XML and typed data.

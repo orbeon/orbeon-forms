@@ -103,10 +103,14 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     def logUnauthorized(e: HttpStatusCodeException) =
       info("unauthorized", logParams :+ ("status-code" → e.code.toString))
 
+    def logMethodNotAllowed() =
+      info("method not allowed", logParams)
+
     // For services: only log and set response code
-    def sendError(t: Throwable)                      = { logError(t);        ec.getResponse.setStatus(500) }
-    def sendNotFound(t: Option[Throwable])           = { logNotFound(t);     ec.getResponse.setStatus(404) }
-    def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e); ec.getResponse.setStatus(e.code) }
+    def sendError(t: Throwable)                      = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
+    def sendNotFound(t: Option[Throwable])           = { logNotFound(t);        ec.getResponse.setStatus(StatusCode.NotFound) }
+    def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e);    ec.getResponse.setStatus(e.code) }
+    def sendMethodNotAllowed()                       = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
 
     // For pages: log and try to run routes
     def runErrorRoute(t: Throwable, log: Boolean = true): Unit = {
@@ -116,7 +120,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       pageFlow.errorRoute match {
         case Some(errorRoute) ⇒
           // Run the error route
-          ec.getResponse.setStatus(500)
+          ec.getResponse.setStatus(StatusCode.InternalServerError)
           if (ProcessorService.showExceptions)
             pc.setAttribute(ProcessorService.Throwable, t)
           errorRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
@@ -133,7 +137,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       pageFlow.notFoundRoute match {
         case Some(notFoundRoute) ⇒
           // Run the not found route
-          ec.getResponse.setStatus(404)
+          ec.getResponse.setStatus(StatusCode.NotFound)
           try notFoundRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
           catch { case NonFatal(t) ⇒ runErrorRoute(t) }
         case None ⇒
@@ -180,9 +184,9 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
               ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
             // We don't have a "deleted" route at this point, and thus run the not found route when we
             // found a "resource" to be deleted
-            case e: HttpStatusCodeException if Set(404, 410)(e.code) ⇒
+            case e: HttpStatusCodeException if Set(StatusCode.NotFound, StatusCode.Gone)(e.code) ⇒
               if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-            case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒
+            case e: HttpStatusCodeException if Set(StatusCode.Unauthorized, StatusCode.Forbidden)(e.code) ⇒
               if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
             case e: ResourceNotFoundException ⇒
               if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
@@ -190,6 +194,9 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
               if (route.isPage) runErrorRoute(t)          else sendError(t)
           }
         }
+      case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) ⇒
+        // Method not allowed on service
+        sendMethodNotAllowed()
       case _ ⇒
         // Handle "not found"
         runNotFoundRoute(None)

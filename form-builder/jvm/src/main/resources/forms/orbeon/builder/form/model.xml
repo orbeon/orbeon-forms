@@ -591,9 +591,9 @@
 
         <!-- Publish -->
         <xf:send submission="fb-publish-submission">
-            <xf:property name="doc"      value="event('doc')"/>
-            <xf:property name="document" value="event('document')"/>
-            <xf:property name="version"  value="event('version')"/>
+            <xf:property name="doc"                      value="event('doc')"/>
+            <xf:property name="document-id"              value="event('document-id')"/>
+            <xf:property name="form-definition-version"  value="event('form-definition-version')"/>
         </xf:send>
     </xf:action>
 
@@ -602,7 +602,11 @@
         ref="event('doc')"
         serialization="application/xml"
         method="post"
-        resource="/fr/service/publish?document-id={event('document')}&amp;form-definition-version={event('version')}"
+        resource="/fr/service/publish?document-id={
+                event('document-id')
+            }&amp;form-definition-version={
+                event('form-definition-version')
+            }"
         replace="instance"
         instance="fb-publish-response-instance"/>
 

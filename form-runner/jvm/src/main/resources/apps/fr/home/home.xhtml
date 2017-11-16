@@ -443,65 +443,17 @@
                             <xf:property name="form" value="$form"/>
                         </xf:send>
 
-                        <!-- If we upgrade the form definition: annotate, deannotate, and add components -->
-                        <xf:action if="instance()/error = ''" type="xpath">
-                            for $form-maybe-upgraded in
-                                if ($upgrade)
-                                    then
-                                        xxf:call-xpl(
-                                            'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                            (
-                                                'data',
-                                                'bindings'
-                                            ),
-                                            (
-                                                xxf:call-xpl(
-                                                    'oxf:/forms/orbeon/builder/form/add-migration.xpl',
-                                                    (
-                                                        'data',
-                                                        'bindings'
-                                                    ),
-                                                    (
-                                                       xxf:call-xpl(
-                                                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                                            'data',
-                                                            xxf:call-xpl(
-                                                                'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                                (
-                                                                    'data',
-                                                                    'bindings'
-                                                                ),
-                                                                (
-                                                                    instance('fr-form'),
-                                                                    instance('fr-components')
-                                                                ),
-                                                                'data'
-                                                            ),
-                                                            'data'
-                                                        ),
-                                                        instance('fr-components')
-                                                    ),
-                                                    'data'
-                                                ),
-                                                instance('fr-components')
-                                            ),
-                                            'data'
-                                        )
-                                    else
-                                        instance('fr-form')
-                            return
-                                frf:publish(
-                                    $form-maybe-upgraded,
-                                    if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url,
-                                    $app,
-                                    $form,
-                                    '',
-                                    if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username else (),
-                                    if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password else (),
-                                    $force-attachments,
-                                    $form-definition-version
-                                )
-                        </xf:action>
+                        <xf:send if="instance()/error = ''" submission="publish-submission">
+                            <xf:property name="doc"                      value="instance('fr-form')"/>
+                            <xf:property name="document-id"              value="''"/>
+                            <xf:property name="form-definition-version"  value="$form-definition-version"/>
+                            <xf:property name="upgrade-form-definition"  value="$upgrade"/>
+                            <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                            <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
+                            <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
+                            <xf:property name="force-attachments"        value="$force-attachments"/>
+                        </xf:send>
+
                     </xf:action>
                 </xf:action>
 
@@ -509,6 +461,33 @@
                 <xf:dispatch name="fr-initialize" targetid="fr-form-model"/>
 
             </xf:action>
+
+            <xf:submission
+                id="publish-submission"
+                ref="event('doc')"
+                serialization="application/xml"
+                method="post"
+                resource="/fr/service/publish?document-id={
+                        event('document-id')
+                    }&amp;form-definition-version={
+                        event('form-definition-version')
+                    }&amp;upgrade-form-definition={
+                        event('upgrade-form-definition')
+                    }&amp;remote-server-url={
+                        encode-for-uri(event('remote-server-url'))
+                    }&amp;username={
+                        encode-for-uri(event('username'))
+                    }&amp;password={
+                        encode-for-uri(event('password'))
+                    }&amp;force-attachments={
+                        event('force-attachments')
+                    }"
+                replace="instance"
+                instance="fb-publish-response-instance"/>
+
+            <xf:instance id="fb-publish-response-instance">
+                <dummy/>
+            </xf:instance>
 
             <!-- Form definition -->
             <xf:instance id="fr-form"><dummy/></xf:instance>
@@ -555,7 +534,7 @@
                 instance="fr-components"
                 xxf:readonly="true"/>
 
-            <xf:action event="xforms-submit-error" observer="read-form read-toolbox">
+            <xf:action event="xforms-submit-error" observer="read-form read-toolbox publish-submission">
 
                 <xf:setvalue
                     ref="error"

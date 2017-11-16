@@ -26,5 +26,6 @@ object FormRunner
   with FormRunnerActionsOps
   with FormRunnerSummary
   with FormRunnerHome
+  with FormRunnerPublish
   with FormRunnerMetadata
   with FormRunnerResourcesOps

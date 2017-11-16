@@ -195,11 +195,11 @@
                                 origin="xf:element('version-comment', instance()/selected-comment/string())"/>
 
                             <xf:dispatch name="fb-publish-form" targetid="fr-form-model">
-                                <xf:property name="doc"      value="$doc"/>
-                                <xf:property name="app"      value="$app"/>
-                                <xf:property name="form"     value="$form"/>
-                                <xf:property name="document" model="fr-persistence-model" value="$document"/>
-                                <xf:property name="version"  value="instance()/selected-version/string()"/>
+                                <xf:property name="doc"                      value="$doc"/>
+                                <xf:property name="app"                      value="$app"/>
+                                <xf:property name="form"                     value="$form"/>
+                                <xf:property name="document-id"              value="$document" model="fr-persistence-model"/>
+                                <xf:property name="form-definition-version"  value="instance()/selected-version/string()"/>
                             </xf:dispatch>
                         </xf:action>
                     </xf:trigger>

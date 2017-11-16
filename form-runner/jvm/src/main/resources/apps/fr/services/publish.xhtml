@@ -49,12 +49,7 @@
 
             <xf:var
                 name="metadata"
-                value="
-                    instance('fr-form-definition-instance')/
-                        xh:head/
-                        xf:model[@id = 'fr-form-model']/
-                        xf:instance[@id = 'fr-form-metadata']/
-                        *"/>
+                value="frf:metadataInstanceRootOpt(instance('fr-form-definition-instance'))"/>
 
             <xf:var
                 name="app"
@@ -111,7 +106,15 @@
                     name="upgrade"
                     value="not(xxf:trim(xxf:get-request-parameter('upgrade-form-definition')) = 'false')"/>
 
-                <!-- Force attachments -->
+                <!-- Available by default -->
+                <xf:var
+                    name="available"
+                    value="not(xxf:trim(xxf:get-request-parameter('available')) = 'false')"/>
+
+                <xf:var
+                    name="version-comment-or-empty"
+                    value="for $vc in xxf:get-request-parameter('version-comment') return xxf:trim($vc)"/>
+
                 <xf:var
                     name="force-attachments"
                     value="xxf:trim(xxf:get-request-parameter('force-attachments')) = 'true'"/>
@@ -129,11 +132,31 @@
                     name="local-write"
                     value="$to-base-url = ''"/>
 
+                <xf:delete
+                    ref="$metadata/available"/>
+
+                <xf:insert
+                    if="not($available)"
+                    context="$metadata"
+                    ref="*"
+                    origin="xf:element('available', 'false')"/>
+
+                <xf:action if="exists($version-comment-or-empty)">
+                    <xf:delete
+                        ref="$metadata/version-comment"/>
+
+                    <xf:insert
+                        if="xxf:non-blank($version-comment-or-empty)"
+                        context="$metadata"
+                        ref="*"
+                        origin="xf:element('version-comment', $version-comment-or-empty)"/>
+                </xf:action>
+
                 <xf:var
                     name="result"
                     value="
                         for $form-maybe-upgraded in
-                            if ($upgrade)
+                            if ($upgrade) then
                                 xxf:call-xpl(
                                     'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
                                     (

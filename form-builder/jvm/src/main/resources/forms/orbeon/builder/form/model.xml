@@ -580,9 +580,6 @@
     <!-- Publish form operation -->
     <xf:action ev:event="fb-publish-form">
 
-        <!-- NOTE: We get an `event('doc')` with the document modified to include the versioning comment and availability.
-             That information is not saved but it is published. -->
-
         <!-- Save -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
@@ -594,6 +591,8 @@
             <xf:property name="doc"                      value="event('doc')"/>
             <xf:property name="document-id"              value="event('document-id')"/>
             <xf:property name="form-definition-version"  value="event('form-definition-version')"/>
+            <xf:property name="version-comment"          value="event('version-comment')"/>
+            <xf:property name="available"                value="event('available')"/>
         </xf:send>
     </xf:action>
 
@@ -603,9 +602,13 @@
         serialization="application/xml"
         method="post"
         resource="/fr/service/publish?document-id={
-                event('document-id')
+                encode-for-uri(event('document-id'))
             }&amp;form-definition-version={
-                event('form-definition-version')
+                encode-for-uri(event('form-definition-version'))
+            }&amp;version-comment={
+                encode-for-uri(event('version-comment'))
+            }&amp;available={
+                encode-for-uri(string(event('available')))
             }"
         replace="instance"
         instance="fb-publish-response-instance"/>

@@ -386,12 +386,12 @@
                     local-to-remote remote-to-local
                     local-upgrade   remote-upgrade">
 
-                <xf:var name="local-read"          value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade')"/>
-                <xf:var name="local-write"         value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade')"/>
-                <xf:var name="toggle-to-publish"   value="event('xxf:type') = ('local-publish',   'remote-publish')"/>
-                <xf:var name="toggle-to-unpublish" value="event('xxf:type') = ('local-unpublish', 'remote-unpublish')"/>
-                <xf:var name="force-attachments"   value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
-                <xf:var name="upgrade"             value="event('xxf:type') = ('local-upgrade',   'remote-upgrade')"/>
+                <xf:var name="local-read"              value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade')"/>
+                <xf:var name="local-write"             value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade')"/>
+                <xf:var name="toggle-to-publish"       value="event('xxf:type') = ('local-publish',   'remote-publish')"/>
+                <xf:var name="toggle-to-unpublish"     value="event('xxf:type') = ('local-unpublish', 'remote-unpublish')"/>
+                <xf:var name="force-attachments"       value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
+                <xf:var name="upgrade-form-definition" value="event('xxf:type') = ('local-upgrade',   'remote-upgrade')"/>
 
                 <!-- Invalidate all instances so we don't find stale component libraries in cache -->
                 <xxf:invalidate-instances/>
@@ -423,19 +423,17 @@
                                     'next'"
                         />
 
-                        <xf:action if="$toggle-to-publish or $toggle-to-unpublish">
-                            <xf:var
-                                name="metadata"
-                                value="instance('fr-form')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                        <xf:var
+                            name="metadata"
+                            value="frf:metadataInstanceRootOpt(instance('fr-form'))"/>
 
-                            <xf:delete
-                                ref="$metadata/available"/>
-                            <xf:insert
-                                if="$toggle-to-unpublish"
-                                context="$metadata"
-                                ref="*"
-                                origin="xf:element('available', 'false')"/>
-                        </xf:action>
+                        <xf:var
+                            name="current-available"
+                            value="not($metadata/available = 'false')"/>
+
+                        <xf:var
+                            name="new-available"
+                            value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
 
                         <!-- If we upgrade the form definition: retrieve toolbox -->
                         <xf:send if="$upgrade" submission="read-toolbox">
@@ -447,11 +445,12 @@
                             <xf:property name="doc"                      value="instance('fr-form')"/>
                             <xf:property name="document-id"              value="''"/>
                             <xf:property name="form-definition-version"  value="$form-definition-version"/>
-                            <xf:property name="upgrade-form-definition"  value="$upgrade"/>
+                            <xf:property name="upgrade-form-definition"  value="$upgrade-form-definition"/>
                             <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
                             <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
                             <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
                             <xf:property name="force-attachments"        value="$force-attachments"/>
+                            <xf:property name="available"                value="$new-available"/>
                         </xf:send>
 
                     </xf:action>
@@ -462,17 +461,18 @@
 
             </xf:action>
 
+            <!-- NOTE: We don't pass `version-comment` at all so it won't be changed. -->
             <xf:submission
                 id="publish-submission"
                 ref="event('doc')"
                 serialization="application/xml"
                 method="post"
                 resource="/fr/service/publish?document-id={
-                        event('document-id')
+                        encode-for-uri(event('document-id'))
                     }&amp;form-definition-version={
-                        event('form-definition-version')
+                        encode-for-uri(event('form-definition-version'))
                     }&amp;upgrade-form-definition={
-                        event('upgrade-form-definition')
+                        encode-for-uri(string(event('upgrade-form-definition')))
                     }&amp;remote-server-url={
                         encode-for-uri(event('remote-server-url'))
                     }&amp;username={
@@ -480,7 +480,9 @@
                     }&amp;password={
                         encode-for-uri(event('password'))
                     }&amp;force-attachments={
-                        event('force-attachments')
+                        encode-for-uri(string(event('force-attachments')))
+                    }&amp;available={
+                        encode-for-uri(string(event('available')))
                     }"
                 replace="instance"
                 instance="fb-publish-response-instance"/>

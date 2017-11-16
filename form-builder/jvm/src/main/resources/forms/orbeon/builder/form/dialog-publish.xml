@@ -167,39 +167,15 @@
                     <!-- Publish button -->
                     <xf:trigger xxf:modal="true" id="fb-publish-publish" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
-                        <!-- Dispatch publish event -->
-
                         <xf:action event="DOMActivate">
-
-                            <xf:var
-                                name="doc"
-                                value="xxf:mutable-document(xxf:instance('fb-form-instance'))"/>
-
-                            <xf:var
-                                name="metadata"
-                                value="frf:metadataInstanceRootOpt($doc)"/>
-
-                            <xf:delete
-                                ref="$metadata/version-comment"/>
-                            <xf:delete
-                                ref="$metadata/available"/>
-                            <xf:insert
-                                if="instance()/available = 'false'"
-                                context="$metadata"
-                                ref="*"
-                                origin="xf:element('available', 'false')"/>
-
-                            <xf:insert
-                                context="$metadata"
-                                ref="*"
-                                origin="xf:element('version-comment', instance()/selected-comment/string())"/>
-
                             <xf:dispatch name="fb-publish-form" targetid="fr-form-model">
-                                <xf:property name="doc"                      value="$doc"/>
+                                <xf:property name="doc"                      value="xxf:instance('fb-form-instance')"/>
                                 <xf:property name="app"                      value="$app"/>
                                 <xf:property name="form"                     value="$form"/>
                                 <xf:property name="document-id"              value="$document" model="fr-persistence-model"/>
                                 <xf:property name="form-definition-version"  value="instance()/selected-version/string()"/>
+                                <xf:property name="version-comment"          value="instance()/selected-comment/string()"/>
+                                <xf:property name="available"                value="not(instance()/available = 'false')"/>
                             </xf:dispatch>
                         </xf:action>
                     </xf:trigger>

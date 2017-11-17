@@ -54,40 +54,40 @@ object ErrorSummary {
     }
 
   // Return the subset of section names passed which contain errors in the global error summary
-  //@XPathFunction
-  def topLevelSectionsWithErrors(sectionNames: String, onlyVisible: Boolean): Seq[String] =
+  def topLevelSectionsWithErrors(sectionNamesSet: Set[String], onlyVisible: Boolean): Map[String, (Int, Int)] =
     findErrorsInstance match {
       case Some(errorsInstance) ⇒
 
-        val sectionNamesSet = sectionNames.splitTo[Set]()
+        val relevantErrorsIt = {
 
-        def allErrorsIt =
-          (errorsInstance.rootElement / "error").iterator
+          def allErrorsIt =
+            (errorsInstance.rootElement / "error").iterator
 
-        def visibleErrorsIt =
-          findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
-            case n: NodeInfo ⇒ n
-          }
+          def visibleErrorsIt =
+            findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
+              case n: NodeInfo ⇒ n
+            }
 
-        val relevantErrorsIt =
           (if (onlyVisible) visibleErrorsIt else allErrorsIt) filter (_.attValue("level") == "error")
+        }
 
-        val sectionNameErrorIt = (
+        val sectionNameErrors = (
           relevantErrorsIt
           map    { e ⇒ e.attValue("section-name") → e }
           filter { case (name, _) ⇒ sectionNamesSet(name) }
+          toList
         )
 
-        val groupedIt =
-          sectionNameErrorIt.to[List] groupBy (_._1) iterator
+        sectionNameErrors groupBy (_._1) map  { case (sectionName, list) ⇒
 
-        val sectionNameCountIt =
-          groupedIt map { case (name, list) ⇒ name → list.size }
+          val requiredButEmptyCount =
+            list count (_._2.attValue("required-empty") == true.toString)
 
-        sectionNameCountIt.map(_._1).to[List]
+          sectionName → (requiredButEmptyCount, list.size - requiredButEmptyCount)
+        }
 
       case None ⇒
-        Nil
+        Map.empty
     }
 
   // Update the iteration in a control's absolute id

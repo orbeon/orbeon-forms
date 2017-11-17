@@ -178,12 +178,12 @@
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">
 
-                    <!-- If the lease feature is enabled but we have not user information, issue a 403 -->
+                    <!-- If the lease feature is enabled but we have no user information, issue a 403 -->
                     <xf:action if="xxf:is-blank(xxf:username())" type="xpath">
                         frf:sendError(403)
                     </xf:action>
 
-                    <!-- Keep track of user and lease duration -->
+                    <!-- Keep track of user, lease duration, and thresholds -->
                     <xf:setvalue ref="instance('fr-lockinfo-request')/d:owner/fr:username" value="xxf:username()"/>
                     <xf:setvalue
                         ref="$lease-duration-elem"
@@ -198,6 +198,12 @@
                             ref="$lease-duration-elem"
                             value="$role-duration"/>
                     </xf:action>
+                    <xf:setvalue
+                        ref="$persistence-instance/lease-renew-threshold"
+                        value="xxf:property(string-join(('oxf.fr.detail.lease.renew-threshold', $app, $form), '.'))"/>
+                    <xf:setvalue
+                        ref="$persistence-instance/lease-alert-threshold"
+                        value="xxf:property(string-join(('oxf.fr.detail.lease.alert-threshold', $app, $form), '.'))"/>
                     <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
                     <xf:send submission="fr-acquire-lease-submission"/>
                 </xf:action>
@@ -579,6 +585,9 @@
             <!-- We acquired a lease: proceed with loading the document -->
             <xf:setvalue ref="$lease-state-elem">current-user</xf:setvalue>
             <xf:setvalue
+                ref="$persistence-instance/lease-start-time"
+                value="current-dateTime()"/>
+            <xf:setvalue
                 ref="$persistence-instance/lease-end-time"
                 value="
                     current-dateTime() +
@@ -723,6 +732,9 @@
             <lease-state/>
             <lease-load-document/>
             <lease-duration/>
+            <lease-renew-threshold/>
+            <lease-alert-threshold/>
+            <lease-start-time/>
             <lease-end-time/>
             <lease-owned-by-current-user/>
         </save>
@@ -842,6 +854,15 @@
                     delay="{$autosave-delay}"
                     xxf:show-progress="false"/>
             </xf:action>
+        </xf:action>
+        <xf:action
+            if="
+                $mode = 'edit' and
+                $lease-state-elem = 'current-user' and
+                current-dateTime() ge
+                    xs:dateTime($persistence-instance/lease-start-time) +
+                    xs:dayTimeDuration(concat('PT', $persistence-instance/lease-renew-threshold, 'M'))">
+            <xf:send submission="fr-acquire-lease-submission"/>
         </xf:action>
     </xf:action>
 

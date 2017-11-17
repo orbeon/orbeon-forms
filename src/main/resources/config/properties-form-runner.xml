@@ -159,6 +159,8 @@
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
     <property as="xs:boolean" name="oxf.fr.detail.lease.enabled.*.*"                            value="false"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                         value="10"/>
+    <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                    value="1"/>
+    <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>

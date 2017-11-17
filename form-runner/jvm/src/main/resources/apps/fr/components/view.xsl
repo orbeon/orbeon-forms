@@ -24,6 +24,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:d="DAV:">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
@@ -527,6 +528,14 @@
         <xi:include href="oxf:/apps/fr/includes/draft-singleton-dialogs.xhtml" xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml"       xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/apps/fr/includes/validation-dialog.xhtml"       xxi:omit-xml-base="true"/>
+
+        <!-- Include dialogs from property -->
+        <xsl:variable
+            name="custom-dialogs"
+            select="p:split(p:property(string-join(('oxf.fr.detail.dialogs.custom', $app, $form), '.')))"/>
+        <xsl:for-each select="$custom-dialogs">
+            <xsl:copy-of select="doc(.)"/>
+        </xsl:for-each>
 
         <!-- Error dialog -->
         <fr:alert-dialog id="fr-error-dialog" close="true">

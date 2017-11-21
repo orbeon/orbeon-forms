@@ -177,7 +177,12 @@
             <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
             <xf:action if="not($mode = ('new', 'test')) and not($is-new-id) and not($is-submit)">
 
-                <xf:var name="lease-enabled" value="xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.'))"/>
+                <xf:var
+                    name="lease-enabled"
+                    value="
+                        xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.')) and
+                        frf:leaseSupported($app, $form)
+                    "/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">
 

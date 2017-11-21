@@ -17,6 +17,8 @@
             <option value="$PROJECT_DIR$/dom/project" />
             <option value="$PROJECT_DIR$/embedding" />
             <option value="$PROJECT_DIR$/embedding/project" />
+            <option value="$PROJECT_DIR$/file-scan-example" />
+            <option value="$PROJECT_DIR$/file-scan-example/project" />
             <option value="$PROJECT_DIR$/form-builder/js" />
             <option value="$PROJECT_DIR$/form-builder/js/project" />
             <option value="$PROJECT_DIR$/form-builder/jvm" />
@@ -51,7 +53,7 @@
             <option value="$PROJECT_DIR$/xupdate/project" />
           </set>
         </option>
-        <option name="sbtVersion" value="0.13.13" />
+        <option name="sbtVersion" value="0.13.16" />
         <option name="useAutoImport" value="true" />
         <option name="useOurOwnAutoImport" value="true" />
       </SbtProjectSettings>

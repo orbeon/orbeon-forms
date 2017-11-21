@@ -13,6 +13,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dom-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding-build.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fileScanExample.iml" filepath="$PROJECT_DIR$/.idea/modules/fileScanExample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fileScanExample-build.iml" filepath="$PROJECT_DIR$/.idea/modules/fileScanExample-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-runner-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-runner-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" />

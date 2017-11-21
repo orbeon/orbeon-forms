@@ -132,7 +132,7 @@
                         then 'has-lease'
                         else 'does-not-have-lease'">
                     <xf:case value="'has-lease'">
-                        <xf:trigger>
+                        <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label>Relinquish lease</xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:send submission="fr-relinquish-lease-submission"/>
@@ -140,7 +140,7 @@
                             </xf:action>
                             <xf:send event="DOMActivate" submission="fr-relinquish-lease-submission"/>
                         </xf:trigger>
-                        <xf:trigger>
+                        <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label>Renew lease</xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:send submission="fr-acquire-lease-submission"/>
@@ -148,7 +148,7 @@
                         </xf:trigger>
                     </xf:case>
                     <xf:case value="'does-not-have-lease'">
-                        <xf:trigger>
+                        <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label>Try to acquire lease</xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>

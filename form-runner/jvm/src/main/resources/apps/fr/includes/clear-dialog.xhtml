@@ -42,6 +42,9 @@
             </xf:trigger>
             <xf:trigger id="fr-clear-confirm-dialog-cancel" appearance="xxf:primary">
                 <xf:label mediatype="text/html" value="$fr-resources/buttons/cancel"/>
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'abort')
+                </xf:action>
             </xf:trigger>
         </xf:group>
     </xh:div>

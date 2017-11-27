@@ -28,7 +28,6 @@ class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
     val doc = this setupDocument
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
           xmlns:xf="http://www.w3.org/2002/xforms"
-          xmlns:ev="http://www.w3.org/2001/xml-events"
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xh:head>
           <xf:model>
@@ -36,14 +35,19 @@ class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
               <invalid/>
             </xf:instance>
             <xf:bind ref="." constraint="false()"/>
-            <xf:dispatch ev:event="xforms-ready" name="fr-visit-all" targetid="error-summary"/>
+            <xf:dispatch
+              event="xforms-ready"
+              name="fr-visit-all"
+              targetid="error-summary"/>
           </xf:model>
         </xh:head>
         <xh:body>
-          <fr:error-summary id="error-summary" observer="output"/>
-          <xf:input ref="." id="output">
-            <xf:alert>alert</xf:alert>
-          </xf:input>
+          <fr:error-summary id="error-summary" observer="my-group"/>
+          <xf:group id="my-group">
+            <xf:input ref="." id="my-input">
+              <xf:alert>alert</xf:alert>
+            </xf:input>
+          </xf:group>
         </xh:body>
       </xh:html>
 
@@ -52,6 +56,9 @@ class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
       val stateInstance = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
       val visibleAlertCountAttr = stateInstance / "state" / "visible-counts" /@ "alert"
       val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
+
+      println(s"xxx $visibleAlertCountValue")
+
       assert(visibleAlertCountValue === "1")
     }
   }

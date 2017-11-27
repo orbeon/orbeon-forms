@@ -87,15 +87,6 @@ object Wizard {
     isAccessible        : Boolean
   )
 
-  private val DummyLeftSectionStatus =
-    SectionStatus(
-      name                = "",
-      isVisited           = true,
-      hasIncompleteFields = false,
-      hasErrorFields      = false,
-      isAccessible        = true
-    )
-
   //@XPathFunction
   def gatherSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
     gatherSectionStatus(relevantTopLevelSectionIds.to[List]) map { sectionStatus ⇒
@@ -121,7 +112,7 @@ object Wizard {
     val wizardMode = getWizardValidatedMode
 
     val sectionStatusesWithDummyHead =
-      relevantTopLevelSectionIds.scanLeft(DummyLeftSectionStatus) { case (prev, sectionId) ⇒
+      relevantTopLevelSectionIds.scanLeft(None: Option[SectionStatus]) { case (prevOpt, sectionId) ⇒
 
         val sectionName = controlNameFromId(sectionId)
 
@@ -131,8 +122,11 @@ object Wizard {
         val isVisited = sectionBoundNode hasAtt "*:section-status"
 
         def strictIsAccessible =
-          prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
-
+          prevOpt match {
+            case Some(prev) ⇒ prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
+            case None       ⇒ true
+          }
+        
         val isAccessible =
           wizardMode match {
             case "free"   ⇒ true
@@ -140,16 +134,18 @@ object Wizard {
             case "strict" ⇒ strictIsAccessible
           }
 
-        SectionStatus(
-          name                = sectionName,
-          isVisited           = isVisited,
-          hasIncompleteFields = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._1 > 0),
-          hasErrorFields      = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._2 > 0),
-          isAccessible        = isAccessible
+        Some(
+          SectionStatus(
+            name                = sectionName,
+            isVisited           = isVisited,
+            hasIncompleteFields = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._1 > 0),
+            hasErrorFields      = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._2 > 0),
+            isAccessible        = isAccessible
+          )
         )
       }
 
-    sectionStatusesWithDummyHead.tail
+    sectionStatusesWithDummyHead.flatten
   }
 
 }

@@ -126,7 +126,7 @@ object Wizard {
             case Some(prev) ⇒ prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
             case None       ⇒ true
           }
-        
+
         val isAccessible =
           wizardMode match {
             case "free"   ⇒ true

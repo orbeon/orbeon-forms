@@ -52,12 +52,10 @@ class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
       </xh:html>
 
     withContainingDocument(doc) {
-      val errorSummary = resolveObject[XFormsComponentControl]("error-summary").get
-      val stateInstance = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
-      val visibleAlertCountAttr = stateInstance / "state" / "visible-counts" /@ "alert"
+      val errorSummary           = resolveObject[XFormsComponentControl]("error-summary").get
+      val stateInstance          = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
+      val visibleAlertCountAttr  = stateInstance / "state" / "visible-counts" /@ "alert"
       val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
-
-      println(s"xxx $visibleAlertCountValue")
 
       assert(visibleAlertCountValue === "1")
     }

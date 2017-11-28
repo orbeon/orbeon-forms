@@ -109,7 +109,10 @@
                     context="$section-binding"
                     origin="xf:attribute('fr:section-status', '')"/>
 
-                <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group" xxbl:scope="outer"/>
+                <xf:dispatch
+                    name="fr-update-section-status"
+                    targetid="fr-wizard-outer-group"
+                    xxbl:scope="outer"/>
 
             </xbl:handler>
         </xbl:handlers>
@@ -624,25 +627,30 @@
                                          -->
 
                                         <!-- Initial status (unless `xxforms-constraints-changed` ran before) -->
-                                        <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group" xxbl:scope="outer"/>
+                                        <xf:dispatch
+                                            name="fr-update-section-status"
+                                            targetid="fr-wizard-outer-group"/>
 
                                         <!-- Find the last available AND visited section -->
                                         <xf:var
                                             name="last-available-and-visited-section-id"
                                             value="
                                                 (
-                                                    for $id in $relevant-top-level-section-ids
-                                                    return
-                                                        if (
-                                                            exists(index-of(xxf:split(xxf:instance('sections')), frf:controlNameFromIdOpt($id))) and
-                                                                exists(xxf:binding($id)/@fr:section-status)
-                                                        ) then
-                                                            $id
-                                                        else
-                                                            ()
+                                                    (: First relevant section by default :)
+                                                    $relevant-top-level-section-ids[1],
+                                                    (: But also check subsequent sections for availability and visited :)
+                                                    (
+                                                        for $id in $relevant-top-level-section-ids[position() gt 1]
+                                                        return
+                                                            if (
+                                                                exists(index-of(xxf:split(xxf:instance('sections')), frf:controlNameFromIdOpt($id))) and
+                                                                    exists(xxf:binding($id)/@fr:section-status)
+                                                            ) then
+                                                                $id
+                                                            else
+                                                                ()
+                                                    )
                                                 )[last()]"/>
-
-                                        <xf:message level="xxf:log-error" value="concat('xxxx last-available-and-visited-section-id', string-join($relevant-top-level-section-ids, ' + '))"/>
 
                                         <!-- Set initial current section -->
                                         <xf:action if="exists($last-available-and-visited-section-id)">
@@ -660,9 +668,9 @@
 
                                             <!-- Dispatch `fr-section-shown` the first time the body is shown if needed -->
                                             <xf:action if="xxf:instance('local')/show-body/data(.)">
-                                                <xf:dispatch name="fr-section-shown" targetid="fr-wizard">
-                                                    <xf:property name="section-binding" value="xxf:binding($last-available-and-visited-section-id)" xxbl:scope="outer"/>
-                                                    <xf:property name="section-name"    value="frf:controlNameFromIdOpt($last-available-and-visited-section-id)"/>
+                                                <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
+                                                    <xf:property name="section-binding" value="xxf:binding($last-available-and-visited-section-id)"              xxbl:scope="outer"/>
+                                                    <xf:property name="section-name"    value="frf:controlNameFromIdOpt($last-available-and-visited-section-id)" xxbl:scope="outer"/>
                                                     <xf:property name="validate"        value="xxf:instance('local')/validate/data(.)"/>
                                                     <xf:property name="separate-toc"    value="xxf:instance('local')/separate-toc/data(.)"/>
                                                 </xf:dispatch>

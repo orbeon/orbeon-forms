@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.saxon.om.NodeInfo
+
+import scala.util.{Failure, Success, Try}
 
 /**
  * 10.1.9 The setvalue Element
@@ -30,14 +32,14 @@ class XFormsSetvalueAction extends XFormsAction {
     val actionInterpreter = actionContext.interpreter
     val actionElement = actionContext.element
 
-    val indentedLogger = actionInterpreter.indentedLogger
-    val containingDocument = actionInterpreter.containingDocument
-    val contextStack = actionInterpreter.actionXPathContext
+    implicit val indentedLogger = actionInterpreter.indentedLogger
+    val containingDocument      = actionInterpreter.containingDocument
+    val contextStack            = actionInterpreter.actionXPathContext
 
     val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 
     // Determine value to set
-    val valueToSet =
+    def evaluateValueToSet =
       valueExpression match {
         case Some(valueExpression) ⇒
           // Value to set is computed with an XPath expression
@@ -52,14 +54,15 @@ class XFormsSetvalueAction extends XFormsAction {
           actionElement.getStringValue
       }
 
-    assert(valueToSet ne null)
-
     // Set the value on target node if possible
-    contextStack.getCurrentBindingContext.singleNodeOpt match {
-      case Some(node: NodeInfo) ⇒
+    contextStack.getCurrentBindingContext.getSingleItem match {
+      case node: NodeInfo ⇒
         // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
         // be written to. But because of the way we now handle errors in actions, we throw an exception instead
         // and action processing is interrupted.
+
+        val valueToSet = evaluateValueToSet
+
         DataModel.setValueIfChanged(
           nodeInfo   = node,
           newValue   = valueToSet,
@@ -70,22 +73,22 @@ class XFormsSetvalueAction extends XFormsAction {
             oldValue           = oldValue,
             newValue           = valueToSet,
             isCalculate        = false,
-            collector          = Dispatch.dispatchEvent)(
-            logger             = indentedLogger
+            collector          = Dispatch.dispatchEvent
           ),
           reason ⇒ throw new OXFException(reason.message)
         )
       case _ ⇒
         // Node doesn't exist: NOP
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug(
-            "xf:setvalue",
-            "not setting instance value",
-            "reason",
-            "destination node not found",
-            "value",
-            valueToSet
+        debug(
+          "xf:setvalue: not setting instance value",
+          List(
+            "reason" → "destination node not found",
+            Try(evaluateValueToSet) match {
+              case Success(v) ⇒ "value" → v
+              case Failure(t) ⇒ "value error" → t.getMessage
+            }
           )
+        )
     }
   }
 }

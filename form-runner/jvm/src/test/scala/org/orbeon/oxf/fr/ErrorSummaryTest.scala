@@ -13,51 +13,59 @@
  */
 package org.orbeon.oxf.fr
 
-import org.junit.Test
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
+class ErrorSummaryTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
-  // Test for issue #1689, where errors were not if the error summary was placed before what it was observing
-  @Test def onTop(): Unit = {
-    val doc = this setupDocument
-      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-          xmlns:xf="http://www.w3.org/2002/xforms"
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <xh:head>
-          <xf:model>
-            <xf:instance>
-              <invalid/>
-            </xf:instance>
-            <xf:bind ref="." constraint="false()"/>
-            <xf:dispatch
-              event="xforms-ready"
-              name="fr-visit-all"
-              targetid="error-summary"/>
-          </xf:model>
-        </xh:head>
-        <xh:body>
-          <fr:error-summary id="error-summary" observer="my-group"/>
-          <xf:group id="my-group">
-            <xf:input ref="." id="my-input">
-              <xf:alert>alert</xf:alert>
-            </xf:input>
-          </xf:group>
-        </xh:body>
-      </xh:html>
+  describe("fr:error-summary") {
 
-    withContainingDocument(doc) {
-      val errorSummary           = resolveObject[XFormsComponentControl]("error-summary").get
-      val stateInstance          = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
-      val visibleAlertCountAttr  = stateInstance / "state" / "visible-counts" /@ "alert"
-      val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
+    it("#1689: show errors when placed before observed") {
+      withTestExternalContext { _ ⇒
 
-      assert(visibleAlertCountValue === "1")
+        val doc = this setupDocument
+          <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:head>
+              <xf:model>
+                <xf:instance>
+                  <invalid/>
+                </xf:instance>
+                <xf:bind ref="." constraint="false()"/>
+                <xf:dispatch
+                  event="xforms-ready"
+                  name="fr-visit-all"
+                  targetid="error-summary"/>
+              </xf:model>
+            </xh:head>
+            <xh:body>
+              <fr:error-summary id="error-summary" observer="my-group"/>
+              <xf:group id="my-group">
+                <xf:input ref="." id="my-input">
+                  <xf:alert>alert</xf:alert>
+                </xf:input>
+              </xf:group>
+            </xh:body>
+          </xh:html>
+
+        withContainingDocument(doc) {
+          val errorSummary           = resolveObject[XFormsComponentControl]("error-summary").get
+          val stateInstance          = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
+          val visibleAlertCountAttr  = stateInstance / "state" / "visible-counts" /@ "alert"
+          val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
+
+          assert(visibleAlertCountValue === "1")
+        }
+      }
     }
+
   }
 }

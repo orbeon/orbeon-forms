@@ -13,44 +13,54 @@
  */
 package org.orbeon.oxf.fr
 
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
 import org.orbeon.oxf.fr.FormRunnerHome._
+import org.scalatest.FunSpecLike
 
-class RemoteServerTest extends AssertionsForJUnit {
+import scala.util.Success
 
-  @Test def remoteServerPropertyParsing(): Unit = {
+class RemoteServerTest extends FunSpecLike {
 
-    assert(Nil === tryRemoteServersFromString("[]").get)
+  describe("Remote server configuration") {
 
-    assert(
-      List(
-        "Prod 1" → "http://prod1.acme.org/orbeon",
-        "Prod 2" → "http://prod2.acme.org/orbeon",
-        "Prod 3" → "http://prod2.acme.org/orbeon"
-      ) === tryRemoteServersFromString(
-        """
-        [
-          { "label": "Prod 1",   "url": "http://prod1.acme.org/orbeon" },
-          { "label": "Prod 2",   "url": "http://prod2.acme.org/orbeon", "foo": 42, "bar": true },
-          { "label": " Prod 3 ", "url": " http://prod2.acme.org/orbeon/ " }
-        ]
-        """
-      ).get
-    )
+    it("must return `Nil` for an empty JSON array") {
+      assert(Nil === tryRemoteServersFromString("[]").get)
+    }
 
-    val Failures = Seq(
-      "",
-      """[ { "label": "Prod 1", "url": "  " } ]""",
-      """[ { "label": "Prod 1", "url": "" } ]""",
-      """[ { "label": "Prod 1" } ]""",
-      """[ { "label": "  ", "url": "http://prod1.acme.org/orbeon" } ]""",
-      """[ { "label": "", "url": "http://prod1.acme.org/orbeon" } ]""",
-      """[ { "url": "http://prod1.acme.org/orbeon" } ]""",
-      """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
-    )
+    it("must parse valid configurations, trim spaces, and ignore extra properties") {
+      assert(
+        Success(
+          List(
+            "Prod 1" → "http://prod1.acme.org/orbeon",
+            "Prod 2" → "http://prod2.acme.org/orbeon",
+            "Prod 3" → "http://prod2.acme.org/orbeon"
+          )
+        ) === tryRemoteServersFromString(
+          """
+          [
+            { "label": "Prod 1",   "url": "http://prod1.acme.org/orbeon" },
+            { "label": "Prod 2",   "url": "http://prod2.acme.org/orbeon", "foo": 42, "bar": true },
+            { "label": " Prod 3 ", "url": " http://prod2.acme.org/orbeon/ " }
+          ]
+          """
+        )
+      )
+    }
 
-    for (json ← Failures)
-      assert(tryRemoteServersFromString(json).isFailure)
+    it("must return a `Failure` for invalid JSON configurations") {
+
+      val Failures = Seq(
+        "",
+        """[ { "label": "Prod 1", "url": "  " } ]""",
+        """[ { "label": "Prod 1", "url": "" } ]""",
+        """[ { "label": "Prod 1" } ]""",
+        """[ { "label": "  ", "url": "http://prod1.acme.org/orbeon" } ]""",
+        """[ { "label": "", "url": "http://prod1.acme.org/orbeon" } ]""",
+        """[ { "url": "http://prod1.acme.org/orbeon" } ]""",
+        """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
+      )
+
+      for (json ← Failures)
+        assert(tryRemoteServersFromString(json).isFailure)
+    }
   }
 }

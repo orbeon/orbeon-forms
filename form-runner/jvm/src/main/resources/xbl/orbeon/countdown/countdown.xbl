@@ -25,7 +25,7 @@
     <xbl:binding
             id="fr-countdown"
             element="fr|countdown"
-            xxf:external-events="fr-countdown-ended"
+            xxf:external-events="fr-countdown-ended fr-countdown-alert"
             xxbl:mode="lhha binding">
 
         <xbl:resources>
@@ -54,10 +54,18 @@
                 then concat('0', string($sec))
                 else string($sec)"/>
             <xf:var name="time-left-min-sec" value="concat($minPart, ':', $secPart)"/>
+            <xf:var name="alert-threshold">
+                <xxf:value
+                    xbl:attr="value=alert-threshold-ref"
+                    xxbl:scope="outer"/>
+            </xf:var>
 
             <xf:output value="$time-left-min-sec">
                 <xf:action event="xforms-enabled" type="javascript">
-                    YAHOO.xbl.fr.Countdown.instance(this);
+                    <xf:param name="alertThreshold" value="$alert-threshold"/>
+                    <xf:body>
+                        YAHOO.xbl.fr.Countdown.instance(this).setAlertThreshold(alertThreshold);
+                    </xf:body>
                 </xf:action>
             </xf:output>
             <xf:output value="$end-time" class="fr-countdown-end-time">

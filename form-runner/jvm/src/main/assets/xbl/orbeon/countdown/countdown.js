@@ -52,13 +52,18 @@
             _.each(outputEls, function(outputEl) {
                 var sec = parseDuration($(outputEl).text());
                 if (! _.isNaN(sec)) {
+                    var countdown = YAHOO.xbl.fr.Countdown.instance(outputEl);
+                    var containerId = countdown.container.id;
                     var newSec = sec - increment;
+                    if (newSec <= countdown.alertThreshold && ! $(outputEl).is(".fr-countdown-alert")) {
+                        $(outputEl).addClass("fr-countdown-alert")
+                        ORBEON.xforms.Document.dispatchEvent(containerId, "fr-countdown-alert");
+                    }
                     if (newSec >= 0) {
                         var newDuration = serializeDuration(newSec);
                         $(outputEl).text(newDuration);
                     }
                     if (newSec == 0) {
-                        var containerId = ORBEON.jQuery(outputEl).parents(".xbl-fr-countdown").attr("id");
                         ORBEON.xforms.Document.dispatchEvent(containerId, "fr-countdown-ended");
                     }
                 }
@@ -69,6 +74,7 @@
     YAHOO.xbl.fr.Countdown.prototype = {
 
         outputEl: null,
+        alertThreshold: null,
 
         init: function() {
             this.outputEl = $(this.container).find(".xforms-output-output").get(0);
@@ -76,8 +82,15 @@
                 outputEls.push(this.outputEl);
         },
 
+        setAlertThreshold: function(alertThreshold) {
+            this.alertThreshold = parseInt(alertThreshold) * 60;
+        },
+
         durationChanged: function(newValue) {
             $(this.outputEl).text(newValue);
+            var sec = parseDuration(newValue);
+            if (sec > this.alertThreshold)
+                $(this.outputEl).removeClass("fr-countdown-alert")
         }
     };
 })();

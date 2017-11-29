@@ -102,16 +102,36 @@
         >
             <xh:i class="fa fa-lock" aria-hidden="true"/>
 
+            <fr:alert-dialog id="fr-lease-renew-dialog">
+                <fr:label>Renew lease?</fr:label>
+                <fr:message>Your lease is about to expire. Would you like to renew it now?</fr:message>
+                <fr:negative-choice/>
+                <fr:positive-choice>
+                    <xf:send event="DOMActivate" submission="fr-acquire-lease-submission"/>
+                </fr:positive-choice>
+            </fr:alert-dialog>
+
             <xh:div class="fr-lease-message">
                 <xf:switch caseref="$lease-state-elem">
                     <xf:case value="'current-user'">
                         <xh:div>
                             You own a lease on this document for another
-                            <fr:countdown ref="$persistence-instance/lease-end-time">
-                                <xf:setvalue
-                                    event="fr-countdown-ended"
-                                    ref="$lease-state-elem"
-                                    value="'relinquished'"/>
+                            <fr:countdown
+                                ref="$persistence-instance/lease-end-time"
+                                alert-threshold-ref="$persistence-instance/lease-alert-threshold">
+                                <xf:action event="fr-countdown-ended">
+                                    <xf:dispatch
+                                        target="fr-lease-renew-dialog"
+                                        name="fr-hide"/>
+                                    <xf:setvalue
+                                        ref="$lease-state-elem"
+                                        value="'relinquished'"/>
+                                </xf:action>
+                                <xf:action event="fr-countdown-alert">
+                                    <xf:dispatch
+                                        target="fr-lease-renew-dialog"
+                                        name="fr-show"/>
+                                </xf:action>
                             </fr:countdown>.
                         </xh:div>
                     </xf:case>

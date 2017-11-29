@@ -52,7 +52,6 @@ class WizardTest
         def doPrev() =
           XFormsAPI.dispatch(name = "fr-prev", targetId = "fr-view-component")
 
-
         def assertIsFirstPage() = {
           assert(  Wizard.isWizardFirstPage)
           assert(! Wizard.isWizardLastPage)
@@ -196,8 +195,8 @@ class WizardTest
             assertIsFirstPage()
 
             assert(Set("changed", "incomplete") === (section1Holder attTokens "*:section-status"))
-            assert("changed"                    === (section2Holder attValue "*:section-status"))
-            assert("changed"                    === (section3Holder attValue "*:section-status"))
+            assert("changed"                    === (section2Holder attValue  "*:section-status"))
+            assert("changed"                    === (section3Holder attValue  "*:section-status"))
           }
 
           // Clear first value
@@ -213,6 +212,18 @@ class WizardTest
           }
         }
       }
+    }
+
+    ignore("must handle section relevance") {
+      // TODO: Would be great to have a test for this!
+    }
+
+    ignore("must handle separate TOC") {
+      // TODO: Would be great to have a test for this!
+    }
+
+    ignore("must handle subsection navigation") {
+      // TODO: Would be great to have a test for this!
     }
   }
 }

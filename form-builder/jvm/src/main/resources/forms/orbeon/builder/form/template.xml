@@ -85,9 +85,9 @@
     <xh:body>
         <fr:view>
             <fr:body>
-                <fr:section id="section-1-control" bind="section-1-bind">
+                <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
-                    <fr:grid>
+                    <fr:grid id="grid-1-grid">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="control-1-control" bind="control-1-bind">

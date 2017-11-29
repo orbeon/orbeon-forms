@@ -90,9 +90,6 @@
         <xf:var name="persistence-instance"    value="xxf:instance('fr-persistence-instance')"/>
         <xf:var name="lease-enabled"           value="$persistence-instance/lease-enabled = 'true'"/>
         <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
-        <xf:var name="show-lease-current-user" value="    $lease-enabled  and $lease-state-elem = 'current-user'"/>
-        <xf:var name="show-lease-other-user"   value="    $lease-enabled  and $lease-state-elem = 'other-user'"/>
-        <xf:var name="show-lease-relinquished" value="    $lease-enabled  and $lease-state-elem = 'relinquished'"/>
         <xf:var name="show-form-data"          value="not($lease-enabled) or  $lease-state-elem = 'current-user'"/>
 
         <xf:group
@@ -119,7 +116,9 @@
                             <fr:countdown
                                 ref="$persistence-instance/lease-end-time"
                                 alert-threshold-ref="$persistence-instance/lease-alert-threshold">
-                                <xf:action event="fr-countdown-ended">
+                                <xf:action
+                                    event="fr-countdown-ended"
+                                    if="$lease-state-elem = 'current-user'">
                                     <xf:dispatch
                                         target="fr-lease-renew-dialog"
                                         name="fr-hide"/>
@@ -127,7 +126,9 @@
                                         ref="$lease-state-elem"
                                         value="'relinquished'"/>
                                 </xf:action>
-                                <xf:action event="fr-countdown-alert">
+                                <xf:action
+                                    event="fr-countdown-alert"
+                                    if="$lease-state-elem = 'current-user'">
                                     <xf:dispatch
                                         target="fr-lease-renew-dialog"
                                         name="fr-show"/>

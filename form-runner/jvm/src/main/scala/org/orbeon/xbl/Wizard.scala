@@ -27,6 +27,8 @@ import org.orbeon.scaxon.SimplePath._
 
 object Wizard {
 
+  import Private._
+
   //@XPathFunction
   def normalizeWizardMode(mode: String): String =
     mode match {
@@ -36,56 +38,42 @@ object Wizard {
     }
 
   //@XPathFunction
-  def isWizardSeparateToc =
+  def isWizardSeparateToc: Boolean =
     formRunnerProperty("oxf.xforms.xbl.fr.wizard.separate-toc")(FormRunnerParams()) contains "true"
 
-  private def findWizardContainer =
-    XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") map (_.nestedContainer)
-
-  private def findWizardState =
-    for {
-      container ← findWizardContainer
-      model     ← container.defaultModel
-      instance  ← model.defaultInstanceOpt
-    } yield
-      instance.rootElement
-
-  def isWizardTocShown =
+  def isWizardTocShown: Boolean =
     findWizardState map (_ elemValue "show-toc") contains "true"
 
-  def isWizardBodyShown =
+  def isWizardBodyShown: Boolean =
     findWizardState map (_ elemValue "show-body") contains "true"
 
-  def getWizardValidatedMode =
+  def getWizardValidatedMode: String =
     findWizardState map (_ elemValue "validate") getOrElse (throw new IllegalStateException)
 
-  def isWizardValidatedMode =
+  def isWizardValidatedMode: Boolean =
     getWizardValidatedMode != "free"
 
-  def wizardCurrentCaseIdOpt =
+  def wizardCurrentCaseIdOpt: Option[String] =
     findWizardState map (_ elemValue "current-case-id") flatMap (_.trimAllToOpt)
 
-  private def findWizardVariableValue(staticOrAbsoluteId: String) =
-    XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
+  def wizardAvailableSections: Set[String] = {
 
-  private def booleanValue(value: ValueRepresentation) = value match {
-    case v: Value    ⇒ v.effectiveBooleanValue
-    case _           ⇒ false
+    val resultOpt =
+      for {
+        model    ← findWizardModel
+        instance ← model.findInstance("available-sections")
+        root     = instance.rootElement
+      } yield
+        stringToSet(root.stringValue)
+
+    resultOpt getOrElse (throw new IllegalStateException)
   }
 
-  def isWizardLastPage =
+  def isWizardLastPage: Boolean =
     findWizardVariableValue("fr-wizard-is-last-nav") exists booleanValue
 
-  def isWizardFirstPage =
+  def isWizardFirstPage: Boolean =
     findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
-
-  case class SectionStatus(
-    name                : String,
-    isVisited           : Boolean,
-    hasIncompleteFields : Boolean,
-    hasErrorFields      : Boolean,
-    isAccessible        : Boolean
-  )
 
   //@XPathFunction
   def gatherSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
@@ -101,51 +89,87 @@ object Wizard {
       )
     }
 
-  def gatherSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
+  private object Private {
 
-    val topLevelSectionNamesWithErrorsMap =
-      ErrorSummary.topLevelSectionsWithErrors(
-        relevantTopLevelSectionIds flatMap controlNameFromIdOpt toSet,
-        onlyVisible = false
-     )
+    case class SectionStatus(
+      name                : String,
+      isVisited           : Boolean,
+      hasIncompleteFields : Boolean,
+      hasErrorFields      : Boolean,
+      isAccessible        : Boolean
+    )
 
-    val wizardMode = getWizardValidatedMode
+    def findWizardContainer =
+      XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") map (_.nestedContainer)
 
-    val sectionStatusesWithDummyHead =
-      relevantTopLevelSectionIds.scanLeft(None: Option[SectionStatus]) { case (prevOpt, sectionId) ⇒
+    def findWizardModel =
+      for {
+        container ← findWizardContainer
+        model     ← container.defaultModel
+      } yield
+        model
 
-        val sectionName = controlNameFromId(sectionId)
+    def findWizardState =
+      for {
+        model     ← findWizardModel
+        instance  ← model.defaultInstanceOpt
+      } yield
+        instance.rootElement
 
-        val sectionBoundNode =
-          XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNode) getOrElse (throw new IllegalStateException)
+    def findWizardVariableValue(staticOrAbsoluteId: String) =
+      XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
 
-        val isVisited = sectionBoundNode hasAtt "*:section-status"
+    def booleanValue(value: ValueRepresentation) = value match {
+      case v: Value    ⇒ v.effectiveBooleanValue
+      case _           ⇒ false
+    }
 
-        def strictIsAccessible =
-          prevOpt match {
-            case Some(prev) ⇒ prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
-            case None       ⇒ true
-          }
+    def gatherSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
 
-        val isAccessible =
-          wizardMode match {
-            case "free"   ⇒ true
-            case "lax"    ⇒ isVisited || strictIsAccessible
-            case "strict" ⇒ strictIsAccessible
-          }
+      val topLevelSectionNamesWithErrorsMap =
+        ErrorSummary.topLevelSectionsWithErrors(
+          relevantTopLevelSectionIds flatMap controlNameFromIdOpt toSet,
+          onlyVisible = false
+       )
 
-        Some(
-          SectionStatus(
-            name                = sectionName,
-            isVisited           = isVisited,
-            hasIncompleteFields = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._1 > 0),
-            hasErrorFields      = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._2 > 0),
-            isAccessible        = isAccessible
+      val wizardMode = getWizardValidatedMode
+
+      val sectionStatusesWithDummyHead =
+        relevantTopLevelSectionIds.scanLeft(None: Option[SectionStatus]) { case (prevOpt, sectionId) ⇒
+
+          val sectionName = controlNameFromId(sectionId)
+
+          val sectionBoundNode =
+            XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNode) getOrElse (throw new IllegalStateException)
+
+          val isVisited = sectionBoundNode hasAtt "*:section-status"
+
+          def strictIsAccessible =
+            prevOpt match {
+              case Some(prev) ⇒ prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
+              case None       ⇒ true
+            }
+
+          val isAccessible =
+            wizardMode match {
+              case "free"   ⇒ true
+              case "lax"    ⇒ isVisited || strictIsAccessible
+              case "strict" ⇒ strictIsAccessible
+            }
+
+          Some(
+            SectionStatus(
+              name                = sectionName,
+              isVisited           = isVisited,
+              hasIncompleteFields = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._1 > 0),
+              hasErrorFields      = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._2 > 0),
+              isAccessible        = isAccessible
+            )
           )
-        )
-      }
+        }
 
-    sectionStatusesWithDummyHead.flatten
+      sectionStatusesWithDummyHead.flatten
+    }
   }
 
 }

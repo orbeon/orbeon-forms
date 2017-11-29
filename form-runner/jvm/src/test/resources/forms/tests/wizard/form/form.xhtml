@@ -1,0 +1,154 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         fr:data-format-version="4.0.0">
+    <xh:head>
+        <xh:title>Wizard View</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <control-11/>
+                    </section-1>
+                    <section-2>
+                        <control-21/>
+                    </section-2>
+                    <section-3>
+                        <control-31/>
+                    </section-3>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-11-bind" name="control-11" ref="control-11" xxf:whitespace="trim"
+                             required="true()"
+                             constraint="xxf:min-length(2)"/>
+                </xf:bind>
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
+                    <xf:bind id="control-21-bind" name="control-21" ref="control-21" xxf:whitespace="trim"
+                             required="true()"/>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3">
+                    <xf:bind id="control-31-bind" name="control-31" ref="control-31" xxf:whitespace="trim"
+                             required="true()"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>wizard</form-name>
+                    <title xml:lang="en">Wizard View</title>
+                    <description xml:lang="en"/>
+
+                    <wizard>true</wizard>
+                    <wizard-mode>strict</wizard-mode>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-31>
+                            <label>Field 3</label>
+                            <hint/>
+                        </control-31>
+                        <control-21>
+                            <label>Field 2</label>
+                            <hint/>
+                        </control-21>
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                        <section-2>
+                            <label>Section 2</label>
+                            <help/>
+                        </section-2>
+                        <section-3>
+                            <label>Section 3</label>
+                            <help/>
+                        </section-3>
+                        <control-11>
+                            <label>Field 1</label>
+                            <hint/>
+                        </control-11>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="control-11-control" bind="control-11-bind">
+                                <xf:label ref="$form-resources/control-11/label"/>
+                                <xf:hint ref="$form-resources/control-11/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-2-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-21-control" bind="control-21-bind">
+                                <xf:label ref="$form-resources/control-21/label"/>
+                                <xf:hint ref="$form-resources/control-21/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-3-section" bind="section-3-bind">
+                    <xf:label ref="$form-resources/section-3/label"/>
+                    <fr:grid id="grid-3-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-31-control" bind="control-31-bind">
+                                <xf:label ref="$form-resources/control-31/label"/>
+                                <xf:hint ref="$form-resources/control-31/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

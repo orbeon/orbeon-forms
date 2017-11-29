@@ -28,10 +28,10 @@ class DatasetsTest
 
     it("must call services and actions and return expected dataset values") {
 
-      val (processorService, docOpt, _) =
+      val (processorService, Some(doc), _) =
         runFormRunner("tests", "datasets", "new", document = "", noscript = false, initialize = true)
 
-      withFormRunnerDocument(processorService, docOpt.get) {
+      withFormRunnerDocument(processorService, doc) {
 
         def sectionTemplateResolver(sectionId: String) = {
 

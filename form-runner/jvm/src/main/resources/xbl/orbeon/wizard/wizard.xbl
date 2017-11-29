@@ -136,12 +136,9 @@
                 <xf:bind ref="show-toc"     type="xs:boolean" xxf:default="true()"/>
                 <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(Wizard:isWizardSeparateToc())"/>
 
-                <!-- Section status -->
-                <xf:instance id="sections" xxf:expose-xpath-types="true">
-                    <sections/>
+                <xf:instance id="available-sections" xxf:expose-xpath-types="true">
+                    <available-sections/>
                 </xf:instance>
-
-                <xf:var name="sections" value="instance('sections')"/>
 
             </xf:model>
         </xbl:implementation>
@@ -513,7 +510,7 @@
                                     value="
                                         exists(
                                             index-of(
-                                                xxf:split(xxf:instance('sections')),
+                                                xxf:split(xxf:instance('available-sections')),
                                                 frf:controlNameFromIdOpt(replace($next-top-level-case-ids[1], '-case$', ''))
                                             )
                                         )"/>
@@ -555,7 +552,7 @@
                                     <!-- We do this because we don't want to run `Wizard:gatherSectionStatusJava` at each refresh, and we want to
                                          depend on instance values, although in practice it might not make much of a difference. -->
                                     <xf:setvalue
-                                        ref="xxf:instance('sections')"
+                                        ref="xxf:instance('available-sections')"
                                         value="
                                             string-join(
                                                 for $m in $maps
@@ -643,7 +640,7 @@
                                                         for $id in $relevant-top-level-section-ids[position() gt 1]
                                                         return
                                                             if (
-                                                                exists(index-of(xxf:split(xxf:instance('sections')), frf:controlNameFromIdOpt($id))) and
+                                                                exists(index-of(xxf:split(xxf:instance('available-sections')), frf:controlNameFromIdOpt($id))) and
                                                                     exists(xxf:binding($id)/@fr:section-status)
                                                             ) then
                                                                 $id
@@ -814,7 +811,9 @@
                             select="concat($static-top-level-section-id, '-case')"/>
 
                         <xf:var name="top-level-section-available">
-                            <xxf:value value="exists(index-of(xxf:split(xxf:instance('sections')), '{frf:controlNameFromIdOpt($static-section-id)}'))" xxbl:scope="inner"/>
+                            <xxf:value
+                                value="exists(index-of(xxf:split(xxf:instance('available-sections')), '{frf:controlNameFromIdOpt($static-section-id)}'))"
+                                xxbl:scope="inner"/>
                         </xf:var>
 
                         <xf:var

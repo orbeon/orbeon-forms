@@ -438,6 +438,6 @@ trait FormRunnerPersistence {
     (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
   }
 
-  def userOwnsDocumentLease: Boolean =
+  def userOwnsLeaseOrNoneRequired: Boolean =
     persistenceInstance.rootElement / "lease-owned-by-current-user" === "true"
 }

@@ -96,41 +96,41 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName = List(
-    "mode"                     → (() ⇒ FormRunner.FormRunnerParams().mode),
-    "app-name"                 → (() ⇒ FormRunner.FormRunnerParams().app),
-    "form-name"                → (() ⇒ FormRunner.FormRunnerParams().form),
-    "document-id"              → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
-    "lang"                     → (() ⇒ FormRunner.currentLang.stringValue),
-    "username"                 → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
-    "user-group"               → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull)
+    "mode"                        → (() ⇒ FormRunner.FormRunnerParams().mode),
+    "app-name"                    → (() ⇒ FormRunner.FormRunnerParams().app),
+    "form-name"                   → (() ⇒ FormRunner.FormRunnerParams().form),
+    "document-id"                 → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
+    "lang"                        → (() ⇒ FormRunner.currentLang.stringValue),
+    "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
+    "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull)
   )
 
   val BooleanGettersByName = List(
-    "is-design-time"           → (() ⇒ FormRunner.isDesignTime),
-    "is-readonly-mode"         → (() ⇒ FormRunner.isReadonlyMode),
-    "is-noscript"              → (() ⇒ FormRunner.isNoscript),
-    "is-form-data-valid"       → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
-    "is-form-data-saved"       → (() ⇒ FormRunner.isFormDataSaved),
-    "is-wizard-toc-shown"      → (() ⇒ Wizard.isWizardTocShown),
-    "is-wizard-body-shown"     → (() ⇒ Wizard.isWizardBodyShown),
-    "is-wizard-first-page"     → (() ⇒ Wizard.isWizardFirstPage),
-    "is-wizard-last-page"      → (() ⇒ Wizard.isWizardLastPage),
-    "can-create"               → (() ⇒ FormRunner.canCreate),
-    "can-read"                 → (() ⇒ FormRunner.canRead),
-    "can-update"               → (() ⇒ FormRunner.canUpdate),
-    "can-delete"               → (() ⇒ FormRunner.canDelete),
-    "user-owns-document-lease" → (() ⇒ FormRunner.userOwnsDocumentLease)
+    "is-design-time"              → (() ⇒ FormRunner.isDesignTime),
+    "is-readonly-mode"            → (() ⇒ FormRunner.isReadonlyMode),
+    "is-noscript"                 → (() ⇒ FormRunner.isNoscript),
+    "is-form-data-valid"          → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
+    "is-form-data-saved"          → (() ⇒ FormRunner.isFormDataSaved),
+    "is-wizard-toc-shown"         → (() ⇒ Wizard.isWizardTocShown),
+    "is-wizard-body-shown"        → (() ⇒ Wizard.isWizardBodyShown),
+    "is-wizard-first-page"        → (() ⇒ Wizard.isWizardFirstPage),
+    "is-wizard-last-page"         → (() ⇒ Wizard.isWizardLastPage),
+    "can-create"                  → (() ⇒ FormRunner.canCreate),
+    "can-read"                    → (() ⇒ FormRunner.canRead),
+    "can-update"                  → (() ⇒ FormRunner.canUpdate),
+    "can-delete"                  → (() ⇒ FormRunner.canDelete),
+    "owns-lease-or-none-required" → (() ⇒ FormRunner.userOwnsLeaseOrNoneRequired)
   )
 
   val IntGettersByName = List(
-    "form-version"             → (() ⇒ FormRunner.FormRunnerParams().formVersion)
+    "form-version"                → (() ⇒ FormRunner.FormRunnerParams().formVersion)
   )
 
   val DateTimeGettersByName = List(
-    "created-dateTime"         → (() ⇒ FormRunner.documentCreatedDate),
-    "modified-dateTime"        → (() ⇒ FormRunner.documentModifiedDate),
-    "created-date"             → (() ⇒ FormRunner.documentCreatedDate), // only keep until 2017.1 or 2017.2 for backward compatibility
-    "modified-date"            → (() ⇒ FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
+    "created-dateTime"            → (() ⇒ FormRunner.documentCreatedDate),
+    "modified-dateTime"           → (() ⇒ FormRunner.documentModifiedDate),
+    "created-date"                → (() ⇒ FormRunner.documentCreatedDate), // only keep until 2017.1 or 2017.2 for backward compatibility
+    "modified-date"               → (() ⇒ FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
   )
 
   private val IndexedStringFunctions = (

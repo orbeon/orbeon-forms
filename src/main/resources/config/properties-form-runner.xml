@@ -126,23 +126,23 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
 
     <!-- Buttons visible / enabled-->
-    <property as="xs:string"  name="oxf.fr.detail.button.*.visible.*.*"                         value="fr:user-owns-document-lease()"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.*.visible.*.*"                         value="fr:owns-lease-or-none-required()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="true()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="true()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*"               >
-        fr:user-owns-document-lease() and fr:is-wizard-body-shown()
+        fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.enabled.*.*">
         not(fr:is-wizard-first-page())
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-next.visible.*.*">
-        fr:user-owns-document-lease() and fr:is-wizard-body-shown()
+        fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-next.enabled.*.*">
         not(fr:is-wizard-last-page())
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-toc.visible.*.*">
-        fr:user-owns-document-lease() and fr:is-wizard-body-shown()
+        fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
     </property>
 
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->

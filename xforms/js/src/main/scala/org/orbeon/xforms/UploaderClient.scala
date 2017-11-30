@@ -172,7 +172,16 @@ object UploaderClient {
           def isUuidInput      (e: html.Input)   = e.name == "$uuid"
           def isThisUpload     (e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
           def isFieldset       (e: html.Element) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
-          def isDisabled       (e: html.Element) = e.disabled.toOption.contains(true)
+
+          def isDisabled(e: html.Element) = e match {
+            case e: html.Select   ⇒ e.disabled
+            case e: html.Button   ⇒ e.disabled
+            case e: html.Input    ⇒ e.disabled
+            case e: html.TextArea ⇒ e.disabled
+            case e: html.FieldSet ⇒ e.disabled
+            case e: html.OptGroup ⇒ e.disabled
+            case _                ⇒ false
+          }
 
           def mustDisableElem  (e: html.Element) = ! isThisUpload(e) && ! isFieldset(e) && ! isDisabled(e)
           def mustDisableInput (e: html.Input)   = ! isUuidInput(e) && mustDisableElem(e)
@@ -185,7 +194,18 @@ object UploaderClient {
           currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter toList
         }
 
-        newlyDisabledElems foreach (_.disabled = true)
+        def setDisabled(e: html.Element, value: Boolean) =
+          e match {
+            case e: html.Select   ⇒ e.disabled = value
+            case e: html.Button   ⇒ e.disabled = value
+            case e: html.Input    ⇒ e.disabled = value
+            case e: html.TextArea ⇒ e.disabled = value
+            case e: html.FieldSet ⇒ e.disabled = value
+            case e: html.OptGroup ⇒ e.disabled = value
+            case _                ⇒
+          }
+
+        newlyDisabledElems foreach (setDisabled(_, value = true))
 
         // Trigger actual upload through a form POST and start asking server for progress
         YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)
@@ -207,7 +227,7 @@ object UploaderClient {
 
         askForProgressUpdate()
 
-        newlyDisabledElems foreach (_.disabled = false)
+        newlyDisabledElems foreach (setDisabled(_, value = false))
     }
   }
 }

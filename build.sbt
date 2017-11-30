@@ -8,8 +8,8 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 val DefaultOrbeonFormsVersion     = "2017.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
-val ScalaJsDomVersion             = "0.9.0"
-val ScalaJsJQueryVersion          = "0.9.0"
+val ScalaJsDomVersion             = "0.9.4"
+val ScalaJsJQueryVersion          = "0.9.2"
 val JUnitInterfaceVersion         = "0.11"
 val CirceVersion                  = "0.6.0"
 val JodaConvertVersion            = "1.2"

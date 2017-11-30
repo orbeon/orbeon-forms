@@ -72,10 +72,10 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     if (lhhaAnalysis.localName == "alert")
       _alerts :+= lhhaAnalysis
     else
-      _lhh += LHHA.withName(lhhaAnalysis.localName) → lhhaAnalysis
+      _lhh += lhhaAnalysis.lhhaType → lhhaAnalysis
 
-  def lhh(lhhaType: LHHA) = _lhh.get(lhhaType)
-  def alerts              = _alerts
+  def lhh(lhhaType: LHHA): Option[LHHAAnalysis] = _lhh.get(lhhaType)
+  def alerts             : List[LHHAAnalysis]   = _alerts
 
   def hasLHHA(lhhaType: LHHA) =
     if (lhhaType == LHHA.Alert) alerts.nonEmpty else lhh(lhhaType).nonEmpty

@@ -77,12 +77,12 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
   def elementAnalysisForSource = {
     val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
-    context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+    context.container.partAnalysis.findControlAnalysis(prefixedId)
   }
 
   def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext): Option[ElementAnalysis] = {
     val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
-    context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+    context.container.partAnalysis.findControlAnalysis(prefixedId)
   }
 
   def sourceScope(implicit xpathContext: XPathContext): Scope =

@@ -42,8 +42,6 @@ class XFormsLHHAHandler(
     val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
     val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-    val lhhaType = LHHA.withName(localname)
-
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     staticControlOpt match {
@@ -104,7 +102,7 @@ class XFormsLHHAHandler(
             val targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
 
             val forEffectiveIdOpt =
-              if (lhhaType == LHHA.Label)
+              if (lhhaAnalysis.lhhaType == LHHA.Label)
                 XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, targetControl, targetControlEffectiveId)
               else
                 None
@@ -113,7 +111,7 @@ class XFormsLHHAHandler(
               lhhaAnalysis,
               targetControlEffectiveId,
               forEffectiveIdOpt.orNull,
-              lhhaType,
+              lhhaAnalysis.lhhaType,
               None,
               xformsControlOpt.orNull,
               isTemplate,

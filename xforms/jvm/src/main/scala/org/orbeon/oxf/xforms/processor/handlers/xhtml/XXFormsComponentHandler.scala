@@ -40,7 +40,7 @@ class XXFormsComponentHandler(
   private lazy val binding =
     containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
 
-  private lazy val handleLHHA =
+  private lazy val modeIsLhhaButNotCustom =
     binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
 
   private def hasLabelFor =
@@ -68,7 +68,7 @@ class XXFormsComponentHandler(
     xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
-    if (handleLHHA) {
+    if (modeIsLhhaButNotCustom) { // also implied: label is local (from `XFormsControlLifecyleHandler`)
       if (hasLabelFor) {
         super.handleLabel()
       } else {
@@ -85,9 +85,9 @@ class XXFormsComponentHandler(
       }
     }
 
-  protected override def handleAlert() = if (handleLHHA) super.handleAlert()
-  protected override def handleHint()  = if (handleLHHA) super.handleHint()
-  protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
+  protected override def handleAlert() = if (modeIsLhhaButNotCustom) super.handleAlert()
+  protected override def handleHint()  = if (modeIsLhhaButNotCustom) super.handleHint()
+  protected override def handleHelp()  = if (modeIsLhhaButNotCustom) super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // TODO: Most of this should be done statically, not dynamically. See also `findTargetControlForEffectiveId`.

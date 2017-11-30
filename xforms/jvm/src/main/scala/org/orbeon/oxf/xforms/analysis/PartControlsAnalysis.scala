@@ -87,14 +87,14 @@ trait PartControlsAnalysis extends TransientState {
   def iterateControls =
     controlAnalysisMap.valuesIterator
 
-  def getControlAnalysisOpt(prefixedId: String) =
+  def findControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId)
 
   def getControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId) orNull
 
   def controlElement(prefixedId: String) =
-    getControlAnalysisOpt(prefixedId) map (control ⇒ staticStateDocument.documentWrapper.wrap(control.element))
+    findControlAnalysis(prefixedId) map (control ⇒ staticStateDocument.documentWrapper.wrap(control.element))
 
   def hasAttributeControl(prefixedForAttribute: String) =
     _attributeControls.get(prefixedForAttribute).isDefined

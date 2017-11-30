@@ -109,7 +109,7 @@ extends InputValueControl
             require(nestedElement ne null)
 
           if (nestedElement ne null) {
-            val nestedAnalysis = new LHHAAnalysis(
+            val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
               staticStateContext = staticStateContext,
               element            = nestedElement,
               parent             = Some(itemElementAnalysis),

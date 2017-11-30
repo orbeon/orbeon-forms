@@ -46,10 +46,12 @@ class LHHAAnalysis(
 
   require(parent.isDefined)
 
-  val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
-  val isLocal           = forStaticIdOption.isEmpty
-  val defaultToHTML     = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
-  val containsHTML      = LHHAAnalysis.containsHTML(element)
+  def lhhaType = LHHA.withName(localName)
+
+  val forStaticIdOpt = element.attributeValueOpt(FOR_QNAME)
+  val isLocal        = forStaticIdOpt.isEmpty
+  val defaultToHTML  = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
+  val containsHTML   = LHHAAnalysis.containsHTML(element)
 
   var isForRepeat       = false // updated in `attachToControl()`
 
@@ -80,7 +82,7 @@ class LHHAAnalysis(
 
   // Find the target control if any
   def targetControlOpt = (
-    forStaticIdOption
+    forStaticIdOpt
     map (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)))
     orElse parent
     collect { case lhhaControl: StaticLHHASupport ⇒ lhhaControl }

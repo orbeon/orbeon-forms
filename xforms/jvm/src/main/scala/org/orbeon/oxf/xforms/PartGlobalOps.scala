@@ -39,6 +39,7 @@ trait PartGlobalOps {
 
   // Controls
   def getControlAnalysis(prefixedId: String): ElementAnalysis
+  def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
   def hasControlByName(controlName: String): Boolean
   def controlsByName(controlName: String): Traversable[ElementAnalysis]
 
@@ -69,24 +70,23 @@ trait PartGlobalOps {
   def uniqueJsScripts: List[ShareableScript]
 
   // Functions derived from getControlAnalysis
-  def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))
-  def getControlElement(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.element) orNull
-  def hasBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) exists (_.hasBinding)
+  def getControlElement(prefixedId: String) = findControlAnalysis(prefixedId) map (_.element) orNull
+  def hasBinding(prefixedId: String) = findControlAnalysis(prefixedId) exists (_.hasBinding)
 
-  def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) collect {
+  def getControlPosition(prefixedId: String) = findControlAnalysis(prefixedId) collect {
     case viewTrait: ViewTrait ⇒ viewTrait.index
   }
 
-  def getSelect1Analysis(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
+  def getSelect1Analysis(prefixedId: String) = findControlAnalysis(prefixedId) match {
     case Some(selectionControl: SelectionControlTrait) ⇒ selectionControl
     case _ ⇒ null
   }
 
   def isValueControl(effectiveId: String) =
-    getControlAnalysisOption(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
+    findControlAnalysis(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 
   def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
-    getControlAnalysisOption(prefixedId) foreach { controlAnalysis ⇒
+    findControlAnalysis(prefixedId) foreach { controlAnalysis ⇒
       val controlClasses = controlAnalysis.classes
       if (StringUtils.isNotEmpty(controlClasses)) {
         if (sb.length > 0)

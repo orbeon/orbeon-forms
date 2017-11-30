@@ -15,15 +15,15 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
-
 import org.xml.sax.Attributes
+import org.orbeon.oxf.util.CoreUtils._
 
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
@@ -37,17 +37,20 @@ class XFormsLHHAHandler(
   handlerContext : AnyRef
 ) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false) {
 
+  import XFormsLHHAHandler._
+
   override def start(): Unit = {
 
-    val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
-    val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
+    val lhhaEffectiveId = getEffectiveId
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     staticControlOpt match {
-      case Some(staticControl: LHHAAnalysis) if staticControl.isForRepeat ⇒
+      case Some(staticLhha: LHHAAnalysis) if staticLhha.isForRepeat ⇒
 
-        // Special case where the LHHA has a dynamic representation and is in a lower nesting of repeats
+        // Case where the LHHA has a dynamic representation and is in a lower nesting of repeats.
+        // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
+        // `aria-*` attributes to point to this element.
 
         val containerAtts =
           getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
@@ -58,7 +61,7 @@ class XFormsLHHAHandler(
             externalValue      ← currentLHHAControl.externalValueOpt
             if externalValue.nonEmpty
           } locally {
-            if (staticControl.element.attributeValueOpt("mediatype") contains "text/html") {
+            if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
               XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
             } else {
               xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
@@ -66,67 +69,59 @@ class XFormsLHHAHandler(
           }
         }
 
-      case Some(lhhaAnalysis: LHHAAnalysis) if ! lhhaAnalysis.isLocal ⇒
+      case Some(staticLhha: LHHAAnalysis) if ! staticLhha.isForRepeat && ! staticLhha.isLocal ⇒
 
-        // Find control ids based on @for attribute
+        // Non-repeated case of an external label.
+        // Here we have a `for` attribute.
 
-        lhhaAnalysis.targetControlOpt match {
-          case Some(targetControl) ⇒
+        def resolveControlOpt(staticControl: ElementAnalysis) =
+          if (! isTemplate) {
+            containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId, null) collect {
+              case control: XFormsControl ⇒ control
+            }
+          } else
+            None
 
-            val isTemplate = xformsHandlerContext.isTemplate
+        val effectiveTargetControlOpt =
+          staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
+            case Some(Left(effectiveTargetControl)) ⇒ resolveControlOpt(effectiveTargetControl)
+            case Some(Right(_))                     ⇒ None
+            case None                               ⇒ resolveControlOpt(staticLhha.directTargetControl)
+          }
 
-            // Find concrete control if possible, to retrieve the concrete LHHA values
-            val xformsControlOpt =
-              if (! isTemplate) {
-                containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, targetControl.staticId, null) match {
-                  case Some(control: XFormsControl) ⇒ Some(control)
-                  case Some(otherObject) ⇒
-                    // TODO: Better/more consistent error handling
-                    containingDocument.getControls.getIndentedLogger.logWarning(
-                      "", "Object pointed by @for attribute is not a control",
-                      "class", otherObject.getClass.getName)
-                    return
-                  case None ⇒
-                    // TODO: Better/more consistent error handling
-                    containingDocument.getControls.getIndentedLogger.logWarning(
-                      "", "Object pointed by @for attribute not found")
-                    return
-                }
-              } else
-                None
+        val forEffectiveIdOpt =
+          staticLhha.lhhaType == LHHA.Label option {
+            staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
+              case Some(Left(effectiveTargetControl)) ⇒
+                findTargetControlForEffectiveId(
+                  xformsHandlerContext,
+                  effectiveTargetControl,
+                  XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
+                )
+              case Some(Right(targetPrefixedId)) ⇒
+                Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
+              case None ⇒
+                findTargetControlForEffectiveId(
+                  xformsHandlerContext,
+                  staticLhha.directTargetControl,
+                  XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId)
+                )
+            }
+          }
 
-            // Here we statically determine the effective id of the target control. This assumes that we
-            // don't cross repeat boundaries.
-            // In the future, we want to be more flexible, see:
-            // https://github.com/orbeon/orbeon-forms/issues/241
-            val targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
+        handleLabelHintHelpAlert(
+          lhhaAnalysis             = staticLhha,
+          targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId), // `id` placed on the label itself
+          forEffectiveId           = forEffectiveIdOpt.flatten.orNull,
+          lhha                     = staticLhha.lhhaType,
+          requestedElementNameOpt  = None,
+          controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value
+          isTemplate               = isTemplate,
+          isExternal               = true
+        )
 
-            val forEffectiveIdOpt =
-              if (lhhaAnalysis.lhhaType == LHHA.Label)
-                XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, targetControl, targetControlEffectiveId)
-              else
-                None
-
-            handleLabelHintHelpAlert(
-              lhhaAnalysis,
-              targetControlEffectiveId,
-              forEffectiveIdOpt.orNull,
-              lhhaAnalysis.lhhaType,
-              None,
-              xformsControlOpt.orNull,
-              isTemplate,
-              isExternal = true
-            )
-
-          case _ ⇒
-            // Don't output markup for the LHHA
-            // Can happen if the @for points to a non-existing control
-        }
-
-      case _ ⇒
-        // Don't output markup for the LHHA
-        // This can happen if the author forgot a @for attribute, but also for xf:group/xf:label[not(@for)]
-        // Q: Can this also happen if we don't find the LHHAAnalysis?
+      case _ ⇒ // `None if staticLhha.isLocal && ! staticLhha.isForRepeat`
+        // Q: Can this happen? There should always be a static LHHA for the control, right?
     }
   }
 }

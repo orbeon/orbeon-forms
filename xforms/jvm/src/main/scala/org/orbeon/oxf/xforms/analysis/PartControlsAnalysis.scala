@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
@@ -48,11 +49,11 @@ trait PartControlsAnalysis extends TransientState {
 
     // Register special controls
     elementAnalysis match {
-      case lhha: LHHAAnalysis             ⇒ lhhas         += lhha
-      case eventHandler: EventHandlerImpl ⇒ eventHandlers += eventHandler
-      case model: Model                   ⇒ models        += model
-      case attribute: AttributeControl    ⇒ attributes    += attribute
-      case _                              ⇒
+      case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) ⇒ lhhas += lhha
+      case eventHandler: EventHandlerImpl                                                 ⇒ eventHandlers += eventHandler
+      case model: Model                                                                   ⇒ models        += model
+      case attribute: AttributeControl                                                    ⇒ attributes    += attribute
+      case _                                                                              ⇒
     }
   }
 

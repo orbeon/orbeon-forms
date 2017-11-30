@@ -20,9 +20,12 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable
 
@@ -230,20 +233,27 @@ object ControlAjaxSupport {
   def findAriaBy(
     staticControl      : ElementAnalysis,
     controlOpt         : Option[XFormsControl],
-    lhha               : LHHA)(
+    lhha               : LHHA,
+    force              : Boolean)(
     containingDocument : XFormsContainingDocument
-  ): Option[String] = staticControl match {
-    case lhhaSupport: StaticLHHASupport ⇒
-      lhhaSupport.lhh(lhha) filter (_.isForRepeat) map { lhhaAnalysis ⇒
+  ): Option[String] = {
 
-        val labelValueOpt = controlOpt flatMap { currentControl ⇒
-          containingDocument.getControls.resolveObjectByIdOpt(currentControl.effectiveId, lhhaAnalysis.staticId, null) collect {
-            case control: XFormsLHHAControl ⇒ control.effectiveId
-          }
-        }
+    import shapeless._
+    import syntax.typeable._
 
-        labelValueOpt getOrElse ""
+    for {
+      currentControl    ← controlOpt
+      staticLhhaSupport ← staticControl.cast[StaticLHHASupport]
+      staticLhha        ← staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
+      if force || staticLhha.isForRepeat
+    } yield
+      if (staticLhha.isLocal) {
+        XFormsBaseHandler.getLHHACId(containingDocument, currentControl.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+      } else {
+        val suffix    = XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)
+        val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting) map (_.toString: AnyRef)
+
+        XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix)
       }
-    case _ ⇒ None
   }
 }

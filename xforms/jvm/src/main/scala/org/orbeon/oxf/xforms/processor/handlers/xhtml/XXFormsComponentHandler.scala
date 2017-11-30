@@ -15,9 +15,12 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.lang.StringBuilder
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml._
 import org.xml.sax.{Attributes, Locator}
 import org.orbeon.xforms.XFormsId
@@ -43,9 +46,6 @@ class XXFormsComponentHandler(
   private lazy val modeIsLhhaButNotCustom =
     binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
 
-  private def hasLabelFor =
-    binding.abstractBinding.labelFor.isDefined
-
   protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
@@ -68,67 +68,58 @@ class XXFormsComponentHandler(
     xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
-    if (modeIsLhhaButNotCustom) { // also implied: label is local (from `XFormsControlLifecyleHandler`)
-      if (hasLabelFor) {
-        super.handleLabel()
-      } else {
-        handleLabelHintHelpAlert(
-          getStaticLHHA(getPrefixedId, LHHA.Label),
-          getEffectiveId,
-          getForEffectiveId(getEffectiveId),
-          LHHA.Label,
-          Some("span"),
-          currentControlOrNull,
-          isTemplate,
-          isExternal = false
-        )
-      }
-    }
+    if (modeIsLhhaButNotCustom) // also implied: label is local (from `XFormsControlLifecyleHandler`)
+      handleLabelHintHelpAlert(
+        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
+        targetControlEffectiveId = getEffectiveId,
+        forEffectiveId           = getForEffectiveId(getEffectiveId),
+        lhha                     = LHHA.Label,
+        requestedElementNameOpt  = (binding.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) option "span",
+        controlOrNull            = currentControlOrNull,
+        isTemplate               = isTemplate,
+        isExternal               = false
+      )
 
   protected override def handleAlert() = if (modeIsLhhaButNotCustom) super.handleAlert()
   protected override def handleHint()  = if (modeIsLhhaButNotCustom) super.handleHint()
   protected override def handleHelp()  = if (modeIsLhhaButNotCustom) super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
-  // TODO: Most of this should be done statically, not dynamically. See also `findTargetControlForEffectiveId`.
+  // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.
   override def getForEffectiveId(effectiveId: String): String = {
 
-    val labelForStaticIdOpt = binding.abstractBinding.labelFor
+    import shapeless._
+    import syntax.typeable._
 
-    val staticTargetOpt =
+    val result =
       for {
-        labelForStaticId   ← labelForStaticIdOpt
-        labelForPrefixedId ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
-        staticTarget       ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
+        currentControl                    ← currentControlOpt // `None` if in template
+        staticControl                     ← staticControlOpt
+        staticLhhaSupport                 ← staticControl.cast[StaticLHHASupport]
+        staticLabel                       ← staticLhhaSupport.lhh(Label)
+        effectiveTargetControlOrPrefixedI ← staticLabel.effectiveTargetControlOrPrefixedIdOpt
+        currentControlSuffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
       } yield
-        staticTarget
-
-    staticTargetOpt match {
-      case Some(staticTarget) ⇒
-        // `label-for` is known statically
-        for {
-          currentControl   ← currentControlOpt // can be missing if we are in template
-          targetControlFor ← {
-            // Assume the target is within the same repeat iteration
-            val suffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-            val labelForEffectiveId = staticTarget.prefixedId + suffix
+        effectiveTargetControlOrPrefixedI match {
+          case Left(effectiveTargetControl) ⇒
 
             // Push/pop component context so that handler resolution works
             xformsHandlerContext.pushComponentContext(getPrefixedId)
-            try XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, staticTarget, labelForEffectiveId)
-            finally xformsHandlerContext.popComponentContext()
-          }
-        } yield
-          targetControlFor
-      case None ⇒
-        // `label-for` is now known statically, assume it's a nested HTML element
-        for {
-          labelForStaticId ← labelForStaticIdOpt
-          currentControl   ← currentControlOpt // can be missing if we are in template
-        } yield
-          XFormsId.getRelatedEffectiveId(currentControl.getEffectiveId + COMPONENT_SEPARATOR, labelForStaticId)
-    }
-  } orNull
+            try
+              XFormsLHHAHandler.findTargetControlForEffectiveId(
+                xformsHandlerContext,
+                effectiveTargetControl,
+                effectiveTargetControl.prefixedId + currentControlSuffix
+              )
+            finally
+              xformsHandlerContext.popComponentContext()
+
+          case Right(targetPrefixedId) ⇒
+            Some(targetPrefixedId + currentControlSuffix)
+        }
+
+    result.flatten.orNull
+  }
 }
 
 object XXFormsComponentHandler {

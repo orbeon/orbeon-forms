@@ -1387,7 +1387,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-repeat-template">
                     <xh:span class="xforms-label" id="my-new-select1≡≡l"/>
-                    <xh:span class="xforms-items" role="radiogroup" aria-labelledby="my-new-select1≡≡l">
+                    <xh:span class="xforms-items" role="radiogroup">
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>
@@ -2788,26 +2788,39 @@
                                 <row>
                                     <input>input 1</input>
                                     <textarea>textarea 1</textarea>
+                                    <gaga>gaga 1</gaga>
                                 </row>
                                 <row>
                                     <input>input 2</input>
                                     <textarea>textarea 2</textarea>
+                                    <gaga>gaga 2</gaga>
                                 </row>
                             </rows>
                         </xf:instance>
                         <xf:bind ref="row/input" required="true()"/>
                     </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="lhha binding value" xxbl:container="span" xxbl:label-for="input">
+                            <xbl:template>
+                                <xf:input ref="xxf:binding('fr-gaga')" id="input"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
                 </xh:head>
                 <xh:body>
                     <xf:label for="my-input"    id="my-input-label"   >Name</xf:label>
                     <xf:label for="my-textarea" id="my-textarea-label" mediatype="text/html"><i>Description</i></xf:label>
+                    <xf:label for="my-gaga"     id="my-gaga-label"    >Gaga</xf:label>
                     <xf:hint  for="my-input"    id="my-input-hint"    >Name Hint</xf:hint>
                     <xf:hint  for="my-textarea" id="my-textarea-hint" mediatype="text/html"><i>Description Hint</i></xf:hint>
+                    <xf:hint  for="my-gaga"     id="my-gaga-hint"     >Gaga Hint</xf:hint>
                     <xf:help  for="my-input"    id="my-input-help"    >Name Help</xf:help>
                     <xf:help  for="my-textarea" id="my-textarea-help" mediatype="text/html"><i>Description Help</i></xf:help>
+                    <xf:help  for="my-gaga"     id="my-gaga-help"     >Gaga Help</xf:help>
                     <xf:repeat ref="row" id="my-repeat">
                         <xf:input    ref="input"    id="my-input"/>
                         <xf:textarea ref="textarea" id="my-textarea"/>
+                        <fr:gaga     ref="gaga"     id="my-gaga"/>
                     </xf:repeat>
                 </xh:body>
             </xh:html>
@@ -2818,14 +2831,17 @@
                 <xh:span id="my-textarea-label" class="xforms-control xforms-label xforms-mediatype-text-html xforms-mediatype-text">
                     <xh:i>Description</xh:i>
                 </xh:span>
+                <xh:span  id="my-gaga-label" class="xforms-control xforms-label">Gaga</xh:span>
                 <xh:span id="my-input-hint" class="xforms-control xforms-hint">Name Hint</xh:span>
                 <xh:span id="my-textarea-hint" class="xforms-control xforms-hint xforms-mediatype-text-html xforms-mediatype-text">
                     <xh:i>Description Hint</xh:i>
                 </xh:span>
+                <xh:span  id="my-gaga-hint" class="xforms-control xforms-hint">Gaga Hint</xh:span>
                 <xh:span id="my-input-help" class="xforms-control xforms-help">Name Help</xh:span>
                 <xh:span id="my-textarea-help" class="xforms-control xforms-help xforms-mediatype-text-html xforms-mediatype-text">
                     <xh:i>Description Help</xh:i>
                 </xh:span>
+                <xh:span  id="my-gaga-help" class="xforms-control xforms-help">Gaga Help</xh:span>
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -2836,6 +2852,12 @@
                 <xh:span id="my-textarea⊙1" class="xforms-control xforms-textarea xforms-repeat-selected-item-1">
                     <xh:textarea id="my-textarea≡≡c⊙1" name="my-textarea⊙1" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 1</xh:textarea>
                 </xh:span>
+                 <xh:span  class="xforms-repeat-selected-item-1"/>
+                     <xh:span  id="my-gaga⊙1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1">
+                         <xh:span id="my-gaga≡input⊙1" class="xforms-control xforms-input">
+                             <xh:input id="my-gaga≡input≡xforms-input-1⊙1" type="text" name="my-gaga≡input≡xforms-input-1⊙1" value="gaga 1" class="xforms-input-input" aria-labelledby="my-gaga-label" aria-describedby="my-gaga-hint" aria-details="my-gaga-help"/>
+                         </xh:span>
+                     </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span/>
@@ -2846,16 +2868,28 @@
                 <xh:span id="my-textarea⊙2" class="xforms-control xforms-textarea">
                     <xh:textarea id="my-textarea≡≡c⊙2" name="my-textarea⊙2" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 2</xh:textarea>
                 </xh:span>
+                <xh:span />
+                    <xh:span  id="my-gaga⊙2" class="xbl-component xbl-fr-gaga">
+                        <xh:span id="my-gaga≡input⊙2" class="xforms-control xforms-input">
+                            <xh:input id="my-gaga≡input≡xforms-input-1⊙2" type="text" name="my-gaga≡input≡xforms-input-1⊙2" value="gaga 2" class="xforms-input-input" aria-labelledby="my-gaga-label" aria-describedby="my-gaga-hint" aria-details="my-gaga-help"/>
+                        </xh:span>
+                    </xh:span>
                 <xh:span/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input" aria-labelledby="" aria-describedby="" aria-details=""/>
+                    <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-textarea" class="xforms-control xforms-textarea xforms-repeat-template">
-                    <xh:textarea id="my-textarea≡≡c" name="my-textarea" aria-labelledby="" aria-describedby="" aria-details=""/>
+                    <xh:textarea id="my-textarea≡≡c" name="my-textarea"/>
                 </xh:span>
+                <xh:span  class="xforms-repeat-template"/>
+                    <xh:span  id="my-gaga" class="xbl-component xbl-fr-gaga xforms-repeat-template">
+                        <xh:span id="my-gaga≡input" class="xforms-control xforms-input">
+                            <xh:input id="my-gaga≡input≡xforms-input-1" type="text" name="my-gaga≡input≡xforms-input-1" value="" class="xforms-input-input"/>
+                        </xh:span>
+                    </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>

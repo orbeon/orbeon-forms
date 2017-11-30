@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -46,6 +47,8 @@ class LHHAAnalysis(
 
   require(parent.isDefined)
 
+  def getParent = parent.get // TODO: rename `parent` to `parentOpt`, and this `def` to `parent`
+
   def lhhaType = LHHA.withName(localName)
 
   val forStaticIdOpt = element.attributeValueOpt(FOR_QNAME)
@@ -53,7 +56,16 @@ class LHHAAnalysis(
   val defaultToHTML  = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
   val containsHTML   = LHHAAnalysis.containsHTML(element)
 
-  var isForRepeat       = false // updated in `attachToControl()`
+  // Updated in `attachToControl()`
+  private var _isForRepeat                          : Boolean                                 = false
+  private var _forRepeatNesting                     : Int                                     = 0
+  private var _directTargetControlOpt               : Option[StaticLHHASupport]               = None
+  private var _effectiveTargetControlOrPrefixedIdOpt: Option[StaticLHHASupport Either String] = None
+
+  def isForRepeat                           = _isForRepeat
+  def forRepeatNesting                      = _forRepeatNesting
+  def directTargetControl                   = _directTargetControlOpt getOrElse (throw new IllegalStateException)
+  def effectiveTargetControlOrPrefixedIdOpt = _effectiveTargetControlOrPrefixedIdOpt
 
   val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
   val hasLocalFullAppearance    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
@@ -80,23 +92,67 @@ class LHHAAnalysis(
     else
       Set.empty[ValidationLevel]
 
-  // Find the target control if any
-  def targetControlOpt = (
-    forStaticIdOpt
-    map (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)))
-    orElse parent
-    collect { case lhhaControl: StaticLHHASupport ⇒ lhhaControl }
-  )
-
   // Attach this LHHA to its target control if any
-  def attachToControl() = targetControlOpt match {
-    case Some(targetControl) ⇒
-      self.isForRepeat = ! self.isLocal && targetControl.ancestorRepeats.size > self.ancestorRepeats.size
-      targetControl.attachLHHA(self)
-    case None if ! isLocal ⇒
-      part.getIndentedLogger.logWarning("", "cannot attach external LHHA to control",
-        Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
-    case None ⇒
+  def attachToControl(): Unit = {
+
+    val (targetControl, effectiveTargetControlOrPrefixedIdOpt) = {
+
+      def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
+        part.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport ⇒ e}
+
+      def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
+        e match {
+          case xbl: ComponentControl ⇒
+            xbl.binding.abstractBinding.labelFor match {
+              case Some(nestedLabelForStaticId) ⇒
+                searchLHHAControlInScope(xbl.binding.innerScope, nestedLabelForStaticId) match {
+                  case Some(nestedLabelForTarget) ⇒ searchXblLabelFor(nestedLabelForTarget) // recurse
+                  case None                       ⇒ Some(Right(xbl.binding.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
+                }
+              case None ⇒
+                Some(Left(xbl))
+            }
+          case _ ⇒
+            Some(Left(e))
+        }
+
+      def initialElemFromForOpt =
+        forStaticIdOpt map  { forStaticId ⇒
+          searchLHHAControlInScope(scope, forStaticId) getOrElse (
+            throw new ValidationException(
+              s"`for` attribute with value `$forStaticId` doesn't point to a control supporting label, help, hint or alert.",
+              ElementAnalysis.createLocationData(element)
+            )
+          )
+        }
+
+      val initialElem = initialElemFromForOpt getOrElse {
+        getParent match {
+          case e: StaticLHHASupport ⇒ e
+          case _ ⇒
+            throw new ValidationException(
+              s"parent control must support label, help, hint or alert.",
+              ElementAnalysis.createLocationData(element)
+            )
+        }
+      }
+
+      (initialElem, searchXblLabelFor(initialElem))
+    }
+
+    // NOTE: We don't support a reference to an effective control within an XBL which is in a repeat nested within the XBL!
+    val repeatNesting = targetControl.ancestorRepeats.size - self.ancestorRepeats.size
+
+    self._isForRepeat                           = ! self.isLocal && repeatNesting > 0
+    self._forRepeatNesting                      = if (self._isForRepeat && repeatNesting > 0) repeatNesting else 0
+    self._directTargetControlOpt                = Some(targetControl)
+    self._effectiveTargetControlOrPrefixedIdOpt = effectiveTargetControlOrPrefixedIdOpt
+
+    // We attach the LHHA to one, and possibly two target controls
+    targetControl.attachLHHA(self)
+    effectiveTargetControlOrPrefixedIdOpt foreach {
+      _.left.toOption filter (_ ne targetControl) foreach (_.attachLHHABy(self))
+    }
   }
 
   // TODO: make use of static value

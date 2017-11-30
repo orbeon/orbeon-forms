@@ -369,11 +369,19 @@ abstract class XFormsBaseHandlerXHTML (
     newAttributes
   }
 
+  final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
+    for {
+      staticControl   ← staticControlOpt
+      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, LHHA.Label, force = true)(containingDocument)
+    } locally {
+      atts.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, value)
+    }
+
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
       staticControl   ← staticControlOpt
       (lhha, attName) ← ControlAjaxSupport.LhhaWithAriaAttName
-      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha)(containingDocument)
+      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha, force = false)(containingDocument)
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, value)
     }

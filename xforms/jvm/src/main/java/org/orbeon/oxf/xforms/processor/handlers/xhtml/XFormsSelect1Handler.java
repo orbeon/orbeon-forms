@@ -261,10 +261,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items");
 
         // For accessibility, label the group, since the control label doesn't apply to a single input
-        final String role = isMultiple ? "group" : "radiogroup";
-        containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, role);
-        final String labelId = getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML$.MODULE$.LabelCode());
-        containerAttributes.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelId);
+        containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, isMultiple ? "group" : "radiogroup");
+        handleAriaByAttForSelect1Full(containerAttributes);
+
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";

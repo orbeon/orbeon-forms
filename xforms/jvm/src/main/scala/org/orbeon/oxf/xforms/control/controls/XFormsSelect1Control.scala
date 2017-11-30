@@ -264,12 +264,9 @@ class XFormsSelect1Control(
     )
   }
 
-  // For full appearance we don't put a @for attribute so that selecting the main label doesn't
+  // https://github.com/orbeon/orbeon-forms/issues/3383
   override def findAriaByControlEffectiveId =
-    if (staticControl.isFull)
-      super.findAriaByControlEffectiveId
-    else
-      None
+    super.findAriaByControlEffectiveId
 
   // Don't accept focus if we have the internal appearance
   override def focusableControls =

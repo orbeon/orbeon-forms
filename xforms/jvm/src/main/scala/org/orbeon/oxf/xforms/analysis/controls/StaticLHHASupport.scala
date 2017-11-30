@@ -19,9 +19,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-
-import scala.collection.mutable
+import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, XPathAnalysis}
 
 sealed trait LHHA extends EnumEntry with Lowercase
 
@@ -69,21 +67,28 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
 
   // Because an LHHA might follow a control in the document, attachment must be deferred
   def attachLHHA(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (lhhaAnalysis.localName == "alert")
-      _alerts :+= lhhaAnalysis
-    else
-      _lhh += lhhaAnalysis.lhhaType → lhhaAnalysis
+    lhhaAnalysis.lhhaType match {
+      case LHHA.Alert ⇒ _alerts :+= lhhaAnalysis
+      case _          ⇒ _lhh     += lhhaAnalysis.lhhaType → lhhaAnalysis
+    }
 
-  def lhh(lhhaType: LHHA): Option[LHHAAnalysis] = _lhh.get(lhhaType)
-  def alerts             : List[LHHAAnalysis]   = _alerts
+  def attachLHHABy(lhhaAnalysis: LHHAAnalysis): Unit =
+    lhhaAnalysis.lhhaType match {
+      case LHHA.Alert ⇒ _alertsBy :+= lhhaAnalysis
+      case _          ⇒ _lhhBy     += lhhaAnalysis.lhhaType → lhhaAnalysis
+    }
 
-  def hasLHHA(lhhaType: LHHA) =
+  def lhh(lhhaType: LHHA)  : Option[LHHAAnalysis] = _lhh.get(lhhaType)
+  def lhhBy(lhhaType: LHHA): Option[LHHAAnalysis] = _lhhBy.get(lhhaType)
+  def alerts               : List[LHHAAnalysis]   = _alerts
+
+  def hasLHHA(lhhaType: LHHA): Boolean =
     if (lhhaType == LHHA.Alert) alerts.nonEmpty else lhh(lhhaType).nonEmpty
 
-  def hasLocal(lhhaType: LHHA) =
+  def hasLocal(lhhaType: LHHA): Boolean =
     lhhaAsList(lhhaType) exists (_.isLocal)
 
-  def lhhaValueAnalyses(lhhaType: LHHA) =
+  def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
     lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 
   val beforeAfterTokensOpt: Option[(List[String], List[String])] =
@@ -101,8 +106,10 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
 
     // All LHHA, local or external
     // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
-    val _lhh    = mutable.HashMap.empty[LHHA, LHHAAnalysis]
-    var _alerts = List.empty[LHHAAnalysis]
+    var _lhh      = Map.empty[LHHA, LHHAAnalysis] // at most 3 entries
+    var _lhhBy    = Map.empty[LHHA, LHHAAnalysis] // at most 3 entries
+    var _alerts   = List.empty[LHHAAnalysis]
+    var _alertsBy = List.empty[LHHAAnalysis]
 
     def lhhaAsList(lhhaType: LHHA) =
       if (lhhaType == LHHA.Alert) alerts else lhh(lhhaType).toList

@@ -16,7 +16,7 @@ package org.orbeon.oxf.cache
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import java.util.concurrent.locks.{ReentrantLock, Lock}
-import collection.JavaConversions._
+import collection.JavaConverters._
 import concurrent.{Await, Future}
 import concurrent.duration._
 import concurrent.ExecutionContext.Implicits.global
@@ -209,12 +209,12 @@ class MemoryCacheTest extends AssertionsForJUnit {
     val cache = new MemoryCacheImpl(size)
 
     val range = 1 to size
-    
+
     for (i ← range.reverse)
       cache.add(Key("o" + i), VALIDITY, i)
 
-    val keysAsInts = cache.iterateCacheKeys map (_.asInstanceOf[Key].key.tail.toInt) toSeq
-    val values = cache.iterateCacheObjects map (_.asInstanceOf[Int]) toSeq
+    val keysAsInts = cache.iterateCacheKeys.asScala map (_.asInstanceOf[Key].key.tail.toInt) toSeq
+    val values = cache.iterateCacheObjects.asScala map (_.asInstanceOf[Int]) toSeq
 
     assert(range === keysAsInts)
     assert(range === values)

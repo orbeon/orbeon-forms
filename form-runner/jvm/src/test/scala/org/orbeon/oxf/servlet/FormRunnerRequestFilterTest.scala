@@ -23,7 +23,7 @@ import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.FunSpecLike
 import org.scalatest.mockito.MockitoSugar
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
@@ -54,8 +54,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
       override def getHeader(name: String) = initialHeaders.get(name) map (_.head) orNull
       override def getHeaders(name: String) =
-        asJavaEnumeration(initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty)
-      override def getHeaderNames= initialHeaders.keysIterator
+        (initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty).asJavaEnumeration
+      override def getHeaderNames = initialHeaders.keysIterator.asJavaEnumeration
       override def getSession(create: Boolean) = mockSession
     }
 
@@ -69,8 +69,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics
-    val actualHeaders = amendedRequest.getHeaderNames map
-      (n ⇒ n → amendedRequest.getHeaders(n).toList) toMap
+    val actualHeaders = amendedRequest.getHeaderNames.asScala map
+      (n ⇒ n → amendedRequest.getHeaders(n).asScala.toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

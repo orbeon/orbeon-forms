@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
-import org.orbeon.oxf.xforms._
-import collection.JavaConversions._
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.dom.{QName, Element}
-import collection.mutable
 import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.LocationData
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 object SubmissionHeaders {
 
@@ -36,7 +37,7 @@ object SubmissionHeaders {
     val fullPrefix = xblContainer.getFullPrefix
 
     val headerElements = enclosingElement.elements(XFormsConstants.XFORMS_HEADER_QNAME)
-    if (headerElements.nonEmpty) {
+    if (headerElements.asScala.nonEmpty) {
 
       val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
 
@@ -103,7 +104,7 @@ object SubmissionHeaders {
       }
 
       // Process all nested <header> elements
-      for (headerElement ← headerElements) {
+      for (headerElement ← headerElements.asScala) {
         val headerScope =
           xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
 

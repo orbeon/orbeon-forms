@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import java.io.ByteArrayOutputStream
-import java.util.{Map ⇒ JMap}
+import java.{util ⇒ ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
@@ -33,7 +33,7 @@ import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable.{LinkedHashSet, Stack}
 import scala.util.control.NonFatal
 import scala.xml._
@@ -181,7 +181,7 @@ object PathMapXPathAnalysis {
       val stringPathmap = new PathMap(new StringLiteral(""))
 
       // In-scope variables
-      val variablePathMaps: JMap[String, PathMap] =
+      val variablePathMaps: ju.Map[String, PathMap] = {
         for {
           (name, variable) ← inScopeVariables
           valueAnalysis    = variable.variableAnalysis
@@ -193,6 +193,7 @@ object PathMapXPathAnalysis {
             // Constant string
             case _ ⇒ stringPathmap
           })
+      }.asJava
 
       def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 

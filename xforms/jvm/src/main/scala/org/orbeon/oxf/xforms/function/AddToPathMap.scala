@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.saxon.expr._
-import collection.JavaConversions._
+import collection.JavaConverters._
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.functions.SystemFunction
 
@@ -37,7 +37,7 @@ trait AddToPathMap {
     }
 
     val resultNodeSet = new PathMap.PathMapNodeSet
-    for (child ← iterateSubExpressions)
+    for (child ← iterateSubExpressions.asScala)
       resultNodeSet.addNodeSet(child.asInstanceOf[Expression].addToPathMap(pathMap, attachmentPoint))
 
     // Handle result differently if result type is atomic or not

@@ -26,7 +26,7 @@ import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.FunSpecLike
 import org.scalatest.mockito.MockitoSugar
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
@@ -53,8 +53,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {
       override def getProperty(name: String) = initialProperties.get(name) map (_.head) orNull
       override def getProperties(name: String) =
-        asJavaEnumeration(initialProperties.get(name) map (_.iterator) getOrElse Iterator.empty)
-      override def getPropertyNames = initialProperties.keysIterator
+        (initialProperties.get(name) map (_.iterator) getOrElse Iterator.empty).asJavaEnumeration
+      override def getPropertyNames = initialProperties.keysIterator.asJavaEnumeration
       override def getPortletSession = mockSession
       override def getPortletSession(create: Boolean) = mockSession
     }
@@ -109,7 +109,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
 
     // NOTE: Don't use Array for comparison, because Array's == doesn't work as expected in Scala
     val actualProperties =
-      amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap
+      amendedRequest.getPropertyNames.asScala map (n ⇒ n → amendedRequest.getProperties(n).asScala.toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

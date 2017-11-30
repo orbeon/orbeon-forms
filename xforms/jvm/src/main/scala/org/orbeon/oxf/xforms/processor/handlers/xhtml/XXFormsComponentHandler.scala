@@ -72,16 +72,16 @@ class XXFormsComponentHandler(
       if (hasLabelFor) {
         super.handleLabel()
       } else {
-          handleLabelHintHelpAlert(
-            getStaticLHHA(getPrefixedId, LHHA.Label),
-            getEffectiveId,
-            getForEffectiveId(getEffectiveId),
-            LHHA.Label,
-            Some("span"),
-            currentControlOrNull,
-            isTemplate,
-            isExternal = false
-          )
+        handleLabelHintHelpAlert(
+          getStaticLHHA(getPrefixedId, LHHA.Label),
+          getEffectiveId,
+          getForEffectiveId(getEffectiveId),
+          LHHA.Label,
+          Some("span"),
+          currentControlOrNull,
+          isTemplate,
+          isExternal = false
+        )
       }
     }
 

@@ -73,7 +73,7 @@ public final class DOMGenerator extends ProcessorImpl {
 
         DOM4JSourceFactory(final org.orbeon.dom.Document d, final String sid, boolean clone) {
             super(sid);
-            doc = clone ? (org.orbeon.dom.Document) d.clone() : d;
+            doc = clone ? (org.orbeon.dom.Document) d.deepCopy() : d;
         }
 
         Source makeDOMSource() {

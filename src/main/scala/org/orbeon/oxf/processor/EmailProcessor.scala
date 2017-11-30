@@ -283,7 +283,7 @@ class EmailProcessor extends ProcessorImpl {
             // Create Document and convert it into a String
             val rootElement = if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
             val partDocument = DocumentFactory.createDocument
-            partDocument.setRootElement(rootElement.clone().asInstanceOf[Element])
+            partDocument.setRootElement(rootElement.deepCopy.asInstanceOf[Element])
             Right(handleInlinePartContent(partDocument, mediatype))
         }
 

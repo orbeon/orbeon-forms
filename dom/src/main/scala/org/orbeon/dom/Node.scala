@@ -13,7 +13,7 @@ object Node {
   }
 }
 
-trait Node extends Cloneable {
+trait Node {
 
   def getParent: Element
   def setParent(parent: Element): Unit
@@ -33,8 +33,8 @@ trait Node extends Cloneable {
 
   def accept(visitor: Visitor): Unit
 
-  // TODO: We don't like `Cloneable`. Instead use custom `copy` or `deepCopy` method.
-  override def clone(): AnyRef = super.clone()
+  // Maybe check this: https://tpolecat.github.io/2015/04/29/f-bounds.html
+  def deepCopy: Node
 }
 
 trait Comment extends Node

@@ -4,7 +4,7 @@ import java.io.Serializable
 
 import org.orbeon.dom.{Document, Element, Node}
 
-abstract class AbstractNode extends Node with Cloneable with Serializable {
+abstract class AbstractNode extends Node with Serializable { // TODO: `Serializable` needed?
 
   def getDocument: Document = {
     val element = getParent
@@ -18,7 +18,7 @@ abstract class AbstractNode extends Node with Cloneable with Serializable {
 
   def hasContent: Boolean = false
 
-  override def clone(): AnyRef = {
+  def deepCopy: Node = {
     val clone = super.clone().asInstanceOf[Node]
     clone.setParent(null)
     clone.setDocument(null)

@@ -84,7 +84,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     inScopeContainingDocument.setTransientState(
       RollbackContent.getClass.getName,
       RollbackContent(
-        data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).clone().asInstanceOf[Document], // ugly way to copy
+        data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
         saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
         autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
       )

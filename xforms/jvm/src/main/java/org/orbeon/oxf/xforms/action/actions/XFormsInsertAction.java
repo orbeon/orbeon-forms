@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.model.FlaggedDefaultsStrategy$;
 import org.orbeon.oxf.xforms.model.InstanceDataOps;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.dom.saxon.DocumentWrapper;
@@ -288,7 +287,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                         // NOTE: Don't clone nodes if doClone == false
                         final Node sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject);
-                        final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Element) sourceNode).createCopy() : (Node) sourceNode.clone() : sourceNode;
+                        final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Element) sourceNode).createCopy() : (Node) sourceNode.deepCopy() : sourceNode;
 
                         sourceNodes.add(sourceNode);
                         clonedNodesTemp.add(clonedNode);

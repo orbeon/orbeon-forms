@@ -323,7 +323,7 @@ public class RequestGenerator extends ProcessorImpl {
         final Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
             context.wholeRequest = readWholeRequestAsDOM4J(getRequest(pipelineContext), context);
-        final Document result = (Document) context.wholeRequest.clone();
+        final Document result = (Document) context.wholeRequest.deepCopy();
 
         // Filter the request based on the config input
         filterRequestDocument(result, config);

@@ -68,7 +68,7 @@ public class ASTDocumentHandler implements ASTHandler {
             if (input.getContent() instanceof Document) {
                 inputElement.add(((Document) input.getContent()).getRootElement().createCopy());
             } else {
-                inputElement.add((Node) input.getContent().clone());
+                inputElement.add((Node) input.getContent().deepCopy());
             }
         }
     }

@@ -36,8 +36,8 @@ class ConcreteDocument extends AbstractBranch with Document {
 
   def content = internalContent
 
-  override def clone(): AnyRef = {
-    val document = super.clone().asInstanceOf[ConcreteDocument]
+  override def deepCopy: Node = {
+    val document = super.deepCopy.asInstanceOf[ConcreteDocument]
     document._rootElement = null
     document._internalContent = null
     document.appendContent(this)

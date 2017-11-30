@@ -75,7 +75,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                                     final Iterator it = inputElement.elementIterator();
                                     if (it.hasNext()) {
                                         final Element srcElt = (Element) it.next();
-                                        final Element elt = (Element) srcElt.clone();
+                                        final Element elt = (Element) srcElt.deepCopy();
                                         processorDefinition.addInput(name, elt);
                                     } else
                                         throw new OXFException("Node not found input element");

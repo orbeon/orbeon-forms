@@ -99,7 +99,7 @@ public class PageFlowControllerBuilder {
             if (!setValueElements.isEmpty()) {
                 for (Object setValueElement1: setValueElements) {
                     final Element setValueElement = (Element) setValueElement1;
-                    setvaluesDocument.getRootElement().add((Element) setValueElement.clone());
+                    setvaluesDocument.getRootElement().add((Element) setValueElement.deepCopy());
                 }
             }
         } else {

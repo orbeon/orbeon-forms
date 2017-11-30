@@ -12,7 +12,7 @@ private object ConcreteElement {
   def appendAttributes(src: Element, dst: Element): Unit = {
     for (i ← 0 until src.attributeCount) {
       val att = src.attribute(i)
-      dst.add(att.clone().asInstanceOf[Attribute])
+      dst.add(att.deepCopy.asInstanceOf[Attribute])
     }
   }
 }
@@ -573,7 +573,7 @@ class ConcreteElement(var qname: QName)
 
   // Doesn't try to grab namespace declarations from ancestors.
   private def cloneInternal: ConcreteElement = {
-    val clone = super.clone().asInstanceOf[ConcreteElement]
+    val clone = super.deepCopy.asInstanceOf[ConcreteElement]
     if (clone ne this) {
       clone._internalContent = new ju.ArrayList[Node](DefaultContentListSize)
       clone._attributes      = new ju.ArrayList[Attribute](DefaultContentListSize)
@@ -589,14 +589,14 @@ class ConcreteElement(var qname: QName)
       val clone =
         branch.node(i) match {
           case elem: ConcreteElement ⇒ elem.cloneInternal
-          case node                  ⇒ node.clone().asInstanceOf[Node]
+          case node                  ⇒ node.deepCopy
         }
       add(clone: Node)
     }
   }
 
   // The clone will have parent eq null but will have any necessary namespace declarations this element's ancestors.
-  override def clone(): AnyRef = {
+  override def deepCopy: Node = {
 
     val clone = cloneInternal
     var ancestor = getParent

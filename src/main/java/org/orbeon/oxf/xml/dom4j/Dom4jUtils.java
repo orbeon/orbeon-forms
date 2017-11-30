@@ -474,7 +474,7 @@ public class Dom4jUtils {
      * @return          copy of Node
      */
     public static Node createCopy(Node source) {
-        return (source instanceof Element) ? ((Element) source).createCopy() : (Node) source.clone();
+        return (source instanceof Element) ? ((Element) source).createCopy() : (Node) source.deepCopy();
     }
 
     /**

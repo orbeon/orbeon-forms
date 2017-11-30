@@ -69,7 +69,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 try {
                     final Element filterElement = readInputAsOrbeonDom(pipelineContext, INPUT_FILTER).getRootElement();
-                    final Document instance = ( Document ) readInputAsOrbeonDom( pipelineContext, INPUT_INSTANCE ).clone();
+                    final Document instance = ( Document ) readInputAsOrbeonDom( pipelineContext, INPUT_INSTANCE ).deepCopy();
 
                     final LocationData locationData = ((LocationData) instance.getRootElement().getData());
 

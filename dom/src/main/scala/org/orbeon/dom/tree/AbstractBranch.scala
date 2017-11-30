@@ -96,7 +96,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   def appendContent(branch: Branch): Unit = {
     for (i ← 0 until branch.nodeCount) {
       val node = branch.node(i)
-      add(node.clone().asInstanceOf[Node])
+      add(node.deepCopy)
     }
   }
 

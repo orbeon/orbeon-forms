@@ -105,7 +105,7 @@ trait LockUnlock extends RequestResponse {
           RelationalUtils.withConnection { connection ⇒
             def callThunk(leaseStatus: LeaseStatus): Unit =
               thunk(connection, leaseStatus, dataPart, reqLockInfo)
-            LockSql.readLease(connection, dataPart) match {
+            LockSql.readLease(connection, req.provider, dataPart) match {
               case Some(lease) ⇒
                 val canUseExistingLease =
                   reqLockInfo.username == lease.lockInfo.username || lease.timeout <= 0

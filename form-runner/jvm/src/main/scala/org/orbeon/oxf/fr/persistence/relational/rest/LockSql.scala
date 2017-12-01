@@ -16,6 +16,8 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.util.IOUtils.useAndClose
 import java.sql.{Connection, ResultSet}
 
+import org.orbeon.oxf.fr.persistence.relational.Provider
+
 object LockSql {
 
   case class Lease(
@@ -25,12 +27,14 @@ object LockSql {
 
   def readLease(
     connection  : Connection,
+    provider    : Provider,
     reqDataPart : DataPart
   )             : Option[Lease] = {
+    Provider.lockTable(connection, provider, "orbeon_form_data_lease")
     val sql =
       s"""SELECT username, groupname,
          |       datediff(second, CURRENT_TIMESTAMP, expiration) AS timeout
-         |  FROM orbeon_form_data_lease (TABLOCKX)
+           |  FROM orbeon_form_data_lease (TABLOCKX)
          | WHERE document_id = ?
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒

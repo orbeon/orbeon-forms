@@ -309,8 +309,8 @@
                     <xf:var name="tab" value="."/>
                     <xf:var name="validating" value="xs:boolean($tab/validating)"/>
 
-                    <fr:grid columns="3">
-                        <xf:group ref="$tab/file[not(normalize-space())]">
+                    <xf:group ref="$tab/file[not(normalize-space())]">
+                        <fr:grid>
                             <xh:tr>
                                 <xh:td colspan="3">
 
@@ -330,9 +330,12 @@
 
                                 </xh:td>
                             </xh:tr>
-                        </xf:group>
+                        </fr:grid>
+                    </xf:group>
 
-                        <xf:group ref="$tab/file[normalize-space()]">
+
+                    <xf:group ref="$tab/file[normalize-space()]">
+                        <fr:grid>
                             <xh:tr>
                                 <xh:td>
                                     <xf:output ref="@filename">
@@ -345,10 +348,11 @@
                                     </xf:output>
                                 </xh:td>
                             </xh:tr>
-                        </xf:group>
+                        </fr:grid>
+                    </xf:group>
 
-                        <xf:group ref=".[$validating]">
-
+                    <xf:group ref=".[$validating]">
+                        <fr:grid>
                             <xh:tr>
                                 <xh:td>
                                     <!-- Progress status -->
@@ -391,16 +395,18 @@
                                 </xh:td>
                                 <xh:td/>
                             </xh:tr>
-                        </xf:group>
+                        </fr:grid>
+                    </xf:group>
 
-                        <!-- Validation results when available -->
-                        <xf:group context="instance('import-validation-result')" ref=".[$validation-done]">
-                            <!-- Validation results -->
+                    <!-- Validation results when available -->
+                    <xf:group context="instance('import-validation-result')" ref=".[$validation-done]">
+                        <!-- Validation results -->
 
-                            <xf:var name="some-invalid" value="bind('invalid-count-bind') gt 0"/>
+                        <xf:var name="some-invalid" value="bind('invalid-count-bind') gt 0"/>
 
-                            <!-- No invalid documents -->
-                            <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
+                        <!-- No invalid documents -->
+                        <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
+                            <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="fb-import-success">
@@ -413,9 +419,11 @@
                                         </xh:span>
                                     </xh:td>
                                 </xh:tr>
-                            </xf:group>
-                            <!-- Warn user if there is any invalid documents -->
-                            <xf:group ref=".[$some-invalid and not($validation-canceled)]">
+                            </fr:grid>
+                        </xf:group>
+                        <!-- Warn user if there is any invalid documents -->
+                        <xf:group ref=".[$some-invalid and not($validation-canceled)]">
+                            <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="fb-import-warning">
@@ -429,9 +437,11 @@
                                         </xh:span>
                                     </xh:td>
                                 </xh:tr>
-                            </xf:group>
-                            <!-- Case where validation was canceled -->
-                            <xf:group ref=".[$validation-canceled]">
+                            </fr:grid>
+                        </xf:group>
+                        <!-- Case where validation was canceled -->
+                        <xf:group ref=".[$validation-canceled]">
+                            <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="fb-import-warning">
@@ -451,26 +461,26 @@
                                         </xf:trigger>
                                     </xh:td>
                                 </xh:tr>
-                            </xf:group>
+                            </fr:grid>
                         </xf:group>
-                    </fr:grid>
+                    </xf:group>
 
                 </fr:section>
                 <fr:section id="import-section" ref="instance()/import[$validation-done and not($validation-canceled)]">
                     <xf:label>Import</xf:label>
 
-                    <fr:grid columns="3">
 
-                        <xf:var name="tab" value="."/>
+                    <xf:var name="tab" value="."/>
 
-                        <xf:var name="searched"  value="exists(instance('import-search-response')/@search-total)"/>
-                        <xf:var name="importing" value="xs:boolean($tab/importing)"/>
+                    <xf:var name="searched"  value="exists(instance('import-search-response')/@search-total)"/>
+                    <xf:var name="importing" value="xs:boolean($tab/importing)"/>
 
-                        <xf:group ref=".[$searched]">
+                    <xf:group ref=".[$searched]">
 
-                            <xf:var name="existing" value="xs:integer(instance('import-search-response')/@search-total)"/>
+                        <xf:var name="existing" value="xs:integer(instance('import-search-response')/@search-total)"/>
 
-                            <xf:group ref=".[not($importing or $import-done)]">
+                        <xf:group ref=".[not($importing or $import-done)]">
+                            <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <xf:output
@@ -539,10 +549,11 @@
                                         </xf:trigger>
                                     </xh:td>
                                 </xh:tr>
-                            </xf:group>
+                            </fr:grid>
+                        </xf:group>
 
-                            <xf:group ref=".[$importing]">
-
+                        <xf:group ref=".[$importing]">
+                            <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <xf:group>
@@ -594,15 +605,17 @@
                                         </xf:trigger>
                                     </xh:td>
                                 </xh:tr>
-                            </xf:group>
+                            </fr:grid>
+                        </xf:group>
 
-                            <!-- Import results when available -->
-                            <xf:group context="instance('import-result')" ref=".[$import-done]">
-                                <!-- Validation results -->
+                        <!-- Import results when available -->
+                        <xf:group context="instance('import-result')" ref=".[$import-done]">
+                            <!-- Validation results -->
 
-                                <xf:var name="skipped" value="xs:integer(processed) - succeeded"/>
+                            <xf:var name="skipped" value="xs:integer(processed) - succeeded"/>
 
-                                <xf:group ref=".[not($import-canceled)]">
+                            <xf:group ref=".[not($import-canceled)]">
+                                <fr:grid>
                                     <xh:tr>
                                         <xh:td colspan="2">
                                             <xh:span class="fb-import-success">
@@ -619,9 +632,11 @@
                                             </xh:span>
                                         </xh:td>
                                     </xh:tr>
-                                </xf:group>
-                                <!-- Case where validation was canceled -->
-                                <xf:group ref=".[$import-canceled]">
+                                </fr:grid>
+                            </xf:group>
+                            <!-- Case where validation was canceled -->
+                            <xf:group ref=".[$import-canceled]">
+                                <fr:grid>
                                     <xh:tr>
                                         <xh:td colspan="2">
                                             <xh:span class="fb-import-warning">
@@ -641,11 +656,11 @@
                                             </xf:trigger>
                                         </xh:td>
                                     </xh:tr>
-                                </xf:group>
-
+                                </fr:grid>
                             </xf:group>
+
                         </xf:group>
-                    </fr:grid>
+                    </xf:group>
                 </fr:section>
 
                 <!--<fr:xforms-inspector/>-->

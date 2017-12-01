@@ -510,8 +510,10 @@
 
     <!-- Clear operation -->
     <xf:action event="fr-clear">
-        <!-- Case of inline template -->
-        <xf:insert ref="xxf:instance('fr-form-instance')" origin="instance('fr-initial-instance')"/>
+
+        <xf:insert
+            ref="xxf:instance('fr-form-instance')"
+            origin="instance('fr-initial-instance')"/>
 
         <!-- Notify that the data is reset -->
         <xf:dispatch targetid="fr-form-model" name="fr-data-reset"/>
@@ -699,7 +701,7 @@
     </xf:action>
 
     <!-- Initial instance (to support clear) -->
-    <xf:instance id="fr-initial-instance" xxf:readonly="false"><!-- Set to false so that xf:insert works -->
+    <xf:instance id="fr-initial-instance" xxf:readonly="false"><!-- Set to false so that `xf:insert` works -->
         <form xmlns=""/>
     </xf:instance>
 

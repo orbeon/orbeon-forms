@@ -26,6 +26,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.concurrent.*;
 
 /**
@@ -225,7 +229,7 @@ public class AsynchronousSubmissionManager {
         }
     }
 
-    private static class AsynchronousSubmissions {
+    private static class AsynchronousSubmissions implements Externalizable {
         private final CompletionService<SubmissionResult> completionService =
                 new ExecutorCompletionService<SubmissionResult>(getExecutorService());
         private int pendingCount = 0;
@@ -251,6 +255,16 @@ public class AsynchronousSubmissionManager {
 
         public int getPendingCount() {
             return pendingCount;
+        }
+
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            // NOP
+        }
+
+        @Override
+        public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+            // NOP
         }
     }
 }

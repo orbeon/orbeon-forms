@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.function.xxforms
 import java.text.MessageFormat
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.{StringValue, Value}
 import org.orbeon.scaxon.Implicits._
@@ -33,35 +32,7 @@ class XXFormsFormatMessage extends XFormsFunction {
     // Convert sequence to array of Java objects
     val arguments = asScalaIterator(messageArguments) map Value.convertToJava toArray
 
-    // Find xml:lang and set locale if any
-
-    val format =
-      elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _)) match {
-        case Some(lang) ⇒
-          // Not sure how xml:lang should be parsed, see:
-          //
-          // XML spec points to:
-          //
-          // - http://tools.ietf.org/html/rfc4646
-          // - http://tools.ietf.org/html/rfc4647
-          //
-          // NOTES:
-          //
-          // - IETF BCP 47 replaces RFC 4646 (and includes RFC 5646 and RFC 4647)
-          // - Java 7 has an improved Locale class which supports parsing BCP 47
-          //
-          // http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html#forLanguageTag(java.lang.String)
-          // http://www.w3.org/International/articles/language-tags/
-          // http://sites.google.com/site/openjdklocale/design-specification
-          // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
-
-          // Use Saxon utility for now
-          new MessageFormat(template, Configuration.getLocale(lang))
-        case None ⇒
-          new MessageFormat(template)
-      }
-
-    format.format(arguments)
+    new MessageFormat(template, currentLocale).format(arguments)
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {

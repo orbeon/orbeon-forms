@@ -13,9 +13,15 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import java.text.MessageFormat
+import java.util.Locale
+import java.util.regex.Matcher
+
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.model.XFormsInstance
+import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{AxisExpression, PathMap, StringLiteral, XPathContext}
 import org.orbeon.saxon.om._
@@ -34,7 +40,11 @@ class XXFormsResource extends XFormsFunction {
 
     implicit val ctx = xpathContext
 
-    def findInstance = stringArgumentOpt(1) match {
+    val resourceKeyArgument = stringArgument(0)
+    val instanceArgumentOpt = stringArgumentOpt(1)
+    val templateParamsOpt   = itemsArgumentOpt(2) map (it ⇒ MapFunctions.collectMapValues(it.iterator).next())
+
+    def findInstance = instanceArgumentOpt match {
       case Some(instanceName) ⇒ resolveOrFindByStaticOrAbsoluteId(instanceName)
       case None               ⇒ resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
     }
@@ -46,15 +56,31 @@ class XXFormsResource extends XFormsFunction {
       availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
     }
 
+    def processResourceString(resourceOrTemplate: String): String =
+      templateParamsOpt match {
+        case Some(params) ⇒
+
+          val javaNamedParamsIt = params.iterator map {
+            case (key, value) ⇒
+              val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
+              key.getStringValue → javaParamOpt.orNull
+          }
+
+          processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to[List], currentLocale)
+
+        case None ⇒
+          resourceOrTemplate
+      }
+
     val resultOpt =
       for {
         elementAnalysis ← elementAnalysisForSource
         resources       ← findResourcesElement
         requestedLang   ← XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
         resourceRoot    ← findResourceElementForLang(resources, requestedLang)
-        leaves          ← pathFromTokens(resourceRoot, splitResourceName(stringArgument(0))).headOption
+        leaf            ← pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
       } yield
-        stringToStringValue(leaves.stringValue)
+        stringToStringValue(processResourceString(leaf.stringValue))
 
     resultOpt.orNull
   }
@@ -156,5 +182,37 @@ object XXFormsResource {
         }
 
       findChild(List(context), tokens)
+  }
+
+  // Ideally should be the same as a non-qualified XPath variable name
+  private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*""".r
+
+
+  // Template processing
+  //
+  // - See https://github.com/orbeon/orbeon-forms/issues/3078
+  // - For now, we only support template values like `{$foo}`.
+  // - Whitespace is allowed between the brackets: `{ $foo }`.
+  //
+  // In the future, we would like to extend the syntax with full nested XPath expressions, which would mean
+  // compiling the template to an XPath value template.
+
+  def processTemplateWithNames(
+    templateWithNames : String,
+    javaNamedParams   : List[(String, Any)],
+    currentLocale     : Locale
+  ): String = {
+
+    val nameToPos = javaNamedParams.iterator.map(_._1).zipWithIndex.toMap
+
+    val templateWithPositions =
+      MatchTemplateKey.replaceAllIn(templateWithNames, m ⇒ {
+        Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
+      })
+
+    // TODO: Don't use `MessageFormat`, but format values per the default formatting rules for the types, as `xf:output` does.
+    new MessageFormat(templateWithPositions, currentLocale)
+      .format(javaNamedParams.map(_._2).to[Array]: Array[Any])
+
   }
 }

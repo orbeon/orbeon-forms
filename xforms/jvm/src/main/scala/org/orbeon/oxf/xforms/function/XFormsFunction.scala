@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.util.{Iterator ⇒ JIterator}
+import java.util.{Locale, Iterator ⇒ JIterator}
 
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
@@ -22,9 +22,11 @@ import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
+import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
@@ -72,10 +74,10 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
   def bindingContext = context.bindingContext
 
-  def getSourceEffectiveId =
+  def getSourceEffectiveId: String =
     context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
-  def elementAnalysisForSource = {
+  def elementAnalysisForSource: Option[ElementAnalysis] = {
     val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
     context.container.partAnalysis.findControlAnalysis(prefixedId)
   }
@@ -91,8 +93,37 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   def getContainingDocument(implicit xpathContext: XPathContext): XFormsContainingDocument =
     Option(context) map (_.container.getContainingDocument) orNull
 
-  def setProperty(name: String, value: Option[String]) =
+  def setProperty(name: String, value: Option[String]): Unit =
     context.setProperty(name, value)
+
+  def currentLangOpt(implicit xpathContext: XPathContext): Option[String] =
+    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
+
+  def currentLocale(implicit xpathContext: XPathContext): Locale =
+    currentLangOpt match {
+      case Some(lang) ⇒
+        // Not sure how xml:lang should be parsed, see:
+        //
+        // XML spec points to:
+        //
+        // - http://tools.ietf.org/html/rfc4646
+        // - http://tools.ietf.org/html/rfc4647
+        //
+        // NOTES:
+        //
+        // - IETF BCP 47 replaces RFC 4646 (and includes RFC 5646 and RFC 4647)
+        // - Java 7 has an improved Locale class which supports parsing BCP 47
+        //
+        // http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html#forLanguageTag(java.lang.String)
+        // http://www.w3.org/International/articles/language-tags/
+        // http://sites.google.com/site/openjdklocale/design-specification
+        // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+
+        // Use Saxon utility for now
+        Configuration.getLocale(lang)
+      case None ⇒
+        Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
+  }
 
   protected def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName = {
 

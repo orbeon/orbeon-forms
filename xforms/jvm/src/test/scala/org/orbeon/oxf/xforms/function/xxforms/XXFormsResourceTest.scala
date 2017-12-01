@@ -13,6 +13,8 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import java.util.Locale
+
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -22,7 +24,7 @@ class XXFormsResourceTest extends FunSpec {
 
   describe("The `pathFromTokens()` function") {
 
-    val xml1: NodeInfo =
+    val resources: NodeInfo =
       <resources>
         <components>
           <grid>
@@ -45,7 +47,7 @@ class XXFormsResourceTest extends FunSpec {
     for ((path, expected) ← Expected)
       it(s"must find the node with path `$path`") {
 
-        val result = XXFormsResource.pathFromTokens(xml1.rootElement, XXFormsResource.splitResourceName(path))
+        val result = XXFormsResource.pathFromTokens(resources.rootElement, XXFormsResource.splitResourceName(path))
 
         assert(1 === result.size)
         assert(expected === result.stringValue)
@@ -64,6 +66,40 @@ class XXFormsResourceTest extends FunSpec {
       it(s"must flatten path `$path`") {
         assert(expected === XXFormsResource.flattenResourceName(path))
       }
+  }
+
+  describe("Template replacement") {
+
+    // NOTE: We don't want to support Java's `MessageFormat` `choice` anymore, see
+    // https://github.com/orbeon/orbeon-forms/issues/3078.
+    val PublishTemplate =
+      """Version {
+        $form-version
+      } with {
+        $attachments,choice,0#no attachments|1#1 attachment|1<{$attachments} attachments}."""
+
+    val Expected = List(
+      (
+        PublishTemplate,
+        List("form-version" → 42, "attachments" → 0)
+      ) → """Version 42 with no attachments.""",
+      (
+        PublishTemplate,
+        List("form-version" → 42, "attachments" → 1)
+      ) → """Version 42 with 1 attachment.""",
+      (
+        PublishTemplate,
+        List("form-version" → 42, "attachments" → 3)
+      ) → """Version 42 with 3 attachments."""
+    )
+
+    for (((template, params), expected) ← Expected)
+      it(s"must replace template to `$expected`") {
+        assert(
+          expected === XXFormsResource.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))
+        )
+      }
+
   }
 
 }

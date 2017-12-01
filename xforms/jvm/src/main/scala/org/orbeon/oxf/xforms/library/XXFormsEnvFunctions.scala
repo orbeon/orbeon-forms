@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
@@ -174,7 +174,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun("r", classOf[XXFormsResource], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
-      Arg(STRING, EXACTLY_ONE)
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE) // `map(*)`
     )
 
     Fun("pending-uploads", classOf[XXFormsPendingUploads], op = 0, min = 0, INTEGER, EXACTLY_ONE)

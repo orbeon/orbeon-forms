@@ -137,16 +137,13 @@
                 <xsl:variable
                     name="static-col-count"
                     select="
-                        if ($is-12col-input) then
-                            12
-                        else
-                            max(
-                                for $row in $grid-rows-if-not-12col-input
-                                return sum(
-                                    for $td in $row/*:td
-                                    return ($td/@colspan[. castable as xs:integer and xs:integer(.) ge 1]/xs:integer(.), 1)[1]
-                                )
+                        if (array:size($rows-array) ge 1) then
+                            sum(
+                                for $map in array:get($rows-array, 1)
+                                    return map:get($map, 'w')
                             )
+                        else
+                            0
                     "/>
 
                 <xsl:variable

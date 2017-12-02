@@ -117,7 +117,7 @@ trait LiferayAPI {
   private[liferay] type RoleFacade = {
     def getName         : String
     def getType         : Int
-    def toString        : String
+    def toString()      : String // use `toString()` instead of `toString` to make Scala 2.12 happy
   }
 
   private[liferay] type UserGroupRoleFacade = {

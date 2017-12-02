@@ -65,11 +65,9 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
       def getDescriptiveName = getName
     }
 
-    case class MyRole(
-      getName             : String
-    ) {
-      def getType           = LiferayAPI.LiferayRegularRoleType.value
-      override def toString = s"MyRole($getName)"
+    case class MyRole(getName: String) {
+      def getType             = LiferayAPI.LiferayRegularRoleType.value
+      override def toString() = s"MyRole($getName)"
     }
 
     class MyUser {

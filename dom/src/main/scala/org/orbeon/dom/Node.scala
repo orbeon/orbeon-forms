@@ -13,7 +13,7 @@ object Node {
   }
 }
 
-trait Node {
+trait Node extends Cloneable {
 
   def getParent: Element
   def setParent(parent: Element): Unit

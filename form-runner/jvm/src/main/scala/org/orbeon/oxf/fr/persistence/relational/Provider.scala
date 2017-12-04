@@ -99,9 +99,9 @@ object Provider {
   def lockTable(connection: Connection, provider: Provider, tableName: String): Unit = {
     val sql =
       provider match {
-        case MySQL     ⇒ s"LOCK TABLES $tableName WRITE"
-        case SQLServer ⇒ s"SELECT 1 FROM $tableName (TABLOCKX)"
-        case Oracle    ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
+        case MySQL      ⇒ s"LOCK TABLES $tableName WRITE"
+        case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
+        case _          ⇒ throw new UnsupportedOperationException
       }
     useAndClose(connection.prepareStatement(sql))(_.executeUpdate())
   }

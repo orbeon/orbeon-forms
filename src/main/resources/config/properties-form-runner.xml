@@ -65,8 +65,8 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.lease"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.lease"                            value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.lease"                             value="true"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.lease"                        value="false"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.db2.lease"                               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.lease"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.db2.lease"                               value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.lease"                         value="true"/>
 
     <!-- Whether providers are active -->

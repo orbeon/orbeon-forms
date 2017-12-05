@@ -103,6 +103,6 @@ object Provider {
         case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
         case _          ⇒ throw new UnsupportedOperationException
       }
-    useAndClose(connection.prepareStatement(sql))(_.executeUpdate())
+    useAndClose(connection.prepareStatement(sql))(_.execute())
   }
 }

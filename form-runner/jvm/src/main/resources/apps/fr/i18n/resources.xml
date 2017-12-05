@@ -245,6 +245,17 @@
                     This is a read-only view of your data.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title>Renew lease?</renew-lease-title>
+                <renew-lease-message>Your lease is about to expire. Would you like to renew it now?</renew-lease-message>
+                <current-user-left>You own a lease on this document for another </current-user-left>
+                <current-user-right>.</current-user-right>
+                <relinquished>You don't own a lease on this document anymore.</relinquished>
+                <other-user>Another user, with username "{0}", currently owns a lease on this document.</other-user>
+                <relinquish>Relinquish lease</relinquish>
+                <renew>Renew lease</renew>
+                <try-acquire>Try to acquire lease</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Save Locally</dialog-title>

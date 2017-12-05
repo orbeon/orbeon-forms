@@ -112,7 +112,7 @@
                 <xf:switch caseref="$lease-state-elem">
                     <xf:case value="'current-user'">
                         <xh:div>
-                            You own a lease on this document for another
+                            <xf:output value="$fr-resources/detail/lease/current-user-left"/>
                             <fr:countdown
                                 ref="$persistence-instance/lease-end-time"
                                 alert-threshold-ref="$persistence-instance/lease-alert-threshold">
@@ -133,16 +133,20 @@
                                         target="fr-lease-renew-dialog"
                                         name="fr-show"/>
                                 </xf:action>
-                            </fr:countdown>.
+                            </fr:countdown>
+                            <xf:output value="$fr-resources/detail/lease/current-user-right"/>
                         </xh:div>
                     </xf:case>
                     <xf:case value="'relinquished'">
-                        You don't own a lease on this document anymore.
+                        <xf:output value="$fr-resources/detail/lease/relinquished"/>
                     </xf:case>
                     <xf:case value="'other-user'">
-                        Another user, with username
-                        "<xf:output value="xxf:instance('fr-lockinfo-response')/d:owner/fr:username"/>",
-                        currently owns a lease on this document.
+                        <xf:output value="
+                            xxf:format-message(
+                                $fr-resources/detail/lease/other-user,
+                                xxf:instance('fr-lockinfo-response')/d:owner/fr:username
+                            )
+                        "/>
                     </xf:case>
                 </xf:switch>
             </xh:div>
@@ -154,7 +158,7 @@
                         else 'does-not-have-lease'">
                     <xf:case value="'has-lease'">
                         <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label>Relinquish lease</xf:label>
+                            <xf:label ref="$fr-resources/detail/lease/relinquish"/>
                             <xf:action event="DOMActivate">
                                 <xf:send submission="fr-relinquish-lease-submission"/>
                                 <xf:setvalue ref="$lease-state-elem">relinquished</xf:setvalue>
@@ -162,7 +166,7 @@
                             <xf:send event="DOMActivate" submission="fr-relinquish-lease-submission"/>
                         </xf:trigger>
                         <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label>Renew lease</xf:label>
+                            <xf:label ref="$fr-resources/detail/lease/renew"/>
                             <xf:action event="DOMActivate">
                                 <xf:send submission="fr-acquire-lease-submission"/>
                             </xf:action>
@@ -170,7 +174,7 @@
                     </xf:case>
                     <xf:case value="'does-not-have-lease'">
                         <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label>Try to acquire lease</xf:label>
+                            <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
                                 <xf:send submission="fr-acquire-lease-submission"/>

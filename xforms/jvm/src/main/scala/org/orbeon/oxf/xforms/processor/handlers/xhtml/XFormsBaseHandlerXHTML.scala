@@ -64,9 +64,9 @@ abstract class XFormsBaseHandlerXHTML (
   final def staticControlOpt = containingDocument.getStaticOps.findControlAnalysis(getPrefixedId)
 
   final val currentControlOpt =
-    ! xformsHandlerContext.isTemplate                            option
-      containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
-      (! _.contains(null))
+    ! isTemplate                                               option
+    containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
+    (! _.contains(null))
 
   final def currentControlOrNull = currentControlOpt.orNull // legacy
 
@@ -84,7 +84,7 @@ abstract class XFormsBaseHandlerXHTML (
     val isRelevant = control != null && control.isRelevant
 
     // don't output class within a template
-    if (! isRelevant && ! xformsHandlerContext.isTemplate)
+    if (! isRelevant && ! isTemplate)
       appendWithSpace("xforms-disabled")
 
     // MIP classes for a concrete control
@@ -416,14 +416,14 @@ object XFormsBaseHandlerXHTML {
     }
 
   def outputLabelFor(
-    handlerContext: HandlerContext,
-    attributes: Attributes,
-    targetControlEffectiveId: String,
-    forEffectiveId: String,
-    lhha: LHHA,
-    elementName: String,
-    labelValue: String,
-    mustOutputHTMLFragment: Boolean,
+    handlerContext           : HandlerContext,
+    attributes               : Attributes,
+    targetControlEffectiveId : String,
+    forEffectiveId           : String,
+    lhha                     : LHHA,
+    elementName              : String,
+    labelValue               : String,
+    mustOutputHTMLFragment   : Boolean,
     addIds: Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)

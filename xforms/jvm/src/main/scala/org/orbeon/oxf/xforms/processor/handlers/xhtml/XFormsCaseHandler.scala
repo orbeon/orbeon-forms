@@ -55,7 +55,7 @@ class XFormsCaseHandler(
 
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
-      if (! xformsHandlerContext.isTemplate && (caseControl ne null))
+      if (! isTemplate && (caseControl ne null))
         caseControl.isVisible
       else
         false

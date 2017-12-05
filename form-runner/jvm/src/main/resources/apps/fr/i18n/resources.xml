@@ -579,6 +579,17 @@
                     Ceci est une vue en lecture seule de vos données.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title>Renouvellement du bail?</renew-lease-title>
+                <renew-lease-message>Votre bail est sur le point d'expirer. Souhaitez-vous le renouveller?</renew-lease-message>
+                <current-user-left>Votre bail sur ce document encore valable pour </current-user-left>
+                <current-user-right>.</current-user-right>
+                <relinquished>Vous ne possédez plus de bail sur ce document.</relinquished>
+                <other-user>Un autre utilisateur, "{0}", possède maintenant le bail sur ce document.</other-user>
+                <relinquish>Renoncer au bail</relinquish>
+                <renew>Renouveler le bail</renew>
+                <try-acquire>Essayer d'obtenir le bail</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Sauvegarder Localement</dialog-title>
@@ -891,6 +902,17 @@
                     Vista de lectura solamente.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>
@@ -1202,6 +1224,17 @@
                     Dette er en skrivebeskyttet versjon av dine data.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Lagre</dialog-title>
@@ -1509,6 +1542,17 @@
                     Это версия только для чтения.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Сохранить</dialog-title>
@@ -1824,6 +1868,17 @@
                     Questa è una vista di sola lettura dei dati.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Salva localmente</dialog-title>
@@ -2143,6 +2198,17 @@
                     Dies ist eine schreibgeschützte Ansicht Ihrer Daten.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Lokal speichern</dialog-title>
@@ -2462,6 +2528,17 @@
                     Tämä on kirjoitussuojattu näkymä tiedoistasi.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Tallenna paikallisesti</dialog-title>
@@ -2781,6 +2858,17 @@
                     Detta är en skrivskyddad visning av data
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Spara lokalt</dialog-title>
@@ -3100,6 +3188,17 @@
                     Dit is een alleen-lezen weergave van uw gegevens.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Lokaal opslaan</dialog-title>
@@ -3419,6 +3518,17 @@
                     Esta é uma vista só de leitura dos seus dados.
                 </explanation>
             </view>
+            <lease>
+                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <current-user-right todo="true">.]</current-user-right>
+                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+                <relinquish todo="true">[Relinquish lease]</relinquish>
+                <renew todo="true">[Renew lease]</renew>
+                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+            </lease>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>

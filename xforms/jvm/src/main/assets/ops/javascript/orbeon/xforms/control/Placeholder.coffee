@@ -17,10 +17,6 @@ Events = ORBEON.xforms.Events
 Init = ORBEON.xforms.Init
 YD = YAHOO.util.Dom
 
-browserSupportsPlaceholder = do ->
-    input = document.createElement "input"
-    input.placeholder?
-
 # Returns true if this control has a placeholder
 isPlaceholderControl = (control) ->
     if $(control).is('.xforms-input, .xforms-textarea')
@@ -55,41 +51,6 @@ hidePlaceholder = (control) ->
         YD.removeClass control, "xforms-placeholder"
         inputOrTextarea.value = ""
 
-# On DOM ready, get initial placeholder inputs and populate value with placeholder
-do ->
-    if not browserSupportsPlaceholder
-        Event.onDOMReady ->
-            # Initial initialization of placeholders
-            for own formId, formInfo of orbeonInitData #xxx formId unused?
-                placeholders = formInfo.placeholders
-                continue if not placeholders?
-                for id in placeholders
-                    control = YD.get id
-                    input = $(control).find('input')
-                    # Don't show the placeholder if the focus is already on this input
-                    if not input.is(document.activeElement)
-                        showPlaceholder control
-
-# Call showPlaceholder/hidePlaceholder when users focus in and out of input
-do ->
-    if not browserSupportsPlaceholder
-        addFocusListener = (name, f) ->
-            Event.addListener document, name, (event) ->
-                target = Event.getTarget event
-                targetControl = YD.getAncestorByClassName target, "xforms-control"
-                f targetControl if targetControl? and isPlaceholderControl targetControl
-        addFocusListener "focusin", hidePlaceholder
-        addFocusListener "focusout", showPlaceholder
-
-# Call showPlaceholder/hidePlaceholder before/after the XForms engine changes the value
-do ->
-    if not browserSupportsPlaceholder
-        addChangeListener = (customEvent, f) ->
-            customEvent.subscribe (event) ->
-                f(event.control) if isPlaceholderControl event.control
-        addChangeListener Controls.beforeValueChange, hidePlaceholder
-        addChangeListener Controls.afterValueChange, showPlaceholder
-
 # When the label/hint changes, set the value of the placeholder
 do ->
     Controls.lhhaChangeEvent.subscribe (event) ->
@@ -100,12 +61,3 @@ do ->
                 inputOrTextarea = findInputOrTextarea event.control
                 if inputOrTextarea?
                     $(inputOrTextarea).attr('placeholder', event.message)
-                showPlaceholder event.control if not browserSupportsPlaceholder
-
-# When getting the value of a placeholder input, if the placeholder is shown, the current value is empty string
-do ->
-    if not browserSupportsPlaceholder
-        Controls.getCurrentValueEvent.subscribe (event) ->
-            if isPlaceholderControl event.control
-                if $(event.control).is('.xforms-placeholder')
-                    event.result = ""

@@ -98,7 +98,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-control-editor-left,
     .fb-control-editor-right {
 
-        // Try a zoom effect
+        // Zoom effect on icons
         // Works well on section icons but needs work on cell and grid row icons
         .fa:not([class ~= 'disabled']):hover {
             font-size: 130%;
@@ -249,53 +249,96 @@ div.orbeon.orbeon-portlet-div {
             overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
             .box-sizing(border-box);
 
-            .xbl-fr-tabbable .nav-tabs > li:not(.active) > a {
+            .xforms-trigger a {
+                text-decoration: none;
+                color: @frHeaderColor;
+            }
 
-                background-color: #ccc;
-                color: white;
+            .xbl-fr-tabbable .nav-tabs {
 
-                &:hover {
-                    background-color: white;
-                    color: #ccc;
+                li {
+                    width: 50%;
+                }
+
+                li:first-of-type > a {
+                    margin-left: 0;
+                }
+
+                li:last-of-type > a {
+                    margin-right: 0;
+                }
+
+                &>  li:not(.active) > a {
+
+                    background-color: #ccc;
+                    color: white;
+
+                    &:hover {
+                        background-color: white;
+                        color: #ccc;
+                    }
+                }
+            }
+
+            .fb-toolbox-icons-tools {
+                padding: 8px;
+                text-align: center;
+                background-color: white;
+
+                .xforms-trigger-appearance-minimal {
+                    margin: 0;
+                }
+
+                .xforms-trigger-appearance-minimal a:focus {
+                    outline: none;
+                }
+
+                .fa-code {
+                    font-weight: bold;
+                }
+
+                &.fb-toolbox-top-icons {
+                    display: grid;
+                    grid-template-columns: repeat(6, 1fr);
+
+                    .fb-form-settings-button     { grid-row-start: 1; grid-column-start: 1; }
+                    .fb-cut-button               { grid-row-start: 1; grid-column-start: 2; }
+                    .fb-copy-button              { grid-row-start: 1; grid-column-start: 3; }
+                    .fb-paste-button             { grid-row-start: 1; grid-column-start: 4; }
+                    .fb-undo-button              { grid-row-start: 1; grid-column-start: 5; }
+                    .fb-redo-button              { grid-row-start: 1; grid-column-start: 6; }
+                }
+
+                &.fb-toolbox-advanced-icons {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    padding: 0;
+                    margin-bottom: 2px;
+
+                    .fb-workflow-button          { grid-row-start: 1; ; grid-column-start: 1; }
+                    .fb-permissions-button       { grid-row-start: 1; ; grid-column-start: 1; }
+                    .fb-edit-source-button       { grid-row-start: 1; ; grid-column-start: 2; }
+                    .fb-reload-components-button { grid-row-start: 1; ; grid-column-start: 3; }
+                }
+
+                // Zoom effect on icons
+                .xforms-trigger-appearance-minimal:not([class ~= 'xforms-readonly']) {
+                    .fa:hover {
+                        font-size: 130%;
+                        vertical-align: -2px;
+                        margin-left: -2px;
+                        margin-right: -3px;
+                        transition: all ease 100ms;
+                    }
                 }
             }
 
             .fb-tools {
-                .fr-border();
-                padding: 2px 8px 8px 8px;           // 2px at top or legend has too much space above
+                //.fr-border();
+                //padding: 2px 8px 8px 8px;           // 2px at top or legend has too much space above
 
-                &.fb-icons-tools {
-                    padding-top: 8px;               // except for icons tools where we need the full padding
-                    text-align: center;
-
-                    .xforms-trigger-appearance-minimal {
-                        margin-right: 4px;
-                    }
-
-                    .xforms-trigger-appearance-minimal a:focus {
-                        outline: none;
-                    }
-
-                    .fa-code {
-                        font-weight: bold;
-                    }
-
-                    &> .xforms-group {
-                        display: grid;
-                        grid-template-columns: repeat(6, 1fr);
-
-                        .fb-form-settings-button     { grid-row-start: 1;  }
-                        .fb-edit-source-button       { grid-row-start: 1;  }
-                        .fb-reload-components-button { grid-row-start: 1;  }
-                        .fb-workflow-button          { grid-row-start: 1;  }
-                        .fb-permissions-button       { grid-row-start: 1;  }
-                        .fb-cut-button               { grid-row-start: 2;  }
-                        .fb-copy-button              { grid-row-start: 2;  }
-                        .fb-paste-button             { grid-row-start: 2;  }
-                        .fb-undo-button              { grid-row-start: 1; grid-column-start: 6; }
-                        .fb-redo-button              { grid-row-start: 2; grid-column-start: 6; }
-                    }
-                }
+                padding: 0;
+                margin-bottom: 10px;
 
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
@@ -308,7 +351,8 @@ div.orbeon.orbeon-portlet-div {
                 }
 
                 .fb-tool {
-                    margin: 0 0 0 4px;
+                    //margin: 0 0 0 4px;
+                    margin: 0;
 
                     .xforms-trigger button {
                         padding: 2px 4px;
@@ -335,10 +379,6 @@ div.orbeon.orbeon-portlet-div {
                 // Services and actions
                 ul { margin: 0; overflow: auto }
                 li { list-style-type: none; white-space: nowrap; font-size: 11px }
-                .xforms-trigger a {
-                    text-decoration: none;
-                    color: @frHeaderColor;
-                }
             }
 
             .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll

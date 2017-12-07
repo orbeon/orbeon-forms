@@ -31,8 +31,8 @@
 
     <xh:div class="fb-toolbox-inside">
 
-        <xh:div class="fb-tools fb-icons-tools">
-            <xf:group>
+        <xh:div class="fb-tools">
+            <xh:div class="fb-toolbox-icons-tools fb-toolbox-top-icons">
 
                 <!-- Form settings -->
                 <xf:trigger appearance="minimal" class="fb-form-settings-button">
@@ -55,61 +55,6 @@
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
                         </xxf:show>
                     </xf:action>
-                </xf:trigger>
-
-                <!-- Edit Source -->
-                <xf:trigger appearance="minimal" class="fb-edit-source-button" ref="instance('fb-metadata-instance')/toolbox/edit-source">
-                    <xf:label><xh:i class="fa fa-code fa-fw" title="{$form-resources/edit-source/label}"/></xf:label>
-                    <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
-                </xf:trigger>
-
-                <!-- Reload components -->
-                <xf:trigger appearance="minimal" class="fb-reload-components-button" xxf:modal="true">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/reload-components/label}"
-                            class="fb-container-cut fa fa-refresh fa-fw"/>
-                    </xf:label>
-                    <xf:action ev:event="DOMActivate">
-                        <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                        <xf:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
-                        <!-- Invalidate and reload the toolbox -->
-                        <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
-                        <xf:send submission="fb-load-toolbox">
-                            <xf:property name="app"  value="bind('application-name-bind')"/>
-                            <xf:property name="form" value="bind('form-name-bind')"/>
-                        </xf:send>
-                    </xf:action>
-                </xf:trigger>
-
-                <!-- Workflow and permissions -->
-                <xf:trigger
-                    ref="instance('fb-metadata-instance')/toolbox/workflow"
-                    appearance="minimal"
-                    class="fb-workflow-button">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/dialog-workflow/label}"
-                            class="fa fa-lock fa-fw"/>
-                        <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
-                        <!--<xf:output ref="$form-resources/dialog-workflow/label"/>-->
-                    </xf:label>
-                    <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-workflow-dialog"/>
-                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                </xf:trigger>
-                <xf:trigger
-                    ref=".[instance('fb-metadata-instance')/toolbox/permissions]"
-                    appearance="minimal"
-                    class="fb-permissions-button">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/dialog-permissions/label}"
-                            class="fa fa-lock fa-fw"/>
-                        <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
-                        <!--<xf:output ref="$form-resources/permissions/label"/>-->
-                    </xf:label>
-                    <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
-                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                 </xf:trigger>
 
                 <!-- Clipboard operations -->
@@ -173,7 +118,8 @@
                     </xf:action>
                 </xf:trigger>
 
-            </xf:group>
+            </xh:div>
+
         </xh:div>
 
         <fr:tabbable id="fb-toolbox-tabs">
@@ -279,6 +225,65 @@
             <fr:tab id="fb-toolbox-advanced-tab">
                 <xf:label value="$form-resources/advanced/label"/>
 
+                <xh:div class="fb-toolbox-icons-tools fb-toolbox-advanced-icons">
+
+                    <!-- Workflow and permissions -->
+                    <xf:trigger
+                        ref="instance('fb-metadata-instance')/toolbox/workflow"
+                        appearance="minimal"
+                        class="fb-workflow-button">
+                        <xf:label>
+                            <xh:i
+                                title="{$form-resources/dialog-workflow/label}"
+                                class="fa fa-lock fa-fw"/>
+                            <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
+                            <!--<xf:output ref="$form-resources/dialog-workflow/label"/>-->
+                        </xf:label>
+                        <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-workflow-dialog"/>
+                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                    </xf:trigger>
+                    <xf:trigger
+                        ref=".[instance('fb-metadata-instance')/toolbox/permissions]"
+                        appearance="minimal"
+                        class="fb-permissions-button">
+                        <xf:label>
+                            <xh:i
+                                title="{$form-resources/dialog-permissions/label}"
+                                class="fa fa-lock fa-fw"/>
+                            <!--<xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>-->
+                            <!--<xf:output ref="$form-resources/permissions/label"/>-->
+                        </xf:label>
+                        <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
+                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                    </xf:trigger>
+
+                    <!-- Edit Source -->
+                    <xf:trigger appearance="minimal" class="fb-edit-source-button" ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                        <xf:label><xh:i class="fa fa-code fa-fw" title="{$form-resources/edit-source/label}"/></xf:label>
+                        <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
+                    </xf:trigger>
+
+                    <!-- Reload components -->
+                    <xf:trigger appearance="minimal" class="fb-reload-components-button" xxf:modal="true">
+                        <xf:label>
+                            <xh:i
+                                title="{$form-resources/reload-components/label}"
+                                class="fb-container-cut fa fa-refresh fa-fw"/>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate">
+                            <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
+                            <xf:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
+                            <!-- Invalidate and reload the toolbox -->
+                            <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
+                            <xf:send submission="fb-load-toolbox">
+                                <xf:property name="app"  value="bind('application-name-bind')"/>
+                                <xf:property name="form" value="bind('form-name-bind')"/>
+                            </xf:send>
+                        </xf:action>
+                    </xf:trigger>
+
+                </xh:div>
+
                 <xf:group
                     xxf:element="div"
                     class="fb-tools"
@@ -314,6 +319,36 @@
                                     <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xf:group>
+                        </xh:div>
+                    </xf:group>
+                </xf:group>
+
+                <!-- Actions -->
+                <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/actions">
+                    <xf:group class="fb-hide-alert">
+                        <xf:label ref="$form-resources/actions/label"/>
+                        <!-- Repeat over existing bindings -->
+                        <xf:repeat ref="$model/fb:action[ends-with(@id, '-binding')]">
+                            <xh:div class="fb-tool">
+                                <xf:var name="current-action" value="."/>
+                                <xf:var name="binding-name" value="substring-before(@id, '-binding')"/>
+                                <xf:trigger>
+                                    <xf:label value="$binding-name"/>
+                                    <xxf:show ev:event="DOMActivate" dialog="fb-action-dialog">
+                                        <xf:property name="binding-name" value="$binding-name"/>
+                                    </xxf:show>
+                                </xf:trigger>
+                            </xh:div>
+                        </xf:repeat>
+                        <xh:div class="fb-tool">
+                            <xf:trigger id="fb-add-action">
+                                <xf:label>
+                                    <xh:i class="fa fa-fw fa-plus-circle"/>
+                                    <xf:output value="$form-resources/add/label"/>
+                                </xf:label>
+                                <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>
+                                <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                            </xf:trigger>
                         </xh:div>
                     </xf:group>
                 </xf:group>
@@ -381,35 +416,6 @@
                     </xf:group>
                 </xf:group>
 
-                <!-- Actions -->
-                <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/actions">
-                    <xf:group class="fb-hide-alert">
-                        <xf:label ref="$form-resources/actions/label"/>
-                        <!-- Repeat over existing bindings -->
-                        <xf:repeat ref="$model/fb:action[ends-with(@id, '-binding')]">
-                            <xh:div class="fb-tool">
-                                <xf:var name="current-action" value="."/>
-                                <xf:var name="binding-name" value="substring-before(@id, '-binding')"/>
-                                <xf:trigger>
-                                    <xf:label value="$binding-name"/>
-                                    <xxf:show ev:event="DOMActivate" dialog="fb-action-dialog">
-                                        <xf:property name="binding-name" value="$binding-name"/>
-                                    </xxf:show>
-                                </xf:trigger>
-                            </xh:div>
-                        </xf:repeat>
-                        <xh:div class="fb-tool">
-                            <xf:trigger id="fb-add-action">
-                                <xf:label>
-                                    <xh:i class="fa fa-fw fa-plus-circle"/>
-                                    <xf:output value="$form-resources/add/label"/>
-                                </xf:label>
-                                <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>
-                                <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                            </xf:trigger>
-                        </xh:div>
-                    </xf:group>
-                </xf:group>
             </fr:tab>
         </fr:tabbable>
 

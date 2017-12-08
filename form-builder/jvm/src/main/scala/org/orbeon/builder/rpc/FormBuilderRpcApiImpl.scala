@@ -39,7 +39,9 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       }
     )
 
-    FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML)
+    // The client might send this after the control is deleted and we don't want to crash
+    if (FormRunner.findControlByName(ctx.bodyElem, "control-2").isDefined)
+      FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML)
   }
 
   def controlDelete(controlId: String): Unit = {

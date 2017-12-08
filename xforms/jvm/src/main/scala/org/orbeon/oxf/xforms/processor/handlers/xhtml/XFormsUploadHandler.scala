@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandl
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
-
 import org.xml.sax._
 
 /**

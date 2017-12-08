@@ -19,13 +19,12 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
-import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
-import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable
 

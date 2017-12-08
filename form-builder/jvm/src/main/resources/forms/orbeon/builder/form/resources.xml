@@ -99,13 +99,13 @@
             <label>Change Schema</label>
         </change-schema>
         <upload-schema>
-            <label>Attach Schema</label>
+            <label>XML Schema</label>
         </upload-schema>
         <change-pdf>
             <label>Change PDF</label>
         </change-pdf>
         <upload-pdf>
-            <label>Attach PDF</label>
+            <label>PDF Template</label>
         </upload-pdf>
         <change-css>
             <label>Change CSS</label>
@@ -1121,13 +1121,13 @@
             <label>Changer schéma</label>
         </change-schema>
         <upload-schema>
-            <label>Joindre schéma</label>
+            <label>Schéma XML</label>
         </upload-schema>
         <change-pdf>
             <label>Changer PDF</label>
         </change-pdf>
         <upload-pdf>
-            <label>Joindre PDF</label>
+            <label>Modèle PDF</label>
         </upload-pdf>
         <change-css>
             <label>Changer CSS</label>
@@ -4249,7 +4249,7 @@
             <label>Cambia schema</label>
         </change-schema>
         <upload-schema>
-            <label>Allega schema</label>
+            <label>Schema XML</label>
         </upload-schema>
         <change-pdf>
             <label>Cambia PDF</label>
@@ -5293,7 +5293,7 @@
             <label>Schema ändern</label>
         </change-schema>
         <upload-schema>
-            <label>Schema anhängen</label>
+            <label>Schema XML</label>
         </upload-schema>
         <change-pdf>
             <label>PDF ändern</label>
@@ -7385,7 +7385,7 @@
             <label>Cambiar Esquema</label>
         </change-schema>
         <upload-schema>
-            <label>Adjuntar Esquema</label>
+            <label>Esquema XML</label>
         </upload-schema>
         <change-pdf>
             <label>Cambiar PDF</label>
@@ -8430,7 +8430,7 @@
             <label>Alterar o Schema</label>
         </change-schema>
         <upload-schema>
-            <label>Anexar o Schema</label>
+            <label>XML Schema</label>
         </upload-schema>
         <change-pdf>
             <label>Alterar o PDF</label>
@@ -9481,7 +9481,7 @@
             <label>Ändra schema</label>
         </change-schema>
         <upload-schema>
-            <label>Infoga schema</label>
+            <label>XML Schema</label>
         </upload-schema>
         <change-pdf>
             <label>Ändra PDF</label>

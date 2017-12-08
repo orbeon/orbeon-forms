@@ -127,7 +127,7 @@
 
                 <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger">
                     <xf:label>
-                        <xh:i title="{$redo-title}" class="fa fa-undo fa-fw"/>
+                        <xh:i title="{$redo-title}" class="fa fa-repeat fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:redoAction()

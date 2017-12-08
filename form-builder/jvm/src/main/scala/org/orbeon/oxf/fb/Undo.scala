@@ -27,13 +27,13 @@ import org.orbeon.scaxon.SimplePath._
 case class ControlPosition  (gridName: String,     coordinate: Coordinate1)
 case class ContainerPosition(into: Option[String], after: Option[String])
 
-sealed trait UndoAction
+sealed trait UndoAction { val name: String}
 
 object UndoAction {
 //  case class UndoInsert(controlName: String)              extends UndoAction
-  case class UndoRename(oldName: String, newName: String)                    extends UndoAction
-  case class UndoDeleteControl  (position: ControlPosition,   xcv: NodeInfo) extends UndoAction
-  case class UndoDeleteContainer(position: ContainerPosition, xcv: NodeInfo) extends UndoAction
+  case class UndoRename         (oldName: String, newName: String)           extends UndoAction { val name = "rename"           }
+  case class UndoDeleteControl  (position: ControlPosition,   xcv: NodeInfo) extends UndoAction { val name = "delete-control"   }
+  case class UndoDeleteContainer(position: ContainerPosition, xcv: NodeInfo) extends UndoAction { val name = "delete-container" }
 //  case class UndoMoveContainer() extends UndoAction
 //  case class UndoUpdateSettings() extends UndoAction
 }
@@ -45,7 +45,11 @@ object Undo {
     val encoded = JsonConverter.encode(action)
     val undos   = ctx.undoRootElem / "undos"
 
-    XFormsAPI.insert(into = undos, after = undos / *, origin = elementInfo("undo", List(encoded)))
+    XFormsAPI.insert(
+      into   = undos,
+      after  = undos / *,
+      origin = elementInfo("undo", List(attributeInfo("name", action.name), encoded))
+    )
   }
 
   def popUndoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {

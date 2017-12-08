@@ -53,6 +53,18 @@
         <paste>
             <label>Paste</label>
         </paste>
+        <undo-redo>
+            <undo>Undo {0}</undo>
+            <redo>Redo {0}</redo>
+            <insert>insert</insert>
+            <rename>rename</rename>
+            <delete-control>delete control</delete-control>
+            <delete-container>delete container</delete-container>
+            <merge-section-template>merge section template</merge-section-template>
+            <move-control>move control</move-control>
+            <move-container>move container</move-container>
+            <update-settings>update settings</update-settings>
+        </undo-redo>
         <merge-section>
             <label>Merge Section Template</label>
         </merge-section>
@@ -1075,6 +1087,18 @@
         <paste>
             <label>Coller</label>
         </paste>
+        <undo-redo>
+            <undo>Annuler {0}</undo>
+            <redo>Refaire {0}</redo>
+            <insert>insertion</insert>
+            <rename>renommage</rename>
+            <delete-control>suppression du contrôle</delete-control>
+            <delete-container>suppression du conteneur</delete-container>
+            <merge-section-template>intégration du modèle de section</merge-section-template>xxx
+            <move-control>déplacement du contrôle</move-control>
+            <move-container>déplacement du conteneur</move-container>
+            <update-settings>mise à jour des réglages</update-settings>
+        </undo-redo>
         <merge-section>
             <label>Intégrer modèle de section</label>
         </merge-section>
@@ -2099,6 +2123,18 @@
         <paste>
             <label>Lim inn</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -3151,6 +3187,18 @@
         <paste>
             <label>Вставить</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -4203,6 +4251,18 @@
         <paste>
             <label>Incolla</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -5247,6 +5307,18 @@
         <paste>
             <label>Einfügen</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -6293,6 +6365,18 @@
         <paste>
             <label>Liitä</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -7339,6 +7423,18 @@
         <paste>
             <label>Pegar</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -8384,6 +8480,18 @@
         <paste>
             <label>Colar</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>
@@ -9435,6 +9543,18 @@
         <paste>
             <label>Klistra in</label>
         </paste>
+        <undo-redo>
+            <undo todo="true">[Undo {0}]</undo>
+            <redo todo="true">[Redo {0}]</redo>
+            <insert>[insert]</insert>
+            <rename todo="true">[rename]</rename>
+            <delete-control todo="true">[delete control]</delete-control>
+            <delete-container todo="true">[delete container]</delete-container>
+            <merge-section-template todo="true">[merge section template]</merge-section-template>
+            <move-control todo="true">[move control]</move-control>
+            <move-container todo="true">[move container]</move-container>
+            <update-settings todo="true">[update settings]</update-settings>
+        </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
         </merge-section>

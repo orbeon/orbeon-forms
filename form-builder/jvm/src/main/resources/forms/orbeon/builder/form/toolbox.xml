@@ -94,24 +94,40 @@
                         <!--class="fb-clipboard fa fa-clipboard fa-fw"/>-->
                 <!--</xf:group>-->
 
+                <xf:var
+                    name="undo-title"
+                    value="
+                        if (not(xxf:readonly($undo/undo-trigger))) then
+                            xxf:format-message(
+                                $form-resources/undo-redo/undo,
+                                $form-resources/undo-redo/*[name() = $undo/undos/undo[last()]/@name]/string()
+                            )
+                        else
+                            ''"/>
+
                 <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger">
                     <xf:label>
-                        <!-- TODO: i18n -->
-                        <xh:i
-                            title="{$form-resources/undo/label}"
-                            class="fa fa-undo fa-fw"/>
+                        <xh:i title="{$undo-title}" class="fa fa-undo fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:undoAction()
                     </xf:action>
                 </xf:trigger>
 
+                <xf:var
+                    name="redo-title"
+                    value="
+                        if (not(xxf:readonly($undo/redo-trigger))) then
+                            xxf:format-message(
+                                $form-resources/undo-redo/redo,
+                                $form-resources/undo-redo/*[name() = $undo/redos/redo[last()]/@name]/string()
+                            )
+                        else
+                            ''"/>
+
                 <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger">
                     <xf:label>
-                        <!-- TODO: i18n -->
-                        <xh:i
-                            title="{$form-resources/redo/label}"
-                            class="fa fa-repeat fa-fw"/>
+                        <xh:i title="{$redo-title}" class="fa fa-undo fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:redoAction()

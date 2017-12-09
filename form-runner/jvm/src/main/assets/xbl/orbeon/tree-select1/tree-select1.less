@@ -174,4 +174,60 @@
     .fancytree-node.fancytree-active > .fancytree-title {
         background-color: rgba(82, 168, 236, 0.8);
     }
+
+    // Special appearance which is more compatible with the Orbeon Forms 4.7 appearance
+    &.xforms-select1-appearance-tree-plus-minus .fancytree-container {
+
+        .fancytree-expander {
+            display: inline-block;
+            background-image: url("/ops/yui/treeview/assets/skins/sam/treeview-sprite.gif");
+            background-repeat: no-repeat;
+            width: 18px;
+            height: 22px;
+            margin: 0;
+        }
+
+        .fancytree-node {
+            margin: 0;
+
+            .fancytree-icon {
+                display: none;
+            }
+        }
+
+        li {
+            line-height: 16px;
+        }
+
+        .fancytree-node:not(.fancytree-lastsib) + ul {
+            background-image: url("/ops/yui/treeview/assets/skins/sam/treeview-sprite.gif");
+            background-repeat: no-repeat;
+            width: 18px;
+            background-position: 0 -8000px;
+        }
+
+        .fancytree-exp-e .fancytree-expander {
+            background-position: 0 -4000px;
+        }
+
+        .fancytree-exp-c .fancytree-expander {
+            background-position: 0 -6400px;
+        }
+
+        .fancytree-exp-el .fancytree-expander {
+            background-position: 0 0;
+        }
+
+        .fancytree-exp-cl .fancytree-expander {
+            background-position: 0 -2400px;
+        }
+
+        .fancytree-exp-n .fancytree-expander {
+            background-position: 0 -5600px;
+        }
+
+        .fancytree-exp-nl .fancytree-expander {
+            background-position: 0 -1600px;
+        }
+    }
 }

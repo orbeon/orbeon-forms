@@ -68,6 +68,14 @@ trait ContainerOps extends ControlOps {
   def canDeleteContainer(containerElem: NodeInfo): Boolean =
     containerElem sibling FRContainerTest nonEmpty
 
+  def containerPosition(containerId: String)(implicit ctx: FormBuilderDocContext): ContainerPosition = {
+    val container = containerById(containerId)
+    ContainerPosition(
+      findAncestorContainersLeafToRoot(container).headOption flatMap getControlNameOpt, // top-level container doesn't have a name
+      precedingSiblingOrSelfContainers(container).headOption map getControlName
+    )
+  }
+
   // Delete the entire container and contained controls
   def deleteContainerById(
     canDelete   : NodeInfo ⇒ Boolean,
@@ -78,11 +86,8 @@ trait ContainerOps extends ControlOps {
     canDelete(container) option {
 
       val undo =
-        UndoAction.UndoDeleteContainer(
-          ContainerPosition(
-            findAncestorContainersLeafToRoot(container).headOption flatMap getControlNameOpt, // top-level container doesn't have a name
-            precedingSiblingOrSelfContainers(container).headOption map getControlName
-          ),
+        UndoAction.DeleteContainer(
+          containerPosition(containerId),
           ToolboxOps.controlOrContainerElemToXcv(container)
         )
 

@@ -64,6 +64,9 @@
             <move-control>move control</move-control>
             <move-container>move container</move-container>
             <update-settings>update settings</update-settings>
+            <insert-control>insert control</insert-control>
+            <insert-section>insert section</insert-section>
+            <insert-grid>insert grid</insert-grid>
         </undo-redo>
         <merge-section>
             <label>Merge Section Template</label>
@@ -1098,6 +1101,9 @@
             <move-control>déplacement du contrôle</move-control>
             <move-container>déplacement du conteneur</move-container>
             <update-settings>mise à jour des réglages</update-settings>
+            <insert-control>insertion de contrôle</insert-control>
+            <insert-section>insertion de section</insert-section>
+            <insert-grid>insertion de grille</insert-grid>
         </undo-redo>
         <merge-section>
             <label>Intégrer modèle de section</label>
@@ -2134,6 +2140,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -3198,6 +3207,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -4262,6 +4274,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -5318,6 +5333,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -6376,6 +6394,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -7433,7 +7454,9 @@
             <merge-section-template todo="true">[merge section template]</merge-section-template>
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
-            <update-settings todo="true">[update settings]</update-settings>
+            <update-settings todo="true">[update settings]</update-settings><insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -8491,6 +8514,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -9554,6 +9580,9 @@
             <move-control todo="true">[move control]</move-control>
             <move-container todo="true">[move container]</move-container>
             <update-settings todo="true">[update settings]</update-settings>
+            <insert-control todo="true">[insert control]</insert-control>
+            <insert-section todo="true">[insert section]</insert-section>
+            <insert-grid todo="true">[insert grid]</insert-grid>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>

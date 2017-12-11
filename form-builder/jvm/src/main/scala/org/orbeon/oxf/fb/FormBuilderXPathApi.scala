@@ -520,7 +520,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.containerMerge(containerId, prefix, suffix)
+    ToolboxOps.containerMerge(containerId, prefix, suffix) foreach Undo.pushUndoAction
   }
 
   //@XPathFunction
@@ -529,17 +529,26 @@ object FormBuilderXPathApi {
     suffix      : String
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.readXcvFromClipboard foreach
-      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty))
+    ToolboxOps.readXcvFromClipboard flatMap
+      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty)) foreach
+      Undo.pushUndoAction
   }
 
   //@XPathFunction
   def undoAction(): Unit = {
-
     implicit val ctx = FormBuilderDocContext()
+    Undo.popUndoAction() flatMap processUndoRedoAction foreach Undo.pushRedoAction
+  }
 
-    Undo.popUndoAction() foreach {
-      case UndoDeleteContainer(position, xcvElem) ⇒
+  //@XPathFunction
+  def redoAction(): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    Undo.popRedoAction() flatMap processUndoRedoAction foreach Undo.pushUndoAction
+  }
+
+  private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
+    undoAction match {
+      case DeleteContainer(position, xcvElem) ⇒
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           "",
@@ -547,20 +556,46 @@ object FormBuilderXPathApi {
           Some(position),
           Set.empty
         )
-      case UndoDeleteControl(position, xcvElem) ⇒
+      case DeleteControl(position, xcvElem) ⇒
         ToolboxOps.pasteSingleControlFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           Some(position)
         )
-      case UndoRename(oldName, newName) ⇒
+      case Rename(oldName, newName) ⇒
         FormBuilder.renameControlIfNeeded(newName, oldName)
+      case InsertControl(controlId) ⇒
+        FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)) map
+          (_.parentUnsafe) flatMap
+          (FormBuilder.deleteControlWithinCell(_))
+      case InsertSection(sectionId) ⇒
+        FormBuilder.deleteSectionById(sectionId)
+      case InsertGrid(gridId) ⇒
+        FormBuilder.deleteGridById(gridId)
+      case MoveControl(insert, delete) ⇒
+        for {
+          newUndoDeleteAction ← processUndoRedoAction(delete)
+          newUndoInsertAction ← processUndoRedoAction(insert)
+        } yield
+          MoveControl(newUndoDeleteAction, newUndoInsertAction)
+      case InsertSectionTemplate(sectionId) ⇒
+        FormBuilder.deleteSectionById(sectionId)
+      case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) ⇒
+
+        val containerPosition = FormBuilder.containerPosition(sectionId)
+
+        FormBuilder.deleteSectionById(sectionId)
+
+        ToolboxOps.pasteSectionGridFromXcv(
+          TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+          "",
+          "",
+          Some(containerPosition),
+          Set.empty
+        )
+
+        Some(UnmergeSectionTemplate(sectionId, prefix, suffix))
+      case UnmergeSectionTemplate(sectionId, prefix, suffix) ⇒
+        ToolboxOps.containerMerge(sectionId, prefix, suffix)
+
     }
-
-  }
-
-  //@XPathFunction
-  def redoAction(): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    ???
-  }
 }

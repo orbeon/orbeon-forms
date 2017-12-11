@@ -73,7 +73,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     val sourceCellElem = resolveId(controlId).get.parentUnsafe
     val targetCellElem = resolveId(destCellId).get
 
-    ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy)
+    ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy) foreach Undo.pushUndoAction
   }
 
   def rowInsertAbove(controlId: String, position: Int): Unit = {

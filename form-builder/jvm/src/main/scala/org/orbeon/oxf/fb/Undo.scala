@@ -14,6 +14,8 @@
 package org.orbeon.oxf.fb
 
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -30,46 +32,52 @@ case class ContainerPosition(into: Option[String], after: Option[String])
 sealed trait UndoAction { val name: String}
 
 object UndoAction {
-//  case class UndoInsert(controlName: String)              extends UndoAction
-  case class UndoRename         (oldName: String, newName: String)           extends UndoAction { val name = "rename"           }
-  case class UndoDeleteControl  (position: ControlPosition,   xcv: NodeInfo) extends UndoAction { val name = "delete-control"   }
-  case class UndoDeleteContainer(position: ContainerPosition, xcv: NodeInfo) extends UndoAction { val name = "delete-container" }
+  case class Rename                (oldName   : String,            newName : String)     extends UndoAction { val name = "rename"                   }
+  case class DeleteControl         (position  : ControlPosition,   xcv     : NodeInfo)   extends UndoAction { val name = "delete-control"           }
+  case class DeleteContainer       (position  : ContainerPosition, xcv     : NodeInfo)   extends UndoAction { val name = "delete-container"         }
+
+  case class MoveControl           (insert    : UndoAction,        delete  : UndoAction) extends UndoAction { val name = "move-control"             }
+
+  case class InsertControl         (controlId : String)                                  extends UndoAction { val name = "insert-control"           }
+  case class InsertSection         (sectionId : String)                                  extends UndoAction { val name = "insert-section"           }
+  case class InsertGrid            (gridId    : String)                                  extends UndoAction { val name = "insert-grid"              }
+
+  case class InsertSectionTemplate (sectionId : String)                                  extends UndoAction { val name = "merge-section-template"   }
+  case class MergeSectionTemplate  (sectionId : String,
+                                    xcv       : NodeInfo,
+                                    prefix    : String,
+                                    suffix    : String)                                  extends UndoAction { val name = "merge-section-template"   }
+
+  case class UnmergeSectionTemplate(sectionId : String,
+                                    prefix    : String,
+                                    suffix    : String)                                  extends UndoAction { val name = "unmerge-section-template" }
+
 //  case class UndoMoveContainer() extends UndoAction
 //  case class UndoUpdateSettings() extends UndoAction
 }
 
 object Undo {
 
-  def pushUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit = {
+  import Private._
 
-    val encoded = JsonConverter.encode(action)
-    val undos   = ctx.undoRootElem / "undos"
+  def pushUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit =
+    pushAction(UndoOrRedo.Undo, action)
 
-    XFormsAPI.insert(
-      into   = undos,
-      after  = undos / *,
-      origin = elementInfo("undo", List(attributeInfo("name", action.name), encoded))
-    )
-  }
+  def popUndoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
+    popAction(UndoOrRedo.Undo)
 
-  def popUndoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
-    ctx.undoRootElem / "undos" lastChildOpt * flatMap { lastUndo ⇒
+  def pushRedoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit =
+    pushAction(UndoOrRedo.Redo, action)
 
-      val encoded = lastUndo.stringValue
-      val result  = JsonConverter.decode(encoded).toOption
-
-      // TODO: Add to redo actions.
-      XFormsAPI.delete(lastUndo)
-      result
-    }
-  }
+  def popRedoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
+    popAction(UndoOrRedo.Redo)
 
   object JsonConverter {
 
     import cats.syntax.either._
     import io.circe.generic.auto._
-    import io.circe.{parser, _}
     import io.circe.syntax._
+    import io.circe.{parser, _}
 
     import scala.util.{Failure, Success, Try}
 
@@ -85,5 +93,40 @@ object Undo {
 
     def encode(state: UndoAction) : String          = state.asJson.noSpaces
     def decode(jsonString: String): Try[UndoAction] = parser.decode[UndoAction](jsonString).fold(Failure.apply, Success.apply)
+  }
+
+  private object Private {
+
+    sealed trait UndoOrRedo extends EnumEntry with Lowercase
+    object UndoOrRedo extends Enum[UndoOrRedo] {
+
+      val values = findValues
+
+      case object Undo extends UndoOrRedo
+      case object Redo extends UndoOrRedo
+    }
+
+    def pushAction(undoOrRedo: UndoOrRedo, action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit = {
+
+      val encoded = JsonConverter.encode(action)
+      val undos   = ctx.undoRootElem / (undoOrRedo.entryName + "s")
+
+      XFormsAPI.insert(
+        into   = undos,
+        after  = undos / *,
+        origin = elementInfo(undoOrRedo.entryName, List(attributeInfo("name", action.name), encoded))
+      )
+    }
+
+    def popAction(undoOrRedo: UndoOrRedo)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
+      ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo ⇒
+
+        val encoded = lastUndoOrRedo.stringValue
+        val result  = JsonConverter.decode(encoded).toOption
+
+        XFormsAPI.delete(lastUndoOrRedo)
+        result
+      }
+    }
   }
 }

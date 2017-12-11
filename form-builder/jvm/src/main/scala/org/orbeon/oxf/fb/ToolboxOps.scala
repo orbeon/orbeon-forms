@@ -18,6 +18,7 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
+import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -150,8 +151,11 @@ object ToolboxOps {
           // This can impact templates
           updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
 
+          Undo.pushUndoAction(InsertControl(newControlElem.id))
+
           Some(newControlName)
         }
+
       case _ ⇒
         // no empty td found/created so NOP
         None
@@ -193,6 +197,8 @@ object ToolboxOps {
 
       // Select first grid cell
       selectFirstCellInContainer(newGridElem)
+
+      Undo.pushUndoAction(InsertGrid(newGridElem.id))
     }
   }
 
@@ -254,6 +260,8 @@ object ToolboxOps {
 
       // TODO: Open label editor for newly inserted section
 
+      Undo.pushUndoAction(InsertSection(newSectionElem.id))
+
       Some(newSectionElem)
     }
   }
@@ -309,6 +317,8 @@ object ToolboxOps {
       // Select new td
       selectFirstCellInContainer(newGridElem)
 
+      Undo.pushUndoAction(InsertGrid(newGridElem.id))
+
       Some(newGridName)
     }
   }
@@ -323,7 +333,7 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     // Insert new section first
-    insertNewSection(inDoc, withGrid = false) foreach { section ⇒
+    insertNewSection(inDoc, withGrid = false) map { section ⇒
 
       val selector = binding attValue "element"
 
@@ -337,6 +347,8 @@ object ToolboxOps {
       // Insert template into section
       findViewTemplate(binding) foreach
         (template ⇒ insert(into = section, after = section / *, origin = template))
+
+      UndoAction.InsertSectionTemplate(section.id)
     }
   }
 
@@ -375,7 +387,6 @@ object ToolboxOps {
     case object Resources extends XcvEntry
     case object Bind      extends XcvEntry
   }
-
 
   def controlOrContainerElemToXcv(controlOrContainerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): NodeInfo = {
 
@@ -477,7 +488,7 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     copyToClipboard(cellElem)
-    deleteControlWithinCell(cellElem, updateTemplates = true)
+    deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUndoAction
   }
 
   def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
@@ -505,22 +516,27 @@ object ToolboxOps {
     targetCellElem : NodeInfo,
     copy           : Boolean)(implicit
     ctx            : FormBuilderDocContext
-  ): Unit = {
+  ): Option[UndoAction] = {
 
     val xcvElemOpt = controlElementsInCellToXcv(sourceCellElem)
 
-    xcvElemOpt foreach { x ⇒
-      println(TransformerUtils.tinyTreeToString(x))
-    }
+    val undoDeleteControlOpt =
+      withDebugGridOperation("dnd delete") {
+        if (! copy)
+          deleteControlWithinCell(sourceCellElem, updateTemplates = true)
+        else
+          None
+      }
 
-    withDebugGridOperation("dnd delete") {
-    if (! copy)
-      deleteControlWithinCell(sourceCellElem, updateTemplates = true)
-    }
+    val undoInsertControlOpt =
+      withDebugGridOperation("dnd paste") {
+        selectCell(targetCellElem)
+        xcvElemOpt flatMap (pasteSingleControlFromXcv(_, None))
+      }
 
-    withDebugGridOperation("dnd paste") {
-    selectCell(targetCellElem)
-    xcvElemOpt foreach (pasteSingleControlFromXcv(_, None))
+    undoDeleteControlOpt match {
+      case Some(undoDeleteControl) ⇒ undoInsertControlOpt map (MoveControl(_, undoDeleteControl))
+      case None                    ⇒ undoInsertControlOpt
     }
   }
 
@@ -556,7 +572,7 @@ object ToolboxOps {
     require(xcvElem.isElement)
 
     val xcvNamesInUse =
-      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem), xcvElem / XcvEntry.Holder.entryName / * headOption) -- ignore toList
+      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem)) -- ignore toList
 
     def toNameWithPrefixSuffix(name: String) = prefix + name + suffix
 
@@ -724,10 +740,21 @@ object ToolboxOps {
     prefix      : String,
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
-  ): Unit =
-    xcvFromSectionWithTemplate(containerId) foreach { xcvElem ⇒
+  ): Option[UndoAction] =
+    xcvFromSectionWithTemplate(containerId) map { xcvElem ⇒
+
+      val undo =
+        MergeSectionTemplate(
+          containerId,
+          TransformerUtils.extractAsMutableDocument(controlOrContainerElemToXcv(containerById(containerId))).rootElement,
+          prefix,
+          suffix
+        )
+
       deleteSectionById(containerId)
       pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)))
+
+      undo
     }
 
   // Paste control from the clipboard
@@ -736,23 +763,25 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    readXcvFromClipboard foreach { xcvElem ⇒
+    readXcvFromClipboard flatMap { xcvElem ⇒
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
       if (IsGrid(controlElem) || IsSection(controlElem)) {
-
-        if (namesToRenameForPaste(xcvElem, "", "", Set.empty) forall (! _._3))
+        if (namesToRenameForPaste(xcvElem, "", "", Set.empty) forall (! _._3)) {
           pasteSectionGridFromXcv(xcvElem, "", "", None, Set.empty)
-        else
+        } else {
           XFormsAPI.dispatch(
             name       = "fb-show-dialog",
             targetId   = "dialog-ids",
             properties = Map("container-id" → Some(controlElem.id), "action" → Some("paste"))
           )
+          None
+        }
       } else
         pasteSingleControlFromXcv(xcvElem, None)
-    }
+    } foreach
+      Undo.pushUndoAction
   }
 
   private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"
@@ -764,7 +793,7 @@ object ToolboxOps {
     insertPosition : Option[ContainerPosition],
     ignore         : Set[String])(implicit
     ctx            : FormBuilderDocContext
-  ): Unit = {
+  ): Option[UndoAction] = {
 
     require(xcvElem.isElement)
 
@@ -956,20 +985,24 @@ object ToolboxOps {
 
     // Select first grid cell
     selectFirstCellInContainer(newContainerElem)
+
+    Some(
+      if (IsGrid(newContainerElem))
+        InsertGrid(newContainerElem.id)
+      else
+        InsertSection(newContainerElem.id)
+    )
   }
 
   def pasteSingleControlFromXcv(
     xcvElem        : NodeInfo,
     insertPosition : Option[ControlPosition])(implicit
     ctx            : FormBuilderDocContext
-  ): Unit = {
+  ): Option[UndoAction] = {
 
     val insertCellElemOpt =
       insertPosition match {
         case Some(ControlPosition(gridName, Coordinate1(x, y))) ⇒
-
-
-
           findControlByName(ctx.formDefinitionRootElem, gridName).toList descendant CellTest collectFirst {
             case cell if NodeInfoCellOps.x(cell).contains(x) && NodeInfoCellOps.y(cell).contains(y) ⇒ cell
           }
@@ -977,7 +1010,7 @@ object ToolboxOps {
         case None ⇒ ensureEmptyCell()
       }
 
-     insertCellElemOpt foreach { incertCellElem ⇒
+     insertCellElemOpt map { insertCellElem ⇒
 
       implicit val ctx = FormBuilderDocContext()
 
@@ -1009,7 +1042,7 @@ object ToolboxOps {
       }
 
       // Insert control and holders
-      val newControlElem = insert(into = incertCellElem, origin = controlElem).head
+      val newControlElem = insert(into = insertCellElem, origin = controlElem).head
 
       insertHolders(
         controlElement       = newControlElem,
@@ -1019,7 +1052,7 @@ object ToolboxOps {
       )
 
       // Create the bind and copy all attributes and content
-      val bind = ensureBinds(findContainerNamesForModel(incertCellElem) :+ name)
+      val bind = ensureBinds(findContainerNamesForModel(insertCellElem) :+ name)
       (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }
@@ -1058,7 +1091,9 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(incertCellElem).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).to[Set])
+
+      InsertControl(newControlElem.id)
     }
   }
 

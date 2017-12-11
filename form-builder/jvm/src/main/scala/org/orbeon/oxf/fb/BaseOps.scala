@@ -120,26 +120,24 @@ trait BaseOps extends Logging {
     elementIdsFromIndexOpt getOrElse elementIdsFromXPath
   }
 
-  // The idea is that we can search ids in the following ways:
+  // We search ids y looking for `id` attributes in a document, whether via an index or XPath.
   //
-  // - looking for `id` attributes in a document, whether via an index or XPath
-  // - looking for element names in a another, optional document
+  // We used to check element names in a another, optional document as well, typically instance data.
+  // But this should not be done:
+  //
+  // - it is redundant, as ids on binds and controls must identity all data in use
+  // - it is incorrect, as section templates insert their data templates and those names
+  //   must not be considered as being in use
   //
   // The resulting `Iterator` can contain duplicates.
   //
   // NOTE: We consider that an `-iteration` suffix is not allowed as a control name,
   // and always used only as a suffix of a repeated grid or section name.
   //
-  def iterateNamesInUse(
-    docWithIdsInstanceOrElem : XFormsInstance Either NodeInfo,
-    dataElemOpt              : Option[NodeInfo]
-  ): Iterator[String] = {
-
-    val namesFromIndexIt = idsIterator(docWithIdsInstanceOrElem) flatMap controlNameFromIdOpt
-    val namesFromDataIt  = dataElemOpt.toList descendant * map (_.localname)
-
-    namesFromIndexIt ++ namesFromDataIt filterNot (_.endsWith(DefaultIterationSuffix))
-  }
+  def iterateNamesInUse(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] =
+    idsIterator(docWithIdsInstanceOrElem) flatMap
+      controlNameFromIdOpt                filterNot
+      (_.endsWith(DefaultIterationSuffix))
 
   // Special id namespace for `tmp-n-tmp` ids. We don't care if those are used in data as element names, or
   // if they are in the clipboard.
@@ -181,16 +179,11 @@ trait BaseOps extends Logging {
     val allNamesInUse =
       collection.mutable.Set() ++
         // Ids coming from the form definition
-        iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem)) ++ {
+        iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)) ++ {
         // Ids coming from the special cut/copy/paste instance, if present
         ctx.xcvInstance match {
-          case Some(xcvInstance) ⇒
-
-            val dataElemOpt =
-              ctx.xcvInstance flatMap (_.rootElement / XcvEntry.Holder.entryName headOption)
-
-            iterateNamesInUse(Left(xcvInstance), dataElemOpt)
-          case None ⇒ Nil
+          case Some(xcvInstance) ⇒ iterateNamesInUse(Left(xcvInstance))
+          case None              ⇒ Nil
         }
       }
 

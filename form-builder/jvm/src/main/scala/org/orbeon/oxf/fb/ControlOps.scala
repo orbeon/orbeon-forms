@@ -156,7 +156,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     cellElem firstChildOpt * map { controlElem ⇒
 
       val undo =
-        UndoDeleteControl(
+        DeleteControl(
           ControlPosition(
             gridName   = findAncestorContainersLeafToRoot(controlElem, includeSelf = false).headOption flatMap getControlNameOpt get,
             coordinate = Coordinate1(NodeInfoCellOps.x(cellElem).get, NodeInfoCellOps.y(cellElem).get)
@@ -194,7 +194,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Rename a control with its holders, binds, etc. but *not* its nested iteration if any
-  def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Option[UndoRename] =
+  def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Option[Rename] =
     oldName != newName option {
 
       require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
@@ -210,7 +210,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
 
-      UndoRename(oldName, newName)
+      Rename(oldName, newName)
     }
 
   def renameControlIterationIfNeeded(
@@ -470,7 +470,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
   def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
-    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get), Some(ctx.dataRootElem)).to[Set]
+    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)).to[Set]
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =

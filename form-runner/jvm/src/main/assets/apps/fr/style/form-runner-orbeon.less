@@ -243,10 +243,12 @@ body.orbeon { background-color: @frBackground }
     // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
     .fr-mode-new, .fr-mode-edit, .fr-mode-test, .xforms-dialog {
         .xforms-required {
-            .xforms-label:before {
-                content: '* ';
-                vertical-align: middle;                   // So the star doesn't show too high relative to the text of the label
-                font-size: 150%;                          // Default size isn't visible enough
+            &.xforms-label, .xforms-label {
+                &:before {
+                    content: '* ';
+                    vertical-align: middle;                   // So the star doesn't show too high relative to the text of the label
+                    font-size: 150%;                          // Default size isn't visible enough
+                }
             }
         }
 

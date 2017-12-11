@@ -461,7 +461,7 @@
                                                     </xsl:if>
 
                                                     <!-- Create external LHH pointing to the control -->
-                                                    <xsl:for-each select="$control/(xf:label, xf:hint, xf:help)">
+                                                    <xsl:for-each select="$control/xf:help, $control/(xf:label, xf:hint)">
                                                         <xsl:copy>
                                                             <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
                                                             <xsl:attribute name="for" select="$control/@id"/>

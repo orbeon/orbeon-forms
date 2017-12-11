@@ -144,7 +144,7 @@
                         <xf:output value="
                             xxf:format-message(
                                 $fr-resources/detail/lease/other-user,
-                                xxf:instance('fr-lockinfo-response')/d:owner/fr:username
+                                xxf:instance('fr-lockinfo-response')/d:owner/fr:username/string()
                             )
                         "/>
                     </xf:case>

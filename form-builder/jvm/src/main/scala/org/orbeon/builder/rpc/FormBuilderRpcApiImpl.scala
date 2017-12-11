@@ -40,7 +40,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     )
 
     // The client might send this after the control is deleted and we don't want to crash
-    if (FormRunner.findControlByName(ctx.bodyElem, "control-2").isDefined)
+    if (FormRunner.findControlByName(ctx.bodyElem, controlName).isDefined)
       FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML)
   }
 

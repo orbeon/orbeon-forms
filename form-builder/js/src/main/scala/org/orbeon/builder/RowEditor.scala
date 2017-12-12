@@ -25,12 +25,23 @@ import org.scalajs.jquery.JQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.$
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.dom.document
+import org.orbeon.oxf.util.CoreUtils._
 
 object RowEditor {
 
   var currentGridBodyOpt : Option[Block] = None
   var currentRowPosOpt   : Option[Int]   = None
   lazy val rowEditorContainer                       = $(".fb-row-editor")
+
+  def withCurrentGridBody[T](f: Block ⇒ T): Option[T] =
+    currentGridBodyOpt flatMap { currentGridBody ⇒
+      // Check the current grid is still in the document, as we might have an outdated reference in case we read it in
+      // `onUnderPointerChange`, since the current grid is also updated in another listener to `onUnderPointerChange`
+      val gridIsInDocument =
+        $.contains(document.documentElement, currentGridBody.el.get(0))
+      gridIsInDocument option f(currentGridBody)
+    }
 
   sealed abstract class RowEditor extends EnumEntry with Hyphencase {
     def className = s".fb-row-$entryName"
@@ -52,7 +63,7 @@ object RowEditor {
 
   // Position row editor
   Position.onUnderPointerChange {
-    currentGridBodyOpt foreach { currentGridBody ⇒
+    withCurrentGridBody { currentGridBody ⇒
 
       // Get the height of each row track
       val rowsHeight =
@@ -125,7 +136,7 @@ object RowEditor {
   RowEditor.values foreach { rowEditor ⇒
     val iconEl = rowEditorContainer.children(rowEditor.className)
     iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
-      currentGridBodyOpt foreach { currentGridBody ⇒
+      withCurrentGridBody { currentGridBody ⇒
         currentRowPosOpt foreach { currentRowPos ⇒
 
           val gridEl    = currentGridBody.el.closest(BlockCache.GridSelector)

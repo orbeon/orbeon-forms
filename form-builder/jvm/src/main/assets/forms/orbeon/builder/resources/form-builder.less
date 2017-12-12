@@ -15,8 +15,6 @@
 @darkBlue: #004B92;
 @lightBlue: #DEF;
 @yellow: #ffffd3;
-@cellSelectColorBorder     : rgba(66, 133, 244, 1.0);
-@cellSelectColorBackground : rgba(66, 133, 244, 0.05);
 
 @fbGutter: 10px;
 @fbToolbarWidth: 208px;
@@ -917,7 +915,8 @@ div.orbeon.orbeon-portlet-div {
 
         .fr-grid-td {
             &.fb-selected {                                                             // Selected cell in grids
-                box-shadow: inset 0 0 0 2px @cellSelectColorBorder !important;        // Highlight current cell
+                box-shadow: 0 0 5px 3px #aaccee !important;                             // Highlight current cell
+                z-index: 1;                                                             // Highlight to show over grey background for hover cell
             }
             &:hover:not(.fb-selected) {
                 background-color: #eee;

@@ -68,7 +68,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
 
 sealed abstract class ErrorType(override val entryName: String) extends EnumEntry
 
-object ErrorType  extends Enum[ErrorType] {
+object ErrorType extends Enum[ErrorType] {
 
   val values = findValues
 

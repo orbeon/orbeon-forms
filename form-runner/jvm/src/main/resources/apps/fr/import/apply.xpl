@@ -56,14 +56,14 @@
                      xmlns:ms-orels="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
                      xmlns:ms-prels="http://schemas.openxmlformats.org/package/2006/relationships">
                 <!-- Fixed documents -->
-                <xsl:variable name="workbook" select="doc(/*/file[@name = 'xl/workbook.xml'])" as="document-node()"/>
-                <xsl:variable name="rels" select="doc(/*/file[@name = 'xl/_rels/workbook.xml.rels'])" as="document-node()"/>
-                <xsl:variable name="strings" select="doc(/*/file[@name = 'xl/sharedStrings.xml'])" as="document-node()"/>
+                <xsl:variable name="workbook"       select="doc(/*/file[@name = 'xl/workbook.xml'])" as="document-node()"/>
+                <xsl:variable name="rels"           select="doc(/*/file[@name = 'xl/_rels/workbook.xml.rels'])" as="document-node()"/>
+                <xsl:variable name="strings"        select="doc(/*/file[@name = 'xl/sharedStrings.xml'])" as="document-node()"/>
 
                 <!-- Open first sheet -->
-                <xsl:variable name="sheet-rid" select="$workbook/*/ms-main:sheets/ms-main:sheet[1]/@ms-orels:id" as="xs:string"/>
+                <xsl:variable name="sheet-rid"      select="$workbook/*/ms-main:sheets/ms-main:sheet[1]/@ms-orels:id" as="xs:string"/>
                 <xsl:variable name="sheet-filename" select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target" as="xs:string"/>
-                <xsl:variable name="sheet" select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
+                <xsl:variable name="sheet"          select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
 
                 <xsl:for-each select="$sheet/*/ms-main:sheetData/ms-main:row">
 
@@ -72,7 +72,7 @@
                         <row>
                             <xsl:for-each select="ms-main:c">
                                 <xsl:variable name="v" select="ms-main:v"/>
-                                <c><xsl:value-of select="if (@t = 's') then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
+                                <c r="{replace(@r, '\d', '')}"><xsl:value-of select="if (@t = 's') then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
                             </xsl:for-each>
                         </row>
                     </xsl:variable>
@@ -85,7 +85,7 @@
                 </xsl:for-each>
             </rows>
         </p:input>
-        <p:output name="data" id="rows"/>
+        <p:output name="data" id="rows" debug="xxx rows"/>
     </p:processor>
 
     <!-- Obtain the form definition -->

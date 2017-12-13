@@ -61,13 +61,13 @@ object Undo {
   import Private._
 
   def pushUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit =
-    pushAction(UndoOrRedo.Undo, action)
+    pushAction(UndoOrRedo.Undo, action, action.name)
 
   def popUndoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     popAction(UndoOrRedo.Undo)
 
-  def pushRedoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit =
-    pushAction(UndoOrRedo.Redo, action)
+  def pushRedoAction(action: UndoAction, name: String)(implicit ctx: FormBuilderDocContext): Unit =
+    pushAction(UndoOrRedo.Redo, action, name)
 
   def popRedoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     popAction(UndoOrRedo.Redo)
@@ -106,7 +106,7 @@ object Undo {
       case object Redo extends UndoOrRedo
     }
 
-    def pushAction(undoOrRedo: UndoOrRedo, action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit = {
+    def pushAction(undoOrRedo: UndoOrRedo, action: UndoAction, name: String)(implicit ctx: FormBuilderDocContext): Unit = {
 
       val encoded = JsonConverter.encode(action)
       val undos   = ctx.undoRootElem / (undoOrRedo.entryName + "s")
@@ -114,7 +114,7 @@ object Undo {
       XFormsAPI.insert(
         into   = undos,
         after  = undos / *,
-        origin = elementInfo(undoOrRedo.entryName, List(attributeInfo("name", action.name), encoded))
+        origin = elementInfo(undoOrRedo.entryName, List(attributeInfo("name", name), encoded))
       )
     }
 

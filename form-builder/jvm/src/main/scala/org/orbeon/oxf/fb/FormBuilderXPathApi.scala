@@ -537,7 +537,12 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def undoAction(): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    Undo.popUndoAction() flatMap processUndoRedoAction foreach Undo.pushRedoAction
+    for {
+      undoAction ← Undo.popUndoAction()
+      redoAction ← processUndoRedoAction(undoAction)
+    } locally {
+      Undo.pushRedoAction(redoAction, undoAction.name)
+    }
   }
 
   //@XPathFunction

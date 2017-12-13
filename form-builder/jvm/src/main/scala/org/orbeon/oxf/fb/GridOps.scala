@@ -166,7 +166,7 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
-    allCells.size > 1 && adjustedRowPos < allCells.size
+    allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size
   }
 
   def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Unit = {
@@ -177,7 +177,7 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
-    if (allCells.size > 1 && adjustedRowPos < allCells.size)
+    if (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size)
       withDebugGridOperation("delete row") {
 
         // Reduce height of cells which start on a previous row
@@ -210,13 +210,15 @@ trait GridOps extends ContainerOps {
 
         // Adjust selected cell if needed
         newCellToSelect foreach selectCell
+
+
       }
   }
 
   // Whether this is the last grid in the section
   // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
   def isLastGridInSection(grid: NodeInfo): Boolean =
-    childrenGrids(findAncestorContainersLeafToRoot(grid).head).size == 1
+    childrenGrids(findAncestorContainersLeafToRoot(grid).head).lengthCompare(1) == 0
 
   private def selectedCellVar(implicit ctx: FormBuilderDocContext) =
     ctx.formBuilderModel.get.unsafeGetVariableAsNodeInfo("selected-cell")
@@ -439,7 +441,7 @@ trait GridOps extends ContainerOps {
 
       // If we get here and the size is 1, it means that `firstCell.x == x && firstCell.y == y`, which
       // is not allowed as there cannot be two cells originating at the same coordinate.
-      require(originCells.size > 1)
+      require(originCells.lengthCompare(1) > 0)
 
       val afterCellOpt =
         originCells.sliding(2) collectFirst {

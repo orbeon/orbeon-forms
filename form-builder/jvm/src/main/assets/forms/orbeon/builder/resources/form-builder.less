@@ -243,8 +243,9 @@ div.orbeon.orbeon-portlet-div {
         .fb-toolbox-inside {
             width: 100%;
             height: 100%;
+            display: flex;
+            flex-direction: column;
             padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
-            overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
             .box-sizing(border-box);
 
             .xforms-trigger a {
@@ -378,6 +379,21 @@ div.orbeon.orbeon-portlet-div {
                 // Services and actions
                 ul { margin: 0; overflow: auto }
                 li { list-style-type: none; white-space: nowrap; font-size: 11px }
+            }
+
+            #fb-toolbox-tabs {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+
+                > div {
+                    display: flex;
+                    flex-direction: column;
+                    .tab-content {
+                        flex-grow: 1;
+                        overflow-y: auto;
+                    }
+                }
             }
 
             .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll

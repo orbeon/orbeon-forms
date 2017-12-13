@@ -72,6 +72,7 @@
 
             <!-- Save on click on save -->
             <xbl:handler event="DOMActivate" observer="save-trigger" type="xpath">
+                fbf:saveControlToUndoStack($i/control-name, $i/control-name),
                 fbf:setControlItems($i/control-name, $i/items),
                 fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
             </xbl:handler>

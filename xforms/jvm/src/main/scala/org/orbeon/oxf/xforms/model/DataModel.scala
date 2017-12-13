@@ -132,7 +132,7 @@ object DataModel {
     newValue  : String,
     onSuccess : String ⇒ Unit = _ ⇒ (),
     onError   : Reason ⇒ Unit = _ ⇒ ()
-  ) = {
+  ): Boolean = {
 
     assert(nodeInfo ne null)
     assert(newValue ne null)
@@ -162,7 +162,7 @@ object DataModel {
     isCalculate        : Boolean,
     collector          : XFormsEvent ⇒ Unit = Dispatch.dispatchEvent)(implicit
     logger             : IndentedLogger
-  ) = {
+  ): Boolean = {
 
     assert(containingDocument ne null)
     assert(logger ne null)

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.datatypes.Direction
+import org.orbeon.oxf.fb.UndoAction.MoveContainer
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
@@ -27,6 +29,21 @@ trait SectionOps extends ContainerOps {
 
   def deleteSectionById(sectionId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     deleteContainerById(canDeleteSection, sectionId)
+
+  def moveSection(container: NodeInfo, direction: Direction)(implicit ctx: FormBuilderDocContext): Some[UndoAction] = {
+
+    val sectionId = container.id
+    val position  = FormBuilder.containerPosition(sectionId)
+
+    direction match {
+      case Direction.Up    ⇒ moveSectionUp(container)
+      case Direction.Down  ⇒ moveSectionDown(container)
+      case Direction.Left  ⇒ moveSectionLeft(container)
+      case Direction.Right ⇒ moveSectionRight(container)
+    }
+
+    Some(MoveContainer(sectionId, direction, position))
+  }
 
   // Move the section up if possible
   def moveSectionUp(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =

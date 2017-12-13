@@ -233,8 +233,13 @@
 
                 <xf:action if="instance('modified')/@* = true()">
 
-                    <xf:var name="old-name" value="$i/original-control-name/string()"/>
+                    <xf:var name="old-name" value="$i/original-control-name/string()"/>\
+                    <xf:var name="new-name" value="$i/control-name/string()"/>
                     <xf:var name="control"  value="fbf:findControlByNameOrEmpty($old-name)"/>
+
+                    <xf:action type="xpath">
+                        fbf:saveControlToUndoStack($old-name, $new-name)
+                    </xf:action>
 
                     <xf:var
                         name="control-details"
@@ -255,11 +260,9 @@
 
                     <xf:action if="instance('modified')/@i = true()">
 
-                        <xf:var name="new-name" value="$i/control-name/string()"/>
-
                         <!-- Rename if needed -->
                         <xf:action type="xpath">
-                            fbf:renameControlIfNeeded($old-name, $new-name)
+                            fbf:renameControlIfNeeded($old-name, $new-name, false())
                         </xf:action>
                         <!-- Write classes -->
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>

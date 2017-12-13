@@ -8,6 +8,13 @@
       <option name="RIGHT_MARGIN" value="72" />
     </MarkdownNavigatorCodeStyleSettings>
     <ScalaCodeStyleSettings>
+      <option name="alwaysUsedImports">
+        <array>
+          <option value="io.circe.generic.auto._" />
+          <option value="org.orbeon.xforms.XFormsId" />
+          <option value="scala.concurrent.ExecutionContext.Implicits.global" />
+        </array>
+      </option>
       <option name="NOT_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
       <option name="ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT" value="false" />
       <option name="REPLACE_CASE_ARROW_WITH_UNICODE_CHAR" value="true" />

@@ -165,13 +165,14 @@ trait ResourcesOps extends BaseOps {
   }
 
   // Set a control's current resource for the current language
+  // Return `true` if changed
   def setControlResource(
     controlName  : String,
     resourceName : String,
     value        : String
-  )(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
+  )(implicit ctx: FormBuilderDocContext): Boolean = {
     val resourceHolder = ensureResourceHolder(controlName, resourceName)
-    setvalue(resourceHolder, value)
+    setvalue(resourceHolder, value) exists (_._2)
   }
 
   // Delete existing control resources and set new resource values
@@ -273,7 +274,7 @@ trait ResourcesOps extends BaseOps {
     } yield
       lhhaHolder
 
-  def hasBlankOrMissingLHHAForAllLangsUseDoc(
+  def hasBlankOrMissingLHHAForAllLangsUseDoc( // TODO: use LHHA type
     controlName : String,
     lhha        : String)(implicit
     ctx         : FormBuilderDocContext

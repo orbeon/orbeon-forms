@@ -58,9 +58,9 @@ class FormBuilderUndoTest
             assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
 
             if (isGrid)
-              FormBuilder.deleteGridById(containerId) foreach Undo.pushUndoAction
+              FormBuilder.deleteGridById(containerId) foreach Undo.pushUserUndoAction
             else
-              FormBuilder.deleteSectionById(containerId) foreach Undo.pushUndoAction
+              FormBuilder.deleteSectionById(containerId) foreach Undo.pushUserUndoAction
 
             assert(FormBuilder.findContainerById(containerId).isEmpty)
             assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)

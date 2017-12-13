@@ -13,6 +13,8 @@
  */
 package org.orbeon.builder.rpc
 
+import org.orbeon.datatypes.{AboveBelow, Direction}
+import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps, Undo}
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -40,8 +42,19 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     )
 
     // The client might send this after the control is deleted and we don't want to crash
-    if (FormRunner.findControlByName(ctx.bodyElem, controlName).isDefined)
-      FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML)
+    FormRunner.findControlByName(ctx.bodyElem, controlName) foreach { controlElem ⇒
+
+      val xcvElem = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+
+      if (FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, isHTML))
+        Undo.pushUserUndoAction(
+          ControlSettings(
+            controlName,
+            controlName,
+            xcvElem
+          )
+        )
+    }
   }
 
   def controlDelete(controlId: String): Unit = {
@@ -49,7 +62,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     resolveId(controlId) flatMap { controlElem ⇒
       FormBuilder.deleteControlWithinCell(controlElem.parentUnsafe, updateTemplates = true)
     } foreach
-      Undo.pushUndoAction
+      Undo.pushUserUndoAction
   }
 
   def controlEditDetails(controlId: String): Unit =
@@ -73,23 +86,25 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     val sourceCellElem = resolveId(controlId).get.parentUnsafe
     val targetCellElem = resolveId(destCellId).get
 
-    ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy) foreach Undo.pushUndoAction
+    ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy) foreach Undo.pushUserUndoAction
   }
 
-  def rowInsertAbove(controlId: String, position: Int): Unit = {
+  def rowInsert(controlId: String, position: Int, aboveBelowString: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.rowInsertAbove(FormBuilder.containerById(controlId), position - 1)
+
+    val (_, undoAction) =
+      AboveBelow.withName(aboveBelowString) match {
+        case AboveBelow.Above ⇒ FormBuilder.rowInsertAbove(FormBuilder.containerById(controlId), position - 1)
+        case AboveBelow.Below ⇒ FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
+      }
+
+    undoAction foreach Undo.pushUserUndoAction
   }
 
   def rowDelete(controlId: String, position: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()
     if (FormBuilder.canDeleteRow(controlId, position - 1))
-      FormBuilder.rowDelete(controlId, position - 1)
-  }
-
-  def rowInsertBelow(controlId: String, position: Int): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
+      FormBuilder.rowDelete(controlId, position - 1) foreach Undo.pushUserUndoAction
   }
 
   def shrinkDown(cellId: String): Unit = {
@@ -114,7 +129,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def sectionDelete(sectionId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteSectionById(sectionId) foreach Undo.pushUndoAction
+    FormBuilder.deleteSectionById(sectionId) foreach Undo.pushUserUndoAction
   }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
@@ -136,29 +151,20 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       properties = Map("control-id" → Some(sectionId))
     )
 
-  def sectionMoveUp(sectionId: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveSectionUp(FormBuilder.containerById(sectionId))
-  }
+  def sectionMove(sectionId: String, directionString: String): Unit = {
 
-  def sectionMoveDown(sectionId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveSectionDown(FormBuilder.containerById(sectionId))
-  }
 
-  def sectionMoveRight(sectionId: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveSectionRight(FormBuilder.containerById(sectionId))
-  }
-
-  def sectionMoveLeft(sectionId: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveSectionLeft(FormBuilder.containerById(sectionId))
+    FormBuilder.moveSection(
+      FormBuilder.containerById(sectionId),
+      Direction.withName(directionString)
+    ) foreach
+      Undo.pushUserUndoAction
   }
 
   def gridDelete(gridId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteGridById(gridId) foreach Undo.pushUndoAction
+    FormBuilder.deleteGridById(gridId) foreach Undo.pushUserUndoAction
   }
 
   def containerCopy(containerId: String): Unit = {

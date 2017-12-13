@@ -148,6 +148,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def iterateSelfAndDescendantHoldersReversed(rootHolder: NodeInfo): Iterator[NodeInfo] =
     (rootHolder descendantOrSelf *).reverseIterator
 
+  def controlPosition(controlElem: NodeInfo): ControlPosition = {
+
+    val cellElem = controlElem.parentUnsafe
+
+    ControlPosition(
+      gridName   = findAncestorContainersLeafToRoot(controlElem, includeSelf = false).headOption flatMap getControlNameOpt get,
+      coordinate = Coordinate1(NodeInfoCellOps.x(cellElem).get, NodeInfoCellOps.y(cellElem).get)
+    )
+  }
+
   def deleteControlWithinCell(
     cellElem        : NodeInfo,
     updateTemplates : Boolean = false)(implicit
@@ -157,10 +167,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       val undo =
         DeleteControl(
-          ControlPosition(
-            gridName   = findAncestorContainersLeafToRoot(controlElem, includeSelf = false).headOption flatMap getControlNameOpt get,
-            coordinate = Coordinate1(NodeInfoCellOps.x(cellElem).get, NodeInfoCellOps.y(cellElem).get)
-          ),
+          controlPosition(controlElem),
           ToolboxOps.controlOrContainerElemToXcv(controlElem)
         )
 
@@ -509,9 +516,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     value       : String,
     isHTML      : Boolean)(implicit
     ctx         : FormBuilderDocContext
-  ): Unit = {
-    setControlResource(controlName, lht, value.trimAllToEmpty)
-    FormBuilder.setControlLHHATMediatype(controlName, lht, isHTML)
+  ): Boolean = {
+    val resourceChanged  = setControlResource(controlName, lht, value.trimAllToEmpty)
+    val mediatypeChanged = FormBuilder.setControlLHHATMediatype(controlName, lht, isHTML)
+
+    resourceChanged || mediatypeChanged
   }
 
   // Find a control's LHHA (there can be more than one for alerts)
@@ -523,9 +532,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     hasHTMLMediatype(getControlLHHAT(controlName, lhha))
 
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
-  def setControlLHHATMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Unit =
-    if (isHTML != isControlLHHATHTMLMediatype(controlName, lhha))
+  def setControlLHHATMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Boolean = {
+
+    val changed = isHTML != isControlLHHATHTMLMediatype(controlName, lhha)
+
+    if (changed)
       setHTMLMediatype(getControlLHHAT(controlName, lhha), isHTML)
+
+    changed
+  }
 
   // For a given control, whether the mediatype on itemset labels is HTML
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =

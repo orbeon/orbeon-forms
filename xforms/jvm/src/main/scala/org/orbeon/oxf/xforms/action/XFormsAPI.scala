@@ -75,9 +75,8 @@ object XFormsAPI {
 
   // xf:setvalue
   // @return the node whose value was set, if any
-  def setvalue(ref: Seq[NodeInfo], value: String) =
-    ref.nonEmpty option {
-      val nodeInfo = ref.head
+  def setvalue(ref: Seq[NodeInfo], value: String): Option[(NodeInfo, Boolean)] =
+    ref.headOption map { nodeInfo ⇒
 
       def onSuccess(oldValue: String): Unit =
         for (action ← actionInterpreterDyn.value)
@@ -93,9 +92,9 @@ object XFormsAPI {
               logger             = action.indentedLogger
             )
 
-      DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
+      val changed = DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 
-      nodeInfo
+      (nodeInfo, changed)
     }
 
   // xf:setindex

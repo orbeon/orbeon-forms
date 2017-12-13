@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.datatypes.Direction
+import org.orbeon.datatypes.{AboveBelow, Direction}
+import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow}
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -60,7 +61,7 @@ trait GridOps extends ContainerOps {
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeInfo =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsGrid head
 
-  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo =
+  def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[UndoAction]) =
     withDebugGridOperation("insert row below") {
 
       val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
@@ -102,11 +103,14 @@ trait GridOps extends ContainerOps {
             w={cell.w.toString}/>: NodeInfo
         }
 
-      insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption.orNull
+      val insertedNode =
+        insert(into = Nil, after = precedingCellOpt.toList, origin = newCells).headOption.orNull
       // `.orNull` is bad, but `insert()` is not always able to return the inserted item at this time
+
+      (insertedNode, Some(InsertRow(gridElem.id, adjustedRowPos, AboveBelow.Below)))
     }
 
-  def rowInsertAbove(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): NodeInfo = {
+  def rowInsertAbove(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[UndoAction]) = {
 
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
@@ -143,8 +147,11 @@ trait GridOps extends ContainerOps {
 
         val firstCellOpt = allCells.iterator.flatten.nextOption() flatMap (_.u)
 
-        insert(into = List(gridElem), before = firstCellOpt.toList, origin = newCells).headOption.orNull
-        // `.orNull` is bad, but `insert()` is not always able to return the inserted item at this time
+        val insertedNode =
+          insert(into = List(gridElem), before = firstCellOpt.toList, origin = newCells).headOption.orNull
+          // `.orNull` is bad, but `insert()` is not always able to return the inserted item at this time
+
+        (insertedNode, Some(InsertRow(gridElem.id, adjustedRowPos, AboveBelow.Above)))
       }
   }
 
@@ -169,7 +176,7 @@ trait GridOps extends ContainerOps {
     allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size
   }
 
-  def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Unit = {
+  def rowDelete(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
 
     require(rowPos >= 0)
 
@@ -177,8 +184,10 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
     val adjustedRowPos = rowPos % allCells.size
 
-    if (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size)
+    (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size) option
       withDebugGridOperation("delete row") {
+
+        val undo = DeleteRow(gridId, ToolboxOps.controlOrContainerElemToXcv(gridElem), adjustedRowPos)
 
         // Reduce height of cells which start on a previous row
         val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
@@ -211,7 +220,7 @@ trait GridOps extends ContainerOps {
         // Adjust selected cell if needed
         newCellToSelect foreach selectCell
 
-
+        undo
       }
   }
 
@@ -262,7 +271,7 @@ trait GridOps extends ContainerOps {
         val newCell =
           availableCellOpt match {
             case Some(Cell(Some(cellNode), _, _, _, _, _)) ⇒ Some(cellNode)
-            case _                                         ⇒ Option(rowInsertBelow(gridElem, currentCell.y - 1))
+            case _                                         ⇒ Option(rowInsertBelow(gridElem, currentCell.y - 1)._1)
           }
 
          newCell |!> selectCell

@@ -14,19 +14,21 @@
 package org.orbeon.builder
 
 import autowire._
-import enumeratum.{Enum, EnumEntry}
 import enumeratum.EnumEntry.Hyphencase
+import enumeratum.{Enum, EnumEntry}
+import io.circe.generic.auto._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.datatypes.AboveBelow
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.jquery.JQuery
+import org.orbeon.oxf.util.CoreUtils.{asUnit, _}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.$
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
-import org.orbeon.oxf.util.CoreUtils._
+import org.scalajs.jquery.JQuery
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object RowEditor {
 
@@ -144,9 +146,9 @@ object RowEditor {
           val client    = RpcClient[FormBuilderRpcApi]
 
           rowEditor match {
-            case InsertAbove ⇒ client.rowInsertAbove(controlId, currentRowPos).call()
-            case Delete      ⇒ client.rowDelete     (controlId, currentRowPos).call()
-            case InsertBelow ⇒ client.rowInsertBelow(controlId, currentRowPos).call()
+            case InsertAbove ⇒ client.rowInsert(controlId, currentRowPos, AboveBelow.Above.entryName).call()
+            case Delete      ⇒ client.rowDelete(controlId, currentRowPos).call()
+            case InsertBelow ⇒ client.rowInsert(controlId, currentRowPos, AboveBelow.Below.entryName).call()
           }
         }
       }

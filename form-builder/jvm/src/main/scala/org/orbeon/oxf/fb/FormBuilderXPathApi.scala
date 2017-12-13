@@ -13,8 +13,9 @@
   */
 package org.orbeon.oxf.fb
 
-import org.orbeon.datatypes.MediatypeRange
+import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FR, XF}
@@ -63,10 +64,11 @@ object FormBuilderXPathApi {
     )(FormBuilderDocContext())
 
   //@XPathFunction
-  def renameControlIfNeeded(oldName: String, newName: String): Unit = {
+  def renameControlIfNeeded(oldName: String, newName: String, addToUndoStack: Boolean): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.renameControlIfNeeded(oldName, newName) foreach
-      Undo.pushUndoAction
+    FormBuilder.renameControlIfNeeded(oldName, newName) filter
+      (_ ⇒ addToUndoStack) foreach
+      Undo.pushUserUndoAction
   }
 
   // Find the value of a MIP or null (the empty sequence)
@@ -126,7 +128,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormBuilder.setControlResource(controlName, "help", value.trimAllToEmpty)
+    val changed = FormBuilder.setControlResource(controlName, "help", value.trimAllToEmpty)
 
     if (hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, "help"))
       FormBuilder.removeLHHAElementAndResources(controlName, "help")
@@ -520,7 +522,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.containerMerge(containerId, prefix, suffix) foreach Undo.pushUndoAction
+    ToolboxOps.containerMerge(containerId, prefix, suffix) foreach Undo.pushUserUndoAction
   }
 
   //@XPathFunction
@@ -531,7 +533,20 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.readXcvFromClipboard flatMap
       (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty)) foreach
-      Undo.pushUndoAction
+      Undo.pushUserUndoAction
+  }
+
+  //@XPathFunction
+  def saveControlToUndoStack(oldName: String, newName: String): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    for {
+      control ← FormRunner.findControlByName(ctx.formDefinitionRootElem, oldName)
+      xcv     = ToolboxOps.controlOrContainerElemToXcv(control)
+    } locally {
+      Undo.pushUserUndoAction(ControlSettings(oldName, newName, xcv))
+    }
   }
 
   //@XPathFunction
@@ -541,14 +556,19 @@ object FormBuilderXPathApi {
       undoAction ← Undo.popUndoAction()
       redoAction ← processUndoRedoAction(undoAction)
     } locally {
-      Undo.pushRedoAction(redoAction, undoAction.name)
+      Undo.pushAction(UndoOrRedo.Redo, redoAction, undoAction.name)
     }
   }
 
   //@XPathFunction
   def redoAction(): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    Undo.popRedoAction() flatMap processUndoRedoAction foreach Undo.pushUndoAction
+    for {
+      redoAction ← Undo.popRedoAction()
+      undoAction ← processUndoRedoAction(redoAction)
+    } locally {
+      Undo.pushAction(UndoOrRedo.Undo, undoAction, undoAction.name)
+    }
   }
 
   private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
@@ -566,6 +586,27 @@ object FormBuilderXPathApi {
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           Some(position)
         )
+      case DeleteRow(gridId, xcvElem, rowPos) ⇒
+
+        val containerPosition = FormBuilder.containerPosition(gridId)
+
+        FormBuilder.deleteContainerById(_ ⇒ true, gridId)
+
+        ToolboxOps.pasteSectionGridFromXcv(
+          TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+          "",
+          "",
+          Some(containerPosition),
+          Set.empty
+        )
+
+        Some(UndeleteRow(gridId, rowPos))
+      case UndeleteRow(gridId, rowPos) ⇒
+        FormBuilder.rowDelete(gridId, rowPos)
+      case InsertRow(gridId, rowPos, AboveBelow.Above) ⇒
+        FormBuilder.rowDelete(gridId, rowPos)
+      case InsertRow(gridId, rowPos, AboveBelow.Below) ⇒
+        FormBuilder.rowDelete(gridId, rowPos + 1)
       case Rename(oldName, newName) ⇒
         FormBuilder.renameControlIfNeeded(newName, oldName)
       case InsertControl(controlId) ⇒
@@ -582,13 +623,23 @@ object FormBuilderXPathApi {
           newUndoInsertAction ← processUndoRedoAction(insert)
         } yield
           MoveControl(newUndoDeleteAction, newUndoInsertAction)
+      case MoveContainer(sectionId, direction, position) ⇒
+
+        val container = FormBuilder.containerById(sectionId)
+
+        direction match {
+          case Direction.Up    ⇒ FormBuilder.moveSection(container, Direction.Down)
+          case Direction.Down  ⇒ FormBuilder.moveSection(container, Direction.Up)
+          case Direction.Left  ⇒ FormBuilder.moveSection(container, Direction.Right)
+          case Direction.Right ⇒ FormBuilder.moveSection(container, Direction.Left)
+        }
       case InsertSectionTemplate(sectionId) ⇒
         FormBuilder.deleteSectionById(sectionId)
       case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) ⇒
 
         val containerPosition = FormBuilder.containerPosition(sectionId)
 
-        FormBuilder.deleteSectionById(sectionId)
+        FormBuilder.deleteContainerById(_ ⇒ true, sectionId)
 
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
@@ -601,6 +652,42 @@ object FormBuilderXPathApi {
         Some(UnmergeSectionTemplate(sectionId, prefix, suffix))
       case UnmergeSectionTemplate(sectionId, prefix, suffix) ⇒
         ToolboxOps.containerMerge(sectionId, prefix, suffix)
+      case ControlSettings(oldName, newName, xcvElem) ⇒
+        for {
+          controlElem ← FormRunner.findControlByName(ctx.formDefinitionRootElem, newName)
+          newXcvElem  = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+        } yield {
 
+          if (FormRunner.IsContainer(controlElem)) {
+            // NOTE: It is a bit costly to do this for entire sections or grids. We could do
+            // better and create a smaller set of information but it would be more work.
+            val containerId = controlElem.id
+
+            val containerPosition = FormBuilder.containerPosition(containerId)
+
+            FormBuilder.deleteContainerById(_ ⇒ true, containerId)
+
+            ToolboxOps.pasteSectionGridFromXcv(
+              TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+              "",
+              "",
+              Some(containerPosition),
+              Set.empty
+            )
+
+          } else {
+            val cellElem = controlElem.parentUnsafe
+            val position = FormBuilder.controlPosition(controlElem)
+
+            FormBuilder.deleteControlWithinCell(cellElem)
+
+            ToolboxOps.pasteSingleControlFromXcv(
+              TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
+              Some(position)
+            )
+          }
+
+          ControlSettings(newName, oldName, newXcvElem)
+        }
     }
 }

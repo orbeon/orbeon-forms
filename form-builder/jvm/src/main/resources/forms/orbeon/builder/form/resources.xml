@@ -67,6 +67,9 @@
             <insert-control>insert control</insert-control>
             <insert-section>insert section</insert-section>
             <insert-grid>insert grid</insert-grid>
+            <delete-row>delete row</delete-row>
+            <insert-row>insert row</insert-row>
+            <control-settings>control settings</control-settings>
         </undo-redo>
         <merge-section>
             <label>Merge Section Template</label>
@@ -1104,6 +1107,9 @@
             <insert-control>insertion de contrôle</insert-control>
             <insert-section>insertion de section</insert-section>
             <insert-grid>insertion de grille</insert-grid>
+            <delete-row>suppression d'une rangée</delete-row>
+            <insert-row>insertion d'une rangée</insert-row>
+            <control-settings>réglage du contrôle</control-settings>
         </undo-redo>
         <merge-section>
             <label>Intégrer modèle de section</label>
@@ -2143,6 +2149,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -3210,6 +3219,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -4277,6 +4289,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -5336,6 +5351,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -6397,6 +6415,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -7457,6 +7478,9 @@
             <update-settings todo="true">[update settings]</update-settings><insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -8517,6 +8541,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -9583,6 +9610,9 @@
             <insert-control todo="true">[insert control]</insert-control>
             <insert-section todo="true">[insert section]</insert-section>
             <insert-grid todo="true">[insert grid]</insert-grid>
+            <delete-row todo="true">[delete row]</delete-row>
+            <insert-row todo="true">[insert row]</insert-row>
+            <control-settings todo="true">[control settings]</control-settings>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>

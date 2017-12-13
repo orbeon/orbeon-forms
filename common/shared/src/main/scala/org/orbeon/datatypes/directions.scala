@@ -20,10 +20,20 @@ sealed abstract class Direction extends EnumEntry with Lowercase
 
 object Direction extends Enum[Direction] {
 
-   val values = findValues
+  val values = findValues
 
-   case object Up    extends Direction
-   case object Down  extends Direction
-   case object Left  extends Direction
-   case object Right extends Direction
+  case object Up    extends Direction
+  case object Down  extends Direction
+  case object Left  extends Direction
+  case object Right extends Direction
+}
+
+sealed abstract class AboveBelow extends EnumEntry with Lowercase
+
+object AboveBelow extends Enum[AboveBelow] {
+
+  val values = findValues
+
+  case object Above extends AboveBelow
+  case object Below extends AboveBelow
 }

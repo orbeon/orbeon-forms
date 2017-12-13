@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.datatypes.Coordinate1
+import org.orbeon.datatypes.{AboveBelow, Coordinate1, Direction}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -29,45 +29,90 @@ import org.orbeon.scaxon.SimplePath._
 case class ControlPosition  (gridName: String,     coordinate: Coordinate1)
 case class ContainerPosition(into: Option[String], after: Option[String])
 
-sealed trait UndoAction { val name: String}
+sealed trait UndoAction extends Product {
+  val name: String = UndoAction.camelToResourceName(productPrefix)
+}
 
 object UndoAction {
-  case class Rename                (oldName   : String,            newName : String)     extends UndoAction { val name = "rename"                   }
-  case class DeleteControl         (position  : ControlPosition,   xcv     : NodeInfo)   extends UndoAction { val name = "delete-control"           }
-  case class DeleteContainer       (position  : ContainerPosition, xcv     : NodeInfo)   extends UndoAction { val name = "delete-container"         }
+  case class Rename                (oldName    : String,            newName : String)     extends UndoAction
+  case class DeleteControl         (position   : ControlPosition,   xcv     : NodeInfo)   extends UndoAction
+  case class DeleteContainer       (position   : ContainerPosition, xcv     : NodeInfo)   extends UndoAction
+  case class DeleteRow             (gridId     : String,
+                                    xcv        : NodeInfo,
+                                    rowPos     : Int)                                     extends UndoAction
+  case class UndeleteRow           (gridId     : String,            rowPos: Int)          extends UndoAction
+  case class InsertRow             (gridId     : String,
+                                    rowPos     : Int,
+                                    aboveBelow : AboveBelow)                              extends UndoAction
 
-  case class MoveControl           (insert    : UndoAction,        delete  : UndoAction) extends UndoAction { val name = "move-control"             }
+  case class MoveControl           (insert     : UndoAction,        delete  : UndoAction) extends UndoAction
+  case class MoveContainer         (containerId: String,
+                                    direction  : Direction,
+                                    position   : ContainerPosition)                       extends UndoAction
 
-  case class InsertControl         (controlId : String)                                  extends UndoAction { val name = "insert-control"           }
-  case class InsertSection         (sectionId : String)                                  extends UndoAction { val name = "insert-section"           }
-  case class InsertGrid            (gridId    : String)                                  extends UndoAction { val name = "insert-grid"              }
+  case class InsertControl         (controlId  : String)                                  extends UndoAction
+  case class InsertSection         (sectionId  : String)                                  extends UndoAction
+  case class InsertGrid            (gridId     : String)                                  extends UndoAction
 
-  case class InsertSectionTemplate (sectionId : String)                                  extends UndoAction { val name = "merge-section-template"   }
-  case class MergeSectionTemplate  (sectionId : String,
-                                    xcv       : NodeInfo,
-                                    prefix    : String,
-                                    suffix    : String)                                  extends UndoAction { val name = "merge-section-template"   }
+  case class InsertSectionTemplate (sectionId  : String)                                  extends UndoAction
+  case class MergeSectionTemplate  (sectionId  : String,
+                                    xcv        : NodeInfo,
+                                    prefix     : String,
+                                    suffix     : String)                                  extends UndoAction
 
-  case class UnmergeSectionTemplate(sectionId : String,
-                                    prefix    : String,
-                                    suffix    : String)                                  extends UndoAction { val name = "unmerge-section-template" }
+  case class UnmergeSectionTemplate(sectionId  : String,
+                                    prefix     : String,
+                                    suffix     : String)                                  extends UndoAction
 
-//  case class UndoMoveContainer() extends UndoAction
-//  case class UndoUpdateSettings() extends UndoAction
+  case class ControlSettings       (oldName    : String,
+                                    newName    : String,
+                                    xcv        : NodeInfo)                                extends UndoAction
+
+  // From https://github.com/lloydmeta/enumeratum/blob/92b28ca1ceb72cebd58c1b3b1b763a6add875be3/enumeratum-core/src/main/scala/enumeratum/EnumEntry.scala#L34
+  import java.util.regex.Pattern
+
+  private val Pattern1    : Pattern = Pattern.compile("([A-Z]+)([A-Z][a-z])")
+  private val Pattern2    : Pattern = Pattern.compile("([a-z\\d])([A-Z])")
+  private val Replacement : String  = "$1-$2"
+
+  private def camelToResourceName(name: String): String = {
+    val first = Pattern1.matcher(name).replaceAll(Replacement)
+    Pattern2.matcher(first).replaceAll(Replacement).toLowerCase
+  }
 }
 
 object Undo {
 
   import Private._
 
-  def pushUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit =
+  sealed trait UndoOrRedo extends EnumEntry with Lowercase
+    object UndoOrRedo extends Enum[UndoOrRedo] {
+
+      val values = findValues
+
+      case object Undo extends UndoOrRedo
+      case object Redo extends UndoOrRedo
+    }
+
+  def pushUserUndoAction(action: UndoAction)(implicit ctx: FormBuilderDocContext): Unit = {
     pushAction(UndoOrRedo.Undo, action, action.name)
+    clearStack(UndoOrRedo.Redo)
+  }
+
+  def pushAction(undoOrRedo: UndoOrRedo, action: UndoAction, name: String)(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val encoded = JsonConverter.encode(action)
+    val undos   = ctx.undoRootElem / (undoOrRedo.entryName + "s")
+
+    XFormsAPI.insert(
+      into   = undos,
+      after  = undos / *,
+      origin = elementInfo(undoOrRedo.entryName, List(attributeInfo("name", name), encoded))
+    )
+  }
 
   def popUndoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     popAction(UndoOrRedo.Undo)
-
-  def pushRedoAction(action: UndoAction, name: String)(implicit ctx: FormBuilderDocContext): Unit =
-    pushAction(UndoOrRedo.Redo, action, name)
 
   def popRedoAction()(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     popAction(UndoOrRedo.Redo)
@@ -97,27 +142,6 @@ object Undo {
 
   private object Private {
 
-    sealed trait UndoOrRedo extends EnumEntry with Lowercase
-    object UndoOrRedo extends Enum[UndoOrRedo] {
-
-      val values = findValues
-
-      case object Undo extends UndoOrRedo
-      case object Redo extends UndoOrRedo
-    }
-
-    def pushAction(undoOrRedo: UndoOrRedo, action: UndoAction, name: String)(implicit ctx: FormBuilderDocContext): Unit = {
-
-      val encoded = JsonConverter.encode(action)
-      val undos   = ctx.undoRootElem / (undoOrRedo.entryName + "s")
-
-      XFormsAPI.insert(
-        into   = undos,
-        after  = undos / *,
-        origin = elementInfo(undoOrRedo.entryName, List(attributeInfo("name", name), encoded))
-      )
-    }
-
     def popAction(undoOrRedo: UndoOrRedo)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
       ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo ⇒
 
@@ -128,5 +152,8 @@ object Undo {
         result
       }
     }
+
+    def clearStack(undoOrRedo: UndoOrRedo)(implicit ctx: FormBuilderDocContext): Unit =
+      XFormsAPI.delete(ctx.undoRootElem / (undoOrRedo.entryName + "s") / *)
   }
 }

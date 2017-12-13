@@ -22,9 +22,8 @@ trait FormBuilderRpcApi {
   def controlEditItems    (controlId: String): Unit
   def controlDnD          (controlId: String, destCellId: String, copy: Boolean): Unit
 
-  def rowInsertAbove      (controlId: String, position: Int): Unit
+  def rowInsert           (controlId: String, position: Int, aboveBelowString: String): Unit // TODO: `AboveBelow` doesn't serialize correctly with Circe.
   def rowDelete           (controlId: String, position: Int): Unit
-  def rowInsertBelow      (controlId: String, position: Int): Unit
 
   def shrinkDown          (cellId: String): Unit
   def expandRight         (cellId: String): Unit
@@ -34,10 +33,7 @@ trait FormBuilderRpcApi {
   def sectionDelete       (sectionId: String): Unit
   def sectionUpdateLabel  (sectionId: String, label: String): Unit
   def sectionEditHelp     (sectionId: String): Unit
-  def sectionMoveUp       (sectionId: String): Unit
-  def sectionMoveDown     (sectionId: String): Unit
-  def sectionMoveRight    (sectionId: String): Unit
-  def sectionMoveLeft     (sectionId: String): Unit
+  def sectionMove         (sectionId: String, directionString: String): Unit // TODO: `Direction` doesn't serialize correctly with Circe.
 
   def gridDelete          (gridId: String): Unit
 

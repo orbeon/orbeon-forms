@@ -15,7 +15,6 @@ package org.orbeon.builder.rpc
 
 import org.orbeon.xforms.rpc.RouterBase
 
-
 object Router extends RouterBase {
   // Probably due to Autowire's macro, placing this in the base class doesn't work
   protected val routes: Router = route[FormBuilderRpcApi](FormBuilderRpcApiImpl)

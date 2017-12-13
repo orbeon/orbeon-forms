@@ -133,6 +133,10 @@
                     <xf:var name="remains-repeat" value="$i/was-repeat = true() and $i/is-repeat = true()"/>
 
                     <xf:action type="xpath">
+                        fbf:saveControlToUndoStack($old-name, $new-name)
+                    </xf:action>
+
+                    <xf:action type="xpath">
                         if ($remains-repeat) then
                             fbf:renameControlIterationIfNeeded(
                                 $old-name,
@@ -142,7 +146,7 @@
                             )
                         else
                             (),
-                        fbf:renameControlIfNeeded($old-name, $new-name),
+                        fbf:renameControlIfNeeded($old-name, $new-name, false()),
                         fbf:updateMipAsAttributeOnly($new-name, 'relevant', $i/relevant),
                         fbf:updateMipAsAttributeOnly($new-name, 'readonly', $i/readonly),
                         fbf:setRepeatProperties(

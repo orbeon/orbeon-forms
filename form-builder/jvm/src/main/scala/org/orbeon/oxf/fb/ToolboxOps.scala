@@ -151,7 +151,7 @@ object ToolboxOps {
           // This can impact templates
           updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
 
-          Undo.pushUndoAction(InsertControl(newControlElem.id))
+          Undo.pushUserUndoAction(InsertControl(newControlElem.id))
 
           Some(newControlName)
         }
@@ -198,7 +198,7 @@ object ToolboxOps {
       // Select first grid cell
       selectFirstCellInContainer(newGridElem)
 
-      Undo.pushUndoAction(InsertGrid(newGridElem.id))
+      Undo.pushUserUndoAction(InsertGrid(newGridElem.id))
     }
   }
 
@@ -260,7 +260,7 @@ object ToolboxOps {
 
       // TODO: Open label editor for newly inserted section
 
-      Undo.pushUndoAction(InsertSection(newSectionElem.id))
+      Undo.pushUserUndoAction(InsertSection(newSectionElem.id))
 
       Some(newSectionElem)
     }
@@ -317,7 +317,7 @@ object ToolboxOps {
       // Select new td
       selectFirstCellInContainer(newGridElem)
 
-      Undo.pushUndoAction(InsertGrid(newGridElem.id))
+      Undo.pushUserUndoAction(InsertGrid(newGridElem.id))
 
       Some(newGridName)
     }
@@ -488,7 +488,7 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     copyToClipboard(cellElem)
-    deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUndoAction
+    deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUserUndoAction
   }
 
   def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
@@ -781,7 +781,7 @@ object ToolboxOps {
       } else
         pasteSingleControlFromXcv(xcvElem, None)
     } foreach
-      Undo.pushUndoAction
+      Undo.pushUserUndoAction
   }
 
   private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"

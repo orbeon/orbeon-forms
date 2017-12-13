@@ -21,10 +21,10 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.jquery.JQuery
+import io.circe.generic.auto._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -153,10 +153,10 @@ object SectionGridEditor {
           editor match {
             case SectionDelete        ⇒ client.sectionDelete       (sectionGridId).call()
             case SectionEditHelp      ⇒ client.sectionEditHelp     (sectionGridId).call()
-            case SectionMoveUp        ⇒ client.sectionMoveUp       (sectionGridId).call()
-            case SectionMoveDown      ⇒ client.sectionMoveDown     (sectionGridId).call()
-            case SectionMoveRight     ⇒ client.sectionMoveRight    (sectionGridId).call()
-            case SectionMoveLeft      ⇒ client.sectionMoveLeft     (sectionGridId).call()
+            case SectionMoveUp        ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
+            case SectionMoveDown      ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
+            case SectionMoveRight     ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
+            case SectionMoveLeft      ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
             case GridDelete           ⇒ client.gridDelete          (sectionGridId).call()
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()

@@ -41,6 +41,7 @@
             <!-- Save data upon close if valid -->
             <xbl:handler event="DOMActivate" observer="save-trigger" if="valid($i)">
                 <xf:action type="xpath">
+                    fbf:saveControlToUndoStack($i/control-name, $i/control-name),
                     fbf:setControlHelp($i/control-name, $i/help)
                 </xf:action>
                 <xxf:hide dialog="dialog"/>

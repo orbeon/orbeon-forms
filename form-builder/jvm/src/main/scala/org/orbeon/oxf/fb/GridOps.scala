@@ -392,6 +392,9 @@ trait GridOps extends ContainerOps {
   def canDeleteGrid(gridElem: NodeInfo): Boolean =
     canDeleteContainer(gridElem)
 
+  def canDeleteRow(gridElem: NodeInfo): Boolean =
+    Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).lengthCompare(1) > 0
+
   // Find the new td to select if we are removing the currently selected td
   def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findSelectedCell match {

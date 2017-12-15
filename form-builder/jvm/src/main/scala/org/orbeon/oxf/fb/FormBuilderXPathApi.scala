@@ -619,9 +619,9 @@ object FormBuilderXPathApi {
           (_.parentUnsafe) flatMap
           (FormBuilder.deleteControlWithinCell(_))
       case InsertSection(sectionId) ⇒
-        FormBuilder.deleteSectionById(sectionId)
+        FormBuilder.deleteSectionByIdIfPossible(sectionId)
       case InsertGrid(gridId) ⇒
-        FormBuilder.deleteGridById(gridId)
+        FormBuilder.deleteGridByIdIfPossible(gridId)
       case MoveControl(insert, delete) ⇒
         for {
           newUndoDeleteAction ← processUndoRedoAction(delete)
@@ -639,7 +639,7 @@ object FormBuilderXPathApi {
           case Direction.Right ⇒ FormBuilder.moveSection(container, Direction.Left)
         }
       case InsertSectionTemplate(sectionId) ⇒
-        FormBuilder.deleteSectionById(sectionId)
+        FormBuilder.deleteSectionByIdIfPossible(sectionId)
       case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) ⇒
 
         val containerPosition = FormBuilder.containerPosition(sectionId)

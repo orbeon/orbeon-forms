@@ -129,7 +129,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def sectionDelete(sectionId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteSectionById(sectionId) foreach Undo.pushUserUndoAction
+    FormBuilder.deleteSectionByIdIfPossible(sectionId) foreach Undo.pushUserUndoAction
   }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
@@ -164,7 +164,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def gridDelete(gridId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteGridById(gridId) foreach Undo.pushUserUndoAction
+    FormBuilder.deleteGridByIdIfPossible(gridId) foreach Undo.pushUserUndoAction
   }
 
   def containerCopy(containerId: String): Unit = {
@@ -184,9 +184,9 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       containerCopy(containerId)
 
       if (FormRunner.IsGrid(FormBuilder.containerById(containerId)))
-        FormBuilder.deleteGridById(containerId)
+        FormBuilder.deleteGridByIdIfPossible(containerId)
       else
-        FormBuilder.deleteSectionById(containerId)
+        FormBuilder.deleteSectionByIdIfPossible(containerId)
     }
   }
 

@@ -27,8 +27,9 @@ trait SectionOps extends ContainerOps {
   def canDeleteSection(section: NodeInfo): Boolean =
     canDeleteContainer(section)
 
-  def deleteSectionById(sectionId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
-    deleteContainerById(canDeleteSection, sectionId)
+  def deleteSectionByIdIfPossible(sectionId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
+    findContainerById(sectionId) flatMap
+      (_ ⇒ deleteContainerById(canDeleteSection, sectionId))
 
   def moveSection(container: NodeInfo, direction: Direction)(implicit ctx: FormBuilderDocContext): Some[UndoAction] = {
 

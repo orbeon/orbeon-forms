@@ -751,7 +751,7 @@ object ToolboxOps {
           suffix
         )
 
-      deleteSectionById(containerId)
+      deleteSectionByIdIfPossible(containerId)
       pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)))
 
       undo

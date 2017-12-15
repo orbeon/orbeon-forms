@@ -62,7 +62,7 @@ trait ContainerOps extends ControlOps {
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
 
-  def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = findFRBodyElem(inDoc) descendant * filter IsContainer
+  def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
 
   // A container can be removed if it's not the last one at that level
   def canDeleteContainer(containerElem: NodeInfo): Boolean =
@@ -333,7 +333,7 @@ trait ContainerOps extends ControlOps {
   ): Unit = {
 
     val templateInstanceId = templateId(controlName)
-    val modelElement = findModelElem(ctx.formDefinitionRootElem)
+    val modelElement = getModelElem(ctx.formDefinitionRootElem)
     modelElement / XFInstanceTest find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content

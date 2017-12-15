@@ -21,7 +21,7 @@ import org.orbeon.scaxon.SimplePath._
 trait SchemaOps {
 
   def findSchema(inDoc: NodeInfo) =
-    findModelElem(inDoc) / XSSchemaTest headOption
+    getModelElem(inDoc) / XSSchemaTest headOption
 
   def findSchemaNamespace(inDoc: NodeInfo) =
     for {

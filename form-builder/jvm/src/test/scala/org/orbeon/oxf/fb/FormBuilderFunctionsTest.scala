@@ -53,8 +53,8 @@ class FormBuilderFunctionsTest
       val doc = ctx.formDefinitionRootElem
 
       it("must find the model") {
-        assert(findModelElem(doc).getDisplayName === "xf:model")
-        assert(findModelElem(doc).hasIdValue(Names.FormModel))
+        assert(getModelElem(doc).getDisplayName === "xf:model")
+        assert(getModelElem(doc).hasIdValue(Names.FormModel))
       }
 
       it("must find the instance") {
@@ -267,7 +267,7 @@ class FormBuilderFunctionsTest
           assert(controlBind.hasIdValue(bindId(newRepeatName)))
           assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-          assert(findModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-2-template")))
+          assert(getModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-2-template")))
         }
 
         // Insert a new control

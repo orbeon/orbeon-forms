@@ -482,7 +482,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
-    findFRBodyElem(inDoc) descendant * filter
+    getFormRunnerBodyElem(inDoc) descendant * filter
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")

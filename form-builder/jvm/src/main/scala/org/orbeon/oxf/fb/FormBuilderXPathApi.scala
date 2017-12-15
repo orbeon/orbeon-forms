@@ -391,9 +391,9 @@ object FormBuilderXPathApi {
   // Various counts
   //@XPathFunction
   def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.IsSection
-  def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.findFRBodyElem(inDoc) descendant * count FormRunner.IsGrid
+  def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.IsGrid
   def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.isRepeat
-  def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.findFRBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
+  def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
   def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot FormRunner.IsContainer size

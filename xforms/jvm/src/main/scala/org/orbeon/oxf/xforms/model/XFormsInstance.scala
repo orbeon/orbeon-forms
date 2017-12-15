@@ -389,6 +389,7 @@ trait XFormsInstanceIndex {
   private var idIndex: m.Map[String, List[Element]] = _
 
   // Iterator over all ids
+  // TODO: Not useful for Form Builder, because it must search under `<xh:body>` only.
   def idsIterator = {
     createIndexIfNeeded()
     if (idIndex ne null) idIndex.keysIterator else Iterator.empty

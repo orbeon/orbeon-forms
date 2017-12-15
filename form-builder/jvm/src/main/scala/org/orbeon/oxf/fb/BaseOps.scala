@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.ToolboxOps.XcvEntry
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -48,12 +46,12 @@ case class FormBuilderDocContext(
   lazy val formResourcesRoot: NodeInfo =
     formBuilderModel.get.unsafeGetVariableAsNodeInfo("resources")
 
-  lazy val modelElem             = findModelElem(formDefinitionRootElem)
+  lazy val modelElem             = getModelElem(formDefinitionRootElem)
   lazy val dataInstanceElem      = instanceElemFromModelElem(modelElem, Names.FormInstance).get
   lazy val metadataInstanceElem  = instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
   lazy val resourcesInstanceElem = instanceElemFromModelElem(modelElem, Names.FormResources).get
   lazy val topLevelBindElem      = findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              = findFRBodyElem(formDefinitionRootElem)
+  lazy val bodyElem              = getFormRunnerBodyElem(formDefinitionRootElem)
 
   lazy val dataRootElem          = dataInstanceElem      / * head
   lazy val metadataRootElem      = metadataInstanceElem  / * head
@@ -107,17 +105,16 @@ trait BaseOps extends Logging {
       case Right(formElem) ⇒ formElem
     }
 
-    def elementIdsFromIndexOpt =
-      for {
-        formDefinitionInstance ← docWithIdsInstanceOrElem.left.toOption
-        if formDefinitionHasIndex(formDefinitionRootElem.root)
-      } yield
-        formDefinitionInstance.idsIterator
+    // This is not ideal, but we special-case search in XHTML vs. in an "xcv" document so as to avoid finding
+    // ids under `/xh:html/xh:head/xbl:xbl`.
+    if (formDefinitionRootElem self "*:html" nonEmpty) {
+      val modelOpt = findModelElem(formDefinitionRootElem)
+      val bodyOpt  = findFormRunnerBodyElem(formDefinitionRootElem)
 
-    def elementIdsFromXPath =
+      (modelOpt.toList descendantOrSelf *).ids.iterator ++ (bodyOpt.toList descendantOrSelf *).ids.iterator
+    } else {
       (formDefinitionRootElem descendantOrSelf *).ids.iterator
-
-    elementIdsFromIndexOpt getOrElse elementIdsFromXPath
+    }
   }
 
   // We search ids y looking for `id` attributes in a document, whether via an index or XPath.

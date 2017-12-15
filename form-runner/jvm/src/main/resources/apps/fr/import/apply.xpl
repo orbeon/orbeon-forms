@@ -85,7 +85,7 @@
                 </xsl:for-each>
             </rows>
         </p:input>
-        <p:output name="data" id="rows" debug="xxx rows"/>
+        <p:output name="data" id="rows"/>
     </p:processor>
 
     <!-- Obtain the form definition -->

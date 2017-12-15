@@ -17,6 +17,7 @@ import org.orbeon.saxon.expr.PathMap
 import org.orbeon.saxon.expr.StaticProperty
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xml.DependsOnContextItem
 
 /**
  * XForms 1.1 context() function.
@@ -26,13 +27,10 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
  * ancestor element may have been created dynamically as part of the run-time expansion of repeated content as
  * described in Section 4.7 Resolving ID References in XForms."
  */
-class Context extends XFormsFunction with MatchSimpleAnalysis {
+class Context extends XFormsFunction with MatchSimpleAnalysis with DependsOnContextItem {
 
   override def evaluateItem(xpathContext: XPathContext) =
     bindingContext.contextItem
-
-  override def getIntrinsicDependencies =
-    StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
     pathMap.getPathMapContext match {

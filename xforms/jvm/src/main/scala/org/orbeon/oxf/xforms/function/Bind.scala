@@ -14,10 +14,11 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.model.RuntimeBind
+import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
-class Bind extends XFormsFunction {
+class Bind extends XFormsFunction with DependsOnContextItem {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -25,10 +26,9 @@ class Bind extends XFormsFunction {
 
     val bindId = stringArgument(0)
 
-    XFormsFunction.context.container.searchContainedModelsInScope(getSourceEffectiveId, bindId, bindingContext.singleItemOpt) match {
+    XFormsFunction.context.container.searchContainedModelsInScope(getSourceEffectiveId, bindId, Option(xpathContext.getContextItem)) match {
       case Some(bind: RuntimeBind) ⇒ new ListIterator(bind.items)
       case _                       ⇒ EmptyIterator.getInstance
     }
   }
 }
-

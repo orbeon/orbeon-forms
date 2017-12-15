@@ -30,6 +30,11 @@ trait RuntimeDependentFunction extends DefaultFunctionSupport {
     super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
 }
 
+trait DependsOnContextItem extends FunctionSupport {
+  override def getIntrinsicDependencies =
+    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_CONTEXT_ITEM
+}
+
 // Mix-in for functions which use the context if single optional argument is missing
 trait DependsOnContextItemIfSingleArgumentMissing extends FunctionSupport {
   override def getIntrinsicDependencies =

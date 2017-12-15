@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.exforms
 
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort
+import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.ExpressionVisitor
 import org.orbeon.saxon.expr.StaticProperty
 import org.orbeon.saxon.expr.XPathContext
@@ -22,7 +23,7 @@ import org.orbeon.saxon.om.SequenceIterator
 /**
  * exf:sort() function
  */
-class EXFormsSort extends XXFormsSort {
+class EXFormsSort extends XXFormsSort with DependsOnContextItem {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     val sequenceToSortExpression = argument(0)
@@ -41,7 +42,4 @@ class EXFormsSort extends XXFormsSort {
   // Needed by prepareExpression()
   override def checkArguments(visitor: ExpressionVisitor): Unit =
     copyStaticContextIfNeeded(visitor)
-
-  override def getIntrinsicDependencies =
-    StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 }

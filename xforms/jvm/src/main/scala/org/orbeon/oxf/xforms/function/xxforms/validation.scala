@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
+import org.orbeon.oxf.xml.{DependsOnContextItem, NamespaceMapping, ShareableXPathStaticContext}
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
@@ -27,7 +27,7 @@ import org.orbeon.scaxon.Implicits._
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-trait ValidationFunction[T] extends XFormsFunction {
+trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 
   def propertyName: String
 
@@ -50,9 +50,6 @@ trait ValidationFunction[T] extends XFormsFunction {
       case None       ⇒ true
     }
   }
-
-  override def getIntrinsicDependencies =
-    StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 
   override def addToPathMap(
     pathMap        : PathMap,

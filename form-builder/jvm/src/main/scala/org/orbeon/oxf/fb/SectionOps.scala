@@ -98,7 +98,7 @@ trait SectionOps extends ContainerOps {
 
   // Whether the given container can be moved to the left
   def canMoveLeft(container: NodeInfo): Boolean =
-    canDeleteSection(container) && findAncestorContainersLeafToRoot(container).size >= 2
+    canDeleteSection(container) && findAncestorContainersLeafToRoot(container).lengthCompare(2) >= 0
 
   val DirectionCheck = List(
     "up"    → canMoveUp _,

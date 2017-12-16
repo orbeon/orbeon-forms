@@ -71,10 +71,9 @@ object LabelEditor {
       if (Globals.eventQueue.length > 0 || Globals.requestInProgress) {
 
         // If we have a request in progress or events in the queue, try this again later
-        js.timers.setTimeout(
-          interval = Properties.internalShortDelay.get())(
-          body     = () ⇒ showLabelEditor(clickInterceptor)
-        )
+        js.timers.setTimeout(Properties.internalShortDelay.get()) {
+          showLabelEditor(clickInterceptor)
+        }
 
       } else {
 

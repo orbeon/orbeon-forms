@@ -88,7 +88,7 @@ trait BaseOps extends Logging {
     inScopeContainingDocument.getObjectByEffectiveId(s"$DynamicControlId${COMPONENT_SEPARATOR}fr-form-model")
       .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
-  def templateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+  def findTemplateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     inlineInstanceRootElem(ctx.formDefinitionRootElem, templateId(repeatName))
 
   // Find the next available id for a given token

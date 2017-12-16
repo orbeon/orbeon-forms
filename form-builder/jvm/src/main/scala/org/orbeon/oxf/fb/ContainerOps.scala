@@ -317,7 +317,7 @@ trait ContainerOps extends ControlOps {
 
   def renameTemplate(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      root     ← templateRoot(oldName)
+      root     ← findTemplateRoot(oldName)
       instance ← root.parentOption
     } locally {
       ensureAttribute(instance, "id", templateId(newName))

@@ -299,7 +299,7 @@ class FormBuilderFunctionsTest
 
           assert(allResources(ctx.resourcesRootElem) / newControlName nonEmpty)
 
-          val templateHolder = templateRoot(newRepeatName).get / newControlName headOption
+          val templateHolder = findTemplateRoot(newRepeatName).get / newControlName headOption
 
           assert(templateHolder.isDefined)
           assert(templateHolder.get precedingSibling * isEmpty)

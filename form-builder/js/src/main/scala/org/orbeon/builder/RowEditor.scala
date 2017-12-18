@@ -124,7 +124,8 @@ object RowEditor {
 
         currentRowPosOpt = Some(rowIndex + 1)
         positionElWithClass(RowEditor.InsertAbove.className, (_) ⇒ rowTop)
-        positionElWithClass(RowEditor.Delete.className,      (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
+        if (currentGridBody.el.closest(".fr-grid").is(".fb-can-delete-row"))
+          positionElWithClass(RowEditor.Delete.className, (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
         positionElWithClass(RowEditor.InsertBelow.className, (e) ⇒ rowBottom - e.height())
       })
     }

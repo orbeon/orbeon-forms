@@ -55,7 +55,6 @@
                     <description xml:lang="en">The Contact form is a simple form which can be created in a few minutes with Form Builder.</description>
                     <title xml:lang="fr">Contact</title>
                     <description xml:lang="fr">Le formulaire Contact peut être créé à l'aide de Form Builder en quelques minutes.</description>
-                    <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xf:instance>

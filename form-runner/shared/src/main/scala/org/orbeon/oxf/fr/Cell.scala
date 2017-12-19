@@ -71,9 +71,10 @@ object Cell {
     val rows = ops.children(grid, TrTestName)
 
     // TODO: can it be 0?
-    val gridHeight = rows.size
+    val xyGridHeight = rows.size
+    val xyGridWidth  = StandardGridWidth
 
-    val xy = Array.fill[Cell[Underlying]](gridHeight, StandardGridWidth)(null)
+    val xy = Array.fill[Cell[Underlying]](xyGridHeight, xyGridWidth)(null)
 
     // Mark cells
     rows.iterator.zipWithIndex foreach { case (tr, iy) ⇒
@@ -91,8 +92,8 @@ object Cell {
             val newCell = Cell(Some(td), None, start + 1, iy + 1, h, w)
 
             for {
-              iy1 ← iy until iy + h
-              ix1 ← start until start + w
+              iy1 ← iy until ((iy + h) min xyGridHeight)
+              ix1 ← start until ((start + w) min xyGridWidth)
               isOriginCell = ix1 == start && iy1 == iy
             } locally {
               xy(iy1)(ix1) =
@@ -105,7 +106,7 @@ object Cell {
             ix = start + w
 
             case None ⇒
-              ix = StandardGridWidth // break
+              ix = xyGridWidth // break
         }
       }
     }
@@ -114,17 +115,19 @@ object Cell {
     // right side of the grid if needed. We could do the converse and adjust everything on a 12-column
     // basis.
 
-    // NOTE: Checking the first row should be enough if the grid is well-formed.
-    val gridWidth = {
-      val widths = xy.iterator map (_.iterator filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum)
-      if (widths.nonEmpty) widths.max else 0
-    }
+    val widthToTruncate = {
 
-    val widthToTruncate =
-      if (simplify && gridWidth != 0 && Cell.StandardGridWidth % gridWidth == 0)
-        gridWidth
+      // NOTE: Checking the first row should be enough if the grid is well-formed.
+      val actualGridWidth = {
+        val widths = xy.iterator map (_.iterator filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum)
+        if (widths.nonEmpty) widths.max else 0
+      }
+
+      if (simplify && actualGridWidth != 0 && Cell.StandardGridWidth % actualGridWidth == 0)
+        actualGridWidth
       else
         StandardGridWidth
+    }
 
     // In most cases, there won't be holes as `<xh:tr>`/`<xh:td>` grids are supposed to be fully populated.
     fillHoles(xy, widthToTruncate)

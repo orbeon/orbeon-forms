@@ -98,6 +98,7 @@ object Globals extends js.Object {
   val ns                    : js.Dictionary[String]     = js.native
   val eventQueue            : js.Array[js.Any]          = js.native
   val requestInProgress     : Boolean                   = js.native
+  val dialogs               : js.Dictionary[js.Dynamic] = js.native
 }
 
 @js.native

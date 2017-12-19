@@ -17,7 +17,7 @@ import org.orbeon.builder.BlockCache.Block
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms._
-import org.orbeon.xforms.facade.Events
+import org.orbeon.xforms.facade.{Events, Globals}
 import org.scalajs.dom.{document, window}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -94,8 +94,18 @@ object Position {
     onUnderPointerChange {
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
-      val newContainer = findInCache(containerCache, top, left)
-      notifyChange(newContainer.toOption)
+      val dialogVisible =
+        Globals.dialogs.exists {
+          case (_: String, yuiDialog: js.Dynamic) ⇒
+            yuiDialog.cfg.config.visible.value.asInstanceOf[Boolean]
+        }
+      val newContainer =
+        if (dialogVisible)
+          // Ignore container under the pointer if a dialog is visible
+          None
+        else
+          findInCache(containerCache, top, left).toOption
+      notifyChange(newContainer)
     }
   }
 

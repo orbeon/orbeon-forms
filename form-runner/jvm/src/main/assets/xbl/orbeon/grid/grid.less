@@ -19,6 +19,68 @@
         margin-right: 5px;
     }
 
+    // Mixin as Flying Saucer doesn't support `:not()`!
+    .grid-not-css() {
+
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+
+        .fr-grid-head {
+            display: table-header-group;
+        }
+
+        .fr-grid-body {
+            display: table-row-group;
+        }
+
+        .fr-grid-tr, .fr-grid-master-row {
+            display: table-row;
+        }
+
+        // Padding/margin in the cell content: see https://github.com/orbeon/orbeon-forms/issues/2414
+        .fr-grid-body .fr-grid-td {
+            display: table-cell;
+            vertical-align: top;
+            padding: 0 @frGridCellPadding;
+
+            &> .xforms-control, &> .xbl-component, &> .xforms-group {
+                margin: @frGridCellPadding 0;
+                display: block;
+            }
+        }
+
+        .fr-grid-head .fr-grid-th {
+            display: table-cell;
+            text-align: left;
+
+            .xforms-output {
+                // We want the block for the label in the header to "go around" its content, so the help
+                // popover is correctly positioned.
+                display: block;
+            }
+
+            // If there is a group with a label in a grid th, remove the border added by Bootstrap
+            legend.xforms-label {
+                border-bottom: none;
+                margin: 0;
+            }
+        }
+
+        // In non-repeated grids, make rows except the last one take the minimum possible amount of vertical space in
+        // case `rowspan`s are used. This is usually the intended layout, as opposed to rows taking proportionally more
+        // or less vertical space.
+        // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
+        &:not(.fr-repeat):not(.fr-editable) { // see also https://github.com/orbeon/orbeon-forms/issues/3283
+            .fr-grid-body .fr-grid-tr {
+                height: 0;
+            }
+            .fr-grid-body tr:last-of-type {
+                height: auto;
+            }
+        }
+    }
+
     .xbl-fr-grid {
 
         margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
@@ -114,64 +176,7 @@
 
         // Grid NOT displayed with CSS grids
         .fr-grid:not(.fr-grid-css) { // this is the enclosing `<div>` or `<table>` element
-
-            display: table;
-            table-layout: fixed;
-            width: 100%;
-
-            .fr-grid-head {
-                display: table-header-group;
-            }
-
-            .fr-grid-body {
-                display: table-row-group;
-            }
-
-            .fr-grid-tr, .fr-grid-master-row {
-                display: table-row;
-            }
-
-            // Padding/margin in the cell content: see https://github.com/orbeon/orbeon-forms/issues/2414
-            .fr-grid-body .fr-grid-td {
-                display: table-cell;
-                vertical-align: top;
-                padding: 0 @frGridCellPadding;
-
-                &> .xforms-control, &> .xbl-component, &> .xforms-group {
-                    margin: @frGridCellPadding 0;
-                    display: block;
-                }
-            }
-
-            .fr-grid-head .fr-grid-th {
-                display: table-cell;
-                text-align: left;
-
-                .xforms-output {
-                    // We want the block for the label in the header to "go around" its content, so the help
-                    // popover is correctly positioned.
-                    display: block;
-                }
-
-                // If there is a group with a label in a grid th, remove the border added by Bootstrap
-                legend.xforms-label {
-                    border-bottom: none;
-                    margin: 0;
-                }
-            }
-
-            // In non-repeated grids, make rows except the last one take the minimum possible amount of vertical space in
-            // case `rowspan`s are used. This is usually the intended layout, as opposed to rows taking proportionally more
-            // or less vertical space.
-            // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
-            &:not(.fr-repeat):not(.fr-editable) { // see also https://github.com/orbeon/orbeon-forms/issues/3283
-                .fr-grid-body .fr-grid-tr {
-                    height: 0;
-                }
-                .fr-grid-body tr:last-of-type {
-                    height: auto;
-                }
-            }
+            .grid-not-css();
         }
 
         .fr-grid {
@@ -371,6 +376,9 @@
             }
 
             .fr-grid {
+
+                .grid-not-css();
+
                 .xforms-field, .xforms-textarea > pre {
 
                     padding: @frGridCellPadding @frGridCellPadding+2px;

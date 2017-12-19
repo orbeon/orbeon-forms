@@ -205,11 +205,9 @@
     <!-- Configuration of built-in forms -->
     <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="exist"/>
-    <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>
-    <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="exist"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
         pdf tiff wizard-prev wizard-next review

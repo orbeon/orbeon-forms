@@ -1,0 +1,900 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         fr:data-format-version="4.0.0">
+    <xh:head>
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
+                  xxf:xpath-analysis="true"
+                  xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+                    <personal-information>
+                        <last-name/>
+                        <first-name/>
+                        <initial/>
+                        <driver-license-number/>
+                        <birth-date/>
+                        <voter-address-change>false</voter-address-change>
+                    </personal-information>
+                    <residence-address>
+                        <residence-street-number/>
+                        <residence-street-name-1/>
+                        <residence-street-name-2/>
+                        <residence-apt/>
+                        <residence-city/>
+                        <residence-state/>
+                        <residence-zip/>
+                    </residence-address>
+                    <mailing-address>
+                        <mailing-address-different>false</mailing-address-different>
+                        <mailing-street-number/>
+                        <mailing-street-name-1/>
+                        <mailing-street-name-2/>
+                        <mailing-apt/>
+                        <mailing-city/>
+                        <mailing-state/>
+                        <mailing-zip/>
+                    </mailing-address>
+                    <vehicles>
+                        <vehicle>
+                            <vehicle-iteration>
+                                <plate-number/>
+                                <vin/>
+                                <leased>false</leased>
+                            </vehicle-iteration>
+                        </vehicle>
+                        <leasing-company-name/>
+                    </vehicles>
+                    <old-address>
+                        <old-street-number-name/>
+                        <old-city/>
+                        <old-state/>
+                        <old-zip/>
+                    </old-address>
+                    <trailer-coach-vessel>
+                        <has-trailer-coach-vessel>false</has-trailer-coach-vessel>
+                        <vehicle-street-number/>
+                        <vehicle-street-name-1/>
+                        <vehicle-street-name-2/>
+                        <vehicle-city/>
+                        <vehicle-county/>
+                    </trailer-coach-vessel>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref=".">
+                <xf:bind id="personal-information-bind" ref="personal-information"
+                         name="personal-information">
+                    <xf:bind id="birth-date-bind" ref="birth-date" type="xs:date" required="true()">
+                        <xf:constraint id="validation-6-validation" value=". lt current-date()"/>
+                    </xf:bind>
+                    <xf:bind id="voter-address-change-bind" ref="voter-address-change"
+                             name="voter-address-change"
+                             type="xf:boolean"/>
+                    <xf:bind id="last-name-bind" ref="last-name" name="last-name" required="true()"
+                             xxf:whitespace="trim"
+                             type="dmv:last-name">
+
+                    </xf:bind>
+                    <xf:bind id="first-name-bind" ref="first-name" name="first-name" required="true()"
+                             xxf:whitespace="trim"
+                             type="dmv:first-name">
+
+                    </xf:bind>
+                    <xf:bind id="driver-license-number-bind" ref="driver-license-number"
+                             name="driver-license-number"
+                             required="true()"
+                             xxf:whitespace="trim"
+                             type="dmv:driver-license-number">
+
+                    </xf:bind>
+                    <xf:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="residence-address-bind" ref="residence-address" name="residence-address">
+                    <xf:bind id="residence-street-name-1-bind" ref="residence-street-name-1"
+                             name="residence-street-name-1"
+                             type="dmv:street-name-1"
+                             required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="residence-city-bind" ref="residence-city" name="residence-city"
+                             type="dmv:city"
+                             required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="residence-state-bind" ref="residence-state" name="residence-state"
+                             type="dmv:state"
+                             required="true()"/>
+                    <xf:bind id="residence-zip-bind" ref="residence-zip" name="residence-zip" type="dmv:zip"
+                             required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="residence-street-number-bind" ref="residence-street-number"
+                             name="residence-street-number"
+                             type="dmv:street-number"
+                             xxf:whitespace="trim">
+
+
+                    </xf:bind>
+                    <xf:bind id="residence-street-name-2-bind" ref="residence-street-name-2"
+                             name="residence-street-name-2"
+                             type="dmv:street-name-2"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="residence-apt-bind" ref="residence-apt" name="residence-apt" type="dmv:apt"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
+                    <xf:bind id="mailing-address-different-bind" ref="mailing-address-different"
+                             name="mailing-address-different"
+                             type="xf:boolean"/>
+                    <xf:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
+                             name="mailing-street-name-1"
+                             type="dmv:street-name-1"
+                             required="$mailing-address-different = true()"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-city-bind" ref="mailing-city" name="mailing-city" type="dmv:city"
+                             required="$mailing-address-different = true()"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-state-bind" ref="mailing-state" name="mailing-state"
+                             type="dmv:state"
+                             required="$mailing-address-different = true()"
+                             readonly="not($mailing-address-different = true())"/>
+                    <xf:bind id="mailing-zip-bind" ref="mailing-zip" name="mailing-zip" type="dmv:zip"
+                             required="$mailing-address-different = true()"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-street-number-bind" ref="mailing-street-number"
+                             name="mailing-street-number"
+                             type="dmv:street-number"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-street-name-2-bind" ref="mailing-street-name-2"
+                             name="mailing-street-name-2"
+                             type="dmv:street-name-2"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt"
+                             readonly="not($mailing-address-different = true())"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="vehicles-bind" ref="vehicles" name="vehicles">
+                    <xf:bind id="vehicle-bind" ref="vehicle" name="vehicle">
+                        <xf:bind ref="vehicle-iteration" name="vehicle-iteration">
+                            <xf:bind id="plate-number-bind" ref="plate-number" name="plate-number"
+                                     type="dmv:plate-number"
+                                     required="true()"
+                                     xxf:whitespace="trim"
+                                     readonly="false()"
+                                     calculate="upper-case(.)"/>
+                            <xf:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
+                                     xxf:whitespace="trim"
+                                     readonly="false()"
+                                     calculate="upper-case(.)"/>
+                            <xf:bind id="leased-bind" ref="leased" name="leased" type="xf:boolean"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="leasing-company-name-bind" ref="leasing-company-name"
+                             name="leasing-company-name"
+                             type="dmv:company-name"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
+                         name="trailer-coach-vessel">
+                    <xf:bind id="has-trailer-coach-vessel-bind" name="has-trailer-coach-vessel"
+                             ref="has-trailer-coach-vessel"
+                             type="xf:boolean"/>
+                    <xf:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
+                             name="vehicle-street-name-1"
+                             type="dmv:street-name-1"
+                             required="$has-trailer-coach-vessel = true()"
+                             readonly="not($has-trailer-coach-vessel = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="vehicle-city-bind" ref="vehicle-city" name="vehicle-city" type="dmv:city"
+                             required="$has-trailer-coach-vessel = true()"
+                             readonly="not($has-trailer-coach-vessel = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="vehicle-county-bind" ref="vehicle-county" name="vehicle-county"
+                             type="dmv:county"
+                             required="$has-trailer-coach-vessel = true()"
+                             readonly="not($has-trailer-coach-vessel = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="vehicle-street-number-bind" ref="vehicle-street-number"
+                             name="vehicle-street-number"
+                             type="dmv:street-number"
+                             readonly="not($has-trailer-coach-vessel = true())"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="vehicle-street-name-2-bind" ref="vehicle-street-name-2"
+                             name="vehicle-street-name-2"
+                             type="dmv:street-name-2"
+                             readonly="not($has-trailer-coach-vessel = true())"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="old-address-bind" ref="old-address" name="old-address">
+                    <xf:bind id="old-street-number-name-bind" ref="old-street-number-name"
+                             name="old-street-number-name"
+                             type="xs:string"
+                             required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="old-zip-bind" ref="old-zip" name="old-zip" type="dmv:zip" required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="old-state-bind" ref="old-state" name="old-state" type="dmv:state"
+                             required="true()"/>
+                    <xf:bind id="old-city-bind" ref="old-city" name="old-city" type="dmv:city"
+                             required="true()"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>DMV-14</form-name>
+                    <title xml:lang="en">Notice of Change of Address</title>
+                    <description xml:lang="en"/>
+                    <logo mediatype="" filename="" size=""/>
+                    <migration version="4.8.0">[{ "path": "vehicles/vehicle", "iteration-name": "vehicle-iteration" }]</migration>
+                    <wizard>true</wizard>
+                    <wizard-mode>free</wizard-mode>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="dmv14.pdf" size="81260">/fr/service/persistence/crud/orbeon/dmv-14/form/99450e3daef3872b58a965d90333ec2f62f77e40.bin</pdf>
+                </attachments>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="en">
+                        <old-street-number-name>
+                            <label>Street Number/Name</label>
+                            <hint/>
+                        </old-street-number-name>
+                        <old-city>
+                            <label>City</label>
+                            <hint/>
+                        </old-city>
+                        <old-state>
+                            <label>State</label>
+                            <hint/>
+                        </old-state>
+                        <old-zip>
+                            <label>Zip</label>
+                            <hint/>
+                        </old-zip>
+                        <vehicle-street-number>
+                            <label>Street Number</label>
+                            <hint/>
+                        </vehicle-street-number>
+                        <vehicle-street-name-1>
+                            <label>Street Name 1</label>
+                            <hint/>
+                        </vehicle-street-name-1>
+                        <vehicle-street-name-2>
+                            <label>Street Name 2</label>
+                            <hint/>
+                        </vehicle-street-name-2>
+                        <vehicle-city>
+                            <label>City</label>
+                            <hint/>
+                        </vehicle-city>
+                        <vehicle-county>
+                            <label>County</label>
+                            <hint/>
+                        </vehicle-county>
+                        <leasing-company-name>
+                            <label>Leasing Company's Name</label>
+                            <hint/>
+                        </leasing-company-name>
+                        <plate-number>
+                            <label>CA plate/CF/Placard No.</label>
+                            <hint/>
+                        </plate-number>
+                        <vin>
+                            <label>Vehicle/Vessel Id Number</label>
+                            <hint/>
+                        </vin>
+                        <leased>
+                            <label>Leased</label>
+                            <hint/>
+                        </leased>
+                        <plate-preview>
+                            <label>Licence Plate Preview</label>
+                        </plate-preview>
+                        <mailing-street-number>
+                            <label>Street Number</label>
+                            <hint/>
+                        </mailing-street-number>
+                        <mailing-street-name-1>
+                            <label>Street Name 1</label>
+                            <hint/>
+                        </mailing-street-name-1>
+                        <mailing-street-name-2>
+                            <label>Street Name 2</label>
+                            <hint/>
+                        </mailing-street-name-2>
+                        <mailing-apt>
+                            <label>Apt. No</label>
+                            <hint/>
+                        </mailing-apt>
+                        <mailing-city>
+                            <label>City</label>
+                            <hint/>
+                        </mailing-city>
+                        <mailing-state>
+                            <label>State</label>
+                            <hint/>
+                        </mailing-state>
+                        <mailing-zip>
+                            <label>Zip</label>
+                            <hint/>
+                        </mailing-zip>
+                        <residence-street-number>
+                            <label>Street Number</label>
+                            <hint/>
+
+
+                        </residence-street-number>
+                        <residence-street-name-1>
+                            <label>Street Name 1</label>
+                            <hint/>
+                        </residence-street-name-1>
+                        <residence-street-name-2>
+                            <label>Street Name 2</label>
+                            <hint/>
+                        </residence-street-name-2>
+                        <residence-apt>
+                            <label>Apt. No</label>
+                            <hint/>
+                        </residence-apt>
+                        <residence-city>
+                            <label>City</label>
+                            <hint/>
+                        </residence-city>
+                        <residence-state>
+                            <label>State</label>
+                            <hint/>
+                        </residence-state>
+                        <residence-zip>
+                            <label>Zip</label>
+                            <hint/>
+                        </residence-zip>
+                        <voter-address-change>
+                            <label>Don't change my voting address</label>
+                            <hint/>
+                        </voter-address-change>
+                        <personal-information>
+                            <label>Personal Information</label>
+                        </personal-information>
+                        <last-name>
+                            <label>Last Name</label>
+                            <hint/>
+
+                        </last-name>
+                        <first-name>
+                            <label>First Name</label>
+                            <hint/>
+
+                        </first-name>
+                        <initial>
+                            <label>Initial</label>
+                            <hint/>
+                        </initial>
+                        <driver-license-number>
+                            <label>Driver License / Id Card No.</label>
+                            <hint/>
+
+                        </driver-license-number>
+                        <birth-date>
+                            <label>Birth Date</label>
+                            <hint/>
+                            <alert>Must be in the past</alert>
+                        </birth-date>
+                        <residence-address>
+                            <label>New or Correct Residence Address</label>
+                            <hint/>
+                        </residence-address>
+                        <mailing-address-different>
+                            <label>My mailing address is different from my residence address</label>
+                            <hint/>
+                        </mailing-address-different>
+                        <mailing-address>
+                            <label>New or Correct Mailing Address</label>
+                            <hint/>
+                        </mailing-address>
+                        <vehicles>
+                            <label>Vehicles, Vessels, or Placards Owned by You</label>
+                            <hint/>
+                        </vehicles>
+                        <has-trailer-coach-vessel>
+                            <label>Its location is different from my residence address</label>
+                            <hint/>
+                        </has-trailer-coach-vessel>
+                        <old-address>
+                            <label>Old Address</label>
+                            <hint/>
+                        </old-address>
+                        <trailer-coach-vessel>
+                            <label>Location of Trailer Coach or Vessel</label>
+                            <hint/>
+                        </trailer-coach-vessel>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:exclude-result-prefixes="#all" id="vehicle-template">
+                <vehicle-iteration>
+                    <plate-number/>
+                    <vin/>
+                    <leased>false</leased>
+                </vehicle-iteration>
+            </xf:instance>
+            <xs:schema targetNamespace="http://orbeon.org/oxf/examples/dmv"
+                       elementFormDefault="qualified"
+                       attributeFormDefault="unqualified">
+
+                <xs:simpleType name="first-name">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="9"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="initial">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="([A-Z])?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="last-name">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="19"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="driver-license-number">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="([A-Z][0-9]{7})?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="street-number">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="([0-9]{0,5})?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="street-name-1">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="20"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="street-name-2">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="22"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="apt">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="plate-number">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="(([A-Z]|[a-z]|[1-9]){0,7})?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="vin">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="(([A-Z]|[a-z]|[0-9]){0,17})?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="zip">
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="(\d{5})?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="city">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="21"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="county">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="13"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="company-name">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="22"/>
+                    </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType name="state">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="AL"/>
+                        <xs:enumeration value="AK"/>
+                        <xs:enumeration value="AZ"/>
+                        <xs:enumeration value="AR"/>
+                        <xs:enumeration value="CA"/>
+                        <xs:enumeration value="CO"/>
+                        <xs:enumeration value="CT"/>
+                        <xs:enumeration value="DE"/>
+                        <xs:enumeration value="DC"/>
+                        <xs:enumeration value="FL"/>
+                        <xs:enumeration value="GA"/>
+                        <xs:enumeration value="HI"/>
+                        <xs:enumeration value="ID"/>
+                        <xs:enumeration value="IL"/>
+                        <xs:enumeration value="IN"/>
+                        <xs:enumeration value="IA"/>
+                        <xs:enumeration value="KS"/>
+                        <xs:enumeration value="LA"/>
+                        <xs:enumeration value="ME"/>
+                        <xs:enumeration value="MD"/>
+                        <xs:enumeration value="MA"/>
+                        <xs:enumeration value="MI"/>
+                        <xs:enumeration value="MN"/>
+                        <xs:enumeration value="MS"/>
+                        <xs:enumeration value="MO"/>
+                        <xs:enumeration value="MT"/>
+                        <xs:enumeration value="NE"/>
+                        <xs:enumeration value="NV"/>
+                        <xs:enumeration value="NH"/>
+                        <xs:enumeration value="NJ"/>
+                        <xs:enumeration value="NM"/>
+                        <xs:enumeration value="NY"/>
+                        <xs:enumeration value="NC"/>
+                        <xs:enumeration value="ND"/>
+                        <xs:enumeration value="OH"/>
+                        <xs:enumeration value="OK"/>
+                        <xs:enumeration value="OR"/>
+                        <xs:enumeration value="PA"/>
+                        <xs:enumeration value="RI"/>
+                        <xs:enumeration value="SC"/>
+                        <xs:enumeration value="SD"/>
+                        <xs:enumeration value="TN"/>
+                        <xs:enumeration value="TX"/>
+                        <xs:enumeration value="UT"/>
+                        <xs:enumeration value="VT"/>
+                        <xs:enumeration value="VA"/>
+                        <xs:enumeration value="WA"/>
+                        <xs:enumeration value="WV"/>
+                        <xs:enumeration value="WI"/>
+                        <xs:enumeration value="WY"/>
+                        <xs:enumeration value="AS"/>
+                        <xs:enumeration value="GU"/>
+                        <xs:enumeration value="MP"/>
+                        <xs:enumeration value="PR"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:schema>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:ev="http://www.w3.org/2001/xml-events">
+                <fr:section id="personal-information-section" bind="personal-information-bind">
+                    <xf:label ref="$form-resources/personal-information/label"/>
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="4">
+                            <xf:input id="last-name-control" bind="last-name-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/last-name/label"/>
+                                <xf:hint ref="$form-resources/last-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                            <xf:input id="first-name-control" bind="first-name-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/first-name/label"/>
+                                <xf:hint ref="$form-resources/first-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="1">
+                            <xf:input id="initial-control" bind="initial-bind">
+                                <xf:label ref="$form-resources/initial/label"/>
+                                <xf:hint ref="$form-resources/initial/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="2" h="1"/>
+                        <fr:c x="12" y="1" w="1" h="1"/>
+                        <fr:c y="2" x="1" w="4">
+                            <xf:input id="driver-license-number-control" bind="driver-license-number-bind"
+                                      class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/driver-license-number/label"/>
+                                <xf:hint ref="$form-resources/driver-license-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <xf:input id="birth-date-control" bind="birth-date-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/birth-date/label"/>
+                                <xf:hint ref="$form-resources/birth-date/hint"/>
+                                <xf:alert ref="$form-resources/birth-date/alert" validation="validation-6-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4">
+                            <fr:checkbox-input id="voter-address-change-control" bind="voter-address-change-bind">
+                                <xf:label ref="$form-resources/voter-address-change/label"/>
+                                <xf:hint ref="$form-resources/voter-address-change/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:checkbox-input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="residence-address-section" bind="residence-address-bind">
+                    <xf:label ref="$form-resources/residence-address/label"/>
+                    <fr:grid id="grid-2-grid">
+                        <fr:c y="1" x="1" w="2">
+                            <xf:input id="residence-street-number-control" bind="residence-street-number-bind">
+                                <xf:label ref="$form-resources/residence-street-number/label"/>
+                                <xf:hint ref="$form-resources/residence-street-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="3" y="1" w="1" h="1"/>
+                        <fr:c y="1" x="4" w="3">
+                            <xf:input id="residence-street-name-1-control" bind="residence-street-name-1-bind">
+                                <xf:label ref="$form-resources/residence-street-name-1/label"/>
+                                <xf:hint ref="$form-resources/residence-street-name-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="3">
+                            <xf:input id="residence-street-name-2-control" bind="residence-street-name-2-bind">
+                                <xf:label ref="$form-resources/residence-street-name-2/label"/>
+                                <xf:hint ref="$form-resources/residence-street-name-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="10" w="3"/>
+                        <fr:c y="2" x="1" w="3">
+                            <xf:input id="residence-apt-control" bind="residence-apt-bind">
+                                <xf:label ref="$form-resources/residence-apt/label"/>
+                                <xf:hint ref="$form-resources/residence-apt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="4" w="3">
+                            <xf:input id="residence-city-control" bind="residence-city-bind">
+                                <xf:label ref="$form-resources/residence-city/label"/>
+                                <xf:hint ref="$form-resources/residence-city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="3">
+                            <fr:us-state id="residence-state-control" bind="residence-state-bind">
+                                <xf:label ref="$form-resources/residence-state/label"/>
+                                <xf:hint ref="$form-resources/residence-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/residence-state/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c y="2" x="10" w="2">
+                            <xf:input id="residence-zip-control" bind="residence-zip-bind">
+                                <xf:label ref="$form-resources/residence-zip/label"/>
+                                <xf:hint ref="$form-resources/residence-zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="12" y="2" w="1" h="1"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="mailing-address-section" bind="mailing-address-bind">
+                    <fr:grid id="grid-3-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <fr:checkbox-input id="mailing-address-different-control" bind="mailing-address-different-bind">
+                                <xf:label ref="$form-resources/mailing-address-different/label"/>
+                                <xf:hint ref="$form-resources/mailing-address-different/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:checkbox-input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-4-grid">
+                        <fr:c y="1" x="1" w="2">
+                            <xf:input id="mailing-street-number-control" bind="mailing-street-number-bind">
+                                <xf:label ref="$form-resources/mailing-street-number/label"/>
+                                <xf:hint ref="$form-resources/mailing-street-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="3" y="1" w="1" h="1"/>
+                        <fr:c y="1" x="4" w="3">
+                            <xf:input id="mailing-street-name-1-control" bind="mailing-street-name-1-bind">
+                                <xf:label ref="$form-resources/mailing-street-name-1/label"/>
+                                <xf:hint ref="$form-resources/mailing-street-name-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="3">
+                            <xf:input id="mailing-street-name-2-control" bind="mailing-street-name-2-bind">
+                                <xf:label ref="$form-resources/mailing-street-name-2/label"/>
+                                <xf:hint ref="$form-resources/mailing-street-name-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="10" w="3"/>
+                        <fr:c y="2" x="1" w="3">
+                            <xf:input id="mailing-apt-control" bind="mailing-apt-bind">
+                                <xf:label ref="$form-resources/mailing-apt/label"/>
+                                <xf:hint ref="$form-resources/mailing-apt/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="4" w="3">
+                            <xf:input id="mailing-city-control" bind="mailing-city-bind">
+                                <xf:label ref="$form-resources/mailing-city/label"/>
+                                <xf:hint ref="$form-resources/mailing-city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="3">
+                            <fr:us-state id="mailing-state-control" bind="mailing-state-bind">
+                                <xf:label ref="$form-resources/mailing-state/label"/>
+                                <xf:hint ref="$form-resources/mailing-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/mailing-state/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c y="2" x="10" w="2">
+                            <xf:input id="mailing-zip-control" bind="mailing-zip-bind">
+                                <xf:label ref="$form-resources/mailing-zip/label"/>
+                                <xf:hint ref="$form-resources/mailing-zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="12" y="2" w="1" h="1"/>
+                    </fr:grid>
+                    <xf:label ref="$form-resources/mailing-address/label"/>
+                </fr:section>
+                <fr:section id="vehicles-section" bind="vehicles-bind">
+                    <xf:label ref="$form-resources/vehicles/label"/>
+                    <fr:grid bind="vehicle-bind" id="vehicle-repeat" repeat="content" min="1" max="3"
+                             template="instance('vehicle-template')">
+                        <fr:c y="1" x="1" w="4">
+                            <xf:input id="plate-number-control" bind="plate-number-bind">
+                                <xf:label ref="$form-resources/plate-number/label"/>
+                                <xf:hint ref="$form-resources/plate-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4" h="1">
+                            <xf:input id="vin-control" bind="vin-bind">
+                                <xf:label ref="$form-resources/vin/label"/>
+                                <xf:hint ref="$form-resources/vin/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="2">
+                            <fr:checkbox-input id="leased-control" bind="leased-bind">
+                                <xf:label ref="$form-resources/leased/label"/>
+                                <xf:hint ref="$form-resources/leased/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:checkbox-input>
+                        </fr:c>
+                        <fr:c y="1" x="11" w="2">
+                            <fr:california-plate ref="plate-number">
+                                <xf:label ref="$form-resources/plate-preview/label"/>
+                            </fr:california-plate>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-5-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <xf:input id="leasing-company-name-control" bind="leasing-company-name-bind">
+                                <xf:label ref="$form-resources/leasing-company-name/label"/>
+                                <xf:hint ref="$form-resources/leasing-company-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="trailer-coach-vessel-section" bind="trailer-coach-vessel-bind">
+                    <xf:label ref="$form-resources/trailer-coach-vessel/label"/>
+                    <fr:grid id="grid-6-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <fr:checkbox-input id="has-trailer-coach-vessel-control" bind="has-trailer-coach-vessel-bind">
+                                <xf:label ref="$form-resources/has-trailer-coach-vessel/label"/>
+                                <xf:hint ref="$form-resources/has-trailer-coach-vessel/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:checkbox-input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-7-grid">
+                        <fr:c y="1" x="1" w="2">
+                            <xf:input id="vehicle-street-number-control" bind="vehicle-street-number-bind">
+                                <xf:label ref="$form-resources/vehicle-street-number/label"/>
+                                <xf:hint ref="$form-resources/vehicle-street-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="3" y="1" w="1" h="1"/>
+                        <fr:c y="1" x="4" w="3">
+                            <xf:input id="vehicle-street-name-1-control" bind="vehicle-street-name-1-bind">
+                                <xf:label ref="$form-resources/vehicle-street-name-1/label"/>
+                                <xf:hint ref="$form-resources/vehicle-street-name-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="3">
+                            <xf:input id="vehicle-street-name-2-control" bind="vehicle-street-name-2-bind">
+                                <xf:label ref="$form-resources/vehicle-street-name-2/label"/>
+                                <xf:hint ref="$form-resources/vehicle-street-name-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="10" w="3"/>
+                        <fr:c y="2" x="1" w="3">
+                            <xf:input id="vehicle-city-control" bind="vehicle-city-bind">
+                                <xf:label ref="$form-resources/vehicle-city/label"/>
+                                <xf:hint ref="$form-resources/vehicle-city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="4" w="3">
+                            <xf:input id="vehicle-county-control" bind="vehicle-county-bind">
+                                <xf:label ref="$form-resources/vehicle-county/label"/>
+                                <xf:hint ref="$form-resources/vehicle-county/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="3"/>
+                        <fr:c y="2" x="10" w="3"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="old-address-section" bind="old-address-bind">
+                    <xf:label ref="$form-resources/old-address/label"/>
+                    <fr:grid id="grid-8-grid">
+                        <fr:c y="1" x="1" w="3">
+                            <xf:input id="old-street-number-name-control" bind="old-street-number-name-bind">
+                                <xf:label ref="$form-resources/old-street-number-name/label"/>
+                                <xf:hint ref="$form-resources/old-street-number-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="4" w="3">
+                            <xf:input id="old-city-control" bind="old-city-bind">
+                                <xf:label ref="$form-resources/old-city/label"/>
+                                <xf:hint ref="$form-resources/old-city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="3" h="1">
+                            <fr:us-state id="old-state-control" bind="old-state-bind">
+                                <xf:label ref="$form-resources/old-state/label"/>
+                                <xf:hint ref="$form-resources/old-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/old-state/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="2" h="1">
+                            <xf:input id="old-zip-control" bind="old-zip-bind">
+                                <xf:label ref="$form-resources/old-zip/label"/>
+                                <xf:hint ref="$form-resources/old-zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="12" y="1" w="1" h="1"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

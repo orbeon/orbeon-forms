@@ -1,20 +1,8 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:sql="http://orbeon.org/oxf/xml/sql"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:saxon="http://saxon.sf.net/" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <xh:head>
         <xh:title>Global Library</xh:title>
-        <xf:model id="fr-form-model">
-            <xf:instance id="fr-form-instance">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
+            <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <address>
                         <street-number/>
@@ -26,13 +14,10 @@
                     </address>
                 </form>
             </xf:instance>
-            <xf:bind id="fr-form-binds"
-                     ref="instance('fr-form-instance')">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="address-bind" ref="address" name="address">
-                    <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim"
-                             ref="street-number">
-                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
-                                       level="warning" xxf:whitespace="trim"/>
+                    <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
+                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer" level="warning" xxf:whitespace="trim"/>
                     </xf:bind>
                     <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/>
                     <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/>
@@ -143,72 +128,54 @@
         </xf:model>
     </xh:head>
     <xh:body>
-        <fr:view xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                 xmlns:xbl="http://www.w3.org/ns/xbl"
-                 xmlns:p="http://www.orbeon.com/oxf/pipeline">
-            <fr:body>
+        <fr:view xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="address-section" bind="address-bind">
                     <xf:label ref="$form-resources/address/label"/>
-                    <fr:grid columns="3">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="street-number-control" bind="street-number-bind">
-                                    <xf:label ref="$form-resources/street-number/label"/>
-                                    <xf:hint ref="$form-resources/street-number/hint"/>
-                                    <xf:alert ref="$form-resources/street-number/alert" validation="constraint-8-constraint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                          id="street-name-control"
-                                          bind="street-name-bind">
-                                    <xf:label ref="$form-resources/street-name/label"/>
-                                    <xf:hint ref="$form-resources/street-name/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                          id="apt-suite-control"
-                                          bind="apt-suite-bind">
-                                    <xf:label ref="$form-resources/apt-suite/label"/>
-                                    <xf:hint ref="$form-resources/apt-suite/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                          id="city-control"
-                                          bind="city-bind">
-                                    <xf:label ref="$form-resources/city/label"/>
-                                    <xf:hint ref="$form-resources/city/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                             id="state-control"
-                                             bind="state-bind">
-                                    <xf:label ref="$form-resources/state/label"/>
-                                    <xf:hint ref="$form-resources/state/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:us-state>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                          id="zip-control"
-                                          bind="zip-bind">
-                                    <xf:label ref="$form-resources/zip/label"/>
-                                    <xf:hint ref="$form-resources/zip/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="3" id="grid-1-grid">
+                        <fr:c y="1" x="1" w="4">
+                            <xf:input id="street-number-control" bind="street-number-bind">
+                                <xf:label ref="$form-resources/street-number/label"/>
+                                <xf:hint ref="$form-resources/street-number/hint"/>
+                                <xf:alert ref="$form-resources/street-number/alert" validation="constraint-8-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="street-name-control" bind="street-name-bind">
+                                <xf:label ref="$form-resources/street-name/label"/>
+                                <xf:hint ref="$form-resources/street-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="apt-suite-control" bind="apt-suite-bind">
+                                <xf:label ref="$form-resources/apt-suite/label"/>
+                                <xf:hint ref="$form-resources/apt-suite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="city-control" bind="city-bind">
+                                <xf:label ref="$form-resources/city/label"/>
+                                <xf:hint ref="$form-resources/city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="state-control" bind="state-bind">
+                                <xf:label ref="$form-resources/state/label"/>
+                                <xf:hint ref="$form-resources/state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="zip-control" bind="zip-bind">
+                                <xf:label ref="$form-resources/zip/label"/>
+                                <xf:hint ref="$form-resources/zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

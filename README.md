@@ -110,10 +110,9 @@ The source code is available on [github](https://github.com/orbeon/orbeon-forms/
 
 Orbeon Forms is written mainly using the following languages and technologies:
 
-- Java
 - Scala
+- Java
 - JavaScript
-- CoffeeScript
 - XForms, XSLT, and other XML technologies
 
 
@@ -149,8 +148,7 @@ third-party software.
 Third-party software
 --------------------
 
-This product includes software developed by the Apache Software Foundation
-(http://www.apache.org/):
+This product includes software developed by the [Apache Software Foundation](http://www.apache.org/):
 
 - [Ant](http://ant.apache.org/)
 - [Avalon](http://avalon.apache.org/closed.html)
@@ -170,17 +168,17 @@ In addition, this product includes the following software:
 - [Ehcache](http://ehcache.org/)
 - [eXist](http://exist-db.org/)
 - [Flying Saucer](http://code.google.com/p/flying-saucer/)
-- [iText](http://itextpdf.com/)
+- [iText](https://itextpdf.com/)
 - Jaxen
 - [JCIFS](http://jcifs.samba.org/)
 - [JTidy](http://jtidy.sourceforge.net/)
 - [JUnit](http://junit.org/)
 - [Saxon](http://saxon.sourceforge.net/)
-- [SAXPath](http://sourceforge.net/projects/saxpath/)
+- [SAXPath](https://sourceforge.net/projects/saxpath)
 - [Scala](http://www.scala-lang.org/)
 - [ScalaTest](http://www.scalatest.org/)
+- Sun Multi-Schema XML Validator
 - TagSoup
-- [Sun Multi-Schema XML Validator](https://msv.java.net/)
 - [YUI Library](http://yuilibrary.com/)
 
 This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided
@@ -190,10 +188,10 @@ locations:
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
     jar:orbeon-resources-private.jar!/ops/xforms/schema/*.rn[c|g]
 
-This product makes use of the Silk Icons, released under a Creative Commons
-Attribution 2.5 License (<http://www.famfamfam.com/lab/icons/silk/>).
+This product makes use of the [Silk Icons](<http://www.famfamfam.com/lab/icons/silk/>), released
+under a Creative Commons Attribution 2.5 License.
 
-This product makes use of the PixelMixer icons (<http://www.iconarchive.com/artist/pixelmixer.html>).
+This product makes use of the [PixelMixer icons](http://www.iconarchive.com/artist/pixelmixer.html).
 
 Please consult the `third-party-licenses` directory for more information
 about individual licenses.

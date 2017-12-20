@@ -82,7 +82,7 @@
                     <application-name>orbeon</application-name>
                     <form-name>w9</form-name>
                     <title xml:lang="en">Request for Taxpayer Identification Number and Certification</title>
-                    <description xml:lang="en"/>
+                    <description xml:lang="en">Use this form to provide your correct TIN to the person who is required to file an information return with the IRS to report, for example, income paid to you, real estate transactions, mortgage interest you paid, acquisition or abandonment of secured property, cancellation of debt, or contributions you made to an IRA.</description>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

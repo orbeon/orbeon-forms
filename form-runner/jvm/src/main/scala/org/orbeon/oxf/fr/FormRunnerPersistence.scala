@@ -295,7 +295,7 @@ trait FormRunnerPersistence {
 
     val unsavedAttachmentHolders =
       documentIdOpt match {
-        case Some(documentId) if Set("new", "edit")(mode) ⇒
+        case Some(documentId) if isNewOrEditMode(mode) ⇒
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)

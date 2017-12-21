@@ -217,10 +217,13 @@ trait FormRunnerBaseOps {
   def documentCreatedDate: Option[Long] = documentMetadataDate(Headers.Created)
   def documentModifiedDate: Option[Long] = documentMetadataDate(Headers.LastModified)
 
+  private val NewOrEditModes = Set("new", "edit")
+  def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
+
   // Captcha support
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
-  def showCaptcha: Boolean = Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+  def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {

@@ -81,14 +81,15 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   // the instance is mutable.
   // See https://github.com/orbeon/orbeon-forms/issues/3301
   def transactionStart(): Unit =
-    inScopeContainingDocument.setTransientState(
-      RollbackContent.getClass.getName,
-      RollbackContent(
-        data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
-        saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
-        autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
+    if (isNewOrEditMode(FormRunnerParams().mode))
+      inScopeContainingDocument.setTransientState(
+        RollbackContent.getClass.getName,
+        RollbackContent(
+          data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
+          saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
+          autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
+        )
       )
-    )
 
   def transactionRollback(): Unit =
     inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent ⇒

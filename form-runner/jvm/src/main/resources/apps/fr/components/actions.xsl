@@ -612,7 +612,10 @@
         </xsl:copy>
         <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
         <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
-            <xf:label ref="label"/>
+            <xf:label ref="label">
+                <!-- Keep mediatype in case it is present so that service can return HTML labels -->
+                <xsl:copy-of select="xf:label/@mediatype"/>
+            </xf:label>
             <xf:value ref="value"/>
         </xf:itemset>
     </xsl:template>

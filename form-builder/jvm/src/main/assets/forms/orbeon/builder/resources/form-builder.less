@@ -851,6 +851,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-label-editor {
         position: absolute;                         // If not explicitly set, jQuery uses position: relative, which create scrollbars
         top: 0; left: 0;                            // So the first call to .offset() works when the page is scrolled, see issue #2093
+        z-index: 1;                                 // For the editor to be above control, allowing it to catch clicks, see issue #3410
         .flex();
         input[type='text'] {
             .flex-flow(column);

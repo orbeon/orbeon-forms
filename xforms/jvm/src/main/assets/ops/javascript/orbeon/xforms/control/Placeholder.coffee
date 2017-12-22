@@ -17,15 +17,6 @@ Events = ORBEON.xforms.Events
 Init = ORBEON.xforms.Init
 YD = YAHOO.util.Dom
 
-# Returns true if this control has a placeholder
-isPlaceholderControl = (control) ->
-    if $(control).is('.xforms-input, .xforms-textarea')
-        inputOrTextarea = findInputOrTextarea control
-        placeholder = YD.getAttribute inputOrTextarea, "placeholder"
-        placeholder != null
-    else
-        false
-
 findInputOrTextarea = (control) ->
     input = (control.getElementsByTagName "input")[0]
     if input?
@@ -54,7 +45,7 @@ hidePlaceholder = (control) ->
 # When the label/hint changes, set the value of the placeholder
 do ->
     Controls.lhhaChangeEvent.subscribe (event) ->
-        if isPlaceholderControl event.control
+        if $(event.control).is('.xforms-input, .xforms-textarea')
             labelHint = Controls.getControlLHHA event.control, event.type
             if not labelHint?
                 # Update placeholder attribute and show it

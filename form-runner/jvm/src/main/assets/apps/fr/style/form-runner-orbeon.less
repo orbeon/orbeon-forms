@@ -30,6 +30,17 @@ body.orbeon { background-color: @frBackground }
         content: "";
     }
 
+    .nav > li > span {
+        padding: 0;
+    }
+
+    .checkbox input[type="checkbox"],
+        .checkbox-inline input[type="checkbox"],
+        .radio input[type="radio"],
+        .radio-inline input[type="radio"] {
+        transform: none;
+    }
+
     #xforms-form { // id because Liferay uses an id too
 
         .row {

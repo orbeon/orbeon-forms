@@ -301,7 +301,7 @@
             </xbl:handler>
             <xbl:handler
                 event="DOMActivate"
-                observer="control-name-input control-custom-input save-button prev-button next-button">
+                observer="control-name-input control-custom-input save-button prev-button next-button control-label-input control-hint-input">
 
                 <xf:action if="valid($i)">
                     <xf:var
@@ -1014,7 +1014,7 @@
                                             <xf:label ref="$resources/dialog-control-details/control-label/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
                                         </fr:tinymce>
-                                        <xf:input ref="label[not($is-html)]">
+                                        <xf:input ref="label[not($is-html)]" id="control-label-input">
                                             <xf:label ref="$resources/dialog-control-details/control-label/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-label/hint"/>
                                         </xf:input>
@@ -1031,7 +1031,7 @@
                                             <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
                                         </fr:tinymce>
-                                        <xf:input ref="hint[not($is-html)]">
+                                        <xf:input ref="hint[not($is-html)]" id="control-hint-input">
                                             <xf:label ref="$resources/dialog-control-details/control-hint/label"/>
                                             <xf:hint  ref="$resources/dialog-control-details/control-hint/hint"/>
                                         </xf:input>

@@ -372,7 +372,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>Email Bind Carbon Copy Recipient</label>
+                    <label>Email Blind Carbon Copy Recipient</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -2454,7 +2454,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -3524,7 +3524,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -4594,7 +4594,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -5656,7 +5656,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -6721,7 +6721,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -7783,7 +7783,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -8846,7 +8846,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
@@ -9915,7 +9915,7 @@
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>[Email Blind Carbon Copy Recipient]</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>

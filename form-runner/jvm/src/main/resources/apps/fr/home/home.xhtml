@@ -417,7 +417,7 @@
                         <xf:var
                             name="form-definition-version"
                             value="
-                                if ($upgrade) then
+                                if ($upgrade-form-definition) then
                                     normalize-space((instance()/form-definition-version[normalize-space()], '1')[1])
                                 else
                                     'next'"
@@ -436,7 +436,7 @@
                             value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
 
                         <!-- If we upgrade the form definition: retrieve toolbox -->
-                        <xf:send if="$upgrade" submission="read-toolbox">
+                        <xf:send if="$upgrade-form-definition" submission="read-toolbox">
                             <xf:property name="app"  value="$app"/>
                             <xf:property name="form" value="$form"/>
                         </xf:send>

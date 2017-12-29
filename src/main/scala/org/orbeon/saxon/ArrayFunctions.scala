@@ -163,8 +163,6 @@ trait ArrayFunctions extends OrbeonFunctionLibrary {
 
     // Other candidates:
     //
-    // - array:put
-    // - array:append
     // - array:subarray
     // - array:remove
     // - array:insert-before

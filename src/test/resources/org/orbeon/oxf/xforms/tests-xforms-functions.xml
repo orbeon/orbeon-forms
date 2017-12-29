@@ -3013,12 +3013,12 @@
                                                     array:join(()),
                                                     42
                                                 ),
-                                            'forty-two'
+                                                'forty-two'
+                                            ),
+                                            instance()
                                         ),
-                                        instance()
-                                    ),
-                                    1 to 10
-                                )"/>
+                                        1 to 10
+                                    )"/>
 
                             <xf:setvalue ref="size"      value="array:size($array)"/>
                             <xf:setvalue ref="number"    value="array:get($array, 1)"/>

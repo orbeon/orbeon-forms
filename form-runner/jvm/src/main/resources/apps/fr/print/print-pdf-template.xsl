@@ -48,7 +48,7 @@
 
     <xsl:variable
         name="select1-components"
-        select="'xbl-fr-autocomplete', 'fr-yesno-input', 'fr-databound-select1'"
+        select="'xbl-fr-autocomplete', 'fr-yesno-input', 'fr-databound-select1', 'fr-checkbox-input'"
         as="xs:string*"/>
 
     <xsl:variable

@@ -34,6 +34,7 @@ case class FormBuilderDocContext(
   lazy val formDefinitionInstance = formBuilderModel flatMap (_.findInstance("fb-form-instance"))
   lazy val xcvInstance            = formBuilderModel flatMap (_.findInstance("fb-xcv-instance"))
   lazy val undoInstance           = formBuilderModel flatMap (_.findInstance("fb-undo-instance"))
+  lazy val userAgentInstance      = formBuilderModel flatMap (_.findInstance("fb-user-agent-instance"))
 
   lazy val formDefinitionRootElem = explicitFormDefinitionInstance getOrElse formDefinitionInstance.get.rootElement
 
@@ -74,11 +75,6 @@ object FormBuilderDocContext {
 trait BaseOps extends Logging {
 
   implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-builder")
-
-  // Minimal version of IE supported for Form Builder
-  // 2017-10-06: Starting Orbeon Forms 2017.2, we don't support IE11 anymore and require Edge.
-  //@XPathExpression
-  val MinimalIEVersion = 12
 
   // Id of the xxf:dynamic control holding the edited form
   val DynamicControlId = "fb"

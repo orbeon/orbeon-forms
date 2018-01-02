@@ -27,6 +27,16 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   private val EditorIdPrefix   = "fb-lhh-editor-for-"
   private val EditorIdPrefixes = List("label", "hint") map (EditorIdPrefix + _ + '-')
 
+
+  def unsupportedBrowser(browserName: String, browserVersion: Double): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+
+    val rootElem = ctx.userAgentInstance.toList map (_.rootElement)
+
+    XFormsAPI.setvalue(rootElem child "browser-name",         s"$browserName $browserVersion")
+    XFormsAPI.setvalue(rootElem child "is-supported-browser", "false")
+  }
+
   def controlUpdateLabelOrHintOrText(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
 
     implicit val ctx = FormBuilderDocContext()

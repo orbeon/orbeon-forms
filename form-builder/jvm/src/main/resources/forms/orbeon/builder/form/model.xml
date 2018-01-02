@@ -245,10 +245,6 @@
             </xf:action>
         </xf:action>
 
-        <!-- Handle user agent -->
-        <xf:setvalue ref="instance('fb-user-agent-instance')/minimal-ie-version" value="fbf:MinimalIEVersion()"/>
-        <xf:setvalue ref="instance('fb-user-agent-instance')/is-supported-browser" value="fbf:isBrowserSupported()"/>
-
         <xf:rebuild/>
         <xf:recalculate/>
 
@@ -467,7 +463,7 @@
     <!-- Store user-agent details -->
     <xf:instance id="fb-user-agent-instance">
         <user-agent>
-            <minimal-ie-version/>
+            <browser-name/>
             <is-supported-browser/>
         </user-agent>
     </xf:instance>

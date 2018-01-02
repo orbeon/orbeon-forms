@@ -232,19 +232,24 @@
                             <xf:group ref=".[fr:mode() != 'new' and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
                                 <xf:switch>
                                     <xf:case id="fb-ie-warning-case-on">
-                                        <xf:var name="minimal-ie-version" value="xs:integer(xxf:instance('fb-user-agent-instance')/minimal-ie-version)"/>
+                                        <xf:var
+                                            xmlns:BrowserVersion="java:org.orbeon.builder.BrowserVersion"
+                                            name="minimal-microsoft-browser"
+                                            value="BrowserVersion:MinimalMicrosoftBrowserNameAndVersion()"/>
                                         <xh:div class="fb-ie-warning">
-                                            It appears that you are using Internet Explorer
-                                            <xf:output value="$minimal-ie-version - 1"/> or earlier. Form Builder is likely not working
-                                            properly with this browser. We recommend you upgrade to Internet Explorer
-                                            <xf:output value="$minimal-ie-version"/> or newer, or use
+                                            It appears that you are using
+                                            <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>.
+                                            Form Builder is likely not working properly with this browser. We recommend you upgrade to
+                                            <xf:output value="$minimal-microsoft-browser"/>
+                                            or newer, or use
                                             <a href="http://www.google.com/chrome">Google Chrome</a>,
-                                            <a href="http://www.mozilla.com/firefox/">Firefox</a>, or
+                                            <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                                            or
                                             <a href="http://www.apple.com/safari/">Safari</a>.
-                                            If we made a mistake and you are not using Internet Explorer
-                                            <xf:output value="$minimal-ie-version - 1"/>
-                                            or earlier, please
-                                            <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
+                                            If we made a mistake and you are not using
+                                            <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>,
+                                            please
+                                            <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
 
                                             <xf:trigger appearance="minimal">
                                                 <xf:label>[close]</xf:label>

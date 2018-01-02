@@ -33,6 +33,8 @@ object FormBuilderApp {
       ControlEditor
       ControlLabelHintTextEditor
       GridColumnDnD
+
+      BrowserCheck.checkSupportedBrowser()
     }
 
     $(initializeOnDomReady _)

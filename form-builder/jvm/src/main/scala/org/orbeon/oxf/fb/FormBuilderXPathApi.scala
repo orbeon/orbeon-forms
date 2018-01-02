@@ -22,7 +22,6 @@ import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
@@ -444,18 +443,6 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
     FormBuilder.hasEditor(controlElement, editor)(FormBuilderDocContext())
-
-  //@XPathExpression
-  def MinimalIEVersion: Int =
-    FormBuilder.MinimalIEVersion
-
-  // Whether the browser is supported
-  // Concretely, we only return false if the browser is an "old" version of IE
-  //@XPathFunction
-  def isBrowserSupported: Boolean = {
-    val request = NetUtils.getExternalContext.getRequest
-    ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
-  }
 
   //@XPathExpression
   def alwaysShowRoles: List[String] = {

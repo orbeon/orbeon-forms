@@ -20,7 +20,7 @@
             <display-name lang="es">Valor Calculado</display-name>
             <display-name lang="fr" todo="true">Valeur calculée</display-name>
             <display-name lang="ru" todo="true">Неизменяемый текст</display-name>
-            <display-name lang="de" todo="true">Textausgabe</display-name>
+            <display-name lang="de">Textausgabe</display-name>
             <display-name lang="it" todo="true">Testo statico</display-name>
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
             <display-name lang="sv">Beräknat värde</display-name>

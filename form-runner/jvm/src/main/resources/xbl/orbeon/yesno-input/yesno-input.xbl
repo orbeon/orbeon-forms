@@ -33,7 +33,7 @@
             <display-name lang="fr">Réponse oui/non</display-name>
             <display-name lang="ru" todo="true">[Yes/No Answer]</display-name>
             <display-name lang="it" todo="true">[Yes/No Answer]</display-name>
-            <display-name lang="de" todo="true">[Yes/No Answer]</display-name>
+            <display-name lang="de">Ja/Nein Auswahl</display-name>
             <display-name lang="sv">Ja/Nej-val</display-name>
             <display-name lang="nl" todo="true">[Yes/No Answer]</display-name>
             <display-name lang="pt" todo="true">[Yes/No Answer]</display-name>

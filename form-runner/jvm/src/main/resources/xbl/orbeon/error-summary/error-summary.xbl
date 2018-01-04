@@ -421,7 +421,6 @@ Inserting error information into error list:
                                 </xsl:for-each>
 
                                 <!-- Controls errors -->
-                                <xf:var name="noscript" value="property('xxf:noscript')"/>
                                 <xf:group ref=".[exists($visible-errors-for-section)]">
                                     <xh:ol class="fr-error-group">
                                         <xf:repeat ref="$visible-errors-for-section" id="er">
@@ -444,38 +443,30 @@ Inserting error information into error list:
                                                     value="xxf:focusable(@absolute-id)"/>
 
                                                 <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
-                                                <xf:switch class="fr-error-link" caseref="$noscript" xxf:xforms11-switch="true">
+                                                <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
                                                     <xf:case value="true()">
-                                                        <!-- Use a plain link to the client id -->
-                                                        <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="$label-or-placeholder" class="fr-error-label"/></xh:a>
-                                                    </xf:case>
-                                                    <xf:case value="false()">
-                                                        <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
-                                                            <xf:case value="true()">
-                                                                <xf:trigger appearance="minimal">
-                                                                    <xf:label>
-                                                                        <xf:output
-                                                                            mediatype="text/html"
-                                                                            value="$label-or-placeholder"/>
-                                                                        <span class="fr-error-alert fr-error-alert-{{@level}}">
-                                                                            <xf:output
-                                                                                mediatype="text/html"
-                                                                                value="@alert"/>
-                                                                        </span>
-                                                                    </xf:label>
-                                                                    <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
-                                                                </xf:trigger>
-                                                            </xf:case>
-                                                            <xf:case value="false()">
+                                                        <xf:trigger appearance="minimal">
+                                                            <xf:label>
                                                                 <xf:output
                                                                     mediatype="text/html"
                                                                     value="$label-or-placeholder"/>
-                                                                <xf:output
-                                                                    class="fr-error-alert fr-error-alert-{{@level}}"
-                                                                    mediatype="text/html"
-                                                                    value="@alert"/>
-                                                            </xf:case>
-                                                        </xf:switch>
+                                                                <span class="fr-error-alert fr-error-alert-{{@level}}">
+                                                                    <xf:output
+                                                                        mediatype="text/html"
+                                                                        value="@alert"/>
+                                                                </span>
+                                                            </xf:label>
+                                                            <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
+                                                        </xf:trigger>
+                                                    </xf:case>
+                                                    <xf:case value="false()">
+                                                        <xf:output
+                                                            mediatype="text/html"
+                                                            value="$label-or-placeholder"/>
+                                                        <xf:output
+                                                            class="fr-error-alert fr-error-alert-{{@level}}"
+                                                            mediatype="text/html"
+                                                            value="@alert"/>
                                                     </xf:case>
                                                 </xf:switch>
                                             </xh:li>

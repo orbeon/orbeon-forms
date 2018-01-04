@@ -171,39 +171,6 @@ object XFormsError {
       "fixup-xml-base", "false"
     ))
 
-  // Output the Noscript error panel and insert the errors
-  def outputNoscriptErrorPanel(
-    containingDocument : XFormsContainingDocument,
-    helper             : XMLReceiverHelper,
-    htmlPrefix         : String
-  ): Unit = {
-    val errors = containingDocument.getServerErrors.asScala
-    if (errors nonEmpty) {
-
-      // Read the template
-      val resourcePath =
-        XHTMLBodyHandler.getIncludedResourcePath(containingDocument.getRequestPath, "error-dialog-noscript.xml")
-
-      val template =
-        new DocumentWrapper(
-          ResourceManagerWrapper.instance.getContentAsDOM4J(resourcePath),
-          null,
-          XPath.GlobalConfiguration
-        )
-
-      // Find insertion point and insert list of errors
-      // NOTE: This is a poor man's template system. Ideally, we would use XForms or XSLT for this.
-      template descendant * find (_.attClasses("xforms-error-panel-details")) foreach { div ⇒
-        insert(into = div, origin = ServerError.errorsAsXHTMLElem(errors): NodeInfo)
-      }
-
-      // Write out result using XInclude semantics
-      // NOTE: Parent namespace information is not passed here, and that is probably not right
-      TransformerUtils.writeDom4j(unsafeUnwrapElement(template.rootElement),
-        new EmbeddedDocumentXMLReceiver(new XIncludeReceiver(null, helper.getXmlReceiver, null, null)))
-    }
-  }
-
   import XMLReceiverSupport._
 
   // Insert server errors into the Ajax response

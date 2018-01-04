@@ -29,7 +29,7 @@ class DatasetsTest
     it("must call services and actions and return expected dataset values") {
 
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "datasets", "new", document = "", noscript = false, initialize = true)
+        runFormRunner("tests", "datasets", "new", document = "", initialize = true)
 
       withFormRunnerDocument(processorService, doc) {
 

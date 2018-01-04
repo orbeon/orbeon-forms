@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.util.{Calendar, GregorianCalendar}
-
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
-import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -27,12 +24,10 @@ import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.value.{CalendarValue, DateValue, TimeValue}
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
-import scala.util.matching.Regex
 
 /**
  * xf:input control
@@ -99,27 +94,12 @@ class XFormsInputControl(
     // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
     // the encrypted value of "true". So we do not encrypt values.
 
-    val isNoscript = containingDocument.noscript
-
     // Whether the day precedes the month in dates
     def dayMonth = containingDocument.getDateFormatInput.startsWith("[D")
 
     Option(
       getBuiltinTypeName match {
-        case "boolean"                ⇒ normalizeBooleanString(externalValue)
-        case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trimAllToEmpty, dayMonth)
-        case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trimAllToEmpty, dayMonth)
-        case "dateTime" if isNoscript ⇒
-          // Split into date and time parts
-          // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
-          val datePart = getDateTimeDatePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
-          val timePart = getDateTimeTimePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
-          if (datePart.nonEmpty || timePart.nonEmpty)
-            // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
-            parseForNoscript(DateParsePatterns, datePart, dayMonth) + 'T' + parseForNoscript(TimeParsePatterns, timePart, dayMonth)
-          else
-            // Special case of empty parts
-            ""
+        case "boolean"       ⇒ normalizeBooleanString(externalValue)
         case "string" | null ⇒
           // Replacement-based input sanitation for string type only
           containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
@@ -258,105 +238,5 @@ object XFormsInputControl {
       ""
     else
       value.substring(separatorIndex + 1).trimAllToEmpty
-  }
-
-  private def parseForNoscript(patterns: Seq[ParsePattern], value: String, dayMonth: Boolean): String = {
-    for (currentPattern ← patterns.toIterator) {
-      val result = MatchResult(currentPattern.regex.pattern, value)
-      if (result.matches)
-        return currentPattern(result, dayMonth)
-    }
-    value
-  }
-
-  def testParseTimeForNoscript(value: String): String = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
-  def testParseDateForNoscript(value: String, dayMonth: Boolean): String = parseForNoscript(DateParsePatterns, value, dayMonth)
-
-  private val DateComponentSeparators = "[./\\-\\s]"
-
-  // TODO: https://github.com/orbeon/orbeon-forms/issues/1154
-  // TODO: remaining regexps from xforms.js?
-  private val DateParsePatterns = Array(
-    // Today
-    // Tomorrow
-    // Yesterday
-    // 4th
-    // 4th Jan
-    // 4th Jan 2003
-    // Jan 4th
-    // Jan 4th 2003
-    // next Tuesday - this is suspect due to weird meaning of "next"
-    // last Tuesday
-
-    // mm/dd/yyyy (American style)
-    // Support separators: ".", "/", "-", and single space
-    new ParsePattern(("^(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})" + DateComponentSeparators + "(\\d{2,4})$").r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToDate(result.group(2), result.group(if (dayMonth) 1 else 0), result.group(if (dayMonth) 0 else 1))
-    },
-    // mm/dd (American style without year)
-    // Support separators: ".", "/", "-", and single space
-    new ParsePattern(("^(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})$").r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToDate((new GregorianCalendar).get(Calendar.YEAR).toString, result.group(if (dayMonth) 1 else 0), result.group(if (dayMonth) 0 else 1))
-    },
-    // yyyy-mm-dd (ISO style)
-    // But also support separators: ".", "/", "-", and single space
-    new ParsePattern(("(\\d{2,4})" + DateComponentSeparators + "(\\d{1,2})" + DateComponentSeparators + "(\\d{1,2})(Z|([+-]\\d{2}:\\d{2}))?").r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToDate(result.group(0), result.group(1), result.group(2))
-    }
-  )
-
-  // See also patterns on xforms.js
-  // TODO: remaining regexps from xforms.js?
-  private val TimeParsePatterns = Array(
-
-    // 12:34:56 p.m.
-    new ParsePattern("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(adjustHoursPM(result.group(0)), result.group(1), result.group(2))
-    },
-    // 12:34 p.m.
-    new ParsePattern("^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(adjustHoursPM(result.group(0)), result.group(1), "0")
-    },
-    // 12 p.m.
-    new ParsePattern("^(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(adjustHoursPM(result.group(0)), "0", "0")
-    },
-    // 12:34:56 (a.m.)
-    new ParsePattern("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(result.group(0), result.group(1), result.group(2))
-    },
-    // 12:34 (a.m.)
-    new ParsePattern("^(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(result.group(0), result.group(1), "0")
-    },
-    // 12 (a.m.)
-    new ParsePattern("^(\\d{1,2}) ?(a|am|a\\.m\\.)?$".r) {
-      def apply(result: MatchResult, dayMonth: Boolean): String =
-        stringsToTime(result.group(0), "0", "0")
-    }
-  )
-
-  private abstract class ParsePattern(val regex: Regex) extends ((MatchResult, Boolean) ⇒ String) {
-    def stringsToDate(year: String, month: String, day: String): String =
-      new DateValue(year.toInt, month.toByte, day.toByte).getStringValue
-
-    def stringsToTime(hours: String, minutes: String, seconds: String): String =
-      new TimeValue(hours.toByte, minutes.toByte, seconds.toByte, 0, CalendarValue.NO_TIMEZONE).getStringValue
-
-    def adjustHoursPM(hours: String): String = {
-      val hoursInt = hours.toInt
-      if (hoursInt < 12)
-        (hoursInt + 12).toString
-      else
-        hours
-    }
   }
 }

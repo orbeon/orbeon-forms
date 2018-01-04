@@ -27,7 +27,7 @@ class ItemsetActionTest
   describe("Form Runner itemset actions") {
 
     val (processorService, docOpt, _) =
-      runFormRunner("tests", "itemset-action", "new", document = "", noscript = false, initialize = true)
+      runFormRunner("tests", "itemset-action", "new", document = "", initialize = true)
 
     val doc = docOpt.get
 

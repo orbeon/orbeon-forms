@@ -63,11 +63,8 @@
                             name="script"
                             value="
                                 not(
-                                    (
-                                        xxf:is-control-readonly('fr-button') and
-                                        property('xxf:readonly-appearance') = 'static'
-                                    ) or
-                                        property('xxf:noscript')
+                                    xxf:is-control-readonly('fr-button') and
+                                    property('xxf:readonly-appearance') = 'static'
                                 )"/>
 
                         <xf:trigger xbl:attr="xxf:modal" xxbl:scope="outer">

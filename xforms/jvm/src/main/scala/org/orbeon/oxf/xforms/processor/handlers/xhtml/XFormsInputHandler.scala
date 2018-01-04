@@ -191,7 +191,6 @@ class XFormsInputHandler(
           reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
           reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
           reusableAttributes.addAttribute("", "alt", "alt", XMLReceiverHelper.CDATA, "")
-          // TODO: Is this an appropriate name? Noscript must be able to find this
           reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
           val inputClasses = new StringBuilder("xforms-input-input")
           if (isRelevantControl) {

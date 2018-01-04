@@ -42,8 +42,8 @@
                      id, otherwise pass the requested form version if there is one.
 
                      The case where we have a document id and data was POSTed to us is the case of switching between
-                     modes or script/noscript. In that case, there is no data in the database and the persistence layer
-                     must use the version if any. -->
+                     modes. In that case, there is no data in the database and the persistence layer must use the
+                     version if any. -->
                 <xsl:variable name="use-document-id"                 select="$params/document     != '' and empty(p:get-request-attribute('fr-form-data'))"/>
                 <xsl:variable name="specific-form-version-requested" select="$params/form-version != ''"/>
 

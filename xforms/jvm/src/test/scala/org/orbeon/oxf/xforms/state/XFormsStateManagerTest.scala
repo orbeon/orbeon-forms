@@ -58,7 +58,7 @@ class XFormsStateManagerTest
               true
             )
 
-          XFormsStateManager.afterInitialResponse(doc, null, disableDocumentCache = false)
+          XFormsStateManager.afterInitialResponse(doc, disableDocumentCache = false)
 
           doc
         }
@@ -117,7 +117,7 @@ class XFormsStateManagerTest
 
           // Initial response sent
           state1.document.afterInitialResponse()
-          XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
+          XFormsStateManager.afterInitialResponse(state1.document, ! isCache)
         }
 
         assert(state1.dynamicStateString map getSequenceNumber contains 1)
@@ -177,7 +177,7 @@ class XFormsStateManagerTest
           assertEmptyClientState(state1)
 
           state1.document.afterInitialResponse()
-          XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
+          XFormsStateManager.afterInitialResponse(state1.document, ! isCache)
 
           DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState, isForceEncryption = false)
         }

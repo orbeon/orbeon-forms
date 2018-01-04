@@ -48,33 +48,6 @@
 
     // ***** XForms Controls *******************************************************************************************
 
-    .xforms-noscript {
-        // NOTE: In noscript mode, help appears last in a control for accessibility reasons
-        .xforms-help {
-            display: block;
-            margin: 0 0 0 .5em;
-        }
-
-        // Noscript help section
-        .xforms-help-panel {
-            display: block;
-            width: auto;
-            padding: 0 1em;
-
-            .xforms-help-group { margin: 0 0 .5em }
-            .xforms-label { display: inline }
-            .xforms-help { display: none }
-        }
-
-        .fr-help-back { margin-left: .5em }
-
-        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-            .xforms-help {
-                display: none;
-            }
-        }
-    }
-
     // Hide alerts by default
     // NOTE: Include active alerts because Form Runner only shows active alerts for visited controls
     .xforms-alert, .xforms-alert.xforms-active {
@@ -223,10 +196,6 @@
             margin-right: 5px;
         }
     }
-
-    // Enable noscript icon when in noscript mode
-    .fr-noscript-icon { display: none }
-    .xforms-noscript .fr-noscript-icon { display: inline }
 
     // Messages
     .fr-message-success {

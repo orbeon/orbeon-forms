@@ -55,7 +55,6 @@ trait FormRunnerActions {
     "review"                 → tryNavigateToReview,
     "edit"                   → tryNavigateToEdit,
     "open-rendered-format"   → tryOpenRenderedFormat,
-    "toggle-noscript"        → tryToggleNoscript,
     "visit-all"              → tryVisitAll,
     "unvisit-all"            → tryUnvisitAll,
     "expand-all"             → tryExpandSections,
@@ -292,7 +291,6 @@ trait FormRunnerActions {
         case name @ "document"            ⇒ name → document.get
         case name @ "valid"               ⇒ name → dataValid.toString
         case name @ "language"            ⇒ name → currentLang.stringValue
-        case name @ "noscript"            ⇒ name → isNoscript.toString
         case name @ DataFormatVersionName ⇒ name → dataVersion
       }
 
@@ -372,7 +370,6 @@ trait FormRunnerActions {
     }
 
   private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
-    NoscriptParam   → (() ⇒ isNoscript.toString,     _ == "true"),
     LanguageParam   → (() ⇒ currentLang.stringValue, _ ⇒ false  ),
     EmbeddableParam → (() ⇒ isEmbeddable.toString,   _ == "true")
   )
@@ -380,7 +377,7 @@ trait FormRunnerActions {
   private val StateParamNames               = (StateParams map (_._1) toSet) + "form-version"
   private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName
 
-  // Automatically prepend `fr-noscript`, `fr-language` and `orbeon-embeddable` based on their current value unless
+  // Automatically prepend `fr-language` and `orbeon-embeddable` based on their current value unless
   // they are already specified in the given path.
   //
   // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
@@ -517,13 +514,6 @@ trait FormRunnerActions {
         formTargetOpt      = Some("_blank"),
         responseIsResource = true
       )
-
-  def tryToggleNoscript(params: ActionParams): Try[Any] =
-    Try {
-      val FormRunnerParams(app, form, _, Some(document), mode) = FormRunnerParams()
-      s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! isNoscript).toString}"
-    } flatMap
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
   // Visit/unvisit controls
   def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = ErrorSummaryModel))

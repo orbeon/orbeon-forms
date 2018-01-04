@@ -52,8 +52,8 @@ class XFormsRepeatHandler(
 
     val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
     val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
-    val isMustGenerateTemplate = (isTemplate || isTopLevelRepeat) && ! xformsHandlerContext.isNoScript // don't generate templates in noscript mode as they won't be used
-    val isMustGenerateDelimiters = ! xformsHandlerContext.isNoScript
+    val isMustGenerateTemplate = isTemplate || isTopLevelRepeat
+    val isMustGenerateDelimiters = true
     val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
 

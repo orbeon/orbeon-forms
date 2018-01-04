@@ -75,7 +75,7 @@ object Dom4j {
   }
 
   private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String ⇒ String) =
-    left.size == right.size && (left.zip(right) forall
+    left.lengthCompare(right.size) == 0 && (left.zip(right) forall
       { case (n1, n2) ⇒ compareTwoNodes(n1, n2)(normalizeText) })
 
   private implicit def dom4jListToNodeSeq(l: JList[_]): Seq[Node] = l.asInstanceOf[JList[Node]].asScala

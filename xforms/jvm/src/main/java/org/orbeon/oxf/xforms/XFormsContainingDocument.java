@@ -135,8 +135,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
             if (! isNoUpdatesStatic())  // attempt to ignore oxf:xforms-submission
                 LifecycleLogger.eventAssumingRequestJava("xforms", "new form session", new String[] { "uuid", uuid });
 
-            // NOTE: template is not stored right away, as it depends on the evaluation of the noscript property.
-
             this.xpathDependencies =
                 (Version.isPE() && this.staticState.isXPathAnalysis()) ? new PathMapXPathDependencies(this) : new DumbXPathDependencies();
 
@@ -253,7 +251,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         // Restore request information
         restoreRequestInformation(dynamicState);
         restorePathMatchers(dynamicState);
-        restoreTemplate(dynamicState);
 
         // Restore other encoded objects
         this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
@@ -536,13 +533,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
                 "script id", scriptInvocation.script().prefixedId()
             );
         } else {
-            // Warn that scripts won't run in noscript mode (duh)
-            if (noscript())
-                indentedLogger().logInfo(
-                    "noscript",
-                    "script won't run in noscript mode",
-                    "script id", scriptInvocation.script().prefixedId()
-                );
 
             if (scriptsToRun == null)
                 scriptsToRun = new ArrayList<ScriptInvocation>();

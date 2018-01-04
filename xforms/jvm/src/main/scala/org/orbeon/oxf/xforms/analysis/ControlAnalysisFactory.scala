@@ -30,7 +30,7 @@ object ControlAnalysisFactory {
   // Control factories
   type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
-  private val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE, XXFORMS_VALUE_OR_ACTIVATE)
+  private val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE)
   private val ValueExternalEvents   = TriggerExternalEvents + XXFORMS_VALUE
 
   // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here

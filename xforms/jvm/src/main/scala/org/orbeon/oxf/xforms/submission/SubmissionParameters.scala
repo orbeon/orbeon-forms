@@ -27,7 +27,6 @@ case class SubmissionParameters(
   xxfUploads                     : Boolean,
   xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
-  isNoscript                     : Boolean,
   isDeferredSubmission           : Boolean,
   isDeferredSubmissionFirstPass  : Boolean,
   isDeferredSubmissionSecondPass : Boolean,
@@ -185,14 +184,13 @@ object SubmissionParameters {
         staticSubmission.element.elements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
 
     // TODO: use static for headers
-    // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
+    // In "Ajax portlet" mode, there is no deferred submission process
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
     // NOTE: Method can be `null` e.g. in a portlet render request.
     val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
 
-    val isNoscript                     = containingDocument.noscript
-    val isAllowDeferredSubmission      = ! isNoscript && incomingMethod != HttpMethod.GET
+    val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.isInitializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
     val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventNameOrNull
@@ -212,7 +210,6 @@ object SubmissionParameters {
       xxfUploads                     = resolvedXxfUploads,
       xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
-      isNoscript                     = isNoscript,
       isDeferredSubmission           = isDeferredSubmission,
       isDeferredSubmissionFirstPass  = isDeferredSubmissionFirstPass,
       isDeferredSubmissionSecondPass = isDeferredSubmissionSecondPass,

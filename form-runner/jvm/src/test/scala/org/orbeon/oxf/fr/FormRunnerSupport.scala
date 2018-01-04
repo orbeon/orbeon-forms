@@ -62,13 +62,12 @@ trait FormRunnerSupport extends DocumentTestBase {
     formVersion : String  = "", // not used yet
     document    : String  = "", // not used yet
     uuid        : String  = "",
-    noscript    : Boolean = false,
     initialize  : Boolean = true
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val (processorService, response, _, events) =
       TestHttpClient.connect(
-        url         = s"/fr/$app/$form/$mode${if (noscript) "?fr-noscript=true" else ""}",
+        url         = s"/fr/$app/$form/$mode",
         method      = GET,
         headers     = Map.empty,
         content     = None

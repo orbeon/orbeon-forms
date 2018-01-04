@@ -105,11 +105,9 @@ object XFormsStateManager extends XFormsStateLifecycle {
     */
   def afterInitialResponse(
     containingDocument   : XFormsContainingDocument,
-    template             : AnnotatedTemplate,
     disableDocumentCache : Boolean
   ): Unit =
     if (! containingDocument.isNoUpdates) {
-      containingDocument.setTemplateIfNeeded(template)
       addDocumentToSession(containingDocument.getUUID)
       cacheOrStore(containingDocument, isInitialState = true, disableDocumentCache = disableDocumentCache)
     }

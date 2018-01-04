@@ -123,7 +123,7 @@
             </xf:message>
 
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
-                /new below. Would that break in case of switching modes (script/noscript)? Here seems to be a good start. -->
+                `/new` below. Here seems to be a good start. -->
             <xf:insert ref="instance('fr-initial-instance')" origin="xxf:instance('fr-form-instance')"/>
 
             <!-- NOTE: We used to do a sort of permission check here for submits. Since #75 is implemented and there is
@@ -801,8 +801,7 @@
 
         <!-- NOTE: As of 2013-04-04, only used for PDF button which uses fr:href-button -->
         <xf:bind ref="strict-submit"
-                 readonly="not(property('xxf:noscript'))
-                           and (xxf:instance('fr-error-summary-instance')/valid = false() or xxf:pending-uploads() > 0)"/>
+                 readonly="(xxf:instance('fr-error-summary-instance')/valid = false() or xxf:pending-uploads() > 0)"/>
 
         <!-- Show summary button if users have the read permission (obviously), but also if they are logged in, as in
              that case they might be able to see data based on ownership -->

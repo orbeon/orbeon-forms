@@ -139,14 +139,13 @@
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
             <xf:action event="fr-summary-create">
-                <xf:load resource="/fr/{$app}/{$form}/new{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xf:load resource="/fr/{$app}/{$form}/new"/>
             </xf:action>
 
             <xf:action event="fr-summary-view" if="$selection-is-one-document">
-                <xf:var name="params" value="(
-                        if (property('xxf:noscript'))           then 'fr-noscript=true' else (),
-                        if ($selection-data-or-draft = 'draft') then 'draft=true'       else ()
-                    )"/>
+                <xf:var
+                    name="params"
+                    value="if ($selection-data-or-draft = 'draft') then 'draft=true' else ()"/>
                 <xf:load resource="/fr/{$app}/{$form}/view/{$selection-document-id}{if (exists($params)) then concat('?', string-join($params, '&amp;')) else ()}"/>
             </xf:action>
 
@@ -476,7 +475,6 @@
                     <!--<fr:logo paths="$source-form-metadata/logo[@xml:lang = xxf:lang()], $source-form-metadata/logo"/>-->
                     <!--<fr:title/>-->
                     <!--<fr:language-selector/>-->
-                    <!--<fr:noscript-selector/>-->
                     <!--<fr:form-builder-doc/>-->
                     <!--<fr:goto-content/>-->
                 <!--</fr:header>-->
@@ -737,10 +735,7 @@
                                                         ''"/>
                                             <xf:var
                                                 name="req-parameters"
-                                                value="(
-                                                    if (property('xxf:noscript')) then 'fr-noscript=true' else (),
-                                                    if ($document/@draft = 'true') then 'draft=true' else ()
-                                                )"/>
+                                                value="if ($document/@draft = 'true') then 'draft=true' else ()"/>
                                             <xf:var
                                                 name="current-document-href"
                                                 value="
@@ -1036,9 +1031,9 @@
                     <xf:var name="is-singleton"            value="$source-form-metadata/singleton = 'true'"/>
                     <xf:var name="singleton-limit-reached" value="$is-singleton and $doc-count > 0"/>
                     <xf:var name="new-visible"             value="$global-operations = ('*', 'create') and not($singleton-limit-reached)"/>
-                    <xf:var name="view-enabled"            value="property('xxf:noscript') or (count($documents-selected)  = 1 and $documents-can-view)"/>
-                    <xf:var name="delete-enabled"          value="property('xxf:noscript') or (count($documents-selected) != 0 and $documents-can-delete)"/>
-                    <xf:var name="duplicate-enabled"       value="property('xxf:noscript') or (count($documents-selected) != 0 and $documents-can-view and $new-visible)"/>
+                    <xf:var name="view-enabled"            value="count($documents-selected)  = 1 and $documents-can-view"/>
+                    <xf:var name="delete-enabled"          value="count($documents-selected) != 0 and $documents-can-delete"/>
+                    <xf:var name="duplicate-enabled"       value="count($documents-selected) != 0 and $documents-can-view and $new-visible"/>
 
                     <xf:var name="enabled"                 value="instance('fr-summary-triggers-instance')/enabled"/>
                     <xf:var name="disabled"                value="instance('fr-summary-triggers-instance')/disabled"/>
@@ -1091,7 +1086,7 @@
                             <xf:group ref="if ($button-name = 'test') then if ($view-enabled) then $enabled else $disabled else ()">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"
+                                        href="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}"
                                         class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="'Test'"/><!-- TODO: i18n -->
                                 </fr:href-button>

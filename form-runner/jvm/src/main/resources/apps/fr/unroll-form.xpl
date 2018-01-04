@@ -52,11 +52,9 @@
     <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
 
     <!-- Get request information -->
-    <!-- Noscript parameter -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/parameters/parameter[starts-with(name, 'fr-noscript')]</include>
                 <include>/request/request-path</include>
                 <include>/request/request-uri</include>
             </config>

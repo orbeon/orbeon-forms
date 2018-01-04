@@ -50,7 +50,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
         // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
         // automatically handles ids and element names
         currentSavedOutput = controller.getOutput();
-        if (!xformsHandlerContext.isNoScript()) {
+        {
 
             final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId());
 
@@ -91,9 +91,6 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
-        } else if (isNonRelevant(currentControlOrNull())) {
-            // In noscript, if the group not visible, set output to a black hole
-            controller.setOutput(new DeferredXMLReceiverAdapter());
         }
 
         // Don't support label, help, alert, or hint and other appearances, only the content!
@@ -103,7 +100,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     public void handleControlEnd() throws SAXException {
 
         final ElementHandlerController controller = xformsHandlerContext.getController();
-        if (! xformsHandlerContext.isNoScript()) {
+        {
             // Restore output
             controller.setOutput(currentSavedOutput);
 
@@ -115,9 +112,6 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end",
                         "group-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId()));
             }
-        } else if (isNonRelevant(currentControlOrNull())) {
-            // In noscript, group was not visible, restore output
-            controller.setOutput(currentSavedOutput);
         }
 
         // Don't support help, alert, or hint!

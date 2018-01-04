@@ -29,7 +29,6 @@
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       xxf:external-events="fb-show-test-dialog xxforms-rpc-request"
-      xxf:noscript-support="false"
       xxf:xpath-analysis="false"
       xxf:expose-xpath-types="true"
 

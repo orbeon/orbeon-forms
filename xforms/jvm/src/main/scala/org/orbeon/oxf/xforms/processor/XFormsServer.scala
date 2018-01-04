@@ -306,36 +306,6 @@ object XFormsServer {
       xmlReceiver.endPrefixMapping("xxf")
     }
 
-  def outputNoscriptResponse(
-    containingDocument : XFormsContainingDocument,
-    xmlReceiver        : XMLReceiver,
-    externalContext    : ExternalContext)(implicit
-    indentedLogger     : IndentedLogger
-  ): Unit =
-    withDebug("handling noscript response") {
-      // This will also cache the containing document if needed
-      // QUESTION: Do we actually need to cache if a xf:submission[@replace = 'all'] happened?
-      containingDocument.getLoadsToRun.asScala.headOption match {
-        case Some(firstLoad) ⇒
-
-          // Send redirect
-          debug("handling noscript redirect response for xf:load", List("url" → firstLoad.resource))
-
-          // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-          externalContext.getResponse.sendRedirect(firstLoad.resource, isServerSide = false, isExitPortal = false)
-          SAXUtils.streamNullDocument(xmlReceiver)
-        case None ⇒
-          // The template is stored either in the static state or in the dynamic state
-          val template =
-            containingDocument.getStaticState.template orElse
-              containingDocument.getTemplate           getOrElse
-              (throw new IllegalStateException("missing template"))
-
-          debug("handling noscript response for XHTML output")
-          XFormsToXHTML.outputResponseDocument(externalContext, template, containingDocument, xmlReceiver)
-      }
-    }
-
   def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
 
     val uuid = XFormsStateManager.getRequestUUID(request) ensuring (_ ne null)
@@ -747,7 +717,7 @@ class XFormsServer extends ProcessorImpl {
                             // Output null document so that rest of pipeline doesn't fail and no further processing takes place
                             debug("handling submission with `replace=\"all\"` with redirect")
                             SAXUtils.streamNullDocument(xmlReceiver)
-                          } else if (! containingDocument.noscript) {
+                          } else {
                             // This is an Ajax response
                             withDebug("handling regular Ajax response") {
                               // Hook-up debug content handler if we must log the response document
@@ -795,9 +765,6 @@ class XFormsServer extends ProcessorImpl {
                                 debugResults(List("ajax response" → Dom4jUtils.domToPrettyString(debugContentHandler.getDocument)))
                               }
                             }
-                          } else {
-                            // Noscript mode
-                            outputNoscriptResponse(containingDocument, xmlReceiver, externalContext)
                           }
                         case None ⇒
                           // This is the second pass of a submission with replace="all". We ensure that the document is

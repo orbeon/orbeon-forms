@@ -35,10 +35,7 @@ public class XFormsProperties {
     public static final String STATE_HANDLING_SERVER_VALUE = "server";
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
 
-    public static final String NOSCRIPT_SUPPORT_PROPERTY = "noscript-support";
     public static final String NOSCRIPT_PROPERTY = "noscript";
-    public static final String NOSCRIPT_TEMPLATE = "noscript-template";
-    public static final String NOSCRIPT_TEMPLATE_STATIC_VALUE = "static";
 
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
@@ -231,9 +228,6 @@ public class XFormsProperties {
             ),
 
             new PropertyDefinition(FUNCTION_LIBRARY_PROPERTY                     , "",                             false),
-            new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY                     , true,                           false),
-            new PropertyDefinition(NOSCRIPT_PROPERTY                             , false,                          false),
-            new PropertyDefinition(NOSCRIPT_TEMPLATE                             , NOSCRIPT_TEMPLATE_STATIC_VALUE, false),
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT_PROPERTY    , "full",                         false),
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY   , "full",                         false),
             new PropertyDefinition(ORDER_PROPERTY                                , DEFAULT_ORDER_PROPERTY,         false),

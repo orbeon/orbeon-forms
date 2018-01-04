@@ -137,7 +137,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         } else  if (! isStaticReadonly) {
             // Create xhtml:select
             final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
-            containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);// necessary for noscript mode
+            containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);// was necessary for noscript mode
 
             if (appearanceTrait != null && appearanceTrait.isCompact())
                 containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple");
@@ -268,11 +268,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
 
-        // In noscript mode, use <fieldset>
-
-        // TODO: This really hasn't much to do with noscript; should we always use fieldset, or make this an
-        // option? Benefit of limiting to noscript is that then no JS change is needed
-        final String containingElementName = xformsHandlerContext.isNoScript() ? "fieldset" : "span";
+        // TODO: Should we always use fieldset, or make this an option?
+        final String containingElementName = "span";
         final String containingElementQName = XMLUtils.buildQName(xhtmlPrefix, containingElementName);
 
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
@@ -283,20 +280,20 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             if (outputContainerElement)
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {
-                if (xformsHandlerContext.isNoScript()) {
-                    // Output <legend>
-                    final String legendName = "legend";
-                    final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
-                    reusableAttributes.clear();
-                    // TODO: handle other attributes? xforms-disabled?
-                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
-                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
-                    if (control != null) {
-                        final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
-                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
-                    }
-                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
-                }
+//                {
+//                    // Output <legend>
+//                    final String legendName = "legend";
+//                    final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
+//                    reusableAttributes.clear();
+//                    // TODO: handle other attributes? xforms-disabled?
+//                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
+//                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
+//                    if (control != null) {
+//                        final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
+//                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
+//                    }
+//                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
+//                }
 
                 if (itemset != null) {
                     int itemIndex = 0;
@@ -610,9 +607,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     public void handleLabel() throws SAXException {
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final boolean isFull = appearanceTrait != null && appearanceTrait.isFull();
-        if (!isStaticReadonly(currentControlOrNull()) && xformsHandlerContext.isNoScript() && isFull) {
-            // NOP: in noscript mode for full items, this is handled by fieldset/legend
-        } else if (isFull) {
+        if (isFull) {
             // For radio and checkboxes, produce span with an id
             handleLabelHintHelpAlert(
                 getStaticLHHA(getPrefixedId(), LHHA$.MODULE$.jLabel()),

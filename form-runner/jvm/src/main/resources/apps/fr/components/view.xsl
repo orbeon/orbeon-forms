@@ -64,9 +64,6 @@
         </xh:div>
 
         <fr:row>
-            <fr:noscript-help/>
-        </fr:row>
-        <fr:row>
             <fr:messages/>
         </fr:row>
         <fr:row>
@@ -303,7 +300,6 @@
                         <fr:title/>
                         <!-- These are typically to the right -->
                         <fr:language-selector/>
-                        <fr:noscript-selector/>
                         <fr:status-icons/>
                         <fr:goto-content/>
                     </xsl:variable>
@@ -400,24 +396,6 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="fr:noscript-help" name="fr-noscript-help">
-        <!-- Noscript help section (shown only in edit mode) -->
-        <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
-            <!-- Only display this section if there is at least one non-empty nested help text -->
-            <xf:group
-                ref=".[xxf:non-blank(string-join(({string-join(($body//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
-                <xh:div class="xforms-help-panel">
-                    <xh:h2>
-                        <xf:output value="$fr-resources/summary/titles/help"/>
-                    </xh:h2>
-                    <xh:ul>
-                        <xsl:apply-templates select="$body/*" mode="noscript-help"/>
-                    </xh:ul>
-                </xh:div>
-            </xf:group>
-        </xsl:if>
-    </xsl:template>
-
     <!-- Remove id elements on Form Builder templates -->
     <xsl:template match="@id | @bind" mode="filter-fb-template"/>
     <xsl:template match="@ref[not(normalize-space())] | @nodeset[not(normalize-space())]" mode="filter-fb-template">
@@ -488,41 +466,8 @@
         </xf:group>
     </xsl:template>
 
-    <xsl:template match="fr:noscript-selector">
-        <!-- Switch script/noscript -->
-
-        <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes a CSS  bug with IE 7:
-             https://github.com/orbeon/orbeon-forms/issues/733 -->
-        <xf:group
-            xxf:element="div"
-            model="fr-form-model"
-            ref=".[$fr-mode = ('new', 'edit') and not(xxf:property(string-join(('oxf.fr.noscript-link', $fr-app, $fr-form), '.')) = false()) and property('xxf:noscript-support')]"
-            class="fr-noscript-choice"
-            xml:space="preserve">
-
-            <xf:group ref=".[not(property('xxf:noscript'))]">
-                <xf:trigger appearance="minimal">
-                    <xf:label>
-                        <xf:output value="$fr-resources/summary/labels/noscript"/>
-                    </xf:label>
-                </xf:trigger>
-            </xf:group>
-            <xf:group ref=".[property('xxf:noscript')]">
-                <xf:trigger appearance="minimal">
-                    <xf:label>
-                        <xf:output value="$fr-resources/summary/labels/script"/>
-                    </xf:label>
-                </xf:trigger>
-            </xf:group>
-            <!-- React to activation of both triggers -->
-            <xf:action ev:event="DOMActivate" type="xpath">
-                fr:run-process('oxf.fr.detail.process', 'toggle-noscript')
-            </xf:action>
-        </xf:group>
-    </xsl:template>
-
     <xsl:template match="fr:goto-content">
-        <xf:group model="fr-form-model" class="{{if (property('xxf:noscript')) then '' else 'xforms-hidden'}}">
+        <xf:group model="fr-form-model" class="xforms-hidden">
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
@@ -642,58 +587,6 @@
             frf:successMessage(xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
         </xf:action>
 
-    </xsl:template>
-
-    <!-- Noscript section help entry -->
-    <xsl:template match="fr:section[@id]" mode="noscript-help">
-        <!-- Assumption: help referred to by xf:help/@ref and XPath expression is independent on the control's context (case of Form Builder-generated forms) -->
-
-        <!-- Only display this <li> if there is at least one non-empty nested help text -->
-        <xf:group
-            ref=".[xxf:non-blank(string-join(({string-join(((descendant-or-self::fr:section | .//xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
-            <xh:li class="xforms-help-group">
-                <xf:var name="section-has-help" value="xxf:non-blank({xf:help/@ref})" as="xs:boolean"/>
-                <!-- Case where current section has help -->
-                <xf:group ref=".[$section-has-help]">
-                    <!-- Linked reachable from help icon -->
-                    <xh:a name="{@id}$$p"/>
-                    <!-- Label and help text -->
-                    <xf:output class="xforms-label" value="{xf:label/@ref}"/>: <xf:output value="{xf:help/@ref}"/>
-                    <!-- Link back to control -->
-                    <xh:a href="#{@id}" class="fr-help-back"><xf:output value="$fr-resources/summary/labels/help-back"/></xh:a>
-                </xf:group>
-                <!-- Case where current section doesn't have help -->
-                <xf:group ref=".[not($section-has-help)]">
-                    <!-- Label -->
-                    <xf:output class="xforms-label" value="{xf:label/@ref}"/>
-                </xf:group>
-                <!-- Recurse into nested controls if there is at least one non-empty nested help text -->
-                <xf:group ref=".[xxf:non-blank(string-join(({string-join((.//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
-                    <xh:ul>
-                        <xsl:apply-templates mode="#current"/>
-                    </xh:ul>
-                </xf:group>
-            </xh:li>
-        </xf:group>
-    </xsl:template>
-
-    <!-- Noscript control help entry -->
-    <xsl:template match="xf:*[@id and xf:help]" mode="noscript-help">
-        <xf:group ref=".[xxf:non-blank(({xf:help/@ref})[1])]">
-            <!-- (...)[1] protects against incorrect form where more than one node is returned -->
-            <xh:li class="xforms-help-group">
-                <!-- Linked reachable from help icon -->
-                <xh:a name="{@id}$$p"/>
-                <!-- Label and help text -->
-                <xf:output class="xforms-label" value="{xf:label/@ref}"/>: <xf:output value="{xf:help/@ref}"/>
-                <!-- Link back to the control -->
-                <xh:a href="#{@id}" class="fr-help-back"><xf:output value="$fr-resources/summary/labels/help-back"/></xh:a>
-            </xh:li>
-        </xf:group>
-    </xsl:template>
-
-    <xsl:template match="node()" mode="noscript-help">
-        <xsl:apply-templates mode="#current"/>
     </xsl:template>
 
     <!-- Error summary UI -->

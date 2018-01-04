@@ -12,8 +12,7 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <xh:head>
-        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
-                  xxf:noscript-support="false">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <text-controls>

@@ -250,7 +250,7 @@ object XFormsStaticStateImpl {
 
   // Create analyzed static state for the given XForms document.
   // Used by unit tests.
-  def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
+  def createFromDocument(formDocument: Document): XFormsStaticState = {
 
     val startScope = new Scope(None, "")
 
@@ -267,12 +267,12 @@ object XFormsStaticStateImpl {
       )
     }
 
-    createFromDocument(formDocument, startScope, create)
+    createFromDocument(formDocument, startScope, create)._2
   }
 
   // Create template and analyzed part for the given XForms document.
   // Used by xxf:dynamic.
-  def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope) =
+  def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope): (SAXStore, PartAnalysisImpl) =
     createFromDocument(formDocument, startScope, (staticStateDocument: Document, digest: String, metadata: Metadata, _) ⇒ {
       val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
       part.analyze()
@@ -382,25 +382,12 @@ object XFormsStaticStateImpl {
     (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
   }
 
-  def isStoreNoscriptTemplate(nonDefaultProperties: collection.Map[String, String]) = {
-
-    def defaultPropertyValueAsString(propertyName: String) =
-      P.getPropertyDefinition(propertyName).defaultValue.toString
-
-    def propertyAsString(propertyName: String) =
-      nonDefaultProperties.getOrElse(propertyName, defaultPropertyValueAsString(propertyName))
-
-    propertyAsString(P.NOSCRIPT_SUPPORT_PROPERTY).toBoolean &&
-      propertyAsString(P.NOSCRIPT_TEMPLATE) == P.NOSCRIPT_TEMPLATE_STATIC_VALUE
-  }
-
   // Represent the static state XML document resulting from the extractor
   //
   // - The underlying document produced by the extractor used to be further transformed to extract various documents.
   //   This is no longer the case and the underlying document should be considered immutable (it would be good if it
   //   was in fact immutable).
-  // - The template, when kept for full update marks, is stored in the static state document as Base64. In noscript
-  //   mode, it is stored in the dynamic state.
+  // - The template, when kept for full update marks, is stored in the static state document as Base64.
   class StaticStateDocument(val xmlDocument: Document) {
 
     require(xmlDocument ne null)

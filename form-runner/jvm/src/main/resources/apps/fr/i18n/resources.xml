@@ -171,7 +171,6 @@
                 <free-search>Free Search</free-search>
                 <any>[Any]</any>
                 <script>Full Version</script>
-                <noscript>Accessible Version</noscript>
                 <refresh>Refresh</refresh>
                 <close-box>[close]</close-box>
                 <help-back>Back</help-back>
@@ -505,7 +504,6 @@
                 <free-search>Recherche libre</free-search>
                 <any>[Tous]</any>
                 <script>Version complète</script>
-                <noscript>Version accessible</noscript>
                 <refresh>Rafraîchir</refresh>
                 <close-box>[fermer]</close-box>
                 <help-back>Retour</help-back>
@@ -831,7 +829,6 @@
                 <free-search>Búsqueda Libre</free-search>
                 <any>Cualquiera</any>
                 <script>Versión Completa</script>
-                <noscript>Version Accesible</noscript>
                 <refresh>Actualizar</refresh>
                 <close-box>Cerrar</close-box>
                 <help-back>Anterior</help-back>
@@ -1153,7 +1150,6 @@
                 <free-search>Fritekstsøk</free-search>
                 <any>[Vilkårlig]</any>
                 <script>Full versjon</script>
-                <noscript>Tilgjengelig versjon</noscript>
                 <refresh>Oppdater</refresh>
                 <close-box>[lukk]</close-box>
                 <help-back>Tilbake</help-back>
@@ -1471,7 +1467,6 @@
                 <free-search>Поиск</free-search>
                 <any>[Что угодно]</any>
                 <script>Полная версия</script>
-                <noscript>Упрощенная версия</noscript>
                 <refresh>Обновить</refresh>
                 <close-box>[закрыть]</close-box>
                 <help-back>Назад</help-back>
@@ -1794,7 +1789,6 @@
                 <free-search>Ricerca libera</free-search>
                 <any>[Tutti]</any>
                 <script>Versione completa</script>
-                <noscript>Versione accessibile</noscript>
                 <refresh>Aggiorna</refresh>
                 <close-box>[chiudi]</close-box>
                 <help-back>Indietro</help-back>
@@ -2124,7 +2118,6 @@
                 <free-search>Freie Suche</free-search>
                 <any>[Alle]</any>
                 <script>Vollversion</script>
-                <noscript>Verfügbare Version</noscript>
                 <refresh>Aktualisieren</refresh>
                 <close-box>[Schließen]</close-box>
                 <help-back>Zurück</help-back>
@@ -2454,7 +2447,6 @@
                 <free-search>Vapaa haku</free-search>
                 <any>[mikä tahansa]</any>
                 <script>Täysi versio</script>
-                <noscript>Helppokäyttöinen versio</noscript>
                 <refresh>Lataa sivu uudelleen</refresh>
                 <close-box>[sulje]</close-box>
                 <help-back>Paluu</help-back>
@@ -2784,7 +2776,6 @@
                 <free-search>Fri sökning</free-search>
                 <any>[Alla]</any>
                 <script>Fullständig version</script>
-                <noscript>Tillgänglig version</noscript>
                 <refresh>Visa på nytt</refresh>
                 <close-box>[stäng]</close-box>
                 <help-back>Tillbaka</help-back>
@@ -3114,7 +3105,6 @@
                 <free-search>Vrij zoeken</free-search>
                 <any>[Elke]</any>
                 <script>Volledige versie</script>
-                <noscript>Toegankelijke versie</noscript>
                 <refresh>Verversen</refresh>
                 <close-box>[sluiten]</close-box>
                 <help-back>Terug</help-back>
@@ -3444,7 +3434,6 @@
                 <free-search>Pesquisa Livre</free-search>
                 <any>[Qualquer]</any>
                 <script>Versão Completa</script>
-                <noscript>Versão acessível</noscript>
                 <refresh>Refrescar</refresh>
                 <close-box>[fechar]</close-box>
                 <help-back>Voltar</help-back>

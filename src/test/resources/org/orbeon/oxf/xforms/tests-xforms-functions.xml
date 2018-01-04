@@ -2707,45 +2707,6 @@
         </output>
     </test>
 
-    <test description="xxf:noscript dynamic property" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model" xxf:noscript-support="true" xxf:noscript="{instance()/noscript}">
-                        <xf:instance id="instance">
-                            <instance>
-                                <noscript>true</noscript>
-                                <property-name>xxf:noscript</property-name>
-                            </instance>
-                        </xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:output id="output1" value="property('xxf:noscript')"/>
-                    <xf:output id="output2" value="property(instance()/property-name)"/>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <xxf:event-response>
-                <xxf:dynamic-state>
-                    <dynamic-state/>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="output1">
-                            <xxf:value>true</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="output2">
-                            <xxf:value>true</xxf:value>
-                        </xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
     <test description="#2642: xxf:binding-context() function within repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

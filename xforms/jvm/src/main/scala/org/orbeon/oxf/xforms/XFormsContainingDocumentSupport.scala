@@ -42,7 +42,7 @@ import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactor
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, RequestParameters, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
@@ -129,7 +129,6 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     with ContainingDocumentMisc
     with ContainingDocumentUpload
     with ContainingDocumentEvent
-    with ContainingDocumentTemplate
     with ContainingDocumentProperties
     with ContainingDocumentRequestStats
     with ContainingDocumentRequest
@@ -253,29 +252,6 @@ trait ContainingDocumentEvent {
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
 }
 
-trait ContainingDocumentTemplate extends Logging {
-
-  implicit def indentedLogger: IndentedLogger
-  def getStaticState: XFormsStaticState
-  def noscript: Boolean
-
-  private var _template: Option[AnnotatedTemplate] = None
-
-  // The page template if available. Only for noscript mode.
-  def getTemplate = _template
-
-  // Whether to keep the annotated template in the document itself (dynamic state)
-  // See: http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-state-handling#TOC-Handling-of-the-HTML-template
-  def setTemplateIfNeeded(template: AnnotatedTemplate): Unit = {
-
-    _template = noscript && getStaticState.template.isEmpty option template |!>
-      (t ⇒ debug("keeping XHTML tree", List("approximate size (bytes)" → t.saxStore.getApproximateSize.toString)))
-  }
-
-  def restoreTemplate(dynamicState: DynamicState): Unit =
-    _template = dynamicState.decodeAnnotatedTemplate
-}
-
 trait ContainingDocumentProperties {
 
   def getStaticState: XFormsStaticState
@@ -292,7 +268,7 @@ trait ContainingDocumentProperties {
   // Used by the property() function
   def getProperty(propertyName: String): Any = propertyName match {
     case READONLY_APPEARANCE_PROPERTY ⇒ if (staticReadonly) READONLY_APPEARANCE_STATIC_VALUE else READONLY_APPEARANCE_DYNAMIC_VALUE
-    case NOSCRIPT_PROPERTY            ⇒ noscript
+    case NOSCRIPT_PROPERTY            ⇒ false
     case ENCRYPT_ITEM_VALUES_PROPERTY ⇒ encodeItemValues
     case ORDER_PROPERTY               ⇒ lhhacOrder
     case _                            ⇒ getStaticState.propertyMaybeAsExpression(propertyName).left.get
@@ -345,16 +321,6 @@ trait ContainingDocumentProperties {
     dynamicProperty(
       READONLY_APPEARANCE_PROPERTY,
       _ == READONLY_APPEARANCE_STATIC_VALUE
-    )
-
-  def noscript =
-    dynamicProperty(
-      NOSCRIPT_PROPERTY,
-      s ⇒
-        if (staticBooleanProperty(NOSCRIPT_SUPPORT_PROPERTY))
-          s.toBoolean |!> (Version.instance.isPEFeatureEnabled(_, NOSCRIPT_PROPERTY))
-        else
-          false
     )
 
   def encodeItemValues =

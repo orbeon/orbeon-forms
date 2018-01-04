@@ -28,7 +28,7 @@ import org.scalatest.junit.AssertionsForJUnit
 object XFormsStaticStateTest {
 
   def getStaticState(documentURL: String): XFormsStaticState =
-    XFormsStaticStateImpl.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))._2
+    XFormsStaticStateImpl.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
   def withRefresh[T](thunk: ⇒ T)(implicit dependencies: XPathDependencies): T = {
     dependencies.refreshStart()

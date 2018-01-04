@@ -96,12 +96,10 @@ class XHTMLHeadHandler(
     // Stylesheets
     val attributesImpl = new AttributesImpl
 
-
-
     outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, styles, baselineStyles)
 
     // Scripts
-    if (! xformsHandlerContext.isNoScript) {
+    locally {
 
       // Main JavaScript resources
       outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)

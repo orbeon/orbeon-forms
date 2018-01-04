@@ -30,7 +30,6 @@ import scala.util.Try
 
 trait FormRunnerBaseOps {
 
-  val NoscriptParam         = "fr-noscript"
   val LanguageParam         = "fr-language"
   val EmbeddableParam       = "orbeon-embeddable"
 
@@ -223,7 +222,7 @@ trait FormRunnerBaseOps {
   // Captcha support
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
-  def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+  def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
@@ -260,7 +259,6 @@ trait FormRunnerBaseOps {
   def isDesignTime: Boolean = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
   def isReadonlyMode = ReadonlyModes(FormRunner.FormRunnerParams().mode)
 
-  def isNoscript: Boolean = inScopeContainingDocument.noscript
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
   // The standard Form Runner parameters

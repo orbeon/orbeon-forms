@@ -37,7 +37,7 @@
     </p:processor>
 
     <p:choose href="#request-info">
-        <!-- Check for noscript mode form post OR script form post for replace="all" -->
+        <!-- Check for script form post for `replace="all"` -->
         <!-- NOTE: In portlet mode, the method and content-type are not available (not sure why), so just assume checking for the content type is enough -->
         <p:when
             test="
@@ -50,7 +50,6 @@
                     ) or
                         /*/container-type = 'portlet'
                 ) and (
-                    /*/parameters/parameter[name = '$noscript']/value = 'true' or
                     /*/parameters/parameter[name = '$server-events']
                 )">
             <!-- Process submission -->

@@ -45,7 +45,6 @@ trait XFormsStateLifecycle {
 
   def afterInitialResponse(
     containingDocument   : XFormsContainingDocument,
-    template             : AnnotatedTemplate,
     disableDocumentCache : Boolean
   ): Unit
 

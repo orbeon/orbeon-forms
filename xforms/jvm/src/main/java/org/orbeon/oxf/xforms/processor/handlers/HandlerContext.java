@@ -55,8 +55,6 @@ public class HandlerContext {
     private final String helpElementName;
     private final String alertElementName;
 
-    public final boolean isNoscript;
-
     // Context information
     private final Stack<PartAnalysis> partAnalysisStack;
     private Stack<String> componentContextStack;
@@ -76,8 +74,6 @@ public class HandlerContext {
         this.hintElementName = containingDocument.getHintElementName();
         this.helpElementName = containingDocument.getHelpElementName();
         this.alertElementName = containingDocument.getAlertElementName();
-
-        this.isNoscript = containingDocument.noscript();
 
         // Top-level part is containing document
         this.partAnalysisStack = new Stack<PartAnalysis>();
@@ -126,10 +122,6 @@ public class HandlerContext {
 
     public String getAlertElementName() {
         return alertElementName;
-    }
-
-    final public boolean isNoScript() {
-        return isNoscript;
     }
 
     public String findXHTMLPrefix() {

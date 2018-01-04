@@ -85,16 +85,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             }
         }
 
-        // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
-        if (!xformsHandlerContext.isNoScript()) {
-            helper.element("", XMLNames.XIncludeURI(), "include", new String[] {
-                    "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
-                    "fixup-xml-base", "false"
-            });
-        }
+        helper.element("", XMLNames.XIncludeURI(), "include", new String[] {
+            "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
+            "fixup-xml-base", "false"
+        });
 
-        final StringBuilder sb = new StringBuilder("xforms-form");
-        sb.append(xformsHandlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
+        final StringBuilder sb = new StringBuilder("xforms-form xforms-initially-hidden");
 
         // LHHA appearance classes
         //
@@ -126,8 +122,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 "class", sb.toString(),
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
-                // In noscript mode, don't add event handler
-                "onsubmit", xformsHandlerContext.isNoScript() ? null : "return false",
+                "onsubmit", "return false",
                 doMultipartPOST ? "enctype" : null, doMultipartPOST ? "multipart/form-data" : null});
 
         {
@@ -139,7 +134,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             //
             // - 2nd phase of replace="all" submission: we don't (and can't) retry
             // - background upload: we don't want a sequence number as this run in parallel
-            // - noscript mode: we don't (and can't) retry
             //
             // NOTE: Keep empty static state and dynamic state until client is able to deal without them
             final Option<String> clientEncodedStaticStateOpt = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
@@ -154,7 +148,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
         }
 
-        if (!xformsHandlerContext.isNoScript()) {
+        {
             // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
@@ -203,14 +197,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                         "xforms-select1-full-template", "$xforms-item-name$", false, "radio");
             }
 
-        } else {
-            // Noscript mode
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$noscript", "value", "true"
-            });
-
-            // Noscript error panel
-            XFormsError.outputNoscriptErrorPanel(containingDocument, helper, htmlPrefix);
         }
     }
 
@@ -296,12 +282,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", ANY_MATCHER);
 
         // xf:trigger
-        final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) {
-            public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                // in noscript mode, use the full appearance
-                return ! containingDocument.noscript() && super.doesMatch(attributes, handlerContext);
-            }
-        };
+        final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
         controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", ANY_MATCHER);
 
@@ -359,10 +340,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Other controls
         controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea", ANY_MATCHER);
-        if (!containingDocument.noscript())
-            controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
-        else
-            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
+        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
 
         // xf:select and xf:select1
         controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select",

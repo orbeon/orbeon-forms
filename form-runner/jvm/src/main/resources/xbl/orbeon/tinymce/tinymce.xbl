@@ -102,8 +102,7 @@
                 name="script"
                 value="
                     not(
-                        xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or
-                        property('xxf:noscript')
+                        xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'
                     )"/>
 
             <xf:group ref=".[$script]" xxf:element="div">

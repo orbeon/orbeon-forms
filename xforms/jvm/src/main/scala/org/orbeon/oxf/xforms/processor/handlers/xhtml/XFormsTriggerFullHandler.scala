@@ -27,8 +27,6 @@ import org.xml.sax.helpers.AttributesImpl
 
 /**
  * Default full appearance (button).
- *
- * This can also be the "pseudo-minimal" appearance for noscript mode.
  */
 class XFormsTriggerFullHandler(
   uri            : String,
@@ -49,20 +47,7 @@ class XFormsTriggerFullHandler(
     val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
-    if (xformsHandlerContext.isNoScript) {
-      // Noscript mode: we need a name to detect activation
-      addAttribute(containerAttributes, "name", getEffectiveId)
-
-      // We need a value so we can detect an activated button with IE 7
-      // NOTE: IE 6/7 sends the <button> content as value instead of the value attribute!
-      addAttribute(containerAttributes, "value", "activate")
-
-      // In JS-free mode, all buttons are submit inputs or image inputs
-      addAttribute(containerAttributes, "type", "submit")
-    } else {
-      // Script mode: a button without value
-      addAttribute(containerAttributes, "type", "button")
-    }
+    addAttribute(containerAttributes, "type", "button")
 
     // Disabled attribute when needed
     val disabled = isHTMLDisabled(triggerControl)
@@ -70,16 +55,7 @@ class XFormsTriggerFullHandler(
       outputDisabledAttribute(containerAttributes)
 
     // Determine bootstrap classes, which go on the <button> element
-    // NOTE: It seems we don't need the .disabled class (if (disabled) List("disabled") else Nil).
-    def isNoscriptMinimal =
-      xformsHandlerContext.isNoScript && XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
-
-    val bootstrapClasses = "btn" :: (
-      if (isNoscriptMinimal)
-        "btn-link" :: Nil
-      else
-        XFormsControl.appearances(elementAnalysis) flatMap BootstrapAppearances.get toList
-    )
+    val bootstrapClasses = "btn" :: (XFormsControl.appearances(elementAnalysis) flatMap BootstrapAppearances.get toList)
 
     // xh:button or xh:input
     val elementName = "button"

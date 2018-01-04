@@ -48,17 +48,6 @@
     <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', ''))"          as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$mode = 'summary'"                             as="xs:boolean"/>
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"         as="xs:boolean"/>
-    <xsl:variable name="is-noscript-support" select="$fr-form-model/@xxf:noscript-support = 'true'" as="xs:boolean"/>
-
-    <xsl:variable
-        name="is-noscript"
-        as="xs:boolean"
-        select="
-            doc('input:request')/request/parameters/parameter[
-                name = 'fr-noscript'
-            ]/value = 'true'
-                and
-            $is-noscript-support"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
@@ -69,8 +58,6 @@
         select="version:versionStringIfAllowedOrEmpty()"
         xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
-    <xsl:variable name="has-noscript-link"    select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))"                             as="xs:boolean?"/>
-    <xsl:variable name="is-noscript-table"    select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
     <xsl:variable name="min-toc"              select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]"                       as="xs:integer"/>
     <xsl:variable name="has-toc"              select="$min-toc ge 0"                                                                                   as="xs:boolean"/>
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
@@ -219,23 +206,18 @@
     <!-- fr:section and fr:grid configuration -->
     <xsl:variable
         name="is-ajax-section-animate"
-        select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"
+        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"
         as="xs:boolean"/>
 
     <xsl:variable
         name="is-fr-section-animate"
         as="xs:boolean"
-        select="not($is-noscript) and not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"/>
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-animate-sections"
         as="xs:boolean"
         select="$is-ajax-section-animate and $is-fr-section-animate"/>
-
-    <xsl:variable
-        name="is-noscript-section-collapse"
-        as="xs:boolean"
-        select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-ajax-section-collapse"
@@ -248,23 +230,9 @@
         select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.')) = false())"/>
 
     <xsl:variable
-        name="is-fr-section-noscript-collapsible"
-        as="xs:boolean"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapsible', $app, $form), '.')) = false())"/>
-
-    <xsl:variable
         name="is-section-collapsible"
         as="xs:boolean"
-        select="
-            (
-                not($is-noscript)             and
-                $is-ajax-section-collapse     and
-                $is-fr-section-collapsible
-            ) or (
-                $is-noscript                  and
-                $is-noscript-section-collapse and
-                $is-fr-section-noscript-collapsible
-            )"/>
+        select="$is-ajax-section-collapse and $is-fr-section-collapsible"/>
 
     <xsl:variable
         name="section-appearance"
@@ -360,11 +328,9 @@
             <xsl:apply-templates select="node() except (xh:title | xh:link | xh:style)"/>
 
             <!-- Form Runner JavaScript (standard and custom) -->
-            <xsl:if test="not($is-noscript)">
-                <xsl:for-each select="$js-uri">
-                    <xh:script type="text/javascript" src="{.}"/>
-                </xsl:for-each>
-            </xsl:if>
+            <xsl:for-each select="$js-uri">
+                <xh:script type="text/javascript" src="{.}"/>
+            </xsl:for-each>
         </xsl:copy>
     </xsl:template>
 
@@ -394,21 +360,17 @@
                     normalize-space(xxf:instance('fr-form-attachments')/pdf) != ''
                 )
             }}"
-            xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
             xxf:order="{{
-                if (property('xxf:noscript')) then
-                    'label control alert hint help'
-                else
-                    xxf:property(
-                        string-join(
-                            (
-                                'oxf.fr.detail.lhha-order',
-                                fr:app-name(),
-                                fr:form-name()
-                            ),
-                            '.'
-                        )
+                xxf:property(
+                    string-join(
+                        (
+                            'oxf.fr.detail.lhha-order',
+                            fr:app-name(),
+                            fr:form-name()
+                        ),
+                        '.'
                     )
+                )
             }}"
             xxf:host-language="{{
                 for $mode in fr:mode()
@@ -427,7 +389,6 @@
                 :)
                 starts-with(xxf:get-request-path(), '/fr/service/')
             }}"
-            xxf:noscript-support="{$is-noscript-support}"
             xxf:external-events="{@xxf:external-events}"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xforms11-switch="false"
@@ -669,10 +630,8 @@
 
         </xsl:copy>
 
-        <xsl:if test="not($is-noscript)">
-            <!-- Handle checking dirty status -->
-            <xi:include href="oxf:/apps/fr/includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
-        </xsl:if>
+        <!-- Handle checking dirty status -->
+        <xi:include href="oxf:/apps/fr/includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
 
     </xsl:template>
 

@@ -248,7 +248,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             // Notify state manager
             XFormsAPI.withContainingDocumentJava(containingDocument[0], new Runnable() { // scope because dynamic properties can cause lazy XPath evaluations
                 public void run() {
-                    XFormsStateManager.instance().afterInitialResponse(containingDocument[0], stage2CacheableState.template, false);
+                    XFormsStateManager.instance().afterInitialResponse(containingDocument[0], false);
                 }
             });
 

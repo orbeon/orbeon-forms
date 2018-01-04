@@ -13,57 +13,13 @@
  */
 package org.orbeon.oxf.xforms
 
-import event.{XFormsEvents, ClientEvents}
-import org.orbeon.oxf.common.Version
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.{Assume, Test}
+import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.dom.Element
+import org.orbeon.oxf.xforms.event.ClientEvents
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.Dom4j.elemToElement
-import org.orbeon.oxf.xforms.event.ClientEvents.LocalEvent
+import org.scalatest.junit.AssertionsForJUnit
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
-
-  @Test def noscriptEventReordering(): Unit = {
-
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
-
-    this setupDocument
-      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-        <xh:head>
-          <xf:model xxf:xpath-analysis="true">
-            <xf:instance id="instance">
-              <value>0</value>
-            </xf:instance>
-          </xf:model>
-        </xh:head>
-        <xh:body>
-          <xf:input id="input" ref="instance()"/>
-          <xf:trigger id="trigger"><xf:label/></xf:trigger>
-        </xh:body>
-      </xh:html>
-
-    val events: List[Element] = List(
-      <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>,
-      <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>
-    )
-
-    val expected: List[Element] = List(
-      <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>,
-      <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>
-    )
-
-    val result = ClientEvents.reorderNoscriptEvents(events map (LocalEvent(_, trusted = false)), document)
-
-    assert(expected.size === result.size)
-    for ((left, right) ← expected zip result)
-    yield
-      assert(Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right.elementForDebug))
-  }
 
   @Test def adjustIdForRepeatIteration(): Unit = {
 

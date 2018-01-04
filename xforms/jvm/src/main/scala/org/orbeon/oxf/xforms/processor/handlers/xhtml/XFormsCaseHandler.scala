@@ -66,7 +66,7 @@ class XFormsCaseHandler(
     currentSavedOutput = controller.getOutput
 
     // Place interceptor if needed
-    if (! xformsHandlerContext.isNoScript) {
+    locally {
       isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
       // Classes on top-level elements and characters and on the first delimiter
@@ -116,9 +116,7 @@ class XFormsCaseHandler(
       }
       currentOutputInterceptor.setAddedClasses(controlClasses)
       controller.setOutput(new DeferredXMLReceiverImpl(currentOutputInterceptor))
-    } else if (! isVisible)
-      // Case not visible, set output to a black hole
-      controller.setOutput(new DeferredXMLReceiverAdapter)
+    }
 
     xformsHandlerContext.pushCaseContext(isVisible)
   }
@@ -126,7 +124,7 @@ class XFormsCaseHandler(
   protected override def handleControlEnd(): Unit = {
     xformsHandlerContext.popCaseContext()
 
-    if (! xformsHandlerContext.isNoScript) {
+    locally {
       currentOutputInterceptor.flushCharacters(true, true)
       if (isMustGenerateBeginEndDelimiters) {
         // Make sure first delimiter was output

@@ -2626,9 +2626,6 @@ TODO:
 
 TODO: More tests of client events:
 
-# In Noscript mode
-    * events are reordered so that "activation" events come last (client might send them in another order)
-    * special handling of checkboxes blanking takes place
 # If there are contiguous value change events for a given controls, they are combined (check number of value changes)
 # If the target is within a repeat, xxforms-repeat-activate is dispatched
 # For XFormsOutput, DOMFocusIn translates into:

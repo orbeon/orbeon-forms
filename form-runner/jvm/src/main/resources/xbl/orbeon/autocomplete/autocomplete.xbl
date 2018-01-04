@@ -193,7 +193,7 @@
 
                         <!-- Variable pointing to external single-node binding -->
                         <xf:var name="binding" value="xxf:binding('fr-autocomplete')"/>
-                        <xf:var name="script"  value="not(xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+                        <xf:var name="script"  value="not(xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static')"/>
 
                         <xf:var name="local" value="instance('local')"/>
                         <xf:var name="dynamic-itemset-attribute" xbl:attr="xbl:text=dynamic-itemset"/>

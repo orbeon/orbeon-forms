@@ -81,13 +81,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     val allClientAndServerEvents = {
 
-      // Process events for noscript mode if needed
-      val clientEventsAfterNoscript =
-        if (doc.noscript)
-          reorderNoscriptEvents(clientEvents, doc)
-        else
-          clientEvents
-
       // Decode encrypted server events
       def decodeServerEvents(text: String) =
         Dom4j.elements(EncodeDecode.decodeXML(text, true).getRootElement, XXFORMS_EVENT_QNAME) map
@@ -98,7 +91,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Gather all events including decoding action server events
       globalServerEvents ++ (
-        clientEventsAfterNoscript flatMap {
+        clientEvents flatMap {
           case event if event.name == XXFORMS_SERVER_EVENTS ⇒ decodeServerEvents(event.value)
           case event                                        ⇒ List(event)
         }
@@ -163,66 +156,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     }
 
     EventsFindings(gotAllEvents, valueChangeControlIdsAndValues.toMap, clientFocusControlIdOpt)
-  }
-
-  // NOTE: Leave public for unit tests
-  def reorderNoscriptEvents(eventElements: List[LocalEvent], doc: XFormsContainingDocument): List[LocalEvent] = {
-
-    // Event categories
-    sealed trait EventCategory
-    case object Other       extends EventCategory
-    case object ValueChange extends EventCategory
-    case object SelectBlank extends EventCategory
-    case object Activation  extends EventCategory
-
-    // All categories in the order we want them
-    val AllCategories: List[EventCategory] = List(Other, ValueChange, SelectBlank, Activation)
-
-    // Group events in 3 categories
-    def getEventCategory(event: LocalEvent): EventCategory = event match {
-      // Special event for noscript mode
-      case event if event.name == XXFORMS_VALUE_OR_ACTIVATE ⇒
-        if (doc.getStaticOps.isValueControl(event.targetEffectiveId))
-          // This is a value event
-          ValueChange
-        else
-          // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
-          // to the end so that value change events are committed to instance data before that.
-          Activation
-      case _ ⇒
-        Other
-    }
-
-    // NOTE: map keys are not in predictable order, but map values preserve the order
-    val groups = eventElements groupBy getEventCategory
-
-    // Special handling of checkboxes blanking in noscript mode
-    val blankingEvents: List[LocalEvent] = {
-
-      // Get set of all value change events effective ids
-      def getValueChangeIds = groups.getOrElse(ValueChange, Nil) map (_.targetEffectiveId) toSet
-
-      // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
-      def createBlankingEvent(control: XFormsControl) = {
-        val newEventElement = DocumentFactory.createElement(XXFORMS_EVENT_QNAME)
-        newEventElement.addAttribute("name", XXFORMS_VALUE_OR_ACTIVATE)
-        newEventElement.addAttribute("source-control-id", control.getEffectiveId)
-        LocalEvent(newEventElement, trusted = false)
-      }
-
-      val selectFullControls = doc.getControls.getCurrentControlTree.getSelectFullControlsAsMap
-
-      // Find all relevant and non-readonly select controls for which no value change event arrived. For each such
-      // control, create a new event that will blank its value.
-      selectFullControls.keySet -- getValueChangeIds map
-        (id ⇒ selectFullControls.getOrElse(id, null).asInstanceOf[XFormsSelectControl]) filter
-          (control ⇒ control.isRelevant && ! control.isReadonly) map
-            createBlankingEvent toList
-    }
-
-    // Return all events by category in the order we defined the categories
-    //AllCategories flatMap ((groups + (SelectBlank → blankingEvents)).get(_)) flatten
-    AllCategories flatMap (groups + (SelectBlank → blankingEvents)).get flatten
   }
 
   // Incoming ids can have the form `my-repeat⊙1` in order to target a repeat iteration. This is ambiguous without
@@ -365,8 +298,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     }
   }
 
-  // Process an incoming client event. Preprocessing for noscript and encrypted events is assumed to have taken place.
-  // This handles checking for stale controls, relevance, readonly, and special cases like xf:output.
+  // Process an incoming client event. Preprocessing for encrypted events is assumed to have taken place.
+  // This handles checking for stale controls, relevance, readonly, and special cases like `xf:output`.
   // NOTE: Leave public for unit tests
   def processEvent(doc: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
@@ -550,32 +483,21 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       else if (! checkAllowedExternalEvents)
         return None // event is not trusted and is not allowed
 
-      def mapEventName(event: LocalEvent, eventTarget: XFormsEventTarget) = event.name match {
-        // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
-        // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
-        // the static state kept type information for each control.
-        case XXFORMS_VALUE_OR_ACTIVATE ⇒
-          eventTarget match {
-            case triggerControl: XFormsTriggerControl ⇒ Some(DOM_ACTIVATE)
-            case _                                    ⇒ Some(XXFORMS_VALUE)
-          }
-        case eventName ⇒ Some(eventName)
-      }
-
       // Create event
-      mapEventName(event, eventTarget) map { eventName ⇒
+      val eventName = event.name
 
-        def standardProperties =
-          for {
-            attributeNames ← AllStandardProperties.get(eventName).toList
-            attributeName  ← attributeNames
-            attributeValue = event.attributeValue(attributeName)
-            if attributeValue ne null
-          } yield
-            attributeName → Option(attributeValue)
+      def standardProperties =
+        for {
+          attributeNames ← AllStandardProperties.get(eventName).toList
+          attributeName  ← attributeNames
+          attributeValue = event.attributeValue(attributeName)
+          if attributeValue ne null
+        } yield
+          attributeName → Option(attributeValue)
 
-        def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
+      def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
 
+      Some(
         XFormsEventFactory.createEvent(
           eventName,
           eventTarget,
@@ -583,7 +505,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           event.bubbles,
           event.cancelable
         )
-      }
+      )
     }
   }
 }

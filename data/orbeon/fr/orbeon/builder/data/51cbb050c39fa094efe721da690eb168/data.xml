@@ -12,7 +12,7 @@
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:noscript-support="true">
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
             <xf:instance id="fr-form-instance">
                 <form>
                     <contact>

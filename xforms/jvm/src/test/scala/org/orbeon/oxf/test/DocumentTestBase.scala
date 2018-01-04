@@ -34,10 +34,9 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     // Initialize once
     ResourceManagerSupport
 
-    val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
+    val staticState = XFormsStaticStateImpl.createFromDocument(xhtml)
     val doc = new XFormsContainingDocument(staticState, null, null, true)
 
-    doc.setTemplateIfNeeded(AnnotatedTemplate(template))
     doc.afterInitialResponse()
     doc.beforeExternalEvents(null)
 

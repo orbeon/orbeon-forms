@@ -40,7 +40,6 @@ case class DynamicState(
   pathMatchers        : Seq[Byte],
   focusedControl      : Option[String],
   pendingUploads      : Seq[Byte],
-  annotatedTemplate   : Option[Seq[Byte]],
   lastAjaxResponse    : Seq[Byte],
   instances           : Seq[Byte],
   controls            : Seq[Byte]
@@ -48,7 +47,6 @@ case class DynamicState(
   // Decode individual bits
   def decodePathMatchers           = fromByteSeq[List[PathMatcher]](pathMatchers)
   def decodePendingUploads         = fromByteSeq[Set[String]](pendingUploads)
-  def decodeAnnotatedTemplate      = annotatedTemplate map (AnnotatedTemplate(_))
   def decodeLastAjaxResponse       = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
   def decodeInstances              = fromByteSeq[List[InstanceState]](instances)
   def decodeControls               = fromByteSeq[List[ControlState]](controls)
@@ -62,7 +60,6 @@ case class DynamicState(
   def decodePathMatchersJava       = decodePathMatchers.asJava
   def decodeFocusedControlJava     = focusedControl.orNull
   def decodePendingUploadsJava     = decodePendingUploads.asJava
-  def decodeAnnotatedTemplateJava  = decodeAnnotatedTemplate.orNull
   def decodeLastAjaxResponseJava   = decodeLastAjaxResponse.orNull
   def decodeInstancesJava          = decodeInstances.asJava
   def decodeControlsJava           = decodeControls.asJava
@@ -156,7 +153,7 @@ case class DynamicState(
     }
 
     // Template and Ajax response
-    Seq(("template", decodeAnnotatedTemplate map (_.saxStore)), ("response", decodeLastAjaxResponse)) collect {
+    List(("response", decodeLastAjaxResponse)) collect {
       case (elementName, Some(saxStore)) ⇒
         val templateElement = rootElement.addElement(elementName)
         val document = TransformerUtils.saxStoreToDom4jDocument(saxStore)
@@ -173,7 +170,6 @@ case class DynamicState(
     println("   pendingUploads: " + pendingUploads.size)
     println("   instances: " + instances.size)
     println("   controls: " + controls.size)
-    println("   annotatedTemplate: " + (annotatedTemplate map (_.size) getOrElse 1))
     println("   lastAjaxResponse: " + lastAjaxResponse.size)
 
     val decodedParts = Array(
@@ -182,7 +178,6 @@ case class DynamicState(
       decodePendingUploadsJava,
       decodeControlsJava,
       decodeInstancesJava.toArray,
-      decodeAnnotatedTemplateJava,
       decodeLastAjaxResponseJava
     )
 
@@ -266,22 +261,21 @@ object DynamicState {
     // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
     //    be something to experiment with.
     DynamicState(
-      document.getUUID,
-      document.getSequence,
-      Option(document.getDeploymentType) map (_.toString),
-      Option(document.getRequestContextPath),
-      Option(document.getRequestPath),
-      document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
-      document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
-      Option(document.getContainerType),
-      Option(document.getContainerNamespace),
-      toByteSeq(document.getVersionedPathMatchers.asScala.toList),
-      Option(document.getControls.getFocusedControl) map (_.getEffectiveId),
-      toByteSeq(document.getPendingUploads.asScala.toSet),
-      document.getTemplate map (_.asByteSeq), // template returns its own serialization
-      toByteSeq(Option(document.getLastAjaxResponse)),
-      toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
-      toByteSeq(controlsToSerialize)
+      uuid               = document.getUUID,
+      sequence           = document.getSequence,
+      deploymentType     = Option(document.getDeploymentType) map (_.toString),
+      requestContextPath = Option(document.getRequestContextPath),
+      requestPath        = Option(document.getRequestPath),
+      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
+      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
+      containerType      = Option(document.getContainerType),
+      containerNamespace = Option(document.getContainerNamespace),
+      pathMatchers       = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
+      focusedControl     = Option(document.getControls.getFocusedControl) map (_.getEffectiveId),
+      pendingUploads     = toByteSeq(document.getPendingUploads.asScala.toSet),
+      lastAjaxResponse   = toByteSeq(Option(document.getLastAjaxResponse)),
+      instances          = toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+      controls           = toByteSeq(controlsToSerialize)
     )
   }
 

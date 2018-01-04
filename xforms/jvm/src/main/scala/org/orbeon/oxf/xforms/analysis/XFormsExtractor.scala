@@ -21,9 +21,9 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -80,7 +80,7 @@ object XFormsExtractor {
   *   <properties xxf:noscript="true" .../>
   *   <!-- Last id used (for id generation in XBL after deserialization) -->
   *   <last-id id="123"/>
-  *   <!-- Template (for full updates, possibly noscript) -->
+  *   <!-- Template (for full updates) -->
   *   <template>base64</template>
   * </static-state>
   */
@@ -188,10 +188,8 @@ class XFormsExtractor(
           // static state and since the serialization is only needed if the static state is serialized. In other
           // words, serialization of the template should be lazy.
 
-          // Remember the template (and marks if any) if:
-          // - we are in noscript mode and told to store the template statically
-          // - OR if there are top-level marks
-          if (isStoreNoscriptTemplate || metadata.hasTopLevelMarks)
+          // Remember the template (and marks if any) if there are top-level marks
+          if (metadata.hasTopLevelMarks)
             templateUnderConstructionOpt foreach { templateUnderConstruction ⇒
               withElement(localName = "template") {
                 // NOTE: At this point, the template has just received endDocument(), so is no longer under under
@@ -516,9 +514,6 @@ trait ExtractorProperties {
       element(localName = "properties", atts = newAttributes)
       xmlReceiver.endPrefixMapping("xxf")
     }
-
-  protected def isStoreNoscriptTemplate =
-    XFormsStaticStateImpl.isStoreNoscriptTemplate(unparsedLocalProperties)
 
   protected def addPropertiesIfAny(attributes: Attributes): Unit =
     for {

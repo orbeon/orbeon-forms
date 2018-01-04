@@ -33,7 +33,7 @@ class WizardTest
     it("must control strict navigation") {
 
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "wizard", "new", document = "", noscript = false, initialize = true)
+        runFormRunner("tests", "wizard", "new", document = "", initialize = true)
 
       withFormRunnerDocument(processorService, doc) {
 

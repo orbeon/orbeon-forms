@@ -2028,7 +2028,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model" xxf:noscript="false">
+                    <xf:model id="model">
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
@@ -2060,45 +2060,6 @@
                         <xh:li id="group-begin-group3" class="xforms-group-begin-end"/>
                         <xh:li>Fish</xh:li>
                         <xh:li id="group-end-group3" class="xforms-group-begin-end"/>
-                    </xh:ul>
-                </xh:span>
-            </controls>
-        </output>
-    </test>
-
-    <test description="#90: Noscript: empty TOC items appear for non-visible sections (noscript mode)" name="oxf:pipeline" edition="pe">
-        <!-- See: https://github.com/orbeon/orbeon-forms/issues/90 -->
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model" xxf:noscript-support="true" xxf:noscript="true">
-                        <xf:instance id="instance">
-                            <instance/>
-                        </xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:group id="group1">
-                        <xh:ul>
-                            <xh:li>Cat</xh:li>
-                            <xf:group ref="()" id="group2">
-                                <xh:li>Dog</xh:li>
-                            </xf:group>
-                            <xf:group ref="." id="group3">
-                                <xh:li>Fish</xh:li>
-                            </xf:group>
-                        </xh:ul>
-                    </xf:group>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <controls>
-                <xh:span id="group1" class="xforms-group">
-                    <xh:ul>
-                        <xh:li>Cat</xh:li>
-                        <xh:li>Fish</xh:li>
                     </xh:ul>
                 </xh:span>
             </controls>

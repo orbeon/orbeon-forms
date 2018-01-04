@@ -54,7 +54,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
                 "resource",                 p2.actionOrResource(),
-                "noscript",                 Boolean.toString(p.isNoscript()),
                 "is asynchronous",          Boolean.toString(p2.isAsynchronous()),
                 "container type",           request.getContainerType(),
                 "norewrite",                Boolean.toString(p.urlNorewrite()),
@@ -85,14 +84,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "resource URL has protocol", "resource", p2.actionOrResource());
-            return false;
-        }
-
-        // TODO: why is this condition here?
-        if (p.isNoscript()) {
-            if (isDebugEnabled)
-                indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
-                        "reason", "noscript mode enabled");
             return false;
         }
 

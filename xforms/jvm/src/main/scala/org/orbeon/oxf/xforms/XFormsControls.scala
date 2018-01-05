@@ -198,11 +198,8 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
             // dispatched.
 
             // `None` if bindings are clean
-
-            for {
-              updater ← updateControlBindings()
-            } yield
-              (updater, gatherControlsForRefresh)
+            for (updater ← updateControlBindings())
+              yield updater → gatherControlsForRefresh
 
           } finally {
 

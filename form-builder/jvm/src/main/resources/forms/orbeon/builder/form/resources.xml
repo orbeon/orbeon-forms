@@ -5322,10 +5322,10 @@
             <hint>Das Logo erscheint oberhalb des Formulars</hint>
         </logo>
         <general-settings>
-            <label todo="true">[General Settings]</label>
+            <label>Allgemeine Einstellungen</label>
         </general-settings>
         <custom-settings>
-            <label todo="true">[Custom Settings]</label>
+            <label>Erweiterte Einstellungen</label>
         </custom-settings>
         <!-- Toolbox -->
         <cut>
@@ -5338,25 +5338,25 @@
             <label>Einfügen</label>
         </paste>
         <undo-redo>
-            <undo todo="true">[Undo {0}]</undo>
-            <redo todo="true">[Redo {0}]</redo>
-            <insert>[insert]</insert>
-            <rename todo="true">[rename]</rename>
-            <delete-control todo="true">[delete control]</delete-control>
-            <delete-container todo="true">[delete container]</delete-container>
-            <merge-section-template todo="true">[merge section template]</merge-section-template>
-            <move-control todo="true">[move control]</move-control>
-            <move-container todo="true">[move container]</move-container>
-            <update-settings todo="true">[update settings]</update-settings>
-            <insert-control todo="true">[insert control]</insert-control>
-            <insert-section todo="true">[insert section]</insert-section>
-            <insert-grid todo="true">[insert grid]</insert-grid>
-            <delete-row todo="true">[delete row]</delete-row>
-            <insert-row todo="true">[insert row]</insert-row>
-            <control-settings todo="true">[control settings]</control-settings>
+            <undo>Rückgängig {0}</undo>
+            <redo>Wiederherstellen {0}</redo>
+            <insert>Einfügen</insert>
+            <rename>Umbenennen</rename>
+            <delete-control>Steuerelement entfernen</delete-control>
+            <delete-container>Container entfernen</delete-container>
+            <merge-section-template>Abschnittsvorlagen zusammenführen</merge-section-template>
+            <move-control>Steuerelement verschieben</move-control>
+            <move-container>Container verschieben</move-container>
+            <update-settings>Einstellungen aktualisieren</update-settings>
+            <insert-control>Steuerelement einfügen</insert-control>
+            <insert-section>Abschnitt einfügen</insert-section>
+            <insert-grid>Tabelle einfügen</insert-grid>
+            <delete-row>Zeile entfernen</delete-row>
+            <insert-row>Zeile einfügen</insert-row>
+            <control-settings>Steuerelement-Einstellungen</control-settings>
         </undo-redo>
         <merge-section>
-            <label todo="true">[Merge Section Template]</label>
+            <label>Abschnittsvorlage zusammenführen</label>
         </merge-section>
         <form-structure>
             <label>Struktur des Formulars</label>
@@ -5374,7 +5374,7 @@
             <label>Erweitert</label>
         </advanced>
         <attachments>
-            <label todo="true">[Attachments]</label>
+            <label>Anhänge</label>
         </attachments>
         <services-actions>
             <label>Dienste &amp; Aktionen</label>
@@ -5461,22 +5461,22 @@
             <label>Auswahlmöglichkeiten bearbeiten</label>
         </edit-items>
         <expand-horizontally-icon>
-            <label todo="true">[Expand horizontally]</label>
+            <label>Horizontal erweitern</label>
         </expand-horizontally-icon>
         <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
+            <label>Horizontal schrumpfen</label>
         </shrink-horizontally-icon>
         <expand-vertically-icon>
-            <label todo="true">[Expand vertically]</label>
+            <label>Vertikal erweitern</label>
         </expand-vertically-icon>
         <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
+            <label>Vertikal schrumpfen</label>
         </shrink-vertically-icon>
         <delete-control-icon>
             <label>Steuerelement löschen</label>
         </delete-control-icon>
         <move-icon>
-            <label todo="true">[Drag &amp; drop to move or copy]</label>
+            <label>Per Drag &amp; drop verschieben oder kopieren</label>
         </move-icon>
         <delete-grid-icon>
             <label>Raster löschen</label>
@@ -5543,9 +5543,9 @@
             <label>Benutzerdefinierte CSS-Klassen</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
+            <item id="0">Standard verwenden</item>
+            <item id="1">Immer</item>
+            <item id="2">Nie</item>
         </default-always-never>
         <!-- Dialogs -->
         <continue>
@@ -5570,7 +5570,7 @@
             <label>Formulareinstellungen</label>
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
-            <options todo="true">[Form Options]</options>
+            <options>Formulareinstellungen</options>
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
@@ -5579,46 +5579,46 @@
             <controls>Steuerelemente</controls>
             <all>Alle</all>
             <singleton>
-                <label todo="true">[Singleton form]</label>
-                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+                <label>Nur eine einzige Formularinstanz erlauben</label>
+                <hint>Verhindert, dass Benutzer weitere Formulare dieses Typs erstellen, wenn sie bereits Zugriff auf ein Formular dieses Typs haben</hint>
             </singleton>
             <wizard>
-                <label todo="true">[Wizard View]</label>
-                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+                <label>Wizard-Ansicht</label>
+                <hint>Zeigt die Haupt-Abschnitte als einzelne Seiten zum durchblättern</hint>
             </wizard>
             <wizard-mode>
-                <label todo="true">[Wizard Navigation Validation Mode]</label>
-                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
-                <item todo="true" id="1">[Free]</item>
-                <item todo="true" id="2">[Lax]</item>
-                <item todo="true" id="3">[Strict]</item>
+                <label>Wizard-Navigation: Validierungsmodus</label>
+                <hint>Wie soll sich die Wizard-Navigation verhalten, wenn die Daten ungültig sind?</hint>
+                <item id="0">Standard-Einstellung</item>
+                <item id="1">Frei</item>
+                <item id="2">Lax</item>
+                <item id="3">Streng</item>
             </wizard-mode>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
-                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+                <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
+                <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
-                <label todo="true">[Maximum Aggregate Attachment Size]</label>
-                <hint todo="true">[Applies to all attachment controls in this form]</hint>
+                <label>Maximale Dateigröße aller Anhänge</label>
+                <hint>Beinhaltet alle Steuerelemente dieses Formulars</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed File Types]</label>
-                <hint todo="true">[For example "image/* application/pdf"]</hint>
+                <label>Erlaubte Dateitypen</label>
+                <hint>Zum Beispiel "image/* application/pdf"</hint>
             </attachment-mediatypes>
             <labels>
-                <label todo="true">[Appearance of Control Labels]</label>
+                <label>Anzeige der Steuerelement-Titel</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of Control Hints]</label>
+                <label>Anzeige der Steuerelement-Hinweise</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
-                <item todo="true" id="1">[Inline]</item>
-                <item todo="true" id="2">[Tooltip]</item>
+                <item id="0">Standard-Einstellung</item>
+                <item id="1">Inline</item>
+                <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label>Platzhalter für Textfelder und mehrzeilige Textfelder benutzen</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -5626,7 +5626,7 @@
             <tab-base><label>Grundeinstellungen</label></tab-base>
             <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
             <tab-formulas><label>Formeln</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
+            <tab-label-hint><label>Beschriftung und Hinweis</label></tab-label-hint>
             <tab-help><label>Hilfsnachricht</label></tab-help>
             <control-name>
                 <label>Steuerelementname</label>
@@ -5652,28 +5652,28 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
-                    <label>[Email Carbon Copy Recipient]</label>
+                    <label>E-Mail CC Empfänger</label>
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <label>E-Mail BCC Empfänger</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
-                    <label>[Email Sender]</label>
+                    <label>E-Mail Absender</label>
                     <value>fr-email-sender</value>
                 </item>
                 <item>
-                    <label todo="true">[Include as Email Attachment]</label>
+                    <label>Als E-Mail Anhang einfügen</label>
                     <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
-                <label todo="true">[Control Appearance]</label>
+                <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
             <whitespace>
                 <item>
-                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <label>Leerzeich davor und danach entfernen</label>
                     <value>trim</value>
                 </item>
             </whitespace>
@@ -5728,7 +5728,7 @@
                         <type label="Tag">gDay</type>
                     </choices>
                     <choices>
-                        <label>XML Types</label>
+                        <label>XML Typen</label>
                         <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
@@ -5762,28 +5762,28 @@
                 <hint>Ob die Eingabe erforderlich ist</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nein</item>
-                <item id="2" todo="true">XPath</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
-                <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Maximum Length]</item>
-                <item id="min-length" todo="true">[Minimum Length]</item>
-                <item id="positive" todo="true">[Positive]</item>
-                <item id="non-negative" todo="true">[Positive or Zero]</item>
-                <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Negative]</item>
-                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
-                <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
-                <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="formula">Formel</item>
+                <item id="max-length">Maximale Länge</item>
+                <item id="min-length">Minimale Länge</item>
+                <item id="positive">Positiv</item>
+                <item id="non-negative">Positiv oder Null</item>
+                <item id="non-positive">Negativ oder Null</item>
+                <item id="negative">Negativ</item>
+                <item id="fraction-digits">Maximale Nachkommastellen</item>
+                <item id="upload-max-size">Maximale Größe des Dateianhangs</item>
+                <item id="upload-mediatypes">Erlaubte Dateitypen</item>
             </constraint>
             <formula>
-                <label todo="true">[Formula]</label>
+                <label>Formel</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck</hint>
             </formula>
             <integer-argument>
-                <label todo="true">[Integer Value]</label>
-                <alert todo="true">[Incorrect Value]</alert>
+                <label>Ganzzahl</label>
+                <alert>Ungültige Ganzzahl</alert>
             </integer-argument>
             <visibility>
                 <label>Sichtbarkeit</label>
@@ -5806,10 +5806,10 @@
                 <hint>XPath-Ausdruck</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label>Beschriftung</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label>Hinweis</label>
             </control-hint>
             <control-help>
                 <label>Hilfsnachricht</label>
@@ -5844,7 +5844,7 @@
             <options>
                 <label>Optionen</label>
                 <item>
-                    <label todo="true">[Initially Open]</label>
+                    <label>Initial geöffnet</label>
                     <value>fr-initially-open</value>
                 </item>
                 <item>
@@ -5853,7 +5853,7 @@
                 </item>
             </options>
             <collapsible>
-                <label todo="true">[Collapsible]</label>
+                <label>Kann versteckt werden</label>
             </collapsible>
             <visibility>
                 <label>Sichtbarkeit</label>
@@ -5888,10 +5888,10 @@
                 <hint>Positive Zahl oder XPath-Ausdruck</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label>Formeln für Initialwerte berechnen, wenn Iterationen hinzugefügt werden</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label>Initial-Anzahl der Iterationen</label>
             </initial-iterations>
             <other>Anderes</other>
             <one>Eine Wiederholung</one>
@@ -5910,18 +5910,18 @@
             </help-message>
         </dialog-help>
         <dialog-ids>
-            <label todo="true">[Control Names]</label>
+            <label>Steuerelementnamen</label>
             <prefix>
-                <label todo="true">[Prefix]</label>
+                <label>Prefix</label>
             </prefix>
             <suffix>
-                <label todo="true">[Suffix]</label>
+                <label>Suffix</label>
             </suffix>
             <original-name>
-                <label todo="true">[Original Name]</label>
+                <label>Originalname</label>
             </original-name>
             <new-name>
-                <label todo="true">[New Name]</label>
+                <label>Neuer Name</label>
             </new-name>
         </dialog-ids>
         <dialog-publish>
@@ -5940,9 +5940,9 @@
             </overwrite-version-help>
             <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
             <open-new>Öffne neue Seite des veröffentlichten Formulars </open-new>
-            <version todo="true">[Version]</version>
-            <available todo="true">[Make published form available]</available>
-            <comment todo="true">[Comment]</comment>
+            <version>Version</version>
+            <available>Veröffentlichtes Formular verfügbar machen</available>
+            <comment>Kommentar</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Sprache hinzufügen</label>
@@ -6021,21 +6021,21 @@
                 <label>Hinweis</label>
             </hint-header>
             <clear-value>
-                <label todo="true">[Clear Value]</label>
+                <label>Wert löschen</label>
             </clear-value>
             <remove-all>
-                <label todo="true">[Remove All]</label>
+                <label>Alle entfernen</label>
             </remove-all>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
-            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
-            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
-            <tab-test todo="true"><label>[Test Results]</label></tab-test>
-            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
-            <parameter-name todo="true"><label>[Name]</label></parameter-name>
-            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
-            <no-headers todo="true">[No headers received].</no-headers>
+            <tab-definition><label>Definition</label></tab-definition>
+            <tab-advanced><label>Erweitert</label></tab-advanced>
+            <tab-test><label>Testergebnisse</label></tab-test>
+            <url-parameters><label>URL Parameter</label></url-parameters>
+            <parameter-name><label>Name</label></parameter-name>
+            <parameter-default-value><label>Standardwert</label></parameter-default-value>
+            <no-headers>Keine Kopfzeilen empfangen.</no-headers>
             <service-name>
                 <label>Name des Dienstes</label>
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
@@ -6155,37 +6155,37 @@
                 <hint>Wähle einen einzigartigen Namen für diese Aktion</hint>
             </service-name>
             <observer-type>
-                <label todo="true">[Run action when]</label>
+                <label>Aktion ausführen wenn</label>
                 <item id="0">
-                    <label todo="true">[control]</label>
+                    <label>Steuerelement</label>
                 </item>
                 <item id="1">
-                    <label todo="true">[the form loads]</label>
+                    <label>das Formular lädt</label>
                 </item>
             </observer-type>
             <event-type>
                 <item id="0">
-                    <label todo="true">[changes its value]</label>
+                    <label>hat den Wert geändert</label>
                     <hint/>
                 </item>
                 <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
+                    <label>erscheint oder den Wert ändert</label>
                     <hint/>
                 </item>
                 <item id="2">
-                    <label todo="true">[is activated]</label>
+                    <label>aktiviert wird</label>
                     <hint/>
                 </item>
                 <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
+                    <label>alle Steuerelemente bereit sind</label>
                     <hint/>
                 </item>
                 <item id="5">
-                    <label todo="true">[after the data is ready]</label>
+                    <label>alle Daten bereit sind</label>
                     <hint/>
                 </item>
                 <item id="4">
-                    <label todo="true">[before the data's initial values are calculated]</label>
+                    <label>bevor die Initialwerte berechnet werden</label>
                     <hint/>
                 </item>
             </event-type>
@@ -6284,7 +6284,7 @@
                 <label>Testen</label>
             </test>
 
-            <general-settings todo="true">[General Settings]</general-settings>
+            <general-settings>Allgemeine Einstellungen</general-settings>
             <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
             <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
 

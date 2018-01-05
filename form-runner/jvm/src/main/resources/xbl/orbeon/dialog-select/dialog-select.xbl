@@ -36,7 +36,7 @@
             <display-name lang="fr">Dialogue liste multiple</display-name>
             <display-name lang="ru">Несколько из диалога</display-name>
             <display-name lang="it" todo="true">[Dialog Multi Selector]</display-name>
-            <display-name lang="de" todo="true">[Dialog Multi Selector]</display-name>
+            <display-name lang="de">Dialog mit Mehrfachauswahl</display-name>
             <display-name lang="sv">Dialog med flera val</display-name>
             <display-name lang="nl">Dialoog meervoudige selectie</display-name>
             <display-name lang="pt">Diálogo Multi-Selecção</display-name>

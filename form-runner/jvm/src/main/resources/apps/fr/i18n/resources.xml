@@ -2032,7 +2032,7 @@
                 <section-name>Abschnittsname</section-name>
                 <yes>Ja</yes>
                 <no>Nein</no>
-                <other>Andere</other>
+                <other>Sonstige</other>
             </labels>
             <grid>
                 <insert-above>Darüber einfügen</insert-above>

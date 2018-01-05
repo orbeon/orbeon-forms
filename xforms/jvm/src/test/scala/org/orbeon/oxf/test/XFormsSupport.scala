@@ -142,7 +142,7 @@ trait XFormsSupport extends MockitoSugar {
   def isValid(controlEffectiveId: String)    = getSingleNodeControl(controlEffectiveId).isValid
   def getType(controlEffectiveId: String)    = getSingleNodeControl(controlEffectiveId).valueType
 
-  def hasFocus(controlEffectiveId: String)   = getSingleNodeControl(controlEffectiveId) eq document.getControls.getFocusedControl
+  def hasFocus(controlEffectiveId: String)   = document.getControls.getFocusedControl exists (_ eq getSingleNodeControl(controlEffectiveId))
 
   def getItemset(controlEffectiveId: String) = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]

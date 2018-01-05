@@ -207,22 +207,22 @@ object Controls {
         targetPrefixedId,
         followIndexes
       )
-      control            ← Option(controls.getObjectByEffectiveId(effectiveControlId))
+      control            ← controls.findObjectByEffectiveId(effectiveControlId)
     } yield
       control
   }
 
-  def resolveObjectByIdJava(
+  def resolveObjectById(
     containingDocument       : XFormsContainingDocument,
     sourceControlEffectiveId : String,
     targetStaticId           : String
-  ): XFormsControl =
+  ): Option[XFormsControl] =
     resolveControlsById(
       containingDocument,
       sourceControlEffectiveId,
       targetStaticId,
       followIndexes = true
-    ).headOption.orNull
+    ).headOption
 
   /**
    * Find effective control ids based on a source and a control static id, following XBL scoping and the repeat
@@ -487,12 +487,9 @@ object Controls {
   }
 
   // Visit all the controls
+  // 2018-01-04: 1 use left
   def visitAllControls(containingDocument: XFormsContainingDocument, listener: XFormsControlVisitorListener): Unit =
-    visitAllControls(containingDocument.getControls.getCurrentControlTree, listener)
-
-  // Visit all the controls
-  def visitAllControls(tree: ControlTree, listener: XFormsControlVisitorListener): Unit =
-    visitSiblings(listener, tree.children)
+    visitSiblings(listener, containingDocument.getControls.getCurrentControlTree.children)
 
   // Iterator over the given control and its descendants
   class ControlsIterator(
@@ -536,7 +533,11 @@ object Controls {
   }
 
   object ControlsIterator {
-    def apply(start: XFormsControl, includeSelf: Boolean) = new ControlsIterator(start, includeSelf)
+    def apply(start: XFormsControl, includeSelf: Boolean): Iterator[XFormsControl] =
+      new ControlsIterator(start, includeSelf)
+
+    def apply(start: ControlTree): Iterator[XFormsControl] =
+      start.children.iterator flatMap (new ControlsIterator(_, includeSelf = true))
   }
 
   // Evaluate the body with InstancesControls in scope
@@ -560,7 +561,7 @@ object Controls {
   private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]
 
   // Visit all the descendant controls of the given container control
-  // 2016-09-20: 3 uses left.
+  // 2018-01-04: 2 uses left.
   def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
     control match {
       case containerControl: XFormsContainerControl ⇒
@@ -602,5 +603,5 @@ object Controls {
   // Log a subtree of controls as XML
   private def logTreeIfNeeded(message: String)(control: XFormsControl): Unit =
     if (XFormsProperties.getDebugLogging.contains("control-tree"))
-      control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
+      control.containingDocument.getControls.indentedLogger.logDebug(message, control.toXMLString)
 }

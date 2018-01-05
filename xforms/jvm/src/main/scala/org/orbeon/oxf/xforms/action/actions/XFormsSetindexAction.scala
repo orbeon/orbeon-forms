@@ -86,13 +86,13 @@ object XFormsSetindexAction {
             "old index", repeatControl map (_.getIndex.toString) orNull,
             "new index", index.toString)
 
-        val focusedBefore = interpreter.containingDocument().getControls.getFocusedControl
+        val focusedBeforeOpt = interpreter.containingDocument.getControls.getFocusedControl
 
         // Dispatch to any control so that other custom controls can implement the notion of "setindex"
         Dispatch.dispatchEvent(new XXFormsSetindexEvent(control, index))
 
         // Handle focus changes
-        Focus.updateFocusWithEvents(focusedBefore)
+        Focus.updateFocusWithEvents(focusedBeforeOpt)(interpreter.containingDocument)
 
         // However at this time return the index only for repeat controls as we don't have a generic way to
         // figure this out yet

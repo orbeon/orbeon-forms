@@ -69,12 +69,12 @@ trait VisitableTrait extends XFormsControl {
       case _: DOMFocusOutEvent ⇒
         // Mark control visited upon focus out event. This applies to any control, including grouping controls. We
         // do this upon the event reaching the target, so that by the time a regular event listener makes use of the
-        // visited property, it is up to date. This seems reasonable since DOMFocusOut indicates that the focus has
+        // visited property, it is up to date. This seems reasonable since `DOMFocusOut` indicates that the focus has
         // already left the control.
         visited = true
       case _: XXFormsBlurEvent ⇒
-        // The client dispatches xxforms-blur when focus goes away from all XForms controls.
-        if (containingDocument.getControls.getFocusedControl eq this) {
+        // The client dispatches `xxforms-blur` when focus goes away from all XForms controls.
+        if (containingDocument.getControls.getFocusedControl exists (_ eq this)) {
           visited = true
           Focus.removeFocus(containingDocument)
         }

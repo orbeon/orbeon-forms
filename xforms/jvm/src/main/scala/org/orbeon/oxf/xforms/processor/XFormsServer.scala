@@ -263,7 +263,7 @@ object XFormsServer {
 
             // Output focus instruction
             locally {
-              val afterFocusedControlOpt = Option(containingDocument.getControls.getFocusedControl)
+              val afterFocusedControlOpt = containingDocument.getControls.getFocusedControl
 
               // The focus as known by the client, as far as we know: either the focus sent by the client in the
               // current request, or the focus information we kept since the previous request.
@@ -662,7 +662,7 @@ class XFormsServer extends ProcessorImpl {
               // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In
               // most cases should get files here only in noscript mode, but there is a chance in script mode in
               // a 2-pass submission that some files could make it here as well.
-              val beforeFocusedControlIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.effectiveId)
+              val beforeFocusedControlIdOpt = containingDocument.getControls.getFocusedControl map (_.effectiveId)
 
               val beforeRepeatHierarchyOpt =
                 containingDocument.getStaticOps.controlsByName("dynamic").nonEmpty option

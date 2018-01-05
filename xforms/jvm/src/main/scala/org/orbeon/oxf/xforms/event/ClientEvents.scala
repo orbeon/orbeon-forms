@@ -361,7 +361,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           warn(s"non-focusable control for ${e.name}")
 
         // The client must dispatch xxforms-blur only to a control which had the focus
-        case (control: XFormsControl, e: XXFormsBlurEvent) if doc.getControls.getFocusedControl ne control ⇒
+        case (control: XFormsControl, e: XXFormsBlurEvent) if ! (doc.getControls.getFocusedControl exists (_ eq control)) ⇒
           warn(s"control doesn't have focus control for ${e.name}")
 
         case _ ⇒

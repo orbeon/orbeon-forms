@@ -108,7 +108,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     Mockito.when(mockDocument.getControls).thenReturn(mockControls)
     Mockito.when(mockDocument.getIndentedLogger(Matchers.anyString)).thenReturn(staticState.getIndentedLogger)
 
-    Mockito.when(mockControls.getIndentedLogger).thenReturn(staticState.getIndentedLogger)
+    Mockito.when(mockControls.indentedLogger).thenReturn(staticState.getIndentedLogger)
 
     mockDocument
   }

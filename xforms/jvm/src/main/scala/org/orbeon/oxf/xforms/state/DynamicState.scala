@@ -271,7 +271,7 @@ object DynamicState {
       containerType      = Option(document.getContainerType),
       containerNamespace = Option(document.getContainerNamespace),
       pathMatchers       = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
-      focusedControl     = Option(document.getControls.getFocusedControl) map (_.getEffectiveId),
+      focusedControl     = document.getControls.getFocusedControl map (_.getEffectiveId),
       pendingUploads     = toByteSeq(document.getPendingUploads.asScala.toSet),
       lastAjaxResponse   = toByteSeq(Option(document.getLastAjaxResponse)),
       instances          = toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),

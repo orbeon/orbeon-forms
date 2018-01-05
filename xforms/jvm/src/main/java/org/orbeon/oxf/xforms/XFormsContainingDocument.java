@@ -274,7 +274,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
 
                         // Once the control tree is rebuilt, restore focus if needed
                         if (dynamicState.decodeFocusedControlJava() != null)
-                            xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().findControlOrNullJava(dynamicState.decodeFocusedControlJava()));
+                            xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().findControl(dynamicState.decodeFocusedControlJava()));
                     }
                 });
             }
@@ -743,7 +743,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         rebuildRecalculateRevalidateIfNeeded();
 
         // Initialize controls
-        xformsControls.createControlTree( scala.Option.<scala.collection.immutable.Map<String, ControlState >>apply(null));
+        xformsControls.createControlTree(scala.Option.<scala.collection.immutable.Map<String, ControlState >>apply(null));
     }
 
     @Override

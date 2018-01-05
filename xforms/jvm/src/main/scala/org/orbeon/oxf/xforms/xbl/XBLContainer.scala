@@ -434,17 +434,19 @@ trait ContainerResolver {
     }
 
     // Resolve on controls
-    val result =
-      containingDocument.getControls.resolveObjectById(
+    val controlOpt =
+      containingDocument.getControls.resolveObjectByIdOpt(
         sourceControlEffectiveId,
         staticOrAbsoluteId
-      ).asInstanceOf[XFormsControl]
+      )
 
-    // If result is provided, make sure it is within the resolution scope of this container
-    if (result != null && ! isEffectiveIdResolvableByThisContainer(result.getEffectiveId))
-      throw new OXFException("Resulting control is no in proper scope: " + result.getEffectiveId) // This should not happen!
-    else
-      result
+    controlOpt match {
+      case Some(control) if ! isEffectiveIdResolvableByThisContainer(control.getEffectiveId) ⇒
+        // This should not happen!
+        throw new OXFException(s"Resulting control is not in proper scope: `${control.getEffectiveId}`")
+      case controlOpt ⇒
+        controlOpt.orNull
+    }
   }
 
   // Recursively find the instance containing the specified node

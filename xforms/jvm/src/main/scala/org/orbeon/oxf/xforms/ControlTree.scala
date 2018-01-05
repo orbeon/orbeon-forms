@@ -93,9 +93,7 @@ private class ControlIndex {
   }
 }
 
-/**
-  * Represents a tree of XForms controls.
-  */
+// Represent a tree of XForms controls
 class ControlTree(private implicit val indentedLogger: IndentedLogger) extends Cloneable {
 
   // Top-level controls
@@ -140,9 +138,6 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
 
       debugResults(List("controls created" → allControls.size.toString))
     }
-
-  def dispatchRefreshEventsJava(controlsEffectiveIds: ju.Collection[String]): Unit =
-    dispatchRefreshEvents(controlsEffectiveIds.asScala)
 
   def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String]): Unit =
     withDebug("dispatching refresh events") {
@@ -265,9 +260,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     case None       ⇒ Nil
   }
 
-  def effectiveIdsToControls                     = _controlIndex.effectiveIdsToControls
-  def findControl(effectiveId: String)           = effectiveIdsToControls.get(effectiveId)
-  def findControlOrNullJava(effectiveId: String) = findControl(effectiveId).orNull
+  def effectiveIdsToControls           = _controlIndex.effectiveIdsToControls
+  def findControl(effectiveId: String) = effectiveIdsToControls.get(effectiveId)
 
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
     findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]

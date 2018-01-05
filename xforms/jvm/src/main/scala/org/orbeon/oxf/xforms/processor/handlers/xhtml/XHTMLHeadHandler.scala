@@ -297,8 +297,8 @@ class XHTMLHeadHandler(
     val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
-    val scriptInvocations      = containingDocument.getScriptsToRun.asScala
-    val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
+    val scriptInvocations = containingDocument.getScriptsToRun.asScala
+    val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
     val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
     val dialogsToOpen =

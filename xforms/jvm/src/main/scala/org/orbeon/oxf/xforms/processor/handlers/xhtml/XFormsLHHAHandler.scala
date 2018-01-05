@@ -76,7 +76,7 @@ class XFormsLHHAHandler(
 
         def resolveControlOpt(staticControl: ElementAnalysis) =
           if (! isTemplate) {
-            containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId, null) collect {
+            containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId) collect {
               case control: XFormsControl ⇒ control
             }
           } else

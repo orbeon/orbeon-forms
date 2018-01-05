@@ -142,7 +142,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
         result
       } else {
         // LHHA is somewhere else. We resolve the control and ask for its value.
-        Option(control.containingDocument.getControls.resolveObjectById(control.effectiveId, lhhaAnalysis.staticId)) collect {
+        control.containingDocument.getControls.resolveObjectByIdOpt(control.effectiveId, lhhaAnalysis.staticId) collect {
           case control: XFormsLHHAControl ⇒ control.getValue
         }
       }

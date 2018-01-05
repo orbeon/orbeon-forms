@@ -45,19 +45,22 @@ class XFormsToggleAction extends XFormsAction {
 object XFormsToggleAction {
 
   def toggle(caseControl: XFormsCaseControl, deferred: Boolean = true): Unit = {
+
+    val doc = XFormsAPI.inScopeContainingDocument
+
     // "This XForms Action begins by invoking the deferred update behavior."
     if (deferred)
-      XFormsAPI.inScopeContainingDocument.synchronizeAndRefresh()
+      doc.synchronizeAndRefresh()
 
     if (caseControl.parent.isRelevant && ! caseControl.isSelected) {
       // This case is in a relevant switch and not currently selected
-      val focusedBefore = XFormsAPI.inScopeContainingDocument.getControls.getFocusedControl
+      val focusedBeforeOpt = doc.getControls.getFocusedControl
 
       // Actually toggle the xf:case
       caseControl.toggle()
 
       // Handle focus changes
-      Focus.updateFocusWithEvents(focusedBefore, None)
+      Focus.updateFocusWithEvents(focusedBeforeOpt, None)(doc)
     }
   }
 }

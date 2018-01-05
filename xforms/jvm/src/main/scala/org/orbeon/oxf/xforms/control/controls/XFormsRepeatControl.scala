@@ -196,7 +196,7 @@ class XFormsRepeatControl(
     // 3. Insert node into destination
     XFormsInsertAction.doInsert(
       /* containingDocument    = */ containingDocument,
-      /* indentedLogger        = */ containingDocument.getControls.getIndentedLogger,
+      /* indentedLogger        = */ containingDocument.getControls.indentedLogger,
       /* positionAttribute     = */ destinationBeforeAfter,
       /* collectionToBeUpdated = */ destinationItemsCopy,
       /* insertContextNodeInfo = */ null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
@@ -274,7 +274,7 @@ class XFormsRepeatControl(
     if (! SaxonUtils.compareItemSeqs(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
       // Update iterationsInitialStateIfNeeded()
 
-      val focusedBefore = containingDocument.getControls.getFocusedControl
+      val focusedBeforeOpt = containingDocument.getControls.getFocusedControl
 
       val (newIterations, partialFocusRepeatOption) =
         updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
@@ -289,7 +289,7 @@ class XFormsRepeatControl(
       containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(List(getEffectiveId))
 
       // Handle focus changes
-      Focus.updateFocusWithEvents(focusedBefore, partialFocusRepeatOption)
+      Focus.updateFocusWithEvents(focusedBeforeOpt, partialFocusRepeatOption)(containingDocument)
     }
   }
 

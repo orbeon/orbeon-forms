@@ -89,7 +89,7 @@ class XFormsControl(
   final def localName = staticControl.localName
 
   def getContextStack = container.getContextStack
-  implicit final def logger = containingDocument.getControls.getIndentedLogger
+  implicit final def logger = containingDocument.getControls.indentedLogger
 
   final def getResolutionScope =
     part.scopeForPrefixedId(prefixedId)

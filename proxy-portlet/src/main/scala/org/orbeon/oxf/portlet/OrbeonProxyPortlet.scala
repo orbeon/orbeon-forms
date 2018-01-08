@@ -173,15 +173,23 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     else
       None
 
-    private def preferenceFromPublicRenderParameter(request: PortletRequest, pref: Pref): Option[String] =
-      if (getBooleanPreference(request, EnablePublicRenderParameters))
-        publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
-      else
-        None
+  private def preferenceFromPublicRenderParameter(request: PortletRequest, pref: Pref): Option[String] =
+    if (getBooleanPreference(request, EnablePublicRenderParameters))
+      publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+    else
+      None
+
+  private def preferenceFromSessionParameter(request: PortletRequest, pref: Pref) = {
+    if (getBooleanPreference(request, EnableSessionParameters))
+      sessionParameters(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+    else
+      None
+  }
 
   private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
-    preferenceFromPublicRenderParameter(request, pref) orElse
-      preferenceFromPortalQuery(request, pref)         getOrElse
+    preferenceFromSessionParameter(request, pref)        orElse
+      preferenceFromPublicRenderParameter(request, pref) orElse
+      preferenceFromPortalQuery(request, pref)           getOrElse
       getPreference(request, pref)
 
   private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
@@ -242,6 +250,19 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       nonBlankValue ← firstValue.trimAllToOpt
     } yield
       key → nonBlankValue
+
+  private def sessionParameters(request: PortletRequest): Iterator[(String, String)] = {
+
+    def fromSession(name: String) =
+      request.getPortletSession.getAttribute(name, PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
+
+    Iterator(
+      DocumentId.nameLabel.publicName → fromSession("LIFERAY_SHARED_ORBEON_DOCUMENT_ID"),
+      AppName.nameLabel.publicName    → fromSession("LIFERAY_SHARED_ORBEON_APP"),
+      FormName.nameLabel.publicName   → fromSession("LIFERAY_SHARED_ORBEON_FORM"),
+      Page.nameLabel.publicName       → fromSession("LIFERAY_SHARED_ORBEON_PAGE")
+    )
+  }
 
   private def newRequestDetails(
     settings: PortletSettings,

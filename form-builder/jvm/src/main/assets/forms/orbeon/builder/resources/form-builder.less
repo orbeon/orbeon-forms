@@ -243,10 +243,10 @@ div.orbeon.orbeon-portlet-div {
         .fb-toolbox-inside {
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
             padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
             .box-sizing(border-box);
+            display: grid;
+            grid-template-rows: auto 1fr;
 
             .xforms-trigger a {
                 text-decoration: none;
@@ -383,15 +383,12 @@ div.orbeon.orbeon-portlet-div {
             }
 
             #fb-toolbox-tabs {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-
+                min-height: 0;
                 > div {
-                    display: flex;
-                    flex-direction: column;
+                    height: 100%;
+                    display: grid;
+                    grid-template-rows: auto 1fr;
                     .tab-content {
-                        flex-grow: 1;
                         overflow-y: auto;
                     }
                 }

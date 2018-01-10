@@ -90,11 +90,11 @@ object TreeSelect1 {
               childrenOrUndef = item.children map convertItems
             } yield
               FancytreeJsonNode(
-                item.label,
-                item.value,
-                itemOpen(item) || itemChildrenOpen(childrenOrUndef),
-                item.attributes flatMap (_.`class`),
-                childrenOrUndef
+                label           = item.label,
+                value           = item.value,
+                open            = itemOpen(item) || itemChildrenOpen(childrenOrUndef),
+                classesOrUndef  = item.attributes flatMap (_.`class`),
+                childrenOrUndef = childrenOrUndef
               )
 
           val jTreeContainer        = findTreeContainer

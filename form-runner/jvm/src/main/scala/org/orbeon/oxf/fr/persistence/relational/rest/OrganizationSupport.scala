@@ -41,7 +41,7 @@ object OrganizationSupport {
 
       val sql = {
 
-        // Generate lists for each level or the organization
+        // Generate lists for each level of the organization
         def perLevel(f: Int ⇒ List[String]): List[String] =
           organization
             .levels

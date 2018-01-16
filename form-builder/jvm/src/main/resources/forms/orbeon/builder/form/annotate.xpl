@@ -82,6 +82,9 @@
                     - we annotate fr:body below
                 -->
 
+                <!-- https://github.com/orbeon/orbeon-forms/issues/3450 -->
+                <xsl:template match="xh:body/fr:view/xf:label"/>
+
                 <!-- fr:body → xf:group -->
                 <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
 

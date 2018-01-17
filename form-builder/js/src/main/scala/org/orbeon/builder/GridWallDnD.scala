@@ -24,10 +24,12 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 
-object GridColumnDnD {
+// Allows form authors to move the grid cell walls to resize cells.
+object GridWallDnD {
 
   if (false)
   locally {
@@ -36,10 +38,10 @@ object GridColumnDnD {
     val ColumnContainerClass = "fb-grid-dnd-column-container"
     val ColumnHandleClass    = "fb-grid-dnd-column-handle"
     val ColumnShadowClass    = "fb-grid-dnd-column-shadow"
-    val FbMain               = $(s".$FbMainClass")
 
     Cell.listenOnChange()
 
+    // Keeps track of the current cell (if any), and provides utility functions on cells.
     object Cell {
 
       var currentOpt: Option[Block] = None
@@ -61,30 +63,36 @@ object GridColumnDnD {
         )
       }
 
-      def x(cell: Block) = cell.el.attr("data-fr-x").get.toInt
-      def w(cell: Block) = cell.el.attr("data-fr-w").get.toInt
+      def x(cell: Block): Int = cell.el.attr("data-fr-x").get.toInt
+      def w(cell: Block): Int = cell.el.attr("data-fr-w").get.toInt
     }
 
-    // Blocks signaling where cell borders can be dragged from and to
+    // Blocks signaling where cell borders can be dragged from and to.
     object DndContainers {
+
+      private val existingContainers = new mutable.ListBuffer[JQuery]
 
       def show(index: Int): Unit = {
         Cell.currentOpt.foreach { (currentCell) ⇒
-          val gridBody     = currentCell.el.parents(".fr-grid-body").first()
+          val frGridBody   = currentCell.el.parents(".fr-grid-body").first()
+          var frGrid       = frGridBody.parent
           val dndContainer = $(s"""<div class="$ColumnContainerClass" data-index="$index">""")
           val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
           dndContainer.append(dndHandle)
-          FbMain.append(dndContainer)
+          frGrid.append(dndContainer)
+          existingContainers.append(dndContainer)
           Offset.offset(dndContainer, Offset(
-            left = Offset(gridBody).left + (gridBody.width() - dndContainer.width()) / 12 * index,
+            left = Offset(frGridBody).left + (frGridBody.width() - dndContainer.width()) / 12 * index,
             top  = currentCell.top
           ))
           dndContainer.height(currentCell.height)
         }
       }
 
-      def hideAll(): Unit =
-        FbMain.find(s".$ColumnContainerClass").remove()
+      def hideAll(): Unit = {
+        existingContainers.foreach(_.remove())
+        existingContainers.clear()
+      }
     }
 
     // Block showing during the dragging operation
@@ -98,11 +106,12 @@ object GridColumnDnD {
 
         // Create shadow element
         val dndShadow = $(s"""<div class="$ColumnShadowClass">""")
-        FbMain.append(dndShadow)
         dndShadowOpt = Some(dndShadow)
 
-        // Position and size  the shadow over source container
+        // Position and size the shadow over source container
         val container = $(containerEl)
+        val frGrid = container.parent()
+        frGrid.append(dndShadow)
         Offset.offset(dndShadow, Offset(container))
         dndShadow.width(container.width())
         dndShadow.height(container.height())

@@ -32,7 +32,7 @@ object FormBuilderApp {
       LabelEditor
       ControlEditor
       ControlLabelHintTextEditor
-      GridColumnDnD
+      GridWallDnD
 
       BrowserCheck.checkSupportedBrowser()
     }

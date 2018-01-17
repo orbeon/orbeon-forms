@@ -83,6 +83,10 @@ object Position {
     }.orUndefined
   }
 
+  // Hacky way for a 3rd-party to tell use to ignore container changes
+  // We could make this a function, to right away notify we have no container when set to true
+  var maskContainerChange: Boolean = false
+
   // Container is either a section or grid; calls listeners passing old/new container
   def currentContainerChanged(
     containerCache : js.Array[Block],
@@ -100,7 +104,7 @@ object Position {
             yuiDialog.cfg.config.visible.value.asInstanceOf[Boolean]
         }
       val newContainer =
-        if (dialogVisible)
+        if (dialogVisible || maskContainerChange)
           // Ignore container under the pointer if a dialog is visible
           None
         else

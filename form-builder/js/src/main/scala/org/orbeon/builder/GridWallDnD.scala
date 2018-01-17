@@ -161,10 +161,17 @@ object GridWallDnD {
 
     drake.onDrag { (el: html.Element, source: html.Element) ⇒
       scala.scalajs.js.Dynamic.global.console.log("drag, storing shadow")
+      Position.maskContainerChange = true
       DndShadow.show(source)
       DndContainers.hideAll()
       for (i ← (1 to 5) ++ (6 to 11))
         DndContainers.show(i)
+    }
+
+    drake.onDragend {(el: html.Element) ⇒
+      scala.scalajs.js.Dynamic.global.console.log("drag end")
+      Position.maskContainerChange = false
+      DndShadow.hide()
     }
 
     drake.onDrop {(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒
@@ -176,11 +183,6 @@ object GridWallDnD {
         for (i ← 1 to Math.abs(targetIndex - sourceIndex))
           ControlEditor.resizeCell(currentCell, direction)
       }
-    }
-
-    drake.onDragend {(el: html.Element) ⇒
-      scala.scalajs.js.Dynamic.global.console.log("drag end")
-      DndShadow.hide()
     }
   }
 }

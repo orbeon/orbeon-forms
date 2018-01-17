@@ -688,14 +688,15 @@ class ConcreteElement(var qname: QName)
     } else {
       val list = internalContent
       val size = list.size
-      for (i ← 0 until size) {
+
+      // `for (i ← 0 until size)` is inefficient and shows in the profiler
+      var i = 0
+      while (i < size) {
         list.get(i) match {
-          case namespace: Namespace ⇒
-            if (prefix == namespace.prefix) {
-              return namespace
-            }
+          case namespace: Namespace if prefix == namespace.prefix ⇒ return namespace
           case _ ⇒
         }
+        i+= 1
       }
     }
     val parent = getParent

@@ -210,24 +210,28 @@ div.orbeon.orbeon-portlet-div {
     // So the cursor is inside the element, and picking the cursor works
     .gu-mirror { padding-right: 28px }
 
-    .fb-grid-dnd-column-container {
+    .fb-grid-dnd-wall-container {
 
         width: 7px;
         position: absolute;
-        background-color: #eee;
-        &:hover { background-color: #ddd }
+        background-color: #ccc;
+        &:hover { background-color: #aaa }
 
-        .fb-grid-dnd-column-handle {
+        .fb-grid-dnd-wall-handle {
             height: 100%;
         }
     }
 
-    .fb-grid-dnd-column-handle {
+    .fb-grid-dnd-wall-handle {
         cursor: col-resize;
     }
-    .fb-grid-dnd-column-shadow {
+    .fb-grid-dnd-wall-veil {
+        z-index: 1;                                                         // Veil prevents hover on elements in the grid during D&D
+    }
+    .fb-grid-dnd-wall-shadow {
         position: absolute;
-        background-color: #ddd;
+        background-color: #F9A03F;
+        z-index: 2;                                                         // To be above veil
     }
 
     // ***** Toolbox ***************************************************************************************************

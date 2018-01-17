@@ -34,10 +34,10 @@ object GridWallDnD {
   if (false)
   locally {
 
-    val FbMainClass          = "fb-main"
-    val ColumnContainerClass = "fb-grid-dnd-column-container"
-    val ColumnHandleClass    = "fb-grid-dnd-column-handle"
-    val ColumnShadowClass    = "fb-grid-dnd-column-shadow"
+    val WallContainerClass = "fb-grid-dnd-wall-container"
+    val WallHandleClass    = "fb-grid-dnd-wall-handle"
+    val WallShadowClass    = "fb-grid-dnd-wall-shadow"
+    val WallVeilClass      = "fb-grid-dnd-wall-veil"
 
     Cell.listenOnChange()
 
@@ -56,9 +56,15 @@ object GridWallDnD {
             },
           becomesCurrent = (cell: Block) ⇒
             if (! DndShadow.isDragging) {
-              scala.scalajs.js.Dynamic.global.console.log("new cell", cell.el.attr("id").get)
               currentOpt = Some(cell)
-              DndContainers.show(Cell.x(cell) + Cell.w(cell) - 1)
+              val x = Cell.x(cell)
+              val w = Cell.w(cell)
+              // Left
+              if (x > 1 || w > 1)
+                DndContainers.show(x - 1)
+              // Right
+              if (x + w < 12 || w > 1)
+                DndContainers.show(x + w - 1)
             }
         )
       }
@@ -76,8 +82,8 @@ object GridWallDnD {
         Cell.currentOpt.foreach { (currentCell) ⇒
           val frGridBody   = currentCell.el.parents(".fr-grid-body").first()
           var frGrid       = frGridBody.parent
-          val dndContainer = $(s"""<div class="$ColumnContainerClass" data-index="$index">""")
-          val dndHandle    = $(s"""<div class="$ColumnHandleClass">""")
+          val dndContainer = $(s"""<div class="$WallContainerClass" data-index="$index">""")
+          val dndHandle    = $(s"""<div class="$WallHandleClass">""")
           dndContainer.append(dndHandle)
           frGrid.append(dndContainer)
           existingContainers.append(dndContainer)
@@ -98,19 +104,27 @@ object GridWallDnD {
     // Block showing during the dragging operation
     object DndShadow {
 
-      var dndShadowOpt: Option[JQuery] = None
+      var dndVeilOpt   : Option[JQuery] = None
+      var dndShadowOpt : Option[JQuery] = None
 
       def isDragging: Boolean = dndShadowOpt.isDefined
 
       def show(containerEl: html.Element): Unit = {
 
-        // Create shadow element
-        val dndShadow = $(s"""<div class="$ColumnShadowClass">""")
-        dndShadowOpt = Some(dndShadow)
-
-        // Position and size the shadow over source container
         val container = $(containerEl)
         val frGrid = container.parent()
+
+        // Create veil
+        val dndVeil = $(s"""<div class="$WallVeilClass">""")
+        dndVeilOpt = Some(dndVeil)
+        frGrid.append(dndVeil)
+        Offset.offset(dndVeil, Offset(frGrid))
+        dndVeil.width(frGrid.width())
+        dndVeil.height(frGrid.height())
+
+        // Create shadow element, position and size the shadow over source container
+        val dndShadow = $(s"""<div class="$WallShadowClass">""")
+        dndShadowOpt = Some(dndShadow)
         frGrid.append(dndShadow)
         Offset.offset(dndShadow, Offset(container))
         dndShadow.width(container.width())
@@ -124,7 +138,8 @@ object GridWallDnD {
 
       Position.onUnderPointerChange {
         dndShadowOpt.foreach { (dndShadow) ⇒
-          val newShadowOffset = Offset(dndShadow).copy(left = Position.pointerPos.left)
+          val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
+          val newShadowOffset = Offset(dndShadow).copy(left = newLeft)
           Offset.offset(dndShadow, newShadowOffset)
         }
       }
@@ -134,13 +149,13 @@ object GridWallDnD {
       js.Array(),
       new DragulaOptions {
         override def isContainer(el: html.Element): Boolean = {
-          el.classList.contains(ColumnContainerClass)
+          el.classList.contains(WallContainerClass)
         }
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
-          handle.classList.contains(ColumnHandleClass)
+          handle.classList.contains(WallHandleClass)
         }
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
-          target.classList.contains(ColumnContainerClass)
+          target.classList.contains(WallContainerClass)
       }
     )
 

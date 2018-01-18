@@ -114,7 +114,7 @@ abstract class XFormsEvent(
 
   private def warnUnsupportedIfNeeded(name: String) =
     if (warnIfMissingProperty)
-      indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
+      indentedLogger.logDebug("", "Unsupported event context information for event('" + name + "').")
 
   // These methods can be overridden by subclasses
   implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)

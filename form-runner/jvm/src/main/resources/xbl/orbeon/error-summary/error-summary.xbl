@@ -54,8 +54,8 @@
             <xbl:handler event="fr-update-lang" phase="target">
                 <!-- Update labels/alerts upon language change -->
                 <xf:action iterate="error">
-                    <xf:setvalue ref="@alert" value="xxf:alert(../@absolute-id)"/>
-                    <xf:setvalue ref="@label" value="xxf:label(../@absolute-id)"/>
+                    <xf:setvalue ref="@alert" value="xxf:alert(../@id)"/>
+                    <xf:setvalue ref="@label" value="xxf:label(../@id)"/>
                 </xf:action>
             </xbl:handler>
             <xbl:handler event="fr-hide" phase="target">
@@ -76,8 +76,8 @@
                     <xf:delete ref="instance('fr-errors-instance')/*"/>
                 </xf:action>
 
-                <!-- Instance containing the current errors -->
-                <xf:instance id="fr-errors-instance">
+                <!-- Instance containing the current errors, indexed by absolute id -->
+                <xf:instance id="fr-errors-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                     <errors xmlns=""/>
                 </xf:instance>
 
@@ -87,7 +87,7 @@
                 </xf:instance>
 
                 <!-- State instance -->
-                <xf:instance id="fr-state-instance">
+                <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
                     <state xmlns="">
                         <!-- Whether to be visible or not -->
                         <show>true</show>
@@ -122,7 +122,7 @@
                                     'fr-snapshot-instance'
                             )/error
                         return
-                            if (xxf:visited($e/@absolute-id)) then
+                            if (xxf:visited($e/@id)) then
                                 $e
                             else
                                 ()"/>
@@ -139,11 +139,6 @@
                     <xf:bind ref="visible-counts/(@* except @alert)" calculate="for $n in name() return count($visible-errors[@level = $n])"/>
                 </xf:bind>
 
-                <!-- Template for error information -->
-                <xf:instance id="fr-error-template" xxf:readonly="true">
-                    <error xmlns="" absolute-id="" position="" label="" alert="" level="" section-name="" required-empty=""/>
-                </xf:instance>
-
                 <!-- Reusable method to insert an error in the right place in the summary -->
                 <xf:action ev:event="fr-insert-error">
                     <!-- Useful stuff passed to us -->
@@ -158,27 +153,34 @@
                     <!--
 <xf:message level="xxf:log-debug">
 Inserting error information into error list:
-<xf:output value="for $n in ('absolute-id', 'control-position', 'level', 'alert', 'label') return concat($n, ': ', event($n), '\n')"/>
+<xf:output value="for $n in ('id', 'control-position', 'level', 'alert', 'label') return concat($n, ': ', event($n), '\n')"/>
 </xf:message>
                     -->
 
                     <xf:var
                         name="insert-position"
-                        value="count(error[ErrorSummary:controlSortString(@absolute-id, 4)
+                        value="count(error[ErrorSummary:controlSortString(@id, 4)
                                         lt ErrorSummary:controlSortString($absolute-id, 4)])"/>
 
                     <!-- Now that we have found the position, simply insert -->
-                    <xf:insert context="." ref="error[$insert-position]" origin="instance('fr-error-template')"/>
-                    <!-- Set all the attributes -->
-                    <xf:action context="error[$insert-position + 1]">
-                        <xf:setvalue ref="@absolute-id"    value="$absolute-id"/>
-                        <xf:setvalue ref="@position"       value="$control-position"/>
-                        <xf:setvalue ref="@level"          value="$level"/>
-                        <xf:setvalue ref="@alert"          value="$alert"/>
-                        <xf:setvalue ref="@label"          value="$label"/>
-                        <xf:setvalue ref="@section-name"   value="ErrorSummary:topLevelSectionNameForControlId($absolute-id)"/>
-                        <xf:setvalue ref="@required-empty" value="$required-empty"/>
-                    </xf:action>
+                    <xf:insert
+                        context="."
+                        ref="error[$insert-position]"
+                        origin="
+                            xf:element(
+                                'error',
+                                (
+                                    xf:attribute('id',             $absolute-id),
+                                    xf:attribute('position',       $control-position),
+                                    xf:attribute('label',          $level),
+                                    xf:attribute('alert',          $alert),
+                                    xf:attribute('level',          $label),
+                                    xf:attribute('section-name',   ErrorSummary:topLevelSectionNameForControlId($absolute-id)),
+                                    xf:attribute('required-empty', $required-empty)
+                                )
+                            )"
+                        xxf:update-repeats="false"
+                    />
 
                 </xf:action>
 
@@ -222,69 +224,31 @@ Inserting error information into error list:
                         </xf:action>
 
                         <!-- Control changes validity -->
-                        <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid" xxf:phantom="true" ev:phase="capture">
-
-                            <xf:action xxbl:scope="inner">
-
-                                <!-- Useful stuff passed to us -->
-                                <xf:var name="absolute-id" value="event('xxf:absolute-targetid')"/>
-
-                                <!-- Try to find existing error element -->
-                                <xf:var name="current-error" value="error[@absolute-id = $absolute-id]"/>
-
-                                <!-- xforms-invalid indicates an error level, but doesn't always have constraints associated -->
-                                <xf:var
-                                    name="event-level"
-                                    value="
-                                        if (event('xxf:type') = 'xxforms-constraints-changed') then
-                                            event('level')
-                                        else if (event('xxf:type') = 'xforms-invalid') then
-                                            'error'
-                                        else
-                                            ()"/>
-
-                                <xf:var name="has-level"      value="exists($event-level) and exists(event('xxf:alert'))"/>
-                                <xf:var name="must-remove"    value="not($has-level) and exists($current-error)"/>
-                                <xf:var name="must-update"    value="$has-level      and exists($current-error)"/>
-                                <xf:var name="must-insert"    value="$has-level      and  empty($current-error)"/>
-                                <xf:var name="required-empty" value="(for $b in event('xxf:binding')[1] return xxf:required($b) and string($b) = '', false())[1]"/>
-
-                                <!-- Remove error -->
-                                <xf:action if="$must-remove">
-                                    <xf:delete ref="$current-error"/>
-                                </xf:action>
-
-                                <!-- Just update what we must if error already exists -->
-                                <xf:action if="$must-update" context="$current-error">
-                                    <xf:setvalue ref="$current-error/@level"          value="$event-level"/>
-                                    <xf:setvalue ref="$current-error/@alert"          value="event('xxf:alert')"/>
-                                    <xf:setvalue ref="$current-error/@label"          value="event('xxf:label')"/>
-                                    <xf:setvalue ref="$current-error/@required-empty" value="$required-empty"/>
-                                </xf:action>
-                                <!-- Otherwise insert new element and sets its values -->
-                                <xf:action if="$must-insert">
-                                    <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xf:property name="absolute-id"         value="$absolute-id"/>
-                                        <xf:property name="control-position"    value="event('xxf:control-position')"/>
-                                        <xf:property name="level"               value="$event-level"/>
-                                        <xf:property name="alert"               value="event('xxf:alert')"/>
-                                        <xf:property name="label"               value="event('xxf:label')"/>
-                                        <xf:property name="required-empty"      value="$required-empty"/>
-                                    </xf:dispatch>
-                                </xf:action>
-
-                                <!-- Update validity -->
-                                <xf:setvalue
-                                    ref="$state/valid"
-                                    value="count(instance('fr-errors-instance')/error[@level = 'error']) = 0"/>
-
-                            </xf:action>
+                        <xf:action
+                            xbl:attr="ev:observer=observer"
+                            ev:event="xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid"
+                            xxf:phantom="true"
+                            ev:phase="capture"
+                            type="xpath">
+                            ErrorSummary:removeUpdateOrInsertError(
+                                xxf:instance('fr-errors-instance')/root(),
+                                event('xxf:absolute-targetid'),
+                                event('xxf:type'),
+                                event('xxf:control-position'),
+                                event('xxf:binding')[1],
+                                event('level'),
+                                event('xxf:alert'),
+                                event('xxf:label')
+                            )
                         </xf:action>
 
                         <!-- Node-set changed -->
                         <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed" xxf:phantom="true" ev:phase="capture"
                                        if="count(event('xxf:to-positions')) > 0">
                             <xf:action xxbl:scope="inner">
+
+                                <!-- TODO: Move to Scala as well. -->
+
                                 <!-- One or more iterations have moved. This is a bit tricky: we must update the error summary properly. -->
 
                                 <xf:var name="target-absolute-id" value="event('xxf:absolute-targetid')"/>
@@ -294,7 +258,7 @@ Inserting error information into error list:
                                 <xf:var
                                     name="affected-errors"
                                     as="element(error)*"
-                                    value="error[@absolute-id != ErrorSummary:updateIteration(@absolute-id, $target-absolute-id, $from-positions, $to-positions)]"/>
+                                    value="error[@id != ErrorSummary:updateIteration(@id, $target-absolute-id, $from-positions, $to-positions)]"/>
 
                                 <!-- Remove affected errors from instance -->
                                 <xf:delete ref="$affected-errors"/>
@@ -304,7 +268,7 @@ Inserting error information into error list:
                                     <xf:var name="error" value="."/>
 
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xf:property name="absolute-id"         value="ErrorSummary:updateIteration($error/@absolute-id, $target-absolute-id, $from-positions, $to-positions)"/>
+                                        <xf:property name="absolute-id"         value="ErrorSummary:updateIteration($error/@id, $target-absolute-id, $from-positions, $to-positions)"/>
                                         <xf:property name="control-position"    value="$error/@position"/>
                                         <xf:property name="level"               value="$error/@level"/>
                                         <xf:property name="alert"               value="$error/@alert"/>
@@ -440,7 +404,7 @@ Inserting error information into error list:
                                                             '&lt;span/>'"/>
                                                 <xf:var
                                                     name="focusable"
-                                                    value="xxf:focusable(@absolute-id)"/>
+                                                    value="xxf:focusable(@id)"/>
 
                                                 <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
                                                 <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
@@ -456,7 +420,7 @@ Inserting error information into error list:
                                                                         value="@alert"/>
                                                                 </span>
                                                             </xf:label>
-                                                            <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
+                                                            <xf:setfocus ev:event="DOMActivate" control="{{@id}}"/>
                                                         </xf:trigger>
                                                     </xf:case>
                                                     <xf:case value="false()">

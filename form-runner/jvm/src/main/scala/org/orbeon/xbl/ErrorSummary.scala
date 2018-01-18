@@ -296,7 +296,7 @@ object ErrorSummary {
         val insertionPoint =
           rootElemDomContent.binarySearch(newElemForSorting, 0, rootElemDomContent.length) match {
             case InsertionPoint(p) ⇒ p
-            case Found(i)          ⇒ throw new IllegalStateException(s"xxx found at index $i") // there must not be an existing error and we know because we search for it above
+            case Found(i)          ⇒ throw new IllegalStateException // there must not be an existing error and we know because we search for it above
           }
 
         val afterElemList =

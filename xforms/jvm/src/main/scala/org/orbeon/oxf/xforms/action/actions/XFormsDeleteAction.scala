@@ -45,6 +45,7 @@ class XFormsDeleteAction extends XFormsAction {
     // require a `ref` or `bind` returning a non-empty sequence.
 
     if (collectionToUpdate.nonEmpty) {
+
       val deleteIndexOpt =
         atAttributeOpt match {
           case Some(atAttribute) ⇒
@@ -72,11 +73,15 @@ class XFormsDeleteAction extends XFormsAction {
             None
         }
 
+      val updateRepeats =
+        actionContext.interpreter.resolveAVT(actionContext.element, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME) != "false"
+
       doDelete(
         containingDocument = actionContext.containingDocument,
         collectionToUpdate = collectionToUpdate,
         deleteIndexOpt     = deleteIndexOpt,
-        doDispatch         = true
+        doDispatch         = true,
+        updateRepeats      = updateRepeats
       )
     } else {
       // "The delete action is terminated with no effect if the Sequence Binding is expressed and the Sequence Binding
@@ -101,7 +106,8 @@ object XFormsDeleteAction extends Logging {
   def doDeleteOne(
     containingDocument : XFormsContainingDocument,
     nodeInfo           : NodeInfo,
-    doDispatch         : Boolean)(implicit
+    doDispatch         : Boolean,
+    updateRepeats      : Boolean)(implicit
     indentedLogger     : IndentedLogger
   ): Option[DeletionDescriptor] = {
 
@@ -111,7 +117,8 @@ object XFormsDeleteAction extends Logging {
       containingDocument = containingDocument,
       collectionToUpdate = List(nodeInfo),
       deleteIndexOpt     = Some(1),
-      doDispatch         = doDispatch
+      doDispatch         = doDispatch,
+      updateRepeats      = updateRepeats
     ).headOption
   }
 
@@ -119,7 +126,8 @@ object XFormsDeleteAction extends Logging {
     containingDocument : XFormsContainingDocument,
     collectionToUpdate : Seq[Item],
     deleteIndexOpt     : Option[Int],
-    doDispatch         : Boolean)(implicit
+    doDispatch         : Boolean,
+    updateRepeats      : Boolean)(implicit
     indentedLogger     : IndentedLogger
   ): List[DeletionDescriptor] = {
 
@@ -158,7 +166,7 @@ object XFormsDeleteAction extends Logging {
 
           // "4. If the delete is successful, the event xforms-delete is dispatched."
           if (doDispatch)
-            Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt))
+            Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt, updateRepeats))
         }
       }
 

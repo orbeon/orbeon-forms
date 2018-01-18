@@ -235,6 +235,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_DEFAULT_QNAME = QName.apply("default", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFAULTS_QNAME = QName.apply("defaults", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFERRED_QNAME = QName.apply("deferred", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_UPDATE_REPEATS_QNAME = QName.apply("update-repeats", XXFORMS_NAMESPACE);
 
     public static final QName VALIDATION_QNAME = QName.apply("validation");
     public static final QName XFORMS_VALIDATION_QNAME = QName.apply("validation", XFORMS_NAMESPACE);

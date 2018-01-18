@@ -192,22 +192,23 @@ class XFormsInstance(
       case insertEvent: XFormsInsertEvent ⇒
         // New nodes were just inserted
 
-        // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
-        // inserted.
-
-        // Find affected repeats
         val insertedNodes = insertEvent.insertedNodes
 
-        //didInsertNodes = insertedNodes.size() != 0
+        if (insertEvent.updateRepeats) {
 
-        // Find affected repeats and update their node-sets and indexes
-        val controls = container.getContainingDocument.getControls
-        updateRepeatNodesets(controls, insertedNodes)
+          // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
+          // inserted.
+
+          // Find affected repeats and update their node-sets and indexes
+          val controls = container.getContainingDocument.getControls
+          updateRepeatNodesets(controls, insertedNodes)
+        }
 
         // Update index
         // If this was a root element replacement, rely on XXFormsReplaceEvent instead
         if (! insertEvent.isRootElementReplacement)
           updateIndexForInsert(insertedNodes)
+
       case deleteEvent: XFormsDeleteEvent ⇒
         // New nodes were just deleted
         if (deleteEvent.deletedNodes.nonEmpty) {
@@ -353,7 +354,8 @@ class XFormsInstance(
           null,   // CHECK
           currentRoot.getDocumentRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
-          0
+          0,
+          true
         )
       )
     }

@@ -23,13 +23,26 @@ class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false)
   with InstanceEvent {
 
-  def this(target: XFormsEventTarget, deletionDescriptors: Seq[DeletionDescriptor], deleteIndexOpt: Option[Int]) = {
-    this(target, Map("deleted-nodes" → Option(deletionDescriptors map (_.nodeInfo)), "delete-location" → deleteIndexOpt))
+  def this(
+    target              : XFormsEventTarget,
+    deletionDescriptors : Seq[DeletionDescriptor],
+    deleteIndexOpt      : Option[Int],
+    updateRepeats       : Boolean
+  ) = {
+    this(
+      target,
+      Map(
+        "deleted-nodes"   → Option(deletionDescriptors map (_.nodeInfo)),
+        "delete-location" → deleteIndexOpt,
+        "update-repeats"  → Some(updateRepeats)
+      )
+    )
     _deletionDescriptorsOpt = Option(deletionDescriptors)
   }
 
   private var _deletionDescriptorsOpt: Option[Seq[DeletionDescriptor]] = None
   def deletionDescriptors = _deletionDescriptorsOpt.get
 
-  def deletedNodes = property[Seq[NodeInfo]]("deleted-nodes").get
+  def deletedNodes  = property[Seq[NodeInfo]]("deleted-nodes").get
+  def updateRepeats = property[Boolean]("update-repeats").get
 }

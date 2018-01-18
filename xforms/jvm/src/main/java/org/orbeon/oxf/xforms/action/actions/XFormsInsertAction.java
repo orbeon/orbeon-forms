@@ -61,6 +61,8 @@ public class XFormsInsertAction extends XFormsAction {
         // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
         final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME));
 
+        final boolean updateRepeats = ! "false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME));
+
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
             final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
@@ -186,7 +188,9 @@ public class XFormsInsertAction extends XFormsAction {
             insertionIndex,
             true,
             true,
-            setRequireDefaultValues
+            setRequireDefaultValues,
+            updateRepeats,
+            true
         );
     }
 
@@ -200,7 +204,9 @@ public class XFormsInsertAction extends XFormsAction {
         int insertionIndex,
         boolean doClone,
         boolean doDispatch,
-        boolean requireDefaultValues
+        boolean requireDefaultValues,
+        boolean updateRepeats,
+        boolean searchForInstance
     ) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
@@ -225,7 +231,7 @@ public class XFormsInsertAction extends XFormsAction {
 
         // Identify the instance that actually changes
         final XFormsInstance modifiedInstanceOrNull =
-            (containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
+            (searchForInstance && containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
 
         // NOTE: The check on `hasAnyCalculationBind` is not optimal: we should check whether specifically there are any xxf:default which can touch this
         // instance, ideally.
@@ -515,7 +521,8 @@ public class XFormsInsertAction extends XFormsAction {
                     originItems,
                     adjustedInsertLocationNodeInfo,
                     adjustedBeforeAfterInto,
-                    insertLocationIndexWithinParentBeforeUpdate
+                    insertLocationIndexWithinParentBeforeUpdate,
+                    updateRepeats
                 )
             );
         }

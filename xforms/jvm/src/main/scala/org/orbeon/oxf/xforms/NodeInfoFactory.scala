@@ -31,7 +31,7 @@ object NodeInfoFactory {
 
   def elementInfo(qName: QName, content: Seq[Item] = Nil): NodeInfo = {
     val newElement = Wrapper.wrap(DocumentFactory.createElement(qName))
-    XFormsAPI.insert(into = Seq(newElement), origin = content)
+    XFormsAPI.insert(into = Seq(newElement), origin = content, doDispatch = false, updateRepeats = false, searchForInstance = false)
     newElement
   }
 

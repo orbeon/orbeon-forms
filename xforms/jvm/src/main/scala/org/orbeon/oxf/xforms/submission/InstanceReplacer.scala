@@ -293,14 +293,17 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           1,
           false,
           true,
-          applyDefaults
+          applyDefaults,
+          true,
+          true
         )
 
         // Perform the deletion of the selected node
         XFormsDeleteAction.doDeleteOne(
           containingDocument = containingDocument,
           nodeInfo           = destinationNodeInfo,
-          doDispatch         = true
+          doDispatch         = true,
+          updateRepeats      = true
         )
 
         // Update model instance

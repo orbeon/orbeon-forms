@@ -31,7 +31,8 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
     originItems         : JList[Item],
     insertLocationNode  : NodeInfo,
     position            : String,
-    insertLocationIndex : Int
+    insertLocationIndex : Int,
+    updateRepeats       : Boolean
   ) = this(
       target,
       Map(
@@ -39,7 +40,8 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
         "origin-nodes"          → Option(originItems.asScala),    // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
         "insert-location-node"  → Option(insertLocationNode),     // "The insert location node as defined by the insert action."
         "insert-location-index" → Option(insertLocationIndex),    // The position of the insert location node relative to its parent, before the insertion took place.
-        "position"              → Option(position)                // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
+        "position"              → Option(position),               // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
+        "update-repeats"        → Some(updateRepeats)
       )
     )
 
@@ -48,6 +50,7 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def insertLocationNode  = property[NodeInfo]("insert-location-node").get
   def insertLocationIndex = property[Int]("insert-location-index").get
   def position            = property[String]("position").get
+  def updateRepeats       = property[Boolean]("update-repeats").get
 
   // Whether this event was dispatched when the root element of an instance was replaced
   def isRootElementReplacement = insertLocationNode.isInstanceOf[DocumentInfo]

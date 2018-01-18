@@ -173,7 +173,8 @@ class XFormsRepeatControl(
           containingDocument = containingDocument,
           collectionToUpdate = sourceItems,
           deleteIndexOpt     = Some(requestedSourceIndex),
-          doDispatch         = false // don't dispatch event because one call to updateRepeatNodeset() is enough
+          doDispatch         = false, // don't dispatch event because one call to updateRepeatNodeset() is enough
+          updateRepeats      = false  // meaningless if `doDispatch == false`
         )
       deletionDescriptors.head.nodeInfo // above deletes exactly one node
     }
@@ -204,7 +205,9 @@ class XFormsRepeatControl(
       /* insertionIndex        = */ actualDestinationIndex,
       /* doClone               = */ false, // do not clone the node as we know the node it is ready for insertion
       /* doDispatch            = */ true,
-      /* requireDefaultValues  = */ false
+      /* requireDefaultValues  = */ false,
+      /* updateRepeats         = */ true,
+      /* searchForInstance     = */ true
     )
 
     // TODO: should dispatch xxforms-move instead of xforms-insert?

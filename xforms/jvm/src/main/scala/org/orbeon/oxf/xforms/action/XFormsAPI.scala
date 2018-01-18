@@ -17,7 +17,6 @@ import java.util.{List ⇒ JList}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -116,7 +115,9 @@ object XFormsAPI {
     after                : Seq[NodeInfo] = Nil,
     before               : Seq[NodeInfo] = Nil,
     doDispatch           : Boolean       = true,
-    requireDefaultValues : Boolean       = false
+    requireDefaultValues : Boolean       = false,
+    updateRepeats        : Boolean       = true,
+    searchForInstance    : Boolean       = true
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
       val action = actionInterpreterDyn.value
@@ -137,15 +138,18 @@ object XFormsAPI {
         collectionToUpdate.size,
         true, // doClone
         doDispatch,
-        requireDefaultValues
+        requireDefaultValues,
+        updateRepeats,
+        searchForInstance
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil
 
   // xf:delete
   def delete(
-    ref        : Seq[NodeInfo],
-    doDispatch : Boolean = true
+    ref           : Seq[NodeInfo],
+    doDispatch    : Boolean = true,
+    updateRepeats : Boolean = true
   ): Seq[NodeInfo] =
     if (ref.nonEmpty) {
       val action = actionInterpreterDyn.value
@@ -155,7 +159,8 @@ object XFormsAPI {
           containingDocument = action map (_.containingDocument) orNull,
           collectionToUpdate = ref,
           deleteIndexOpt     = None,
-          doDispatch         = doDispatch)(
+          doDispatch         = doDispatch,
+          updateRepeats      = updateRepeats)(
           indentedLogger     = action map (_.indentedLogger) orNull
         )
 

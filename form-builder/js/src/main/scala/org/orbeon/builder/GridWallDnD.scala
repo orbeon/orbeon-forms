@@ -22,7 +22,7 @@ import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,14 +39,13 @@ object GridWallDnD {
     val WallShadowClass    = "fb-grid-dnd-wall-shadow"
     val WallVeilClass      = "fb-grid-dnd-wall-veil"
 
-    Cell.listenOnChange()
-
-    // Keeps track of the current cell (if any), and provides utility functions on cells.
+    // Keeps track of the current cell (if any), and instruct containers to show when appropriate
+    Cell // Force initialization
     object Cell {
 
       var currentOpt: Option[Block] = None
 
-      def listenOnChange(): Unit = {
+      locally {
         Position.currentContainerChanged(
           containerCache = BlockCache.cellCache,
           wasCurrent     = (_   : Block) ⇒
@@ -92,6 +91,8 @@ object GridWallDnD {
             top  = currentCell.top
           ))
           dndContainer.height(currentCell.height)
+          dndContainer.on("mouseenter", ControlEditor.mask _)
+          dndContainer.on("mouseleave", ControlEditor.unmask _)
         }
       }
 
@@ -161,7 +162,7 @@ object GridWallDnD {
 
     drake.onDrag { (el: html.Element, source: html.Element) ⇒
       scala.scalajs.js.Dynamic.global.console.log("drag, storing shadow")
-      Position.maskContainerChange = true
+      ControlEditor.mask()
       DndShadow.show(source)
       DndContainers.hideAll()
       for (i ← (1 to 5) ++ (6 to 11))
@@ -170,7 +171,7 @@ object GridWallDnD {
 
     drake.onDragend {(el: html.Element) ⇒
       scala.scalajs.js.Dynamic.global.console.log("drag end")
-      Position.maskContainerChange = false
+      ControlEditor.unmask()
       DndShadow.hide()
     }
 

@@ -40,96 +40,115 @@ object ControlEditor {
     }
   }
 
-  locally {
+  private val ControlActionNames             = List("delete", "edit-details", "edit-items")
+  private var currentCellOpt: Option[Block]  = None
+  private lazy val controlEditorLeft         = $(".fb-control-editor-left")
+  private lazy val controlEditorRight        = $(".fb-control-editor-right")
+  private var previousCellOpt: Option[Block] = None
+  private var masking: Boolean               = false
 
-    val ControlActionNames            = List("delete", "edit-details", "edit-items")
+  // Show/hide editor
+  Position.currentContainerChanged(
+    containerCache = BlockCache.cellCache,
+    wasCurrent     = (_) ⇒ {
+      previousCellOpt = None
+      hideEditors()
+    },
+    becomesCurrent = (cell: Block) ⇒ {
+      if (! masking)
+        showEditors(cell)
+    }
+  )
 
-    var currentCellOpt: Option[Block] = None
-    lazy val controlEditorLeft        = $(".fb-control-editor-left")
-    lazy val controlEditorRight       = $(".fb-control-editor-right")
+  def mask(): Unit = {
+    masking = true
+    previousCellOpt = currentCellOpt
+    hideEditors()
+  }
 
-    // Show/hide editor
-    Position.currentContainerChanged(
-      containerCache = BlockCache.cellCache,
-      wasCurrent = (cell: Block) ⇒ {
-        currentCellOpt = None
-        controlEditorLeft.hide()
-        controlEditorRight.hide()
-        controlEditorLeft.detach()
-        controlEditorRight.detach()
-      },
+  def unmask(): Unit = {
+    masking = false
+    previousCellOpt.foreach(showEditors)
+    previousCellOpt = None
+  }
 
-      becomesCurrent = (cell: Block) ⇒ {
+  private def showEditors(cell: Block): Unit = {
 
-        currentCellOpt = Some(cell)
+    currentCellOpt = Some(cell)
 
-        // Position editors
-        def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
-          editor.show()
-          Offset.offset(editor, Offset(
-            left = cell.left + offsetLeft,
-            top  = cell.top - Position.scrollTop()
-          ))
+    // Position editors
+    def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
+      editor.show()
+      Offset.offset(editor, Offset(
+        left = cell.left + offsetLeft,
+        top  = cell.top - Position.scrollTop()
+      ))
+    }
+    val cellContent = cell.el.children()
+    val controlElOpt = (cellContent.length > 0).option(cellContent.first())
+    controlElOpt.foreach((controlEl) ⇒ {
+      // Control editor is only show when the cell isn't empty
+      controlEl.append(controlEditorRight)
+      positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
+      // Show/hide itemset icon
+      val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
+      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
+    })
+    controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
+    positionEditor(controlEditorLeft, 0)
+
+    // Enable/disable arrow icons
+    for (direction ← Direction.values) {
+      val cellEl = cell.el.get(0).asInstanceOf[html.Element]
+      val directionName = direction.entryName
+      val disableIcon =
+        direction match {
+          case Direction.Right | Direction.Down ⇒
+            Grid.spaceToExtendCell(cellEl, direction) == 0
+          case Direction.Left ⇒
+            (cell.el.attr(AttW) map (_.toInt) getOrElse 1) <= 1
+          case Direction.Up ⇒
+            (cell.el.attr(AttH) map (_.toInt) getOrElse 1) <= 1
         }
-        val cellContent = cell.el.children()
-        val controlElOpt = (cellContent.length > 0).option(cellContent.first())
-        controlElOpt.foreach((controlEl) ⇒ {
-          // Control editor is only show when the cell isn't empty
-          controlEl.append(controlEditorRight)
-          positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
-          // Show/hide itemset icon
-          val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
-          itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
-        })
-        controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
-        positionEditor(controlEditorLeft, 0)
+      val icon = controlEditorLeft.find(s".fb-arrow-$directionName")
+      icon.toggleClass("disabled", disableIcon)
+    }
+  }
 
-        // Enable/disable arrow icons
-        for (direction ← Direction.values) {
-          val cellEl = cell.el.get(0).asInstanceOf[html.Element]
-          val directionName = direction.entryName
-          val disableIcon =
-            direction match {
-              case Direction.Right | Direction.Down ⇒
-                Grid.spaceToExtendCell(cellEl, direction) == 0
-              case Direction.Left ⇒
-                (cell.el.attr(AttW) map (_.toInt) getOrElse 1) <= 1
-              case Direction.Up ⇒
-                (cell.el.attr(AttH) map (_.toInt) getOrElse 1) <= 1
-            }
-          val icon = controlEditorLeft.find(s".fb-arrow-$directionName")
-          icon.toggleClass("disabled", disableIcon)
+  private def hideEditors(): Unit = {
+    currentCellOpt = None
+    controlEditorLeft.hide()
+    controlEditorRight.hide()
+    controlEditorLeft.detach()
+    controlEditorRight.detach()
+  }
+
+  // Control actions
+  ControlActionNames.foreach((actionName) ⇒ {
+    val actionEl = controlEditorRight.find(s".fb-control-$actionName")
+    actionEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
+      currentCellOpt.foreach((currentCell) ⇒ {
+
+        val controlId = currentCell.el.children().attr("id").get
+
+        actionName match {
+          case "delete"       ⇒ RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
+          case "edit-details" ⇒ RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
+          case "edit-items"   ⇒ RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
         }
-      }
-    )
-
-    // Control actions
-    ControlActionNames.foreach((actionName) ⇒ {
-      val actionEl = controlEditorRight.find(s".fb-control-$actionName")
-      actionEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
-        currentCellOpt.foreach((currentCell) ⇒ {
-
-          val controlId = currentCell.el.children().attr("id").get
-
-          actionName match {
-            case "delete"       ⇒ RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
-            case "edit-details" ⇒ RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
-            case "edit-items"   ⇒ RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
-          }
-        })
       })
     })
+  })
 
-    // Expand/shrink actions
-    for (direction ← Direction.values) {
-      val directionName = direction.entryName
-      val className = s"fb-arrow-$directionName"
-      val iconEl = controlEditorLeft.find(s".$className")
+  // Expand/shrink actions
+  for (direction ← Direction.values) {
+    val directionName = direction.entryName
+    val className = s"fb-arrow-$directionName"
+    val iconEl = controlEditorLeft.find(s".$className")
 
-      iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
-        if (! iconEl.is(".disabled"))
-          currentCellOpt.foreach(resizeCell(_, direction))
-      })
-    }
+    iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
+      if (! iconEl.is(".disabled"))
+        currentCellOpt.foreach(resizeCell(_, direction))
+    })
   }
 }

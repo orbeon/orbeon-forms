@@ -215,11 +215,13 @@ div.orbeon.orbeon-portlet-div {
         width: 7px;
         position: absolute;
         background-color: #ccc;
-        &:hover { background-color: #aaa }
+        &:hover                 { background-color: #AAA    }               // Cue container can be grabbed
+        &.fb-grid-dnd-wall-drop { background-color: #F9A03F }               // On drop, wall will be moved here
 
         .fb-grid-dnd-wall-handle {
             height: 100%;
         }
+        z-index: 1;                                                         // For containers to be above the shadow
     }
 
     .fb-grid-dnd-wall-handle {
@@ -230,8 +232,7 @@ div.orbeon.orbeon-portlet-div {
     }
     .fb-grid-dnd-wall-shadow {
         position: absolute;
-        background-color: #F9A03F;
-        z-index: 2;                                                         // To be above veil
+        background-color: #ccc;
     }
 
     // ***** Toolbox ***************************************************************************************************

@@ -37,6 +37,7 @@ object GridWallDnD {
     val WallContainerClass = "fb-grid-dnd-wall-container"
     val WallHandleClass    = "fb-grid-dnd-wall-handle"
     val WallShadowClass    = "fb-grid-dnd-wall-shadow"
+    val WallDropClass      = "fb-grid-dnd-wall-drop"
     val WallVeilClass      = "fb-grid-dnd-wall-veil"
 
     // Keeps track of the current cell (if any), and instruct containers to show when appropriate
@@ -75,7 +76,8 @@ object GridWallDnD {
     // Blocks signaling where cell borders can be dragged from and to.
     object DndContainers {
 
-      private val existingContainers = new mutable.ListBuffer[JQuery]
+      private val containers                 = new mutable.ListBuffer[JQuery]
+      private var dropTarget: Option[JQuery] = None
 
       def show(index: Int): Unit = {
         Cell.currentOpt.foreach { (currentCell) ⇒
@@ -85,7 +87,7 @@ object GridWallDnD {
           val dndHandle    = $(s"""<div class="$WallHandleClass">""")
           dndContainer.append(dndHandle)
           frGrid.append(dndContainer)
-          existingContainers.append(dndContainer)
+          containers.append(dndContainer)
           Offset.offset(dndContainer, Offset(
             left = Offset(frGridBody).left + (frGridBody.width() - dndContainer.width()) / 12 * index,
             top  = currentCell.top
@@ -97,9 +99,28 @@ object GridWallDnD {
       }
 
       def hideAll(): Unit = {
-        existingContainers.foreach(_.remove())
-        existingContainers.clear()
+        containers.foreach(_.remove())
+        containers.clear()
       }
+
+      def markClosestAsDropTarget(left: Double): Unit = {
+
+        val closestContainer: Option[JQuery] = {
+          def distance(container: JQuery) = Math.abs(Offset(container).left - left)
+          case class BestContainer(container: JQuery, distance: Double)
+          containers.foldLeft(None: Option[BestContainer]) { (bestOpt, container) ⇒
+            val currentDistance = distance(container)
+            val keepBest = bestOpt.exists(_.distance <= currentDistance)
+            if (keepBest) bestOpt else Some(BestContainer(container, currentDistance))
+          }.map(_.container)
+        }
+
+        dropTarget.foreach(_.removeClass(WallDropClass))
+        dropTarget = closestContainer
+        dropTarget.foreach(_.addClass(WallDropClass))
+      }
+
+      def getDropTarget: Option[JQuery] = dropTarget
     }
 
     // Block showing during the dragging operation
@@ -142,6 +163,7 @@ object GridWallDnD {
           val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
           val newShadowOffset = Offset(dndShadow).copy(left = newLeft)
           Offset.offset(dndShadow, newShadowOffset)
+          DndContainers.markClosestAsDropTarget(newLeft)
         }
       }
     }
@@ -165,7 +187,7 @@ object GridWallDnD {
       ControlEditor.mask()
       DndShadow.show(source)
       DndContainers.hideAll()
-      for (i ← (1 to 5) ++ (6 to 11))
+      for (i ← 1 to 11)
         DndContainers.show(i)
     }
 
@@ -173,16 +195,15 @@ object GridWallDnD {
       scala.scalajs.js.Dynamic.global.console.log("drag end")
       ControlEditor.unmask()
       DndShadow.hide()
-    }
-
-    drake.onDrop {(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒
       Cell.currentOpt.foreach { (currentCell) ⇒
-        val sourceIndex  = Cell.x(currentCell) + Cell.w(currentCell) - 1
-        val targetIndex  = target.getAttribute("data-index").toInt
-        val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
-        scala.scalajs.js.Dynamic.global.console.log(sourceIndex, targetIndex, direction.toString)
-        for (i ← 1 to Math.abs(targetIndex - sourceIndex))
-          ControlEditor.resizeCell(currentCell, direction)
+        DndContainers.getDropTarget.foreach { (dropTarget) ⇒
+          val sourceIndex  = Cell.x(currentCell) + Cell.w(currentCell) - 1
+          val targetIndex  = dropTarget.attr("data-index").get.toInt
+          val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
+          scala.scalajs.js.Dynamic.global.console.log(sourceIndex, targetIndex, direction.toString)
+          for (i ← 1 to Math.abs(targetIndex - sourceIndex))
+            ControlEditor.resizeCell(currentCell, direction)
+        }
       }
     }
   }

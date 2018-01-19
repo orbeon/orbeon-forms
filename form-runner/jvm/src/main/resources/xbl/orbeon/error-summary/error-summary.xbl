@@ -139,51 +139,6 @@
                     <xf:bind ref="visible-counts/(@* except @alert)" calculate="for $n in name() return count($visible-errors[@level = $n])"/>
                 </xf:bind>
 
-                <!-- Reusable method to insert an error in the right place in the summary -->
-                <xf:action ev:event="fr-insert-error">
-                    <!-- Useful stuff passed to us -->
-                    <xf:var name="absolute-id"      value="event('absolute-id')"/>
-                    <xf:var name="control-position" value="event('control-position')"/>
-                    <xf:var name="level"            value="event('level')"/>
-                    <xf:var name="alert"            value="event('alert')"/>
-                    <xf:var name="label"            value="event('label')"/>
-                    <xf:var name="required-empty"   value="event('required-empty')"/>
-
-                    <!-- Debug -->
-                    <!--
-<xf:message level="xxf:log-debug">
-Inserting error information into error list:
-<xf:output value="for $n in ('id', 'control-position', 'level', 'alert', 'label') return concat($n, ': ', event($n), '\n')"/>
-</xf:message>
-                    -->
-
-                    <xf:var
-                        name="insert-position"
-                        value="count(error[ErrorSummary:controlSortString(@id, 4)
-                                        lt ErrorSummary:controlSortString($absolute-id, 4)])"/>
-
-                    <!-- Now that we have found the position, simply insert -->
-                    <xf:insert
-                        context="."
-                        ref="error[$insert-position]"
-                        origin="
-                            xf:element(
-                                'error',
-                                (
-                                    xf:attribute('id',             $absolute-id),
-                                    xf:attribute('position',       $control-position),
-                                    xf:attribute('label',          $level),
-                                    xf:attribute('alert',          $alert),
-                                    xf:attribute('level',          $label),
-                                    xf:attribute('section-name',   ErrorSummary:topLevelSectionNameForControlId($absolute-id)),
-                                    xf:attribute('required-empty', $required-empty)
-                                )
-                            )"
-                        xxf:update-repeats="false"
-                    />
-
-                </xf:action>
-
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -230,6 +185,7 @@ Inserting error information into error list:
                             xxf:phantom="true"
                             ev:phase="capture"
                             type="xpath">
+
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
                                 event('xxf:absolute-targetid'),
@@ -243,40 +199,19 @@ Inserting error information into error list:
                         </xf:action>
 
                         <!-- Node-set changed -->
-                        <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed" xxf:phantom="true" ev:phase="capture"
-                                       if="count(event('xxf:to-positions')) > 0">
-                            <xf:action xxbl:scope="inner">
+                        <xf:action
+                            xbl:attr="ev:observer=observer"
+                            ev:event="xxforms-nodeset-changed"
+                            xxf:phantom="true"
+                            ev:phase="capture"
+                            if="count(event('xxf:to-positions')) > 0">
 
-                                <!-- TODO: Move to Scala as well. -->
-
-                                <!-- One or more iterations have moved. This is a bit tricky: we must update the error summary properly. -->
-
-                                <xf:var name="target-absolute-id" value="event('xxf:absolute-targetid')"/>
-                                <xf:var name="from-positions"     value="event('xxf:from-positions')"/>
-                                <xf:var name="to-positions"       value="event('xxf:to-positions')"/>
-
-                                <xf:var
-                                    name="affected-errors"
-                                    as="element(error)*"
-                                    value="error[@id != ErrorSummary:updateIteration(@id, $target-absolute-id, $from-positions, $to-positions)]"/>
-
-                                <!-- Remove affected errors from instance -->
-                                <xf:delete ref="$affected-errors"/>
-
-                                <!-- Re-insert affected errors -->
-                                <xf:action iterate="$affected-errors">
-                                    <xf:var name="error" value="."/>
-
-                                    <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xf:property name="absolute-id"         value="ErrorSummary:updateIteration($error/@id, $target-absolute-id, $from-positions, $to-positions)"/>
-                                        <xf:property name="control-position"    value="$error/@position"/>
-                                        <xf:property name="level"               value="$error/@level"/>
-                                        <xf:property name="alert"               value="$error/@alert"/>
-                                        <xf:property name="label"               value="$error/@label"/>
-                                    </xf:dispatch>
-                                </xf:action>
-
-                            </xf:action>
+                            ErrorSummary:updateForMovedIteration(
+                                xxf:instance('fr-errors-instance')/root(),
+                                event('xxf:absolute-targetid'),
+                                event('xxf:from-positions'),
+                                event('xxf:to-positions')
+                            )
                         </xf:action>
 
                         <!-- For all levels, plus combined 'alerts' level -->

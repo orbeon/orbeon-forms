@@ -170,31 +170,35 @@ object ErrorSummary {
         )
       }
 
-    def updateValidStatusForDelete(currentError: NodeInfo) =
-      if ((currentError attValue LevelAttName) == ErrorLevel.entryName)
-        updateValidStatus(
-          ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ErrorLevel.entryName))
-        )
-
-    def updateValidStatusForInsert(actualEventLevel: ValidationLevel) =
-      if (previousStatusIsValid && actualEventLevel == ValidationLevel.ErrorLevel)
-          updateValidStatus(false)
+    def updateValidStatusByScanning() =
+      updateValidStatus(
+        ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ErrorLevel.entryName))
+      )
 
     (currentErrorOpt, actualEventLevelOpt, alertOpt) match {
-      case (Some(currentError), None, _) ⇒
-        XFormsAPI.delete(ref = currentError, updateRepeats = false)
-        updateValidStatusForDelete(currentError)
-      case (Some(currentError), _, None) ⇒
-        XFormsAPI.delete(ref = currentError, updateRepeats = false)
-        updateValidStatusForDelete(currentError)
       case (Some(currentError), Some(actualEventLevel), Some(alert)) ⇒
 
-        XFormsAPI.setvalue(currentError /@ LevelAttName        , actualEventLevel.entryName)
+        val levelAtt      = currentError /@ LevelAttName
+        val previousLevel = ValidationLevel.withNameInsensitive(levelAtt.stringValue)
+
+        XFormsAPI.setvalue(levelAtt                            , actualEventLevel.entryName)
         XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
         XFormsAPI.setvalue(currentError /@ LabelAttName        , labelOpt getOrElse "")
         XFormsAPI.setvalue(currentError /@ RequiredEmptyAttName, requiredEmpty.toString)
 
-        updateValidStatusForInsert(actualEventLevel)
+        if (previousLevel != actualEventLevel) {
+          if (previousStatusIsValid && actualEventLevel == ValidationLevel.ErrorLevel)
+            updateValidStatus(false)
+          else if (! previousStatusIsValid && actualEventLevel != ValidationLevel.ErrorLevel)
+            updateValidStatusByScanning()
+        }
+
+      case (Some(currentError), _, _) ⇒
+
+        XFormsAPI.delete(ref = currentError, updateRepeats = false)
+
+        if ((currentError attValue LevelAttName) == ErrorLevel.entryName)
+          updateValidStatusByScanning()
 
       case (None, Some(actualEventLevel), Some(alert)) ⇒
 
@@ -210,7 +214,8 @@ object ErrorSummary {
           )
         )
 
-        updateValidStatusForInsert(actualEventLevel)
+        if (previousStatusIsValid && actualEventLevel == ValidationLevel.ErrorLevel)
+          updateValidStatus(false)
 
       case _ ⇒
     }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}

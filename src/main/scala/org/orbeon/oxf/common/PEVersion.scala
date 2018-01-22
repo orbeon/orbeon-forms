@@ -79,7 +79,7 @@ class PEVersion extends Version {
     if (licenseInfo.isExpired)
       licenseError(s"License has expired on ${licenseInfo.formattedExpiration.get}")
 
-    logger.info("This installation of " + VersionString + " is licensed to: " + licenseInfo.toString)
+    logger.info(s"This installation of $VersionString is licensed to: ${licenseInfo.toString}")
   }
 
   def requirePEFeature(featureName: String) = ()
@@ -119,15 +119,15 @@ private object PEVersion {
   )
 
   case class LicenseInfo(
-      versionNumber: String,
-      licensor: String,
-      licensee: String,
-      organization: String,
-      email: String,
-      issued: String,
-      version: Option[String],
-      expiration: Option[Long],
-      subscriptionEnd: Option[Long]) {
+      versionNumber   : String,
+      licensor        : String,
+      licensee        : String,
+      organization    : String,
+      email           : String,
+      issued          : String,
+      version         : Option[String],
+      expiration      : Option[Long],
+      subscriptionEnd : Option[Long]) {
 
     def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
     def isExpired                   = expiration      exists (System.currentTimeMillis() > _)

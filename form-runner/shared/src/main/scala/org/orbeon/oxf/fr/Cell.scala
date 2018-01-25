@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.Try
+import org.orbeon.oxf.util.CoreUtils._
 
 case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
 
@@ -226,6 +227,56 @@ object Cell {
       else
         Nil
     }
+
+  // For a given cell, what walls can be moved by D&D?
+  def movableWalls[Underlying](
+    cellElem     : Underlying)(
+    implicit ops : CellOps[Underlying]
+  ): List[Direction] = {
+
+    println("movableWalls cellElem", cellElem)
+    val cells = analyze12ColumnGridAndFillHoles(ops.parent(cellElem), simplify = false)
+    println("movableWalls cells", cells)
+    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
+      println("originCell", originCell)
+      val directionToX = List(
+        Direction.Left →  (originCell.x - 1),
+        Direction.Right → (originCell.x + originCell.w)
+      )
+      println("originCell x/y", originCell.x, originCell.y)
+      directionToX.flatMap { case (direction, x) ⇒
+        // We can't move this wall if it is at the edge of the grid
+        val isCoordinateValid =
+          x >= 1 &&
+          x <= Cell.StandardGridWidth
+        println("Valid direction", direction, isCoordinateValid)
+        isCoordinateValid.flatList {
+          val ys                     = originCell.y until originCell.y + originCell.h
+          println("ys", ys)
+          val neighborCells          = ys.toList.map { y ⇒
+            println("Getting cell for x/y", x, y)
+            cells(y - 1)(x - 1)
+          }
+          val originNeighborCells    = neighborCells.map(c ⇒ c.origin.getOrElse(c)).distinct
+          val hasOverFlowingNeighbor = originNeighborCells.exists(c ⇒ c.y < originCell.y || c.y + c.h > originCell.y + originCell.h)
+          (! hasOverFlowingNeighbor).list(direction)
+        }
+      }
+    }
+  }
+
+
+  //def cellWallPossibleDropTargets[Underlying : CellOps](
+  //  startCell : Underlying,
+  //  startSide : Direction
+  //): List[Int] = {
+  //  val cells = analyze12ColumnGridAndFillHoles(startCell, simplify = true)
+  //  findOriginCell(cells, startCell) flatMap { startCell ⇒
+  //    startCell
+  //    ???
+  //  }
+  //  ???
+  //}
 
   def spaceToExtendCell[Underlying : CellOps](
     cells     : List[List[Cell[Underlying]]],

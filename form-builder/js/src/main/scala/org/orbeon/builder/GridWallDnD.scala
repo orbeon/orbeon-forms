@@ -13,16 +13,15 @@
  */
 package org.orbeon.builder
 
-import autowire._
 import org.orbeon.builder.BlockCache.Block
-import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
+import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
+import org.orbeon.oxf.fr.Cell
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import org.scalajs.jquery.JQuery
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,9 +39,12 @@ object GridWallDnD {
     val WallDropClass      = "fb-grid-dnd-wall-drop"
     val WallVeilClass      = "fb-grid-dnd-wall-veil"
 
-    // Keeps track of the current cell (if any), and instruct containers to show when appropriate
-    Cell // Force initialization
-    object Cell {
+    // Initialize listeners for current cell
+    CurrentCell
+
+    // Keep track of the current cell
+    // Instruct containers to show when appropriate
+    object CurrentCell {
 
       var currentOpt: Option[Block] = None
 
@@ -57,8 +59,11 @@ object GridWallDnD {
           becomesCurrent = (cell: Block) ⇒
             if (! DndShadow.isDragging) {
               currentOpt = Some(cell)
-              val x = Cell.x(cell)
-              val w = Cell.w(cell)
+              val cellEl = cell.el.get(0).asInstanceOf[html.Element]
+              val walls = Cell.movableWalls(cellEl)
+              println(walls)
+              val x = CurrentCell.x(cell)
+              val w = CurrentCell.w(cell)
               // Left
               if (x > 1 || w > 1)
                 DndContainers.show(x - 1)
@@ -70,7 +75,7 @@ object GridWallDnD {
       }
 
       def x(cell: Block): Int = cell.el.attr("data-fr-x").get.toInt
-      def w(cell: Block): Int = cell.el.attr("data-fr-w").get.toInt
+      def w(cell: Block): Int = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)
     }
 
     // Blocks signaling where cell borders can be dragged from and to.
@@ -80,7 +85,7 @@ object GridWallDnD {
       private var dropTarget: Option[JQuery] = None
 
       def show(index: Int): Unit = {
-        Cell.currentOpt.foreach { (currentCell) ⇒
+        CurrentCell.currentOpt.foreach { (currentCell) ⇒
           val frGridBody   = currentCell.el.parents(".fr-grid-body").first()
           var frGrid       = frGridBody.parent
           val dndContainer = $(s"""<div class="$WallContainerClass" data-index="$index">""")
@@ -168,41 +173,42 @@ object GridWallDnD {
       }
     }
 
-    val drake = Dragula(
-      js.Array(),
-      new DragulaOptions {
-        override def isContainer(el: html.Element): Boolean = {
-          el.classList.contains(WallContainerClass)
+    // Handle D&D
+    locally {
+      val drake = Dragula(
+        js.Array(),
+        new DragulaOptions {
+          override def isContainer(el: html.Element): Boolean = {
+            el.classList.contains(WallContainerClass)
+          }
+          override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
+            handle.classList.contains(WallHandleClass)
+          }
+          override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
+            target.classList.contains(WallContainerClass)
         }
-        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
-          handle.classList.contains(WallHandleClass)
-        }
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
-          target.classList.contains(WallContainerClass)
+      )
+
+      drake.onDrag { (el: html.Element, source: html.Element) ⇒
+        ControlEditor.mask()
+        DndShadow.show(source)
+        DndContainers.hideAll()
+
+        for (i ← 1 to 11)
+          DndContainers.show(i)
       }
-    )
 
-    drake.onDrag { (el: html.Element, source: html.Element) ⇒
-      scala.scalajs.js.Dynamic.global.console.log("drag, storing shadow")
-      ControlEditor.mask()
-      DndShadow.show(source)
-      DndContainers.hideAll()
-      for (i ← 1 to 11)
-        DndContainers.show(i)
-    }
-
-    drake.onDragend {(el: html.Element) ⇒
-      scala.scalajs.js.Dynamic.global.console.log("drag end")
-      ControlEditor.unmask()
-      DndShadow.hide()
-      Cell.currentOpt.foreach { (currentCell) ⇒
-        DndContainers.getDropTarget.foreach { (dropTarget) ⇒
-          val sourceIndex  = Cell.x(currentCell) + Cell.w(currentCell) - 1
-          val targetIndex  = dropTarget.attr("data-index").get.toInt
-          val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
-          scala.scalajs.js.Dynamic.global.console.log(sourceIndex, targetIndex, direction.toString)
-          for (i ← 1 to Math.abs(targetIndex - sourceIndex))
-            ControlEditor.resizeCell(currentCell, direction)
+      drake.onDragend {(el: html.Element) ⇒
+        ControlEditor.unmask()
+        DndShadow.hide()
+        CurrentCell.currentOpt.foreach { (currentCell) ⇒
+          DndContainers.getDropTarget.foreach { (dropTarget) ⇒
+            val sourceIndex  = CurrentCell.x(currentCell) + CurrentCell.w(currentCell) - 1
+            val targetIndex  = dropTarget.attr("data-index").get.toInt
+            val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
+            for (i ← 1 to Math.abs(targetIndex - sourceIndex))
+              ControlEditor.resizeCell(currentCell, direction)
+          }
         }
       }
     }

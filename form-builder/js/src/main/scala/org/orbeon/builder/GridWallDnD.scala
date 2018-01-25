@@ -39,73 +39,77 @@ object GridWallDnD {
     val WallDropClass      = "fb-grid-dnd-wall-drop"
     val WallVeilClass      = "fb-grid-dnd-wall-veil"
 
-    // Initialize listeners for current cell
-    CurrentCell
+    case class CurrentCell(block: Block, draggedWall: Option[Direction])
+    case class DraggedWall(side: Direction)
 
-    // Keep track of the current cell
-    // Instruct containers to show when appropriate
-    object CurrentCell {
+    var currentCellOpt: Option[CurrentCell] = None
 
-      var currentOpt: Option[Block] = None
-
-      locally {
-        Position.currentContainerChanged(
-          containerCache = BlockCache.cellCache,
-          wasCurrent     = (_   : Block) ⇒
-            if (! DndShadow.isDragging) {
-              currentOpt = None
-              DndContainers.hideAll()
-            },
-          becomesCurrent = (cell: Block) ⇒
-            if (! DndShadow.isDragging) {
-              currentOpt = Some(cell)
-              val cellEl = cell.el.get(0).asInstanceOf[html.Element]
-              val walls = Cell.movableWalls(cellEl)
-              println(walls)
-              val x = CurrentCell.x(cell)
-              val w = CurrentCell.w(cell)
-              // Left
-              if (x > 1 || w > 1)
-                DndContainers.show(x - 1)
-              // Right
-              if (x + w < 12 || w > 1)
-                DndContainers.show(x + w - 1)
+    // Keep track of the current cell and show draggable walls
+    locally {
+      Position.currentContainerChanged(
+        containerCache = BlockCache.cellCache,
+        wasCurrent     = (_   : Block) ⇒
+          if (! DndShadow.isDragging) {
+            currentCellOpt = None
+            DndWall.hideAll()
+          },
+        becomesCurrent = (cell: Block) ⇒
+          if (! DndShadow.isDragging) {
+            currentCellOpt = Some(CurrentCell(cell, None))
+            val cellEl     = cell.el.get(0).asInstanceOf[html.Element]
+            val walls      = Cell.movableWalls(cellEl)
+            val x          = CellBlockOps.x(cell)
+            val w          = CellBlockOps.w(cell)
+            walls.foreach {
+              case Direction.Left  ⇒ DndWall.show(x - 1    , Some(Direction.Left))
+              case Direction.Right ⇒ DndWall.show(x + w - 1, Some(Direction.Right))
             }
-        )
-      }
+          }
+      )
+    }
 
+    object CellBlockOps {
       def x(cell: Block): Int = cell.el.attr("data-fr-x").get.toInt
       def w(cell: Block): Int = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)
     }
 
     // Blocks signaling where cell borders can be dragged from and to.
-    object DndContainers {
+    object DndWall {
 
-      private val containers                 = new mutable.ListBuffer[JQuery]
+      private val walls                      = new mutable.ListBuffer[JQuery]
       private var dropTarget: Option[JQuery] = None
 
-      def show(index: Int): Unit = {
-        CurrentCell.currentOpt.foreach { (currentCell) ⇒
-          val frGridBody   = currentCell.el.parents(".fr-grid-body").first()
-          var frGrid       = frGridBody.parent
+      def show(index: Int, side: Option[Direction]): Unit = {
+        currentCellOpt.foreach { (currentCell) ⇒
+          val frGridBody   = currentCell.block.el.parents(".fr-grid-body").first()
+          val frGrid       = frGridBody.parent
           val dndContainer = $(s"""<div class="$WallContainerClass" data-index="$index">""")
           val dndHandle    = $(s"""<div class="$WallHandleClass">""")
           dndContainer.append(dndHandle)
           frGrid.append(dndContainer)
-          containers.append(dndContainer)
+          walls.append(dndContainer)
+          val wallSlide = side match {
+            case Some(Direction.Right) ⇒ dndContainer.width()
+            case Some(Direction.Left)  ⇒ 0
+            case None                  ⇒ dndContainer.width() / 2
+          }
+          val wallLeft =
+            Offset(frGridBody).left +
+            frGridBody.width() / 12 * index -
+            wallSlide
           Offset.offset(dndContainer, Offset(
-            left = Offset(frGridBody).left + (frGridBody.width() - dndContainer.width()) / 12 * index,
-            top  = currentCell.top
+            left = wallLeft,
+            top  = currentCell.block.top
           ))
-          dndContainer.height(currentCell.height)
+          dndContainer.height(currentCell.block.height)
           dndContainer.on("mouseenter", ControlEditor.mask _)
           dndContainer.on("mouseleave", ControlEditor.unmask _)
         }
       }
 
       def hideAll(): Unit = {
-        containers.foreach(_.remove())
-        containers.clear()
+        walls.foreach(_.remove())
+        walls.clear()
       }
 
       def markClosestAsDropTarget(left: Double): Unit = {
@@ -113,7 +117,7 @@ object GridWallDnD {
         val closestContainer: Option[JQuery] = {
           def distance(container: JQuery) = Math.abs(Offset(container).left - left)
           case class BestContainer(container: JQuery, distance: Double)
-          containers.foldLeft(None: Option[BestContainer]) { (bestOpt, container) ⇒
+          walls.foldLeft(None: Option[BestContainer]) { (bestOpt, container) ⇒
             val currentDistance = distance(container)
             val keepBest = bestOpt.exists(_.distance <= currentDistance)
             if (keepBest) bestOpt else Some(BestContainer(container, currentDistance))
@@ -168,7 +172,7 @@ object GridWallDnD {
           val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
           val newShadowOffset = Offset(dndShadow).copy(left = newLeft)
           Offset.offset(dndShadow, newShadowOffset)
-          DndContainers.markClosestAsDropTarget(newLeft)
+          DndWall.markClosestAsDropTarget(newLeft)
         }
       }
     }
@@ -192,22 +196,21 @@ object GridWallDnD {
       drake.onDrag { (el: html.Element, source: html.Element) ⇒
         ControlEditor.mask()
         DndShadow.show(source)
-        DndContainers.hideAll()
-
+        DndWall.hideAll()
         for (i ← 1 to 11)
-          DndContainers.show(i)
+          DndWall.show(i, None)
       }
 
       drake.onDragend {(el: html.Element) ⇒
         ControlEditor.unmask()
         DndShadow.hide()
-        CurrentCell.currentOpt.foreach { (currentCell) ⇒
-          DndContainers.getDropTarget.foreach { (dropTarget) ⇒
-            val sourceIndex  = CurrentCell.x(currentCell) + CurrentCell.w(currentCell) - 1
+        currentCellOpt.foreach { (currentCell) ⇒
+          DndWall.getDropTarget.foreach { (dropTarget) ⇒
+            val sourceIndex  = CellBlockOps.x(currentCell.block) + CellBlockOps.w(currentCell.block) - 1
             val targetIndex  = dropTarget.attr("data-index").get.toInt
             val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
             for (i ← 1 to Math.abs(targetIndex - sourceIndex))
-              ControlEditor.resizeCell(currentCell, direction)
+              ControlEditor.resizeCell(currentCell.block, direction)
           }
         }
       }

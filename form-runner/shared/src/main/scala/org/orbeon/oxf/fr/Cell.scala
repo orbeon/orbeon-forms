@@ -25,8 +25,9 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
   require(x > 0 && y > 0 && h > 0 && w > 0,                                     s"`$x`, `$y`, `$h`, `$w`")
   require(x <= Cell.StandardGridWidth && (x + w - 1) <= Cell.StandardGridWidth, s"`$x`, `$y`, `$h`, `$w`")
 
-  def td      = u getOrElse (throw new NoSuchElementException)
-  def missing = origin.isDefined
+  def td           = u getOrElse (throw new NoSuchElementException)
+  def missing      = origin.isDefined
+  def originOrSelf = origin.getOrElse(this)
 }
 
 // TODO: Pass this around and add operations
@@ -230,11 +231,11 @@ object Cell {
 
   // For a given cell, what walls can be moved by D&D?
   def movableWalls[Underlying](
-    cellElem     : Underlying)(
-    implicit ops : CellOps[Underlying]
+    cellElem         : Underlying)(
+    implicit cellOps : CellOps[Underlying]
   ): List[Direction] = {
 
-    val cells = analyze12ColumnGridAndFillHoles(ops.parent(cellElem), simplify = false)
+    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
       val directionToX = List(
         Direction.Left →  (originCell.x - 1),
@@ -248,7 +249,7 @@ object Cell {
         isCoordinateValid.flatList {
           val ys                     = originCell.y until originCell.y + originCell.h
           val neighborCells          = ys.toList.map(y ⇒ cells(y - 1)(x - 1))
-          val originNeighborCells    = neighborCells.map(c ⇒ c.origin.getOrElse(c)).distinct
+          val originNeighborCells    = neighborCells.map(_.originOrSelf).distinct
           val hasOverFlowingNeighbor = originNeighborCells.exists(c ⇒ c.y < originCell.y || c.y + c.h > originCell.y + originCell.h)
           (! hasOverFlowingNeighbor).list(direction)
         }
@@ -256,18 +257,28 @@ object Cell {
     }
   }
 
-
-  //def cellWallPossibleDropTargets[Underlying : CellOps](
-  //  startCell : Underlying,
-  //  startSide : Direction
-  //): List[Int] = {
-  //  val cells = analyze12ColumnGridAndFillHoles(startCell, simplify = true)
-  //  findOriginCell(cells, startCell) flatMap { startCell ⇒
-  //    startCell
-  //    ???
-  //  }
-  //  ???
-  //}
+  // When dragging a given wall of a given cell, where can this wall go?
+  def cellWallPossibleDropTargets[Underlying](
+    cellElem         : Underlying,
+    startSide        : Direction)(
+    implicit cellOps : CellOps[Underlying]
+  ): List[Int] = {
+    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = true)
+    val originCell = findOriginCell(cells, cellElem).get
+    def insideCellPositions(cell: Cell[Underlying]): List[Int] = (cell.x until cell.x + cell.w - 1).toList
+    val statusQuoPosition   = startSide match {
+      case Direction.Left  ⇒ originCell.x - 1
+      case Direction.Right ⇒ originCell.x + originCell.w - 1
+    }
+    val neighborXY = startSide match {
+      case Direction.Left  ⇒ (originCell.x - 1, originCell.y)
+      case Direction.Right ⇒ (originCell.x + 1, originCell.y)
+    }
+    val neighborCell = cells(neighborXY._2 - 1)(neighborXY._1 - 1).originOrSelf
+    println("neighborCell", neighborCell)
+    println("inside neighborCell", insideCellPositions(neighborCell))
+    statusQuoPosition :: insideCellPositions(originCell) ++ insideCellPositions(neighborCell)
+  }
 
   def spaceToExtendCell[Underlying : CellOps](
     cells     : List[List[Cell[Underlying]]],

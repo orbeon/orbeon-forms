@@ -30,6 +30,12 @@ import scala.scalajs.js
 // Allows form authors to move the grid cell walls to resize cells.
 object GridWallDnD {
 
+  private implicit class CellBlockOps(val cell: Block) extends AnyVal {
+    def x         : Int = cell.el.attr("data-fr-x").get.toInt
+    def w         : Int = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)
+    def underlying: html.Element = cell.el.get(0).asInstanceOf[html.Element]
+  }
+
   if (false)
   locally {
 
@@ -56,21 +62,15 @@ object GridWallDnD {
         becomesCurrent = (cell: Block) ⇒
           if (! DndShadow.isDragging) {
             currentCellOpt = Some(CurrentCell(cell, None))
-            val cellEl     = cell.el.get(0).asInstanceOf[html.Element]
-            val walls      = Cell.movableWalls(cellEl)
-            val x          = CellBlockOps.x(cell)
-            val w          = CellBlockOps.w(cell)
+            val walls      = Cell.movableWalls(cell.underlying)
+            val x          = cell.x
+            val w          = cell.w
             walls.foreach {
               case Direction.Left  ⇒ DndWall.show(x - 1    , Some(Direction.Left))
               case Direction.Right ⇒ DndWall.show(x + w - 1, Some(Direction.Right))
             }
           }
       )
-    }
-
-    object CellBlockOps {
-      def x(cell: Block): Int = cell.el.attr("data-fr-x").get.toInt
-      def w(cell: Block): Int = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)
     }
 
     // Blocks signaling where cell borders can be dragged from and to.
@@ -194,11 +194,17 @@ object GridWallDnD {
       )
 
       drake.onDrag { (el: html.Element, source: html.Element) ⇒
+        val possibleTargets = {
+          val wallIndex = source.getAttribute("data-index").toInt
+          val currentCell = currentCellOpt.get
+          val startSide = if (wallIndex == currentCell.block.x - 1) Direction.Left else Direction.Right
+          Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide)
+        }
+        println("possibleTargets", possibleTargets)
         ControlEditor.mask()
         DndShadow.show(source)
         DndWall.hideAll()
-        for (i ← 1 to 11)
-          DndWall.show(i, None)
+        possibleTargets.foreach(DndWall.show(_, None))
       }
 
       drake.onDragend {(el: html.Element) ⇒
@@ -206,7 +212,7 @@ object GridWallDnD {
         DndShadow.hide()
         currentCellOpt.foreach { (currentCell) ⇒
           DndWall.getDropTarget.foreach { (dropTarget) ⇒
-            val sourceIndex  = CellBlockOps.x(currentCell.block) + CellBlockOps.w(currentCell.block) - 1
+            val sourceIndex  = currentCell.block.x + currentCell.block.w - 1
             val targetIndex  = dropTarget.attr("data-index").get.toInt
             val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
             for (i ← 1 to Math.abs(targetIndex - sourceIndex))

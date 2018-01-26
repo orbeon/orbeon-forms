@@ -1,0 +1,218 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+
+    <xbl:binding
+        id="fb-parameters-editor"
+        element="fb|parameters-editor"
+        xxbl:mode="binding lhha custom-lhha">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/fb/parameters-editor/parameters-editor.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all" xxbl:mirror="true">
+                    <params/>
+                </xf:instance>
+
+                <xf:var name="i" value="instance('i')"/>
+
+                <xf:bind
+                    ref="fr:param/fr:name"
+                    required="true()"
+                    constraint="matches(., '^[A-Za-z0-9\-_]+$') and not(. = preceding::fr:name)"
+                    xxf:whitespace="trim"/>
+
+                <xf:bind
+                    ref="fr:param/fr:expr"
+                    required="true()"
+                    type="xxf:xpath2"
+                    xxf:whitespace="trim"/>
+
+                <xf:bind
+                    ref="fr:param/fr:controlName"
+                    required="true()"/>
+
+                <!-- NOTE: This could be generated automatically. -->
+                <xf:instance id="expression-param-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <fr:param type="ExpressionParam">
+                        <fr:name/>
+                        <fr:expr/>
+                    </fr:param>
+                </xf:instance>
+
+                <!-- NOTE: This could be generated automatically. -->
+                <xf:instance id="control-value-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <fr:param type="ControlValueParam">
+                        <fr:name/>
+                        <fr:controlName/>
+                    </fr:param>
+                </xf:instance>
+
+
+                <xf:var name="template" value="instance('control-value-template')"/>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <!-- Bindings specified on control -->
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+            <xf:var name="body"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=body-ref"/></xf:var>
+
+            <!--<xf:var name="binding" value="xxf:binding('fb-parameters-editor')"/>-->
+
+            <xf:group>
+                <xf:label value="xxf:label('fb-parameters-editor')"/>
+
+                <fr:dnd-repeat
+                    ref="
+                        let $params :=
+                            $i/fr:param
+                        return
+                            if (exists($params)) then
+                                $params
+                            else
+                                $template">
+
+                    <xf:var name="current-param"    value="."/>
+                    <xf:var name="param-count"      value="count($i/fr:param)"/>
+                    <xf:var name="can-remove-param" value="$param-count gt 0"/>
+
+                    <xh:div
+                        class="{
+                            'fb-param-iteration',
+                             'xforms-dnd-item',
+                             'xforms-dnd-moves'[$param-count gt 1]
+                        }">
+
+                        <xf:input ref="$current-param/fr:name" class="fb-param-name">
+                            <!-- TODO i18n -->
+                            <xf:label appearance="minimal">Name</xf:label>
+                            <xf:alert>Missing or incorrect value</xf:alert>
+                        </xf:input>
+
+                        <xf:select1 ref="$current-param/@type" class="fb-param-type">
+                            <xf:label>Type</xf:label>
+
+                            <xf:item>
+                                <xf:label>Control Value</xf:label>
+                                <xf:value>ControlValueParam</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>XPath Expression</xf:label>
+                                <xf:value>ExpressionParam</xf:value>
+                            </xf:item>
+
+                            <xf:action event="xforms-select">
+                                <xf:var name="name" value="../fr:name"/>
+                                <xf:delete ref="../*"/>
+                                <xf:insert
+                                    context=".."
+                                    origin="
+                                        (
+                                            if (event('xxf:item-value') = 'ExpressionParam') then
+                                                instance('expression-param-template')
+                                            else if (event('xxf:item-value') = 'ControlValueParam') then
+                                                instance('control-value-template')
+                                            else
+                                                error()
+                                        )/*
+                                "/>
+                                <xf:setvalue ref="../fr:name" value="$name"/>
+                            </xf:action>
+                        </xf:select1>
+
+                        <xf:switch caseref="$current-param/@type" class="fb-param-details">
+                            <xf:case value="'ExpressionParam'">
+                                <xf:input ref="$current-param/fr:expr">
+                                    <!-- TODO i18n -->
+                                    <xf:label appearance="minimal">XPath Expression</xf:label>
+                                    <xf:alert>Incorrect XPath expression</xf:alert>
+                                </xf:input>
+                            </xf:case>
+                            <xf:case value="'ControlValueParam'">
+                                <fr:dropdown-select1 ref="$current-param/fr:controlName">
+                                    <!-- TODO i18n -->
+                                    <xf:label appearance="minimal">Control</xf:label>
+                                    <xf:alert>Missing value</xf:alert>
+                                    <xf:itemset ref="xxf:('fb-form-instance')/xh:body//*[@bind and ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
+                                        <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xf:itemset>
+                                </fr:dropdown-select1>
+                            </xf:case>
+                        </xf:switch>
+
+                        <xh:div class="fb-param-buttons">
+                            <xh:i class="icon-align-justify fb-param-grab"/>
+                            <xf:trigger
+                                appearance="minimal"
+                                ref="if ($can-remove-param) then $i else ''">
+                                <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:delete ref="$current-param"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger appearance="minimal">
+                                <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:insert
+                                        context="$i"
+                                        ref="$current-param[parent::* is $i]"
+                                        position="after"
+                                        origin="$template"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:div>
+
+                    </xh:div>
+
+                </fr:dnd-repeat>
+            </xf:group>
+
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

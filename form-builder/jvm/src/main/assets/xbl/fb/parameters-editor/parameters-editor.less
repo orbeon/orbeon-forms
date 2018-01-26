@@ -1,0 +1,85 @@
+// Copyright (C) 2018 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../../../../../bootstrap-src/less/variables";
+@import (reference) "../../../../../../../bootstrap-src/less/mixins";
+@import (reference) "../../../../../../../bootstrap-src/less/forms";
+@import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-common";
+@import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-bootstrap-override";
+
+.orbeon {
+
+    .xbl-fb-parameters-editor {
+
+        .fb-param-iteration {
+
+            &> * {
+                padding-right: 2px;
+                padding-bottom: 2px;
+            }
+
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); // leave last column to auto size
+
+            .fb-param-name {
+                grid-column-start: 1;
+            }
+
+            .fb-param-type {
+                grid-column-start: 2;
+                grid-column-end: 3;
+
+                .xforms-label {
+                    display: none;
+                }
+            }
+
+            .fb-param-details {
+                grid-column-start: 3;
+                grid-column-end: 6;
+            }
+
+
+            // On the right, the buttons to reorder, remove, and add rows
+            .fb-param-buttons {
+
+                grid-column-start: 6;
+                grid-column-end: 7;
+
+                padding-top: 3px;
+                text-align: right;
+                white-space: nowrap;
+                vertical-align: top;
+            }
+
+            &.gu-mirror {
+                .fb-param-buttons {
+                }
+            }
+
+            .fb-param-options,
+            .fb-param-buttons {
+            }
+
+            .fb-param-grab {
+                display: none;
+            }
+
+            &.xforms-dnd-moves .fb-param-grab {
+                display: inline-block;
+                cursor: move;
+                .opacity(50);
+            }
+        }
+    }
+
+}

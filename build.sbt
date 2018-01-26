@@ -24,6 +24,7 @@ val AutowireVersion               = "0.2.6"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
+  "com.beachape"                %% "enumeratum-circe"               % EnumeratumVersion,
   "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
   "io.spray"                    %% "spray-json"                     % "1.3.2",
   "org.scala-lang.modules"      %% "scala-xml"                      % "1.0.6",
@@ -347,7 +348,8 @@ lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-common",
-    libraryDependencies += "com.beachape"           %%% "enumeratum"  % EnumeratumVersion
+    libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
+    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumVersion
   )
   .jvmSettings(
     (unmanagedJars in Compile) := myFindUnmanagedJars(
@@ -580,9 +582,10 @@ lazy val xformsJS: Project = xforms.js
   .settings(
 
     libraryDependencies            ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "com.beachape" %%% "enumeratum"     % EnumeratumVersion
+      "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape" %%% "enumeratum-circe" % EnumeratumVersion
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",

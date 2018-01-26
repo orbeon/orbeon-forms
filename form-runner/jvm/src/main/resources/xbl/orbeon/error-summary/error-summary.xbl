@@ -188,6 +188,7 @@
 
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
+                                xxf:instance('fr-state-instance')/root(),
                                 event('xxf:absolute-targetid'),
                                 event('xxf:type'),
                                 event('xxf:control-position'),

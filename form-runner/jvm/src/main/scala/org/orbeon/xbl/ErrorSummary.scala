@@ -135,6 +135,7 @@ object ErrorSummary {
   //@XPathFunction
   def removeUpdateOrInsertError(
     errorsInstanceDoc : DocumentInfo,
+    stateInstanceDoc  : DocumentInfo,
     absoluteTargetId  : String,
     eventName         : String,
     controlPosition   : Int,
@@ -160,15 +161,13 @@ object ErrorSummary {
       bindingOpt exists (b ⇒ InstanceData.getRequired(b) && b.stringValue.isEmpty)
 
     val previousStatusIsValid =
-      findStateInstance exists (i ⇒ (i.rootElement elemValue "valid") == "true")
+      (stateInstanceDoc.rootElement elemValue "valid") == "true"
 
     def updateValidStatus(value: Boolean) =
-      findStateInstance foreach { stateInstance ⇒
-        XFormsAPI.setvalue(
-          ref   = stateInstance.rootElement / "valid",
-          value = value.toString
-        )
-      }
+      XFormsAPI.setvalue(
+        ref   = stateInstanceDoc.rootElement / "valid",
+        value = value.toString
+      )
 
     def updateValidStatusByScanning() =
       updateValidStatus(

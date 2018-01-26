@@ -204,6 +204,24 @@ body.orbeon { background-color: @frBackground }
         color: @info;
     }
 
+    .xforms-invalid.xforms-visited {
+        &> input, &> textarea, &> select {
+            border-color: @error;
+        }
+    }
+
+    .xforms-warning.xforms-visited {
+        &> input, &> textarea, &> select {
+            border-color: @warning;
+        }
+    }
+
+    .xforms-info.xforms-visited {
+        &> input, &> textarea, &> select {
+            border-color: @info;
+        }
+    }
+
     .xforms-hint {
         font-size: smaller;
         color: #6E6E6E;

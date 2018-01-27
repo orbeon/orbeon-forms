@@ -21,7 +21,8 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+    xmlns:utils="java:org.orbeon.oxf.util.StringUtils">
 
     <xbl:binding
         id="fb-parameters-editor"
@@ -160,27 +161,27 @@
                                 </xf:input>
                             </xf:case>
                             <xf:case value="'ControlValueParam'">
+                                <xf:var name="current-resources" value="fbf:currentResources()"/>
                                 <fr:dropdown-select1 ref="$current-param/fr:controlName">
                                     <!-- TODO i18n -->
                                     <xf:label appearance="minimal">Control</xf:label>
                                     <xf:alert>Missing value</xf:alert>
-                                    <xf:itemset ref="xxf:('fb-form-instance')/xh:body//*[@bind and ends-with(@id, '-control')]">
+
+                                    <xf:itemset ref="for $c in fbf:getAllControlsWithIds() return frf:controlNameFromId($c/@id)">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label
                                             value="
                                                 utils:truncateWithEllipsis(
-                                                    for $id in substring-before(@id, '-control')
-                                                    return
-                                                        concat(
-                                                            $current-resources/*[name() = $id]/label,
-                                                            ' (',
-                                                            $id,
-                                                            ')'
-                                                        ),
+                                                    concat(
+                                                        $current-resources/*[name() = context()]/label,
+                                                        ' (',
+                                                        context(),
+                                                        ')'
+                                                    ),
                                                     60,
                                                     6
                                                 )"/>
-                                        <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        <xf:value value="."/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
                             </xf:case>

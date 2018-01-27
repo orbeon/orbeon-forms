@@ -394,13 +394,13 @@ object FormBuilderXPathApi {
 
   // Various counts
   //@XPathFunction
-  def countSections        (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.IsSection
+  def countSections        (inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count FormRunner.IsSection
   def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.IsGrid
-  def countRepeats         (inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc)                  count FormRunner.isRepeat
+  def countRepeats         (inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count FormRunner.isRepeat
   def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = getAllControlsWithIds(inDoc) filterNot FormRunner.IsContainer size
+  def countAllNonContainers(inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count (! FormRunner.IsContainer(_))
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
@@ -415,6 +415,14 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def currentLang: String =
     FormBuilder.currentLang(FormBuilderDocContext())
+
+  //@XPathFunction
+  def currentResources: NodeInfo =
+    FormBuilderDocContext().formBuilderModel.get.unsafeGetVariableAsNodeInfo("current-resources")
+
+  //@XPathFunction
+  def getAllControlsWithIds: SequenceIterator =
+    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot FormRunner.IsContainer
 
   //@XPathFunction
   def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] =

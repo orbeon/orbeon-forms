@@ -27,7 +27,6 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
 
   def td           = u getOrElse (throw new NoSuchElementException)
   def missing      = origin.isDefined
-  def originOrSelf = origin.getOrElse(this)
 }
 
 // TODO: Pass this around and add operations
@@ -229,6 +228,31 @@ object Cell {
         Nil
     }
 
+  // Finds the neighbors on the given side of the given cell
+  def findOriginNeighbors[Underlying](
+    originCell : Cell[Underlying],
+    side       : Direction,
+    cells      : List[List[Cell[Underlying]]]
+  ): List[Cell[Underlying]] = {
+    val (neighborX, neighborY) = side match {
+      case Direction.Left  ⇒ (originCell.x - originCell.w, originCell.y)
+      case Direction.Right ⇒ (originCell.x + originCell.w, originCell.y)
+    }
+    val isCoordinateValid =
+      neighborX >= 1 &&
+      neighborX <= Cell.StandardGridWidth &&
+      neighborY >= 1 &&
+      neighborY <= cells.length
+    isCoordinateValid.flatList {
+      val (xs, ys) = side match {
+        case Direction.Left | Direction.Right ⇒ List(neighborX) → (originCell.y until originCell.y + originCell.h).toList
+        case Direction.Up   | Direction.Down  ⇒ (originCell.x until originCell.x + originCell.w).toList → List(neighborY)
+      }
+      val neighborCells = xs.flatMap(x ⇒ ys.map(y ⇒ cells(y - 1)(x - 1)))
+      neighborCells.map(selfCellOrOrigin).distinct
+    }
+  }
+
   // For a given cell, what walls can be moved by D&D?
   def movableWalls[Underlying](
     cellElem         : Underlying)(
@@ -237,22 +261,12 @@ object Cell {
 
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
-      val directionToX = List(
-        Direction.Left →  (originCell.x - 1),
-        Direction.Right → (originCell.x + originCell.w)
-      )
-      directionToX.flatMap { case (direction, x) ⇒
-        // We can't move this wall if it is at the edge of the grid
-        val isCoordinateValid =
-          x >= 1 &&
-          x <= Cell.StandardGridWidth
-        isCoordinateValid.flatList {
-          val ys                     = originCell.y until originCell.y + originCell.h
-          val neighborCells          = ys.toList.map(y ⇒ cells(y - 1)(x - 1))
-          val originNeighborCells    = neighborCells.map(_.originOrSelf).distinct
-          val hasOverFlowingNeighbor = originNeighborCells.exists(c ⇒ c.y < originCell.y || c.y + c.h > originCell.y + originCell.h)
-          (! hasOverFlowingNeighbor).list(direction)
-        }
+      List(Direction.Left, Direction.Right) flatMap { direction ⇒
+        val neighborCells                            = findOriginNeighbors(originCell, direction, cells)
+        val originNeighborCells                      = neighborCells.map(selfCellOrOrigin).distinct
+        def overflowsOriginCell(c: Cell[Underlying]) = c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
+        val directionOK                              = originNeighborCells.nonEmpty && ! originNeighborCells.exists(overflowsOriginCell)
+        directionOK.list(direction)
       }
     }
   }
@@ -263,21 +277,24 @@ object Cell {
     startSide        : Direction)(
     implicit cellOps : CellOps[Underlying]
   ): List[Int] = {
-    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = true)
-    val originCell = findOriginCell(cells, cellElem).get
-    def insideCellPositions(cell: Cell[Underlying]): List[Int] = (cell.x until cell.x + cell.w - 1).toList
-    val statusQuoPosition   = startSide match {
-      case Direction.Left  ⇒ originCell.x - 1
-      case Direction.Right ⇒ originCell.x + originCell.w - 1
+    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
+    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
+      def insideCellPositions(cell: Cell[Underlying]): List[Int] = (cell.x until cell.x + cell.w - 1).toList
+      val statusQuoPosition   = startSide match {
+        case Direction.Left  ⇒ originCell.x - 1
+        case Direction.Right ⇒ originCell.x + originCell.w - 1
+      }
+      val smallestNeighbor = {
+        val neighbors = findOriginNeighbors(originCell, startSide, cells)
+        neighbors match {
+          case Nil ⇒ None
+          case _   ⇒ Some(neighbors.minBy(_.w))
+        }
+      }
+      statusQuoPosition ::
+        insideCellPositions(originCell) ++
+        smallestNeighbor.toList.flatMap(insideCellPositions)
     }
-    val neighborXY = startSide match {
-      case Direction.Left  ⇒ (originCell.x - 1, originCell.y)
-      case Direction.Right ⇒ (originCell.x + 1, originCell.y)
-    }
-    val neighborCell = cells(neighborXY._2 - 1)(neighborXY._1 - 1).originOrSelf
-    println("neighborCell", neighborCell)
-    println("inside neighborCell", insideCellPositions(neighborCell))
-    statusQuoPosition :: insideCellPositions(originCell) ++ insideCellPositions(neighborCell)
   }
 
   def spaceToExtendCell[Underlying : CellOps](

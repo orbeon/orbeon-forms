@@ -18,7 +18,7 @@ import enumeratum._
 
 sealed abstract class Direction extends EnumEntry with Lowercase
 
-object Direction extends Enum[Direction] {
+object Direction extends Enum[Direction] with CirceEnum[Direction] {
 
   val values = findValues
 

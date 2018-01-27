@@ -117,6 +117,11 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       FormBuilder.rowDelete(controlId, position - 1) foreach Undo.pushUserUndoAction
   }
 
+  def moveWall(cellId: String, startSide: Direction, target: Int): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.moveWall(resolveId(cellId).get, startSide, target)
+  }
+
   def shrinkDown(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.shrinkCellDown(resolveId(cellId).get, 1)

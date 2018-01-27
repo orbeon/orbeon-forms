@@ -13,6 +13,8 @@
  */
 package org.orbeon.builder.rpc
 
+import org.orbeon.datatypes.Direction
+
 trait FormBuilderRpcApi {
 
   def unsupportedBrowser(browserName: String, browserVersion: Double): Unit
@@ -27,6 +29,7 @@ trait FormBuilderRpcApi {
   def rowInsert           (controlId: String, position: Int, aboveBelowString: String): Unit // TODO: `AboveBelow` doesn't serialize correctly with Circe.
   def rowDelete           (controlId: String, position: Int): Unit
 
+  def moveWall            (cellId: String, startSide: Direction, target: Int): Unit
   def shrinkDown          (cellId: String): Unit
   def expandRight         (cellId: String): Unit
   def expandDown          (cellId: String): Unit

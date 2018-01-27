@@ -13,13 +13,16 @@
  */
 package org.orbeon.builder
 
+import autowire._
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.Cell
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
@@ -36,7 +39,6 @@ object GridWallDnD {
     def underlying: html.Element = cell.el.get(0).asInstanceOf[html.Element]
   }
 
-  if (false)
   locally {
 
     val WallContainerClass = "fb-grid-dnd-wall-container"
@@ -194,29 +196,29 @@ object GridWallDnD {
       )
 
       drake.onDrag { (el: html.Element, source: html.Element) ⇒
-        val possibleTargets = {
-          val wallIndex = source.getAttribute("data-index").toInt
-          val currentCell = currentCellOpt.get
-          val startSide = if (wallIndex == currentCell.block.x - 1) Direction.Left else Direction.Right
-          Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide)
+        currentCellOpt.foreach { currentCell ⇒
+          val startSide = {
+            val wallIndex = source.getAttribute("data-index").toInt
+            if (wallIndex == currentCell.block.x - 1) Direction.Left else Direction.Right
+          }
+          currentCellOpt = Some(currentCell.copy(draggedWall = Some(startSide)))
+          val possibleTargets = Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide)
+          ControlEditor.mask()
+          DndShadow.show(source)
+          DndWall.hideAll()
+          possibleTargets.foreach(DndWall.show(_, None))
         }
-        println("possibleTargets", possibleTargets)
-        ControlEditor.mask()
-        DndShadow.show(source)
-        DndWall.hideAll()
-        possibleTargets.foreach(DndWall.show(_, None))
       }
 
       drake.onDragend {(el: html.Element) ⇒
         ControlEditor.unmask()
         DndShadow.hide()
-        currentCellOpt.foreach { (currentCell) ⇒
-          DndWall.getDropTarget.foreach { (dropTarget) ⇒
-            val sourceIndex  = currentCell.block.x + currentCell.block.w - 1
-            val targetIndex  = dropTarget.attr("data-index").get.toInt
-            val direction = if (sourceIndex < targetIndex) Direction.Right else Direction.Left
-            for (i ← 1 to Math.abs(targetIndex - sourceIndex))
-              ControlEditor.resizeCell(currentCell.block, direction)
+        DndWall.getDropTarget.foreach { (dropTarget) ⇒
+          currentCellOpt match {
+            case Some(CurrentCell(block, Some(startSide))) ⇒
+              val targetIndex  = dropTarget.attr("data-index").get.toInt
+              val cellId       = block.el.attr("id").get
+              RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
           }
         }
       }

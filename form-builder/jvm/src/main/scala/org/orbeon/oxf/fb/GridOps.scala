@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.fb
 
+import javax.naming.OperationNotSupportedException
+import javax.swing.plaf.DimensionUIResource
+
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow}
 import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
@@ -370,6 +373,40 @@ trait GridOps extends ContainerOps {
           }
         }
       }
+  }
+
+  def moveWall(
+    cellElem     : NodeInfo,
+    startSide    : Direction,
+    target       : Int)(
+    implicit ctx : FormBuilderDocContext
+  ): Unit = {
+    val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+    Cell.findOriginCell(cells, cellElem) foreach {  originCell ⇒
+
+      def moveSingleCell(cell: Cell[NodeInfo], side: Direction, target: Int): Unit = {
+        cell match {
+          case Cell(Some(u), _, x, y, h, w) ⇒
+            val (newX, newW) = side match {
+              case Direction.Left  ⇒ (target + 1, w - (target + 1 - x))
+              case Direction.Right ⇒ (x         , target + 1 - x)
+            }
+            if (x != newX) NodeInfoCellOps.updateX(u, newX)
+            if (w != newW) NodeInfoCellOps.updateW(u, newW)
+          case _ ⇒ throw new IllegalStateException
+        }
+      }
+
+      val neighbors = Cell.findOriginNeighbors(originCell, startSide, cells)
+      startSide match {
+        case Direction.Left ⇒
+          moveSingleCell(originCell, Direction.Left, target)
+          neighbors.foreach(moveSingleCell(_, Direction.Right, target))
+        case Direction.Right ⇒
+          moveSingleCell(originCell, Direction.Right, target)
+          neighbors.foreach(moveSingleCell(_, Direction.Left, target))
+      }
+    }
   }
 
   def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {

@@ -183,20 +183,21 @@
                             xbl:attr="ev:observer=observer"
                             ev:event="xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid"
                             xxf:phantom="true"
-                            ev:phase="capture"
-                            type="xpath">
+                            ev:phase="capture">
 
-                            ErrorSummary:removeUpdateOrInsertError(
-                                xxf:instance('fr-errors-instance')/root(),
-                                xxf:instance('fr-state-instance')/root(),
-                                event('xxf:absolute-targetid'),
-                                event('xxf:type'),
-                                event('xxf:control-position'),
-                                event('xxf:binding')[1],
-                                event('level'),
-                                event('xxf:alert'),
-                                event('xxf:label')
-                            )
+                            <xf:action type="xpath" xxbl:scope="inner">
+                                ErrorSummary:removeUpdateOrInsertError(
+                                    instance('fr-errors-instance')/root(),
+                                    instance('fr-state-instance')/root(),
+                                    event('xxf:absolute-targetid'),
+                                    event('xxf:type'),
+                                    event('xxf:control-position'),
+                                    event('xxf:binding')[1],
+                                    event('level'),
+                                    event('xxf:alert'),
+                                    event('xxf:label')
+                                )
+                            </xf:action>
                         </xf:action>
 
                         <!-- Node-set changed -->
@@ -207,12 +208,14 @@
                             ev:phase="capture"
                             if="count(event('xxf:to-positions')) > 0">
 
-                            ErrorSummary:updateForMovedIteration(
-                                xxf:instance('fr-errors-instance')/root(),
-                                event('xxf:absolute-targetid'),
-                                event('xxf:from-positions'),
-                                event('xxf:to-positions')
-                            )
+                            <xf:action type="xpath" xxbl:scope="inner">
+                                ErrorSummary:updateForMovedIteration(
+                                    instance('fr-errors-instance')/root(),
+                                    event('xxf:absolute-targetid'),
+                                    event('xxf:from-positions'),
+                                    event('xxf:to-positions')
+                                )
+                            </xf:action>
                         </xf:action>
 
                         <!-- For all levels, plus combined 'alerts' level -->

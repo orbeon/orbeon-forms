@@ -342,8 +342,6 @@
             <tab-base><label>Basic Settings</label></tab-base>
             <tab-validations><label>Validations and Alerts</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
-            <tab-label-hint><label>Label and Hint</label></tab-label-hint>
-            <tab-help><label>Help Message</label></tab-help>
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -1382,8 +1380,6 @@
             <tab-base><label>Paramètres de base</label></tab-base>
             <tab-validations><label>Validations et alertes</label></tab-validations>
             <tab-formulas><label>Formules</label></tab-formulas>
-            <tab-label-hint><label>Libellé et suggestion</label></tab-label-hint>
-            <tab-help><label>Message d'Aide</label></tab-help>
             <control-name>
                 <label>Nom du contrôle</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -2424,8 +2420,6 @@
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Elementnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
@@ -3494,8 +3488,6 @@
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Название элемента</label>
                 <alert>Название уже используется или некорректно</alert>
@@ -4564,8 +4556,6 @@
             <tab-base><label>Impostazioni di base</label></tab-base>
             <tab-validations><label>Convalide e avvisi</label></tab-validations>
             <tab-formulas><label>Formule</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label>Messaggio d'aiuto</label></tab-help>
             <control-name>
                 <label>Nome del controllo</label>
                 <alert>Il nome é già in uso o non é valido</alert>
@@ -5626,8 +5616,6 @@
             <tab-base><label>Grundeinstellungen</label></tab-base>
             <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
             <tab-formulas><label>Formeln</label></tab-formulas>
-            <tab-label-hint><label>Beschriftung und Hinweis</label></tab-label-hint>
-            <tab-help><label>Hilfsnachricht</label></tab-help>
             <control-name>
                 <label>Steuerelementname</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
@@ -6691,8 +6679,6 @@
             <tab-base><label>Perusasetukset</label></tab-base>
             <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
             <tab-formulas><label>Kaavat</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label>Ohjeviesti</label></tab-help>
             <control-name>
                 <label>Kontrollin nimi</label>
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
@@ -7753,8 +7739,6 @@
             <tab-base><label>Configuración Básica</label></tab-base>
             <tab-validations><label>Validaciones y Alertas</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label>Mensaje de Ayuda</label></tab-help>
             <control-name>
                 <label>Nombre del Control</label>
                 <alert>Nombre en uso o incorrecto</alert>
@@ -8816,8 +8800,6 @@
             <tab-base><label>Configurações Básicas</label></tab-base>
             <tab-validations><label>Validações e Alertas</label></tab-validations>
             <tab-formulas><label>Fórmulas</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label>Mensagem de Ajuda</label></tab-help>
             <control-name>
                 <label>Nome do Controlo</label>
                 <alert>O nome está incorrecto ou já existe um outro controlo com o mesmo nome</alert>
@@ -9885,8 +9867,6 @@
             <tab-base><label>Basinställningar</label></tab-base>
             <tab-validations><label>Valideringar och aviseringar</label></tab-validations>
             <tab-formulas><label>Formler</label></tab-formulas>
-            <tab-label-hint><label todo="true">[Label and Hint]</label></tab-label-hint>
-            <tab-help><label>Hjälp</label></tab-help>
             <control-name>
                 <label>Kontrollnamn</label>
                 <alert>Namnet används redan eller innehåller otillåtna tecken</alert>

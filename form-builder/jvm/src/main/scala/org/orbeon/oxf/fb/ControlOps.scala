@@ -30,9 +30,12 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -515,13 +518,56 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     controlName : String,
     lht         : String,
     value       : String,
+    params      : Option[Seq[NodeInfo]],
     isHTML      : Boolean)(implicit
     ctx         : FormBuilderDocContext
   ): Boolean = {
     val resourceChanged  = setControlResource(controlName, lht, value.trimAllToEmpty)
-    val mediatypeChanged = FormBuilder.setControlLHHATMediatype(controlName, lht, isHTML)
+    val mediatypeChanged = setControlLHHATMediatype(controlName, lht, isHTML)
+    val paramsChanged    = params exists (setControlLHHATParams(controlName, lht, _))
 
-    resourceChanged || mediatypeChanged
+    resourceChanged || mediatypeChanged || paramsChanged
+  }
+
+  private def setControlLHHATParams(
+    controlName : String,
+    lhha        : String,
+    params      : Seq[NodeInfo])(implicit
+    ctx         : FormBuilderDocContext
+  ): Boolean = {
+
+    val lhhaNodes      = getControlLHHAT(controlName, lhha)
+    val existingParams = lhhaNodes / (FR → "param")
+
+    val changed = {
+
+      val sizeChanged = params.lengthCompare(existingParams.size) != 0
+      val bothEmpty   = ! sizeChanged && params.isEmpty && existingParams.isEmpty
+
+      sizeChanged || ! bothEmpty && {
+
+        val someNode = params.headOption orElse existingParams.headOption get
+        val config   = someNode.getConfiguration
+
+        ! DeepEqual.deepEquals(
+          params.iterator,
+          existingParams.iterator,
+          new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
+          config,
+          DeepEqual.INCLUDE_PREFIXES |
+            DeepEqual.INCLUDE_COMMENTS |
+            DeepEqual.COMPARE_STRING_VALUES |
+            DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS
+        )
+      }
+    }
+
+    if (changed) {
+      XFormsAPI.delete(ref = existingParams, updateRepeats = false)
+      XFormsAPI.insert(into = lhhaNodes, after = lhhaNodes / *, origin = params, updateRepeats = false)
+    }
+
+    changed
   }
 
   // Find a control's LHHA (there can be more than one for alerts)

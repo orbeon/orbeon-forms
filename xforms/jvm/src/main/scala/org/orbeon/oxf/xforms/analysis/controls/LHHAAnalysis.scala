@@ -188,7 +188,9 @@ class LHHAAnalysis(
 
       if (ref.isDefined || value.isDefined) {
         // 1. E.g. <xf:label model="…" context="…" value|ref="…"/>
-        assert(element.elements.isEmpty) // no children elements allowed in this case
+
+        // Don't assert because we want to support nested `fr:param` elements in Form Builder.
+        //assert(element.elements.isEmpty) // no children elements allowed in this case
 
         // Use value provided by the delegate
         delegateAnalysis.getValueAnalysis

@@ -144,9 +144,10 @@ object FormBuilderXPathApi {
     controlName : String,
     lht         : String,
     value       : String,
+    params      : Array[NodeInfo],
     isHTML      : Boolean
   ): Unit =
-    FormBuilder.setControlLabelOrHintOrText(controlName, lht, value, isHTML)(FormBuilderDocContext())
+    FormBuilder.setControlLabelOrHintOrText(controlName, lht, value, Some(params), isHTML)(FormBuilderDocContext())
 
   // Set the control's items for all languages
   //@XPathFunction
@@ -317,6 +318,10 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def getControlLhhOrEmpty(controlName: String, lhh: String): String =
     FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def getControlLhhParams(controlName: String, lhh: String): Seq[NodeInfo] =
+    FormBuilder.getControlLHHAT(controlName, lhh)(FormBuilderDocContext()) child (FR → "param")
 
   //@XPathFunction
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String): Boolean =

@@ -25,6 +25,7 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:map="http://www.w3.org/2005/xpath-functions/map"
         xmlns:d="DAV:">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
@@ -891,6 +892,51 @@
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Process dynamic LHHA with parameters -->
+    <xsl:template
+        match="
+            xf:label[exists(fr:param)] |
+            xf:help [exists(fr:param)] |
+            xf:hint [exists(fr:param)] |
+            xf:alert[exists(fr:param)]">
+
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+
+            <xsl:variable
+                name="expr"
+                select="
+                    concat(
+                        'xxf:r(''',
+                            frf:controlNameFromId(../@id),
+                            '.',
+                            local-name(),
+                            ''',''fr-form-resources'',',
+                            'map:merge((',
+                                string-join(
+                                    for $p in fr:param
+                                    return
+                                        concat(
+                                            'map:entry(''',
+                                                $p/fr:name,
+                                                ''',',
+                                                $p/fr:expr,
+                                            ')'
+                                        ),
+                                    ','
+                                ),
+                            '))',
+                        ')'
+                    )
+                "/>
+
+            <xsl:attribute
+                name="ref"
+                select="$expr"/>
+
         </xsl:copy>
     </xsl:template>
 

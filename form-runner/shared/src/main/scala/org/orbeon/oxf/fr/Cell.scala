@@ -235,7 +235,7 @@ object Cell {
     cells      : List[List[Cell[Underlying]]]
   ): List[Cell[Underlying]] = {
     val (neighborX, neighborY) = side match {
-      case Direction.Left  ⇒ (originCell.x - originCell.w, originCell.y)
+      case Direction.Left  ⇒ (originCell.x - 1           , originCell.y)
       case Direction.Right ⇒ (originCell.x + originCell.w, originCell.y)
     }
     val isCoordinateValid =
@@ -253,7 +253,7 @@ object Cell {
     }
   }
 
-  // For a given cell, what walls can be moved by D&D?
+  // For a given cell, returns the walls that can be moved by D&D
   def movableWalls[Underlying](
     cellElem         : Underlying)(
     implicit cellOps : CellOps[Underlying]
@@ -271,7 +271,7 @@ object Cell {
     }
   }
 
-  // When dragging a given wall of a given cell, where can this wall go?
+  // When dragging a given wall of a given cell, returns where this wall can go
   def cellWallPossibleDropTargets[Underlying](
     cellElem         : Underlying,
     startSide        : Direction)(

@@ -833,7 +833,11 @@
                             'disabled'   [not($top-level-section-available)],
                             'active'     [$top-level-section-active  ],
                             'started'    [$top-level-section-visited ],
-                            $top-level-section-tokens
+                            $top-level-section-tokens,
+
+                            'first-page'         [$relevant-top-level-case-ids[1]      = '{concat($static-section-id, '-case')}'],
+                            'last-top-level-page'[$relevant-top-level-case-ids[last()] = '{concat($static-section-id, '-case')}'],
+                            'last-page'          [$relevant-nav-case-ids[last()]       = '{concat($static-section-id, '-case')}']
                         }}">
 
                             <xf:var

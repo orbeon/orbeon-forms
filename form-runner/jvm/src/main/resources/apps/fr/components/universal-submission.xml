@@ -31,10 +31,8 @@
         ref="
             let $params := xxf:split(instance('fr-send-submission-params')/@content)
             return
-                if ($params = ('pdf', 'pdf-url')) then
-                   xxf:instance('fr-pdf-url-instance')
-                else if ($params = ('tiff', 'tiff-url')) then
-                   xxf:instance('fr-tiff-url-instance')
+                if ($params = ('pdf', 'pdf-url', 'tiff', 'tiff-url')) then
+                   xxf:instance('fr-urls-instance')/*[name() = instance('fr-send-submission-params')/@binary-content-key]
                 else if ($params = 'metadata') then
                    frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
                 else
@@ -80,7 +78,8 @@
             prune-metadata=""
             show-progress=""
             formtarget=""
-            response-is-resource=""/>
+            response-is-resource=""
+            binary-content-key=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission">
         <xf:setvalue

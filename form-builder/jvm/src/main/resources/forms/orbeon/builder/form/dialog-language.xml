@@ -21,7 +21,10 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-add-language-dialog" appearance="minimal" level="modeless">
+      id="fb-add-language-dialog"
+      appearance="minimal"
+      level="modeless"
+      class="fb-add-language-dialog">
 
     <xf:label ref="$form-resources/dialog-add-language/label"/>
 

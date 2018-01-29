@@ -119,12 +119,9 @@
         <upload-schema>
             <label>XML Schema</label>
         </upload-schema>
-        <change-pdf>
-            <label>Change PDF</label>
-        </change-pdf>
-        <upload-pdf>
-            <label>PDF Template</label>
-        </upload-pdf>
+        <pdf-templates>
+            <label>PDF Templates</label>
+        </pdf-templates>
         <change-css>
             <label>Change CSS</label>
         </change-css>
@@ -721,12 +718,18 @@
         <dialog-view-source>
             <label>View Source</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
-            <label>Attach a PDF template file</label>
-            <upload-pdf>
+        <dialog-pdf>
+            <label>Attach PDF templates</label>
+            <pdf-upload>
                 <label>PDF File</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label>Name</label>
+            </attachment-name>
+            <attachment-language>
+                <label>Language</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Edit Choices</label>
             <resources-language>
@@ -1157,12 +1160,9 @@
         <upload-schema>
             <label>Schéma XML</label>
         </upload-schema>
-        <change-pdf>
-            <label>Changer PDF</label>
-        </change-pdf>
-        <upload-pdf>
-            <label>Modèle PDF</label>
-        </upload-pdf>
+        <pdf-templates>
+            <label>Modèles PDF</label>
+        </pdf-templates>
         <change-css>
             <label>Changer CSS</label>
         </change-css>
@@ -1760,12 +1760,18 @@
         <dialog-view-source>
             <label>Code source</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
-            <label>Joindre un fichier PDF</label>
-            <upload-pdf>
+        <dialog-pdf>
+            <label>Joindre des modèles PDF</label>
+            <pdf-upload>
                 <label>Fichier PDF</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label>Nom</label>
+            </attachment-name>
+            <attachment-language>
+                <label>Langue</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Editer liste de choix</label>
             <resources-language>
@@ -2197,12 +2203,9 @@
         <upload-schema>
             <label>Last opp skjema</label>
         </upload-schema>
-        <change-pdf>
-            <label>Endre PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Last opp PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Endre CSS</label>
         </change-css>
@@ -2800,12 +2803,18 @@
         <dialog-view-source>
             <label>Vis kildekode</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Last opp PDF</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>PDF-fil</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label todo="true">[Edit Choices]</label>
             <resources-language>
@@ -3265,12 +3274,9 @@
         <upload-schema>
             <label>Загрузить схему</label>
         </upload-schema>
-        <change-pdf>
-            <label>Изменить PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Загрузить PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Изменить CSS</label>
         </change-css>
@@ -3867,12 +3873,18 @@
         <dialog-view-source>
             <label>Просмотреть код</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Загрузка PDF</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>Файл PDF</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Редактор элементов</label>
             <resources-language>
@@ -4333,12 +4345,9 @@
         <upload-schema>
             <label>Schema XML</label>
         </upload-schema>
-        <change-pdf>
-            <label>Cambia PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Allega PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Cambia CSS</label>
         </change-css>
@@ -4927,12 +4936,18 @@
         <dialog-view-source>
             <label>Visualizza fonte</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Allega un file di modello PDF</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>File PDF</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Modifica scelte</label>
             <resources-language>
@@ -5393,12 +5408,9 @@
         <upload-schema>
             <label>Schema XML</label>
         </upload-schema>
-        <change-pdf>
-            <label>PDF ändern</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>PDF anhängen</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>CSS ändern</label>
         </change-css>
@@ -5988,12 +6000,18 @@
             <dialog-view-source>
             <label>Quelltext anzeigen</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Eine PDF-Vorlage anhängen</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>PDF-Datei</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Auswahlmöglichkeiten bearbeiten</label>
             <resources-language>
@@ -6456,12 +6474,9 @@
         <upload-schema>
             <label>Lähetä skeema</label>
         </upload-schema>
-        <change-pdf>
-            <label>Muuta PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Liitä PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Muuta CSS</label>
         </change-css>
@@ -7051,12 +7066,18 @@
         <dialog-view-source>
             <label>Näytä lähde</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Liitä PDF-mallinne</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>PDF-tiedosto</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Itemset-editori</label>
             <resources-language>
@@ -7516,12 +7537,9 @@
         <upload-schema>
             <label>Esquema XML</label>
         </upload-schema>
-        <change-pdf>
-            <label>Cambiar PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Adjuntar PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Cambiar CSS</label>
         </change-css>
@@ -8111,12 +8129,18 @@
         <dialog-view-source>
             <label>Ver Código Fuente</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Adjuntar una plantilla PDF</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>Archivo PDF</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Editar Opciones</label>
             <resources-language>
@@ -8577,12 +8601,9 @@
         <upload-schema>
             <label>XML Schema</label>
         </upload-schema>
-        <change-pdf>
-            <label>Alterar o PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Anexar o PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Alterar o CSS</label>
         </change-css>
@@ -9178,12 +9199,18 @@
         <dialog-view-source>
             <label>Ver Fonte</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Anexar um template PDF</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>Ficheiro PDF</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Alterar Escolhas</label>
             <resources-language>
@@ -9644,12 +9671,9 @@
         <upload-schema>
             <label>XML Schema</label>
         </upload-schema>
-        <change-pdf>
-            <label>Ändra PDF</label>
-        </change-pdf>
-        <upload-pdf>
+        <pdf-templates>
             <label>Infoga PDF</label>
-        </upload-pdf>
+        </pdf-templates>
         <change-css>
             <label>Ändra CSS</label>
         </change-css>
@@ -10246,12 +10270,18 @@
         <dialog-view-source>
             <label>Visa källkod</label>
         </dialog-view-source>
-        <dialog-upload-pdf>
+        <dialog-pdf>
             <label>Bifoga en PDF-mall</label>
-            <upload-pdf>
+            <pdf-upload>
                 <label>PDF-fil</label>
-            </upload-pdf>
-        </dialog-upload-pdf>
+            </pdf-upload>
+            <attachment-name>
+                <label todo="true">[Name]</label>
+            </attachment-name>
+            <attachment-language>
+                <label todo="true">[Language]</label>
+            </attachment-language>
+        </dialog-pdf>
         <dialog-itemsets>
             <label>Ändra alternativ</label>
             <resources-language>

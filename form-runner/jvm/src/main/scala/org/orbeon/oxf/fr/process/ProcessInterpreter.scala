@@ -36,7 +36,8 @@ import scala.util.{Failure, Success, Try}
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
 
-  type ActionParams = Map[Option[String], String]
+  import ProcessInterpreter._
+
   type Action       = ActionParams ⇒ Try[Any]
 
   val EmptyActionParams: ActionParams = Map.empty
@@ -59,22 +60,6 @@ trait ProcessInterpreter extends Logging {
   def extensionActions: Traversable[(String, Action)] = Nil
   def beforeProcess(): Try[Any] = Try(())
   def afterProcess():  Try[Any] = Try(())
-
-  def paramByName(params: ActionParams, name: String) =
-    params.get(Some(name))
-
-  def booleanParamByName(params: ActionParams, name: String, default: Boolean) =
-    params.get(Some(name)) map (_ == "true") getOrElse default
-
-  def paramByNameOrDefault(params: ActionParams, name: String) =
-    params.get(Some(name)) orElse params.get(None)
-
-  def requiredParamByName(params: ActionParams, action: String, name: String) =
-    params.getOrElse(Some(name), missingArgument(action, name))
-
-  // TODO: Obtain action name automatically.
-  def missingArgument(action: String, name: String) =
-    throw new IllegalArgumentException(s"$action: `$name` parameter is required")
 
   private object ProcessRuntime {
 
@@ -340,4 +325,26 @@ trait ProcessInterpreter extends Logging {
         namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
         functionContext = xpathFunctionContext
       )
+}
+
+object ProcessInterpreter {
+
+  type ActionParams = Map[Option[String], String]
+
+  def paramByName(params: ActionParams, name: String) =
+    params.get(Some(name))
+
+  def booleanParamByName(params: ActionParams, name: String, default: Boolean) =
+    params.get(Some(name)) map (_ == "true") getOrElse default
+
+  def paramByNameOrDefault(params: ActionParams, name: String) =
+    params.get(Some(name)) orElse params.get(None)
+
+  def requiredParamByName(params: ActionParams, action: String, name: String) =
+    params.getOrElse(Some(name), missingArgument(action, name))
+
+  // TODO: Obtain action name automatically.
+  def missingArgument(action: String, name: String) =
+    throw new IllegalArgumentException(s"$action: `$name` parameter is required")
+
 }

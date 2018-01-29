@@ -23,7 +23,7 @@
     <!-- Unrolled XHTML+XForms -->
     <p:param type="input" name="xforms"/>
     <!-- Request parameters -->
-    <p:param type="input" name="parameters"/>
+    <p:param type="input" name="parameters" debug="xxxx parameters"/>
     <!-- PDF document -->
     <p:param type="output" name="data"/>
 
@@ -103,8 +103,25 @@
                 <xsl:variable name="form"   select="/*/*[1]"/>
                 <xsl:variable name="params" select="/*/*[2]"/>
 
+                <xsl:variable name="format"            select="$params/mode"/>
+                <xsl:variable name="pdf-template-name" select="p:get-request-parameter('fr-pdf-template-name')"/>
+                <xsl:variable name="fr-language"       select="p:get-request-parameter('fr-language')"/>
+
+                <xsl:variable name="attach" select="$form//xf:instance[@id = 'fr-form-attachments']/*"/>
+
                 <url>
-                    <xsl:value-of select="p:rewrite-service-uri($form//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
+                    <xsl:value-of
+                        xmlns:rendered-format="java:org.orbeon.oxf.fr.process.FormRunnerRenderedFormat"
+                        select="
+                            p:rewrite-service-uri(
+                                rendered-format:findTemplatePath(
+                                    $attach,
+                                    $format,
+                                    $pdf-template-name,
+                                    $fr-language
+                                ),
+                                true()
+                            )"/>
                 </url>
 
                 <mode>binary</mode>

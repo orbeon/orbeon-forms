@@ -810,7 +810,7 @@
                            or xxf:non-blank(xxf:username())"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
-                 relevant="xxf:is-blank(xxf:instance('fr-form-attachments')/pdf) or version:isPE()"
+                 relevant="not((xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')) or version:isPE()"
                  xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
@@ -827,15 +827,12 @@
          information, so that the above binds are kept in sync. Ideally would need smart dependency system. -->
     <xf:recalculate event="xxforms-value-changed" observer="fr-error-summary-instance"/>
 
-    <xf:instance id="fr-pdf-url-instance" xxf:exclude-result-prefixes="#all">
-        <uri/>
+    <!-- Series of temporary URLs for PDF/TIFF generation -->
+    <xf:instance id="fr-urls-instance" xxf:exclude-result-prefixes="#all">
+        <urls/>
     </xf:instance>
 
-    <xf:instance id="fr-tiff-url-instance" xxf:exclude-result-prefixes="#all">
-        <uri/>
-    </xf:instance>
-
-    <xf:bind ref="instance('fr-pdf-url-instance') | instance('fr-tiff-url-instance')" type="xs:anyURI"/>
+    <xf:bind ref="instance('fr-urls-instance')/*" type="xs:anyURI"/>
 
     <!-- React to issue loading the document. We consider this fatal. -->
     <xf:action event="xforms-submit-error" target="fr-get-document-submission" type="xpath">

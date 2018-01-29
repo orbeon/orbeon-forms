@@ -14,11 +14,12 @@
 package org.orbeon.oxf.fr.process
 
 import org.junit.Test
+import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
 import org.parboiled.errors.ParsingException
 import org.scalatest.junit.AssertionsForJUnit
@@ -127,6 +128,121 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
       assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
       assert(trace === interpreter.trace)
       interpreter.runProcess("", "resume").get
+    }
+  }
+
+  @Test def renderedFormatParametersSelection(): Unit = {
+
+    import FormRunnerRenderedFormat._
+    import org.orbeon.scaxon.NodeConversions._
+
+    val Tests = List[(String, NodeInfo, ActionParams, String, List[(String, String)])](
+      (
+        "no attachment",
+        <attachments/>,
+        Map.empty,
+        "en",
+        List(
+          s"fr-$UsePdfTemplateParam" → "false",
+          "fr-remember-language"     → "false",
+          "fr-language"              → "en"
+        )
+      ),
+      (
+        "legacy attachment with no name or language",
+        <attachments>
+          <pdf>data:</pdf>
+        </attachments>,
+        Map.empty,
+        "en",
+        List(
+          s"fr-$UsePdfTemplateParam" → "true",
+          "fr-remember-language"     → "false",
+          "fr-language"              → "en"
+        )
+      ),
+      (
+        "empty name but languages, using default language",
+        <attachments>
+          <pdf name="" lang="en">data:</pdf>
+          <pdf name="" lang="fr">data:</pdf>
+        </attachments>,
+        Map.empty,
+        "fr",
+        List(
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateNameParam" → "",
+          "fr-remember-language"      → "false",
+          "fr-language"               → "fr"
+        )
+      ),
+      (
+        "empty name but languages, specifying language",
+        <attachments>
+          <pdf name="" lang="en">data:</pdf>
+          <pdf name="" lang="fr">data:</pdf>
+        </attachments>,
+        Map(
+          Some("lang") → "fr"
+        ),
+        "en",
+        List(
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateNameParam" → "",
+          "fr-remember-language" →  "false",
+          "fr-language"          →  "fr"
+        )
+      ),
+      (
+        "names and languages, using default language",
+        <attachments>
+          <pdf name="foo" lang="en">data:</pdf>
+          <pdf name="foo" lang="fr">data:</pdf>
+          <pdf name="bar" lang="en">data:</pdf>
+          <pdf name="bar" lang="fr">data:</pdf>
+        </attachments>,
+        Map(
+          Some(PdfTemplateNameParam) → "bar"
+        ),
+        "fr",
+        List(
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateNameParam" → "bar",
+          "fr-remember-language"      → "false",
+          "fr-language"               → "fr"
+        )
+      ),
+      (
+        "names and languages, specifying language",
+        <attachments>
+          <pdf name="foo" lang="en">data:</pdf>
+          <pdf name="foo" lang="fr">data:</pdf>
+          <pdf name="bar" lang="en">data:</pdf>
+          <pdf name="bar" lang="fr">data:</pdf>
+        </attachments>,
+        Map(
+          Some("lang")               → "fr",
+          Some(PdfTemplateNameParam) → "bar"
+        ),
+        "en",
+        List(
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateNameParam" → "bar",
+          "fr-remember-language"      → "false",
+          "fr-language"               → "fr"
+        )
+      )
+    )
+
+    for ((description, elem, params, defaultLang, expected) ← Tests) {
+      assert(
+        expected ===
+          createPdfOrTiffParams(
+            Some(elem),
+            params,
+            defaultLang
+          )
+      )
     }
   }
 }

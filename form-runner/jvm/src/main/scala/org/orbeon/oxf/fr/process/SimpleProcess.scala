@@ -50,19 +50,19 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   def xpathFunctionLibrary = inScopeContainingDocument.getFunctionLibrary
   def xpathFunctionContext = XPath.functionContext.orNull
 
-  // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared
+  // NOTE: Clear the PDF/TIFF URLs *before* the process, because if we clear it after, it will be already cleared
   // during the second pass of a two-pass submission.
   override def beforeProcess() = Try {
-    List("pdf", "tiff") foreach { mode ⇒
 
-      // Remove resource and temporary file if any
-      pdfOrTiffPathOpt(mode) foreach { path ⇒
-        XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
-      }
+    val elems = getUrlsInstanceRootElem.toList child *
 
-      // Clear stored path
-      setvalue(pdfTiffPathInstanceRootElementOpt(mode).to[List], "")
+    // Remove resource and temporary file if any
+    elems map (_.stringValue) flatMap trimAllToOpt foreach { path ⇒
+      XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
     }
+
+    // Clear stored paths
+    delete(elems)
   }
 
   override def processError(t: Throwable) =

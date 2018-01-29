@@ -375,9 +375,9 @@
                     <xf:bind id="wizard-mode-bind"      ref="wizard-mode"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
-                <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">
+                <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*" id="attachments-bind">
                     <xf:bind id="css-attachment-bind"   ref="css" type="xs:anyURI"/>
-                    <xf:bind id="pdf-attachment-bind"   ref="pdf" type="xs:anyURI"/>
+                    <xf:bind id="pdf-attachments-bind"  ref="pdf" type="xs:anyURI"/>
                 </xf:bind>
                 <!-- Properties on main form model -->
                 <xf:bind id="attachment-max-size-bind"           ref="@xxf:upload.max-size"/>

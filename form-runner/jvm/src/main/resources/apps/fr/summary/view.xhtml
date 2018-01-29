@@ -97,7 +97,7 @@
 
             <xf:var
                 name="has-pdf-template"
-                value="normalize-space($source-form-attachments/pdf)"/>
+                value="$source-form-attachments/pdf/xxf:trim() != ''"/>
 
             <!-- NOTE: use xxf:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to

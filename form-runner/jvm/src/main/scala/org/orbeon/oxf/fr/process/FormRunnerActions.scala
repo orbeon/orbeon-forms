@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner}
 import org.orbeon.oxf.http.HttpMethod
@@ -32,6 +33,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -39,6 +41,8 @@ import scala.language.postfixOps
 import scala.util.Try
 
 trait FormRunnerActions {
+
+  import FormRunnerRenderedFormat._
 
   def runningProcessId: Option[String]
 
@@ -223,18 +227,33 @@ trait FormRunnerActions {
     Try {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 
-      for (format ← SupportedRenderFormats)
-        if (booleanFormRunnerProperty(s"oxf.fr.email.attach-$format"))
-          tryCreatePdfOrTiffIfNeeded(params, format).get
+      val selectedRenderFormatOpt =
+        SupportedRenderFormats find { format ⇒
+          booleanFormRunnerProperty(s"oxf.fr.email.attach-$format")
+        }
+
+      val formatKeyOpt =
+        selectedRenderFormatOpt foreach
+          (tryCreatePdfOrTiffIfNeeded(params, _).get)
+
+      val currentFormLang = FormRunner.currentLang.stringValue
 
       val pdfTiffParams =
         for {
-          format ← SupportedRenderFormats.to[List]
-          path   ← pdfOrTiffPathOpt(format)
+          format      ← SupportedRenderFormats.to[List]
+          (path, _) ← pdfOrTiffPathOpt(
+              urlsInstanceRootElem = getUrlsInstanceRootElem,
+              format               = format,
+              pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang)),
+              defaultLang          = currentFormLang
+            )
         } yield
           format → path
 
-      recombineQuery(s"/fr/service/$app/$form/email/$document", pdfTiffParams ::: requestedLangParams(params))
+      recombineQuery(
+        s"/fr/service/$app/$form/email/$document",
+        pdfTiffParams ::: createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+      )
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
 
@@ -257,7 +276,8 @@ trait FormRunnerActions {
     ShowProgressName,
     FormTargetName,
     "prune", // for backward compatibility,
-    "response-is-resource"
+    "response-is-resource",
+    "binary-content-key"
   ) ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
@@ -354,9 +374,14 @@ trait FormRunnerActions {
       }
 
       // Create PDF and/or TIFF if needed
-      for (format ← SupportedRenderFormats)
-        if (Set(format, s"$format-url")(contentToken))
-          tryCreatePdfOrTiffIfNeeded(params, format).get
+      val selectedRenderFormatOpt =
+        SupportedRenderFormats find { format ⇒
+          Set(format, s"$format-url")(contentToken)
+        }
+
+      val formatKeyOpt =
+        selectedRenderFormatOpt map
+          (tryCreatePdfOrTiffIfNeeded(params, _).get)
 
       // Set data-safe-override as we know we are not losing data upon navigation. This happens:
       // - with changing mode (tryChangeMode)
@@ -364,9 +389,12 @@ trait FormRunnerActions {
       if (evaluatedSendProperties.get("replace").flatten.contains(XFORMS_SUBMIT_REPLACE_ALL))
         setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
-      debug(s"`send` action sending submission", evaluatedSendProperties.iterator collect { case (k, Some(v)) ⇒ k → v } toList)
+      val evaluatedSendPropertiesWithKey =
+        evaluatedSendProperties + ("binary-content-key" → formatKeyOpt)
 
-      sendThrowOnError(s"fr-send-submission", evaluatedSendProperties)
+      debug(s"`send` action sending submission", evaluatedSendPropertiesWithKey.iterator collect { case (k, Some(v)) ⇒ k → v } toList)
+
+      sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithKey)
     }
 
   private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
@@ -502,11 +530,13 @@ trait FormRunnerActions {
         val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
         s"$filename.$format"
       }
-      val requestParams =
-        ("fr-rendered-filename" → fullFilename) ::
-        requestedLangParams(params)
 
-      recombineQuery(s"/fr/$app/$form/$format/$document", requestParams)
+      val currentFormLang = FormRunner.currentLang.stringValue
+
+      recombineQuery(
+        s"/fr/$app/$form/$format/$document",
+        ("fr-rendered-filename" → fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+      )
     } flatMap
       tryChangeMode(
         replace            = XFORMS_SUBMIT_REPLACE_ALL,
@@ -523,38 +553,61 @@ trait FormRunnerActions {
   def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))
   def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
 
-  def pdfTiffPathInstanceRootElementOpt(mode: String) =
-    topLevelInstance(PersistenceModel, s"fr-$mode-url-instance") map (_.rootElement)
+  def getUrlsInstanceRootElem: NodeInfo =
+    topLevelInstance(PersistenceModel, s"fr-urls-instance") map (_.rootElement) get
 
-  def pdfOrTiffPathOpt(mode: String) =
-    pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap trimAllToOpt
+  def findFrFormAttachmentsRootElemOpt: Option[NodeInfo] =
+    topLevelInstance(FormModel, "fr-form-attachments") map (_.rootElement)
 
-  def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[Any] =
+  // Create if needed and return the element key name
+  private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[String] =
     Try {
-      pdfOrTiffPathOpt(format) match {
-        case Some(_) ⇒ // NOP: Path is already available.
-        case None    ⇒
+
+      val currentFormLang = FormRunner.currentLang.stringValue
+      val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang))
+
+      pdfOrTiffPathOpt(
+        urlsInstanceRootElem = getUrlsInstanceRootElem,
+        format               = format,
+        pdfTemplateOpt       = pdfTemplateOpt,
+        defaultLang          = currentFormLang
+      ) match {
+        case Some((_, key)) ⇒ key
+        case None ⇒
+
           implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 
-          val path = recombineQuery(s"/fr/service/$app/$form/$format/$document", requestedLangParams(params))
+          val path =
+            recombineQuery(
+              s"/fr/service/$app/$form/$format/$document",
+              createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+            )
 
-          def processSuccessResponse(param: Any) = {
+          def processSuccessResponse() = {
 
             val response = topLevelInstance(FormModel, "fr-send-submission-response").get
 
-            response.rootElement.stringValue.trimAllToOpt foreach { path ⇒
-              setvalue(pdfTiffPathInstanceRootElementOpt(format).to[List], path)
+            val node =
+              getOrCreatePdfTiffPathElemOpt(
+                urlsInstanceRootElem = getUrlsInstanceRootElem,
+                format               = format,
+                pdfTemplateOpt       = pdfTemplateOpt,
+                defaultLang          = currentFormLang,
+                create               = true
+              ).get
+
+            response.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile ⇒
+              setvalue(
+                ref   = node,
+                value = pathToTmpFile
+              )
             }
+
+            node.localname
           }
 
-          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(path) foreach processSuccessResponse
+          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(path).get
+          processSuccessResponse()
       }
     }
-
-  def requestedLangParams(params: ActionParams): List[(String, String)] = (
-    paramByName(params, "lang")
-    flatMap   trimAllToOpt
-    map       (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
-    getOrElse Nil
-  )
 }

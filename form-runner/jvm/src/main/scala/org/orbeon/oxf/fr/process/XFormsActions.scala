@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._

@@ -346,7 +346,7 @@
                     if (
                         $mode = 'view' or (
                             $mode = ('pdf', 'email') and
-                            normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''
+                            xxf:instance('fr-form-attachments')/pdf/xxf:trim() != ''
                         )
                     ) then
                         'static'
@@ -357,7 +357,7 @@
                 for $mode in fr:mode()
                 return not(
                     $mode = ('pdf', 'email') and
-                    normalize-space(xxf:instance('fr-form-attachments')/pdf) != ''
+                    xxf:instance('fr-form-attachments')/pdf/xxf:trim() != ''
                 )
             }}"
             xxf:order="{{

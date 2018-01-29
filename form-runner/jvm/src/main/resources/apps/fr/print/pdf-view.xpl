@@ -37,8 +37,11 @@
     </p:processor>
 
     <p:choose href="#unrolled-form">
-        <p:when test="normalize-space(/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf) != ''">
-            <!-- A PDF template is attached to the form -->
+        <p:when test="
+            (: TODO: Form may not allow for disabling PDF template! :)
+            not(p:get-request-parameter('fr-use-pdf-template') = 'false') and
+            (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')">
+            <!-- A PDF template is attached to the form and its use is enabled -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="print-pdf-template.xpl"/>
                 <p:input name="xforms" href="#unrolled-form"/>

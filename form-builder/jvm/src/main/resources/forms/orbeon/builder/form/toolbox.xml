@@ -324,11 +324,15 @@
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/pdf.png" alt=""/>
                                         <xh:span>
-                                            <xf:output value="if (bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
+                                            <xf:output value="$form-resources/pdf-templates/label"/>
                                         </xh:span>
                                     </xf:label>
-                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
-                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:dispatch if="$is-pe" name="fb-show-dialog" targetid="dialog-pdf">
+                                            <xf:property name="pdf-attachments" value="bind('pdf-attachments-bind')"/>
+                                        </xf:dispatch>
+                                        <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
+                                    </xf:action>
                                 </xf:trigger>
                             </xf:group>
                         </xh:div>

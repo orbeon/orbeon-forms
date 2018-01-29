@@ -1,0 +1,215 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array">
+
+    <xbl:binding id="fb-dialog-pdf" element="fb|dialog-pdf">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+
+                <!-- Clear all local values -->
+                <xf:delete ref="$i/pdfs/*"/>
+                <xf:setvalue iterate="*[not(*)]" ref="."/>
+
+                <!-- Insert existing elements -->
+                <xf:insert
+                    context="$i/pdfs"
+                    origin="
+                        let $att := event('pdf-attachments')
+                        return
+                            if (exists($att)) then
+                                $att
+                            else
+                                instance('pdf-template')
+                            "/>
+
+                <!--  Add @name/@lang on legacy entries -->
+                <xf:action iterate="$i/pdfs/*">
+                    <xf:insert context="." if="empty(@name)" origin="xf:attribute('name')"/>
+                    <xf:insert context="." if="empty(@lang)" origin="xf:attribute('lang')"/>
+                </xf:action>
+
+                <xxf:show dialog="dialog"/>
+
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="cancel-trigger" >
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i)">
+                <xf:dispatch name="fb-apply" target="fb-dialog-pdf">
+                    <xf:property name="pdf-attachments" value="$i/pdfs/pdf[xxf:non-blank()]"/>
+                </xf:dispatch>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="not(valid($i))">
+                <xxf:setvisited
+                    control="dialog"
+                    recurse="true"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="model">
+                <xf:instance id="i">
+                    <local>
+                        <pdfs/>
+                    </local>
+                </xf:instance>
+
+                <xf:bind id="pdfs-bind" ref="pdfs">
+                    <xf:bind id="pdf-iteration-bind" name="pdf-iteration" ref="pdf">
+
+                        <xf:bind
+                            id="pdf-upload-bind"
+                            name="pdf-upload"
+                            ref="."
+                            type="xf:anyURI"
+                            constraint="xxf:upload-mediatypes('application/pdf')"/>
+
+                        <xf:bind id="attachment-name-bind"     name="attachment-name"     ref="@name" constraint="matches(., '^[A-Za-z0-9\-_]+$') or xxf:is-blank(.)" xxf:whitespace="trim"/>
+                        <xf:bind id="attachment-language-bind" name="attachment-language" ref="@lang"/>
+
+                        <!-- Inter-row validations -->
+                        <xf:bind ref=".[count(../*) = 1]" name="single-row">
+                            <!-- Can be all blank, or if anything is specified then the file is required.
+                                 When there is only one row, the name is optional, also for backward compatibility. -->
+                            <xf:bind
+                                ref="."
+                                required="
+                                    xxf:non-blank($single-row)       or
+                                    xxf:non-blank($single-row/@name) or
+                                    xxf:non-blank($single-row/@lang)"/>
+                        </xf:bind>
+                        <xf:bind ref=".[count(../*) > 1]" name="multiple-row">
+
+                            <!-- Q: Should the name always be optional? -->
+                            <xf:bind
+                                ref=". | @name"
+                                required="true()"/>
+
+                            <xf:bind
+                                ref="@name | @lang"
+                                constraint="
+                                    not(
+                                        concat($multiple-row/@name, '|', $multiple-row/@lang) = (
+                                            for $e in $multiple-row/preceding-sibling::*
+                                            return concat($e/@name, '|', $e/@lang)
+                                        )
+                                    )"/>
+                        </xf:bind>
+
+                    </xf:bind>
+
+                </xf:bind>
+
+                <xf:var name="i" value="instance()"/>
+
+                <xf:instance id="pdf-template" xxf:readonly="true">
+                    <pdf mediatype="" filename="" size="" name="" lang=""/>
+                </xf:instance>
+
+                <xf:instance
+                    id="fr-languages-instance"
+                    src="oxf:/apps/fr/i18n/languages.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="container" appearance="xxf:internal">
+
+                <!-- Bindings specified on control -->
+                <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+                <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-pdf-dialog">
+                    <xf:label ref="$resources/dialog-pdf/label"/>
+
+                    <xf:var
+                        name="languages"
+                        value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
+
+                    <xh:div><!-- TODO: needed element? -->
+
+                        <fr:grid id="pdfs-grid" bind="pdfs-bind" repeat="content" min="1" template="instance('pdf-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                            <fr:c x="1" y="1" w="6">
+                                <fr:attachment id="pdf-upload-control" bind="pdf-upload-bind" class="fr-attachment" >
+                                    <xf:label ref="$resources/dialog-pdf/pdf-upload/label"/>
+                                    <xf:hint ref="$resources/dialog-pdf/pdf-upload/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:attachment>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="3" h="1">
+                                <xf:input id="attachment-name-control" bind="attachment-name-bind">
+                                    <xf:label ref="$resources/dialog-pdf/attachment-name/label"/>
+                                    <xf:hint ref="$resources/dialog-pdf/attachment-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="10" y="1" w="3">
+                                <xf:select1 id="attachment-language-control" bind="attachment-language-bind"  appearance="dropdown">
+                                    <xf:label ref="$resources/dialog-pdf/attachment-language/label"/>
+                                    <xf:hint ref="$resources/dialog-pdf/attachment-language/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:choices>
+                                        <xf:label ref="$resources/dialog-add-language/common"/>
+                                        <xf:itemset ref="xxf:sort($languages[@top = 'true'], @english-name, 'text', 'ascending')">
+                                            <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                            <xf:value ref="@code"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                    <xf:choices>
+                                        <xf:label ref="$resources/dialog-add-language/all"/>
+                                        <xf:itemset ref="$languages[not(@top = 'true')]">
+                                            <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                            <xf:value ref="@code"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                </xf:select1>
+                            </fr:c>
+                        </fr:grid>
+
+                        <!--<fr:xforms-inspector/>-->
+
+                        <xh:div class="fr-dialog-buttons">
+                            <xf:group id="triggers">
+                                <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xf:group>
+                        </xh:div>
+
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

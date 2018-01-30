@@ -122,24 +122,24 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.moveWall(resolveId(cellId).get, startSide, target)
   }
 
-  def shrinkDown(cellId: String): Unit = {
+  def mergeRight(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.shrinkCellDown(resolveId(cellId).get, 1)
+    FormBuilder.merge(resolveId(cellId).get, Direction.Right)
   }
 
-  def expandRight(cellId: String): Unit = {
+  def mergeDown(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.expandCellRight(resolveId(cellId).get, 1)
+    FormBuilder.merge(resolveId(cellId).get, Direction.Down)
   }
 
-  def expandDown(cellId: String): Unit = {
+  def splitX(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.expandCellDown(resolveId(cellId).get, 1)
+    FormBuilder.split(resolveId(cellId).get, Direction.Left)
   }
 
-  def shrinkRight(cellId: String): Unit = {
+  def splitY(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.shrinkCellRight(resolveId(cellId).get, 1)
+    FormBuilder.split(resolveId(cellId).get, Direction.Up)
   }
 
   def sectionDelete(sectionId: String): Unit = {

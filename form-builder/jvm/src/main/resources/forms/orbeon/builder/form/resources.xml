@@ -176,18 +176,18 @@
         <edit-items>
             <label>Edit Choices</label>
         </edit-items>
-        <expand-horizontally-icon>
-            <label>Expand horizontally</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label>Shrink horizontally</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
-            <label>Expand vertically</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label>Shrink vertically</label>
-        </shrink-vertically-icon>
+        <merge-right-icon>
+            <label>Merge with the cell to the right</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label>Split horizontally</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
+            <label>Merge with the cell below</label>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label>Split vertically</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Delete Control</label>
         </delete-control-icon>
@@ -1216,18 +1216,18 @@
         <edit-items>
             <label>Editer les choix</label>
         </edit-items>
-        <expand-horizontally-icon>
-            <label>Etendre horizontalement</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
+        <merge-right-icon>
+            <label>Etendre avec la cellule à droite</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
             <label>Rétrécir horizontalement</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
-            <label>Etendre verticalement</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
+        </split-horizontally-icon>
+        <merge-below-icon>
+            <label>Etendre avec la cellule ci-dessous</label>
+        </merge-below-icon>
+        <split-vertically-icon>
             <label>Rétrécir verticalement</label>
-        </shrink-vertically-icon>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Supprimer le contrôle</label>
         </delete-control-icon>
@@ -2258,18 +2258,18 @@
         <edit-items>
             <label>Rediger svaralternativer</label>
         </edit-items>
-        <expand-horizontally-icon>
-            <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
-            <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        <merge-right-icon>
+            <label todo="true">[Merge with cell to the right]</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
+            <label todo="true">[Merge with the cell below]</label>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Slett element</label>
         </delete-control-icon>
@@ -3328,18 +3328,18 @@
         <edit-items>
             <label>Редактировать элементы</label>
         </edit-items>
-        <expand-horizontally-icon>
-            <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        <merge-right-icon>
+            <label todo="true">[Merge with cell to the right]</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Удалить элемент</label>
         </delete-control-icon>
@@ -4398,18 +4398,18 @@
         <edit-items>
             <label>Modifica scelte</label>
         </edit-items>
-        <expand-horizontally-icon>
-            <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        <merge-right-icon>
+            <label todo="true">[Merge with cell to the right]</label>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Elimina controllo</label>
         </delete-control-icon>
@@ -5460,18 +5460,18 @@
         <edit-items>
             <label>Auswahlmöglichkeiten bearbeiten</label>
         </edit-items>
-        <expand-horizontally-icon>
+        <merge-right-icon>
             <label>Horizontal erweitern</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
+        </merge-right-icon>
+        <split-horizontally-icon>
             <label>Horizontal schrumpfen</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label>Vertikal erweitern</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
             <label>Vertikal schrumpfen</label>
-        </shrink-vertically-icon>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Steuerelement löschen</label>
         </delete-control-icon>
@@ -6525,18 +6525,18 @@
         <edit-items>
             <label>Muokkaa kohdetta</label>
         </edit-items>
-        <expand-horizontally-icon>
+        <merge-right-icon>
             <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Poista kontrolli</label>
         </delete-control-icon>
@@ -7587,18 +7587,18 @@
         <edit-items>
             <label>Editar Opciones</label>
         </edit-items>
-        <expand-horizontally-icon>
+        <merge-right-icon>
             <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Eliminar Control</label>
         </delete-control-icon>
@@ -8650,18 +8650,18 @@
         <edit-items>
             <label>Alterar escolhas</label>
         </edit-items>
-        <expand-horizontally-icon>
+        <merge-right-icon>
             <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Apagar Controlo</label>
         </delete-control-icon>
@@ -9719,18 +9719,18 @@
         <edit-items>
             <label>Ändra alternativ</label>
         </edit-items>
-        <expand-horizontally-icon>
+        <merge-right-icon>
             <label todo="true">[Expand horizontally]</label>
-        </expand-horizontally-icon>
-        <shrink-horizontally-icon>
-            <label todo="true">[Shrink horizontally]</label>
-        </shrink-horizontally-icon>
-        <expand-vertically-icon>
+        </merge-right-icon>
+        <split-horizontally-icon>
+            <label todo="true">[Split horizontally]</label>
+        </split-horizontally-icon>
+        <merge-below-icon>
             <label todo="true">[Expand vertically]</label>
-        </expand-vertically-icon>
-        <shrink-vertically-icon>
-            <label todo="true">[Shrink vertically]</label>
-        </shrink-vertically-icon>
+        </merge-below-icon>
+        <split-vertically-icon>
+            <label todo="true">[Split vertically]</label>
+        </split-vertically-icon>
         <delete-control-icon>
             <label>Ta bort kontroll</label>
         </delete-control-icon>

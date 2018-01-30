@@ -30,10 +30,10 @@ trait FormBuilderRpcApi {
   def rowDelete           (controlId: String, position: Int): Unit
 
   def moveWall            (cellId: String, startSide: Direction, target: Int): Unit
-  def shrinkDown          (cellId: String): Unit
-  def expandRight         (cellId: String): Unit
-  def expandDown          (cellId: String): Unit
-  def shrinkRight         (cellId: String): Unit
+  def splitY              (cellId: String): Unit
+  def mergeRight          (cellId: String): Unit
+  def mergeDown           (cellId: String): Unit
+  def splitX              (cellId: String): Unit
 
   def sectionDelete       (sectionId: String): Unit
   def sectionUpdateLabel  (sectionId: String, label: String): Unit

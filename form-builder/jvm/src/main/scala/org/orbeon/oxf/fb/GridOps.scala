@@ -13,12 +13,9 @@
  */
 package org.orbeon.oxf.fb
 
-import javax.naming.OperationNotSupportedException
-import javax.swing.plaf.DimensionUIResource
-
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow}
-import org.orbeon.oxf.fr.Cell.findDistinctOriginCellsToTheRight
+import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.{Cell, FormRunner}
@@ -321,58 +318,50 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  def expandCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-    val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Right) >= amount)
-      withDebugGridOperation("expand cell right") {
-        Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
-          NodeInfoCellOps.updateW(originCell.td, originCell.w + amount)
-
-          findDistinctOriginCellsToTheRight(cells, cellElem) foreach {
-            case Cell(Some(u), _, x, _, _, w) if w > 1 ⇒
-              NodeInfoCellOps.updateX(u, x + 1)
-              NodeInfoCellOps.updateW(u, w - 1)
-            case Cell(Some(u), _, _, _, _, _) ⇒
-              deleteControlWithinCell(u)
-              delete(u)
-            case _ ⇒
-          }
+  def merge(
+    cellElem     : NodeInfo,
+    direction    : Direction)(
+    implicit ctx : FormBuilderDocContext
+  ): Unit = {
+    if (Cell.canChangeSize(cellElem).contains(direction)) {
+      val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+      findOriginCell(cells, cellElem).foreach { originCell ⇒
+        val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
+        direction match {
+          case Direction.Right ⇒ NodeInfoCellOps.updateW(cellElem, originCell.w + neighbors.head.w)
+          case Direction.Down  ⇒ NodeInfoCellOps.updateH(cellElem, originCell.h + neighbors.head.h)
+          case _               ⇒ throw new IllegalStateException
         }
-      }
-  }
-
-  def shrinkCellRight(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-
-    val cells   = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
-    val cellOpt = Cell.findOriginCell(cells, cellElem)
-
-    cellOpt filter (_.w - amount >= 1) foreach { cell ⇒
-      withDebugGridOperation("shrink cell right") {
-        val newCellW = cell.w - amount
-        NodeInfoCellOps.updateW(cell.td, newCellW)
-        insertCellAtBestPosition(cells, nextTmpId(), cell.x + newCellW, cell.y, amount, cell.h)
+        neighbors.foreach(_.u.foreach { neighborCellElem ⇒
+          deleteControlWithinCell(neighborCellElem)
+          delete(neighborCellElem)
+        })
       }
     }
   }
 
-  def expandCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-    val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-    if (Cell.spaceToExtendCell(cells, cellElem, Direction.Down) >= amount)
-      withDebugGridOperation("expand cell down") {
-        Cell.findOriginCell(cells, cellElem) foreach { originCell ⇒
-          NodeInfoCellOps.updateH(originCell.td, originCell.h + amount)
-
-          Cell.findDistinctOriginCellsBelow(cells, cellElem) foreach {
-            case Cell(Some(u), _, _, y, h, _) if h > 1 ⇒
-              NodeInfoCellOps.updateY(u, y + 1)
-              NodeInfoCellOps.updateW(u, h - 1)
-            case Cell(Some(u), _, _, _, _, _) ⇒
-              deleteControlWithinCell(u)
-              delete(u)
-            case _ ⇒
-          }
+  def split(
+    cellElem     : NodeInfo,
+    direction    : Direction)(
+    implicit ctx : FormBuilderDocContext
+  ): Unit = {
+    if (Cell.canChangeSize(cellElem).contains(direction)) {
+      val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+      findOriginCell(cells, cellElem).foreach { originCell ⇒
+        direction match {
+          case Direction.Left ⇒
+            val newCellW = (originCell.w + 1) / 2
+            NodeInfoCellOps.updateW(cellElem, newCellW)
+            insertCellAtBestPosition(cells, nextTmpId(), originCell.x + newCellW, originCell.y, originCell.w - newCellW, originCell.h)
+          case Direction.Up ⇒
+            val newCellH = (originCell.h + 1) / 2
+            NodeInfoCellOps.updateH(cellElem, newCellH)
+            insertCellAtBestPosition(cells, nextTmpId(), originCell.x, originCell.y + newCellH, originCell.w, originCell.h - newCellH)
+          case _ ⇒
+            throw new IllegalStateException
         }
       }
+    }
   }
 
   def moveWall(
@@ -405,20 +394,6 @@ trait GridOps extends ContainerOps {
         case Direction.Right ⇒
           moveSingleCell(originCell, Direction.Right, target)
           neighbors.foreach(moveSingleCell(_, Direction.Left, target))
-      }
-    }
-  }
-
-  def shrinkCellDown(cellElem: NodeInfo, amount: Int)(implicit ctx: FormBuilderDocContext): Unit = {
-
-    val cells         = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem), simplify = false)
-    val originCellOpt = Cell.findOriginCell(cells, cellElem)
-
-    originCellOpt filter (_.h - amount >= 1) foreach { originCell ⇒
-      withDebugGridOperation("shrink cell down") {
-        val existingCellUpdatedH = originCell.h - amount
-        NodeInfoCellOps.updateH(originCell.td, existingCellUpdatedH)
-        insertCellAtBestPosition(cells, nextTmpId(), originCell.x, originCell.y + existingCellUpdatedH, originCell.w, amount)
       }
     }
   }

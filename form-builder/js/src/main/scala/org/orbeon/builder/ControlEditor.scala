@@ -17,9 +17,9 @@ import autowire._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.fr.Grid
+import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.fr.ClientNames._
+import org.orbeon.oxf.fr.Cell
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
@@ -30,15 +30,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object ControlEditor {
 
-  def resizeCell(cell: Block, direction: Direction): Unit = {
-    val cellId = cell.el.attr("id").get
-    direction match {
-      case Direction.Up    ⇒ RpcClient[FormBuilderRpcApi].shrinkDown (cellId).call()
-      case Direction.Right ⇒ RpcClient[FormBuilderRpcApi].expandRight(cellId).call()
-      case Direction.Down  ⇒ RpcClient[FormBuilderRpcApi].expandDown (cellId).call()
-      case Direction.Left  ⇒ RpcClient[FormBuilderRpcApi].shrinkRight(cellId).call()
-    }
-  }
+  private val SplitMergeCssClassDirectionOps = List(
+    "fb-x-merge" → Direction.Right → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].mergeRight(cellId).call()),
+    "fb-x-split" → Direction.Left  → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].splitX    (cellId).call()),
+    "fb-y-merge" → Direction.Down  → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].mergeDown (cellId).call()),
+    "fb-y-split" → Direction.Up    → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].splitY    (cellId).call())
+  )
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
   private var currentCellOpt: Option[Block]  = None
@@ -97,20 +94,14 @@ object ControlEditor {
     controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
     positionEditor(controlEditorLeft, 0)
 
-    // Enable/disable arrow icons
-    for (direction ← Direction.values) {
+    // Enable/disable split/merge icons
+    val allowedDirections = {
       val cellEl = cell.el.get(0).asInstanceOf[html.Element]
-      val directionName = direction.entryName
-      val disableIcon =
-        direction match {
-          case Direction.Right | Direction.Down ⇒
-            Grid.spaceToExtendCell(cellEl, direction) == 0
-          case Direction.Left ⇒
-            (cell.el.attr(AttW) map (_.toInt) getOrElse 1) <= 1
-          case Direction.Up ⇒
-            (cell.el.attr(AttH) map (_.toInt) getOrElse 1) <= 1
-        }
-      val icon = controlEditorLeft.find(s".fb-arrow-$directionName")
+      Cell.canChangeSize(cellEl)
+    }
+    for (((cssClass, direction), _) ← SplitMergeCssClassDirectionOps) {
+      val disableIcon = ! allowedDirections.contains(direction)
+      val icon = controlEditorLeft.find(s".$cssClass")
       icon.toggleClass("disabled", disableIcon)
     }
   }
@@ -141,14 +132,14 @@ object ControlEditor {
   })
 
   // Expand/shrink actions
-  for (direction ← Direction.values) {
-    val directionName = direction.entryName
-    val className = s"fb-arrow-$directionName"
-    val iconEl = controlEditorLeft.find(s".$className")
-
+  for (((cssClass, _), ops) ← SplitMergeCssClassDirectionOps) {
+    val iconEl = controlEditorLeft.find(s".$cssClass")
     iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
       if (! iconEl.is(".disabled"))
-        currentCellOpt.foreach(resizeCell(_, direction))
+        currentCellOpt.foreach { currentCell ⇒
+          val cellId = currentCell.el.attr("id").get
+          ops(cellId)
+        }
     })
   }
 }

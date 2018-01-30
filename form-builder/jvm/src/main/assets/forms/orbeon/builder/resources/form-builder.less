@@ -128,6 +128,14 @@ div.orbeon.orbeon-portlet-div {
         padding-right: 8px;
     }
 
+    .fb-control-editor-left {
+        .fb-x-split { transform: rotate(135deg) }                           // Default icon is tilted at a 45º angle
+        .fb-y-split { transform: rotate(45deg)  }
+        .fb-x-split { position: relative; left: -3px; top: -4px }           // Adjustments
+        .fb-y-merge { position: relative; left: -1px }
+        .fb-y-split { position: relative; left: -3px }
+    }
+
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
         position: absolute;                                                 // Is left/right set in CoffeeScript relative to the current section label
         cursor: pointer;

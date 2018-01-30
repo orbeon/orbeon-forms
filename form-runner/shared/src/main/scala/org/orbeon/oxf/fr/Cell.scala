@@ -194,40 +194,6 @@ object Cell {
     case Cell(_, Some(origin), _, _, _, _) ⇒ origin
   }
 
-  def findDistinctOriginCellsToTheRight[Underlying : CellOps](
-    cells     : List[List[Cell[Underlying]]],
-    cellElem  : Underlying
-  ): List[Cell[Underlying]] =
-    findOriginCell(cells, cellElem).toList flatMap { originCell ⇒
-
-      val cellToTheRightX = originCell.x + originCell.w
-
-      if (cellToTheRightX <= Cell.StandardGridWidth)
-        originCell.y until (originCell.y + originCell.h) map
-          (iy ⇒ cells(iy - 1)(cellToTheRightX - 1))      map
-          selfCellOrOrigin                               keepDistinctBy
-          (_.u)
-      else
-        Nil
-    }
-
-  def findDistinctOriginCellsBelow[Underlying : CellOps](
-    cells     : List[List[Cell[Underlying]]],
-    cellElem  : Underlying
-  ): List[Cell[Underlying]] =
-    findOriginCell(cells, cellElem).toList flatMap { originCell ⇒
-
-      val cellBelowY = originCell.y + originCell.h
-
-      if (cellBelowY <= cells.size)
-        originCell.x until (originCell.x + originCell.w) map
-          (ix ⇒ cells(cellBelowY - 1)(ix - 1))           map
-          selfCellOrOrigin                               keepDistinctBy
-          (_.u)
-      else
-        Nil
-    }
-
   // Finds the neighbors on the given side of the given cell
   def findOriginNeighbors[Underlying](
     originCell : Cell[Underlying],
@@ -235,8 +201,10 @@ object Cell {
     cells      : List[List[Cell[Underlying]]]
   ): List[Cell[Underlying]] = {
     val (neighborX, neighborY) = side match {
-      case Direction.Left  ⇒ (originCell.x - 1           , originCell.y)
-      case Direction.Right ⇒ (originCell.x + originCell.w, originCell.y)
+      case Direction.Left  ⇒ (originCell.x - 1           , originCell.y               )
+      case Direction.Right ⇒ (originCell.x + originCell.w, originCell.y               )
+      case Direction.Down  ⇒ (originCell.x               , originCell.y + originCell.h)
+      case Direction.Up    ⇒ (originCell.x               , originCell.y - 1           )
     }
     val isCoordinateValid =
       neighborX >= 1 &&
@@ -253,6 +221,21 @@ object Cell {
     }
   }
 
+  def nonOverflowingNeighbors[Underlying](
+    cells: List[List[Cell[Underlying]]],
+    originCell: Cell[Underlying],
+    direction: Direction
+  ): List[Cell[Underlying]] = {
+    def overflowsOriginCell(c: Cell[Underlying]) = direction match {
+      case Direction.Left | Direction.Right ⇒ c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
+      case Direction.Up   | Direction.Down  ⇒ c.x < originCell.x || c.x + c.w > originCell.x + originCell.w
+    }
+    val neighborCells       = findOriginNeighbors(originCell, direction, cells)
+    val originNeighborCells = neighborCells.map(selfCellOrOrigin).distinct
+    val directionOK         = ! originNeighborCells.exists(overflowsOriginCell)
+    if (directionOK) originNeighborCells else Nil
+  }
+
   // For a given cell, returns the walls that can be moved by D&D
   def movableWalls[Underlying](
     cellElem         : Underlying)(
@@ -262,12 +245,26 @@ object Cell {
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
       List(Direction.Left, Direction.Right) flatMap { direction ⇒
-        val neighborCells                            = findOriginNeighbors(originCell, direction, cells)
-        val originNeighborCells                      = neighborCells.map(selfCellOrOrigin).distinct
-        def overflowsOriginCell(c: Cell[Underlying]) = c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
-        val directionOK                              = originNeighborCells.nonEmpty && ! originNeighborCells.exists(overflowsOriginCell)
-        directionOK.list(direction)
+        nonOverflowingNeighbors(cells, originCell, direction).nonEmpty.list(direction)
       }
+    }
+  }
+
+  def canChangeSize[Underlying](
+    cellElem         : Underlying)(
+    implicit cellOps : CellOps[Underlying]
+  ): List[Direction] = {
+    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
+    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
+      val merge =
+        List(Direction.Right, Direction.Down) flatMap { direction ⇒
+          val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
+          val canExpand = neighbors.lengthCompare(1) == 0 && neighbors.head.u.exists(! cellOps.hasChildElement(_))
+          canExpand.list(direction)
+        }
+      val splitX = (originCell.w > 1).list(Direction.Left)
+      val splitY = (originCell.h > 1).list(Direction.Up  )
+      merge ++ splitX ++ splitY
     }
   }
 
@@ -296,74 +293,6 @@ object Cell {
         smallestNeighbor.toList.flatMap(insideCellPositions)
     }
   }
-
-  def spaceToExtendCell[Underlying : CellOps](
-    cells     : List[List[Cell[Underlying]]],
-    cellElem  : Underlying,
-    direction : Direction
-  ): Int =
-    findOriginCell(cells, cellElem) flatMap { originCell ⇒
-
-      val ops = implicitly[CellOps[Underlying]]
-
-      direction match {
-        case Direction.Right ⇒
-
-          //val currentCellHasContent = originCell.u exists ops.hasChildElement
-
-          val cellsToTheRight = findDistinctOriginCellsToTheRight(cells, cellElem)
-
-          cellsToTheRight.nonEmpty option {
-
-            // For now, simplification: we can only expand to the right if:
-            //
-            // - all the cells to the right are empty
-            // - and they don't start or end over the height of the expanding cell
-            //
-            // In the future, something smarter can be done.
-
-            cellsToTheRight.iterator map { cellToTheRight ⇒
-
-              val originRightCell = selfCellOrOrigin(cellToTheRight)
-
-              val hasContent   = originRightCell.u exists ops.hasChildElement
-              val startsBefore = originRightCell.y < originCell.y
-              val endsAfter    = originRightCell.y + originRightCell.h > originCell.y + originCell.h
-
-              if (hasContent || startsBefore || endsAfter)
-                0
-              else
-                cellToTheRight.w
-
-            } min
-          }
-
-        case Direction.Down ⇒
-
-          val cellsBelow = findDistinctOriginCellsBelow(cells, cellElem)
-
-          cellsBelow.nonEmpty option {
-
-            cellsBelow.iterator map { cellBelow ⇒
-
-              val originBelowCell = selfCellOrOrigin(cellBelow)
-
-              val hasContent   = originBelowCell.u exists ops.hasChildElement
-              val startsBefore = originBelowCell.x < originCell.x
-              val endsAfter    = originBelowCell.x + originBelowCell.w > originCell.x + originCell.w
-
-              if (hasContent || startsBefore || endsAfter)
-                0
-              else
-                cellBelow.h
-
-            } min
-          }
-
-        case Direction.Left ⇒ Some(0) // TODO
-        case Direction.Up   ⇒ Some(0) // TODO
-      }
-    } getOrElse 0
 
   private object Private {
 

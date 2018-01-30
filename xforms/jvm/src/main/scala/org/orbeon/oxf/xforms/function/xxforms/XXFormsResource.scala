@@ -19,6 +19,7 @@ import java.util.regex.Matcher
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.MapFunctions
@@ -187,7 +188,6 @@ object XXFormsResource {
   // Ideally should be the same as a non-qualified XPath variable name
   private val MatchTemplateKey = """\{\s*\$([A-Za-z0-9\-_]+)\s*""".r
 
-
   // Template processing
   //
   // - See https://github.com/orbeon/orbeon-forms/issues/3078
@@ -203,6 +203,12 @@ object XXFormsResource {
     currentLocale     : Locale
   ): String = {
 
+    // TODO
+    def formatValue(v: Any) = v match {
+      case null  ⇒ ""
+      case other ⇒ other.toString
+    }
+
     val nameToPos = javaNamedParams.iterator.map(_._1).zipWithIndex.toMap
 
     val templateWithPositions =
@@ -210,9 +216,7 @@ object XXFormsResource {
         Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
       })
 
-    // TODO: Don't use `MessageFormat`, but format values per the default formatting rules for the types, as `xf:output` does.
     new MessageFormat(templateWithPositions, currentLocale)
-      .format(javaNamedParams.map(_._2).to[Array]: Array[Any])
-
+      .format(javaNamedParams.map(v ⇒ formatValue(v._2)).to[Array])
   }
 }

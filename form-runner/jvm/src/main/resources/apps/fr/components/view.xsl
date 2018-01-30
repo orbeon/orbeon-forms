@@ -26,6 +26,7 @@
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+        xmlns:array="http://www.w3.org/2005/xpath-functions/array"
         xmlns:d="DAV:">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
@@ -927,9 +928,9 @@
                                                     $p/fr:expr
                                                 else if (exists($p/fr:controlName)) then
                                                     concat(
-                                                        'fr:control-value(''',
+                                                        'for $a in fr:control-typed-value(''',
                                                         $p/fr:controlName,
-                                                        ''')'
+                                                        ''', false()) return if (array:size($a) = 0) then () else array:get($a, 1)'
                                                     )
                                                 else
                                                     error(),

@@ -649,6 +649,8 @@
                         name="builtin-type"
                         value="$i/validations/validation[@type = 'datatype']/builtin-type/string()"/>
 
+                    <!-- TODO: Language selector like in `dialog-itemsets.xbl` (create XBL component and use native functions). -->
+
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-control-details/tab-base/label"/>

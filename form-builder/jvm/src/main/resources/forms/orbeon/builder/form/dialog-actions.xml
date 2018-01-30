@@ -136,6 +136,7 @@
                                 </xf:select1>
 
                                 <fr:dropdown-select1 ref="$observer[. != 'fr-form-model']" class="fb-action-control">
+                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                     <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label
@@ -260,6 +261,7 @@
                                 <fr:dropdown-select1
                                     ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                     class="fb-action-option-2-col-span-1">
+                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label
@@ -358,6 +360,7 @@
                                 <fr:dropdown-select1
                                     ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                     class="fb-action-option-2-col-span-1">
+                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label
@@ -498,6 +501,7 @@
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/destination-control/label" class="xforms-hidden"/>
+                                        <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                         <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                             <!-- Try to build a reasonably user-friendly label -->
                                             <xf:label

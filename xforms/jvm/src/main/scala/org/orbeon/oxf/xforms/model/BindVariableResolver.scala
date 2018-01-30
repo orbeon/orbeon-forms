@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 
 import scala.collection.JavaConverters._
@@ -27,18 +27,17 @@ object BindVariableResolver {
     modelBinds         : XFormsModelBinds,
     contextBindNodeOpt : Option[BindNode],
     targetStaticBind   : StaticBind
-  ): Option[ValueRepresentation] =
+  ): Option[Iterator[Item]] =
     resolveAncestorOrSelf(
       contextBindNodeOpt,
       targetStaticBind
-    ) orElse {
+    ) map Iterator.single orElse {
       resolveNotAncestorOrSelf(
         modelBinds,
         contextBindNodeOpt,
         targetStaticBind
       ) map { runtimeBindsIt ⇒
-        val itemsIt = runtimeBindsIt flatMap (_.items.asScala.iterator)
-        new SequenceExtent(itemsIt.toArray)
+        runtimeBindsIt flatMap (_.items.asScala.iterator)
       }
     }
 

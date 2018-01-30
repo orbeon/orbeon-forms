@@ -26,6 +26,8 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{StructuredQName, ValueRepresentation}
+import org.orbeon.saxon.value.SequenceExtent
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -183,7 +185,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
             modelBinds          = modelBindsOpt.get, // TODO XXX
             contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
             targetStaticBind    = targetStaticBind
-          ) getOrElse
+          ) map (new SequenceExtent(_)) getOrElse
             (throw new IllegalStateException)
         case None ⇒
           // Try top-level model variables

@@ -13,26 +13,29 @@
  */
 package org.orbeon.oxf.fr.library
 
+import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
-import org.orbeon.oxf.xforms.function.Instance
+import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
+import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.function.{AncestorOrganizations, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
-import org.orbeon.saxon.om.StructuredQName
-import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, IntegerValue, StringValue}
+import org.orbeon.saxon.om.{EmptyIterator, Item, SequenceIterator, StructuredQName}
+import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
+import org.orbeon.xforms.XFormsId
 
 // The Form Runner function library
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -89,6 +92,16 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("control-string-value", classOf[FRControlStringValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE)
+    )
+
+    Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE)
     )
   }
 }
@@ -225,4 +238,51 @@ private object FormRunnerFunctions {
       instanceFn
     }
   }
+
+  class FRControlStringValue extends FunctionSupport with RuntimeDependentFunction {
+
+    override def iterate(context: XPathContext): SequenceIterator = {
+
+      implicit val ctx = context
+
+      FormRunner.resolveTargetRelativeToActionSourceOpt(
+        actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
+        targetControlName      = stringArgument(0),
+        followIndexes          = booleanArgumentOpt(1) getOrElse false
+      ) map { _ map (_.getStringValue): SequenceIterator
+      } getOrElse
+        EmptyIterator.getInstance
+    }
+  }
+
+  class FRControlTypedValue extends FunctionSupport with RuntimeDependentFunction {
+
+    override def evaluateItem(context: XPathContext): Item = {
+
+      implicit val ctx = context
+
+      val resolvedItems =
+        FormRunner.resolveTargetRelativeToActionSourceOpt(
+          actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
+          targetControlName      = stringArgument(0),
+          followIndexes          = booleanArgumentOpt(1) getOrElse false
+        ) getOrElse
+          Iterator.empty
+
+      val allItems =
+        resolvedItems map { item ⇒
+          try {
+            // `TypedNodeWrapper.getTypedValue` *should* return a single value or throw
+            Option(item.getTypedValue.next()) getOrElse EmptySequence.getInstance
+          } catch {
+            case _: TypedValueException ⇒ EmptySequence.getInstance
+          }
+        }
+
+      ArrayFunctions.createValue(allItems.to[Vector])
+    }
+  }
+
+
+
 }

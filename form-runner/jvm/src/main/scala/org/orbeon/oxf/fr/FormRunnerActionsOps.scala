@@ -66,11 +66,22 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     actionSourceAbsoluteId : String,
     targetControlName      : String,
     followIndexes          : Boolean
-  ): ValueRepresentation = {
+  ): ValueRepresentation =
+    resolveTargetRelativeToActionSourceOpt(
+      actionSourceAbsoluteId,
+      targetControlName,
+      followIndexes
+    ) map (new SequenceExtent(_)) orNull
+
+  def resolveTargetRelativeToActionSourceOpt(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean
+  ): Option[Iterator[Item]] = {
 
     val container = XFormsFunction.context.container
 
-    def fromControl: Option[ValueRepresentation] = {
+    def fromControl: Option[Iterator[NodeInfo]] = {
 
       def findControls =
         Controls.resolveControlsById(
@@ -85,10 +96,10 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
           case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
         } flatten
 
-      boundNodes.nonEmpty option new SequenceExtent(boundNodes.toArray[Item])
+      boundNodes.nonEmpty option boundNodes.iterator
     }
 
-    def fromBind: Option[ValueRepresentation] = {
+    def fromBind: Option[Iterator[Item]] = {
 
       val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
 
@@ -112,7 +123,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         value
     }
 
-    fromControl orElse fromBind orNull
+    fromControl orElse fromBind
   }
 
   // Find the node which must store itemset map information

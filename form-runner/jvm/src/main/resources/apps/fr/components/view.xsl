@@ -923,7 +923,16 @@
                                             'map:entry(''',
                                                 $p/fr:name,
                                                 ''',',
-                                                $p/fr:expr,
+                                                if (exists($p/fr:expr)) then
+                                                    $p/fr:expr
+                                                else if (exists($p/fr:controlName)) then
+                                                    concat(
+                                                        'fr:control-value(''',
+                                                        $p/fr:controlName,
+                                                        ''')'
+                                                    )
+                                                else
+                                                    error(),
                                             ')'
                                         ),
                                     ','

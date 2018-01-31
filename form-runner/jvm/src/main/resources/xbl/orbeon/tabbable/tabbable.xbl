@@ -25,7 +25,6 @@
 
     <!--<xbl:script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"/>-->
     <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
-    <xbl:script src="/xbl/orbeon/tabbable/tabbable.js"/>
 
     <xbl:binding
         id="fr-tabbable"

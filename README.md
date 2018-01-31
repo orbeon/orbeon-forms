@@ -204,4 +204,4 @@ Forms with the full-featured [YourKit Java Profiler](https://www.yourkit.com/jav
 
 ---
 
-Copyright 1999-2017 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2018 (C) Orbeon, Inc. All rights reserved.

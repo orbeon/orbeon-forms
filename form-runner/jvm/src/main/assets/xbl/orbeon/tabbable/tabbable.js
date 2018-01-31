@@ -110,6 +110,10 @@
                 });
             }
 
+            // Select first tab
+            // https://github.com/orbeon/orbeon-forms/issues/3458
+            companion.selectTab(0);
+
             // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
             // support dynamically repeated tabs.
             $(companion.container).on('click.tabbable.data-api', '[data-toggle = "tabbable"]', function (e) {

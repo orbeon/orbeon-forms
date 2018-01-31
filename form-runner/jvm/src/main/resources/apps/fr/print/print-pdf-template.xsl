@@ -33,22 +33,49 @@
 
     <xsl:variable
         name="is-not-a-control-classes"
-        select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')"
+        select=
+            "
+                'xforms-trigger',
+                'xforms-disabled',
+                'xforms-group',
+                'xforms-case',
+                'xforms-switch',
+                'xforms-repeat'
+            "
         as="xs:string*"/>
 
     <xsl:variable
         name="control-classes"
-        select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')"
+        select=
+            "
+                'xforms-input',
+                'xforms-textarea',
+                'xforms-select',
+                'xforms-select1',
+                'fr-attachment',
+                'xforms-output'
+            "
         as="xs:string*"/>
 
     <xsl:variable
         name="image-attachment-classes"
-        select="'xbl-fr-image-attachment', 'xbl-fr-wpaint'"
+        select=
+            "
+                'xbl-fr-image-attachment',
+                'xbl-fr-wpaint'
+            "
         as="xs:string*"/>
 
     <xsl:variable
         name="select1-components"
-        select="'xbl-fr-autocomplete', 'fr-yesno-input', 'fr-databound-select1', 'fr-checkbox-input'"
+        select=
+            "
+                'fr-dropdown-select1',
+                'xbl-fr-autocomplete',
+                'fr-yesno-input',
+                'fr-databound-select1',
+                'fr-checkbox-input'
+            "
         as="xs:string*"/>
 
     <xsl:variable

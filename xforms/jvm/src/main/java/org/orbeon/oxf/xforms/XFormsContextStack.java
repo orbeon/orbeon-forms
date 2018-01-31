@@ -91,8 +91,9 @@ public class XFormsContextStack {
         this.containingDocument = container.getContainingDocument();
     }
 
-    // Constructor for XFormsActionInterpreter
+    // Constructor for XFormsModelAction and XFormsActionInterpreter
     public XFormsContextStack(XBLContainer container, BindingContext parentBindingContext) {
+
         this.container = container;
         this.containingDocument = this.container.getContainingDocument();
         this.parentBindingContext = parentBindingContext;

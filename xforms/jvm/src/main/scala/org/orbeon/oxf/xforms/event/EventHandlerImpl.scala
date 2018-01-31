@@ -240,9 +240,10 @@ class EventHandlerImpl(
           // Resolve the concrete handler
           EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
             case Some(concreteHandler) ⇒
-              val handlerContainer = concreteHandler.container
+
+              val handlerContainer   = concreteHandler.container
               val handlerEffectiveId = concreteHandler.getEffectiveId
-              val stack = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
+              val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
               (handlerContainer, handlerEffectiveId, stack)
             case None ⇒

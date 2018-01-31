@@ -145,6 +145,11 @@ object ErrorSummary {
     labelOpt          : Option[String]
   ): Unit = {
 
+    // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
+    // the instances to no longer be accessible by `XBLContainer.findInstance`.
+    if ((errorsInstanceDoc eq null) || (stateInstanceDoc eq null))
+      return
+
     val rootElem = errorsInstanceDoc.rootElement
 
     val currentErrorOpt = Option(errorsInstanceDoc.selectID(absoluteTargetId))
@@ -227,6 +232,11 @@ object ErrorSummary {
     fromIterations    : Array[Int],
     toIterations      : Array[Int]
   ): Unit = {
+
+    // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
+    // the instances to no longer be accessible by `XBLContainer.findInstance`.
+    if (errorsInstanceDoc eq null)
+      return
 
     // Update the iteration in a control's absolute id
     def updateIteration(absoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {

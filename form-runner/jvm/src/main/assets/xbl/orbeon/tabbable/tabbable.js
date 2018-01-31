@@ -136,6 +136,22 @@
                 this.drake.destroy();
         },
 
+        selectTabForPane: function(targetElem) {
+
+            var targetTabPane = $(targetElem).closest('.tab-pane');
+
+            if (targetTabPane.length == 0)
+                return;
+
+            var allTabPanes = targetTabPane.closest('.tab-content').children('.tab-pane').filter(RepeatClassesSelector);
+
+            var index = allTabPanes.index(targetTabPane);
+            if (index < 0)
+                return;
+
+            this.selectTab(index);
+        },
+
         selectTab: function(tabPosition) {
 
             if (tabPosition < 0)

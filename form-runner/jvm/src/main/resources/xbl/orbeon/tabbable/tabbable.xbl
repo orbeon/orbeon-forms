@@ -127,6 +127,7 @@
                                                     <xf:param
                                                         name="newIndex"
                                                         value="event('xxf:new-index') - 1"/>
+                                                    <!-- NOTE: Probably wrong if there are non-repeated tabs before! -->
                                                     <xf:body>
                                                         ORBEON.xforms.XBL.instanceForControl(this).selectTab(newIndex);
                                                     </xf:body>
@@ -155,7 +156,14 @@
                         </xh:ul>
 
                         <!-- Tab content -->
-                        <xh:div class="tab-content">
+                        <xf:group xxf:element="div" class="tab-content">
+
+                            <!-- Focus on tab when `xforms-focus` is dispatched. Use `capture` phase as that event
+                                 doesn't bubble! -->
+                            <xf:action event="xforms-focus" type="javascript" phase="capture" xxf:phantom="true">
+                                ORBEON.xforms.XBL.instanceForControl(this).selectTabForPane(event.target);
+                            </xf:action>
+
                             <xsl:for-each select="fr:tab">
                                 <xsl:variable name="tab"    select="."/>
                                 <xsl:variable name="pos"    select="position()"/>
@@ -195,7 +203,7 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:for-each>
-                        </xh:div>
+                        </xf:group>
                     </xh:div>
                 </xsl:template>
             </xsl:transform>

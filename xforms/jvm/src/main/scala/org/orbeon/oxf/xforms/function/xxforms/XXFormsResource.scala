@@ -205,8 +205,15 @@ object XXFormsResource {
 
     // TODO
     def formatValue(v: Any) = v match {
-      case null  ⇒ ""
-      case other ⇒ other.toString
+      case null       ⇒ ""
+      case v: Byte    ⇒ v
+      case v: Short   ⇒ v
+      case v: Int     ⇒ v
+      case v: Long    ⇒ v
+      case v: Float   ⇒ v
+      case v: Double  ⇒ v
+      case v: Boolean ⇒ v
+      case other      ⇒ other.toString
     }
 
     val nameToPos = javaNamedParams.iterator.map(_._1).zipWithIndex.toMap

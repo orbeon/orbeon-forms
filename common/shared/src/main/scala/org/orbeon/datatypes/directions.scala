@@ -15,6 +15,7 @@ package org.orbeon.datatypes
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.datatypes.Direction.findValues
 
 sealed abstract class Direction extends EnumEntry with Lowercase
 
@@ -26,6 +27,30 @@ object Direction extends Enum[Direction] with CirceEnum[Direction] {
   case object Down  extends Direction
   case object Left  extends Direction
   case object Right extends Direction
+
+  def mirror(direction: Direction): Direction = direction match {
+    case Up    ⇒ Down
+    case Down  ⇒ Up
+    case Left  ⇒ Right
+    case Right ⇒ Left
+  }
+}
+
+sealed abstract class Orientation extends EnumEntry with Lowercase
+
+object Orientation extends Enum[Orientation] with CirceEnum[Orientation] {
+
+  val values = findValues
+
+  case object Horizontal extends Orientation
+  case object Vertical   extends Orientation
+
+  def fromDirection(direction: Direction): Orientation = {
+    direction match {
+      case Direction.Left | Direction.Right ⇒ Horizontal
+      case Direction.Up   | Direction.Down  ⇒ Vertical
+    }
+  }
 }
 
 sealed abstract class AboveBelow extends EnumEntry with Lowercase

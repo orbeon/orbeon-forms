@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
-import org.orbeon.datatypes.Direction
+import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 
@@ -236,6 +236,21 @@ object Cell {
     if (directionOK) originNeighborCells else Nil
   }
 
+  def findSmallestNeighbor[Underlying](
+    side      : Direction,
+    neighbors : List[Cell[Underlying]]
+  ): Option[Cell[Underlying]] = {
+    neighbors match {
+      case Nil ⇒ None
+      case _   ⇒ Some(neighbors.minBy { neighbor ⇒
+        Orientation.fromDirection(side) match {
+          case Orientation.Horizontal ⇒ neighbor.w
+          case Orientation.Vertical ⇒ neighbor.h
+        }
+      })
+    }
+  }
+
   // For a given cell, returns the walls that can be moved by D&D
   def movableWalls[Underlying](
     cellElem         : Underlying)(
@@ -244,8 +259,16 @@ object Cell {
 
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
-      List(Direction.Left, Direction.Right) flatMap { direction ⇒
-        nonOverflowingNeighbors(cells, originCell, direction).nonEmpty.list(direction)
+      Direction.values.flatMap { direction ⇒
+        val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
+        val smallestNeighborOpt = findSmallestNeighbor(direction, neighbors)
+        val directionOK = smallestNeighborOpt.exists(smallestNeighbor ⇒
+          Orientation.fromDirection(direction) match {
+            case Orientation.Horizontal ⇒ originCell.w > 1 || smallestNeighbor.w > 1
+            case Orientation.Vertical ⇒ originCell.h > 1 || smallestNeighbor.h > 1
+          }
+        )
+        directionOK.list(direction)
       }
     }
   }
@@ -276,21 +299,24 @@ object Cell {
   ): List[Int] = {
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
-      def insideCellPositions(cell: Cell[Underlying]): List[Int] = (cell.x until cell.x + cell.w - 1).toList
+
+      def insideCellPositions(cell: Cell[Underlying]): List[Int] =
+        Orientation.fromDirection(startSide) match {
+          case Orientation.Horizontal ⇒ (cell.x until cell.x + cell.w - 1).toList
+          case Orientation.Vertical   ⇒ (cell.y until cell.y + cell.h - 1).toList
+        }
+
       val statusQuoPosition   = startSide match {
         case Direction.Left  ⇒ originCell.x - 1
         case Direction.Right ⇒ originCell.x + originCell.w - 1
+        case Direction.Up    ⇒ originCell.y - 1
+        case Direction.Down  ⇒ originCell.y + originCell.h - 1
       }
-      val smallestNeighbor = {
-        val neighbors = findOriginNeighbors(originCell, startSide, cells)
-        neighbors match {
-          case Nil ⇒ None
-          case _   ⇒ Some(neighbors.minBy(_.w))
-        }
-      }
+
+      val neighbors = findOriginNeighbors(originCell, startSide, cells)
       statusQuoPosition ::
         insideCellPositions(originCell) ++
-        smallestNeighbor.toList.flatMap(insideCellPositions)
+        findSmallestNeighbor(startSide, neighbors).toList.flatMap(insideCellPositions)
     }
   }
 

@@ -23,6 +23,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import org.orbeon.oxf.util.StringUtils._
 
 object Position {
 
@@ -145,5 +146,13 @@ object Position {
       }
     }
   }
+
+  // Get the height of each row track
+  def rowsHeight(gridBody: JQuery): List[Double] =
+    gridBody
+      .css("grid-template-rows")
+      .splitTo[List]()
+      .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
+      .map(_.toDouble)
 
 }

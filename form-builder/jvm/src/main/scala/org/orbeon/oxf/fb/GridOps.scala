@@ -373,28 +373,31 @@ trait GridOps extends ContainerOps {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
     Cell.findOriginCell(cells, cellElem) foreach {  originCell ⇒
 
-      def moveSingleCell(cell: Cell[NodeInfo], side: Direction, target: Int): Unit = {
+      def moveCellWall(
+        cell   : Cell[NodeInfo],
+        side   : Direction,
+        target : Int
+      ): Unit = {
         cell match {
           case Cell(Some(u), _, x, y, h, w) ⇒
-            val (newX, newW) = side match {
-              case Direction.Left  ⇒ (target + 1, w - (target + 1 - x))
-              case Direction.Right ⇒ (x         , target + 1 - x)
+            val (newX, newW, newY, newH) = side match {
+              case Direction.Left  ⇒ (target + 1 , w - (target + 1 - x) , y          , h)
+              case Direction.Right ⇒ (x          , target + 1 - x       , y          , h)
+              case Direction.Up    ⇒ (x          , w                    , target + 1 , h - (target + 1 - y))
+              case Direction.Down  ⇒ (x          , w                    , y          , target + 1 - y)
             }
             if (x != newX) NodeInfoCellOps.updateX(u, newX)
             if (w != newW) NodeInfoCellOps.updateW(u, newW)
+            if (y != newY) NodeInfoCellOps.updateY(u, newY)
+            if (h != newH) NodeInfoCellOps.updateH(u, newH)
           case _ ⇒ throw new IllegalStateException
         }
       }
 
       val neighbors = Cell.findOriginNeighbors(originCell, startSide, cells)
-      startSide match {
-        case Direction.Left ⇒
-          moveSingleCell(originCell, Direction.Left, target)
-          neighbors.foreach(moveSingleCell(_, Direction.Right, target))
-        case Direction.Right ⇒
-          moveSingleCell(originCell, Direction.Right, target)
-          neighbors.foreach(moveSingleCell(_, Direction.Left, target))
-      }
+      val mirrorSide = Direction.mirror(startSide)
+      moveCellWall(originCell, startSide, target)
+      neighbors.foreach(moveCellWall(_, mirrorSide, target))
     }
   }
 

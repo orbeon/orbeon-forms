@@ -67,20 +67,13 @@ object RowEditor {
   Position.onUnderPointerChange {
     withCurrentGridBody { currentGridBody ⇒
 
-      // Get the height of each row track
-      val rowsHeight =
-        currentGridBody.el
-          .css("grid-template-rows")
-          .splitTo[List]()
-          .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
-          .map(_.toDouble)
-
       case class TopBottom(top: Double, bottom: Double)
 
       // For each row track, find its top/bottom
       val rowsTopBottom = {
         val gridBodyTop = currentGridBody.top
         val zero = List(TopBottom(0, gridBodyTop))
+        val rowsHeight = Position.rowsHeight(currentGridBody.el)
         rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
           val lastBottom = soFar.last.bottom
           val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)

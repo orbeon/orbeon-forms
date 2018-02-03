@@ -292,13 +292,14 @@ object Cell {
   }
 
   // When dragging a given wall of a given cell, returns where this wall can go
+  case class PossibleDropTargets(statusQuo: Int, all: List[Int])
   def cellWallPossibleDropTargets[Underlying](
     cellElem         : Underlying,
     startSide        : Direction)(
     implicit cellOps : CellOps[Underlying]
-  ): List[Int] = {
+  ): Option[PossibleDropTargets] = {
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
-    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
+    findOriginCell(cells, cellElem).map { originCell ⇒
 
       def insideCellPositions(cell: Cell[Underlying]): List[Int] =
         Orientation.fromDirection(startSide) match {
@@ -314,9 +315,13 @@ object Cell {
       }
 
       val neighbors = findOriginNeighbors(originCell, startSide, cells)
-      statusQuoPosition ::
-        insideCellPositions(originCell) ++
-        findSmallestNeighbor(startSide, neighbors).toList.flatMap(insideCellPositions)
+      PossibleDropTargets(
+        statusQuo = statusQuoPosition,
+        all =
+          statusQuoPosition ::
+            insideCellPositions(originCell) ++
+            findSmallestNeighbor(startSide, neighbors).toList.flatMap(insideCellPositions)
+      )
     }
   }
 

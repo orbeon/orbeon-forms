@@ -51,8 +51,8 @@ object GridWallDnD {
     val WallDropClass       = "fb-grid-dnd-wall-drop"
     val WallVeilClass       = "fb-grid-dnd-wall-veil"
 
-    case class CurrentCell(block: Block, draggedWall: Option[Direction])
-    case class DraggedWall(side: Direction)
+    case class CurrentCell(block: Block, draggedWall: Option[DraggedWall])
+    case class DraggedWall(startSide: Direction, startIndex: Int)
 
     var currentCellOpt: Option[CurrentCell] = None
 
@@ -216,7 +216,7 @@ object GridWallDnD {
 
       Position.onUnderPointerChange {
         dndShadowOpt.foreach { (dndShadow) ⇒
-          currentCellOpt.foreach { case CurrentCell(_, Some(startSide)) ⇒
+          currentCellOpt.foreach { case CurrentCell(_, Some(DraggedWall(startSide, _))) ⇒
             DndWall.wallOrientation(startSide) match {
               case Orientation.Vertical ⇒
                 val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
@@ -258,13 +258,14 @@ object GridWallDnD {
             if (isVertical) if (wallIndex == currentCell.block.x - 1) Direction.Left else Direction.Right
             else            if (wallIndex == currentCell.block.y - 1) Direction.Up   else Direction.Down
           }
-          currentCellOpt = Some(currentCell.copy(draggedWall = Some(startSide)))
-          val possibleTargets = Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide)
-          ControlEditor.mask()
-          DndShadow.show(source)
-          DndWall.hideAll()
-          val wallOrientation = DndWall.wallOrientation(startSide)
-          possibleTargets.foreach(DndWall.show(_, wallOrientation, None))
+          Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide).foreach { possibleTargets ⇒
+            currentCellOpt = Some(currentCell.copy(draggedWall = Some(DraggedWall(startSide, possibleTargets.statusQuo))))
+            ControlEditor.mask()
+            DndShadow.show(source)
+            DndWall.hideAll()
+            val wallOrientation = DndWall.wallOrientation(startSide)
+            possibleTargets.all.foreach(DndWall.show(_, wallOrientation, None))
+          }
         }
       }
 
@@ -273,10 +274,12 @@ object GridWallDnD {
         DndShadow.hide()
         DndWall.getDropTarget.foreach { (dropTarget) ⇒
           currentCellOpt match {
-            case Some(CurrentCell(block, Some(startSide))) ⇒
+            case Some(CurrentCell(block, Some(DraggedWall(startSide, startIndex)))) ⇒
               val targetIndex  = dropTarget.attr("data-index").get.toInt
-              val cellId       = block.el.attr("id").get
-              RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
+              if (targetIndex != startIndex) {
+                val cellId       = block.el.attr("id").get
+                RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
+              }
             case _ ⇒
               throw new IllegalStateException
           }

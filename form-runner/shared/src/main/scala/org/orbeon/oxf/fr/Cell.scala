@@ -14,11 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.datatypes.{Direction, Orientation}
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.Try
-import org.orbeon.oxf.util.CoreUtils._
 
 case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
 
@@ -29,8 +27,7 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
   def missing      = origin.isDefined
 }
 
-// TODO: Pass this around and add operations
-case class GridModel[Underlying](cells: List[Cell[Underlying]])
+case class GridModel[Underlying](cells: List[List[Cell[Underlying]]])
 
 trait CellOps[Underlying] {
 
@@ -66,7 +63,7 @@ object Cell {
   def analyzeTrTdGrid[Underlying : CellOps](
     grid     : Underlying,
     simplify : Boolean
-  ): (Int, List[List[Cell[Underlying]]]) = {
+  ): (Int, GridModel[Underlying]) = {
 
     val ops  = implicitly[CellOps[Underlying]]
     val rows = ops.children(grid, TrTestName)
@@ -138,7 +135,7 @@ object Cell {
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
     grid       : Underlying,
     simplify   : Boolean
-  ): List[List[Cell[Underlying]]] = {
+  ): GridModel[Underlying] = {
 
     val ops = implicitly[CellOps[Underlying]]
     val cs  = ops.children(grid, CellTestName)
@@ -179,13 +176,13 @@ object Cell {
       xyToList(xy, StandardGridWidth)
   }
 
-  def originCells[Underlying](cells: List[List[Cell[Underlying]]]): List[Cell[Underlying]] =
-    cells.iterator.flatten collect {
+  def originCells[Underlying](gridModel: GridModel[Underlying]): List[Cell[Underlying]] =
+    gridModel.cells.iterator.flatten collect {
       case c @ Cell(Some(_), None, _, _, _, _) ⇒ c
     } toList
 
-  def findOriginCell[Underlying](cells: List[List[Cell[Underlying]]], u: Underlying): Option[Cell[Underlying]] =
-    cells.iterator.flatten collectFirst {
+  def findOriginCell[Underlying](gridModel: GridModel[Underlying], u: Underlying): Option[Cell[Underlying]] =
+    gridModel.cells.iterator.flatten collectFirst {
       case c @ Cell(Some(`u`), None, _, _, _, _) ⇒ c
     }
 
@@ -198,7 +195,7 @@ object Cell {
   def findOriginNeighbors[Underlying](
     originCell : Cell[Underlying],
     side       : Direction,
-    cells      : List[List[Cell[Underlying]]]
+    gridModel  : GridModel[Underlying]
   ): List[Cell[Underlying]] = {
     val (neighborX, neighborY) = side match {
       case Direction.Left  ⇒ (originCell.x - 1           , originCell.y               )
@@ -210,19 +207,19 @@ object Cell {
       neighborX >= 1 &&
       neighborX <= Cell.StandardGridWidth &&
       neighborY >= 1 &&
-      neighborY <= cells.length
+      neighborY <= gridModel.cells.length
     isCoordinateValid.flatList {
       val (xs, ys) = side match {
         case Direction.Left | Direction.Right ⇒ List(neighborX) → (originCell.y until originCell.y + originCell.h).toList
         case Direction.Up   | Direction.Down  ⇒ (originCell.x until originCell.x + originCell.w).toList → List(neighborY)
       }
-      val neighborCells = xs.flatMap(x ⇒ ys.map(y ⇒ cells(y - 1)(x - 1)))
+      val neighborCells = xs.flatMap(x ⇒ ys.map(y ⇒ gridModel.cells(y - 1)(x - 1)))
       neighborCells.map(selfCellOrOrigin).distinct
     }
   }
 
   def nonOverflowingNeighbors[Underlying](
-    cells: List[List[Cell[Underlying]]],
+    cells: GridModel[Underlying],
     originCell: Cell[Underlying],
     direction: Direction
   ): List[Cell[Underlying]] = {
@@ -341,8 +338,8 @@ object Cell {
       index != -1 option index
     }
 
-    def xyToList[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): List[List[Cell[Underlying]]] =
-      xy map (_ take width toList) toList
+    def xyToList[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): GridModel[Underlying] =
+      GridModel(xy map (_ take width toList) toList)
 
      // Fill holes with cells that can span columns (but not rows, to make things simpler)
     def fillHoles[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): Unit =
@@ -385,7 +382,7 @@ object Cell {
     // Create a simplified grid if positions and widths have a gcd
     // NOTE: The resulting grid will then not necessarily have `StandardGridWidth` cells on each row,
     // but 1, 2, 3, 4, 6, or 12 cells.
-    def simplify[Underlying](xy: Array[Array[Cell[Underlying]]]): List[List[Cell[Underlying]]] = {
+    def simplify[Underlying](xy: Array[Array[Cell[Underlying]]]): GridModel[Underlying] = {
 
       val gcd = {
 
@@ -407,14 +404,14 @@ object Cell {
       }
 
       if (gcd > 1)
-        xy map (_ grouped gcd map (x ⇒ x.head) map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList
+        GridModel(xy map (_ grouped gcd map (x ⇒ x.head) map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList)
       else
         xyToList(xy, StandardGridWidth)
     }
   }
 
   def makeASCII[Underlying](
-    cells           : List[List[Cell[Underlying]]],
+    gridModel       : GridModel[Underlying],
     existingMapping : Map[Underlying, Char] = Map.empty[Underlying, Char]
   ): (String, Map[Underlying, Char]) = {
 
@@ -423,14 +420,14 @@ object Cell {
       val existingKeys   = existingMapping.keySet
       val existingValues = existingMapping.values.toSet
 
-      val distinctUs  = (cells.flatten collect { case Cell(Some(u), None, _, _, _, _) ⇒ u } distinct) filterNot existingKeys
+      val distinctUs  = (gridModel.cells.flatten collect { case Cell(Some(u), None, _, _, _, _) ⇒ u } distinct) filterNot existingKeys
       val lettersIt   = Iterator.tabulate(26)('A'.toInt + _ toChar)                          filterNot existingValues
 
       existingMapping ++ (distinctUs.iterator zip lettersIt)
     }
 
     val charGrid =
-      cells map { row ⇒
+      gridModel.cells map { row ⇒
         row map {
           case Cell(Some(u), None,    _, _, _, _) ⇒ usToLetters(u)
           case Cell(Some(u), Some(_), _, _, _, _) ⇒ usToLetters(u).toLower

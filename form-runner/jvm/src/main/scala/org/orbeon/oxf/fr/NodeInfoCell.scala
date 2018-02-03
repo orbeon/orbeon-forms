@@ -69,7 +69,7 @@ object NodeInfoCell {
         1
 
     ArrayFunctions.createValue(
-      allRowCells.to[Vector] map { row ⇒
+      allRowCells.cells.to[Vector] map { row ⇒
         new SequenceExtent(
             row collect {
               case Cell(u, None, x, y, h, w) ⇒
@@ -96,7 +96,7 @@ object NodeInfoCell {
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).to[Vector] map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to[Vector] map { row ⇒
         new SequenceExtent(
           row collect {
             case Cell(u, None, x, y, h, w) ⇒

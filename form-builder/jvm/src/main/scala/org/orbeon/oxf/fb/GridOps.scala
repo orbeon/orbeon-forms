@@ -18,7 +18,7 @@ import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow}
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, FormRunner}
+import org.orbeon.oxf.fr.{Cell, FormRunner, GridModel}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -64,7 +64,7 @@ trait GridOps extends ContainerOps {
   def rowInsertBelow(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[UndoAction]) =
     withDebugGridOperation("insert row below") {
 
-      val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+      val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells
       val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
       // Increment height of origin cells that don't end at the current row
@@ -112,7 +112,7 @@ trait GridOps extends ContainerOps {
 
   def rowInsertAbove(gridElem: NodeInfo, rowPos: Int)(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[UndoAction]) = {
 
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells
     val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
     if (adjustedRowPos >= 1)
@@ -170,7 +170,7 @@ trait GridOps extends ContainerOps {
     require(rowPos >= 0)
 
     val gridElem       = containerById(gridId)
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells
     val adjustedRowPos = rowPos % allCells.size
 
     allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size
@@ -181,7 +181,7 @@ trait GridOps extends ContainerOps {
     require(rowPos >= 0)
 
     val gridElem       = containerById(gridId)
-    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+    val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells
     val adjustedRowPos = rowPos % allCells.size
 
     (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size) option
@@ -259,12 +259,12 @@ trait GridOps extends ContainerOps {
         // - if none, then insert new row below OR at end of grid
 
         val gridElem     = getContainingGrid(currentCellNode)
-        val cells        = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
-        val currentCell  = Cell.findOriginCell(cells, currentCellNode).get
+        val gridModel    = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)
+        val currentCell  = Cell.findOriginCell(gridModel, currentCellNode).get
         val MinimumWidth = currentCell.w
 
         val availableCellOpt =
-          cells.iterator.flatten dropWhile (_ != currentCell) drop 1 collect {
+          gridModel.cells.iterator.flatten dropWhile (_ != currentCell) drop 1 collect {
             case c @ Cell(Some(cellNode), None, _, _, _, _) if ! cellNode.hasChildElement ⇒ c
           } nextOption()
 
@@ -346,17 +346,17 @@ trait GridOps extends ContainerOps {
     implicit ctx : FormBuilderDocContext
   ): Unit = {
     if (Cell.canChangeSize(cellElem).contains(direction)) {
-      val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-      findOriginCell(cells, cellElem).foreach { originCell ⇒
+      val gridModel = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
+      findOriginCell(gridModel, cellElem).foreach { originCell ⇒
         direction match {
           case Direction.Left ⇒
             val newCellW = (originCell.w + 1) / 2
             NodeInfoCellOps.updateW(cellElem, newCellW)
-            insertCellAtBestPosition(cells, nextTmpId(), originCell.x + newCellW, originCell.y, originCell.w - newCellW, originCell.h)
+            insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x + newCellW, originCell.y, originCell.w - newCellW, originCell.h)
           case Direction.Up ⇒
             val newCellH = (originCell.h + 1) / 2
             NodeInfoCellOps.updateH(cellElem, newCellH)
-            insertCellAtBestPosition(cells, nextTmpId(), originCell.x, originCell.y + newCellH, originCell.w, originCell.h - newCellH)
+            insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x, originCell.y + newCellH, originCell.w, originCell.h - newCellH)
           case _ ⇒
             throw new IllegalStateException
         }
@@ -409,7 +409,7 @@ trait GridOps extends ContainerOps {
     canDeleteContainer(gridElem)
 
   def canDeleteRow(gridElem: NodeInfo): Boolean =
-    Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).lengthCompare(1) > 0
+    Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells.lengthCompare(1) > 0
 
   // Find the new td to select if we are removing the currently selected td
   def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
@@ -431,15 +431,15 @@ trait GridOps extends ContainerOps {
     }
 
   private def insertCellAtBestPosition(
-    cells : List[List[Cell[NodeInfo]]],
-    id    : String,
-    x     : Int,
-    y     : Int,
-    w     : Int,
-    h     : Int
+    gridModel : GridModel[NodeInfo],
+    id        : String,
+    x         : Int,
+    y         : Int,
+    w         : Int,
+    h         : Int
   ): Option[NodeInfo] = {
 
-    val originCells = Cell.originCells(cells)
+    val originCells = Cell.originCells(gridModel)
 
     require(originCells.nonEmpty)
 

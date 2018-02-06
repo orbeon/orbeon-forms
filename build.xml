@@ -26,7 +26,7 @@
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
         <classpath>
-            <pathelement location="lib_ant/jarjar-1.3.jar"/>
+            <pathelement location="lib_ant/jarjar-1.4.jar"/>
         </classpath>
     </taskdef>
 
@@ -117,15 +117,11 @@
     <target name="jarjar" depends="prepare">
         <!-- Xerces fat JAR -->
         <jarjar jarfile="lib/xerces-2.11-orbeon.jar">
-            <zipfileset src="lib/src/xerces-resolver-2.11.jar">
-                <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
-            </zipfileset>
-            <zipfileset src="lib/src/xerces-resolver-2.11.jar">
-                <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
-            </zipfileset>
             <zipfileset src="lib/src/xerces-xercesImpl-2.11.jar">
+                <!-- Don't expose any services -->
+                <exclude name="META-INF/services/**"/>
+            </zipfileset>
+            <zipfileset src="lib/src/xerces-serializer-2.11.jar">
                 <!-- Don't expose any services -->
                 <exclude name="META-INF/services/**"/>
             </zipfileset>

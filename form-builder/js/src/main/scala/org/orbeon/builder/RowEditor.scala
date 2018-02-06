@@ -19,7 +19,7 @@ import enumeratum.{Enum, EnumEntry}
 import io.circe.generic.auto._
 import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
-import org.orbeon.datatypes.AboveBelow
+import org.orbeon.datatypes.{AboveBelow, Orientation}
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.{asUnit, _}
 import org.orbeon.oxf.util.StringUtils._
@@ -73,7 +73,7 @@ object RowEditor {
       val rowsTopBottom = {
         val gridBodyTop = currentGridBody.top
         val zero = List(TopBottom(0, gridBodyTop))
-        val rowsHeight = Position.rowsHeight(currentGridBody.el)
+        val rowsHeight = Position.tracksWidth(currentGridBody.el, Orientation.Horizontal)
         rowsHeight.foldLeft(zero) { (soFar: List[TopBottom], rowHeight: Double) ⇒
           val lastBottom = soFar.last.bottom
           val newTopBottom = TopBottom(lastBottom, lastBottom + rowHeight)

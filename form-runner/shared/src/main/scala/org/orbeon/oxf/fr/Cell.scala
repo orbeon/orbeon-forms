@@ -322,6 +322,22 @@ object Cell {
     }
   }
 
+  // Returns for each row (horizontal orientation) or each column (vertical orientation) if there is a grid gap after that row or column
+  def gapsInGrid[Underlying](
+    gridModel   : GridModel[Underlying],
+    orientation : Orientation
+  ): List[Boolean] = {
+    val all = gridModel.cells.flatten
+    val withoutFirstRowColumn = all.filter(c ⇒ c.x != 1 && c.y != 1)
+    val indexGaps = withoutFirstRowColumn.map(c ⇒ orientation match {
+      case Orientation.Horizontal ⇒ c.y → ! c.missing
+      case Orientation.Vertical   ⇒ c.x → ! c.missing
+    }).groupBy(_._1)
+    indexGaps.map { case (index, hasGap) ⇒
+      index → hasGap.exists(_._2)
+    }.toList.sortBy(_._1).map(_._2)
+  }
+
   private object Private {
 
     // Try to get a positive attribute value, returning 1 if that fails for any reason

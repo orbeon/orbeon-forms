@@ -19,7 +19,7 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.fr.Cell
+import org.orbeon.oxf.fr.{Cell, GridModel}
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
@@ -67,6 +67,7 @@ object GridWallDnD {
           },
         becomesCurrent = (cell: Block) ⇒
           if (! DndShadow.isDragging) {
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
             currentCellOpt = Some(CurrentCell(cell, None))
             val walls      = Cell.movableWalls(cell.underlying)
             walls.foreach { direction ⇒
@@ -77,7 +78,7 @@ object GridWallDnD {
                 case Direction.Up    ⇒ cell.y          - 1
                 case Direction.Down  ⇒ cell.y + cell.h - 1
               }
-              DndWall.show(index, wallOrientation, Some(direction))
+              DndWall.show(gridModel, index, wallOrientation, Some(direction))
             }
           }
       )
@@ -89,7 +90,8 @@ object GridWallDnD {
       private val walls                      = new mutable.ListBuffer[JQuery]
       private var dropTarget: Option[JQuery] = None
 
-      def show(
+      def show[Underlying](
+        gridMode    : GridModel[Underlying],
         index       : Int,
         orientation : Orientation,
         side        : Option[Direction]
@@ -107,7 +109,7 @@ object GridWallDnD {
           dndContainer.append(dndHandle)
           frGrid.append(dndContainer)
           walls.append(dndContainer)
-          val wallSlide = {
+          val sideSlide = {
             val wallThickness =
               orientation match {
                 case Orientation.Vertical   ⇒ dndContainer.width()
@@ -119,12 +121,24 @@ object GridWallDnD {
               case None                                   ⇒ wallThickness / 2
             }
           }
+
+          def trackOffset(orientation: Orientation) = {
+            val gridSlide = orientation match {
+              case Orientation.Horizontal ⇒ Offset(frGridBody).top
+              case Orientation.Vertical   ⇒ Offset(frGridBody).left
+            }
+            val tracksSlide = Position.tracksWidth(frGridBody, orientation).take(index).sum
+            val gapSlide = {
+              val rowGapSize  = frGridBody.css("grid-row-gap").split("px")(0).toInt
+              index * rowGapSize
+            }
+            gridSlide + tracksSlide - sideSlide + gapSlide
+          }
+
           Offset.offset(dndContainer, Offset(
             left = orientation match {
               case Orientation.Vertical ⇒
-                Offset(frGridBody).left +
-                frGridBody.width() / 12 * index -
-                wallSlide
+                trackOffset(orientation)
               case Orientation.Horizontal ⇒
                 currentCell.block.left
             },
@@ -132,11 +146,7 @@ object GridWallDnD {
               case Orientation.Vertical ⇒
                 currentCell.block.top
               case Orientation.Horizontal ⇒
-                val rowGap = frGridBody.css("grid-row-gap").split("px")(0).toInt
-                Offset(frGridBody).top +
-                Position.rowsHeight(frGridBody).take(index).sum -
-                wallSlide +
-                index * rowGap
+                trackOffset(orientation)
             }
           ))
           orientation match {
@@ -263,8 +273,9 @@ object GridWallDnD {
             ControlEditor.mask()
             DndShadow.show(source)
             DndWall.hideAll()
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.block.underlying.parentElement, simplify = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
-            possibleTargets.all.foreach(DndWall.show(_, wallOrientation, None))
+            possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
           }
         }
       }

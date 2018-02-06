@@ -14,6 +14,7 @@
 package org.orbeon.builder
 
 import org.orbeon.builder.BlockCache.Block
+import org.orbeon.datatypes.Orientation
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms._
@@ -148,11 +149,18 @@ object Position {
   }
 
   // Get the height of each row track
-  def rowsHeight(gridBody: JQuery): List[Double] =
+  def tracksWidth(
+    gridBody    : JQuery,
+    orientation : Orientation
+  ): List[Double] = {
+    val cssProperty = orientation match {
+      case Orientation.Horizontal ⇒ "grid-template-rows"
+      case Orientation.Vertical   ⇒ "grid-template-columns"
+    }
     gridBody
-      .css("grid-template-rows")
+      .css(cssProperty)
       .splitTo[List]()
-      .map((hPx) ⇒ hPx.substring(0, hPx.indexOf("px")))
+      .map((w) ⇒ w.substring(0, w.indexOf("px")))
       .map(_.toDouble)
-
+  }
 }

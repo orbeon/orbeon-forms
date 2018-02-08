@@ -230,8 +230,9 @@ object APISupport {
           decodeURL,
           ctx.writer
         )
-      case _ ⇒
+      case other ⇒
         // All other types: just output
+        Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
         useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
     }
 

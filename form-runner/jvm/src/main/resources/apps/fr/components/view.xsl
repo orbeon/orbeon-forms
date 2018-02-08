@@ -158,11 +158,9 @@
                     <xf:case value="'has-lease'">
                         <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label ref="$fr-resources/detail/lease/relinquish"/>
-                            <xf:action event="DOMActivate">
-                                <xf:send submission="fr-relinquish-lease-submission"/>
-                                <xf:setvalue ref="$lease-state-elem">relinquished</xf:setvalue>
+                            <xf:action event="DOMActivate" type="xpath">
+                                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
                             </xf:action>
-                            <xf:send event="DOMActivate" submission="fr-relinquish-lease-submission"/>
                         </xf:trigger>
                         <xf:trigger class="xforms-trigger-appearance-modal">
                             <xf:label ref="$fr-resources/detail/lease/renew"/>

@@ -236,7 +236,8 @@
     <!-- Button processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='orbeon-home'/>
     <property as="xs:string"  name="oxf.fr.detail.process.summary.*.*">
-        navigate(uri = "/fr/{xxf:instance('fr-parameters-instance')/app}/{xxf:instance('fr-parameters-instance')/form}/summary")
+        relinquish-lease
+        then navigate(uri = "/fr/{xxf:instance('fr-parameters-instance')/app}/{xxf:instance('fr-parameters-instance')/form}/summary")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
@@ -247,7 +248,8 @@
         xf:show("fr-clear-confirm-dialog") then suspend
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.close.*.*">
-        navigate("oxf.fr.detail.close.uri")
+        relinquish-lease
+        then navigate("oxf.fr.detail.close.uri")
         recover summary
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.save-final.*.*">

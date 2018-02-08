@@ -50,6 +50,7 @@ trait FormRunnerActions {
     "pending-uploads"        → tryPendingUploads,
     "validate"               → tryValidate,
     "save"                   → trySaveAttachmentsAndData,
+    "relinquish-lease"       → tryRelinquishLease,
     "success-message"        → trySuccessMessage,
     "error-message"          → tryErrorMessage,
     "confirm"                → tryConfirm,
@@ -164,6 +165,14 @@ trait FormRunnerActions {
       case _ ⇒
         dispatch(name = "fr-data-save-error", targetId = FormModel)
     }
+
+  def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
+    val leaseState = persistenceInstance.rootElement / "lease-state"
+    if (leaseState.stringValue == "current-user") {
+      send("fr-relinquish-lease-submission", Map.empty)((_) ⇒ ())
+      setvalue(leaseState, "relinquished")
+    }
+  }
 
   def tryNewToEdit(params: ActionParams): Try[Any] = Try {
 

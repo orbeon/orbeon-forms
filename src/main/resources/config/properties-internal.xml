@@ -270,14 +270,18 @@
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value='save'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"   value='abort'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*" value='resume'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*">
-        save(draft = "true")
-    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                   value='save(draft = "true")'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.relinquish-lease.*.*"           value='relinquish-lease'/>
 
     <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                value='navigate("/")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"           value='navigate("/fr")'/>
-
+    <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*">
+        relinquish-lease
+        then navigate("/")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*">
+        relinquish-lease
+        then navigate("/fr")
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
         pending-uploads
         recover (error-message("upload-in-progress") then success)

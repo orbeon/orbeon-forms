@@ -194,7 +194,7 @@ object APISupport {
       originalName → value
 
   // Call the Orbeon service at the other end
-  def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse)= {
+  def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse) = {
 
     Logger.debug("proxying page {}", requestDetails.url)
 

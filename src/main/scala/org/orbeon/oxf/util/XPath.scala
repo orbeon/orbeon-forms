@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import java.util.{List ⇒ JList}
 import javax.xml.transform.sax.SAXSource
-import javax.xml.transform.{Result, Source, TransformerException, URIResolver}
+import javax.xml.transform._
 
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
@@ -26,15 +26,16 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
-import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
+import org.orbeon.saxon.event.{PipelineConfiguration, Receiver, Sender}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
-import org.xml.sax.InputSource
+import org.xml.sax.{InputSource, SAXException, XMLReader}
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -153,6 +154,18 @@ object XPath {
     super.setNamePool(GlobalNamePool)
     super.registerExternalObjectModel(GlobalDataConverter)
     super.registerExternalObjectModel(OrbeonDOMObjectModel)
+
+    // See https://github.com/orbeon/orbeon-forms/issues/3468
+    // We decide not to use a pool for now as creating a parser is fairly cheap
+    override def getSourceParser: XMLReader = getParser
+    override def getStyleParser : XMLReader = getParser
+
+    private def getParser =
+      XMLParsing.newSAXParser(XMLParsing.ParserConfiguration.PLAIN).getXMLReader
+
+    // These are called if the parser came from `getSourceParser` or `getStyleParser`
+    override def reuseSourceParser(parser: XMLReader): Unit = ()
+    override def reuseStyleParser(parser: XMLReader) : Unit = ()
 
     override def setNamePool(targetNamePool: NamePool): Unit =
       throwException()

@@ -23,7 +23,7 @@
     <!-- Unrolled XHTML+XForms -->
     <p:param type="input" name="xforms"/>
     <!-- Request parameters -->
-    <p:param type="input" name="parameters" debug="xxxx parameters"/>
+    <p:param type="input" name="parameters"/>
     <!-- PDF document -->
     <p:param type="output" name="data"/>
 

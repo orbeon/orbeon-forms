@@ -153,11 +153,10 @@ object Tabbable {
 
             val newLi = $(bound).parent(ExcludeRepeatClassesSelector)
 
-            if (newLi.is(ActiveSelector))
-              return
-
-            val tabPosition = newLi.prevAll(ExcludeRepeatClassesSelector).length
-            selectTab(tabPosition)
+            if (! newLi.is(ActiveSelector)) {
+              val tabPosition = newLi.prevAll(ExcludeRepeatClassesSelector).length
+              selectTab(tabPosition)
+            }
           }
         }: js.ThisFunction)
       }

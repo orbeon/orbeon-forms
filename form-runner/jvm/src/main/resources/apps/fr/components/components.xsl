@@ -376,7 +376,7 @@
                     if (
                         $mode = 'view' or (
                             $mode = ('pdf', 'email') and
-                            xxf:instance('fr-form-attachments')/pdf/xxf:trim() != ''
+                            not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
                         )
                     ) then
                         'static'

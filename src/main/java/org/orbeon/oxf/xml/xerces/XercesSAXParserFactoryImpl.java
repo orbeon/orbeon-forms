@@ -43,7 +43,7 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
         this.recognizedFeatures = Collections.unmodifiableSet(configuration.getRecognizedFeatures());
         this.features = configuration.getFeatures();
 
-        setNamespaceAware(true); // this is needed by some tools in addition to the feature
+        setNamespaceAware(true);
         setValidating(parserConfiguration.validating);
     }
 

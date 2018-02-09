@@ -231,6 +231,19 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
           "fr-remember-language"      → "false",
           "fr-language"               → "fr"
         )
+      ),
+      (
+        "legacy empty attachment",
+        <attachments>
+          <pdf mediatype="application/pdf" filename="" size=""/>
+        </attachments>,
+        Map.empty,
+        "en",
+        List(
+          s"fr-$UsePdfTemplateParam" → "false",
+          "fr-remember-language"     → "false",
+          "fr-language"              → "en"
+        )
       )
     )
 

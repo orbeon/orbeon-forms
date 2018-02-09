@@ -58,10 +58,7 @@
 
             <!-- Attachments -->
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
-                <attachments>
-                    <css mediatype="text/css" filename="" size=""/>
-                    <pdf mediatype="application/pdf" filename="" size=""/>
-                </attachments>
+                <attachments/>
             </xf:instance>
 
             <!-- All form resources -->

@@ -87,7 +87,7 @@ object FormRunnerRenderedFormat {
       case None if create ⇒
         XFormsAPI.insert(
           into   = urlsInstanceRootElem,
-          after  = urlsInstanceRootElem child PdfElemName,
+          after  = urlsInstanceRootElem child *,
           origin = NodeInfoFactory.elementInfo(key)
         ).headOption
       case someOrNone ⇒
@@ -107,6 +107,13 @@ object FormRunnerRenderedFormat {
     } yield
       path → node.localname
 
+  private def extractPdfTemplates(attachmentsRootElem : NodeInfo) =
+    for {
+      pdfElem ← attachmentsRootElem child PdfElemName
+      path    ← pdfElem.stringValue.trimAllToOpt
+    } yield
+      PdfTemplate(path, pdfElem.attValueOpt("name"), pdfElem.attValueOpt("lang"))
+
   private def selectPdfTemplate(
     attachmentsRootElem : NodeInfo,
     pdfTemplateNameOpt  : Option[String],
@@ -114,12 +121,7 @@ object FormRunnerRenderedFormat {
     defaultLang         : Option[String]
   ): Option[PdfTemplate] = {
 
-    val pdfTemplates =
-      for {
-        pdfElem ← attachmentsRootElem child PdfElemName
-        path    ← pdfElem.stringValue.trimAllToOpt
-      } yield
-        PdfTemplate(path, pdfElem.attValueOpt("name"), pdfElem.attValueOpt("lang"))
+    val pdfTemplates = extractPdfTemplates(attachmentsRootElem)
 
     // NOTE: We have a choice here is no name is requested:
     // - return entries without a name only
@@ -157,10 +159,10 @@ object FormRunnerRenderedFormat {
     defaultLang                  : Option[String]
   ): Option[PdfTemplate] = {
 
-    def hasTemplates =
-      frFormAttachmentsRootElemOpt.toList child PdfElemName nonEmpty
+    val hasTemplates =
+      frFormAttachmentsRootElemOpt exists (extractPdfTemplates(_).nonEmpty)
 
-    val usePdfTemplate              = booleanParamByName(params, UsePdfTemplateParam, default = hasTemplates)
+    val usePdfTemplate              = hasTemplates && booleanParamByName(params, UsePdfTemplateParam, default = true)
     val requestedPdfTemplateNameOpt = paramByName(params, PdfTemplateNameParam)
 
     usePdfTemplate option {

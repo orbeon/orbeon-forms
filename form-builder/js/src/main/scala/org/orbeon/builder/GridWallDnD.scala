@@ -51,37 +51,43 @@ object GridWallDnD {
     val WallDropClass       = "fb-grid-dnd-wall-drop"
     val WallVeilClass       = "fb-grid-dnd-wall-veil"
 
-    case class CurrentCell(block: Block, draggedWall: Option[DraggedWall])
-    case class DraggedWall(startSide: Direction, startIndex: Int)
+    case class StartCell(block: Block, startSide: Direction, startIndex: Int)
 
-    var currentCellOpt: Option[CurrentCell] = None
+    var currentCellOpt : Option[Block]     = None
+    var startCellOpt   : Option[StartCell] = None
 
     // Keep track of the current cell and show draggable walls
     locally {
       Position.currentContainerChanged(
         containerCache = BlockCache.cellCache,
-        wasCurrent     = (_   : Block) ⇒
-          if (! DndShadow.isDragging) {
-            currentCellOpt = None
+        wasCurrent     = (_   : Block) ⇒ {
+          currentCellOpt = None
+          if (! DndShadow.isDragging)
             DndWall.hideAll()
-          },
-        becomesCurrent = (cell: Block) ⇒
-          if (! DndShadow.isDragging) {
-            val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
-            currentCellOpt = Some(CurrentCell(cell, None))
-            val walls      = Cell.movableWalls(cell.underlying)
-            walls.foreach { direction ⇒
-              val wallOrientation = DndWall.wallOrientation(direction)
-              val index = direction match {
-                case Direction.Left  ⇒ cell.x          - 1
-                case Direction.Right ⇒ cell.x + cell.w - 1
-                case Direction.Up    ⇒ cell.y          - 1
-                case Direction.Down  ⇒ cell.y + cell.h - 1
-              }
-              DndWall.show(gridModel, index, wallOrientation, Some(direction))
-            }
-          }
+        },
+        becomesCurrent = (cell: Block) ⇒ {
+          currentCellOpt = Some(cell)
+          if (! DndShadow.isDragging)
+            DndSides.show(cell)
+        }
       )
+    }
+
+    object DndSides {
+       def show(cell: Block): Unit = {
+         val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
+         val walls      = Cell.movableWalls(cell.underlying)
+         walls.foreach { direction ⇒
+           val wallOrientation = DndWall.wallOrientation(direction)
+           val index = direction match {
+             case Direction.Left  ⇒ cell.x          - 1
+             case Direction.Right ⇒ cell.x + cell.w - 1
+             case Direction.Up    ⇒ cell.y          - 1
+             case Direction.Down  ⇒ cell.y + cell.h - 1
+           }
+           DndWall.show(gridModel, index, wallOrientation, Some(direction))
+         }
+       }
     }
 
     // Blocks signaling where cell borders can be dragged from and to
@@ -102,7 +108,7 @@ object GridWallDnD {
               case Orientation.Vertical   ⇒ WallVerticalClass
               case Orientation.Horizontal ⇒ WallHorizontalClass
             }
-          val frGridBody       = currentCell.block.el.parents(".fr-grid-body").first()
+          val frGridBody       = currentCell.el.parents(".fr-grid-body").first()
           val frGrid           = frGridBody.parent
           val dndContainer     = $(s"""<div class="$WallContainerClass $orientationClass" data-index="$index">""")
           val dndHandle        = $(s"""<div class="$WallHandleClass">""")
@@ -140,18 +146,18 @@ object GridWallDnD {
               case Orientation.Vertical ⇒
                 trackOffset(orientation)
               case Orientation.Horizontal ⇒
-                currentCell.block.left
+                currentCell.left
             },
             top  = orientation match {
               case Orientation.Vertical ⇒
-                currentCell.block.top
+                currentCell.top
               case Orientation.Horizontal ⇒
                 trackOffset(orientation)
             }
           ))
           orientation match {
-            case Orientation.Vertical   ⇒ dndContainer.height(currentCell.block.height)
-            case Orientation.Horizontal ⇒ dndContainer.width (currentCell.block.width)
+            case Orientation.Vertical   ⇒ dndContainer.height(currentCell.height)
+            case Orientation.Horizontal ⇒ dndContainer.width (currentCell.width)
           }
           dndContainer.on("mouseenter", ControlEditor.mask _)
           dndContainer.on("mouseleave", ControlEditor.unmask _)
@@ -220,13 +226,15 @@ object GridWallDnD {
       }
 
       def hide(): Unit = {
+        dndVeilOpt.foreach(_.detach())
+        dndVeilOpt = None
         dndShadowOpt.foreach(_.detach())
         dndShadowOpt = None
       }
 
       Position.onUnderPointerChange {
         dndShadowOpt.foreach { (dndShadow) ⇒
-          currentCellOpt.foreach { case CurrentCell(_, Some(DraggedWall(startSide, _))) ⇒
+          startCellOpt.foreach { case StartCell(_, startSide, _) ⇒
             DndWall.wallOrientation(startSide) match {
               case Orientation.Vertical ⇒
                 val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
@@ -265,15 +273,15 @@ object GridWallDnD {
           val startSide = {
             val wallIndex = source.getAttribute("data-index").toInt
             val isVertical = $(source).hasClass(WallVerticalClass)
-            if (isVertical) if (wallIndex == currentCell.block.x - 1) Direction.Left else Direction.Right
-            else            if (wallIndex == currentCell.block.y - 1) Direction.Up   else Direction.Down
+            if (isVertical) if (wallIndex == currentCell.x - 1) Direction.Left else Direction.Right
+            else            if (wallIndex == currentCell.y - 1) Direction.Up   else Direction.Down
           }
-          Cell.cellWallPossibleDropTargets(currentCell.block.underlying, startSide).foreach { possibleTargets ⇒
-            currentCellOpt = Some(currentCell.copy(draggedWall = Some(DraggedWall(startSide, possibleTargets.statusQuo))))
+          Cell.cellWallPossibleDropTargets(currentCell.underlying, startSide).foreach { possibleTargets ⇒
+            startCellOpt = Some(StartCell(currentCell, startSide, possibleTargets.statusQuo))
             ControlEditor.mask()
             DndShadow.show(source)
             DndWall.hideAll()
-            val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.block.underlying.parentElement, simplify = false)
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.underlying.parentElement, simplify = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
             possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
           }
@@ -281,20 +289,20 @@ object GridWallDnD {
       }
 
       drake.onDragend {(el: html.Element) ⇒
-        ControlEditor.unmask()
-        DndShadow.hide()
         DndWall.getDropTarget.foreach { (dropTarget) ⇒
-          currentCellOpt match {
-            case Some(CurrentCell(block, Some(DraggedWall(startSide, startIndex)))) ⇒
-              val targetIndex  = dropTarget.attr("data-index").get.toInt
-              if (targetIndex != startIndex) {
-                val cellId       = block.el.attr("id").get
-                RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
-              }
-            case _ ⇒
-              throw new IllegalStateException
+          startCellOpt foreach { case StartCell(block, startSide, startIndex) ⇒
+            val targetIndex  = dropTarget.attr("data-index").get.toInt
+            if (targetIndex != startIndex) {
+              val cellId       = block.el.attr("id").get
+              RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
+            }
           }
         }
+        startCellOpt = None
+        ControlEditor.unmask()
+        DndShadow.hide()
+        DndWall.hideAll()
+        currentCellOpt.foreach(DndSides.show)
       }
     }
   }

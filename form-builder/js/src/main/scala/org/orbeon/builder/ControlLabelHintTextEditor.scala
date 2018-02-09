@@ -21,6 +21,7 @@ import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
 import org.orbeon.xforms.rpc.RpcClient
+import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
@@ -44,7 +45,7 @@ object ControlLabelHintTextEditor {
     var resourceEditorCurrentLabelHint: JQuery = null
 
     // Heuristic to close the editor based on click and focus events
-    def clickOrFocus(event: JQueryEventObject): Unit = {
+    def clickOrFocus(event: dom.Event): Unit = {
       val target = $(event.target)
       val eventOnEditor = target.closest(".fb-label-editor").is("*")
       val eventOnControlLabel =
@@ -57,9 +58,9 @@ object ControlLabelHintTextEditor {
     }
 
     locally {
-
-      $(document).on("click.orbeon.builder.lht-editor", clickOrFocus _)
-      $(document).on("focusin.orbeon.builder.lht-editor", clickOrFocus _)
+      // Use capture so we know about the event and send the value to the server before someone else reacting to a `click`
+      document.addEventListener("click"  , clickOrFocus _, useCapture = true)
+      document.addEventListener("focusin", clickOrFocus _, useCapture = true)
 
       // Click on label/hint
       $(document).on(

@@ -315,8 +315,8 @@ object Cell {
       PossibleDropTargets(
         statusQuo = statusQuoPosition,
         all =
-          statusQuoPosition ::
-            insideCellPositions(originCell) ++
+          statusQuoPosition                 ::
+            insideCellPositions(originCell) :::
             findSmallestNeighbor(startSide, neighbors).toList.flatMap(insideCellPositions)
       )
     }

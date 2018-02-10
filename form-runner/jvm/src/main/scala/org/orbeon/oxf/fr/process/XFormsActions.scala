@@ -70,15 +70,18 @@ trait XFormsActions {
 
   def trySetvalue(params: ActionParams): Try[Any] =
     Try {
-      evaluateOne(requiredParamByName(params, "setvalue", "ref")) match {
+      val all      = booleanParamByName(params, "all", default = false)
+      val refParam = requiredParamByName(params, "setvalue", "ref")
+      val refSeq   = if (all) evaluate(refParam) else Seq(evaluateOne(refParam))
+      refSeq.foreach {
         case nodeInfo: NodeInfo ⇒
           val valueToSet = params.get(Some("value")) match {
+            case None            ⇒ ""
             case Some(valueExpr) ⇒
               evaluateString(
                 item = nodeInfo,
                 expr = valueExpr
               )
-            case None            ⇒ ""
           }
           setvalue(nodeInfo, valueToSet)
         case _ ⇒

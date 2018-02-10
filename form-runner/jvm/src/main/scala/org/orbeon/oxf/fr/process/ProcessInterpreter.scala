@@ -30,6 +30,7 @@ import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XPath._
 
 import scala.annotation.tailrec
+import scala.collection.Seq
 import scala.util.control.{Breaks, ControlThrowable, NonFatal}
 import scala.util.{Failure, Success, Try}
 
@@ -309,6 +310,14 @@ trait ProcessInterpreter extends Logging {
 
   def evaluateOne(expr: String, item: Item = xpathContext): Item =
     evalOne(
+      item            = item,
+      expr            = expr,
+      namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      functionContext = xpathFunctionContext
+    )
+
+  def evaluate(expr: String, item: Item = xpathContext): Seq[AnyRef] =
+    eval(
       item            = item,
       expr            = expr,
       namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,

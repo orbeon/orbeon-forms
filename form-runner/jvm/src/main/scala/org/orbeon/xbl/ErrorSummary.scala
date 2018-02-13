@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
@@ -53,11 +53,6 @@ object ErrorSummary {
           def allErrorsIt =
             (errorsInstance.rootElement / ErrorElemName).iterator
 
-          def visibleErrorsIt =
-            findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
-              case n: NodeInfo ⇒ n
-            }
-
           (if (onlyVisible) visibleErrorsIt else allErrorsIt) filter (_.attValue(LevelAttName) == ErrorLevel.entryName)
         }
 
@@ -79,6 +74,20 @@ object ErrorSummary {
       case None ⇒
         Map.empty
     }
+
+  // Returns all sections that contain an invalid control, either directly or indirectly through a subsection
+  def sectionsWithVisibleErrors: List[String] = {
+    val invalidControlIds    = visibleErrorsIt.map(_.attValue(IdAttName))
+    val sectionsWithErrorsIt = invalidControlIds.flatMap { (absoluteControlId) ⇒
+      val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
+      val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
+      controlOpt.toIterable flatMap { control ⇒
+        val containingSections = sectionsIt(control)
+        containingSections.map(_.getId).flatMap(FormRunner.controlNameFromIdOpt)
+      }
+    }
+    sectionsWithErrorsIt.toList
+  }
 
   // Return a sorting string for the given control absolute id, taking repeats into account
   def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
@@ -327,6 +336,11 @@ object ErrorSummary {
       }
     }
 
+    def visibleErrorsIt: Iterator[NodeInfo] =
+      findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
+        case n: NodeInfo ⇒ n
+      }
+
     def findErrorSummaryControl = (
       ErrorSummaryIds
       flatMap      { id ⇒ Option(inScopeContainingDocument.getControlByEffectiveId(id)) }
@@ -344,13 +358,12 @@ object ErrorSummary {
 
     def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
       inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId)) flatMap { control ⇒
+        sectionsIt(control).lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
+      }
 
-        val sectionsIt =
-          new AncestorOrSelfIterator(control) collect {
-            case section: XFormsComponentControl if section.localName == "section" ⇒ section
-          }
-
-        sectionsIt.lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
+    def sectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
+      new AncestorOrSelfIterator(control) collect {
+        case section: XFormsComponentControl if section.localName == "section" ⇒ section
       }
 
     def createNewErrorElem(

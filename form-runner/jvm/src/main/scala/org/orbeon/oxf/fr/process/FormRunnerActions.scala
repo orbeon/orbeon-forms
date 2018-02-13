@@ -36,6 +36,7 @@ import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xbl.ErrorSummary
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -62,7 +63,8 @@ trait FormRunnerActions {
     "open-rendered-format"   → tryOpenRenderedFormat,
     "visit-all"              → tryVisitAll,
     "unvisit-all"            → tryUnvisitAll,
-    "expand-all"             → tryExpandSections,
+    "expand-all"             → tryExpandAllSections,
+    "expand-invalid"         → tryExpandInvalidSections,
     "collapse-all"           → tryCollapseSections,
     "result-dialog"          → tryShowResultDialog,
     "captcha"                → tryCaptcha,
@@ -560,7 +562,15 @@ trait FormRunnerActions {
 
   // Collapse/expand sections
   def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))
-  def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
+  def tryExpandAllSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
+
+  def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
+    Try {
+      ErrorSummary.sectionsWithVisibleErrors.foreach { (sectionName) ⇒
+        val sectionId = FormRunner.sectionId(sectionName)
+        dispatch(name = "fr-expand", targetId = sectionId)
+      }
+    }
 
   def getUrlsInstanceRootElem: NodeInfo =
     topLevelInstance(PersistenceModel, s"fr-urls-instance") map (_.rootElement) get

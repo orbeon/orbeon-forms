@@ -290,7 +290,12 @@
         visit-all
         then captcha
         then validate("error")
-        recover (visit-all then expand-all then error-message("form-validation-error") then success)
+        recover (
+            visit-all
+            then expand-invalid
+            then error-message("form-validation-error")
+            then success
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*">
         validate("warning")

@@ -168,6 +168,28 @@ object StringUtils {
       index >= 0 option index
     }
 
+    def translate(mapString: String, transString: String): String = {
+
+      val inputLength = s.length
+      val transLength = transString.length
+
+      val sb = new java.lang.StringBuilder(inputLength)
+
+      var i = 0
+      while (i < inputLength) {
+
+        val c = s.charAt(i)
+        val j = mapString.indexOf(c)
+
+        if (j < transLength)
+          sb.append(if (j < 0) c else transString.charAt(j))
+
+        i += 1
+      }
+
+      sb.toString
+    }
+
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

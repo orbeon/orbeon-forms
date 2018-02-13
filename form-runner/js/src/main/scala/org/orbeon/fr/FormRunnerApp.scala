@@ -24,6 +24,7 @@ object FormRunnerApp {
     def initializeOnDomReady(): Unit = {
       xbl.DndRepeat
       xbl.Tabbable
+      xbl.Number
       xbl.TreeSelect1
       xbl.WPaint
       xbl.HrefButton

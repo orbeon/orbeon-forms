@@ -258,7 +258,6 @@
             { "full": "/ops/javascript/orbeon/util/FiniteStateMachine.js",                   "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.js",  "min": true  },
-            { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.js", "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/Control.js",                    "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },

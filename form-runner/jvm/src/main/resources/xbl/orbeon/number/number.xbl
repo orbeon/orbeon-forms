@@ -18,17 +18,17 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava">
 
-    <xbl:script src="/xbl/orbeon/number/number.js"/>
     <xbl:binding
             id="fr-number"
             element="
                 fr|number,
                 xf|input:xxf-type('xs:decimal'),
                 xf|input:xxf-type('xs:integer')"
-            xxbl:mode="lhha binding value focus"
+            xxbl:mode="lhha binding value focus javascript-lifecycle"
+            xxf:external-events="fr-set-client-value"
             xxbl:label-for="html-input">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -62,267 +62,170 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
-        <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
-                <xsl:template match="/*">
 
-                    <!-- JavaScript code obtaining the JavaScript companion object -->
-                    <!-- Not great: can we have only one JavaScript object? -->
-                    <xsl:variable
-                        name="js-object"
-                        as="xs:string"
-                        select="concat('YAHOO.xbl.fr.', if (exists(/fr:currency)) then 'Currency' else 'Number', '.instance(this)')"/>
+        <xbl:handlers>
+            <xbl:handler event="fr-set-client-value">
+                <xf:setvalue
+                    ref="xxf:binding('fr-number')"
+                    value="
+                        NumberSupport:getStorageValueJava(
+                            event('value'),
+                            xxf:binding('fr-number'),
+                            xxf:component-param-value('decimal-separator'),
+                            xxf:component-param-value('grouping-separator'),
+                            xxf:component-param-value('prefix'),
+                            xxf:component-param-value('digits-after-decimal'),
+                            string(xxf:component-param-value('round-when-formatting')) = 'true',
+                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                        )"/>
+            </xbl:handler>
 
-                    <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
-                    <xf:group>
-                        <xf:action
-                            type="javascript"
-                            event="xforms-disabled"
-                            target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xf:action>
+            <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
+            <xbl:handler
+                phase="target"
+                type="javascript"
+                event="xforms-enabled xforms-value-changed fr-iteration-moved">
 
-                        <!-- Access to parameters -->
-                        <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'grouping-separator')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'prefix')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'suffix')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'digits-after-decimal')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'round-when-formatting')"/>
-                        <xsl:copy-of select="xxbl:server-parameter(., 'round-when-storing')"/>
+                <xf:param
+                    name="serverValue"
+                    value="
+                        NumberSupport:getDisplayValueJava(
+                            xxf:binding('fr-number'),
+                            xxf:component-param-value('decimal-separator'),
+                            xxf:component-param-value('grouping-separator'),
+                            xxf:component-param-value('prefix'),
+                            xxf:component-param-value('digits-after-decimal'),
+                            string(xxf:component-param-value('round-when-formatting')) = 'true',
+                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                        )"/>
+                <xf:param
+                    name="editValue"
+                    value="
+                        NumberSupport:getEditValueJava(
+                            xxf:binding('fr-number'),
+                            xxf:component-param-value('decimal-separator'),
+                            xxf:component-param-value('grouping-separator'),
+                            xxf:component-param-value('prefix'),
+                            xxf:component-param-value('digits-after-decimal'),
+                            string(xxf:component-param-value('round-when-formatting')) = 'true',
+                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                        )"/>
 
-                        <xf:var
-                            name="binding"
-                            value="xxf:binding('fr-number')"/>
+                <xf:param name="decimalSeparator" value="xxf:component-param-value('decimal-separator')"/>
+                <xf:body>ORBEON.xforms.XBL.instanceForControl(this).updateWithServerValues(serverValue, editValue, decimalSeparator);</xf:body>
 
-                        <xf:var
-                            name="view"
-                            value="
-                                xxf:is-control-readonly('fr-number') and
-                                property('xxf:readonly-appearance') = 'static'"/>
+            </xbl:handler>
 
-                        <xf:var
-                            name="property-fraction-digits-opt"
-                            value="
-                                if (local-name-from-QName(xxf:type($binding)) = 'integer') then
-                                    0
-                                else
-                                    xs:integer(string($digits-after-decimal)[. castable as xs:integer])"/>
+            <xbl:handler
+                phase="target"
+                type="javascript"
+                event="DOMFocusOut">
 
-                        <xf:var
-                            name="validation-fraction-digits-opt"
-                            value="
-                                if (local-name-from-QName(xxf:type($binding)) = 'integer') then
-                                    0
-                                else
-                                    xs:integer(xxf:custom-mip($binding, 'fraction-digits')[. castable as xs:integer])"/>
+                <xf:param
+                    name="serverValue"
+                    value="
+                        NumberSupport:getDisplayValueJava(
+                            $binding,
+                            xxf:component-param-value('decimal-separator'),
+                            xxf:component-param-value('grouping-separator'),
+                            xxf:component-param-value('prefix'),
+                            xxf:component-param-value('digits-after-decimal'),
+                            string(xxf:component-param-value('round-when-formatting')) = 'true',
+                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                        )"/>
+                <xf:param
+                    name="editValue"
+                    value="
+                        NumberSupport:getEditValueJava(
+                            $binding,
+                            xxf:component-param-value('decimal-separator'),
+                            xxf:component-param-value('grouping-separator'),
+                            xxf:component-param-value('prefix'),
+                            xxf:component-param-value('digits-after-decimal'),
+                            string(xxf:component-param-value('round-when-formatting')) = 'true',
+                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                        )"/>
+                <xf:param name="decimalSeparator" value="xxf:component-param-value('decimal-separator'),"/>
+                <xf:body>ORBEON.xforms.XBL.instanceForControl(this).updateWithServerValues(serverValue, editValue, decimalSeparator);</xf:body>
+            </xbl:handler>
 
-                        <xf:var
-                            name="fractional-digits-min"
-                            value="
-                                if (string($round-when-formatting) = 'true' or not(string($binding) castable as xs:decimal)) then
-                                    0
-                                else
-                                    string-length(
-                                        substring-after(
-                                            string(xs:decimal(string($binding))), (: typed value can also be xs:integer so go through string() first :)
-                                            '.'
-                                        )
-                                    )"/>
+        </xbl:handlers>
 
-                        <xf:var
-                            name="picture-string"
-                            value="
-                                concat(
-                                    '#,##0.',
-                                    if (exists($property-fraction-digits-opt)) then
-                                        string-join(for $i in 1 to max(($property-fraction-digits-opt, $fractional-digits-min)) return '0', '')
-                                    else
-                                        string-join(for $i in 1 to max(($validation-fraction-digits-opt, $fractional-digits-min)) return '#', '')
-                                )"/>
+        <xbl:template>
 
-                        <!-- Character used to represent a `.` entered by users, when that character isn't a valid decimal separator -->
-                        <xf:var
-                            name="period-encoded"
-                            value="'&#x2261;'"/>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-number')"/>
 
-                        <!--
-                            TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this
-                            leads to a bug when the prefix changes and the amount stays the same.
+            <xf:var
+                name="view"
+                value="
+                    xxf:is-control-readonly('fr-number') and
+                    property('xxf:readonly-appearance') = 'static'"/>
 
-                            Be sure to replace $decimal-separator before $grouping-separator because $grouping-separator
-                            can be blank: https://github.com/orbeon/orbeon-forms/issues/587
+            <!--<xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>-->
 
-                            If the value has more significant digits after the decimal point than allowed, don't format
-                            the value: https://github.com/orbeon/orbeon-forms/issues/599
-                        -->
+            <!-- Readwrite mode -->
+            <xf:group ref="$binding[not($view)]">
 
-                        <!-- NOTE: There is a lot of code duplication between `$cleaned` below and `unformat`. Would be nice to do this either
-                             in Scala or via xf:function. -->
-                        <xf:var
-                            name="cleaned"
-                            value="
-                                let $raw := string($binding)
-                                return
-                                    translate(
-                                        translate(
-                                            string(
-                                                for $clean in
-                                                    for $v in xxf:trim($raw)
-                                                    return
-                                                        (: There shouldn't be a prefix because that's stored out of band,
-                                                           but we remove it for historical reasons :)
-                                                        if (starts-with($v, $prefix)) then
-                                                            xxf:trim(substring-after($v, $prefix))
-                                                        else
-                                                            $v
-                                                return
-                                                    if ($clean castable as xs:decimal) then
-                                                        xs:decimal($clean)
-                                                    else
-                                                        $raw
-                                            ),
-                                            '.',
-                                            $decimal-separator
-                                        ),
-                                        $period-encoded,
-                                        '.'
-                                    )"/>
 
-                        <xf:var
-                            name="formatted"
-                            id="formatted-value"
-                            value="
-                                if (string($binding) castable as xs:decimal) then
-                                    translate(
-                                        format-number(
-                                            xs:decimal(string($binding)), (: typed value can also be xs:integer so go through string() first :)
-                                            $picture-string
-                                        ),
-                                        '.,',
-                                        concat(
-                                            $decimal-separator,
-                                            $grouping-separator
-                                        )
-                                    )
-                                else
-                                     $cleaned">
-                            <!-- Rewrite event as xxforms-iteration-moved doesn't bubble -->
-                            <xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>
-                        </xf:var>
-                        <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
-                        <xf:action
-                            type="javascript"
-                            target="formatted-value"
-                            event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
+                <xf:var name="prefix" value="xxf:component-param-value('prefix')"/>
+                <xf:var name="suffix" value="xxf:component-param-value('prefix')"/>
 
-                        <xf:action
-                            type="javascript"
-                            target="#observer"
-                            observer="fr-number"
-                            event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
+                <!-- See also https://github.com/orbeon/orbeon-forms/issues/2495 -->
 
-                        <!-- Readwrite mode -->
-                        <xf:group ref="$binding[not($view)]">
-                            <!--
-                                Hidden XForms output with partially-formatted value. We clean as much as we can to help the user.
+                <!--
+                    Visible HTML input
 
-                                See: https://github.com/orbeon/orbeon-forms/issues/2495
-                            -->
-                            <xf:output
-                                value="$cleaned"
-                                class="xbl-fr-number-xforms-output xforms-hidden"/>
-                            <!-- Hidden XForms input -->
-                            <xf:input
-                                id="xforms-input"
-                                ref="."
-                                class="xbl-fr-number-xforms-input xforms-hidden"
-                                xxf:format="$formatted"
-                                xxf:unformat="
-                                    let $raw :=
-                                        if (($grouping-separator, $decimal-separator) = '.')
-                                        then .
-                                        else translate(., '.', $period-encoded)
-                                    return
-                                        let $clean :=
-                                            translate(
-                                                translate(
-                                                    $raw,
-                                                    $grouping-separator,
-                                                    ''
-                                                ),
-                                                $decimal-separator,
-                                                '.'
-                                            )
-                                        return
-                                            if (
-                                                string($round-when-storing) = 'true' and
-                                                $clean castable as xs:decimal        and
-                                                exists(($validation-fraction-digits-opt, $property-fraction-digits-opt))
-                                            ) then
-                                                round-half-to-even(
-                                                    xs:decimal($clean),
-                                                    ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1]
-                                                )
-                                            else if ($clean castable as xs:decimal) then
-                                                xs:decimal($clean)
-                                            else
-                                                $raw">
-                                <xf:action type="javascript" id="xf-ro" event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xf:action>
-                                <xf:action type="javascript" id="xf-rw" event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xf:action>
-                            </xf:input>
+                    - `.xforms-input-input`: so the border gets highlighted when the container gets `.xforms-invalid.xforms-visited`
+                    - `step="any"`: so that even for numbers with decimal digits, increments/decrements are by 1
+                    - `pattern`:
+                        - triggers the numeric keypad on iOS when needed
+                        - use `fraction-digits` common constraint instead of `$digits-after-decimal`, because what matters to select
+                          the keypad is that the *expected* format be a non-negative integer, while `$digits-after-decimal` is used
+                          for formatting only
+                        - also tests on the `integer` datatype, which is the same as `fraction-digits = 0`
+                    - `maxlength`:
+                        - not natively supported for `type="number"`, but when JavaScript support is enabled, the attribute can be read to enforce
+                          a maximum number of allowed characters to type (https://github.com/orbeon/orbeon-forms/issues/2486)
+                        - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
+                    - `min`: makes control natively invalid as the user types, if the value cannot be negative
+                -->
+                <xh:span
+                    class="fr-width-10em {
+                        (
+                            'input-prepend'[xxf:non-blank($prefix)],
+                            'input-append' [xxf:non-blank($suffix)]
+                        )
+                    }">
+                    <xf:group class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
+                    <xh:input
+                        id="html-input"
+                        class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
+                        type="text"
+                        step="any"
+                        pattern="{
+                            if (NumberSupport:validationFractionDigitsOptJava($binding) = 0 and
+                                xxf:custom-mip($binding, 'non-negative') = 'true'
+                            ) then
+                                '[0-9]*'
+                            else
+                                '.*'
+                        }"
+                        min="{
+                            if (xxf:custom-mip($binding, 'non-negative') = 'true') then
+                                '0'
+                            else
+                                ''
+                        }"
+                        maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
+                        xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
+                    <xf:group class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
+                </xh:span>
+            </xf:group>
+            <!-- Static readonly mode -->
+            <xf:input ref="$binding[$view]" xxf:format="string-join(($prefix, $formatted, $suffix), ' ')"/>
 
-                            <!--
-                                Visible HTML input
-
-                                - `.xforms-input-input`: so the border gets highlighted when the container gets `.xforms-invalid.xforms-visited`
-                                - `step="any"`: so that even for numbers with decimal digits, increments/decrements are by 1
-                                - `pattern`:
-                                    - triggers the numeric keypad on iOS when needed
-                                    - use `fraction-digits` common constraint instead of `$digits-after-decimal`, because what matters to select
-                                      the keypad is that the *expected* format be a non-negative integer, while `$digits-after-decimal` is used
-                                      for formatting only
-                                    - also tests on the `integer` datatype, which is the same as `fraction-digits = 0`
-                                - `maxlength`:
-                                    - not natively supported for `type="number"`, but when JavaScript support is enabled, the attribute can be read to enforce
-                                      a maximum number of allowed characters to type (https://github.com/orbeon/orbeon-forms/issues/2486)
-                                    - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
-                                - `min`: makes control natively invalid as the user types, if the value cannot be negative
-                            -->
-                            <xh:span
-                                class="fr-width-10em {{
-                                    (
-                                        'input-prepend'[xxf:non-blank($prefix)],
-                                        'input-append' [xxf:non-blank($suffix)]
-                                    )
-                                }}">
-                                <xf:group class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
-                                <xh:input
-                                    id="html-input"
-                                    class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                                    type="text"
-                                    step="any"
-                                    pattern="{{
-                                        if ($validation-fraction-digits-opt = 0 and xxf:custom-mip($binding, 'non-negative') = 'true') then
-                                            '[0-9]*'
-                                        else
-                                            '.*'
-                                    }}"
-                                    min="{{
-                                        if (xxf:custom-mip($binding, 'non-negative') = 'true') then
-                                            '0'
-                                        else
-                                            ''
-                                    }}"
-                                    maxlength="{{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}}"
-                                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                                <xf:group class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
-                            </xh:span>
-                        </xf:group>
-                        <!-- Static readonly mode -->
-                        <xf:input ref="$binding[$view]" xxf:format="string-join(($prefix, $formatted, $suffix), ' ')"/>
-                    </xf:group>
-                </xsl:template>
-            </xsl:transform>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

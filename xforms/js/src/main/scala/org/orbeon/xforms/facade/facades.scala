@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.YUICustomEvent
+import org.orbeon.xforms.{DocumentAPI, YUICustomEvent}
 import org.scalajs.dom
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
@@ -68,18 +68,38 @@ object AjaxServer extends AjaxServerTrait {
 object AjaxServerOps {
 
   implicit class AjaxServerOps(val ajaxServer: AjaxServerTrait) extends AnyVal {
+
     def ajaxResponseReceivedF: Future[Unit] = {
 
       val result = Promise[Unit]()
 
-      var callback: js.Function = null
-
-      callback = () ⇒ {
+      lazy val callback: js.Function = () ⇒ {
         ajaxServer.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
         result.success(())
       }
 
       ajaxServer.ajaxResponseReceived.add(callback)
+
+      result.future
+    }
+
+    def ajaxResponseProcessedF(formId: String): Future[Unit] = {
+
+      def getSeqNo =
+        DocumentAPI.getFromClientState(formId, "sequence").toInt
+
+      val initialSeqNo = getSeqNo
+
+      val result = Promise[Unit]()
+
+      lazy val callback: js.Function = () ⇒ {
+        if (getSeqNo == initialSeqNo + 1) {
+          Events.ajaxResponseProcessedEvent.unsubscribe(callback)
+          result.success(())
+        }
+      }
+
+      Events.ajaxResponseProcessedEvent.subscribe(callback)
 
       result.future
     }

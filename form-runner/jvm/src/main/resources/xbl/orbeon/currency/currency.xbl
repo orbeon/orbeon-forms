@@ -18,8 +18,6 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xbl:script src="/xbl/orbeon/number/number.js"/>
-    <xbl:script src="/xbl/orbeon/currency/currency.js"/>
     <xbl:binding
         id="fr-number"
         element="

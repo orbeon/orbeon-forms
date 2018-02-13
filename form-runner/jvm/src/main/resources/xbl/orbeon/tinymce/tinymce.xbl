@@ -21,7 +21,7 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
-    <xbl:script src="/xbl/orbeon/tinymce/jscripts/tiny_mce/tiny_mce.js"/>
+    <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/tinymce.min.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce-config.js"/>
     <xbl:binding
@@ -78,7 +78,7 @@
                  We could (should?) support processing any CSS file at some point.
 
                  See also tinymce-config.js. -->
-            <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/ui.css"/>
+            <!--<xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/ui.css"/>-->
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-client-value" phase="target">
@@ -121,7 +121,7 @@
                  -->
                 <xh:a
                     f:url-type="resource"
-                    href="/xbl/orbeon/tinymce/jscripts/tiny_mce1b713b2e6d7fd45753f4b8a6270b776e.js"
+                    href="/xbl/orbeon/tinymce/js/tinymce1b713b2e6d7fd45753f4b8a6270b776e.js"
                     class="tinymce-base-url xforms-hidden"/>
 
                 <!--

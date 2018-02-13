@@ -52,7 +52,7 @@
             }).call(this);
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
             var tabindex = $(tinyMceDiv).attr('tabindex');
-            this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig);
+            this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig, tinymce.EditorManager);
             var xformsValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
             this.onInit(_.bind(function() {
                 // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
@@ -130,7 +130,7 @@
         onInit: function(f) {
             var bound = _.bind(f, this);
             if (this.tinymceInitialized) bound();
-            else this.myEditor.onInit.add(bound);
+            else this.myEditor.on("init", bound);
         },
 
         readonly:   function() { this.onInit(function() { this.myEditor.getBody().contentEditable = false; })},

@@ -862,8 +862,7 @@
                             validate="false"
                             xxf:annotate="error"/>
                         <xf:action event="xforms-ready">
-                            <xf:dispatch name="xxforms-value"
-                                         target="|my-number≡xforms-input|">
+                            <xf:dispatch name="fr-set-client-value" target="my-number">
                                 <xf:property name="value">1.2</xf:property>
                             </xf:dispatch>
                             <xf:send submission="return-instance"/>

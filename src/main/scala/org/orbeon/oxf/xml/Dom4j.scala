@@ -154,6 +154,18 @@ object Dom4j {
     insertIfNeeded(root, path.iterator)
   }
 
+  def visitSubtree(container: Element, process: Element ⇒ Boolean): Unit = {
+    for (childNode ← new java.util.ArrayList(container.content).asScala) {
+      childNode match {
+        case e: Element ⇒
+          if (process(e))
+            visitSubtree(e, process)
+        case _ ⇒
+      }
+    }
+  }
+
+
   // TODO: should ideally not got go through serialization/deserialization
   implicit def elemToDocument(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
   implicit def elemToElement(e: Elem): Element   = Dom4jUtils.readDom4j(e.toString).getRootElement

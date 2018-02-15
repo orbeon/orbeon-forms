@@ -198,7 +198,7 @@
                             'input-append' [xxf:non-blank($suffix)]
                         )
                     }">
-                    <xf:group class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
+                    <xf:group xxbl:use-if-attr="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
                     <xh:input
                         id="html-input"
                         class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
@@ -220,7 +220,7 @@
                         }"
                         maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
                         xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                    <xf:group class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
+                    <xf:group xxbl:use-if-attr="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
                 </xh:span>
             </xf:group>
             <!-- Static readonly mode -->

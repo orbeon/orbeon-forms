@@ -32,9 +32,10 @@ import scala.collection.JavaConverters._
 
 object XBLTransformer {
 
-  val XBLAttrQName    = QName("attr",    XBL_NAMESPACE)
-  val XBLContentQName = QName("content", XBL_NAMESPACE)
-  val XXBLAttrQName   = QName("attr",    XXBL_NAMESPACE)
+  val XBLAttrQName       = QName("attr",       XBL_NAMESPACE)
+  val XBLContentQName    = QName("content",    XBL_NAMESPACE)
+  val XXBLAttrQName      = QName("attr",       XXBL_NAMESPACE)
+  val XXBLUseIfAttrQName = QName("use-if-attr", XXBL_NAMESPACE)
 
   /**
     * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
@@ -52,193 +53,256 @@ object XBLTransformer {
     val documentWrapper  = new DocumentWrapper(boundElement.getDocument, null, org.orbeon.oxf.util.XPath.GlobalConfiguration)
     val boundElementInfo = documentWrapper.wrap(boundElement)
 
-    Dom4jUtils.visitSubtree(
-      shadowTreeDocument.getRootElement, new Dom4jUtils.VisitorListener {
+    def isNestedHandler(e: Element): Boolean =
+      (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)
 
-        private def isNestedHandler(e: Element): Boolean =
-          (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)
+    def isNestedLHHA(e: Element): Boolean =
+      (e.getParent eq boundElement) && LHHA.isLHHA(e)
 
-        private def isNestedLHHA(e: Element): Boolean =
-          (e.getParent eq boundElement) && LHHA.isLHHA(e)
+    def mustFilterOut(e: Element): Boolean =
+      excludeNestedHandlers && isNestedHandler(e) || excludeNestedLHHA && isNestedLHHA(e)
 
-        private def mustFilterOut(e: Element): Boolean =
-          excludeNestedHandlers && isNestedHandler(e) || excludeNestedLHHA && isNestedLHHA(e)
-
-        def startElement(element: Element): Unit = {
-
-          // Handle xbl:content
-
-          val isXBLContent = element.getQName == XBLContentQName
-          var resultingNodes: ju.List[Node] = null
-
-          if (isXBLContent) {
-            val includesAttribute = element.attributeValue(INCLUDES_QNAME)
-            val scopeAttribute = element.attributeValue(XXBL_SCOPE_QNAME)
-
-            var contentToInsert: ju.List[Node] = null
-            if (includesAttribute eq null) {
-              // All bound node content must be copied over (except nested handlers if requested)
-
-              val clonedContent = new ju.ArrayList[Node]
-              for (node ← Dom4j.content(boundElement)) {
-                node match {
-                  case _: Namespace ⇒
-                    // don't copy over namespace nodes
-                  case elem: Element ⇒
-                    if (! mustFilterOut(elem))
-                      clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
-                  case node ⇒
-                    clonedContent.add(Dom4jUtils.createCopy(node))
-                }
-              }
-              contentToInsert = clonedContent
-            } else {
-              // Apply CSS selector
-
-              // Convert CSS to XPath
-              val xpathExpression = CSSParser.toXPath(includesAttribute)
-              val boundElementInfo = documentWrapper.wrap(boundElement)
-
-              // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-              val elements = XPathCache.evaluate(
-                boundElementInfo,
-                xpathExpression,
-                new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-              ).asInstanceOf[ju.List[NodeInfo]].asScala
-
-              if (elements.nonEmpty) {
-                // Clone all the resulting elements
-                contentToInsert = new ju.ArrayList[Node](elements.size)
-                for (currentNodeInfo ← elements) {
-                  val currentElement = unsafeUnwrapElement(currentNodeInfo)
-                  if (! mustFilterOut(currentElement))
-                    contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
-                }
-              } else {
-                // Clone all the element's children if any
-                // See: http://www.w3.org/TR/xbl/#the-content
-                contentToInsert = new ju.ArrayList[Node](element.nodeCount)
-                for (currentElement ← Dom4j.elements(element)) {
-                  if (! mustFilterOut(currentElement))
-                    contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
-                }
-              }
-            }
-
-            // Insert content if any
-            if ((contentToInsert ne null) && ! contentToInsert.isEmpty) {
-              val parentContent = element.getParent.content
-              val elementIndex = parentContent.indexOf(element)
-              parentContent.addAll(elementIndex, contentToInsert)
-            }
-
-            // Remove <xbl:content> from shadow tree
-            element.detach()
-
-            resultingNodes = contentToInsert
-            if (scopeAttribute.nonBlank) {
-              // If author specified scope attribute, use it
-              setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
-            } else {
-              // By default, set xxbl:scope="outer" on resulting elements
-              setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", null)
-            }
-          } else {
-            // Element is simply kept
-            resultingNodes = ju.Collections.singletonList(element.asInstanceOf[Node])
+    def setAttribute(
+      nodes            : ju.List[Node],
+      attributeQName   : QName,
+      attributeValue   : String,
+      namespaceElement : Element
+    ): Unit =
+      if ((attributeValue ne null) && (nodes ne null) && ! nodes.isEmpty) {
+        for (node ← nodes.asScala) {
+          node match {
+            case element: Element ⇒
+              Dom4jUtils.copyMissingNamespaces(namespaceElement, element)
+              element.addAttribute(attributeQName, attributeValue)
+            case _ ⇒
           }
+        }
+      }
 
-          // Handle attribute forwarding
-          val xblAttr  = element.attribute(XBLAttrQName)  // standard xbl:attr (custom syntax)
-          val xxblAttr = element.attribute(XXBLAttrQName) // extension xxbl:attr (XPath expression)
+    def setText(
+      nodes : ju.List[Node],
+      value : String
+    ): Unit =
+      if ((value ne null) && (nodes ne null) && ! nodes.isEmpty) {
+        for (node ← nodes.asScala) {
+          if (node.isInstanceOf[Element]) {
+            node.setText(value)
+          }
+        }
+      }
 
-          if (xblAttr ne null) {
-            // Detach attribute (not strictly necessary?)
-            xblAttr.detach()
+    Dom4j.visitSubtree(shadowTreeDocument.getRootElement, currentElem ⇒ {
 
-            val xblAttrString = xblAttr.getValue
+      val isXBLContent = currentElem.getQName == XBLContentQName
+      var resultingNodes: ju.List[Node] = null
 
-            for (currentValue ← xblAttrString.splitTo[Iterator]()) {
+      val processChildren =
+        if (isXBLContent) {
+          val includesAttribute = currentElem.attributeValue(INCLUDES_QNAME)
+          val scopeAttribute    = currentElem.attributeValue(XXBL_SCOPE_QNAME)
 
-              val equalIndex = currentValue.indexOf('=')
-              if (equalIndex == -1) {
-                // No a=b pair, just a single QName
-                val valueQName = Dom4jUtils.extractTextValueQName(element, currentValue, true)
-                if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
-                  // This is not xbl:text, copy the attribute
-                  val attributeValue = boundElement.attributeValue(valueQName)
-                  if (attributeValue ne null)
-                    setAttribute(resultingNodes, valueQName, attributeValue, boundElement)
-                } else {
-                  // This is xbl:text
-                  // "The xbl:text value cannot occur by itself in the list"
-                }
-              } else {
-                // a=b pair
-                val leftSideQName = {
-                  val leftSide = currentValue.substring(0, equalIndex)
-                  Dom4jUtils.extractTextValueQName(element, leftSide, true)
-                }
-                val rightSideQName = {
-                  val rightSide = currentValue.substring(equalIndex + 1)
-                  Dom4jUtils.extractTextValueQName(element, rightSide, true)
-                }
+          var contentToInsert: ju.List[Node] = null
 
-                val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI
-                val isRightSideXBLText = rightSideQName.namespace.uri == XBL_NAMESPACE_URI
+          if (includesAttribute eq null) {
+            // All bound node content must be copied over (except nested handlers if requested)
 
-                val (rightSideValue, namespaceElement) =
-                  if (! isRightSideXBLText) {
-                    // Get attribute value
-                    boundElement.attributeValue(rightSideQName) → boundElement
-                  } else {
-                    // Get text value
-
-                    // "any text nodes (including CDATA nodes and whitespace text nodes) that are
-                    // explicit children of the bound element must have their data concatenated"
-                    boundElement.getText → null
-                  }
-
-                if (rightSideValue ne null) {
-                  // NOTE: XBL doesn't seem to says what should happen if the source attribute is not
-                  // found! We assume the rule is ignored in this case.
-                  if (! isLeftSideXBLText) {
-                    // Set attribute value
-                    setAttribute(resultingNodes, leftSideQName, rightSideValue, namespaceElement)
-                  } else {
-                    // Set text value
-
-                    // "value of the attribute on the right-hand side are to be represented as text
-                    // nodes underneath the shadow element"
-
-                    // TODO: "If the element has any child nodes in the DOM (any nodes, including
-                    // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
-                    // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
-
-                    setText(resultingNodes, rightSideValue)
-                  }
-                }
+            val clonedContent = new ju.ArrayList[Node]
+            for (node ← Dom4j.content(boundElement)) {
+              node match {
+                case _: Namespace ⇒
+                  // don't copy over namespace nodes
+                case elem: Element ⇒
+                  if (! mustFilterOut(elem))
+                    clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
+                case node ⇒
+                  clonedContent.add(Dom4jUtils.createCopy(node))
               }
-              // TODO: handle xbl:lang?
-              // TODO: handle type specifiers?
             }
-          } else if (xxblAttr ne null) {
-            // Detach attribute (not strictly necessary?)
-            xxblAttr.detach()
-            // Get attribute value
-            val xxblAttrString= xxblAttr.getValue
+            contentToInsert = clonedContent
+          } else {
+            // Apply CSS selector
+
+            // Convert CSS to XPath
+            val xpathExpression = CSSParser.toXPath(includesAttribute)
+            val boundElementInfo = documentWrapper.wrap(boundElement)
 
             // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-            val nodeInfos = XPathCache.evaluate(
+            val elements = XPathCache.evaluate(
               boundElementInfo,
-              xxblAttrString,
-              new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
+              xpathExpression,
+              new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ).asInstanceOf[ju.List[NodeInfo]].asScala
+
+            if (elements.nonEmpty) {
+              // Clone all the resulting elements
+              contentToInsert = new ju.ArrayList[Node](elements.size)
+              for (currentNodeInfo ← elements) {
+                val currentElement = unsafeUnwrapElement(currentNodeInfo)
+                if (! mustFilterOut(currentElement))
+                  contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
+              }
+            } else {
+              // Clone all the element's children if any
+              // See: http://www.w3.org/TR/xbl/#the-content
+              contentToInsert = new ju.ArrayList[Node](currentElem.nodeCount)
+              for (currentElement ← Dom4j.elements(currentElem)) {
+                if (! mustFilterOut(currentElement))
+                  contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
+              }
+            }
+          }
+
+          // Insert content if any
+          if ((contentToInsert ne null) && ! contentToInsert.isEmpty) {
+            val parentContent = currentElem.getParent.content
+            val elementIndex = parentContent.indexOf(currentElem)
+            parentContent.addAll(elementIndex, contentToInsert)
+          }
+
+          // Remove <xbl:content> from shadow tree
+          currentElem.detach()
+
+          resultingNodes = contentToInsert
+          if (scopeAttribute.nonBlank) {
+            // If author specified scope attribute, use it
+            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
+          } else {
+            // By default, set xxbl:scope="outer" on resulting elements
+            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", null)
+          }
+          true
+        } else if (currentElem.attributeValueOpt(XXBLUseIfAttrQName) exists (a ⇒ boundElement.attributeValue(a) eq null)) {
+          // Skip this element
+          currentElem.detach()
+          false
+        } else {
+          // Element is simply kept
+          resultingNodes = ju.Collections.singletonList(currentElem.asInstanceOf[Node])
+          true
+        }
+
+      if (processChildren) {
+
+      }
+
+      // Handle attribute forwarding
+      val xblAttr  = currentElem.attribute(XBLAttrQName)  // standard xbl:attr (custom syntax)
+      val xxblAttr = currentElem.attribute(XXBLAttrQName) // extension xxbl:attr (XPath expression)
+
+      if (xblAttr ne null) {
+        // Detach attribute (not strictly necessary?)
+        xblAttr.detach()
+
+        val xblAttrString = xblAttr.getValue
+
+        for (currentValue ← xblAttrString.splitTo[Iterator]()) {
+
+          val equalIndex = currentValue.indexOf('=')
+          if (equalIndex == -1) {
+            // No a=b pair, just a single QName
+            val valueQName = Dom4jUtils.extractTextValueQName(currentElem, currentValue, true)
+            if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
+              // This is not xbl:text, copy the attribute
+              val attributeValue = boundElement.attributeValue(valueQName)
+              if (attributeValue ne null)
+                setAttribute(resultingNodes, valueQName, attributeValue, boundElement)
+            } else {
+              // This is xbl:text
+              // "The xbl:text value cannot occur by itself in the list"
+            }
+          } else {
+            // a=b pair
+            val leftSideQName = {
+              val leftSide = currentValue.substring(0, equalIndex)
+              Dom4jUtils.extractTextValueQName(currentElem, leftSide, true)
+            }
+            val rightSideQName = {
+              val rightSide = currentValue.substring(equalIndex + 1)
+              Dom4jUtils.extractTextValueQName(currentElem, rightSide, true)
+            }
+
+            val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI
+            val isRightSideXBLText = rightSideQName.namespace.uri == XBL_NAMESPACE_URI
+
+            val (rightSideValue, namespaceElement) =
+              if (! isRightSideXBLText) {
+                // Get attribute value
+                boundElement.attributeValue(rightSideQName) → boundElement
+              } else {
+                // Get text value
+
+                // "any text nodes (including CDATA nodes and whitespace text nodes) that are
+                // explicit children of the bound element must have their data concatenated"
+                boundElement.getText → null
+              }
+
+            if (rightSideValue ne null) {
+              // NOTE: XBL doesn't seem to says what should happen if the source attribute is not
+              // found! We assume the rule is ignored in this case.
+              if (! isLeftSideXBLText) {
+                // Set attribute value
+                setAttribute(resultingNodes, leftSideQName, rightSideValue, namespaceElement)
+              } else {
+                // Set text value
+
+                // "value of the attribute on the right-hand side are to be represented as text
+                // nodes underneath the shadow element"
+
+                // TODO: "If the element has any child nodes in the DOM (any nodes, including
+                // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
+                // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
+
+                setText(resultingNodes, rightSideValue)
+              }
+            }
+          }
+          // TODO: handle xbl:lang?
+          // TODO: handle type specifiers?
+        }
+      } else if (xxblAttr ne null) {
+        // Detach attribute (not strictly necessary?)
+        xxblAttr.detach()
+        // Get attribute value
+        val xxblAttrString= xxblAttr.getValue
+
+        // TODO: don't use getNamespaceContext() as this is already computed for the bound element
+        val nodeInfos = XPathCache.evaluate(
+          boundElementInfo,
+          xxblAttrString,
+          new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        )
+        if (! nodeInfos.isEmpty) {
+          for (nodeInfo ← nodeInfos.asScala) {
+            val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
+            if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
+              val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
+              setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, currentAttribute.getParent)
+            }
+          }
+        }
+      }
+
+      // Check for AVTs
+      if (supportAVTs) {
+        for (att ← Dom4j.attributes(currentElem)) {
+          val attValue = att.getValue
+          if (XFormsUtils.maybeAVT(attValue)) {
+            val newValue = XPathCache.evaluateAsAvt(
+              boundElementInfo,
+              attValue,
+              new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
               null,
               null,
               null,
@@ -246,38 +310,13 @@ object XBLTransformer {
               null,
               null
             )
-            if (! nodeInfos.isEmpty) {
-              for (nodeInfo ← nodeInfos.asScala) {
-                val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
-                if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
-                  val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
-                  setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, currentAttribute.getParent)
-                }
-              }
-            }
-          }
-
-          // Check for AVTs
-          if (supportAVTs) {
-            for (att ← Dom4j.attributes(element)) {
-              val attValue = att.getValue
-              if (XFormsUtils.maybeAVT(attValue)) {
-                val newValue = XPathCache.evaluateAsAvt(
-                  boundElementInfo,
-                  attValue,
-                  new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null
-                )
-                setAttribute(ju.Collections.singletonList[Node](element), att.getQName, newValue, element)
-              }
-            }
+            setAttribute(ju.Collections.singletonList[Node](currentElem), att.getQName, newValue, currentElem)
           }
         }
+      }
+
+      processChildren
+    })
 
         // Prefix resulting xhtml:*/(@id |@for)
 
@@ -318,42 +357,6 @@ object XBLTransformer {
 //                            }
 //                        }
 //                    }
-
-        private def setAttribute(
-          nodes            : ju.List[Node],
-          attributeQName   : QName,
-          attributeValue   : String,
-          namespaceElement : Element
-        ): Unit =
-          if ((attributeValue ne null) && (nodes ne null) && ! nodes.isEmpty) {
-            for (node ← nodes.asScala) {
-              node match {
-                case element: Element ⇒
-                  Dom4jUtils.copyMissingNamespaces(namespaceElement, element)
-                  element.addAttribute(attributeQName, attributeValue)
-                case _ ⇒
-              }
-            }
-          }
-
-        private def setText(
-          nodes : ju.List[Node],
-          value : String
-        ): Unit =
-          if ((value ne null) && (nodes ne null) && ! nodes.isEmpty) {
-            for (node ← nodes.asScala) {
-              if (node.isInstanceOf[Element]) {
-                node.setText(value)
-              }
-            }
-          }
-
-        def endElement(element: Element) = ()
-        def text(text: Text) = ()
-      },
-      /* mutable = */ true
-    )
-
     shadowTreeDocument
   }
 }

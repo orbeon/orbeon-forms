@@ -310,7 +310,7 @@ trait Reindex extends FormDefinition {
   }
 
   // Prefixes used in Form Builder; prefixes in other documents, for now, are not supported
-  private val FbNamespaceMapping = new NamespaceMapping(Map(
+  private val FbNamespaceMapping = NamespaceMapping(Map(
     "xh" → XMLConstants.XHTML_NAMESPACE_URI,
     "xf" → XFormsConstants.XFORMS_NAMESPACE_URI
   ).asJava)

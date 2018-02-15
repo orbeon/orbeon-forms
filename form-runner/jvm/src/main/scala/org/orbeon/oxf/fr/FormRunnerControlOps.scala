@@ -134,7 +134,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
       // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
       // overridden along the way!)
-      val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
+      val namespaces = NamespaceMapping(bind.namespaceMappings.toMap)
 
       // Evaluate path from instance root element
       // NOTE: Don't pass Reporter as not very useful and some tests don't have a containingDocument scoped.

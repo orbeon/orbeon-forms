@@ -29,7 +29,7 @@ object XPath {
   def evalOne(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(
@@ -53,7 +53,7 @@ object XPath {
   def eval(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(
@@ -73,7 +73,7 @@ object XPath {
   def evalValueTemplate(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(

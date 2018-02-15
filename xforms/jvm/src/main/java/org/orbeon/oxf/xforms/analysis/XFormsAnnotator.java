@@ -512,20 +512,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         return false;
     }
 
-    final private void addNamespaceMapping(String rawId) {
-        final Map<String, String> namespaces = new HashMap<String, String>();
-        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
-            final String namespacePrefix = (String) e.nextElement();
-            if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("")) {
-                namespaces.put(namespacePrefix, namespaceContext.getURI(namespacePrefix));
-            }
-        }
-        // Re-add standard "xml" prefix mapping
-        // TODO: WHY?
-        namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
-        metadata.addNamespaceMapping(rewriteId(rawId), namespaces);
-    }
-
     final private void putMark(String rawId) {
         metadata.putMark(templateSAXStore.getMark(rewriteId(rawId)));
     }
@@ -574,7 +560,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
             // Gather namespace information if there is an id
             if (isGenerateIds || idIndex != -1) {
-                addNamespaceMapping(rawId);
+                metadata.addNamespaceMapping(rewriteId(rawId), namespaceContext.currentMapping());
             }
         }
 

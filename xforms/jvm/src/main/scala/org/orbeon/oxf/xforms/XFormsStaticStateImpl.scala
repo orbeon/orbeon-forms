@@ -200,7 +200,7 @@ class XFormsStaticStateImpl(
 object XFormsStaticStateImpl {
 
   val BASIC_NAMESPACE_MAPPING =
-    new NamespaceMapping(Map(
+    NamespaceMapping.apply(Map(
       XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
       XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
       XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
@@ -208,7 +208,7 @@ object XFormsStaticStateImpl {
       XML_EVENTS_PREFIX    → XML_EVENTS_NAMESPACE_URI,
       XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
       XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI
-    ).asJava)
+    ))
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.

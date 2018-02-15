@@ -519,5 +519,5 @@ object ElementAnalysis {
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping) =
-    attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping, _, true))
+    attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping.asJava, _, true))
 }

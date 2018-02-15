@@ -45,15 +45,15 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/xforms/forms/annotator-test.xhtml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
 
         // Test that ns information is provided for those elements
-        assertNotNull(metadata.getNamespaceMapping("output-in-title").mapping);
-        assertNotNull(metadata.getNamespaceMapping("html").mapping);
-        assertNotNull(metadata.getNamespaceMapping("main-instance").mapping);
-        assertNotNull(metadata.getNamespaceMapping("dateTime-component").mapping);
-        assertNotNull(metadata.getNamespaceMapping("dateTime1-control").mapping);
-        assertNotNull(metadata.getNamespaceMapping("value1-control").mapping);
-        assertNotNull(metadata.getNamespaceMapping("output-in-label").mapping);
-        assertNotNull(metadata.getNamespaceMapping("img-in-label").mapping);
-        assertNotNull(metadata.getNamespaceMapping("span").mapping);
+        assertNotNull(metadata.getNamespaceMapping("output-in-title").mapping());
+        assertNotNull(metadata.getNamespaceMapping("html").mapping());
+        assertNotNull(metadata.getNamespaceMapping("main-instance").mapping());
+        assertNotNull(metadata.getNamespaceMapping("dateTime-component").mapping());
+        assertNotNull(metadata.getNamespaceMapping("dateTime1-control").mapping());
+        assertNotNull(metadata.getNamespaceMapping("value1-control").mapping());
+        assertNotNull(metadata.getNamespaceMapping("output-in-label").mapping());
+        assertNotNull(metadata.getNamespaceMapping("img-in-label").mapping());
+        assertNotNull(metadata.getNamespaceMapping("span").mapping());
 
         // Test that ns information is NOT provided for those elements (because processed as part of shadow tree processing)
         assertNull(metadata.getNamespaceMapping("instance-in-xbl"));

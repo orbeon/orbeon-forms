@@ -130,7 +130,7 @@ object XBLTransformer {
             val elements = XPathCache.evaluate(
               boundElementInfo,
               xpathExpression,
-              new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+              NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
               null,
               null,
               null,
@@ -275,7 +275,7 @@ object XBLTransformer {
         val nodeInfos = XPathCache.evaluate(
           boundElementInfo,
           xxblAttrString,
-          new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+          NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
           null,
           null,
           null,
@@ -302,7 +302,7 @@ object XBLTransformer {
             val newValue = XPathCache.evaluateAsAvt(
               boundElementInfo,
               attValue,
-              new NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+              NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
               null,
               null,
               null,

@@ -161,11 +161,11 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             // Save condition
             branchConditions.add(astWhen.getTest());
             // Get namespaces declared at this point in the pipeline
-            if (astWhen.getNode() != null && astWhen.getNamespaces().mapping.size() != 0) {
+            if (astWhen.getNode() != null && astWhen.getNamespaces().mapping().nonEmpty()) {
                 throw new ValidationException("ASTWhen cannot have both a node and namespaces defined", astWhen.getLocationData());
             }
             branchNamespaces.add(astWhen.getNode() != null
-                    ? new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode()))
+                    ? NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode()))
                     : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to

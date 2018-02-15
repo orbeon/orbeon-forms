@@ -172,7 +172,7 @@ class XIncludeReceiver(
               XPathCache.evaluate(
                 document,
                 xpath,
-                new NamespaceMapping(namespaceContext.current.mappingsWithDefault.toMap.asJava),
+                NamespaceMapping(namespaceContext.current.mappingsWithDefault.toMap),
                 Map.empty[String, ValueRepresentation].asJava,
                 FunctionLibrary.instance,
                 null,

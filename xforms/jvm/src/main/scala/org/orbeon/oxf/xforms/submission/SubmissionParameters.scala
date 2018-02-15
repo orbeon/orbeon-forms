@@ -13,6 +13,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
+import scala.collection.JavaConverters._
+
 case class SubmissionParameters(
   refContext                     : RefContext,
   replaceType                    : ReplaceType,
@@ -92,7 +94,7 @@ object SubmissionParameters {
 
       Dom4jUtils.qNameToExplodedQName(
         Dom4jUtils.extractTextValueQName(
-          staticSubmission.namespaceMapping.mapping,
+          staticSubmission.namespaceMapping.mapping.asJava,
           resolvedMethodQName,
           true
         )

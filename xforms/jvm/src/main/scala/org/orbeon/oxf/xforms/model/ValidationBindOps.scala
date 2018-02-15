@@ -216,7 +216,7 @@ trait ValidationBindOps extends Logging {
 
             // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
             val context = evaluator.getStaticContext.asInstanceOf[IndependentContext]
-            for ((prefix, uri) ← staticBind.namespaceMapping.mapping.asScala)
+            for ((prefix, uri) ← staticBind.namespaceMapping.mapping)
               context.declareNamespace(prefix, uri)
 
             evaluator
@@ -256,7 +256,7 @@ trait ValidationBindOps extends Logging {
           if ((namespaceNodeInfo ne null) && namespaceNodeInfo.getNodeKind == Node.ELEMENT_NODE) {
             // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
             val namespaceElement = unsafeUnwrapElement(namespaceNodeInfo)
-            val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
+            val namespaceMapping = NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
             isOptionalAndEmpty || XPath.isXPath2Expression(
               nodeValue,
               namespaceMapping,

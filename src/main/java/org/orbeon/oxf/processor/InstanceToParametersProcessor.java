@@ -92,7 +92,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                                 instanceWrapper.getConfiguration(),
                                 instanceWrapper.wrap(instance),
                                 excludeRef,
-                                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)),
+                                NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(paramElement)),
                                 getLocationData()
                             );
 

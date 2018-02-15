@@ -1,16 +1,19 @@
 package org.orbeon.oxf.xml
 
 import java.util.{List ⇒ JList}
-import javax.xml.transform.{SourceLocator, Source}
+import javax.xml.transform.{Source, SourceLocator}
+
 import org.orbeon.oxf.util.XPath._
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.functions.{FunctionLibraryList, FunctionLibrary}
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.{NamespaceResolver, StructuredQName}
-import org.orbeon.saxon.sxpath.{XPathStaticContext, AbstractStaticContext}
+import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext}
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.saxon.value.{SequenceType, QNameValue}
-import org.orbeon.oxf.util.{Logging, IndentedLogger}
+import org.orbeon.saxon.value.{QNameValue, SequenceType}
+
+import scala.collection.JavaConverters._
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.
@@ -83,10 +86,10 @@ class ShareableXPathStaticContext(
         else
           ""
       } else
-        namespaceMapping.mapping.get(prefix)
+        namespaceMapping.mapping.getOrElse(prefix, null)
 
     def iteratePrefixes =
-      namespaceMapping.mapping.keySet.iterator
+      namespaceMapping.mapping.keySet.iterator.asJava
   }
 
   def getURIForPrefix(prefix: String): String = {

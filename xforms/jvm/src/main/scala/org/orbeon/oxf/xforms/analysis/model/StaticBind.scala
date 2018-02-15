@@ -14,6 +14,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util ⇒ u}
 
+import scala.collection.JavaConverters._
 import scala.collection.immutable.List
 import scala.util.Try
 
@@ -176,7 +177,7 @@ class StaticBind(
 
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) map
-      (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
+      (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping.asJava, _, true))
 
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
     Option(element.attributeValue(XXFORMS_WHITESPACE_QNAME)) map

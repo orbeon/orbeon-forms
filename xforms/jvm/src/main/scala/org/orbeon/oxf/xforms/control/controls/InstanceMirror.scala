@@ -144,7 +144,7 @@ object InstanceMirror {
 
     val inScope = ancestors intersect List(referenceNode) nonEmpty
 
-    def namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
+    def namespaces = NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
 
     inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNode], namespaces)
   }

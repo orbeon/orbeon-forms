@@ -38,7 +38,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
   private val HtmlHead = new QName(XHTML_NAMESPACE_URI, "head")
   private val HtmlTitle = new QName(XHTML_NAMESPACE_URI, "title")
   private val XFormsOutput = new QName(XFORMS_NAMESPACE_URI, "output")
-  
+
   private def newElementDetail(start: StartElement, parent: Option[ElementDetails]) =
     Some(ElementDetails(start, parent, depth, parent map (_.previousState) getOrElse RootState ))
 
@@ -66,7 +66,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
 
   // Register the state machine
   startWith(RootState, None)
-  
+
   when(RootState) {
     case Event(ev @ StartElement(HtmlHead, _), parentOption) ⇒
       forward(out, ev)
@@ -97,14 +97,9 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
   when(PreserveState)(defaultHandler)
 
   initialize()
-  
+
   private val metadata: Metadata = null // TODO
 
-  protected def addNamespaces(id: String): Unit = {
-    val tuples =
-      namespaceContext.current.mappingsWithDefault filterNot
-      { case (prefix, uri) ⇒ prefix.startsWith("xml") }
-
-    metadata.addNamespaceMapping(id, (tuples.toSeq :+ (XML_PREFIX → XML_URI) toMap).asJava)
-  }
+  protected def addNamespaces(id: String): Unit =
+    metadata.addNamespaceMapping(id, namespaceContext.currentMapping)
 }

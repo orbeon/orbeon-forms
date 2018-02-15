@@ -95,7 +95,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         iterationOutput = forEachBlockProcessor.createOutput(idOrRef);
 
         select = forEachAST.getSelect();
-        namespaceContext = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode()));
+        namespaceContext = NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode()));
         if (forEachAST.getRoot() != null) {
             rootQName = forEachAST.getRoot();
             int columnPosition = rootQName.indexOf(':');
@@ -106,7 +106,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             } else {
                 // Extract prefix, find namespace URI
                 final String prefix = rootQName.substring(0, columnPosition);
-                rootNamespaceURI = namespaceContext.mapping.get(prefix);
+                rootNamespaceURI = namespaceContext.mapping().getOrElse(prefix, null);
                 if (rootNamespaceURI == null)
                     throw new ValidationException("Prefix '" + prefix + "' used in root attribute is undefined", forEachAST.getLocationData());
                 rootLocalName = rootQName.substring(columnPosition + 1);

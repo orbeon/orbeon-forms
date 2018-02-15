@@ -84,7 +84,7 @@ trait StringValidationFunction extends ValidationFunction[String] {
 object ValidationFunction {
 
   private val BasicNamespaceMapping =
-    new NamespaceMapping(Map(
+    NamespaceMapping(Map(
       XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
       XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
       XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,

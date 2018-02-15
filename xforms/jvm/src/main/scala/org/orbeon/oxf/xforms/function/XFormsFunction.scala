@@ -308,9 +308,7 @@ object XFormsFunction {
             prefixNotInScope()
         }
 
-        val qNameURI = namespaceMapping.mapping.get(prefix)
-        if (qNameURI eq null)
-          prefixNotInScope()
+        val qNameURI = namespaceMapping.mapping.getOrElse(prefix, prefixNotInScope())
 
         dom.QName(local, Namespace(prefix, qNameURI))
       case UnprefixedName(local) ⇒

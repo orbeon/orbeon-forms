@@ -364,7 +364,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 object XFormsValueControl {
 
   val FormatNamespaceMapping =
-    new NamespaceMapping(
+    NamespaceMapping(
       Map(
         XSD_PREFIX           → XSD_URI,
         XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,

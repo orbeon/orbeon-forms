@@ -53,7 +53,7 @@ object XPathCache {
   object XPathContext {
 
     def apply(
-      ns              : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
+      ns              : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
       vars            : Map[String, ValueRepresentation] = Map.empty,
       functionLibrary : FunctionLibrary                  = null,
       functionContext : FunctionContext                  = null,
@@ -672,7 +672,7 @@ object XPathCache {
 
       // Declare namespaces
       if (namespaceMapping ne null)
-        for ((prefix, uri) ← namespaceMapping.mapping.asScala)
+        for ((prefix, uri) ← namespaceMapping.mapping)
           independentContext.declareNamespace(prefix, uri)
 
       // Declare variables (we don't use the values here, just the names)

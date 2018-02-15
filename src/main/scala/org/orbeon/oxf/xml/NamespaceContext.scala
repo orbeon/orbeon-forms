@@ -72,6 +72,7 @@ class NamespaceContext {
   // Start with the standard "xml" prefix
   private var _current = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
   def current = _current
+  def currentMapping: Map[String, String] = _current.mappings
 
   // Pending mappings, which will be in force for the next element
   private var _pending = Map.empty[String, String]

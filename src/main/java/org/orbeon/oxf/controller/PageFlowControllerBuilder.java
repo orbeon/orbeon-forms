@@ -50,7 +50,7 @@ public class PageFlowControllerBuilder {
         mapping.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
         mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE_URI);
 
-        NAMESPACES_WITH_XSI_AND_XSLT = new NamespaceMapping(mapping);
+        NAMESPACES_WITH_XSI_AND_XSLT = NamespaceMapping.apply(mapping);
     }
 
     public static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
@@ -230,7 +230,7 @@ public class PageFlowControllerBuilder {
                         if (foundActionWithoutWhen[0])
                             throw new ValidationException("Unreachable <action>", (LocationData) actionElement.getData());
                         setTest(whenAttribute);
-                        setNamespaces(new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(actionElement)));
+                        setNamespaces(NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(actionElement)));
                         setLocationData((LocationData) actionElement.getData());
                     } else {
                         foundActionWithoutWhen[0] = true;
@@ -298,7 +298,7 @@ public class PageFlowControllerBuilder {
                                 addWhen(new ASTWhen() {{
                                     if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
-                                        setNamespaces(new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(resultElement)));
+                                        setNamespaces(NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(resultElement)));
                                         final String[] locationParams =
                                                 new String[]{"page id", pageElement.attributeValue("id"), "when", resultWhenAttribute};
                                         setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams));
@@ -499,7 +499,7 @@ public class PageFlowControllerBuilder {
             internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
             isTransformedInstance = true;
 
-            final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces((Element) resultElement.elements().get(0));
+            final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement.elements().get(0));
             final QName transformQName = Dom4jUtils.extractAttributeValueQName(resultElement, "transform");
 
             // Run transform

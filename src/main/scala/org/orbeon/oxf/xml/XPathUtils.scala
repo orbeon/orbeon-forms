@@ -204,7 +204,7 @@ object XPathUtils {
           contextItems        = ju.Collections.singletonList(dw.wrap(contextNode)),
           contextPosition     = 1,
           xpathString         = expr,
-          namespaceMapping    = if ((prefixes eq null) || prefixes.isEmpty) null else new NamespaceMapping(prefixes),
+          namespaceMapping    = if ((prefixes eq null) || prefixes.isEmpty) null else NamespaceMapping(prefixes),
           variableToValueMap  = EmptyVariables,
           functionLibrary     = functionLibrary,
           functionContext     = functionContext,

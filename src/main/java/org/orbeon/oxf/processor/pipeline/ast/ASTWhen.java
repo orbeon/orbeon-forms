@@ -40,7 +40,7 @@ public class ASTWhen extends ASTNodeContainer {
     }
 
     public NamespaceMapping getNamespaces() {
-        return namespaces == null ? NamespaceMapping.EMPTY_MAPPING : namespaces;
+        return namespaces == null ? NamespaceMapping.EmptyMapping() : namespaces;
     }
 
     public void setNamespaces(NamespaceMapping namespaces) {

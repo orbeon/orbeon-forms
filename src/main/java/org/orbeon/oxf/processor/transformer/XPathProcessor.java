@@ -72,7 +72,7 @@ public class XPathProcessor extends ProcessorImpl {
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-                        return new Config(new NamespaceMapping(namespaces), config.getRootElement().elements("xpath").get(0).getStringValue());
+                        return new Config(NamespaceMapping.apply(namespaces), config.getRootElement().elements("xpath").get(0).getStringValue());
                     }
                 });
 

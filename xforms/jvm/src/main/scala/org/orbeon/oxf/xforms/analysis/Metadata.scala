@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 
 /**
  * Container for element metadata gathered during document annotation/extraction:
@@ -75,37 +75,14 @@ trait Marks {
 // Handling of namespaces
 trait NamespaceMappings {
 
-  private val namespaceMappings = new mutable.HashMap[String, NamespaceMapping]
-  private val hashes = new mutable.LinkedHashMap[String, NamespaceMapping]
+  private val mappingsForPrefixedIds = new mutable.HashMap[String, NamespaceMapping]
 
-  def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]): Unit = {
-    // Sort mappings by prefix
-    val sorted = immutable.TreeMap(mapping.asScala.toSeq: _*)
-    // Hash key/values
-    val hexHash = NamespaceMapping.hashMapping(sorted.asJava)
-
-    // Retrieve or create mapping object
-    val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
-      val newNamespaceMapping = new NamespaceMapping(hexHash, sorted.asJava)
-      hashes += (hexHash → newNamespaceMapping)
-      newNamespaceMapping
-    })
-
-    // Remember that id has this mapping
-    namespaceMappings += prefixedId → namespaceMapping
-  }
+  def addNamespaceMapping(prefixedId: String, mapping: Map[String, String]): Unit =
+    mappingsForPrefixedIds += prefixedId → NamespaceMapping(mapping)
 
   def removeNamespaceMapping(prefixedId: String): Unit =
-    namespaceMappings -= prefixedId
+    mappingsForPrefixedIds -= prefixedId
 
-  def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
-
-  def debugPrintNamespaces(): Unit = {
-    println("Number of different namespace mappings: " + hashes.size)
-    for ((key, value) ← hashes) {
-      println("   hash: " + key)
-      for ((prefix, uri) ← value.mapping.asScala)
-        println("     " + prefix + " → " + uri)
-    }
-  }
+  def getNamespaceMapping(prefixedId: String): NamespaceMapping =
+    mappingsForPrefixedIds.get(prefixedId).orNull
 }

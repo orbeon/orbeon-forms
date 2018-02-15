@@ -16,6 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.generic.CanBuildFrom
+import scala.util.Try
 
 object StringUtils {
 
@@ -168,6 +169,11 @@ object StringUtils {
       index >= 0 option index
     }
 
+    // NOTE: Special the case where the string is blank for performance
+    def toIntOpt: Option[Int] =
+      if (isBlank) None else Try(s.toInt).toOption
+
+    // Like the XPath `translate` function
     def translate(mapString: String, transString: String): String = {
 
       val inputLength = s.length

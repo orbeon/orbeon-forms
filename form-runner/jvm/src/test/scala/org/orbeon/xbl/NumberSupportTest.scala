@@ -54,7 +54,7 @@ class NumberSupportTest extends FunSpec {
 
         val data = TestNode(stored, None, Map.empty)
 
-        implicit val params = NumberParams(
+        implicit val params = NumberConfig(
           decimalSeparator    = '.',
           groupingSeparator   = ',',
           prefix              = "",
@@ -101,7 +101,7 @@ class NumberSupportTest extends FunSpec {
 
         val data = TestNode("", None, Map.empty)
 
-        implicit val params = NumberParams(
+        implicit val params = NumberConfig(
           decimalSeparator    = '.',
           groupingSeparator   = ',',
           prefix              = "",

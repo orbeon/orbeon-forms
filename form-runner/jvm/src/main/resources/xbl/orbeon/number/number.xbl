@@ -125,7 +125,7 @@
                     name="serverValue"
                     value="
                         NumberSupport:getDisplayValueJava(
-                            $binding,
+                            xxf:binding('fr-number'),
                             xxf:component-param-value('decimal-separator'),
                             xxf:component-param-value('grouping-separator'),
                             xxf:component-param-value('prefix'),
@@ -137,7 +137,7 @@
                     name="editValue"
                     value="
                         NumberSupport:getEditValueJava(
-                            $binding,
+                            xxf:binding('fr-number'),
                             xxf:component-param-value('decimal-separator'),
                             xxf:component-param-value('grouping-separator'),
                             xxf:component-param-value('prefix'),

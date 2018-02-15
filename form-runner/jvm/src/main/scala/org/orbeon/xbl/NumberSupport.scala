@@ -17,14 +17,13 @@ import java.text.{DecimalFormat, DecimalFormatSymbols}
 import java.util.Locale
 
 import org.orbeon.dom
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.xxforms.NumericValidation
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.NodeInfo
 
-import scala.util.Try
-
-case class NumberParams(
+case class NumberConfig(
   decimalSeparator    : Char,
   groupingSeparator   : Char,
   prefix              : String,
@@ -45,40 +44,11 @@ trait NumberSupport[Binding] {
   def getDatatypeOpt(binding: Binding): Option[dom.QName]
   def getCustomMipOpt(binding: Binding, name: String): Option[String]
 
-  def propertyFractionDigitsOpt(binding: Binding)(implicit params: NumberParams): Option[Int] =
-    if (getDatatypeOpt(binding) exists (_.name == "integer"))
-      Some(0)
-    else
-      params.digitsAfterDecimal
-
   // NOTE: Also return `None` if the `fraction-digits` custom MIP is read and is not an `Int`.
   def validationFractionDigitsOpt(binding: Binding): Option[Int] =
-    if (getDatatypeOpt(binding) exists (_.name == "integer"))
-        Some(0)
-      else
-        getCustomMipOpt(binding, "fraction-digits") flatMap (value ⇒ Try(value.toInt).toOption)
+    fractionDigitsIfInteger(binding) orElse (getCustomMipOpt(binding, "fraction-digits") flatMap (_.toIntOpt))
 
-  def fractionDigitsFromValidationOrProp(binding: Binding)(implicit params: NumberParams): Option[Int] =
-    validationFractionDigitsOpt(binding) orElse propertyFractionDigitsOpt(binding)
-
-  def pictureString(precision: Int, group: Boolean, zeroes: Boolean): String =
-    (if (group) IntegerPictureWithGrouping else IntegerPictureWithoutGrouping) + {
-      if (precision <= 0)
-        ""
-      else
-        "." + ((if (zeroes) "0" else "#") * precision)
-    }
-
-  def tryParseAndPrintDecimalValue(value: String): Option[String] =
-    NumericValidation.tryParseAsLongOrBigDecimal(value) map printDecimalValue
-
-  def printDecimalValue(value: Long Either scala.BigDecimal): String =
-    value.fold(_.toString, _.bigDecimal.toPlainString)
-
-  def significantFractionalDigits(decimal: scala.BigDecimal): Int =
-    decimal.bigDecimal.stripTrailingZeros.scale.max(0)
-
-  def editValue(binding: String)(implicit params: NumberParams): String = {
+  def editValue(binding: String)(implicit params: NumberConfig): String = {
 
     val raw = binding
 
@@ -99,10 +69,7 @@ trait NumberSupport[Binding] {
     normalized.translate(".", params.decimalSeparatorString).translate(PeriodEncodedString, ".")
   }
 
-  def formatNumber(decimal: Long Either scala.BigDecimal, pictureString: String): String =
-    new DecimalFormat(pictureString, DefaultDecimalFormatSymbols).format(decimal.fold(identity, identity))
-
-  def displayValue(binding: Binding)(implicit params: NumberParams): String = {
+  def displayValue(binding: Binding)(implicit params: NumberConfig): String = {
 
     val fractionDigitsOpt =
       fractionDigitsFromValidationOrProp(binding)
@@ -137,7 +104,7 @@ trait NumberSupport[Binding] {
       case  _ ⇒ throw new IllegalStateException
     }
 
-  def storageValue(value: String, binding: Binding)(implicit params: NumberParams): String = {
+  def storageValue(value: String, binding: Binding)(implicit params: NumberConfig): String = {
 
     val withPeriodEncoded =
       if (params.groupingSeparator == '.' || params.decimalSeparator == '.')
@@ -174,6 +141,35 @@ trait NumberSupport[Binding] {
       symbols.setGroupingSeparator(',')
       symbols
     }
+
+    def fractionDigitsIfInteger(binding: Binding): Option[Int] =
+      (getDatatypeOpt(binding) exists (_.name == "integer")) option 0
+
+    def propertyFractionDigitsOpt(binding: Binding)(implicit params: NumberConfig): Option[Int] =
+      fractionDigitsIfInteger(binding) orElse params.digitsAfterDecimal
+
+    def fractionDigitsFromValidationOrProp(binding: Binding)(implicit params: NumberConfig): Option[Int] =
+      validationFractionDigitsOpt(binding) orElse propertyFractionDigitsOpt(binding)
+
+    def formatNumber(decimal: Long Either scala.BigDecimal, pictureString: String): String =
+      new DecimalFormat(pictureString, DefaultDecimalFormatSymbols).format(decimal.fold(identity, identity))
+
+    def pictureString(precision: Int, group: Boolean, zeroes: Boolean): String =
+      (if (group) IntegerPictureWithGrouping else IntegerPictureWithoutGrouping) + {
+        if (precision <= 0)
+          ""
+        else
+          "." + ((if (zeroes) "0" else "#") * precision)
+      }
+
+    def tryParseAndPrintDecimalValue(value: String): Option[String] =
+      NumericValidation.tryParseAsLongOrBigDecimal(value) map printDecimalValue
+
+    def printDecimalValue(value: Long Either scala.BigDecimal): String =
+      value.fold(_.toString, _.bigDecimal.toPlainString)
+
+    def significantFractionalDigits(decimal: scala.BigDecimal): Int =
+      decimal.bigDecimal.stripTrailingZeros.scale.max(0)
   }
 }
 
@@ -199,11 +195,11 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     roundWhenStoring    : Boolean
   ): String = {
 
-    implicit val params = NumberParams(
+    implicit val params = NumberConfig(
       decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption getOrElse ',',
       prefix              = prefix,
-      digitsAfterDecimal  = Try(digitsAfterDecimal.toInt).toOption,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )
@@ -223,11 +219,11 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     roundWhenStoring    : Boolean
   ): String = {
 
-    implicit val params = NumberParams(
+    implicit val params = NumberConfig(
       decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption getOrElse ',',
       prefix              = prefix,
-      digitsAfterDecimal  = Try(digitsAfterDecimal.toInt).toOption,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )
@@ -246,11 +242,11 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     roundWhenStoring    : Boolean
   ): String = {
 
-    implicit val params = NumberParams(
+    implicit val params = NumberConfig(
       decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption getOrElse ',',
       prefix              = prefix,
-      digitsAfterDecimal  = Try(digitsAfterDecimal.toInt).toOption,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )

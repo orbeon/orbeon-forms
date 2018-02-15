@@ -205,7 +205,7 @@
                         type="text"
                         step="any"
                         pattern="{
-                            if (NumberSupport:validationFractionDigitsOptJava($binding) = 0 and
+                            if (NumberSupport:isZeroValidationFractionDigitsJava($binding) and
                                 xxf:custom-mip($binding, 'non-negative') = 'true'
                             ) then
                                 '[0-9]*'

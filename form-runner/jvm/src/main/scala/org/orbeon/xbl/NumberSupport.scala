@@ -259,7 +259,7 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
   }
 
   //@XPathFunction
-  def validationFractionDigitsOptJava(binding: NodeInfo): java.lang.Integer =
-    validationFractionDigitsOpt(binding) map (new java.lang.Integer(_)) orNull
+  def isZeroValidationFractionDigitsJava(binding: NodeInfo): Boolean =
+    validationFractionDigitsOpt(binding) contains 0
 
 }

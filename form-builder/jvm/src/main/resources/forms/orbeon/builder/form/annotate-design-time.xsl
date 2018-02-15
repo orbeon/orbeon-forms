@@ -34,7 +34,7 @@
     <!-- Whether we have "many" controls -->
     <xsl:variable
         name="many-controls"
-        select="count($body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
+        select="count($body//*:td[exists(*)] | $body//*:c[exists(*)]) ge p:property('oxf.fb.section.close')"/>
 
     <!-- Temporarily mark read-only instances as read-write -->
     <xsl:template match="xf:model/xf:instance/@xxf:readonly[. = 'true']" mode="within-model">

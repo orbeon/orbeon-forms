@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -274,11 +275,19 @@ trait ResourcesOps extends BaseOps {
     } yield
       lhhaHolder
 
-  def hasBlankOrMissingLHHAForAllLangsUseDoc( // TODO: use LHHA type
+  // NOTE: Also return `false` if there are any children `fr:param`.
+  def hasBlankOrMissingLHHAForAllLangsUseDoc(
     controlName : String,
-    lhha        : String)(implicit
+    lhha        : LHHA)(implicit
     ctx         : FormBuilderDocContext
-  ): Boolean =
-    findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall
-      { case (_, holder) ⇒ (holder child lhha stringValue).isBlank }
+  ): Boolean = {
+
+    val hasParams =
+      FormBuilder.lhhaChildrenParams(FormBuilder.getControlLHHAT(controlName, lhha.entryName)).nonEmpty
+
+    ! hasParams && {
+      findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall
+        { case (_, holder) ⇒ (holder child lhha.entryName stringValue).isBlank }
+    }
+  }
 }

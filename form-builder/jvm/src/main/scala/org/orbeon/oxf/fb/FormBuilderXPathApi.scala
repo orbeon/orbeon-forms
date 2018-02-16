@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
@@ -121,33 +122,30 @@ object FormBuilderXPathApi {
       validationElems
     )(FormBuilderDocContext())
 
-  // Set the control help and add/remove help element and placeholders as needed
-  //@XPathFunction
-  def setControlHelp(controlName: String,  value: String): Seq[NodeInfo] = {
-
-    implicit val ctx = FormBuilderDocContext()
-
-    val changed = FormBuilder.setControlResource(controlName, "help", value.trimAllToEmpty)
-
-    if (hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, "help"))
-      FormBuilder.removeLHHAElementAndResources(controlName, "help")
-    else
-      FormBuilder.ensureCleanLHHAElements(controlName, "help")
-  }
-
   //@XPathFunction
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean): Unit =
     FormBuilder.setControlLHHATMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
   //@XPathFunction
-  def setControlLabelOrHintOrText(
+  def setControlLabelHintHelpOrText(
     controlName : String,
-    lht         : String,
+    lhht        : String,
     value       : String,
     params      : Array[NodeInfo],
     isHTML      : Boolean
-  ): Unit =
-    FormBuilder.setControlLabelOrHintOrText(controlName, lht, value, Some(params), isHTML)(FormBuilderDocContext())
+  ): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    // Make sure the `xf:help` element is there while we set content or attributes.
+    if (lhht == "help")
+      FormBuilder.ensureCleanLHHAElements(controlName, LHHA.Help, count = 1, replace = true)
+
+    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+
+    if (lhht == "help" && hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, LHHA.Help))
+      FormBuilder.removeLHHAElementAndResources(controlName, LHHA.Help)
+  }
 
   // Set the control's items for all languages
   //@XPathFunction
@@ -219,21 +217,23 @@ object FormBuilderXPathApi {
 
   // Find all resource holders and elements which are unneeded because the resources are blank
   //@XPathFunction
-  def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String): Seq[NodeInfo] = {
+  def findBlankHelpHoldersAndElements(inDoc: NodeInfo): Seq[NodeInfo] = {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
     implicit val ctx = FormBuilderDocContext(inDoc)
 
+    val lhha = LHHA.Help
+
     val allHelpElements =
-      ctx.formDefinitionRootElem.root descendant ((if (lhha=="text") FR else XF) → lhha) map
-      (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
-      { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
+      ctx.formDefinitionRootElem.root descendant LHHA.QNameForValue(lhha) map
+      (lhhaElem ⇒ lhhaElem → lhhaElem.attValue("ref")) collect
+      { case (lhhaElem, HelpRefMatcher(controlName)) ⇒ lhhaElem → controlName }
 
     val allUnneededHolders =
       allHelpElements collect {
         case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhha) ⇒
-           lhhaHoldersForAllLangsUseDoc(controlName, lhha) :+ lhhaElement
+           lhhaHoldersForAllLangsUseDoc(controlName, lhha.entryName) :+ lhhaElement
       }
 
     allUnneededHolders.flatten
@@ -321,7 +321,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getControlLhhParams(controlName: String, lhh: String): Seq[NodeInfo] =
-    FormBuilder.getControlLHHAT(controlName, lhh)(FormBuilderDocContext()) child (FR → "param")
+    lhhaChildrenParams(FormBuilder.getControlLHHAT(controlName, lhh)(FormBuilderDocContext()))
 
   //@XPathFunction
   def isControlLHHAHTMLMediatype(controlName: String, lhha: String): Boolean =

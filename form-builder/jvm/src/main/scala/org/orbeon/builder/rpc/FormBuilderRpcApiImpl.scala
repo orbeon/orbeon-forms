@@ -56,7 +56,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
       val xcvElem = ToolboxOps.controlOrContainerElemToXcv(controlElem)
 
-      if (FormBuilder.setControlLabelOrHintOrText(controlName, lhha, value, None, isHTML))
+      if (FormBuilder.setControlLabelHintHelpOrText(controlName, lhha, value, None, isHTML))
         Undo.pushUserUndoAction(
           ControlSettings(
             controlName,

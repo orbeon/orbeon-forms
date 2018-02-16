@@ -42,7 +42,7 @@
     <xsl:variable
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
         name="unneeded-elements"
-        select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
+        select="fbf:findBlankHelpHoldersAndElements(/)/generate-id()"/>
 
     <!-- Migrate constraints, see https://github.com/orbeon/orbeon-forms/issues/1829 -->
     <xsl:variable

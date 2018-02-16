@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.Dom4j
@@ -514,20 +515,23 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       control
   }
 
-  def setControlLabelOrHintOrText(
+  def setControlLabelHintHelpOrText(
     controlName : String,
-    lht         : String,
+    lhht        : String,
     value       : String,
     params      : Option[Seq[NodeInfo]],
     isHTML      : Boolean)(implicit
     ctx         : FormBuilderDocContext
   ): Boolean = {
-    val resourceChanged  = setControlResource(controlName, lht, value.trimAllToEmpty)
-    val mediatypeChanged = setControlLHHATMediatype(controlName, lht, isHTML)
-    val paramsChanged    = params exists (setControlLHHATParams(controlName, lht, _))
+    val resourceChanged  = setControlResource(controlName, lhht, value.trimAllToEmpty)
+    val mediatypeChanged = setControlLHHATMediatype(controlName, lhht, isHTML)
+    val paramsChanged    = params exists (setControlLHHATParams(controlName, lhht, _))
 
     resourceChanged || mediatypeChanged || paramsChanged
   }
+
+  def lhhaChildrenParams(lhhaNodes: Seq[NodeInfo]): Seq[NodeInfo] =
+    lhhaNodes child (FR → "param")
 
   private def setControlLHHATParams(
     controlName : String,
@@ -537,7 +541,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Boolean = {
 
     val lhhaNodes      = getControlLHHAT(controlName, lhha)
-    val existingParams = lhhaNodes / (FR → "param")
+    val existingParams = lhhaChildrenParams(lhhaNodes)
 
     val changed = {
 
@@ -593,26 +597,31 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
     hasHTMLMediatype(findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset" child "label")
 
-  def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
-    nodes foreach { lhhaElement ⇒
+  def setHTMLMediatype(lhhaElems: Seq[NodeInfo], isHTML: Boolean): Unit =
+    lhhaElems foreach { lhhaElem ⇒
       if (isHTML)
-        insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
+        insert(into = lhhaElem, origin = attributeInfo("mediatype", "text/html"))
       else
-        delete(lhhaElement /@ "mediatype")
+        delete(lhhaElem /@ "mediatype")
     }
 
   def ensureCleanLHHAElements(
     controlName : String,
-    lhha        : String,
-    count       : Int     = 1,
-    replace     : Boolean = true)(implicit
+    lhha        : LHHA,
+    count       : Int,
+    replace     : Boolean)(implicit
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
     val inDoc = ctx.formDefinitionRootElem
 
+    val lhhaName = lhha.entryName
+
     val control  = findControlByName(inDoc, controlName).get
-    val existing = getControlLHHAT(controlName, lhha)
+    val existing = getControlLHHAT(controlName, lhhaName)
+    val params   = lhhaChildrenParams(existing)
+
+    val lhhaQName = LHHA.QNameForValue(lhha)
 
     if (replace)
       delete(existing)
@@ -621,34 +630,42 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // element.
 
     if (count > 0) {
+
       val newTemplates =
         if (count == 1) {
-          def newTemplate: NodeInfo =
-            <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
-                 ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
-
-          Seq(newTemplate)
+          List(
+            elementInfo(
+              lhhaQName,
+              attributeInfo("ref", s"$$form-resources/$controlName/$lhhaName") +: params
+            )
+          )
         } else {
-          def newTemplate(index: Int): NodeInfo =
-            <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
-                 ref={s"$$form-resources/$controlName/$lhha[$index]"}/>.copy(label = lhha)
+
+          def newTemplate(index: Int) =
+            elementInfo(
+              lhhaQName,
+              attributeInfo("ref", s"$$form-resources/$controlName/$lhhaName[$index]") +: params
+            )
 
           1 to count map newTemplate
         }
 
       insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)
+
     } else
       Nil
   }
 
-  def removeLHHAElementAndResources(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {
+  def removeLHHAElementAndResources(
+    controlName : String,
+    lhha        : LHHA)(implicit
+    ctx         : FormBuilderDocContext
+  ): Seq[NodeInfo] = {
 
-    val inDoc = ctx.formDefinitionRootElem
+    val control = findControlByName(ctx.formDefinitionRootElem, controlName).get
 
-    val control = findControlByName(inDoc, controlName).get
-
-    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhha))
-    val removedLHHA    = delete(control child ((if (lhha == "text") FR else XF) → lhha))
+    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhha.entryName))
+    val removedLHHA    = delete(control child LHHA.QNameForValue(lhha))
 
     removedHolders ++ removedLHHA
   }

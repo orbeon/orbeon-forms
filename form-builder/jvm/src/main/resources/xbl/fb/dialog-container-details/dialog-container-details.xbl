@@ -179,17 +179,14 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
-                        for $lh in $i/(label) return
-                            fbf:setControlLabelOrHintOrText(
+                        for $lh in $i/(label, help) return
+                            fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
                                 local-name($lh),
                                 $lh/value,
                                 $lh/fr:param,
                                 $lh/@isHTML = 'true'
-                            ),
-                        (: Write help :)
-                        fbf:setControlHelp($i/control-name, $i/help/value),
-                        fbf:setControlLHHAMediatype($i/control-name, 'help', $i/help/@isHTML = 'true')
+                            )
                     </xf:action>
 
                     <!-- Write classes -->

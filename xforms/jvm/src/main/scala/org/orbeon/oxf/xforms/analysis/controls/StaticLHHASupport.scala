@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -35,16 +35,16 @@ object LHHA extends Enum[LHHA] {
   def jLabel = Label
   def jHelp  = Help
   def jHint  = Hint
-  def jAlert = Alert
 
   val size = values.size
 
-  val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
+  val QNameForValue = values map (value ⇒ value → QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
+  val QNamesSet      = QNameForValue.values.to[Set]
 
   // By default all controls support HTML LHHA
   val DefaultLHHAHTMLSupport = values.toSet
 
-  def isLHHA(e: Element) = LHHAQNames(e.getQName)
+  def isLHHA(e: Element) = QNamesSet(e.getQName)
 
   def getBeforeAfterOrderTokens(tokens: String): (List[String], List[String]) = {
 

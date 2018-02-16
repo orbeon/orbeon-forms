@@ -72,7 +72,14 @@ trait BindingMetadata extends Logging {
     }
 
   def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
-    debug("registering inline binding", List("index" → _xblIndex.isDefined.toString, "element" → elementAtt, "prefixed id" → bindingPrefixedId))
+    debug(
+      "registering inline binding",
+      List(
+        "index"       → _xblIndex.isDefined.toString,
+        "element"     → elementAtt,
+        "prefixed id" → bindingPrefixedId
+      )
+    )
     val newBindingRef = InlineBindingRef(
       bindingPrefixedId,
       CSSSelectorParser.parseSelectors(elementAtt),

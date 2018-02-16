@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.functions.DeepEqual

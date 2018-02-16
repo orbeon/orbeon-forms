@@ -153,8 +153,6 @@
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/number/number.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/currency/currency.js"/>
             </xh:head>
         </output>
     </test>
@@ -657,11 +655,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <errors>
-                                    <error absolute-id="|first-name-control|" position="157" label="First name" alert="Invalid first name" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙1|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙2|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙3|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|last-name-control|" position="165" label="Last name" alert="Invalid last name" level="error" section-name=""/>
+                                    <error id="|first-name-control|" position="109" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙1|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙2|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙3|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|last-name-control|" position="117" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">
@@ -684,10 +682,8 @@
                         </instances>
                         <controls>
                             <control effective-id="my-summary≡er" index="2"/>
-                            <control effective-id="my-summary≡xf-119⊙1" case-id="xf-124"/>
-                            <control effective-id="my-summary≡xf-125⊙1" case-id="xf-126"/>
-                            <control effective-id="my-summary≡xf-119⊙2" case-id="xf-124"/>
-                            <control effective-id="my-summary≡xf-125⊙2" case-id="xf-126"/>
+                            <control effective-id="my-summary≡xf-82⊙1" case-id="xf-83"/>
+                            <control effective-id="my-summary≡xf-82⊙2" case-id="xf-83"/>
                             <control effective-id="repeat" index="2"/>
                         </controls>
                     </dynamic-state>
@@ -695,40 +691,28 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
-                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-114⊙1"/>
-                        <xxf:control id="my-summary≡xf-118⊙1">
+                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-77⊙1"/>
+                        <xxf:control id="my-summary≡xf-81⊙1">
                             <xxf:value>1</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-119⊙1" class="fr-error-link">
-                            <xxf:case id="my-summary≡xf-124⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-120⊙1" visibility="hidden"/>
+                        <xxf:control id="my-summary≡xf-82⊙1">
+                            <xxf:case id="my-summary≡xf-83⊙1" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-90⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:attribute for="my-summary≡xf-121⊙1" name="href"/>
-                        <xxf:control id="my-summary≡xf-123⊙1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-125⊙1">
-                            <xxf:case id="my-summary≡xf-126⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-133⊙1" visibility="hidden"/>
-                        </xxf:control>
-                          <xxf:control id="my-summary≡xf-127⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-130&quot;&gt;Invalid note&lt;/span&gt;"/>
-                          <xxf:control id="my-summary≡xf-134⊙1" relevant="false"/>
-                          <xxf:control id="my-summary≡xf-135⊙1" relevant="false"/>
-                          <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-114⊙2"/>
-                        <xxf:control id="my-summary≡xf-118⊙2">
+                        <xxf:control id="my-summary≡xf-84⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-87&quot;&gt;Invalid note&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-91⊙1" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-92⊙1" relevant="false"/>
+                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-77⊙2"/>
+                        <xxf:control id="my-summary≡xf-81⊙2">
                             <xxf:value>2</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-119⊙2" class="fr-error-link">
-                            <xxf:case id="my-summary≡xf-124⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-120⊙2" visibility="hidden"/>
+                        <xxf:control id="my-summary≡xf-82⊙2">
+                            <xxf:case id="my-summary≡xf-83⊙2" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-90⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:attribute for="my-summary≡xf-121⊙2" name="href"/>
-                        <xxf:control id="my-summary≡xf-123⊙2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-125⊙2">
-                            <xxf:case id="my-summary≡xf-126⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-133⊙2" visibility="hidden"/>
-                        </xxf:control>
-                        <xxf:control id="my-summary≡xf-127⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-130&quot;&gt;Invalid last name&lt;/span&gt;"/>
-                        <xxf:control id="my-summary≡xf-134⊙2" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-135⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-84⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-87&quot;&gt;Invalid last name&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-91⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-92⊙2" relevant="false"/>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
@@ -815,35 +799,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency≡xf-8" class="xbl-fr-currency-decimal-separator xforms-hidden">
-                            <xxf:value>.</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-currency≡xf-27" class="xbl-fr-number-xforms-output xforms-hidden">
-                            <xxf:value>12.34</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-currency≡xf-28" class="xbl-fr-number-xforms-input xforms-hidden">
-                            <xxf:value>12.34</xxf:value>
-                        </xxf:control>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-29"/>
-                        <xxf:control id="my-currency≡xf-31" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-32">
-                            <xxf:value>$</xxf:value>
-                        </xxf:control>
+                        <xxf:control class="fr-width-10em input-prepend input-append" id="my-currency≡xf-10"/>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-36" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-37" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-38" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-15" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
+                    <xxf:script name="xf_0c771ee6f13684b1ebbd988e959e58ef0e6f4fa1" target-id="my-currency" observer-id="my-currency">
+                        <xxf:param>12.34</xxf:param>
+                        <xxf:param>12.34</xxf:param>
+                        <xxf:param>.</xxf:param>
+                    </xxf:script>
                     <xxf:focus control-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="`fr:number`: `1.2` is invalid if grouping separator is `,`" name="oxf:pipeline" only="true">
+    <test description="`fr:number`: `1.2` is invalid if grouping separator is `,`" name="oxf:pipeline">
         <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

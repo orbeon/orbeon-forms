@@ -120,7 +120,7 @@ trait PartXBLAnalysis extends TransientState {
 
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
   // NOTE: Can be used only in a sub-part, as this mutates the tree
-  def updateShadowTree(prefixedId: String, elementInSource: Element) = {
+  def updateShadowTree(prefixedId: String, elementInSource: Element): ComponentControl = {
     assert(! isTopLevel)
     getControlAnalysis(prefixedId) match {
       case existingComponent: ComponentControl ⇒

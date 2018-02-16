@@ -72,7 +72,10 @@ class NamespaceContext {
   // Start with the standard "xml" prefix
   private var _current = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
   def current = _current
-  def currentMapping: Map[String, String] = _current.mappings
+
+  // TODO: We create a copy of the map because we don't want the mapping from "" → default ns.
+  // This is used only by `XFormsAnnotator` but needs to be fixed. Also, what about undeclarations?
+  def currentMapping: Map[String, String] = _current.mappings - ""
 
   // Pending mappings, which will be in force for the next element
   private var _pending = Map.empty[String, String]

@@ -44,7 +44,7 @@ object Number {
 
       import Private._
 
-      var visibleInputElem     : html.Input = null
+      var visibleInputElem: html.Input = null
 
       case class State(serverValue: String, editValue: String, decimalSeparatorChar: Char)
 

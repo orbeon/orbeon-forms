@@ -10,9 +10,15 @@ private object ConcreteElement {
   val DefaultContentListSize = 2 // ORBEON: default was 5
 
   def appendAttributes(src: Element, dst: Element): Unit = {
-    for (i ← 0 until src.attributeCount) {
+
+    val size = src.attributeCount
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       val att = src.attribute(i)
       dst.add(att.deepCopy.asInstanceOf[Attribute])
+      i += 1
     }
   }
 }
@@ -166,23 +172,32 @@ class ConcreteElement(var qname: QName)
   def element(name: String): Element = {
     val list = internalContent
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case element: Element if name == element.getName ⇒ return element
         case _ ⇒
       }
+      i +=1
     }
+
     null
   }
 
   def element(qName: QName): Element = {
     val list = internalContent
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case element: Element if qName == element.getQName ⇒ return element
         case _ ⇒
       }
+      i +=1
     }
     null
   }
@@ -194,12 +209,15 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
-        case element: Element ⇒
-          answer.add(element)
+        case element: Element ⇒ answer.add(element)
         case _ ⇒
       }
+      i += 1
     }
     ju.Collections.unmodifiableList(answer)
   }
@@ -208,14 +226,17 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case element: Element ⇒
-          if (name == element.getName) {
+          if (name == element.getName)
             answer.add(element)
-          }
         case _ ⇒
       }
+      i += 1
     }
     ju.Collections.unmodifiableList(answer)
   }
@@ -224,14 +245,17 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case element: Element ⇒
-          if (qName == element.getQName) {
+          if (qName == element.getQName)
             answer.add(element)
-          }
         case _ ⇒
       }
+      i += 1
     }
     ju.Collections.unmodifiableList(answer)
   }
@@ -306,7 +330,9 @@ class ConcreteElement(var qname: QName)
       } else {
         val list = _attributes
         list.clear()
-        for (i ← 0 until size) {
+        // `for (i ← 0 until size)` is inefficient and shows in the profiler
+        var i = 0
+        while (i < size) {
           val attributeName = attributes.getQName(i)
           if (noNamespaceAttributes || !attributeName.startsWith("xmlns")) {
             val attributeURI = attributes.getURI(i)
@@ -317,6 +343,7 @@ class ConcreteElement(var qname: QName)
             list.add(attribute)
             childAdded(attribute)
           }
+          i += 1
         }
       }
     }
@@ -384,14 +411,17 @@ class ConcreteElement(var qname: QName)
   def processingInstruction(target: String): ProcessingInstruction = {
     val list = internalContent
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case pi: ProcessingInstruction ⇒
-          if (target == pi.getName) {
+          if (target == pi.getName)
             return pi
-          }
         case _ ⇒
       }
+      i += 1
     }
     null
   }
@@ -525,12 +555,15 @@ class ConcreteElement(var qname: QName)
         getContentAsStringValue(list.get(0))
       } else {
         val buffer = new jl.StringBuilder
-        for (i ← 0 until size) {
+
+        // `for (i ← 0 until size)` is inefficient and shows in the profiler
+        var i = 0
+        while (i < size) {
           val node = list.get(i)
           val string = getContentAsStringValue(node)
-          if (string.length > 0) {
+          if (string.length > 0)
             buffer.append(string)
-          }
+          i += 1
         }
         buffer.toString
       }
@@ -585,13 +618,19 @@ class ConcreteElement(var qname: QName)
   }
 
   override def appendContent(branch: Branch): Unit = {
-    for (i ← 0 until branch.nodeCount) {
+
+    val size = branch.nodeCount
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       val clone =
         branch.node(i) match {
           case elem: ConcreteElement ⇒ elem.cloneInternal
           case node                  ⇒ node.deepCopy
         }
       add(clone: Node)
+      i += 1
     }
   }
 
@@ -720,14 +759,17 @@ class ConcreteElement(var qname: QName)
     } else {
       val list = internalContent
       val size = list.size
-      for (i ← 0 until size) {
+
+      // `for (i ← 0 until size)` is inefficient and shows in the profiler
+      var i = 0
+      while (i < size) {
         list.get(i) match {
           case namespace: Namespace ⇒
-            if (uri == namespace.uri) {
+            if (uri == namespace.uri)
               return namespace
-            }
           case _ ⇒
         }
+        i += 1
       }
       null
     }
@@ -738,11 +780,15 @@ class ConcreteElement(var qname: QName)
     val answer = new ju.ArrayList[Namespace]
     val list = internalContent
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case namespace: Namespace if namespace != getNamespace ⇒ answer.add(namespace)
         case _ ⇒
       }
+      i += 1
     }
     answer
   }
@@ -751,11 +797,15 @@ class ConcreteElement(var qname: QName)
     val answer = new ju.ArrayList[Namespace]
     val list = internalContent
     val size = list.size
-    for (i ← 0 until size) {
+
+    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    var i = 0
+    while (i < size) {
       list.get(i) match {
         case namespace: Namespace ⇒ answer.add(namespace)
         case _ ⇒
       }
+      i += 1
     }
     answer
   }

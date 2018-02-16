@@ -185,7 +185,7 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     Option(InstanceData.collectAllCustomMIPs(binding)) flatMap (_ get name)
 
   //@XPathFunction
-  def getDisplayValueJava(
+  def getDisplayAndEditValueJava(
     binding             : NodeInfo,
     decimalSeparator    : String,
     groupingSeparator   : String,
@@ -193,7 +193,7 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
-  ): String = {
+  ): Array[String] = {
 
     implicit val params = NumberConfig(
       decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
@@ -204,7 +204,7 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
       roundWhenStoring    = roundWhenStoring
     )
 
-    displayValue(binding)
+    Array(displayValue(binding), editValue(binding.getStringValue))
   }
 
   //@XPathFunction
@@ -229,29 +229,6 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
     )
 
     storageValue(value, binding)
-  }
-
-  //@XPathFunction
-  def getEditValueJava(
-    binding             : NodeInfo,
-    decimalSeparator    : String,
-    groupingSeparator   : String,
-    prefix              : String,
-    digitsAfterDecimal  : String,
-    roundWhenFormatting : Boolean,
-    roundWhenStoring    : Boolean
-  ): String = {
-
-    implicit val params = NumberConfig(
-      decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
-      groupingSeparator   = groupingSeparator.headOption getOrElse ',',
-      prefix              = prefix,
-      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
-      roundWhenFormatting = roundWhenFormatting,
-      roundWhenStoring    = roundWhenStoring
-    )
-
-    editValue(binding.getStringValue)
   }
 
   //@XPathFunction

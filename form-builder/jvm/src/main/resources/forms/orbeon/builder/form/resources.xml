@@ -517,10 +517,10 @@
                 <hint>XPath expression</hint>
             </calculate>
             <control-label>
-                <label>Control Label</label>
+                <label>Label</label>
             </control-label>
             <control-hint>
-                <label>Control Hint</label>
+                <label>Hint</label>
             </control-hint>
             <control-help>
                 <label>Help Message</label>
@@ -614,12 +614,6 @@
         <dialog-confirmation>
             <label>Confirm</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Help</label>
-            <help-message>
-                <label>Help Message</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label>Control Names</label>
             <prefix>
@@ -1558,10 +1552,10 @@
                 <hint>Expression XPath</hint>
             </calculate>
             <control-label>
-                <label>Libellé du contrôle</label>
+                <label>Libellé</label>
             </control-label>
             <control-hint>
-                <label>Suggestion associée au contrôle</label>
+                <label>Suggestion</label>
             </control-hint>
             <control-help>
                 <label>Message d'aide</label>
@@ -1655,12 +1649,6 @@
         <dialog-confirmation>
             <label>Confirmation</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Edition de l'aide</label>
-            <help-message>
-                <label>Message d'aide</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label>Nom des Contrôles</label>
             <prefix>
@@ -2602,10 +2590,10 @@
                 <hint>XPath-uttrykk</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label todo="true">[Help Message]</label>
@@ -2699,12 +2687,6 @@
         <dialog-confirmation>
             <label>Bekreft</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Rediger hjelpetekst</label>
-            <help-message>
-                <label>Hjelpetekst</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -3672,10 +3654,10 @@
                 <hint>Булево выражение XPath</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label todo="true">[Help Message]</label>
@@ -3769,12 +3751,6 @@
         <dialog-confirmation>
             <label>Подтвердить</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Редактировать справку</label>
-            <help-message>
-                <label>Сообщение справки</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -4743,10 +4719,10 @@
                 <hint>Espressione XPath</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label>Messaggio d'aiuto</label>
@@ -4840,12 +4816,6 @@
         <dialog-confirmation>
             <label>Conferma</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Aiuto</label>
-            <help-message>
-                <label>Messaggio d'aiuto</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -5903,12 +5873,6 @@
         <dialog-confirmation>
             <label>Bestätigen</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Hilfe</label>
-            <help-message>
-                <label>Hilfsnachricht</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label>Steuerelementnamen</label>
             <prefix>
@@ -6872,10 +6836,10 @@
                 <hint>XPath-lauseke</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label>Ohjeviesti</label>
@@ -6969,12 +6933,6 @@
         <dialog-confirmation>
             <label>Vahvista</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Ohje</label>
-            <help-message>
-                <label>Ohjeviesti</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -7935,10 +7893,10 @@
                 <hint>Expresión XPath</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label>Mensaje de Ayuda</label>
@@ -8032,12 +7990,6 @@
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Ayuda</label>
-            <help-message>
-                <label>Mensaje de Ayuda</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -8999,10 +8951,10 @@
                 <hint>Expressão XPath</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label>Mensagem de Ajuda</label>
@@ -9096,12 +9048,6 @@
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Ajuda</label>
-            <help-message>
-                <label>Mensagem de Ajuda</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>
@@ -10069,10 +10015,10 @@
                 <hint>XPath-uttryck</hint>
             </calculate>
             <control-label>
-                <label todo="true">[Control Label]</label>
+                <label todo="true">[Label]</label>
             </control-label>
             <control-hint>
-                <label todo="true">[Control Hint]</label>
+                <label todo="true">[Hint]</label>
             </control-hint>
             <control-help>
                 <label>Hjälpmeddelande</label>
@@ -10166,12 +10112,6 @@
         <dialog-confirmation>
             <label>Bekräfta</label>
         </dialog-confirmation>
-        <dialog-help>
-            <label>Hjälp</label>
-            <help-message>
-                <label>Anvisning</label>
-            </help-message>
-        </dialog-help>
         <dialog-ids>
             <label todo="true">[Control Names]</label>
             <prefix>

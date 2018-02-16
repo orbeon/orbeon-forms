@@ -37,7 +37,6 @@ trait FormBuilderRpcApi {
 
   def sectionDelete       (sectionId: String): Unit
   def sectionUpdateLabel  (sectionId: String, label: String): Unit
-  def sectionEditHelp     (sectionId: String): Unit
   def sectionMove         (sectionId: String, directionString: String): Unit // TODO: `Direction` doesn't serialize correctly with Circe.
 
   def gridDelete          (gridId: String): Unit

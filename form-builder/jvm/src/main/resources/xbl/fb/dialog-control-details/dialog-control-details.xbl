@@ -180,7 +180,6 @@
 
                 </xf:action>
 
-
                 <xf:setvalue
                     ref="$i/prev-control-id"
                     value="
@@ -1039,7 +1038,7 @@
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>
-                        <fr:tab  id="label-hint-help-tab" ref="label, hint, help">
+                        <fr:tab id="label-hint-help-tab" ref="label, hint, help">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-details/*[

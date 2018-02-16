@@ -41,7 +41,6 @@ object SectionGridEditor {
     object ContainerEditor extends Enum[ContainerEditor] {
       val values = findValues
       case object SectionDelete        extends ContainerEditor
-      case object SectionEditHelp      extends ContainerEditor
       case object SectionMoveUp        extends ContainerEditor
       case object SectionMoveDown      extends ContainerEditor
       case object SectionMoveRight     extends ContainerEditor
@@ -58,7 +57,6 @@ object SectionGridEditor {
     val SectionAlwaysVisibleIcons =
       List(
         ContainerEditDetails,
-        SectionEditHelp,
         ContainerCopy
       )
 
@@ -152,7 +150,6 @@ object SectionGridEditor {
 
           editor match {
             case SectionDelete        ⇒ client.sectionDelete       (sectionGridId).call()
-            case SectionEditHelp      ⇒ client.sectionEditHelp     (sectionGridId).call()
             case SectionMoveUp        ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
             case SectionMoveDown      ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
             case SectionMoveRight     ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()

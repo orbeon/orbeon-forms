@@ -159,13 +159,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       properties = Map("container" → Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
     )
 
-  def sectionEditHelp(sectionId: String): Unit =
-    XFormsAPI.dispatch(
-      name       = "fb-show-dialog",
-      targetId   = "dialog-help",
-      properties = Map("control-id" → Some(sectionId))
-    )
-
   def sectionMove(sectionId: String, directionString: String): Unit = {
 
     implicit val ctx = FormBuilderDocContext()

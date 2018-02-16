@@ -34,7 +34,9 @@
 
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
 
-                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <!-- Clear all local values -->
+                <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
+                <xf:delete ref="$i/(label, hint, help)/fr:param"/>
 
                 <xf:setvalue ref="$i/original-control-name" value="frf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
@@ -171,8 +173,6 @@
                     <xf:setvalue
                         ref="@isHTML"
                         value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, $lhh)) then 'true' else ''"/>
-
-                    <xf:delete ref="fr:param"/>
 
                     <xf:insert
                         ref="value"

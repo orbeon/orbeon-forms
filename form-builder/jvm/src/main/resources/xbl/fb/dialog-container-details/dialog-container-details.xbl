@@ -30,7 +30,9 @@
             <xbl:handler event="fb-show-dialog fb-load" phase="target" defaultAction="cancel">
                 <xf:var name="form" value="xxf:binding('fb-dialog-container-details')"/>
 
-                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <!-- Clear all local values -->
+                <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
+                <xf:delete ref="$i/(label, help)/fr:param"/>
 
                 <xf:var name="control" value="event('container')"/>
 
@@ -80,8 +82,8 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
-                <!-- Read Label/Help -->
-                <xf:action iterate="$i/(label, help)">
+                <!-- Read Label/Help if we are a section -->
+                <xf:action iterate="$i/(label, help)[$i/container-type = 'section']">
 
                     <xf:var name="lhh" value="local-name()"/>
 
@@ -92,8 +94,6 @@
                     <xf:setvalue
                         ref="@isHTML"
                         value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, $lhh)) then 'true' else ''"/>
-
-                    <xf:delete ref="fr:param"/>
 
                     <xf:insert
                         ref="value"
@@ -179,7 +179,7 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
-                        for $lh in $i/(label, help) return
+                        for $lh in $i/(label, help)[$i/container-type = 'section'] return
                             fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
                                 local-name($lh),
@@ -406,6 +406,10 @@
                 <xf:bind
                     ref="prev-control-id, next-control-id"
                     readonly="xxf:is-blank()"/>
+
+                <xf:bind
+                    ref="label | help"
+                    readonly="$i/container-type = 'grid'"/>
 
                 <xf:bind
                     ref="(label | help)/value"
@@ -653,6 +657,8 @@
                         </fr:tab>
 
                     </fr:tabbable>
+
+                    <!--<fr:xforms-inspector/>-->
 
                     <xh:div class="fr-dialog-buttons">
                         <xh:div class="pull-left">

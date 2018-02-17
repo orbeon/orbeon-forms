@@ -153,7 +153,7 @@
 
 
                 <xf:var name="prefix" value="xxf:component-param-value('prefix')"/>
-                <xf:var name="suffix" value="xxf:component-param-value('prefix')"/>
+                <xf:var name="suffix" value="xxf:component-param-value('suffix')"/>
 
                 <!-- See also https://github.com/orbeon/orbeon-forms/issues/2495 -->
 

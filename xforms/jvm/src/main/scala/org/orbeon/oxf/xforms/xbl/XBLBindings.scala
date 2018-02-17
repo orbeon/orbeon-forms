@@ -325,6 +325,7 @@ class XBLBindings(
           XBLTransformer.transform(
             shadowTreeDocument    = shadowTreeDocument,
             boundElement          = boundElement,
+            abstractBindingOpt    = Some(abstractBinding),
             excludeNestedHandlers = abstractBinding.modeHandlers,
             excludeNestedLHHA     = abstractBinding.modeLHHA,
             supportAVTs           = abstractBinding.supportAVTs

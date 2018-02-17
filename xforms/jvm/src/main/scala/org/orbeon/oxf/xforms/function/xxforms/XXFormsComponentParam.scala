@@ -13,14 +13,15 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xforms.xbl.AbstractBinding
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.xforms.XFormsId
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsId
 
 class XXFormsComponentParam extends XFormsFunction {
 
@@ -29,7 +30,7 @@ class XXFormsComponentParam extends XFormsFunction {
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
 
     val containerForSourceScope =
-      XFormsFunction.context.container.findScopeRoot(XFormsId.getPrefixedId(getSourceEffectiveId))
+      XFormsFunction.context.container.findScopeRoot(XFormsId.getPrefixedId(getSourceEffectiveId): String)
 
     containerForSourceScope.associatedControlOpt collect
       { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒
@@ -39,19 +40,42 @@ class XXFormsComponentParam extends XFormsFunction {
       // NOTE: In the future, we would like constant values to be available right away, and
       // AVTs to support dependencies. Those should probably be stored lazily at the control
       // level.
+      XXFormsComponentParam.evaluateUsePropertiesIfNeeded(
+        concreteBinding.boundElementAtts.lift,
+        c.evaluateAvt,
+        paramName,
+        concreteBinding.abstractBinding
+      )
 
-      def fromElemAlsoTryAvt =
-        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt map stringToStringValue
-
-      def propertyName =
-        concreteBinding.abstractBinding.directName map { qName ⇒
-          List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) mkString "."
-        }
-
-      def fromProperties =
-        propertyName flatMap Property.property
-
-      fromElemAlsoTryAvt orElse fromProperties
     } orNull
   }
+}
+
+object XXFormsComponentParam {
+
+  def evaluateUsePropertiesIfNeeded(
+    atts            : QName ⇒ Option[String],
+    evaluateAvt     : String ⇒ String,
+    paramName       : QName,
+    abstractBinding : AbstractBinding
+  ): Option[AtomicValue] = {
+
+    // NOTE: In the future, we would like constant values to be available right away, and
+    // AVTs to support dependencies. Those should probably be stored lazily at the control
+    // level.
+
+    def fromElemAlsoTryAvt =
+      atts(paramName) map evaluateAvt map stringToStringValue
+
+    def propertyName =
+      abstractBinding.directName map { qName ⇒
+        List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) mkString "."
+      }
+
+    def fromProperties =
+      propertyName flatMap Property.property
+
+    fromElemAlsoTryAvt orElse fromProperties
+  }
+
 }

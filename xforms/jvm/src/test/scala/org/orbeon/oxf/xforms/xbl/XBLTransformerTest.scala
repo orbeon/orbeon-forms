@@ -56,6 +56,7 @@ class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
         XBLTransformer.transform(
           shadowTreeDocument    = elemToDom4j(shadow),
           boundElement          = elemToDom4jElem(bound),
+          abstractBindingOpt    = None,
           excludeNestedHandlers = false,
           excludeNestedLHHA     = false,
           supportAVTs           = true

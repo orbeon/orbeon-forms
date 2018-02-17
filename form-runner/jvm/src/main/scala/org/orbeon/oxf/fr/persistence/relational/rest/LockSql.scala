@@ -30,11 +30,11 @@ object LockSql {
     provider    : Provider,
     reqDataPart : DataPart
   )             : Option[Lease] = {
-    Provider.lockTable(connection, provider, "orbeon_form_data_lease")
+    val timeoutExpr = Provider.secondsTo(provider, "expiration")
     val sql =
       s"""SELECT username, groupname,
-         |       datediff(second, CURRENT_TIMESTAMP, expiration) AS timeout
-           |  FROM orbeon_form_data_lease (TABLOCKX)
+         |       $timeoutExpr AS timeout
+         |  FROM orbeon_form_data_lease
          | WHERE document_id = ?
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
@@ -57,6 +57,7 @@ object LockSql {
 
   def updateLease(
     connection  : Connection,
+    provider    : Provider,
     reqDataPart : DataPart,
     username    : String,
     groupname   : Option[String],
@@ -66,7 +67,7 @@ object LockSql {
       s"""UPDATE orbeon_form_data_lease
          |   SET username    = ?,
          |       groupname   = ?,
-         |       expiration  = DATEADD(second, ?, CURRENT_TIMESTAMP)
+         |       expiration  = ${Provider.dateIn(provider)}
          | WHERE document_id = ?
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
@@ -80,6 +81,7 @@ object LockSql {
 
   def createLease(
     connection  : Connection,
+    provider    : Provider,
     reqDataPart : DataPart,
     username    : String,
     groupname   : Option[String],
@@ -93,7 +95,7 @@ object LockSql {
          |           groupname,
          |           expiration
          |       )
-         |VALUES (?, ?, ?, DATEADD(second, ?, CURRENT_TIMESTAMP)) ;
+         |VALUES (?, ?, ?, ${Provider.dateIn(provider)}) ;
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
       ps.setString(1, reqDataPart.documentId)

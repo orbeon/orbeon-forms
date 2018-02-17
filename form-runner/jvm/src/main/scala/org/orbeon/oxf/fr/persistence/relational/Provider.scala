@@ -96,13 +96,41 @@ object Provider {
     }
   }
 
-  def lockTable(connection: Connection, provider: Provider, tableName: String): Unit = {
-    val sql =
-      provider match {
-        case MySQL      ⇒ s"LOCK TABLES $tableName WRITE"
-        case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
-        case _          ⇒ throw new UnsupportedOperationException
+  def withLockedTable(
+    connection : Connection,
+    provider   : Provider,
+    tableName  : String,
+    thunk      : () ⇒ Unit
+  ): Unit = {
+    val lockSQL = provider match {
+      case MySQL      ⇒ s"LOCK TABLES $tableName WRITE"
+      case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
+      case _          ⇒ throw new UnsupportedOperationException
+    }
+    useAndClose(connection.prepareStatement(lockSQL))(_.execute())
+    try {
+      thunk()
+    } finally {
+      val unlockSQLOpt = provider match {
+        case MySQL ⇒ Some(s"UNLOCK TABLES")
+        case _     ⇒ None
       }
-    useAndClose(connection.prepareStatement(sql))(_.execute())
+      unlockSQLOpt.foreach((unlockSQL) ⇒
+        useAndClose(connection.prepareStatement(unlockSQL))(_.execute()))
+    }
   }
+
+  def secondsTo(provider: Provider, date: String): String =
+    provider match {
+      case MySQL      ⇒ s"TIMESTAMPDIFF(second, CURRENT_TIMESTAMP, $date)"
+      case PostgreSQL ⇒ s"EXTRACT(EPOCH FROM ($date - CURRENT_TIMESTAMP))"
+      case _          ⇒ throw new UnsupportedOperationException
+    }
+
+  def dateIn(provider: Provider): String =
+    provider match {
+      case MySQL        ⇒ "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
+      case PostgreSQL   ⇒ "CURRENT_TIMESTAMP + (interval '1' second * ?)"
+      case _            ⇒ throw new UnsupportedOperationException
+    }
 }

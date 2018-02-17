@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.sql.Connection
 
 import enumeratum._
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -36,9 +36,9 @@ trait LockUnlock extends RequestResponse {
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) ⇒
       leaseStatus match {
         case DoesNotExist ⇒
-          LockSql.createLease(connection, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
+          LockSql.createLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
         case ExistsCanUse ⇒
-          LockSql.updateLease(connection, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
+          LockSql.updateLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
         case ExistsCanNotUse(existingLease) ⇒
           issueLockedResponse(existingLease)
       }
@@ -105,17 +105,19 @@ trait LockUnlock extends RequestResponse {
           RelationalUtils.withConnection { connection ⇒
             def callThunk(leaseStatus: LeaseStatus): Unit =
               thunk(connection, leaseStatus, dataPart, reqLockInfo)
-            LockSql.readLease(connection, req.provider, dataPart) match {
-              case Some(lease) ⇒
-                val canUseExistingLease =
-                  reqLockInfo.username == lease.lockInfo.username || lease.timeout <= 0
-                if (canUseExistingLease)
-                  callThunk(ExistsCanUse)
-                else
-                  callThunk(ExistsCanNotUse(lease))
-              case None ⇒
-                callThunk(DoesNotExist)
-            }
+            Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () ⇒
+              LockSql.readLease(connection, req.provider, dataPart) match {
+                case Some(lease) ⇒
+                  val canUseExistingLease =
+                    reqLockInfo.username == lease.lockInfo.username || lease.timeout <= 0
+                  if (canUseExistingLease)
+                    callThunk(ExistsCanUse)
+                  else
+                    callThunk(ExistsCanNotUse(lease))
+                case None ⇒
+                  callThunk(DoesNotExist)
+              }
+            )
           }
       }
     }

@@ -23,7 +23,8 @@
         element="
             fr|currency,
             xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')"
-        xxbl:mode="lhha binding value focus"
+        xxbl:mode="lhha binding value focus javascript-lifecycle"
+        xxf:external-events="fr-set-client-value"
         xxbl:label-for="html-input">
 
         <!-- Orbeon Form Builder Component Metadata -->

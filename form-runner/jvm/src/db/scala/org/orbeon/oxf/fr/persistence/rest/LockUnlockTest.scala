@@ -24,24 +24,22 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[LockUnlockTest]), true)
 
-  @Test def leaseTest(): Unit = {
+  @Test def lockUnlockTest(): Unit = {
     Connect.withOrbeonTables("lease") { (_, provider) ⇒
-      if (false) {
-        val dataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
-        val homerLockInfo = LockInfo("hsimpson", Some("simpsons"))
-        val margeLockInfo = LockInfo("msimpson", Some("simpsons"))
+      val dataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+      val homerLockInfo = LockInfo("hsimpson", Some("simpsons"))
+      val margeLockInfo = LockInfo("msimpson", Some("simpsons"))
 
-        // Homer locks, Marge can't lock, and Homer can lock again
-        HttpAssert.lock(dataURL, homerLockInfo, 200)
-        HttpAssert.lock(dataURL, margeLockInfo, 423)
-        HttpAssert.lock(dataURL, homerLockInfo, 200)
+      // Homer locks, Marge can't lock, and Homer can lock again
+      HttpAssert.lock(dataURL, homerLockInfo, 200)
+      HttpAssert.lock(dataURL, margeLockInfo, 423)
+      HttpAssert.lock(dataURL, homerLockInfo, 200)
 
-        // After Homer unlock, Marge can lock, and Homer can't lock
-        HttpAssert.unlock(dataURL, homerLockInfo, 200)
-        HttpAssert.lock(dataURL, margeLockInfo, 200)
-        HttpAssert.lock(dataURL, homerLockInfo, 423)
-        HttpAssert.unlock(dataURL, margeLockInfo, 200)
-      }
+      // After Homer unlock, Marge can lock, and Homer can't lock
+      HttpAssert.unlock(dataURL, homerLockInfo, 200)
+      HttpAssert.lock(dataURL, margeLockInfo, 200)
+      HttpAssert.lock(dataURL, homerLockInfo, 423)
+      HttpAssert.unlock(dataURL, margeLockInfo, 200)
     }
   }
 

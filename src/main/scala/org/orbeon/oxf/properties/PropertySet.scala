@@ -111,10 +111,11 @@ class PropertySet {
   def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {
-        key   ← exactProperties.keys
-        value ← CollectionUtils.collectByErasedType[java.lang.Boolean](getObject(key))
+        key          ← exactProperties.keys
+        value        ← getObjectOpt(key)
+        booleanValue ← CollectionUtils.collectByErasedType[java.lang.Boolean](value)
       } yield
-        key → value
+        key → booleanValue
 
     tuples.toMap.asJava
   }
@@ -213,9 +214,6 @@ class PropertySet {
   def getPropertyOpt(name: String): Option[Property] =
     getPropertyOptThrowIfTypeMismatch(name, null)
 
-  def getObject(name: String): AnyRef =
-    getObjectOpt(name).orNull
-
   def getObjectOpt(name: String): Option[AnyRef] =
     getPropertyValueOpt(name, null)
 
@@ -223,15 +221,24 @@ class PropertySet {
     getObjectOpt(name) getOrElse default
 
   def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
-    getObject(name) match {
-      case p: String ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
-      case p: URI    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
-      case null      ⇒ null
-      case _         ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
+    getObjectOpt(name) match {
+      case Some(p: String) ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
+      case Some(p: URI)    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
+      case None            ⇒ null
+      case _               ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
+    }
+
+  def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false): Option[String] =
+    getObjectOpt(name) flatMap {
+      case p: String if allowEmpty ⇒ Some(p.trimAllToEmpty)
+      case p: String               ⇒ p.trimAllToOpt
+      case p: URI    if allowEmpty ⇒ Some(p.toString.trimAllToEmpty)
+      case p: URI                  ⇒ p.toString.trimAllToOpt
+      case _                       ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
     }
 
   def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =
-    Option(getStringOrURIAsString(name, allowEmpty)) getOrElse default
+    getStringOrURIAsStringOpt(name, allowEmpty) getOrElse default
 
   def getNonBlankString(name: String): Option[String] =
     getPropertyValueOrNull(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToOpt

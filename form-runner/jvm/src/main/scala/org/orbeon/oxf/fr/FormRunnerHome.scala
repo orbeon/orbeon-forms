@@ -304,7 +304,7 @@ object FormRunnerHome {
     }
 
   private def remoteServerFromCompatibilityProperty: Option[String] = (
-    Option(properties.getStringOrURIAsString("oxf.fr.production-server-uri"))
+    properties.getStringOrURIAsStringOpt("oxf.fr.production-server-uri")
     flatMap trimAllToOpt
     map     dropTrailingSlash
   )

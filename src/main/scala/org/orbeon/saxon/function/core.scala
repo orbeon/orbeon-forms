@@ -16,7 +16,6 @@ package org.orbeon.saxon.function
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
@@ -32,10 +31,13 @@ class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
 object Property {
 
   def property(propertyName: String): Option[AtomicValue] =
-    ! propertyName.toLowerCase.contains("password")            option
-    Properties.instance.getPropertySet.getObject(propertyName) map
-    SaxonUtils.convertJavaObjectToSaxonObject                  flatMap
-    collectByErasedType[AtomicValue]
+    if (propertyName.toLowerCase.contains("password"))
+      None
+    else {
+      Properties.instance.getPropertySet.getObjectOpt(propertyName) map
+      SaxonUtils.convertJavaObjectToSaxonObject                     flatMap
+      collectByErasedType[AtomicValue]
+    }
 
   def propertyAsString(propertyName: String): Option[String] =
     property(propertyName) map (_.getStringValue)

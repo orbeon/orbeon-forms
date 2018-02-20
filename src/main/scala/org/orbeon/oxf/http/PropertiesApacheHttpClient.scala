@@ -35,7 +35,7 @@ object PropertiesConnectionSettings {
       proxyExclude         = props.getNonBlankString(ProxyExcludeProperty),
 
       sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
-      sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
+      sslKeystoreURI       = props.getStringOrURIAsStringOpt(SSLKeystoreURIProperty, allowEmpty = false),
       sslKeystorePassword  = props.getNonBlankString(SSLKeystorePasswordProperty),
       sslKeystoreType      = props.getNonBlankString(SSLKeystoreTypeProperty),
 

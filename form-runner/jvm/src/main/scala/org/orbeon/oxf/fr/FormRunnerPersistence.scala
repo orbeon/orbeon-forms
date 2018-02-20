@@ -104,13 +104,13 @@ object FormRunnerPersistence {
     // Build headers map
     val headers = (
       for {
-        propertyName ← properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
-        lowerSuffix  ← propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
+        propertyName   ← properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
+        lowerSuffix    ← propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
         if ! StandardProviderProperties(lowerSuffix)
-        headerName  = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
-        headerValue = properties.getObject(propertyName).toString
+        headerName     = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
+        headerValue    ← properties.getObjectOpt(propertyName)
       } yield
-        headerName → headerValue) toMap
+        headerName → headerValue.toString) toMap
 
     val uri = Option(providerPropertyAsURL(provider, "uri")) getOrElse
       (throw new OXFException(s"no base URL specified for requested persistence provider `$provider` (check properties)"))

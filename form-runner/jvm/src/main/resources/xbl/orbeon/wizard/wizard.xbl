@@ -350,7 +350,7 @@
                                                 <!-- Update section status upon value changed -->
                                                 <!-- Same list of events that `fr:error-summary` listens to. `fr:error-summary` now listens to those
                                                      events during the capture phase so that it is up to date once the wizard processes them. -->
-                                                <xf:action event="xxforms-constraints-changed xforms-disabled">
+                                                <xf:action event="xxforms-constraints-changed xforms-disabled" xxf:phantom="true">
                                                     <!-- TODO: This happens too many times upon the initial refresh -->
                                                     <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
                                                 </xf:action>

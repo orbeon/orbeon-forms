@@ -799,13 +799,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="fr-width-10em input-prepend input-append" id="my-currency≡xf-10"/>
+                        <xxf:control id="my-currency" init="true"/>
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-10"/>
+                        <xxf:control id="my-currency≡xf-12" class="add-on"/>
+                        <xxf:control id="my-currency≡xf-13">
+                            <xxf:value>$</xxf:value>
+                        </xxf:control>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-15" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-17" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_0c771ee6f13684b1ebbd988e959e58ef0e6f4fa1" target-id="my-currency" observer-id="my-currency">
+                    <xxf:script name="xf_5dc4c33a29dc3484b57bc2c208e73dd493e3de7b" target-id="my-currency" observer-id="my-currency">
                         <xxf:param>12.34</xxf:param>
                         <xxf:param>12.34</xxf:param>
                         <xxf:param>.</xxf:param>

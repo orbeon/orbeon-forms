@@ -648,8 +648,7 @@
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
                                     <fb:parameters-editor ref="." resources-ref="$resources">
-                                        <!-- TODO: i18n -->
-                                        <xf:label>Parameters</xf:label>
+                                        <xf:label ref="$resources/dialog-control-details/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>
                             </fr:grid>

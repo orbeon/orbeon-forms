@@ -544,6 +544,7 @@
             <validation-details><label>Validation Details</label></validation-details>
             <level><label>Level</label></level>
             <use-html>Use HTML</use-html>
+            <parameters>Parameters</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Section/Grid Settings</label>
@@ -1579,6 +1580,7 @@
             <validation-details><label>Détails de validation</label></validation-details>
             <level><label>Niveau</label></level>
             <use-html>En HTML</use-html>
+            <parameters>Paramètres</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Paramètres de la section/grille</label>
@@ -2617,6 +2619,7 @@
             <validation-details><label todo="true">[Validation Details]</label></validation-details>
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Rediger seksjonsdetaljer</label>
@@ -3681,6 +3684,7 @@
             <validation-details><label todo="true">[Validation Details]</label></validation-details>
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Настройки раздела</label>
@@ -4746,6 +4750,7 @@
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Impostazioni sezione/griglia</label>
@@ -5803,6 +5808,7 @@
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
@@ -6863,6 +6869,7 @@
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Lohkon yksityiskohdat</label>
@@ -7920,6 +7927,7 @@
             <validation-details><label>Detalles de Validación</label></validation-details>
             <level><label>Nivel</label></level>
             <use-html>Usa HTML</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Detalles de Sección/Grilla</label>
@@ -8978,6 +8986,7 @@
             <validation-details><label>Detalhes de Validação</label></validation-details>
             <level><label>Nível</label></level>
             <use-html>Usar HTML</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Configurações da Secção/Grelha</label>
@@ -10042,6 +10051,7 @@
             <validation-details><label>Valideringsdetaljer</label></validation-details>
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
+            <parameters todo="true">[Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Sektions-/rutnätsinställningar</label>

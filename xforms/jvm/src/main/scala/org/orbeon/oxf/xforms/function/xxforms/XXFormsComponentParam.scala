@@ -72,8 +72,13 @@ object XXFormsComponentParam {
         List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) mkString "."
       }
 
+    // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is
+    // `null` or `None`. For properties like `number.digits-after-decimal`, `number.prefix`, etc., we do need
+    // such a way. So if the value is a blank string (which means the value is actually a blank `xs:string` or maybe
+    // `xs:anyURI`), consider the property missing. We could revise this in the future to make a distinction between
+    // a blank or empty string and a missing property.
     def fromProperties =
-      propertyName flatMap Property.property
+      propertyName flatMap Property.property filter (_.getStringValue.nonEmpty)
 
     fromElemAlsoTryAvt orElse fromProperties
   }

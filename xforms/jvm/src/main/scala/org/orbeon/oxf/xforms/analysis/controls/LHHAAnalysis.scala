@@ -103,11 +103,11 @@ class LHHAAnalysis(
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
         e match {
           case xbl: ComponentControl ⇒
-            xbl.binding.abstractBinding.labelFor match {
+            xbl.abstractBinding.labelFor match {
               case Some(nestedLabelForStaticId) ⇒
-                searchLHHAControlInScope(xbl.binding.innerScope, nestedLabelForStaticId) match {
+                searchLHHAControlInScope(xbl.bindingOrThrow.innerScope, nestedLabelForStaticId) match {
                   case Some(nestedLabelForTarget) ⇒ searchXblLabelFor(nestedLabelForTarget) // recurse
-                  case None                       ⇒ Some(Right(xbl.binding.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
+                  case None                       ⇒ Some(Right(xbl.bindingOrThrow.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
                 }
               case None ⇒
                 Some(Left(xbl))

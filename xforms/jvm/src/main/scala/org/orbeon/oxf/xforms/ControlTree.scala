@@ -239,12 +239,17 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     container        : XBLContainer,
     containerControl : XFormsContainerControl,
     elementAnalysis  : ElementAnalysis,
-    state            : Option[Map[String, ControlState]]
+    state            : Option[Map[String, ControlState]],
+    dispatchEvents   : Boolean
   ): Unit = {
+
     Controls.createSubTree(container, _controlIndex, containerControl, elementAnalysis, state)
-    // NOTE: We dispatch refresh events for the subtree right away, by consistency with repeat iterations. But we
-    // don't really have to do this, we could wait for the following refresh.
-    initializeSubTree(containerControl, includeCurrent = false)
+
+    if (dispatchEvents) {
+      // NOTE: We dispatch refresh events for the subtree right away, by consistency with repeat iterations. But we
+      // don't really have to do this, we could wait for the following refresh.
+      initializeSubTree(containerControl, includeCurrent = false)
+    }
   }
 
   // Index a subtree of controls. Also handle special relevance binding events

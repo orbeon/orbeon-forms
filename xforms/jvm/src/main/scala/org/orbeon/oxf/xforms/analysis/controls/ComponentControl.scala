@@ -1,8 +1,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope}
 
 class ComponentControl(
   staticStateContext : StaticStateContext,
@@ -11,42 +13,54 @@ class ComponentControl(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-  with ShadowChildrenBuilder
-  with OptionalSingleNode {   // binding could be mandatory, optional, or prohibited
+     with ShadowChildrenBuilder
+     with OptionalSingleNode {   // binding could be mandatory, optional, or prohibited
 
-  // Binding at the time the component is created
-  private var _binding = part.xblBindings.getBinding(prefixedId) orElse (throw new IllegalStateException)
-  def binding = _binding.get
+  val hasLazyBinding  : Boolean         = ! part.isTopLevel && element.attributeValueOpt(XFormsConstants.XXF_UPDATE_QNAME).contains("full")
+  val abstractBinding : AbstractBinding = part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
 
-  // Remove the component's binding
-  def removeBinding(): Unit = {
+  // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
+  private var _concreteBindingOpt: Option[ConcreteBinding] = None//part.xblBindings.getBinding(prefixedId)
 
-    assert(! part.isTopLevel)
-
-    // Remove all descendants only, keeping the current control
-    part.deindexTree(this, self = false)
-
-    part.deregisterScope(binding.innerScope)
-    part.xblBindings.removeBinding(prefixedId)
-
-    _binding = None
-  }
+  def bindingOpt      : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! part.isTopLevel)
+  def bindingOrThrow  : ConcreteBinding         = _concreteBindingOpt getOrElse (throw new IllegalStateException)
 
   // Set the component's binding
-  def setBinding(elementInSource: Element): Unit = {
-    assert(! part.isTopLevel)
+  // Might not create the binding if the binding does not have a template.
+  def setConcreteBinding(elemInSource: Element): Unit = {
 
-    _binding = part.xblBindings.processElementIfNeeded(elementInSource, prefixedId, locationData, scope)
+    assert(_concreteBindingOpt.isEmpty)
+
+    _concreteBindingOpt =
+      part.xblBindings.createConcreteBindingFromElem(abstractBinding, elemInSource, prefixedId, locationData, containerScope) |!> { newBinding ⇒
+        part.xblBindings.addBinding(prefixedId, newBinding)
+      }
+  }
+
+  // Remove the component's binding
+  def removeConcreteBinding(): Unit = {
+
+    assert(bindingOpt.isDefined)
+
+    bindingOpt foreach { binding ⇒
+      // Remove all descendants only, keeping the current control
+      part.deindexTree(this, self = false)
+
+      part.deregisterScope(binding.innerScope)
+      part.xblBindings.removeBinding(prefixedId)
+
+      _concreteBindingOpt = None
+    }
   }
 
   // Only support binding if the control defines it has a binding
-  override def hasBinding = binding.abstractBinding.modeBinding && super.hasBinding
+  override def hasBinding = abstractBinding.modeBinding && super.hasBinding
 
   // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
   override protected def computeBindingAnalysis =
-    if (binding.abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis
+    if (abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis
 
   // Leave as 'def' as the binding can, in theory, mutate
-  override protected def externalEventsDef = super.externalEventsDef ++ binding.abstractBinding.allowedExternalEvents
+  override protected def externalEventsDef = super.externalEventsDef ++ abstractBinding.allowedExternalEvents
   override def externalEvents              = externalEventsDef
 }

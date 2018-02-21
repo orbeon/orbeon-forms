@@ -76,14 +76,17 @@ object BlockCache {
 
             val titleAnchor = section.find("a")
 
-            sectionGridCache.unshift(new Block {
-              override val el          = section
-              override val top         = Position.adjustedOffset(section).top
-              override val left        = Position.adjustedOffset(mostOuterSection).left
-              override val height      = titleAnchor.height()
-              override val width       = mostOuterSection.width()
-              override val titleOffset = Offset(titleAnchor)
-            })
+            // The section content might be empty when Form Builder optimizes non-relevant sections
+            if (titleAnchor.length > 0) {
+              sectionGridCache.unshift(new Block {
+                override val el          = section
+                override val top         = Position.adjustedOffset(section).top
+                override val left        = Position.adjustedOffset(mostOuterSection).left
+                override val height      = titleAnchor.height()
+                override val width       = mostOuterSection.width()
+                override val titleOffset = Offset(titleAnchor)
+              })
+            }
           })
         })
         $(s"$GridSelector:visible").each((grid: dom.Element) ⇒

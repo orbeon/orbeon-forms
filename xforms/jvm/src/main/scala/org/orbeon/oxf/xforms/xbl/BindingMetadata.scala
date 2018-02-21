@@ -186,7 +186,7 @@ trait BindingMetadata extends Logging {
         _xblIndex = Some(BindingIndex.keepAbstractBindingsOnly(newIndex))
     }
 
-  def findBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
+  def findAbstractBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
     bindingsByControlPrefixedId.get(controlPrefixedId) collect {
       case binding: AbstractBinding ⇒ binding
       case _                        ⇒ throw new IllegalStateException("missing binding")

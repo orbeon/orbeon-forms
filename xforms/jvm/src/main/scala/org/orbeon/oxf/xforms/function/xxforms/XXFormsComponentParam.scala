@@ -35,7 +35,8 @@ class XXFormsComponentParam extends XFormsFunction {
     containerForSourceScope.associatedControlOpt collect
       { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒
 
-      val concreteBinding = c.staticControl.binding
+      val staticControl  =  c.staticControl
+      val concreteBinding = staticControl.bindingOrThrow
 
       // NOTE: In the future, we would like constant values to be available right away, and
       // AVTs to support dependencies. Those should probably be stored lazily at the control
@@ -44,7 +45,7 @@ class XXFormsComponentParam extends XFormsFunction {
         concreteBinding.boundElementAtts.lift,
         c.evaluateAvt,
         paramName,
-        concreteBinding.abstractBinding
+        staticControl.abstractBinding
       )
 
     } orNull

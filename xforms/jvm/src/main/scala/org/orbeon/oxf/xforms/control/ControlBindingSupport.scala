@@ -105,8 +105,11 @@ trait ControlBindingSupport {
   }
 
   // Return the bindings in effect within and after this control
-  def bindingContextForChild = _bindingContext
-  def bindingContextForFollowing = _bindingContext.parent
+  def bindingContextForChildOpt  : Option[BindingContext] = Option(_bindingContext)
+  def bindingContextForFollowing : BindingContext         = _bindingContext.parent
+
+  final def bindingContextForChildOrEmpty: BindingContext =
+    bindingContextForChildOpt getOrElse (throw new IllegalStateException)
 
   // Set this control's binding context and handle create/destroy/update lifecycle
   final def setBindingContext(

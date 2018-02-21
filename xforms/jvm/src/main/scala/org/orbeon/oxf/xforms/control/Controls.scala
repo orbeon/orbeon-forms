@@ -98,7 +98,7 @@ object Controls {
   ): Option[XFormsControl] = {
 
     val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
-    val bindingContext = containerControl.bindingContextForChild
+    val bindingContext = containerControl.bindingContextForChildOrEmpty
 
     buildTree(
       controlIndex,
@@ -149,6 +149,17 @@ object Controls {
           state         = state flatMap (_.get(effectiveId))
         )
 
+        control match {
+          case componentControl: XFormsComponentControl ⇒
+
+            if (componentControl.isRelevant && componentControl.staticControl.hasLazyBinding && componentControl.staticControl.bindingOpt.isDefined) {
+              // Control got created relevant and, in the process, created the static `ConcreteBinding`.
+              componentControl.recreateNestedContainer()
+            }
+
+          case _ ⇒
+        }
+
         // Build the control's children if any
         control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
 
@@ -164,7 +175,7 @@ object Controls {
     idSuffix  : Seq[Int]
   ): Unit = {
     // Start with the context within the current control
-    var newBindingContext = control.bindingContextForChild
+    var newBindingContext = control.bindingContextForChildOrEmpty
     // Build each child
     children foreach { childElement ⇒
       buildTree(control.container, newBindingContext, childElement, idSuffix) foreach { newChildControl ⇒
@@ -319,7 +330,7 @@ object Controls {
     xpathDependencies.bindingUpdateStart()
 
     val startBindingContext =
-      control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChild
+      control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChildOrEmpty
 
     val updater = new BindingUpdater(control.containingDocument, startBindingContext)
     visitControls(control, updater, includeCurrent = true)
@@ -420,6 +431,28 @@ object Controls {
             // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates
             // controls and dispatches events
             this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
+          case componentControl: XFormsComponentControl ⇒
+
+            val hadMissingLazyBinding = componentControl.staticControl.bindingOpt.isEmpty
+
+            componentControl.evaluateBindingAndValues(
+              parentContext = bindingContext,
+              update        = true,
+              restoreState  = false,
+              state         = None
+            )
+
+            if (hadMissingLazyBinding && componentControl.staticControl.bindingOpt.isDefined) {
+              // Control just got relevant and, in the process, created the static `ConcreteBinding`.
+              XXFormsDynamicControl.updateDynamicShadowTree(componentControl, recreateNestedContainer = true, dispatchEvents = false)
+            } else if (! hadMissingLazyBinding && componentControl.staticControl.bindingOpt.isEmpty) {
+              // Control just got non-relevant and, in the process, deleted the static `ConcreteBinding`.
+              containingDocument.getControls.getCurrentControlTree.deindexSubtree(componentControl, includeCurrent = false)
+              componentControl.clearChildren()
+              componentControl.destroyNestedContainer()
+              containingDocument.addControlStructuralChange(componentControl.prefixedId)
+            }
+
           case control ⇒
             // Simply set new binding
             control.evaluateBindingAndValues(
@@ -435,9 +468,6 @@ object Controls {
         _optimizedCount += 1
       }
 
-      // Update context for children controls
-      bindingContext = control.bindingContextForChild
-
       // Remember whether we are in a container whose content relevance has changed
       // NOTE: The correct logic at this time is to force binding re-evaluation if container relevance has
       // changed. Doing this only when content becomes relevant is not enough as shown with the following bug:
@@ -445,7 +475,14 @@ object Controls {
       if (relevanceChangeLevel == -1 && control.isInstanceOf[XFormsContainerControl] && wasContentRelevant != control.contentRelevant)
         relevanceChangeLevel = level // entering level of containing
 
-      true
+      control.bindingContextForChildOpt match {
+        case Some(bindingContextForChild) ⇒
+          bindingContext = bindingContextForChild
+          true
+        case None ⇒
+          bindingContext = null // should not be used
+          false
+      }
     }
 
     def endVisitControl(control: XFormsControl): Unit = {

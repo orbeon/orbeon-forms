@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
-import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl}
+import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
@@ -32,6 +32,7 @@ import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.JavaConverters._
 
@@ -53,12 +54,12 @@ class XFormsValueComponentControl(
   // Don't expose an external value unless explicitly allowed
   // Q: Should throw if not allowed?
   override def storeExternalValue(value: String): Unit =
-    if (staticControl.binding.abstractBinding.modeExternalValue)
+    if (staticControl.abstractBinding.modeExternalValue)
       super.storeExternalValue(value)
 
   // Don't expose an external value unless explicitly allowed
   override def evaluateExternalValue(): Unit =
-    if (staticControl.binding.abstractBinding.modeExternalValue)
+    if (staticControl.abstractBinding.modeExternalValue)
       super.evaluateExternalValue()
     else
       setExternalValue(null)
@@ -100,59 +101,73 @@ class XFormsComponentControl(
 
   private var _listeners: Seq[(XFormsInstance, EventListener)] = Nil
 
-  // Create nested container upon creation
+  // Create nested container upon object instantiation
+  // NOTE: 2018-02-23: We wanted to create this upon `onCreate` and destroy it upon `onDestroy`, but there are
+  // too many assumptions that the container is available even if the control is non-relevant for this to work
+  // easily. Might want to revisit later. However, if we have a lazy `ConcreteBinding`, the container will still
+  // not be created immediately because the container needs the inner scope, which is known only when the
+  // `ConcreteBinding` is available.
   createNestedContainer()
 
   // React to external events only if we are relevant OR upon receiving xforms-disabled
-  def canRunEventHandlers(event: XFormsEvent) =
+  def canRunEventHandlers(event: XFormsEvent): Boolean =
     isRelevant || event.name == "xforms-disabled"
 
-  private def createNestedContainer(): Unit = {
+  private def createNestedContainer(): Option[XBLContainer] = {
 
     assert(_nestedContainerOpt.isEmpty)
 
-    val newContainer = container.createChildContainer(this)
-    // There may or may not be nested models
-    newContainer.addAllModels()
+    _nestedContainerOpt =
+      staticControl.bindingOpt map { concreteBinding ⇒
+        container.createChildContainer(this, concreteBinding) |!> (_.addAllModels())
+      }
 
-    _nestedContainerOpt = Some(newContainer)
+    _nestedContainerOpt
   }
 
   // Destroy container and models if any
-  def destroyNestedContainer(): Unit = {
-    destroyMirrorListenerIfNeeded()
-    nestedContainer.destroy()
-    _nestedContainerOpt = None
-  }
+  def destroyNestedContainer(): Unit =
+    _nestedContainerOpt foreach { nestedContainer ⇒
+      destroyMirrorListenerIfNeeded()
+      nestedContainer.destroy()
+      _nestedContainerOpt = None
+    }
 
   // For xxf:dynamic updates of top-level XBL shadow trees
-  def recreateNestedContainer(): Unit = {
-    createNestedContainer()
-    if (isRelevant)
-      initializeModels()
-  }
+  def recreateNestedContainer(): Option[XBLContainer] =
+    createNestedContainer() |!> { _ ⇒
+      if (isRelevant)
+        initializeModels()
+    }
 
-  private def modeBinding = staticControl.binding.abstractBinding.modeBinding
+  private def modeBinding = staticControl.abstractBinding.modeBinding
 
   // Only handle binding if we support modeBinding
-  override protected def computeBinding(parentContext: BindingContext) =
+  override protected def computeBinding(parentContext: BindingContext): BindingContext =
     if (modeBinding)
       super.computeBinding(parentContext)
     else
       super.computeBindingCopy(parentContext)
 
-  override def bindingContextForChild = {
-    // Start with inner context
-    // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
-    // the context goes inner context → component binding.
-    val contextStack = nestedContainer.getContextStack
-    contextStack.setParentBindingContext(bindingContext)
-    contextStack.resetBindingContext
-    contextStack.getCurrentBindingContext
-  }
+  override def bindingContextForChildOpt: Option[BindingContext] =
+    _nestedContainerOpt map { nestedContainer ⇒
+      // Start with inner context
+      // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
+      // the context goes inner context → component binding.
+      val contextStack = nestedContainer.getContextStack
+      contextStack.setParentBindingContext(bindingContext)
+      contextStack.resetBindingContext
+      contextStack.getCurrentBindingContext
+    }
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
+
+    if (staticControl.bindingOpt.isEmpty) {
+      // Only update the static tree. The dynamic tree is created later.
+      XXFormsDynamicControl.createOrUpdateStaticShadowTree(this, None)
+      assert(staticControl.bindingOpt.isDefined)
+    }
 
     if (Controls.isRestoringDynamicState)
       restoreModels()
@@ -164,42 +179,43 @@ class XFormsComponentControl(
 
   // Attach a mirror listener if needed
   // Return the reference node if a listener was created
-  private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNode): Option[VirtualNode] = {
+  private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNode): Option[VirtualNode] =
+    _nestedContainerOpt map { nestedContainer ⇒
 
-    val outerDocument = referenceNode.getDocumentRoot
-    val outerInstance = containingDocument.getInstanceForNode(outerDocument)
+      val outerDocument = referenceNode.getDocumentRoot
+      val outerInstance = containingDocument.getInstanceForNode(outerDocument)
 
-    val newListenerWithCycleDetector = new ListenerCycleDetector
+      val newListenerWithCycleDetector = new ListenerCycleDetector
 
-    val outerListener = toEventListener(
-      newListenerWithCycleDetector(
-        containingDocument,
-        toInnerInstanceNode(
-          outerDocument,
-          nestedContainer.partAnalysis,
-          nestedContainer,
-          findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)
+      val outerListener = toEventListener(
+        newListenerWithCycleDetector(
+          containingDocument,
+          toInnerInstanceNode(
+            outerDocument,
+            nestedContainer.partAnalysis,
+            nestedContainer,
+            findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)
+          )
         )
       )
-    )
 
-    val innerListener = toEventListener(
-      newListenerWithCycleDetector(
-        containingDocument,
-        toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)
+      val innerListener = toEventListener(
+        newListenerWithCycleDetector(
+          containingDocument,
+          toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)
+        )
       )
-    )
 
-    // Set outer and inner listeners
+      // Set outer and inner listeners
 
-    _listeners = List(outerInstance → outerListener, mirrorInstance → innerListener)
+      _listeners = List(outerInstance → outerListener, mirrorInstance → innerListener)
 
-    _listeners foreach { case (instance, listener) ⇒
-      InstanceMirror.addListener(instance, listener)
+      _listeners foreach { case (instance, listener) ⇒
+        InstanceMirror.addListener(instance, listener)
+      }
+
+      referenceNode
     }
-
-    Some(referenceNode)
-  }
 
   private def destroyMirrorListenerIfNeeded(): Unit = {
     _listeners foreach { case (instance, listener) ⇒
@@ -210,32 +226,42 @@ class XFormsComponentControl(
   }
 
   override def onDestroy(): Unit = {
+
+    // NOTE: We do not *remove* the nested `XBLContainer` (see comments above). However, we should still destroy the container's
+    // models. We should look into that!
+
     removeEnabledListener()
     destroyMirrorListenerIfNeeded()
     super.onDestroy()
+
+    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
+      staticControl.part.clearShadowTree(staticControl)
+      containingDocument.addControlStructuralChange(prefixedId)
+    }
   }
 
-  private def initializeModels(): Unit = {
+  private def initializeModels(): Unit =
+    _nestedContainerOpt foreach { nestedContainer ⇒
 
-    // `xforms-model-construct` without RRR
-    for (model ← nestedContainer.models) {
-      Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
-      // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
-      model.markStructuralChange(None, AllDefaultsStrategy)
+      // `xforms-model-construct` without RRR
+      for (model ← nestedContainer.models) {
+        Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
+        // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
+        model.markStructuralChange(None, AllDefaultsStrategy)
+      }
+
+      initializeMirrorListenerIfNeeded(dispatch = false)
+
+      // Do RRR as xforms-model-construct didn't do it
+      for (model ← nestedContainer.models) {
+        model.doRebuild()
+        model.doRecalculateRevalidate()
+      }
+
+      // `xforms-model-construct-done`
+      for (model ← nestedContainer.models)
+        Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
     }
-
-    initializeMirrorListenerIfNeeded(dispatch = false)
-
-    // Do RRR as xforms-model-construct didn't do it
-    for (model ← nestedContainer.models) {
-      model.doRebuild()
-      model.doRecalculateRevalidate()
-    }
-
-    // `xforms-model-construct-done`
-    for (model ← nestedContainer.models)
-      Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
-  }
 
   private def restoreModels(): Unit = {
     nestedContainer.restoreModelsState(deferRRR = true)
@@ -288,7 +314,7 @@ class XFormsComponentControl(
 
   private var _enabledListener: Dispatch.EventListener = _
 
-  private def addEnabledListener() = {
+  private def addEnabledListener(): Unit = {
 
     assert(_enabledListener eq null)
 
@@ -356,18 +382,19 @@ class XFormsComponentControl(
     buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
     idSuffix: Seq[Int]
   ): Unit =
-    Controls.buildChildren(
-      control   = this,
-      children  = staticControl.children,
-      buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
-      idSuffix  = idSuffix
-    )
+    if (staticControl.bindingOpt.isDefined)
+      Controls.buildChildren(
+        control   = this,
+        children  = staticControl.children,
+        buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
+        idSuffix  = idSuffix
+      )
 
   // Get the control at the root of the inner scope of the component
   def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
 
   private lazy val handleLHHA =
-    staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
+    staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
 
 
   override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
@@ -375,7 +402,7 @@ class XFormsComponentControl(
     var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
 
     // Whether to tell the client to initialize the control within a new iteration
-    if (previousControlOpt.isEmpty && isRelevant && staticControl.binding.abstractBinding.modeJavaScriptLifecycle)
+    if (previousControlOpt.isEmpty && isRelevant && staticControl.abstractBinding.modeJavaScriptLifecycle)
       added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, "init", "true", isNewRepeatIteration = false, isDefaultValue = false)
 
     added

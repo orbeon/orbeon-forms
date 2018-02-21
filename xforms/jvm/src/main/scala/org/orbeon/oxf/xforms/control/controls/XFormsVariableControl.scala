@@ -53,8 +53,9 @@ class XFormsVariableControl(
   final def valueOpt = Option(_value)
   def getVariableName = variable.staticVariable.name
 
-  override def bindingContextForFollowing = _bindingContextForFollowing
-  override def bindingContextForChild = _bindingContextForChild
+  override def bindingContextForChildOpt  : Option[BindingContext] = Option(_bindingContextForChild)
+  override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
+
   override def supportAjaxUpdates = false
   override def focusableControls = Iterator.empty
 

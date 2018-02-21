@@ -21,7 +21,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
   type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) ⇒ Option[ElementAnalysis]
 
-  def findRelevantChildrenElements = findAllChildrenElements
+  def findRelevantChildrenElements: Seq[(Element, Scope)] = findAllChildrenElements
 
   // Default implementation: return all children element with the same container scope as the parent element
   protected def findAllChildrenElements: Seq[(Element, Scope)] = Dom4j.elements(element) map ((_, containerScope))

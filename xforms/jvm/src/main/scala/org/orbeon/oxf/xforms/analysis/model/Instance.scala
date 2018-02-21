@@ -78,13 +78,13 @@ class Instance(
       debug("getting readonly inline instance from abstract binding", Seq(
         "model id"       → parent.get.staticId,
         "instance id"    → staticId,
-        "scope id"       → component.binding.innerScope.scopeId,
-        "binding name"   → component.binding.abstractBinding.debugBindingName,
+        "scope id"       → (component.bindingOpt map (_.innerScope.scopeId) orNull),
+        "binding name"   → component.abstractBinding.debugBindingName,
         "model index"    → modelIndex.toString,
         "instance index" → instanceIndex.toString))
 
       // Delegate to AbstractBinding
-      component.binding.abstractBinding.constantInstances((modelIndex, instanceIndex))
+      component.abstractBinding.constantInstances((modelIndex, instanceIndex))
     } getOrElse
       extractInlineContent
   }

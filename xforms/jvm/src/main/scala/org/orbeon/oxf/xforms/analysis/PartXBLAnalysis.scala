@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLBindings}
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable
@@ -64,7 +64,7 @@ trait PartXBLAnalysis extends TransientState {
     scope
   }
 
-  def deregisterScope(scope: Scope) =
+  def deregisterScope(scope: Scope): Unit =
     scopesById -= scope.scopeId
 
   def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
@@ -80,8 +80,10 @@ trait PartXBLAnalysis extends TransientState {
   def unmapScopeIds(control: ElementAnalysis): Unit = {
     control match {
       case component: ComponentControl ⇒
-        xblBindings.removeBinding(component.prefixedId)
-        deregisterScope(component.binding.innerScope)
+        component.bindingOpt foreach { binding ⇒
+          xblBindings.removeBinding(component.prefixedId)
+          deregisterScope(binding.innerScope)
+        }
       case attribute: AttributeControl ⇒
         control.scope -= attribute.forStaticId
         prefixedIdToXBLScopeMap -= attribute.forPrefixedId
@@ -118,27 +120,31 @@ trait PartXBLAnalysis extends TransientState {
 
   def getGlobals = xblBindings.allGlobals
 
-  // For the given bound node prefixed id, remove the current shadow tree and create a new one
-  // NOTE: Can be used only in a sub-part, as this mutates the tree
-  def updateShadowTree(prefixedId: String, elementInSource: Element): ComponentControl = {
+  def createShadowTree(existingComponent: ComponentControl, elemInSource: Element): Unit = {
+
     assert(! isTopLevel)
-    getControlAnalysis(prefixedId) match {
-      case existingComponent: ComponentControl ⇒
 
-        // Remove the component's binding, including all controls
-        existingComponent.removeBinding()
+    existingComponent.setConcreteBinding(elemInSource)
+    analyzeSubtree(existingComponent)
+  }
 
-        // Create new ConcreteBinding
-        existingComponent.setBinding(elementInSource)
+  def clearShadowTree(existingComponent: ComponentControl): Unit = {
+    assert(! isTopLevel)
+    existingComponent.removeConcreteBinding()
+  }
 
-        // Rebuild subtree
-        analyzeSubtree(existingComponent)
+  // For the given bound node prefixed id, remove the current shadow tree and create a new one
+  // NOTE: Can be used only in a sub-part, as this mutates the tree.
+  // Can return `None` if the binding does not have a template.
+  def createOrUpdateShadowTree(existingComponent: ComponentControl, elemInSource: Element): Unit = {
 
-        existingComponent
+    assert(! isTopLevel)
 
-      case _ ⇒
-        throw new IllegalArgumentException
-    }
+    if (existingComponent.bindingOpt.isDefined)
+      existingComponent.removeConcreteBinding()
+
+    existingComponent.setConcreteBinding(elemInSource)
+    analyzeSubtree(existingComponent)
   }
 
   override def freeTransientState() = {

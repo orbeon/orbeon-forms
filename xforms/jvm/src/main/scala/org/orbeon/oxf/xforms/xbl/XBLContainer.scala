@@ -54,8 +54,8 @@ class XBLContainer(
   val associatedControlOpt : Option[XFormsControl], // `None` for root container
   val innerScope           : Scope
 ) extends ModelContainer
-  with RefreshSupport
-  with ContainerResolver {
+     with RefreshSupport
+     with ContainerResolver {
 
   self ⇒
 
@@ -98,8 +98,11 @@ class XBLContainer(
   final def getPartAnalysis = partAnalysis
 
   // Create a new container child of the given control
-  def createChildContainer(associatedControl: XFormsComponentControl)  =
-    new XBLContainer(associatedControl, self, associatedControl.staticControl.binding.innerScope)
+  // NOTE: Require passing the `ConcreteBinding` to help ensure that the control does have it.
+  def createChildContainer(associatedControl: XFormsComponentControl, concreteBinding: ConcreteBinding): XBLContainer = {
+    require(associatedControl.staticControl.bindingOpt exists (_ eq concreteBinding))
+    new XBLContainer(associatedControl, self, concreteBinding.innerScope)
+  }
 
   def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: PartAnalysis) =
     new XBLContainer(associatedControl, self, childPartAnalysis.startScope) {

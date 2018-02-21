@@ -19,6 +19,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -249,11 +250,16 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
     public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
 
-        // Add handlers for custom components
+        // Add handlers for XBL components
         final StaticStateGlobalOps ops = containingDocument.getStaticOps();
         controller.registerHandler(XXFormsComponentHandler.class.getName(), new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                return ops.getBinding(getPrefixedId(attributes, handlerContext)).isDefined();
+                final Option<ElementAnalysis> control = ops.findControlAnalysis(getPrefixedId(attributes, handlerContext));
+                if (control.isDefined()) {
+                    return control.get() instanceof ComponentControl;
+                } else {
+                    return false;
+                }
             }
         });
 

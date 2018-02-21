@@ -22,8 +22,8 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, LocationDocumentResult}
 import org.xml.sax.Attributes
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 
@@ -85,31 +85,26 @@ class XBLBindings(
   val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
   val allGlobals                  = mutable.ArrayBuffer[Global]()
 
-  // Create concrete binding if there is an applicable abstract binding
-  def processElementIfNeeded(
+  // Can return `None` if the `AbstractBinding` does not have a template.
+  def createConcreteBindingFromElem(
+    abstractBinding   : AbstractBinding,
     controlElement    : Element,
     controlPrefixedId : String,
     locationData      : LocationData,
     containerScope    : Scope
   ): Option[ConcreteBinding] =
-    metadata.findBindingByPrefixedId(controlPrefixedId) flatMap { abstractBinding ⇒
-      generateRawShadowTree(controlElement, abstractBinding) map {
-        rawShadowTree ⇒
-          val newBinding =
-            createConcreteBinding(
-              controlElement,
-              controlPrefixedId,
-              locationData,
-              containerScope,
-              abstractBinding,
-              rawShadowTree
-            )
-          concreteBindings += controlPrefixedId → newBinding
-          newBinding
-      }
-    }
+    for (rawShadowTree ← generateRawShadowTree(controlElement, abstractBinding))
+      yield
+        createScopeAndConcreteBinding(
+          controlElement,
+          controlPrefixedId,
+          locationData,
+          containerScope,
+          abstractBinding,
+          rawShadowTree
+        )
 
-  private def createConcreteBinding(
+  private def createScopeAndConcreteBinding(
     boundElement           : Element,
     boundControlPrefixedId : String,
     locationData           : LocationData,
@@ -307,7 +302,7 @@ class XBLBindings(
 
   // Generate raw (non-annotated) shadow content for the given control id and XBL binding.
   private def generateRawShadowTree(boundElement: Element, abstractBinding: AbstractBinding): Option[Document] =
-    abstractBinding.templateElement map {
+    abstractBinding.templateElementOpt map {
       templateElement ⇒
         withDebug("generating raw XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
 
@@ -436,7 +431,7 @@ class XBLBindings(
 
   // NOTE: We used to clear metadata, but since the enclosing PartAnalysisImpl keeps a reference to metadata, there is
   // no real point to it.
-  def freeTransientState() =
+  def freeTransientState(): Unit =
     metadata.commitBindingIndex()
 
   // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:
@@ -446,9 +441,10 @@ class XBLBindings(
   // - deindex scope id ⇒ Scope
   //def removeScope(scope: Scope) = ???
 
-  def hasBinding(controlPrefixedId: String)          = getBinding(controlPrefixedId).isDefined
-  def getBinding(controlPrefixedId: String)          = concreteBindings.get(controlPrefixedId)
-  def removeBinding(controlPrefixedId: String): Unit = concreteBindings -= controlPrefixedId
+  def addBinding(controlPrefixedId: String, binding: ConcreteBinding) : Unit                    = concreteBindings += controlPrefixedId → binding
+  def hasBinding(controlPrefixedId: String)                           : Boolean                 = getBinding(controlPrefixedId).isDefined
+  def getBinding(controlPrefixedId: String)                           : Option[ConcreteBinding] = concreteBindings.get(controlPrefixedId)
+  def removeBinding(controlPrefixedId: String)                        : Unit                    = concreteBindings -= controlPrefixedId
   // NOTE: Can't update abstractBindings, allScripts, allStyles, allGlobals without checking all again, so for now
   // leave that untouched.
 }

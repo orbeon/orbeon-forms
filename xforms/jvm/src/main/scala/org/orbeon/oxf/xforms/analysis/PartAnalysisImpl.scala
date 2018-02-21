@@ -14,26 +14,22 @@
 package org.orbeon.oxf.xforms.analysis
 
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
-
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
-import org.orbeon.oxf.util.XPathCache
 import org.orbeon.dom.Element
-import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
-
-import collection.mutable.Buffer
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
-import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
-import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, RootControl}
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable.Buffer
 
 /**
  * Static analysis of a whole part, including:
@@ -111,7 +107,7 @@ class PartAnalysisImpl(
     controlElement : Element,
     containerScope : Scope,
     index          : ElementAnalysis ⇒ Unit
-  ) = {
+  ): Option[ElementAnalysis] = {
 
     assert(containerScope ne null)
 
@@ -125,25 +121,30 @@ class PartAnalysisImpl(
     // Prefixed id
     val controlPrefixedId = containerScope.fullPrefix + controlStaticId
 
-    // 1. If element is not built-in, first check XBL and generate shadow content if needed
-    xblBindings.processElementIfNeeded(controlElement, controlPrefixedId, locationData, containerScope)
-
-    // 2. Create new control if possible
-    val elementAnalysis = {
-      val controlScope = scopeForPrefixedId(controlPrefixedId)
-      // NOTE: Wondering if there is a benefit to use separate StaticStateContext vs. just passing the 2 args
-      val staticStateContext = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1)
-      ControlAnalysisFactory.create(staticStateContext, controlElement, Some(parent), preceding, controlScope)
-    }
+    // Create new control if possible
+    val elementAnalysisOpt =
+      ControlAnalysisFactory.create(
+        context        = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1), // Q: Benefit vs. just passing the 2 args?
+        controlElement = controlElement,
+        parent         = Some(parent),
+        preceding      = preceding,
+        scope          = scopeForPrefixedId(controlPrefixedId)
+      )
 
     // Throw if the element is unknown (we could also just warn?)
-    if (elementAnalysis.isEmpty)
+    if (elementAnalysisOpt.isEmpty)
       throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
 
-    // 3. Index new control
-    elementAnalysis foreach index
+    elementAnalysisOpt foreach {
+      case componentControl: ComponentControl if ! componentControl.hasLazyBinding ⇒
+        componentControl.setConcreteBinding(controlElement)
+      case _ ⇒
+    }
 
-    elementAnalysis
+    // 3. Index new control
+    elementAnalysisOpt foreach index
+
+    elementAnalysisOpt
   }
 
   // Analyze a subtree of controls
@@ -269,23 +270,4 @@ class PartAnalysisImpl(
 
   def dumpAnalysis() =
     println(Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this)))
-}
-
-object PartAnalysisImpl {
-
-  def extractNestedModels(compactShadowTreeWrapper: DocumentWrapper, detach: Boolean, locationData: LocationData) = {
-
-    // TODO: Don't use XPath here, but extract models as controls tree is visited
-    val xpathExpression = "//xf:model[not(ancestor::xf:instance)]"
-    val modelItems = XPathCache.evaluate(compactShadowTreeWrapper, xpathExpression,
-      XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null)
-
-    for {
-      item ← modelItems.asScala
-      nodeInfo = item.asInstanceOf[NodeInfo]
-      element = nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
-      document = Dom4jUtils.createDocumentCopyParentNamespaces(element, detach)
-    } yield
-      document
-  }
 }

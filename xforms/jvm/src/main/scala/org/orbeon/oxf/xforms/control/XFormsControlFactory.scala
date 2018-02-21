@@ -120,7 +120,7 @@ object XFormsControlFactory {
     val factory =
       staticElement match {
         case component: ComponentControl ⇒
-          ComponentFactories.get(component.isInstanceOf[ValueTrait], component.binding.abstractBinding.modeFocus)
+          ComponentFactories.get(component.isInstanceOf[ValueTrait], component.abstractBinding.modeFocus)
         case lhhaAnalysis: LHHAAnalysis ⇒
           if (! lhhaAnalysis.isLocal)
             Some(new XFormsLHHAControl(_, _, _, _))

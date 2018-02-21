@@ -585,7 +585,7 @@ object XHTMLHeadHandler {
         }
       case c: XFormsValueComponentControl ⇒
         if (c.isRelevant) {
-          val abstractBinding = c.staticControl.binding.abstractBinding
+          val abstractBinding = c.staticControl.abstractBinding
           if (abstractBinding.modeJavaScriptLifecycle)
             addControlToInitialize(
               c.getEffectiveId,
@@ -596,7 +596,7 @@ object XHTMLHeadHandler {
             )
         }
       case c: XFormsComponentControl ⇒
-        if (c.isRelevant && c.staticControl.binding.abstractBinding.modeJavaScriptLifecycle)
+        if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
           addControlToInitialize(c.getEffectiveId, None)
       case c ⇒
         // Legacy JavaScript initialization

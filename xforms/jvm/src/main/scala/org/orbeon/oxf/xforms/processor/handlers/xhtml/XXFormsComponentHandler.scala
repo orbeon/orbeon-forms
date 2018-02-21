@@ -16,14 +16,13 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.lang.StringBuilder
 
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml._
-import org.xml.sax.{Attributes, Locator}
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.{Attributes, Locator}
 
 class XXFormsComponentHandler(
   uri            : String,
@@ -34,23 +33,23 @@ class XXFormsComponentHandler(
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
+  private lazy val staticControl =
+    containingDocument.getStaticOps.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
+
   protected override def getContainingElementName =
-    binding.abstractBinding.containerElementName
+    staticControl.abstractBinding.containerElementName
 
   protected override def getContainingElementQName =
-    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, binding.abstractBinding.containerElementName)
-
-  private lazy val binding =
-    containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
+    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.abstractBinding.containerElementName)
 
   private lazy val modeIsLhhaButNotCustom =
-    binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
+    staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
 
   protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
 
-    classes.append(binding.abstractBinding.cssClasses)
+    classes.append(staticControl.abstractBinding.cssClasses)
   }
 
   override protected def handleControlStart(): Unit = {
@@ -61,7 +60,9 @@ class XXFormsComponentHandler(
     xformsHandlerContext.pushComponentContext(prefixedId)
 
     // Process shadow content
-    XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
+    staticControl.bindingOpt foreach { binding ⇒
+      XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
+    }
   }
 
   protected override def handleControlEnd(): Unit =
@@ -74,7 +75,7 @@ class XXFormsComponentHandler(
         targetControlEffectiveId = getEffectiveId,
         forEffectiveId           = getForEffectiveId(getEffectiveId),
         lhha                     = LHHA.Label,
-        requestedElementNameOpt  = (binding.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) option "span",
+        requestedElementNameOpt  = (staticControl.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) option "span",
         controlOrNull            = currentControlOrNull,
         isTemplate               = isTemplate,
         isExternal               = false

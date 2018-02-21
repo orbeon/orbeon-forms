@@ -111,13 +111,13 @@ case class AbstractBinding(
       (mi, ii) → im.inlineContent
   ) toMap
 
-  def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
-  def supportAVTs     = templateElement exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
+  def templateElementOpt = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
+  def supportAVTs        = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
-  private def transformQNameOption = templateElement flatMap
+  private def transformQNameOption = templateElementOpt flatMap
     (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
 
-  private def templateRootOption = templateElement map { e ⇒
+  private def templateRootOption = templateElementOpt map { e ⇒
     if (e.elements.size != 1)
       throw new OXFException("xxbl:transform requires a single child element.")
     e.elements.get(0)

@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
@@ -80,13 +80,13 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   def clearNewScripts() = _newScripts = Nil
 
   // TODO: This might blow if the control is non-relevant
-  override def bindingContextForChild =
+  override def bindingContextForChildOpt: Option[BindingContext] =
     _nested map { case Nested(container, _, _, _) ⇒
       val contextStack = container.getContextStack
       contextStack.setParentBindingContext(bindingContext)
       contextStack.resetBindingContext()
       contextStack.getCurrentBindingContext
-    } orNull
+    }
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
@@ -194,7 +194,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val outerListener: EventListener = {
 
       // Mark an unknown change, which will require a complete rebuild of the part
-      val unknownChange: MirrorEventListener = { case _ ⇒
+      val unknownChange: MirrorEventListener = { _ ⇒
         changeCount += 1
         containingDocument.addControlStructuralChange(prefixedId)
         true
@@ -265,10 +265,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     def createAndInitializeDynamicSubTree() =
       tree.createAndInitializeDynamicSubTree(
-        childContainer,
-        this,
-        partAnalysis.getTopLevelControls.head,
-        Controls.restoringControls
+        container        = childContainer,
+        containerControl = this,
+        elementAnalysis  = partAnalysis.getTopLevelControls.head,
+        state            = Controls.restoringControls,
+        dispatchEvents   = true
       )
 
     stateToRestore match {
@@ -299,29 +300,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
           // LATER: See above comments
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
           withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
-
-            // Remove concrete models and controls
-            // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
-            // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
-            //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
-            componentControl.destroyNestedContainer()
-
-            // Remove dynamic controls
-            tree.deindexSubtree(componentControl, includeCurrent = false)
-            componentControl.clearChildren()
-
-            // Update the shadow tree
-            val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, elemInSource)
-
-            // Create the new models and new concrete subtree rooted at xbl:template
-            componentControl.recreateNestedContainer()
-
-            val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
-            templateTree foreach
-              (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _, Controls.restoringControls))
-
-            // Tell client
-            containingDocument.addControlStructuralChange(componentControl.prefixedId)
+            removeDynamicShadowTree(componentControl)
+            createOrUpdateStaticShadowTree(componentControl, Some(elemInSource))
+            updateDynamicShadowTree(componentControl, recreateNestedContainer = true, dispatchEvents = true) // could be `dispatchEvents = false`?
           }
         case _ ⇒
       }
@@ -362,6 +343,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val newScope = new Scope(Some(getResolutionScope ensuring (_ ne null)), getPrefixedId)
     val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.getStaticState, parent, doc, newScope)
     containingDocument.getStaticOps.addPart(newPart)
+
     (template, newPart)
   }
 
@@ -423,16 +405,72 @@ object XXFormsDynamicControl {
       // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
       val all =
         for {
-          ancestor ← ancestorsFromRoot
-          id = ancestor.id
+          ancestor   ← ancestorsFromRoot
+          id         = ancestor.id
           if id.nonEmpty
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          binding ← partAnalysis.getBinding(prefixedId)
+          binding    ← partAnalysis.xblBindings.getBinding(prefixedId)
           if ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId → unsafeUnwrapElement(ancestor)
 
       all.headOption
     }
+  }
+
+  private def removeDynamicShadowTree(componentControl: XFormsComponentControl): Unit = {
+
+    val doc = componentControl.containingDocument
+
+    // Remove concrete models and controls
+    // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
+    // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
+    //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
+    componentControl.destroyNestedContainer()
+
+    // Remove dynamic controls
+    doc.getControls.getCurrentControlTree.deindexSubtree(componentControl, includeCurrent = false)
+    componentControl.clearChildren()
+  }
+
+  def updateDynamicShadowTree(
+    componentControl        : XFormsComponentControl,
+    recreateNestedContainer : Boolean,
+    dispatchEvents          : Boolean
+  ): Unit = {
+
+    val doc             = componentControl.containingDocument
+    val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
+
+    if (recreateNestedContainer)
+      componentControl.recreateNestedContainer()
+
+    templateTreeOpt foreach { templateTree ⇒
+      doc.getControls.getCurrentControlTree.createAndInitializeDynamicSubTree(
+        container        = componentControl.nestedContainer,
+        containerControl = componentControl,
+        elementAnalysis  = templateTree,
+        state            = Controls.restoringControls,
+        dispatchEvents   = dispatchEvents
+      )
+    }
+
+    doc.addControlStructuralChange(componentControl.prefixedId)
+  }
+
+  def createOrUpdateStaticShadowTree(
+    componentControl : XFormsComponentControl,
+    elemInSource     : Option[Element]
+  ): Unit = {
+
+    val doc             = componentControl.containingDocument
+    val staticComponent = componentControl.staticControl
+    val part            = staticComponent.part
+
+    // Update the shadow tree
+    // Can return `None` if the binding does not have a template.
+    part.createOrUpdateShadowTree(staticComponent, elemInSource getOrElse staticComponent.element)
+
+    doc.addControlStructuralChange(componentControl.prefixedId)
   }
 }

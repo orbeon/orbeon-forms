@@ -95,7 +95,7 @@ object LockSql {
          |           groupname,
          |           expiration
          |       )
-         |VALUES (?, ?, ?, ${Provider.dateIn(provider)}) ;
+         |VALUES (?, ?, ?, ${Provider.dateIn(provider)})
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps ⇒
       ps.setString(1, reqDataPart.documentId)

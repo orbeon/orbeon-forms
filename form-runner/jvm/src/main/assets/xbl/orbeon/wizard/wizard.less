@@ -141,9 +141,8 @@
 
     @media (max-width: 980px) {
         // Use flex layout to get the TOC to show before the body
-        // NOTE: Media queries not supported with IE 8 anyway. Only problematic browser might be IE 9, which supports
-        // neither flex nor media queries. We really want to support responsive on mobile/tablets/computers with
-        // more modern browsers through.
+        // NOTE: As of 2018-02-22 the only problematic browser might be IE 9, which supports  neither flex nor media queries. But we
+        // want to support responsive on mobile/tablets/computers only with modern browsers so that is ok.
         .flex();
         .flex-direction(column);
 

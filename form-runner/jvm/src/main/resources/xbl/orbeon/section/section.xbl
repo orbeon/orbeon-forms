@@ -81,6 +81,7 @@
                     <xsl:variable name="readonly"     select="@readonly = 'true'"/>
                     <xsl:variable name="is-repeat"    select="frf:isRepeat(.)"/>
                     <xsl:variable name="appearance"   select="(@appearance, 'full')[1]"/>
+                    <xsl:variable name="repeat-menu"  select="$appearance = 'full'    and not($readonly)"/>
                     <xsl:variable name="right-column" select="$appearance = 'minimal' and not($readonly)"/>
 
                     <!-- Section content area -->
@@ -173,7 +174,7 @@
                                                                 name="{{event('xxf:type')}}"/>
                                                         </xf:action>
 
-                                                        <xsl:if test="$appearance = 'full' and not($readonly)">
+                                                        <xsl:if test="$repeat-menu">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
                                                                 <xh:button
                                                                     class="btn btn-mini fr-repeater-dropdown-button"
@@ -186,7 +187,7 @@
                                                         <xh:div class="fr-repeat-content">
                                                             <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
                                                         </xh:div>
-                                                        <xsl:if test="$right-column and not($readonly)">
+                                                        <xsl:if test="$right-column">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-section-right-column">
                                                                 <xf:group ref=".[$fr-repeater-can-remove]">
                                                                     <xh:button

@@ -25651,4 +25651,4 @@
   exportToModuleLoaders(Tinymce);
 
 }());
-})()
+})();

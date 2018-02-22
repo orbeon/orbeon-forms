@@ -19,7 +19,7 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
-import org.orbeon.xforms.facade.{JQueryTooltipConfig, TinyMceDefaultConfig, TinyMceEditor, Underscore}
+import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
@@ -220,13 +220,12 @@ object ControlLabelHintTextEditor {
       def afterTinyMCEInitialized(f: TinyMceEditor ⇒ Unit): Unit =
         tinyMceObject.initialized.toOption match {
           case Some(true)  ⇒ f(tinyMceObject)
-          case _           ⇒ tinyMceObject.onInit.add(f)
+          case _           ⇒ tinyMceObject.on("init", f)
         }
 
       def makeSpaceForMCE(): Unit = {
         // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-        val mceContainer = document.getElementById(tinyMceObject.editorContainer)
-        val mceHeight = $(mceContainer).height()
+        val mceHeight = $(tinyMceObject.editorContainer).height()
         resourceEditorCurrentLabelHint.height(mceHeight)
       }
 
@@ -242,7 +241,7 @@ object ControlLabelHintTextEditor {
         mceConfig.autoresize_min_height = 100
         mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom
 
-        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig)
+        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMceDefaultEditorManager)
         tinyMceObject.render()
         afterTinyMCEInitialized((_) ⇒ {
           // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM

@@ -239,21 +239,30 @@ abstract class JQueryTooltipConfig extends js.Object {
   val title: String
 }
 
+abstract class TinyMceEditorManager extends js.Object
+@JSGlobal("tinymce.EditorManager")
+@js.native
+object TinyMceDefaultEditorManager extends TinyMceEditorManager
+
 @js.native
 @JSGlobal("tinymce.Editor")
-class TinyMceEditor(containerId: String, config: TinyMceConfig) extends js.Object {
-  val initialized            : js.UndefOr[Boolean] = js.native
-  val onInit                 : TinyMceEvent        = js.native
-  val editorContainer        : String              = js.native
-  val container              : dom.Element         = js.native
-  def render()               : Unit                = js.native
-  def getWin()               : dom.Window          = js.native
-  def getContent()           : String              = js.native
-  def setContent(c: String)  : Unit                = js.native
-  def execCommand(c: String) : Unit                = js.native
-  def show()                 : Unit                = js.native
-  def hide()                 : Unit                = js.native
-  def focus()                : Unit                = js.native
+class TinyMceEditor(
+  containerId   : String,
+  config        : TinyMceConfig,
+  editorManager : TinyMceEditorManager
+) extends js.Object {
+  val initialized                                                   : js.UndefOr[Boolean] = js.native
+  val editorContainer                                               : dom.Element         = js.native
+  val container                                                     : dom.Element         = js.native
+  def on(name: String, callback: js.Function1[TinyMceEditor, Unit]) : Unit                = js.native
+  def render()                                                      : Unit                = js.native
+  def getWin()                                                      : dom.Window          = js.native
+  def getContent()                                                  : String              = js.native
+  def setContent(c: String)                                         : Unit                = js.native
+  def execCommand(c: String)                                        : Unit                = js.native
+  def show()                                                        : Unit                = js.native
+  def hide()                                                        : Unit                = js.native
+  def focus()                                                       : Unit                = js.native
 }
 
 @js.native

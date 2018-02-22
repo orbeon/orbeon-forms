@@ -40,20 +40,20 @@ object ControlLabelHintTextEditor {
     val ControlSelector       = ".xforms-control, .xbl-component"
     val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
 
-
     var resourceEditorCurrentControl: JQuery = null
     var resourceEditorCurrentLabelHint: JQuery = null
 
     // Heuristic to close the editor based on click and focus events
     def clickOrFocus(event: dom.Event): Unit = {
       val target = $(event.target)
-      val eventOnEditor = target.closest(".fb-label-editor").is("*")
-      val eventOnControlLabel =
+      val eventOnEditor        = target.closest(".fb-label-editor").is("*")
+      val eventOnMceFloatPanel = target.closest(".mce-floatpanel" ).is("*")
+      val eventOnControlLabel  =
           // Click on label or element inside label
           (target.is(LabelHintSelector) || target.parents(LabelHintSelector).is("*")) &&
           // Only interested in labels in the "editor" portion of FB
           target.parents(".fb-main").is("*")
-      if (! (eventOnEditor || eventOnControlLabel))
+      if (! (eventOnEditor || eventOnMceFloatPanel || eventOnControlLabel))
         resourceEditorEndEdit()
     }
 

@@ -21,7 +21,9 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.xxforms.NumericValidation
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
 case class NumberConfig(
   decimalSeparator    : Char,
@@ -173,20 +175,29 @@ trait NumberSupport[Binding] {
   }
 }
 
-object NumberSupportJava extends NumberSupport[NodeInfo] {
+object NumberSupportJava extends NumberSupport[Item] {
 
-  def getStringValue(binding: NodeInfo): String =
+  def getStringValue(binding: Item): String =
     binding.getStringValue
 
-  def getDatatypeOpt(binding: NodeInfo): Option[dom.QName] =
-    Option(InstanceData.getType(binding))
+  def getDatatypeOpt(binding: Item): Option[dom.QName] =
+    binding match {
+      case v: NodeInfo     ⇒ Option(InstanceData.getType(v))
+      case v: IntegerValue ⇒ Some(XMLConstants.XS_INTEGER_QNAME)
+      case v: DecimalValue ⇒ Some(XMLConstants.XS_DECIMAL_QNAME)
+      case _               ⇒ None
+    }
 
-  def getCustomMipOpt(binding: NodeInfo, name: String): Option[String] =
-    Option(InstanceData.collectAllCustomMIPs(binding)) flatMap (_ get name)
+
+  def getCustomMipOpt(binding: Item, name: String): Option[String] =
+    binding match {
+      case v: NodeInfo ⇒ Option(InstanceData.collectAllCustomMIPs(v)) flatMap (_ get name)
+      case _           ⇒ None
+    }
 
   //@XPathFunction
   def getDisplayAndEditValueJava(
-    binding             : NodeInfo,
+    binding             : Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
     prefix              : String,
@@ -210,7 +221,7 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
   //@XPathFunction
   def getStorageValueJava(
     value               : String,
-    binding             : NodeInfo,
+    binding             : Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
     prefix              : String,
@@ -232,7 +243,6 @@ object NumberSupportJava extends NumberSupport[NodeInfo] {
   }
 
   //@XPathFunction
-  def isZeroValidationFractionDigitsJava(binding: NodeInfo): Boolean =
+  def isZeroValidationFractionDigitsJava(binding: Item): Boolean =
     validationFractionDigitsOpt(binding) contains 0
-
 }

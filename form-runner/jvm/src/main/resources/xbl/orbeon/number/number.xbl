@@ -102,7 +102,7 @@
                     <xf:param name="displayValue"     value="$display-and-edit-values[1]"/>
                     <xf:param name="editValue"        value="$display-and-edit-values[2]"/>
                     <xf:param name="decimalSeparator" value="xxf:component-param-value('decimal-separator')"/>
-                    <xf:body>ORBEON.xforms.XBL.instanceForControl(this).updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
+                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
                 </xf:action>
 
             </xbl:handler>
@@ -128,7 +128,7 @@
                     <xf:param name="displayValue"     value="$display-and-edit-values[1]"/>
                     <xf:param name="editValue"        value="$display-and-edit-values[2]"/>
                     <xf:param name="decimalSeparator" value="xxf:component-param-value('decimal-separator')"/>
-                    <xf:body>ORBEON.xforms.XBL.instanceForControl(this).updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
+                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
                 </xf:action>
             </xbl:handler>
 

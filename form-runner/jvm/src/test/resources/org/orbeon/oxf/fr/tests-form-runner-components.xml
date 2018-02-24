@@ -810,7 +810,7 @@
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
                         <xxf:control id="my-currency≡xf-17" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_5dc4c33a29dc3484b57bc2c208e73dd493e3de7b" target-id="my-currency" observer-id="my-currency">
+                    <xxf:script name="xf_7bf49dfcd4150b25a37261147c7786f0d4a8da41" target-id="my-currency" observer-id="my-currency">
                         <xxf:param>12.34</xxf:param>
                         <xxf:param>12.34</xxf:param>
                         <xxf:param>.</xxf:param>

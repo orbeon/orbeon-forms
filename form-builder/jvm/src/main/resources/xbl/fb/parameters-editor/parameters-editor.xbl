@@ -167,7 +167,10 @@
                                     <xf:label appearance="minimal">Control</xf:label>
                                     <xf:alert>Missing value</xf:alert>
 
-                                    <xf:itemset ref="for $c in fbf:getAllControlsWithIds() return frf:controlNameFromId($c/@id)">
+                                    <!--  NOTE: If the form has lots of controls (say, > 1000), showing all controls in the itemset is
+                                          costly (say, takes > 10 seconds). We need something different in this case, like a search
+                                          control. -->
+                                    <xf:itemset ref="for $c in fbf:getAllControlsWithIds()[position() le 50] return frf:controlNameFromId($c/@id)">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label
                                             value="

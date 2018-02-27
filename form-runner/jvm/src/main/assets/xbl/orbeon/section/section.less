@@ -14,7 +14,14 @@
 
 .orbeon {
     .xbl-fr-section {
+
         display: block;
+
+        padding-bottom: 4px; // in Form Builder, when sections are collapsed, some spacing is helpful
+
+        &:last-of-type {
+            padding-bottom: 0;
+        }
 
         h2, h3, h4, h5, h6 {
             &.fr-section-title {

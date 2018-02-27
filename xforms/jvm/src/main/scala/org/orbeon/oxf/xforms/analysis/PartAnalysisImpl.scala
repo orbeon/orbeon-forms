@@ -60,20 +60,22 @@ class PartAnalysisImpl(
 
   def getIndentedLogger = staticState.getIndentedLogger
 
-  private def iterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] = new Iterator[PartAnalysis] {
+  private def partAnalysisIterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] =
+    new Iterator[PartAnalysis] {
 
-    private[this] var theNext = start
+      private[this] var theNext = start
 
-    def hasNext = theNext.isDefined
-    def next() = {
-      val newResult = theNext.get
-      theNext = newResult.parent
-      newResult
+      def hasNext = theNext.isDefined
+
+      def next() = {
+        val newResult = theNext.get
+        theNext = newResult.parent
+        newResult
+      }
     }
-  }
 
-  def ancestorIterator       = iterator(partAnalysis.parent)
-  def ancestorOrSelfIterator = iterator(Some(partAnalysis))
+  def ancestorIterator       = partAnalysisIterator(partAnalysis.parent)
+  def ancestorOrSelfIterator = partAnalysisIterator(Some(partAnalysis))
 
   def getMark(prefixedId: String) = metadata.getMark(prefixedId)
 

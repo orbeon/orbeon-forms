@@ -25,7 +25,7 @@
 
     <!-- URL rewriting -->
     <property as="xs:string"  name="oxf.url-rewriting.platform-paths">
-        ^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$
+        ^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|js/|xforms-server).*$
     </property>
     <property as="xs:string"  name="oxf.url-rewriting.app-paths">
         ^/(apps|xbl|forms)/.*$

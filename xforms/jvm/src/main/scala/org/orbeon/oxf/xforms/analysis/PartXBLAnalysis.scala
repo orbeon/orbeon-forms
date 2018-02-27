@@ -101,7 +101,7 @@ trait PartXBLAnalysis extends TransientState {
   def containingScope(prefixedId: String) = {
     val prefix = XFormsId.getEffectiveIdPrefix(prefixedId)
 
-    val scopeId = if (prefix.length == 0) "" else prefix.init
+    val scopeId = if (prefix.isEmpty) "" else prefix.init
     scopesById.get(scopeId).orNull
   }
 

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.Buffer
+import scala.collection.{mutable ⇒ m}
 
 /**
  * Static analysis of a whole part, including:
@@ -86,7 +86,7 @@ class PartAnalysisImpl(
    * cached, compute the mapping on the fly. Note that in this case, the resulting mapping is not added to the cache
    * as the mapping is considered transient and not sharable among pages.
    */
-  def getNamespaceMapping(prefix: String, element: Element) = {
+  def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping = {
     val id = XFormsUtils.getElementId(element)
 
     require(id ne null)
@@ -154,10 +154,10 @@ class PartAnalysisImpl(
     withDebug("performing static analysis of subtree", Seq("prefixed id" → container.prefixedId)) {
 
       // Global lists of external LHHA and handlers
-      val lhhas         = Buffer[LHHAAnalysis]()
-      val eventHandlers = Buffer[EventHandlerImpl]()
-      val models        = Buffer[Model]()
-      val attributes    = Buffer[AttributeControl]()
+      val lhhas         = m.Buffer[LHHAAnalysis]()
+      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val models        = m.Buffer[Model]()
+      val attributes    = m.Buffer[AttributeControl]()
 
       // Rebuild children
       container.build(build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
@@ -189,10 +189,10 @@ class PartAnalysisImpl(
       initializeScopes()
 
       // Global lists LHHA and handlers
-      val lhhas         = Buffer[LHHAAnalysis]()
-      val eventHandlers = Buffer[EventHandlerImpl]()
-      val models        = Buffer[Model]()
-      val attributes    = Buffer[AttributeControl]()
+      val lhhas         = m.Buffer[LHHAAnalysis]()
+      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val models        = m.Buffer[Model]()
+      val attributes    = m.Buffer[AttributeControl]()
 
       // Create and index root control
       val rootControlAnalysis = new RootControl(StaticStateContext(this, 0), staticStateDocument.rootControl, startScope)
@@ -226,7 +226,7 @@ class PartAnalysisImpl(
             }
 
         // Add globals to the root analysis
-        rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq) // TODO: unclear is .toSeq is needed
+        rootControlAnalysis.addChildren(globalsOptions.iterator.flatten)
       } else if (xblBindings.allGlobals.nonEmpty)
         warn(s"There are ${xblBindings.allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 

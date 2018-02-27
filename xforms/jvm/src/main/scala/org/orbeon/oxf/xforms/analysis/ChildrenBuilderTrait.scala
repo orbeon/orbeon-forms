@@ -31,7 +31,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
   final def children = _children
 
   // NOTE: Should probably make it so that controls add themselves to their container upon creation
-  final def addChildren(children: Seq[ElementAnalysis]) =
+  final def addChildren(children: TraversableOnce[ElementAnalysis]): Unit =
     _children ++= children
 
   final def removeChild(child: ElementAnalysis): Unit =

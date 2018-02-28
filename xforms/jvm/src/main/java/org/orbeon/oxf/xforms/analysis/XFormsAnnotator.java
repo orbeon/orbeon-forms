@@ -26,10 +26,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * XMLReceiver that:
  *
@@ -48,8 +44,6 @@ import java.util.Map;
  * least two separate outputs) are produced, one for the annotated output, another for the extracted output.
  */
 public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver {
-
-    private SAXStore templateSAXStore;
 
     private int level = 0;
     private boolean inHead;         // whether we are in the HTML head
@@ -95,22 +89,19 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * @param metadata              metadata to gather
      */
     public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean isTopLevel) {
-        super(templateReceiver, extractorReceiver);
+        super(templateReceiver, extractorReceiver, metadata);
 
         this.metadata      = metadata;
         this.isGenerateIds = true;
         this.isTopLevel    = isTopLevel;
         this.isRestore     = false;
-
-        if (templateReceiver instanceof SAXStore)
-            this.templateSAXStore = (SAXStore) templateReceiver;
     }
 
     /**
      * This constructor just computes the namespace mappings and AVT elements and gathers id information.
      */
     public XFormsAnnotator(Metadata metadata) {
-        super(null, null);
+        super(null, null, metadata);
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.metadata      = metadata;
@@ -125,7 +116,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         namespaceContext.startElement();
-        final StackElement stackElement = startElement(uri, localname);
+        final StackElement stackElement = startElement(uri, localname, attributes);
 
         final int idIndex = attributes.getIndex("id");
 
@@ -184,16 +175,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Index binding by prefixed id
                 metadata.mapBindingToElement(rewriteId(xformsElementId), bindingOpt.get());
 
-                if (templateSAXStore != null) {
-                    // Remember mark if xxf:update="full"
-                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.namespace().uri(), XFormsConstants.XXFORMS_UPDATE_QNAME.name());
-                    if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                        // Remember this subtree has a full update
-                        putMark(xformsElementId);
-                        // Add a class to help the client
-                        attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
-                    }
-                }
+                attributes = handleFullUpdateIfNeeded(stackElement, attributes, xformsElementId);
 
                 // Leave element untouched (except for the id attribute)
                 stackElement.startElement(uri, localname, qName, attributes);
@@ -211,17 +193,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
                 final String xformsElementId = reusableStringArray[0];
 
-                // Handle full update annotation
-                if (templateSAXStore != null) {
-                    // Remember mark if xxf:update="full"
-                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.namespace().uri(), XFormsConstants.XXFORMS_UPDATE_QNAME.name());
-                    if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                        // Remember this subtree has a full update
-                        putMark(xformsElementId);
-                        // Add a class to help the client
-                        attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
-                    }
-                }
+                attributes = handleFullUpdateIfNeeded(stackElement, attributes, xformsElementId);
 
                 // Rewrite elements / add appearances
                 if (inTitle && "output".equals(localname)) {
@@ -510,14 +482,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         }
 
         return false;
-    }
-
-    final private void putMark(String rawId) {
-        metadata.putMark(templateSAXStore.getMark(rewriteId(rawId)));
-    }
-
-    protected String rewriteId(String id) {
-        return id;
     }
 
     @Override

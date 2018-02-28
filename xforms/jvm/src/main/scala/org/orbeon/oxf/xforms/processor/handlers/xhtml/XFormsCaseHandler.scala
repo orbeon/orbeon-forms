@@ -15,10 +15,12 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang ⇒ jl}
 
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 
@@ -37,7 +39,7 @@ class XFormsCaseHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = true) {
 
   private var currentSavedOutput: DeferredXMLReceiver = _
-  private var currentOutputInterceptor: OutputInterceptor = _
+  private var currentOutputInterceptorOpt: Option[OutputInterceptor] = None
   private var isVisible  = false
   private var isMustGenerateBeginEndDelimiters = false
 
@@ -53,6 +55,9 @@ class XFormsCaseHandler(
     // Determine whether this case is visible
     val caseControl = containingDocument.getControlByEffectiveId(getEffectiveId).asInstanceOf[XFormsCaseControl]
 
+    val switchHasFullUpdate =
+      staticControlOpt exists (_.parent.get.asInstanceOf[SwitchControl].hasFullUpdate)
+
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
       if (! isTemplate && (caseControl ne null))
@@ -65,74 +70,112 @@ class XFormsCaseHandler(
     val controller = xformsHandlerContext.getController
     currentSavedOutput = controller.getOutput
 
-    // Place interceptor if needed
-    locally {
-      isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
-
-      // Classes on top-level elements and characters and on the first delimiter
-      val elementClasses = {
-        implicit val classes = new jl.StringBuilder
-        appendControlUserClasses(attributes, currentControlOrNull)
-        // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
-        classes.toString
-      }
-
-      currentOutputInterceptor =
-        new OutputInterceptor(
-          currentSavedOutput,
-          spanQName,
-          new OutputInterceptor.Listener {
-
-            // Classes on first delimiter
-            private val firstDelimiterClasses = {
-              val classes = new jl.StringBuilder("xforms-case-begin-end " + selectedClasses)
-              if (elementClasses.nonEmpty) {
-                classes.append(' ')
-                classes.append(elementClasses)
-              }
-              classes.toString
-            }
-
-            // Delimiter: begin case
-            def generateFirstDelimiter(outputInterceptor: OutputInterceptor): Unit =
-              if (isMustGenerateBeginEndDelimiters)
-                outputInterceptor.outputDelimiter(
-                  currentSavedOutput,
-                  firstDelimiterClasses,
-                  "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
-                )
-
-          },
-          XFormsControl.appearances(elementAnalysis.parent.get)(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
-        )
-
-      val controlClasses = {
-        val classes = new jl.StringBuilder(selectedClasses)
-        if (elementClasses.nonEmpty) {
-          classes.append(' ')
-          classes.append(elementClasses)
-        }
-        classes.toString
-      }
-      currentOutputInterceptor.setAddedClasses(controlClasses)
-      controller.setOutput(new DeferredXMLReceiverImpl(currentOutputInterceptor))
+    // Classes on top-level elements and characters and on the first delimiter
+    val elementClasses = {
+      implicit val classes = new jl.StringBuilder
+      appendControlUserClasses(attributes, currentControlOrNull)
+      // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
+      classes.toString
     }
+
+    val controlClasses = {
+      val classes = new jl.StringBuilder(selectedClasses)
+      if (elementClasses.nonEmpty) {
+        classes.append(' ')
+        classes.append(elementClasses)
+      }
+      classes.toString
+    }
+
+    currentOutputInterceptorOpt =
+      if (switchHasFullUpdate) {
+        // No need for interceptor
+
+        isMustGenerateBeginEndDelimiters = false
+
+        if (isVisible) {
+
+          reusableAttributes.clear()
+          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, controlClasses)
+
+          // `ControlsComparator` skips the root element, so we create a dummy one to be skipped
+          if (xformsHandlerContext.hasFullUpdateTopLevelControl)
+            currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, SAXUtils.EMPTY_ATTRIBUTES)
+
+          currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes)
+
+        } else {
+          controller.setOutput(new DeferredXMLReceiverAdapter)
+        }
+
+        None
+
+      } else {
+        // Place interceptor if needed
+        isMustGenerateBeginEndDelimiters =
+          ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+
+        val newOutputInterceptor =
+          new OutputInterceptor(
+            currentSavedOutput,
+            spanQName,
+            new OutputInterceptor.Listener {
+
+              // Classes on first delimiter
+              private val firstDelimiterClasses = {
+                val classes = new jl.StringBuilder("xforms-case-begin-end " + selectedClasses)
+                if (elementClasses.nonEmpty) {
+                  classes.append(' ')
+                  classes.append(elementClasses)
+                }
+                classes.toString
+              }
+
+              // Delimiter: begin case
+              def generateFirstDelimiter(outputInterceptor: OutputInterceptor): Unit =
+                if (isMustGenerateBeginEndDelimiters)
+                  outputInterceptor.outputDelimiter(
+                    currentSavedOutput,
+                    firstDelimiterClasses,
+                    "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
+                  )
+
+            },
+            XFormsControl.appearances(elementAnalysis.parent.get)(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
+          )
+
+        newOutputInterceptor.setAddedClasses(controlClasses)
+        controller.setOutput(new DeferredXMLReceiverImpl(newOutputInterceptor))
+
+        Some(newOutputInterceptor)
+      }
 
     xformsHandlerContext.pushCaseContext(isVisible)
   }
 
   protected override def handleControlEnd(): Unit = {
+
     xformsHandlerContext.popCaseContext()
 
-    locally {
-      currentOutputInterceptor.flushCharacters(true, true)
-      if (isMustGenerateBeginEndDelimiters) {
-        // Make sure first delimiter was output
-        currentOutputInterceptor.generateFirstDelimitersIfNeeded()
+    currentOutputInterceptorOpt match {
+      case None ⇒
+        if (isVisible) {
+          val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+          val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
+          currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
 
-        // Output end delimiter
-        currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
-      }
+          if (xformsHandlerContext.hasFullUpdateTopLevelControl)
+            currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
+        }
+      case Some(currentOutputInterceptor) ⇒
+        currentOutputInterceptor.flushCharacters(true, true)
+        if (isMustGenerateBeginEndDelimiters) {
+          // Make sure first delimiter was output
+          currentOutputInterceptor.generateFirstDelimitersIfNeeded()
+
+          // Output end delimiter
+          currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+        }
     }
 
     xformsHandlerContext.getController.setOutput(currentSavedOutput)

@@ -298,7 +298,9 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     val otherSwitchControl = previousControlOpt.asInstanceOf[Option[XFormsSwitchControl]]
 
     val hasNestedContent =
-      isRelevant && getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)
+      isRelevant                    &&
+      ! staticControl.hasFullUpdate &&
+      getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)
 
     val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
       // Output newly selected case id
@@ -336,7 +338,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     )
   }
 
-  private def getOtherSelectedCaseEffectiveId(previousSwitchControl: Option[XFormsSwitchControl]): String =
+  def getOtherSelectedCaseEffectiveId(previousSwitchControl: Option[XFormsSwitchControl]): String =
     previousSwitchControl match {
       case Some(control) if control.isRelevant ⇒
         val selectedCaseId = control.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId

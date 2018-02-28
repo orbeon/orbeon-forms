@@ -14,20 +14,25 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsProperties}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverUnneededEvents}
+import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
 import org.xml.sax.{Attributes, Locator}
+import shapeless._
+import shapeless.syntax.typeable._
 
 abstract class XFormsAnnotatorBase(
   templateReceiver  : XMLReceiver,
-  extractorReceiver : XMLReceiver
+  extractorReceiver : XMLReceiver,
+  metadata          : Metadata
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents {
 
   private val keepLocationData = XFormsProperties.isKeepLocation
   private var _documentLocator: Locator = null
   def documentLocator = _documentLocator
+
+  protected val templateSAXStoreOpt = templateReceiver.cast[SAXStore]
 
   def isInXBLBinding: Boolean
   def isInPreserve: Boolean
@@ -45,14 +50,20 @@ abstract class XFormsAnnotatorBase(
     "dl"
   )
 
-  case class StackElement(parent: Option[StackElement], uri: String, localname: String) {
-    val isXForms                   = uri == XFORMS_NAMESPACE_URI
-    val isXXForms                  = uri == XXFORMS_NAMESPACE_URI
-    val isEXForms                  = uri == EXFORMS_NAMESPACE_URI
-    val isXBL                      = uri == XBL_NAMESPACE_URI
-    val isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms
-    def isXHTML                    = uri == XHTML_NAMESPACE_URI
+  case class StackElement(
+    parent                     : Option[StackElement],
+    uri                        : String,
+    localname                  : String,
+    isXForms                   : Boolean,
+    isXXForms                  : Boolean,
+    isEXForms                  : Boolean,
+    isXBL                      : Boolean,
+    isXFormsOrBuiltinExtension : Boolean,
+    isXHTML                    : Boolean,
+    isFullUpdate               : Boolean
+  ) {
 
+    // Urgh, this is ugly
     private var endElementName: Option[(String, String, String)] = None
 
     def startElement(uri: String, localname: String, qName: String, atts: Attributes): Unit = {
@@ -73,11 +84,71 @@ abstract class XFormsAnnotatorBase(
       Iterator.iterate(parent.orNull)(_.parent.orNull) takeWhile (_ ne null)
   }
 
+  object StackElement {
+
+    def apply(parent: Option[StackElement], uri: String, localname: String, atts: Attributes): StackElement = {
+
+      val isXForms  = uri == XFORMS_NAMESPACE_URI
+      val isXXForms = uri == XXFORMS_NAMESPACE_URI
+      val isEXForms = uri == EXFORMS_NAMESPACE_URI
+
+      StackElement(
+        parent                     = parent,
+        uri                        = uri,
+        localname                  = localname,
+        isXForms                   = isXForms,
+        isXXForms                  = isXXForms,
+        isEXForms                  = isEXForms,
+        isXBL                      = uri == XBL_NAMESPACE_URI,
+        isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms,
+        isXHTML                    = uri == XHTML_NAMESPACE_URI,
+        isFullUpdate               = atts.getValue(XXFORMS_UPDATE_QNAME.namespace.uri, XXFORMS_UPDATE_QNAME.name) == XFORMS_FULL_UPDATE
+      )
+    }
+  }
+
+  protected def handleFullUpdateIfNeeded(
+    stackElement    : StackElement,
+    atts            : Attributes,
+    xformsElementId : String
+  ): Attributes =
+    templateSAXStoreOpt map { templateSAXStore ⇒
+
+    def isSwitch =
+      stackElement.isXForms && stackElement.localname == "switch"
+
+    def isCase =
+      stackElement.isXForms && stackElement.localname == "case"
+
+    def putMark(): Unit =
+      metadata.putMark(templateSAXStore.getMark(rewriteId(xformsElementId)))
+
+    def attsWithNewClass =
+      SAXUtils.appendToClassAttribute(atts, "xforms-update-full")
+
+    if (isSwitch && stackElement.isFullUpdate) {
+      // Don't remember mark but produce class
+      attsWithNewClass
+    } else if (isCase && (stackElement.parent exists (_.isFullUpdate))) {
+      // Remember mark but don't produce class
+      putMark() // side effect: remember mark
+      atts
+    } else if (stackElement.isFullUpdate) {
+      putMark() // side effect: remember mark
+      attsWithNewClass
+    } else {
+      atts
+    }
+  } getOrElse
+    atts
+
+  protected def rewriteId(id: String): String = id
+
   private var stack: List[StackElement] = Nil
 
   def currentStackElement = stack.head
 
-  def startElement(uri: String, localname: String): StackElement = {
+  def startElement(uri: String, localname: String, atts: Attributes): StackElement = {
 
     val parentOpt = stack.headOption
 
@@ -85,7 +156,8 @@ abstract class XFormsAnnotatorBase(
       StackElement(
         parentOpt,
         uri,
-        localname
+        localname,
+        atts
       )
 
     stack ::= newStackElement

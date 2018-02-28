@@ -164,7 +164,8 @@ object ControlAnalysisFactory {
        with ChildrenBuilderTrait
        with AppearanceTrait {
 
-    val caseref = Option(element.attributeValue(CASEREF_QNAME))
+    val caseref           = element.attributeValueOpt(CASEREF_QNAME)
+    val hasFullUpdate     = element.attributeValueOpt(XXFORMS_UPDATE_QNAME).contains(XFORMS_FULL_UPDATE)
 
     lazy val caseControls = children collect { case c: CaseControl ⇒ c }
     lazy val caseIds      = caseControls map (_.staticId) toSet
@@ -181,8 +182,8 @@ object ControlAnalysisFactory {
        with StaticLHHASupport
        with ChildrenBuilderTrait {
 
-    val selected        = Option(element.attributeValue(SELECTED_QNAME))
-    val valueExpression = Option(element.attributeValue(VALUE_QNAME))
+    val selected        = element.attributeValueOpt(SELECTED_QNAME)
+    val valueExpression = element.attributeValueOpt(VALUE_QNAME)
     val valueLiteral    = valueExpression flatMap { valueExpr ⇒
 
       val literal =

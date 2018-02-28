@@ -247,7 +247,7 @@
                         <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
 
                             <!-- FIXME: Don't like that this is a top-level `switch` id! -->
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer">
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" xxf:update="full">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xf:action type="javascript" event="fr-section-scroll" target="#observer">
@@ -362,7 +362,7 @@
                                                         <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>
 
                                                         <!-- Subsections -->
-                                                        <xf:switch id="{$static-section-id}-switch" xxf:element="div">
+                                                        <xf:switch id="{$static-section-id}-switch" xxf:element="div" xxf:update="full">
                                                             <xsl:for-each select="fr:section | fr:grid">
                                                                 <!-- fr:grid might not have an id, and we need one to toggle -->
                                                                 <xsl:variable name="section-or-grid-id" select="(@id, concat(generate-id(), '-wizard-grid'))[1]"/>

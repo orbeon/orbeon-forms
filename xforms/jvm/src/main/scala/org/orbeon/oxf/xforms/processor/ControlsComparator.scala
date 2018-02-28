@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XXFormsDynamicControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsCaseControl, XFormsRepeatControl, XFormsSwitchControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.processor.handlers._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XHTMLHeadHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
@@ -66,6 +66,9 @@ class ControlsComparator(
         def getMark(control: XFormsControl) =
           document.getStaticOps.getMark(control.getPrefixedId)
 
+        def getMarkOrThrow(control: XFormsControl) =
+          getMark(control).ensuring(_.isDefined, "missing mark").get
+
         // Custom extractor to make match below nicer
         object ControlWithMark {
           def unapply(c: XFormsControl) = if (fullUpdateBuffer.isEmpty) getMark(c) else None
@@ -85,14 +88,28 @@ class ControlsComparator(
                 true
               } else
                 false
+            case c: XFormsSwitchControl ⇒
+              val otherSwitchControlOpt = control1Opt.asInstanceOf[Option[XFormsSwitchControl]]
+              // TODO: relevance
+              if (c.staticControl.hasFullUpdate && c.getSelectedCaseEffectiveId != c.getOtherSelectedCaseEffectiveId(otherSwitchControlOpt)) {
+                processFullUpdateForContent(c, getMarkOrThrow(c.selectedCase.get).replay)
+                true
+              } else
+                false
+//            case c: XFormsCaseControl ⇒
+//
+//              val isVisible  = c.isVisible
+//              val wasVisible = control1Opt.exists(_.asInstanceOf[XFormsCaseControl].isVisible)
+//
+//              if (c.staticControl.hasFullUpdate && isVisible != wasVisible) {
+//                processFullUpdateForContent(c, getMarkOrThrow(c).replay)
+//                true
+//              } else
+//                false
             case c: XFormsComponentControl ⇒
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")
-
-                val mark =
-                  getMark(c).ensuring(_.isDefined, "missing mark").get
-
-                processFullUpdateForContent(c, mark.replay)
+                processFullUpdateForContent(c, getMarkOrThrow(c).replay)
                 true
               } else
                 false

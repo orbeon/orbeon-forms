@@ -396,8 +396,6 @@ public class XFormsConstants {
     public static final QName SELECTED_QNAME = QName.apply("selected");
     public static final QName CASEREF_QNAME  = QName.apply("caseref");
 
-    public static final QName XXF_UPDATE_QNAME = QName.apply("update", XFormsConstants.XXFORMS_NAMESPACE);
-
     private XFormsConstants() {
         // Disallow construction
     }

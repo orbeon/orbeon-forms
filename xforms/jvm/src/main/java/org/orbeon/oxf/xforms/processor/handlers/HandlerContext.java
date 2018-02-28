@@ -211,6 +211,10 @@ public class HandlerContext {
         return effectiveId.equals(topLevelControlEffectiveId);
     }
 
+    public boolean hasFullUpdateTopLevelControl() {
+        return topLevelControlEffectiveId != null;
+    }
+
     /**
      * Return location data associated with the current SAX event.
      *

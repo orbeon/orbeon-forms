@@ -16,8 +16,12 @@ class ComponentControl(
      with ShadowChildrenBuilder
      with OptionalSingleNode {   // binding could be mandatory, optional, or prohibited
 
-  val hasLazyBinding  : Boolean         = ! part.isTopLevel && element.attributeValueOpt(XFormsConstants.XXF_UPDATE_QNAME).contains("full")
-  val abstractBinding : AbstractBinding = part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
+  val hasLazyBinding: Boolean =
+    ! part.isTopLevel &&
+      element.attributeValueOpt(XFormsConstants.XXFORMS_UPDATE_QNAME).contains(XFormsConstants.XFORMS_FULL_UPDATE)
+
+  val abstractBinding: AbstractBinding =
+    part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
 
   // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
   private var _concreteBindingOpt: Option[ConcreteBinding] = None//part.xblBindings.getBinding(prefixedId)

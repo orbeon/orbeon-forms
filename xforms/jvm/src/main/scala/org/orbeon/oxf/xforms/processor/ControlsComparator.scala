@@ -291,15 +291,15 @@ class ControlsComparator(
         controller.endDocument()
       }
 
-      val javaScriptInitializations @ (placeholders, controlsToInitialize) = XHTMLHeadHandler.gatherJavaScriptInitializations(control)
-      if (placeholders.nonEmpty || controlsToInitialize.nonEmpty) {
+      val controlsToInitialize = XHTMLHeadHandler.gatherJavaScriptInitializations(control)
+      if (controlsToInitialize.nonEmpty) {
         val sb = new jl.StringBuilder
         sb.append('{')
         XHTMLHeadHandler.buildJavaScriptInitializations(
-          containingDocument        = document,
-          prependComma              = false,
-          javaScriptInitializations = javaScriptInitializations,
-          sb                        = sb
+          containingDocument   = document,
+          prependComma         = false,
+          controlsToInitialize = controlsToInitialize,
+          sb                   = sb
         )
         sb.append('}')
 

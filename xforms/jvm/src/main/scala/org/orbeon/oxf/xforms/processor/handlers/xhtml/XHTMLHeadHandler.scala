@@ -25,7 +25,6 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.state.XFormsStateManager
@@ -111,7 +110,7 @@ class XHTMLHeadHandler(
 
       outputJavaScriptInitialData(
         xhtmlPrefix,
-        containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse (Nil, Nil)
+        containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse Nil
       )
     }
   }
@@ -397,22 +396,19 @@ class XHTMLHeadHandler(
   }
 
   private def outputJavaScriptInitialData(
-    xhtmlPrefix               : String,
-    javaScriptInitializations : (List[String], List[(String, Option[String])]))(implicit
-    helper                    : XMLReceiverHelper
+    xhtmlPrefix          : String,
+    controlsToInitialize : List[(String, Option[String])])(implicit
+    helper               : XMLReceiverHelper
   ): Unit = {
 
     helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
-    val (placeholders, controlsToInitialize) = javaScriptInitializations
-
     // Produce JSON output
     val hasPaths                = true
-    val hasPlaceholders         = placeholders.nonEmpty
     val hasControlsToInitialize = controlsToInitialize.nonEmpty
     val hasKeyListeners         = containingDocument.getStaticOps.keypressHandlers.nonEmpty
     val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
-    val outputInitData          = hasPaths || hasPlaceholders || hasControlsToInitialize || hasKeyListeners || hasServerEvents
+    val outputInitData          = hasPaths || hasControlsToInitialize || hasKeyListeners || hasServerEvents
 
     if (outputInitData) {
       val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
@@ -445,12 +441,12 @@ class XHTMLHeadHandler(
         sb.append('}')
       }
 
-      if (hasPlaceholders || hasControlsToInitialize)
-        buildJavaScriptInitializations(containingDocument, hasPaths, javaScriptInitializations, sb)
+      if (hasControlsToInitialize)
+        buildJavaScriptInitializations(containingDocument, hasPaths, controlsToInitialize, sb)
 
       // Output key listener information
       if (hasKeyListeners) {
-        if (hasPaths || hasPlaceholders || hasControlsToInitialize)
+        if (hasPaths || hasControlsToInitialize)
           sb.append(',')
         sb.append("\"keylisteners\":[")
         var first = true
@@ -481,7 +477,7 @@ class XHTMLHeadHandler(
 
       // Output server events
       if (hasServerEvents) {
-        if (hasPaths || hasPlaceholders || hasControlsToInitialize || hasKeyListeners)
+        if (hasPaths || hasControlsToInitialize || hasKeyListeners)
           sb.append(',')
         sb.append("\"server-events\":[")
         val currentTime = System.currentTimeMillis
@@ -525,30 +521,13 @@ object XHTMLHeadHandler {
     }
 
   def buildJavaScriptInitializations(
-    containingDocument        : XFormsContainingDocument,
-    prependComma              : Boolean,
-    javaScriptInitializations : (List[String], List[(String, Option[String])]),
-    sb                        : jl.StringBuilder
-  ): Unit = {
-
-    val (placeholders, controlsToInitialize) = javaScriptInitializations
-
-    if (placeholders.nonEmpty) {
-      if (prependComma)
-        sb.append(',')
-      sb.append("\"placeholders\":[")
-      val i = placeholders.iterator
-      while (i.hasNext) {
-        val controlId = i.next()
-        sb.append(quoteString(controlId))
-        if (i.hasNext)
-          sb.append(',')
-      }
-      sb.append(']')
-    }
-
+    containingDocument   : XFormsContainingDocument,
+    prependComma         : Boolean,
+    controlsToInitialize : List[(String, Option[String])],
+    sb                   : jl.StringBuilder
+  ): Unit =
     if (controlsToInitialize.nonEmpty) {
-      if (prependComma || placeholders.nonEmpty)
+      if (prependComma)
         sb.append(',')
       sb.append("\"controls\":[")
       val it = controlsToInitialize.iterator
@@ -567,22 +546,15 @@ object XHTMLHeadHandler {
       }
       sb.append(']')
     }
-  }
 
-  def gatherJavaScriptInitializations(startControl: XFormsControl): (List[String], List[(String, Option[String])]) = {
+  def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
 
-    val placeholders         = ListBuffer[String]()
     val controlsToInitialize = ListBuffer[(String, Option[String])]()
 
     def addControlToInitialize(effectiveId: String, value: Option[String]) =
       controlsToInitialize += effectiveId → value
 
     Controls.ControlsIterator(startControl, includeSelf = false) foreach {
-      case c: XFormsInputControl ⇒
-        // Special case of placeholders (useful only for IE9 as of 2017-06-02)
-        PlaceHolderInfo.placeHolderValueOpt(c.containingDocument, c.staticControl, Some(c)) foreach { _ ⇒
-          placeholders += c.getEffectiveId
-        }
       case c: XFormsValueComponentControl ⇒
         if (c.isRelevant) {
           val abstractBinding = c.staticControl.abstractBinding
@@ -605,6 +577,6 @@ object XHTMLHeadHandler {
           addControlToInitialize(c.getEffectiveId, None)
     }
 
-    placeholders.result → controlsToInitialize.result
+    controlsToInitialize.result
   }
 }

@@ -643,7 +643,12 @@
                                                         for $id in $relevant-top-level-section-ids[position() gt 1]
                                                         return
                                                             if (
-                                                                exists(index-of(xxf:split(xxf:instance('available-sections')), frf:controlNameFromIdOpt($id))) and
+                                                                exists(
+                                                                    index-of(
+                                                                        xxf:split(xxf:instance('available-sections')),
+                                                                        frf:controlNameFromIdOpt($id)
+                                                                    )
+                                                                ) and
                                                                     exists(xxf:binding($id)/@fr:section-status)
                                                             ) then
                                                                 $id
@@ -815,7 +820,13 @@
 
                         <xf:var name="top-level-section-available">
                             <xxf:value
-                                value="exists(index-of(xxf:split(xxf:instance('available-sections')), '{frf:controlNameFromIdOpt($static-section-id)}'))"
+                                value="
+                                    exists(
+                                        index-of(
+                                            xxf:split(xxf:instance('available-sections')),
+                                            '{frf:controlNameFromIdOpt($static-section-id)}'
+                                        )
+                                    )"
                                 xxbl:scope="inner"/>
                         </xf:var>
 

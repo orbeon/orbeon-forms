@@ -2148,7 +2148,14 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         showDialog: function (controlId, neighbor) {
             var divElement = document.getElementById(controlId);
-            var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+            var initializedDialog = function() { return ORBEON.xforms.Globals.dialogs[controlId]; }
+            var yuiDialog = initializedDialog();
+
+            // Initialize dialog now, if it hasn't been done already
+            if (! _.isObject(yuiDialog)) {
+                ORBEON.xforms.Init._dialog(divElement);
+                yuiDialog = initializedDialog();
+            }
 
             // Take out the focus from the current control. This is particularly important with non-modal dialogs
             // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
@@ -3797,23 +3804,26 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 var control = document.getElementById(idValueOpt.id);
                 if (control) {
                     var jControl = $(control);
-                    if (ORBEON.xforms.XBL.isComponent(control)) {
-                        // Custom XBL component initialization
-                        var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                        if (_.isObject(instance)) {
-                            if (_.isString(idValueOpt.value)) {
-                                ORBEON.xforms.Controls.setCurrentValue(control, idValueOpt.value);
+                    // Exclude controls in repeat templates
+                    if (jControl.parents(".xforms-repeat-template").length == 0) {
+                        if (ORBEON.xforms.XBL.isComponent(control)) {
+                            // Custom XBL component initialization
+                            var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                            if (_.isObject(instance)) {
+                                if (_.isString(idValueOpt.value)) {
+                                    ORBEON.xforms.Controls.setCurrentValue(control, idValueOpt.value);
+                                }
                             }
+                        } else if (jControl.is('.xforms-dialog.xforms-dialog-visible-true')) {
+                            // Initialized visible dialogs
+                            ORBEON.xforms.Init._dialog(control);
+                        } else if (jControl.is('.xforms-select1-appearance-compact, .xforms-select-appearance-compact')) {
+                            // Legacy JavaScript initialization
+                            ORBEON.xforms.Init._compactSelect(control);
+                        } else if (jControl.is('.xforms-range')) {
+                            // Legacy JavaScript initialization
+                            ORBEON.xforms.Init._range(control);
                         }
-                    } else if (jControl.is('.xforms-dialog')) {
-                        // Special case for dialogs
-                        ORBEON.xforms.Init._dialog(control);
-                    } else if (jControl.is('.xforms-select1-appearance-compact, .xforms-select-appearance-compact')) {
-                        // Legacy JavaScript initialization
-                        ORBEON.xforms.Init._compactSelect(control);
-                    } else if (jControl.is('.xforms-range')) {
-                        // Legacy JavaScript initialization
-                        ORBEON.xforms.Init._range(control);
                     }
                 }
             });

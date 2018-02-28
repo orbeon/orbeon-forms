@@ -1765,18 +1765,21 @@
                             if (visible) {
                                 ORBEON.xforms.Controls.showDialog(id, neighbor);
                             } else {
-                                // Remove timer to show the dialog asynchronously so it doesn't show later!
-                                var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID];
-                                if (dialogTimerIdsMap && dialogTimerIdsMap[id]) {
-                                    clearTimeout(dialogTimerIdsMap[id]);
-                                    delete dialogTimerIdsMap[id];
-                                }
+                                // If the dialog hasn't been initialized yet, there is nothing we need to do to hide it
+                                if (_.isObject(yuiDialog)) {
+                                    // Remove timer to show the dialog asynchronously so it doesn't show later!
+                                    var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID];
+                                    if (dialogTimerIdsMap && dialogTimerIdsMap[id]) {
+                                        clearTimeout(dialogTimerIdsMap[id]);
+                                        delete dialogTimerIdsMap[id];
+                                    }
 
-                                ORBEON.xforms.Globals.maskDialogCloseEvents = true;
-                                yuiDialog.hide();
-                                ORBEON.xforms.Globals.maskDialogCloseEvents = false;
-                                // Fixes cursor Firefox issue; more on this in dialog init code
-                                yuiDialog.element.style.display = "none";
+                                    ORBEON.xforms.Globals.maskDialogCloseEvents = true;
+                                    yuiDialog.hide();
+                                    ORBEON.xforms.Globals.maskDialogCloseEvents = false;
+                                    // Fixes cursor Firefox issue; more on this in dialog init code
+                                    yuiDialog.element.style.display = "none";
+                                }
                             }
                         }
 

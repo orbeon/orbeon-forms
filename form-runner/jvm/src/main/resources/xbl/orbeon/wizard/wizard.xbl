@@ -508,12 +508,15 @@
                                 <xf:var
                                     name="allow-next-top-level"
                                     value="
-                                        exists(
-                                            index-of(
-                                                xxf:split(xxf:instance('available-sections')),
-                                                frf:controlNameFromIdOpt(replace($next-top-level-case-ids[1], '-case$', ''))
-                                            )
-                                        )"/>
+                                        let $next-top-level-case-id := $next-top-level-case-ids[1]
+                                        return
+                                            exists($next-top-level-case-id) and
+                                            exists(
+                                                index-of(
+                                                    xxf:split(xxf:instance('available-sections')),
+                                                    frf:controlNameFromIdOpt(replace($next-top-level-case-id, '-case$', ''))
+                                                )
+                                            )"/>
 
                                 <!-- True if we can go to the next top-level section OR if next is not in different top-level section -->
                                 <xf:var

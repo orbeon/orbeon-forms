@@ -235,8 +235,17 @@ object ControlLabelHintTextEditor {
         tinymceAnchor.show()
         tinymceAnchor.attr("id", Underscore.uniqueId())
 
+        // TinyMCE config from property, if defined
+        val mceConfig = {
+          val customConfigJS = $(".fb-tinymce-config .xforms-output-output").text()
+          println("customConfigJS", customConfigJS)
+          if (customConfigJS.trim != "")
+            js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
+          else
+            Underscore.clone(TinyMceDefaultConfig)
+        }
+
         // Auto-size MCE height based on the content, with min height of 100px
-        val mceConfig = Underscore.clone(TinyMceDefaultConfig)
         mceConfig.plugins += ",autoresize"
         mceConfig.autoresize_min_height = 100
         mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom

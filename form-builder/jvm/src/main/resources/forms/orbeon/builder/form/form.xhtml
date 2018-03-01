@@ -28,8 +28,8 @@
     </xh:head>
     <xh:body>
 
-        <!-- For the summary page -->
         <xh:div class="xforms-hidden">
+            <!-- For the summary page -->
             <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search">
                 <xf:label ref="$form-resources/application-name/label"/>
             </xf:output>
@@ -42,6 +42,8 @@
             <xf:output id="description-control" bind="description-bind" class="fr-summary fr-search">
                 <xf:label ref="$form-resources/description/label"/>
             </xf:output>
+            <!-- Expose property -->
+            <xf:output class="fb-tinymce-config" value="xxf:property('oxf.fb.tinymce.config')"/>
         </xh:div>
 
         <xh:div class="fb-navbar navbar navbar-fixed-top">

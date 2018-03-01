@@ -115,6 +115,7 @@
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                                       value="true"/>
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
+    <property as="xs:string"  name="oxf.fb.tinymce.config"                                      value=""/>
 
     <!-- Form Builder detail page buttons -->
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="inline"/>

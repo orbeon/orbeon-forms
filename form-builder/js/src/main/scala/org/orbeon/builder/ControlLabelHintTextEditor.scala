@@ -238,7 +238,6 @@ object ControlLabelHintTextEditor {
         // TinyMCE config from property, if defined
         val mceConfig = {
           val customConfigJS = $(".fb-tinymce-config .xforms-output-output").text()
-          println("customConfigJS", customConfigJS)
           if (customConfigJS.trim != "")
             js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
           else

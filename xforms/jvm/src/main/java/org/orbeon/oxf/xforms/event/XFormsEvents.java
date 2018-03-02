@@ -90,6 +90,9 @@ public class XFormsEvents {
     public static final String XFORMS_READONLY = "xforms-readonly";
     public static final String XXFORMS_CONSTRAINTS_CHANGED = "xxforms-constraints-changed";
 
+    public static final String XXFORMS_VISIBLE = "xxforms-visible";
+    public static final String XXFORMS_HIDDEN  = "xxforms-hidden";
+
     public static final String XXFORMS_VISITED = "xxforms-visited";
     public static final String XXFORMS_UNVISITED = "xxforms-unvisited";
 

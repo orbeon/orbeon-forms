@@ -554,7 +554,7 @@ object XHTMLHeadHandler {
     def addControlToInitialize(effectiveId: String, value: Option[String]) =
       controlsToInitialize += effectiveId → value
 
-    Controls.ControlsIterator(startControl, includeSelf = false) foreach {
+    Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
       case c: XFormsValueComponentControl ⇒
         if (c.isRelevant) {
           val abstractBinding = c.staticControl.abstractBinding

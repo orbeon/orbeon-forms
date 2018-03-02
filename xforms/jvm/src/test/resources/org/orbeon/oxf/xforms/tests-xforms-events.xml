@@ -129,7 +129,9 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-group-1" indexes=""/>
+                                    <event type="xxforms-visible" target="my-group-1" indexes=""/>
                                     <event type="xforms-enabled" target="my-input-1" indexes=""/>
+                                    <event type="xxforms-visible" target="my-input-1" indexes=""/>
                                     <event type="xforms-value-changed" target="my-input-1" indexes=""/>
                                 </events>
                             </instance>
@@ -1564,10 +1566,13 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-switch" indexes=""/>
+                                    <event type="xxforms-visible" target="my-switch" indexes=""/>
                                     <event type="xforms-enabled" target="input1" indexes=""/>
+                                    <event type="xxforms-visible" target="input1" indexes=""/>
                                     <event type="xforms-deselect" target="case1" indexes=""/>
                                     <event type="xforms-disabled" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
+                                    <event type="xxforms-visible" target="input2" indexes=""/>
                                     <event type="xforms-select" target="case2" indexes=""/>
                                 </events>
                             </instance>
@@ -1644,9 +1649,13 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-switch" indexes=""/>
+                                    <event type="xxforms-visible" target="my-switch" indexes=""/>
                                     <event type="xforms-enabled" target="input1" indexes=""/>
+                                    <event type="xxforms-visible" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
                                     <event type="xforms-deselect" target="case1" indexes=""/>
+                                    <event type="xxforms-hidden" target="input1" indexes=""/>
+                                    <event type="xxforms-visible" target="input2" indexes=""/>
                                     <event type="xforms-select" target="case2" indexes=""/>
                                 </events>
                             </instance>
@@ -1879,7 +1888,7 @@
                 </xh:head>
                 <xh:body>
 
-                    <xf:insert ev:event="#all"
+                    <xf:insert ev:event="xforms-enabled xforms-value-changed"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
                                             (xf:attribute('type', event('xxf:type')),
@@ -1988,7 +1997,9 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-input" indexes=""/>
+                                    <event type="xxforms-visible" target="my-input" indexes=""/>
                                     <event type="xforms-enabled" target="my-group" indexes=""/>
+                                    <event type="xxforms-visible" target="my-group" indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -2049,11 +2060,17 @@
                             </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="xforms-enabled" target="my-repeat" indexes=""/>
-                                    <event type="xforms-enabled" target="my-input" indexes="1"/>
-                                    <event type="xforms-enabled" target="my-trigger" indexes="1"/>
-                                    <event type="xforms-disabled" target="my-input" indexes="1"/>
-                                    <event type="xforms-disabled" target="my-trigger" indexes="1"/>
+                                     <event type="xforms-enabled" target="my-repeat" indexes=""/>
+                                     <event type="xxforms-visible" target="my-repeat" indexes=""/>
+                                     <event type="xforms-enabled" target="my-input" indexes="1"/>
+                                     <event type="xxforms-visible" target="my-input" indexes="1"/>
+                                     <event type="xforms-enabled" target="my-trigger" indexes="1"/>
+                                     <event type="xxforms-visible" target="my-trigger" indexes="1"/>
+                                     <event type="xxforms-hidden" target="my-input" indexes="1"/>
+                                     <event type="xforms-disabled" target="my-input" indexes="1"/>
+                                     <event type="xxforms-hidden" target="my-trigger" indexes="1"/>
+                                     <event type="xforms-disabled" target="my-trigger" indexes="1"/>
+                                     <event type="xxforms-hidden" target="my-repeat" indexes=""/>
                                     <event type="xforms-disabled" target="my-repeat" indexes=""/>
                                 </events>
                             </instance>
@@ -2614,6 +2631,95 @@
                     <xxf:control-values/>
                     <xxf:focus control-id="my-input⊙1"/>
                 </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="For #3494: Support xxforms-visible and xxforms-hidden events" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance" xxf:exclude-result-prefixes="#all">
+                            <value show="true"/>
+                        </xf:instance>
+
+                        <xf:bind ref="instance()" relevant="@show = 'true'"/>
+
+                        <xf:instance id="events" xxf:exclude-result-prefixes="#all"><events/></xf:instance>
+
+                        <xf:insert
+                            observer="my-switch"
+                            event="xxforms-enabled xforms-disabled xxforms-visible xxforms-hidden"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element(event('xxf:type'), xf:attribute('targetid', event('xxf:targetid')))"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:toggle case="my-case2"/>
+                            <xf:setvalue ref="@show">false</xf:setvalue>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <xf:switch id="my-switch">
+                        <xf:case id="my-case1">
+
+                            <xf:input id="my-input11" ref="instance()"/>
+                            <xf:input id="my-input12" ref="()"/>
+
+                        </xf:case>
+                        <xf:case id="my-case2">
+
+                            <xf:input id="my-input21" ref="instance()"/>
+                            <xf:input id="my-input22" ref="()"/>
+
+                        </xf:case>
+                    </xf:switch>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                       <instances>
+                           <instance id="instance" model-id="model">
+                               <value show="false"/>
+                           </instance>
+                           <instance id="events" model-id="model">
+                               <events>
+                                   <xxforms-visible targetid="my-switch"/>
+                                   <xxforms-visible targetid="my-input11"/>
+                                   <xxforms-hidden targetid="my-input11"/>
+                                   <xxforms-visible targetid="my-input21"/>
+                                   <xforms-disabled targetid="my-input11"/>
+                                   <xxforms-hidden targetid="my-input21"/>
+                                   <xforms-disabled targetid="my-input21"/>
+                               </events>
+                           </instance>
+                       </instances>
+                       <controls>
+                           <control effective-id="my-switch" case-id="my-case2"/>
+                       </controls>
+                   </dynamic-state>
+               </xxf:dynamic-state>
+               <xxf:action>
+                   <xxf:control-values>
+                       <xxf:control id="my-switch">
+                           <xxf:case id="my-case2" visibility="visible"/>
+                           <xxf:case id="my-case1" visibility="hidden"/>
+                       </xxf:control>
+                       <xxf:control id="my-input11" relevant="false"/>
+                       <xxf:control id="my-input12" relevant="false"/>
+                       <xxf:control id="my-input21" relevant="false"/>
+                       <xxf:control id="my-input22" relevant="false"/>
+                   </xxf:control-values>
+               </xxf:action>
             </xxf:event-response>
         </output>
     </test>

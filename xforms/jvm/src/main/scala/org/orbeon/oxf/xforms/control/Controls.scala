@@ -530,13 +530,15 @@ object Controls {
 
   // Iterator over the given control and its descendants
   class ControlsIterator(
-    private val start       : XFormsControl,
-    private val includeSelf : Boolean
+    private val start         : XFormsControl,
+    private val includeSelf   : Boolean,
+    private val followVisible : Boolean
   ) extends Iterator[XFormsControl] {
 
     private val children = start match {
-      case containerControl: XFormsContainerControl ⇒ containerControl.children.iterator
-      case control                                  ⇒ Iterator.empty
+      case c: XFormsSwitchControl if followVisible ⇒ c.selectedCase.iterator
+      case c: XFormsContainerControl               ⇒ c.children.iterator
+      case _                                       ⇒ Iterator.empty
     }
 
     private var descendants: Iterator[XFormsControl] = Iterator.empty
@@ -570,11 +572,11 @@ object Controls {
   }
 
   object ControlsIterator {
-    def apply(start: XFormsControl, includeSelf: Boolean): Iterator[XFormsControl] =
-      new ControlsIterator(start, includeSelf)
+    def apply(start: XFormsControl, includeSelf: Boolean, followVisible: Boolean = false): Iterator[XFormsControl] =
+      new ControlsIterator(start, includeSelf, followVisible)
 
     def apply(start: ControlTree): Iterator[XFormsControl] =
-      start.children.iterator flatMap (new ControlsIterator(_, includeSelf = true))
+      start.children.iterator flatMap (new ControlsIterator(_, includeSelf = true, followVisible = false))
   }
 
   // Evaluate the body with InstancesControls in scope

@@ -958,7 +958,7 @@
                 <xh:body>
 
                     <xf:group id="group">
-                        <xf:insert ev:event="#all"
+                        <xf:insert ev:event="xforms-insert xforms-delete xforms-submit-done xforms-enabled"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
                                                 (xf:attribute('type', event('xxf:type')),

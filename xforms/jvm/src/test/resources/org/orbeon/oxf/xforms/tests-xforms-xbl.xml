@@ -916,7 +916,7 @@
 
                                 <xf:group id="external-group">
                                     <!-- Record all events -->
-                                    <xf:insert ev:event="#all"
+                                    <xf:insert ev:event="xforms-enabled fr:my-event"
                                                    context="instance('events')" ref="*"
                                                    origin="xf:element('event',
                                                             (xf:attribute('type', event('xxf:type')),
@@ -926,7 +926,7 @@
                                                              xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
                                                              xf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
-                                    <xf:insert ev:event="#all" ev:phase="capture"
+                                    <xf:insert ev:event="xforms-enabled fr:my-event" ev:phase="capture"
                                                    context="instance('events')" ref="*"
                                                    origin="xf:element('event',
                                                             (xf:attribute('type', event('xxf:type')),
@@ -1474,7 +1474,7 @@
                                             </xbl:handler>
 
                                             <!-- TEST: Record all events -->
-                                            <xbl:handler event="#all">
+                                            <xbl:handler event="xforms-enabled my-event">
                                                 <xf:insert model="model"
                                                    context="instance('events')" ref="*"
                                                    origin="xf:element('event',
@@ -1700,14 +1700,22 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xf:element('event',
-                                                            (xf:attribute('observer', event('xxf:observerid')),
-                                                             xf:attribute('type', event('xxf:type')),
-                                                             xf:attribute('target', event('xxf:targetid')),
-                                                             xf:attribute('phase', event('xxf:phase')),
-                                                             xf:attribute('original-target', event('xxf:targetid')),
-                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                <xf:insert
+                                                    context="xxf:instance('events')"
+                                                    ref="*"
+                                                    if="not(event('xxf:type') = ('xxforms-index-changed', 'xxforms-visible'))"
+                                                    origin="
+                                                        xf:element(
+                                                            'event',
+                                                            (
+                                                                xf:attribute('observer', event('xxf:observerid')),
+                                                                xf:attribute('type', event('xxf:type')),
+                                                                xf:attribute('target', event('xxf:targetid')),
+                                                                xf:attribute('phase', event('xxf:phase')),
+                                                                xf:attribute('original-target', event('xxf:targetid')),
+                                                                xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                                            )
+                                                        )"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value1" phase="target" xxbl:scope="outer">
                                                 <xf:dispatch name="up-value2" targetid="level2-component">
@@ -1730,14 +1738,22 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xf:element('event',
-                                                            (xf:attribute('observer', event('xxf:observerid')),
-                                                             xf:attribute('type', event('xxf:type')),
-                                                             xf:attribute('target', event('xxf:targetid')),
-                                                             xf:attribute('phase', event('xxf:phase')),
-                                                             xf:attribute('original-target', event('xxf:targetid')),
-                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                <xf:insert
+                                                    context="xxf:instance('events')"
+                                                    ref="*"
+                                                    if="not(event('xxf:type') = ('xxforms-index-changed', 'xxforms-visible'))"
+                                                    origin="
+                                                        xf:element(
+                                                            'event',
+                                                            (
+                                                                xf:attribute('observer', event('xxf:observerid')),
+                                                                xf:attribute('type', event('xxf:type')),
+                                                                xf:attribute('target', event('xxf:targetid')),
+                                                                xf:attribute('phase', event('xxf:phase')),
+                                                                xf:attribute('original-target', event('xxf:targetid')),
+                                                                xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                                            )
+                                                        )"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
                                                 <xf:dispatch name="up-value3" targetid="level3-component">
@@ -1760,14 +1776,22 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xf:element('event',
-                                                            (xf:attribute('observer', event('xxf:observerid')),
-                                                             xf:attribute('type', event('xxf:type')),
-                                                             xf:attribute('target', event('xxf:targetid')),
-                                                             xf:attribute('phase', event('xxf:phase')),
-                                                             xf:attribute('original-target', event('xxf:targetid')),
-                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                <xf:insert
+                                                    context="xxf:instance('events')"
+                                                    ref="*"
+                                                    if="not(event('xxf:type') = ('xxforms-index-changed', 'xxforms-visible'))"
+                                                    origin="
+                                                        xf:element(
+                                                            'event',
+                                                            (
+                                                                xf:attribute('observer', event('xxf:observerid')),
+                                                                xf:attribute('type', event('xxf:type')),
+                                                                xf:attribute('target', event('xxf:targetid')),
+                                                                xf:attribute('phase', event('xxf:phase')),
+                                                                xf:attribute('original-target', event('xxf:targetid')),
+                                                                xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                                            )
+                                                        )"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value3" phase="target" xxbl:scope="outer">
                                                 <!-- Set title value -->
@@ -1793,14 +1817,23 @@
 
                                 <xf:group context="instance('main-instance')" id="main-group">
                                     <!-- TEST: Event listener -->
-                                    <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" ref="*"
-                                                   origin="xf:element('event',
-                                                            (xf:attribute('observer', event('xxf:observerid')),
-                                                             xf:attribute('type', event('xxf:type')),
-                                                             xf:attribute('target', event('xxf:targetid')),
-                                                             xf:attribute('phase', event('xxf:phase')),
-                                                             xf:attribute('original-target', event('xxf:targetid')),
-                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                    <xf:insert
+                                        event="#all"
+                                        context="instance('events')"
+                                        ref="*"
+                                        if="not(event('xxf:type') = ('xxforms-index-changed', 'xxforms-visible'))"
+                                        origin="
+                                            xf:element(
+                                                'event',
+                                                (
+                                                    xf:attribute('observer', event('xxf:observerid')),
+                                                    xf:attribute('type', event('xxf:type')),
+                                                    xf:attribute('target', event('xxf:targetid')),
+                                                    xf:attribute('phase', event('xxf:phase')),
+                                                    xf:attribute('original-target', event('xxf:targetid')),
+                                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                                )
+                                            )"/>
 
                                     <!-- Top-level component -->
                                     <fr:level1 id="level1-component"/>

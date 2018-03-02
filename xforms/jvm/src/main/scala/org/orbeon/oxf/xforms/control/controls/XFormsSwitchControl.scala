@@ -20,9 +20,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
-import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XFormsSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
+import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent, XXFormsHiddenEvent, XXFormsVisibleEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -80,7 +81,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       local.selectedCaseControlId = newCaseId
     }
 
-    // TODO: deferred event dispatch for xforms-select/deselect
+    // TODO: deferred event dispatch for xforms-select/deselect and xxforms-visible/hidden
   }
 
   private def evaluateCaseRefBinding: Option[Item] =
@@ -228,6 +229,27 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         // Partial refresh on the case that is being selected
         // Do this before xforms-select is dispatched
         containingDocument.getControls.doPartialRefresh(caseControlToSelect)
+      } else {
+
+        assert(isRelevant)
+
+        // https://github.com/orbeon/orbeon-forms/issues/3494
+        if (! Focus.isHidden(this)) {
+          ControlsIterator(
+            start         = previouslySelectedCaseControl,
+            includeSelf   = false,
+            followVisible = true
+          ) filter (_.isRelevant) foreach { control ⇒
+            Dispatch.dispatchEvent(new XXFormsHiddenEvent(control))
+          }
+          ControlsIterator(
+            start         = caseControlToSelect,
+            includeSelf   = false,
+            followVisible = true
+          ) filter (_.isRelevant) foreach { control ⇒
+            Dispatch.dispatchEvent(new XXFormsVisibleEvent(control))
+          }
+        }
       }
 
       // "2. Dispatching an xforms-select event to the case to be selected."

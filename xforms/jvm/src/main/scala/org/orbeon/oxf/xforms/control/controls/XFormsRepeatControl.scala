@@ -361,7 +361,7 @@ class XFormsRepeatControl(
                 }
 
                 // Dispatch destruction events
-                currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, includeCurrent = true)
+                currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(movedOrRemovedIteration, includeCurrent = true)
 
                 // Indicate to iteration that it is being removed
                 // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
@@ -539,7 +539,7 @@ class XFormsRepeatControl(
             "index" → removedIteration.iterationIndex.toString
           )) {
             // Dispatch destruction events and deindex old iteration
-            currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, includeCurrent = true)
+            currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(removedIteration, includeCurrent = true)
             currentControlTree.deindexSubtree(removedIteration, includeCurrent = true)
           }
 

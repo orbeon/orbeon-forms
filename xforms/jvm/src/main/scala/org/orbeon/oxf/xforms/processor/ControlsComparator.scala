@@ -224,7 +224,7 @@ class ControlsComparator(
     receiver : XMLReceiver
   ): Unit = {
 
-    def setupController = {
+    def setupController: ElementHandlerController = {
 
       implicit val controller = new ElementHandlerController
 
@@ -246,7 +246,7 @@ class ControlsComparator(
       controller
     }
 
-    def setupOutputPipeline(controller: ElementHandlerController) = {
+    def setupOutputPipeline(controller: ElementHandlerController): Unit = {
       // Create the output SAX pipeline:
       //
       // - perform URL rewriting

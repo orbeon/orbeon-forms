@@ -78,7 +78,7 @@ trait ControlBindingSupport {
   }
 
   // Refresh the control's binding during update, in case a re-evaluation is not needed
-  final def refreshBindingAndValues(parentContext: BindingContext) = {
+  final def refreshBindingAndValues(parentContext: BindingContext): Unit = {
     // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
     // ensure that the chain of bindings is consistent
     setBindingContext(

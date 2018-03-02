@@ -515,12 +515,7 @@ object Controls {
 
   trait XFormsControlVisitorListener {
     def startVisitControl(control: XFormsControl): Boolean
-    def endVisitControl(control: XFormsControl)
-  }
-
-  class XFormsControlVisitorAdapter extends XFormsControlVisitorListener {
-    def startVisitControl(control: XFormsControl) = true
-    def endVisitControl(control: XFormsControl): Unit = ()
+    def endVisitControl(control: XFormsControl): Unit
   }
 
   // Visit all the controls

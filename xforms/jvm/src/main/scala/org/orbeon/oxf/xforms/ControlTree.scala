@@ -161,7 +161,10 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       }
     }
 
-  def dispatchDestructionEventsForRemovedContainer(removedControl: XFormsContainerControl, includeCurrent: Boolean): Unit =
+  def dispatchDestructionEventsForRemovedRepeatIteration(
+    removedControl: XFormsContainerControl,
+    includeCurrent: Boolean
+  ): Unit =
     withDebug("dispatching destruction events") {
       // Gather ids of controls to handle
 
@@ -171,9 +174,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       // report container controls after their children.
       Controls.visitControls(
         removedControl,
-        new Controls.XFormsControlVisitorAdapter() {
+        new Controls.XFormsControlVisitorListener {
 
-          override def startVisitControl(control: XFormsControl): Boolean = {
+          def startVisitControl(control: XFormsControl): Boolean = {
             // Don't handle container controls here
             if (! control.isInstanceOf[XFormsContainerControl])
               controlsEffectiveIds += control.getEffectiveId
@@ -181,7 +184,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
             true
           }
 
-          override def endVisitControl(control: XFormsControl): Unit = {
+          def endVisitControl(control: XFormsControl): Unit = {
             // Add container control after all its children have been added
             if (control.isInstanceOf[XFormsContainerControl])
               controlsEffectiveIds += control.getEffectiveId

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent, XXFormsHiddenEvent, XXFormsVisibleEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
@@ -238,20 +238,18 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // https://github.com/orbeon/orbeon-forms/issues/3494
         if (! Focus.isHidden(this)) {
-          ControlsIterator(
-            start         = previouslySelectedCaseControl,
-            includeSelf   = false,
-            followVisible = true
-          ) filter (_.isRelevant) foreach { control ⇒
-            Dispatch.dispatchEvent(new XXFormsHiddenEvent(control))
-          }
-          ControlsIterator(
-            start         = caseControlToSelect,
-            includeSelf   = false,
-            followVisible = true
-          ) filter (_.isRelevant) foreach { control ⇒
-            Dispatch.dispatchEvent(new XXFormsVisibleEvent(control))
-          }
+
+          def dispatch(start: XFormsControl, newEvent: XFormsControl ⇒ XFormsEvent): Unit =
+            ControlsIterator(
+              start         = start,
+              includeSelf   = false,
+              followVisible = true
+            ) filter (_.isRelevant) foreach { control ⇒
+              Dispatch.dispatchEvent(newEvent(control))
+            }
+
+          dispatch(previouslySelectedCaseControl, new XXFormsHiddenEvent(_))
+          dispatch(caseControlToSelect,           new XXFormsVisibleEvent(_))
         }
       }
 

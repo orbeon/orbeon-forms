@@ -231,7 +231,7 @@ div.orbeon.orbeon-portlet-div {
         .fb-grid-dnd-wall-handle {
             height: 100%;
         }
-        z-index: 1;                                                         // For containers to be above the shadow
+        z-index: 2;                                                         // For containers to be above the shadow
     }
 
     .fb-grid-dnd-wall-vertical   .fb-grid-dnd-wall-handle { cursor: col-resize }
@@ -244,6 +244,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-grid-dnd-wall-shadow {
         position: absolute;
         background-color: #ccc;
+        z-index: 1;                                                         // For shadow to be above controls
     }
 
     // ***** Toolbox ***************************************************************************************************

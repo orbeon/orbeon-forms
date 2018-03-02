@@ -76,7 +76,7 @@ object GridWallDnD {
     object DndSides {
        def show(cell: Block): Unit = {
          val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
-         val walls      = Cell.movableWalls(cell.underlying)
+         val walls     = Cell.movableWalls(cell.underlying)
          walls.foreach { direction ⇒
            val wallOrientation = DndWall.wallOrientation(direction)
            val index = direction match {
@@ -150,7 +150,7 @@ object GridWallDnD {
             },
             top  = orientation match {
               case Orientation.Vertical ⇒
-                currentCell.top
+                currentCell.top - Position.scrollTop()
               case Orientation.Horizontal ⇒
                 trackOffset(orientation)
             }

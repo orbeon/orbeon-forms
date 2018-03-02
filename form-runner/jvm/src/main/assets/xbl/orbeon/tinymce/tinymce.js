@@ -16,14 +16,7 @@
     var YD = YAHOO.util.Dom;
     var Events = ORBEON.xforms.Events;
 
-    // Tell TinyMCE about base URL, which it can't guess in combined resources
-    $(function() {
-        var href = $('.tinymce-base-url').attr('href');
-        // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
-        // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
-        var baseURL = href.substr(0, href.length - '1b713b2e6d7fd45753f4b8a6270b776e.js'.length);
-        tinymce.baseURL = baseURL;
-    });
+    var baseUrlInitialized = false;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Tinymce = function() {};
@@ -37,6 +30,19 @@
         tinymceInitialized: false,
 
         init: function() {
+
+            if (! baseUrlInitialized) {
+                // Tell TinyMCE about base URL, which it can't guess in combined resources
+
+                var href = $('.tinymce-base-url').attr('href');
+                // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
+                // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
+                var baseURL = href.substr(0, href.length - '1b713b2e6d7fd45753f4b8a6270b776e.js'.length);
+                tinymce.baseURL = baseURL;
+
+                baseUrlInitialized = true;
+            }
+
             this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
 
             // Create TinyMCE editor instance

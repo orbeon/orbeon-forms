@@ -108,7 +108,7 @@
             <xf:group ref=".[$script]" xxf:element="div">
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
-                    <xf:action type="javascript" id="xf-ch" event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xf:action>
+                    <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xf:action>
                     <xf:action type="javascript" id="xf-ro" event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xf:action>
                     <xf:action type="javascript" id="xf-rw" event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xf:action>
                 </xf:output>

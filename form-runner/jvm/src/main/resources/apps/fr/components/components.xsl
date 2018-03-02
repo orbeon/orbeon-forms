@@ -158,7 +158,7 @@
                 'wizard'[$fr-form-metadata/wizard = 'true'],
                 p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[
                     normalize-space() and not($fr-form-metadata/wizard = 'false')
-                    ],
+                ],
                 'full'
             )[1]"/>
 

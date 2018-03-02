@@ -96,16 +96,6 @@ class ControlsComparator(
                 true
               } else
                 false
-//            case c: XFormsCaseControl ⇒
-//
-//              val isVisible  = c.isVisible
-//              val wasVisible = control1Opt.exists(_.asInstanceOf[XFormsCaseControl].isVisible)
-//
-//              if (c.staticControl.hasFullUpdate && isVisible != wasVisible) {
-//                processFullUpdateForContent(c, getMarkOrThrow(c).replay)
-//                true
-//              } else
-//                false
             case c: XFormsComponentControl ⇒
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")

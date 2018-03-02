@@ -108,9 +108,9 @@
             <xf:group ref=".[$script]" xxf:element="div">
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
-                    <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xf:action>
-                    <xf:action type="javascript" id="xf-ro" event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xf:action>
-                    <xf:action type="javascript" id="xf-rw" event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xf:action>
+                    <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">var i = YAHOO.xbl.fr.Tinymce.instance(this); if (i) i.serverToClient();</xf:action>
+                    <xf:action type="javascript" id="xf-ro" event="xforms-readonly">var i = YAHOO.xbl.fr.Tinymce.instance(this); if (i) iYAHOO.xbl.fr.Tinymce.instance(this).readonly();</xf:action>
+                    <xf:action type="javascript" id="xf-rw" event="xforms-readwrite">var i = YAHOO.xbl.fr.Tinymce.instance(this); if (i) iYAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xf:action>
                 </xf:output>
 
                 <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to

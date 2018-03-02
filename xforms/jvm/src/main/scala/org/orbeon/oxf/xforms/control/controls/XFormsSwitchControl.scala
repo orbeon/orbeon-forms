@@ -64,7 +64,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       case None ⇒
         val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
         local.selectedCaseControlId = findInitialSelectedCaseId
-        // TODO: deferred event dispatch for xforms-select/deselect???
+        // TODO: Deferred event dispatch for xforms-select/deselect?
+        // See https://github.com/orbeon/orbeon-forms/issues/3496
     }
   }
 
@@ -81,7 +82,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       local.selectedCaseControlId = newCaseId
     }
 
-    // TODO: deferred event dispatch for xforms-select/deselect and xxforms-visible/hidden
+    // TODO: Deferred event dispatch for xforms-select/deselect and xxforms-visible/hidden.
+    // See https://github.com/orbeon/orbeon-forms/issues/3496
   }
 
   private def evaluateCaseRefBinding: Option[Item] =
@@ -108,6 +110,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       }
 
       // TODO: deferred event dispatch for xforms-binding-error EXCEPT upon restoring state???
+      // See https://github.com/orbeon/orbeon-forms/issues/3496
     }
 
   // "If the caseref attribute is specified, then it takes precedence over the selected attributes of the case

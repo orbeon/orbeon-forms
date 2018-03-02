@@ -76,7 +76,7 @@ private[persistence] object SQL extends Logging {
   }
 
   def executeStatements(provider: Provider, statement: Statement, sql: Seq[String])(implicit logger: IndentedLogger): Unit = {
-    withDebug("running statements", List("provider" → provider.name)) {
+    withDebug("running statements", List("provider" → provider.pathToken)) {
       sql foreach { s ⇒
         withDebug("running", List("statement" → s)) {
           statement.executeUpdate(s)

@@ -80,7 +80,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
-    val name = provider.name
+    val name = provider.pathToken
     withDebug("comparing upgrade to straight", List("provider" → name, "from" → from, "to" → to)) {
       val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
       val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))

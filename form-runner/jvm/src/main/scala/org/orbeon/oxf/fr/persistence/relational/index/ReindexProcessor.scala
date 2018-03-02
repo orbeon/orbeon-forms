@@ -33,7 +33,7 @@ class ReindexProcessor extends ProcessorImpl {
   override def start(pipelineContext: PipelineContext): Unit = {
 
     val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
-    val provider = Provider.providerFromToken(providerToken)
+    val provider = Provider.providerFromPathToken(providerToken)
     RelationalUtils.withConnection(Index.reindex(provider, _, Index.AllData))
   }
 

@@ -63,11 +63,11 @@ trait RequestResponse {
     httpRequest.getRequestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(Provider.providerFromToken(provider), app, form, file, version, None)
+        Request(Provider.providerFromPathToken(provider), app, form, file, version, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId)
-        Request(Provider.providerFromToken(provider), app, form, file, version, Some(dataPart))
+        Request(Provider.providerFromPathToken(provider), app, form, file, version, Some(dataPart))
     }
   }
 

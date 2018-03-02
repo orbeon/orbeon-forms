@@ -44,7 +44,7 @@ trait SearchRequest {
         val group         = httpRequest.credentials flatMap (_.group)
 
         Request(
-          provider       = Provider.providerFromToken(provider),
+          provider       = Provider.providerFromPathToken(provider),
           app            = app,
           form           = form,
           username       = username,

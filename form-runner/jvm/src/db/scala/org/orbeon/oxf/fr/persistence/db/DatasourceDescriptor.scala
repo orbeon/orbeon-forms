@@ -37,7 +37,7 @@ object DatasourceDescriptor {
     val password = System.getenv("RDS_PASSWORD")
 
     DatasourceDescriptor(
-      name     = provider.name,
+      name     = provider.pathToken,
       driver   = DriverClassNames(provider),
       url      = url,
       username = username,

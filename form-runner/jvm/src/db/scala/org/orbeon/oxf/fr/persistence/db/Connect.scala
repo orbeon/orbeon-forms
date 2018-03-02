@@ -34,7 +34,7 @@ private[persistence] object Connect {
   : Unit = {
     Logging.withDebug(message) {
       ProvidersTestedAutomatically.foreach { provider ⇒
-        Logging.withDebug("on database", List("provider" → provider.name)) {
+        Logging.withDebug("on database", List("provider" → provider.pathToken)) {
           Connect.withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
             // Create tables

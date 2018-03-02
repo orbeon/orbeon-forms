@@ -23,18 +23,18 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 
 sealed trait Provider    extends Product with Serializable {
-  val name: String
-  def uri : String = "/fr/service/" + name
+  val pathToken: String
+  def uri : String = "/fr/service/" + pathToken
 }
 
 object Provider {
 
-  case object  MySQL       extends Provider { val name = "mysql"      }
-  case object  PostgreSQL  extends Provider { val name = "postgresql" }
+  case object  MySQL       extends Provider { val pathToken = "mysql"      }
+  case object  PostgreSQL  extends Provider { val pathToken = "postgresql" }
 
   def providerFromToken(token: String): Provider = {
     val AllProviders = List(MySQL, PostgreSQL)
-    val providerOpt = AllProviders.find(_.name == token)
+    val providerOpt = AllProviders.find(_.pathToken == token)
     providerOpt.getOrElse(throw new IllegalStateException)
   }
 

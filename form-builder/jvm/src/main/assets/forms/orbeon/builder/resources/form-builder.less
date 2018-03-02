@@ -955,12 +955,10 @@ div.orbeon.orbeon-portlet-div {
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
-        &:not(:hover) {                                                                 // Highlight selected cell when the pointer isn't
-            .fr-grid-td {                                                               // on the grid.
-                &.fb-selected {
-                    box-shadow: 0 0 5px 3px #aaccee !important;                         // Highlight selected cell
-                    z-index: 1;                                                         // Highlight to show over grey background for hover cell
-                }
+        .fr-grid-td {
+            &.fb-selected {
+                box-shadow: 0 0 5px 3px #aaccee !important;                             // Highlight selected cell
+                z-index: 1;                                                             // Highlight to show over grey background for hover cell
             }
         }
 

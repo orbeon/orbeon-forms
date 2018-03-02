@@ -92,14 +92,10 @@ object ControlLabelHintTextEditor {
           resourceEditorCurrentControl = container.find(ControlSelector)
           val repeat = container.parents(".fr-repeat").first()
           resourceEditorCurrentLabelHint =
-              if (repeat.is("*"))
-                repeat.find(
-                  "thead tr th:nth-child(" +
-                    (container.index() + 1) +
-                    ") .xforms-label, tbody tr td:nth-child(" +
-                    (container.index() + 1) +
-                    ") .xforms-text .xforms-output-output")
-              else
+              if (repeat.is("*")) {
+                val column = container.index() + 1
+                repeat.find(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
+              } else
                 container.find(".xforms-label, .xforms-text .xforms-output-output").first()
           if (resourceEditorCurrentLabelHint.is("*"))
               resourceEditorStartEdit()

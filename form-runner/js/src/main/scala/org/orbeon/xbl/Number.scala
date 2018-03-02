@@ -149,8 +149,7 @@ object Number {
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
-        def log(s: String) =
-          println(s"fr:number: $s")
+        def log(s: String) = () //println(s"fr:number: $s")
 
         // TODO: Can we not send if unchanged?
         def sendValueToServer(): Unit = {

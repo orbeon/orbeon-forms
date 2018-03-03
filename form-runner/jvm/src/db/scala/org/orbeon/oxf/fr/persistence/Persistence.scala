@@ -11,12 +11,12 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fr.persistence
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 
-package object persistence {
+object Persistence {
 
   val ProvidersTestedAutomatically: List[Provider] = List(MySQL)
 

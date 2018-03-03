@@ -33,7 +33,7 @@ private[persistence] object Connect {
     (implicit logger: IndentedLogger)
   : Unit = {
     Logging.withDebug(message) {
-      ProvidersTestedAutomatically.foreach { provider ⇒
+      Persistence.ProvidersTestedAutomatically.foreach { provider ⇒
         Logging.withDebug("on database", List("provider" → provider.pathToken)) {
           Connect.withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
@@ -89,7 +89,7 @@ private[persistence] object Connect {
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
       case provider ⇒
-        throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
+        throw new IllegalArgumentException(s"unsupported provider `${provider.pathToken}`")
     }
     useAndClose(connection.createStatement.executeQuery(query.stripMargin)) { tableNameResultSet ⇒
       val tableNamesList = Iterator

@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fr.persistence.ddl
 
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence.ProvidersTestedAutomatically
+import org.orbeon.oxf.fr.persistence.Persistence
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
@@ -57,7 +59,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
             |    WHERE table_name = ?
             | ORDER BY ordinal_position"""
         case provider ⇒
-          throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
+          throw new IllegalArgumentException(s"unsupported provider `${provider.pathToken}`")
       }
       Connect.getTableNames(provider, connection).map { tableName ⇒
         useAndClose(connection.prepareStatement(query.stripMargin)) { ps ⇒
@@ -89,7 +91,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   @Test def createAndUpgradeTest(): Unit = {
-    ProvidersTestedAutomatically.foreach {
+    Persistence.ProvidersTestedAutomatically.foreach {
       case provider @ MySQL ⇒
         assertSameTable(provider, "4_3"   ,  "4_4")
         assertSameTable(provider, "4_4"   ,  "4_5")

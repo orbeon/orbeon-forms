@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
@@ -64,6 +64,12 @@ class XFormsOutputDefaultHandler(
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
     handleAriaByAtts(containerAttributes)
+    // See https://github.com/orbeon/orbeon-forms/issues/3583
+    if ((isConcreteControl || isTemplate) && staticControlOpt.exists(_.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label))) {
+      containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
+      containerAttributes.addAttribute("", "aria-readonly", "aria-readonly", XMLReceiverHelper.CDATA, "true")
+      containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")
+    }
 
     val elementName = if (getStaticLHHA(getPrefixedId, LHHA.Label) ne null) "output" else "span"
 

@@ -39,6 +39,12 @@
             top: -10000px; // this so that no space is visible on the page
             left: -10000px; // this so that no space is visible on the page
             position: absolute;
+
+            // See https://github.com/orbeon/orbeon-forms/issues/3583
+            // See https://github.com/orbeon/orbeon-forms/issues/3621
+            &>.xforms-output > output[tabindex = '0'] {
+                display: none;
+            }
         }
 
         // Table elements don't work properly with the -10000px trick

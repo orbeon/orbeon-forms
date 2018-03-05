@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.controls.OutputControl
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
@@ -41,6 +41,7 @@ class XFormsOutputControl(
   id        : String
 ) extends XFormsSingleNodeControl(container, parent, element, id)
   with XFormsValueControl
+  with FocusableTrait
   with VisitableTrait
   with FileMetadata {
 
@@ -231,7 +232,9 @@ class XFormsOutputControl(
   override def valueType = super.valueType
 
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
-  override def focusableControls = Iterator.empty
+  // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
+  override def isFocusable: Boolean =
+    isRelevant && staticControl.hasLHHA(LHHA.Label)
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
     var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)

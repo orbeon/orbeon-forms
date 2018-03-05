@@ -45,6 +45,6 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
     altSet ++ targetSet
   }
 
-  override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
+  override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE, XFORMS_FOCUS)
   override val externalEvents              = externalEventsDef
 }

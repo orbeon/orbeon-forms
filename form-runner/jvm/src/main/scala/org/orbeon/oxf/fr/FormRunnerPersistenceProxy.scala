@@ -316,8 +316,7 @@ private object FormRunnerPersistenceProxy {
     val dataProviders = getProviders(usableFor = FormOrData.Data)
     val dataProvidersWithIndexSupport =
       dataProviders.filter { provider ⇒
-        val providerURI = providerPropertyAsURL(provider, "uri")
-        Index.ProvidersWithIndexSupport.map(_.uri).contains(providerURI)
+        FormRunner.providerPropertyAsBoolean(provider, "reindex", default = false)
       }
     Backend.reindexingProviders(
       dataProvidersWithIndexSupport, p ⇒ {

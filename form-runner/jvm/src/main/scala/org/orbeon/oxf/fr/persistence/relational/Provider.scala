@@ -32,7 +32,7 @@ object Provider {
   case object  MySQL       extends Provider { val pathToken = "mysql"      }
   case object  PostgreSQL  extends Provider { val pathToken = "postgresql" }
 
-  def providerFromToken(token: String): Provider = {
+  def providerFromPathToken(token: String): Provider = {
     val AllProviders = List(MySQL, PostgreSQL)
     val providerOpt = AllProviders.find(_.pathToken == token)
     providerOpt.getOrElse(throw new IllegalStateException)

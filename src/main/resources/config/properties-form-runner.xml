@@ -69,6 +69,14 @@
     <property as="xs:boolean" name="oxf.fr.persistence.db2.lease"                               value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.lease"                         value="true"/>
 
+    <!-- Whether providers support reindexing -->
+    <property as="xs:boolean" name="oxf.fr.persistence.*.reindex"                               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.reindex"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.mysql.reindex"                           value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.reindex"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.db2.reindex"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.reindex"                       value="true"/>
+
     <!-- Whether providers are active -->
     <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>

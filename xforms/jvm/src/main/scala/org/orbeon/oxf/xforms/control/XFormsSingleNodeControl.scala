@@ -197,6 +197,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     wasRequiredCommit()
     wasReadonlyCommit()
     wasValidCommit()
+    wasFailedValidationsCommit()
   }
 
   // Binding as a Seq of Item

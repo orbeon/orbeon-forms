@@ -88,7 +88,7 @@
                 <xsl:template match="/*">
 
                     <!-- Root element -->
-                    <xh:div xxf:control="true" class="{'fr-repeat', @class}">
+                    <xh:div xxf:control="true" class="{'fr-repeat-container', @class}">
 
                         <xf:var name="repeat-context">
                             <xxf:value value="." xxbl:scope="outer"/>

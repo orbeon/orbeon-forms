@@ -582,8 +582,8 @@
                         </xf:instance>
 
                         <xf:bind id="first-name-bind" ref="first-name" required="true()"/>
-                        <xf:bind id="last-name-bind" ref="last-name" required="true()"/>
-                        <xf:bind id="note-bind" ref="note" required="true()"/>
+                        <xf:bind id="last-name-bind"  ref="last-name"  required="true()"/>
+                        <xf:bind id="note-bind"       ref="note"       required="true()"/>
 
                         <xf:instance id="error-summary-instance">
                             <error-summary>

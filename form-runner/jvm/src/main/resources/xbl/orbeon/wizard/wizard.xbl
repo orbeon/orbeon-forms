@@ -564,7 +564,7 @@
                                             string-join(
                                                 for $m in $maps
                                                 return
-                                                if (map:get($m, 'is-available')) then map:get($m, 'name') else (),
+                                                    if (map:get($m, 'is-available')) then map:get($m, 'name') else (),
                                                 ' '
                                             )"/>
 

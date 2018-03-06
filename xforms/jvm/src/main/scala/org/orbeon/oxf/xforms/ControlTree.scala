@@ -139,27 +139,29 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       debugResults(List("controls created" → allControls.size.toString))
     }
 
-  def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String]): Unit =
+  def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String]): Unit = {
     withDebug("dispatching refresh events") {
+
+      def dispatchRefreshEvents(control: XFormsControl): Unit =
+        if (XFormsControl.controlSupportsRefreshEvents(control)) {
+          val oldRelevantState = control.wasRelevantCommit()
+          val newRelevantState = control.isRelevant
+          if (newRelevantState && ! oldRelevantState) {
+            // Control has become relevant
+            control.dispatchCreationEvents()
+          } else if (! newRelevantState && oldRelevantState) {
+            // Control has become non-relevant
+            control.dispatchDestructionEvents()
+          } else if (newRelevantState) {
+            // Control was and is relevant
+            control.dispatchChangeEvents()
+          }
+        }
+
       for (controlEffectiveId ← controlsEffectiveIds)
         findControl(controlEffectiveId) foreach dispatchRefreshEvents
     }
-
-  private def dispatchRefreshEvents(control: XFormsControl): Unit =
-    if (XFormsControl.controlSupportsRefreshEvents(control)) {
-      val oldRelevantState = control.wasRelevantCommit()
-      val newRelevantState = control.isRelevant
-      if (newRelevantState && ! oldRelevantState) {
-        // Control has become relevant
-        control.dispatchCreationEvents()
-      } else if (! newRelevantState && oldRelevantState) {
-        // Control has become non-relevant
-        control.dispatchDestructionEvents()
-      } else if (newRelevantState) {
-        // Control was and is relevant
-        control.dispatchChangeEvents()
-      }
-    }
+  }
 
   def dispatchDestructionEventsForRemovedRepeatIteration(
     removedControl: XFormsContainerControl,

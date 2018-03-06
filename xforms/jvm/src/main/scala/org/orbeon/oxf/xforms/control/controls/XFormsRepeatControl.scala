@@ -572,7 +572,7 @@ class XFormsRepeatControl(
     (newIterations, partialFocusRepeatOption)
   }
 
-  override def dispatchChangeEvents() =
+  override def dispatchChangeEvents(): Unit =
     if (refreshInfo ne null) {
       val refreshInfo = this.refreshInfo
       this.refreshInfo = null

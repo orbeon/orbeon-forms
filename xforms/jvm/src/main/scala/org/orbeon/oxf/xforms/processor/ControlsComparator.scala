@@ -112,7 +112,14 @@ class ControlsComparator(
                 buffer.replay(receiver)
               } catchBreak {
                 // Incremental updates did trigger full updates
-                processFullUpdateForContent(c, mark.replay)
+
+                val controlAdjustedForSwitch =
+                  c match {
+                    case c: XFormsCaseControl ⇒ c.parent
+                    case c                    ⇒ c
+                  }
+
+                processFullUpdateForContent(controlAdjustedForSwitch, mark.replay)
               }
               true
             case _ ⇒

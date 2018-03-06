@@ -330,6 +330,18 @@
                                         </xf:action>
 
                                         <xf:group appearance="xxf:internal">
+
+                                            <!-- Update section status upon incremental changes to controls.
+
+                                                 - `fr:error-summary` listens to events during the capture phase so that it is up to
+                                                   date once the wizard processes them.
+                                                 - We don't listen to `xforms-enabled` here because we have `fr-section-shown`.
+                                                 - `xxforms-constraints-changed` subsumes `xforms-valid`/`xforms-invalid`.
+                                             -->
+                                            <xf:action event="xxforms-constraints-changed xforms-disabled" xxf:phantom="true">
+                                                <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
+                                            </xf:action>
+
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @open)"/>
@@ -345,14 +357,6 @@
                                                                     string-join(($tokens, 'changed'), ' ')
                                                                 else
                                                                     ."/>
-                                                </xf:action>
-
-                                                <!-- Update section status upon value changed -->
-                                                <!-- Same list of events that `fr:error-summary` listens to. `fr:error-summary` now listens to those
-                                                     events during the capture phase so that it is up to date once the wizard processes them. -->
-                                                <xf:action event="xxforms-constraints-changed xforms-disabled" xxf:phantom="true">
-                                                    <!-- TODO: This happens too many times upon the initial refresh -->
-                                                    <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
                                                 </xf:action>
 
                                                 <xsl:choose>

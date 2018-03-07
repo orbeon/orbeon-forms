@@ -66,10 +66,18 @@
                                <r4/>
                            </instance>
                         </xf:instance>
-                        <xf:submission id="test-submission" ref="instance('new-instance')" action="echo:"
-                                           replace="instance" instance="main-instance" method="post"/>
+                        <xf:submission
+                            id="test-submission"
+                            ref="instance('new-instance')"
+                            action="echo:"
+                            replace="instance"
+                            instance="main-instance"
+                            method="post"/>
 
-                        <xf:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
+                        <xf:dispatch
+                            event="xforms-ready"
+                            name="DOMActivate"
+                            targetid="test-trigger"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
@@ -84,7 +92,7 @@
                     </xf:repeat>
                     <xf:trigger id="test-trigger">
                         <xf:label>Test</xf:label>
-                        <xf:send id="my-submission" submission="test-submission" ev:event="DOMActivate"/>
+                        <xf:send id="my-submission" submission="test-submission" event="DOMActivate"/>
                     </xf:trigger>
                 </xh:body>
             </xh:html>
@@ -116,9 +124,9 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="repeat1" index="2"/>
+                            <control effective-id="repeat1" index="3"/>
                             <control effective-id="repeat2⊙2" index="1"/>
-                            <control effective-id="repeat4" index="1"/>
+                            <control effective-id="repeat4" index="3"/>
                             <control effective-id="repeat5⊙1" index="1"/>
                             <control effective-id="repeat5⊙2" index="1"/>
                         </controls>

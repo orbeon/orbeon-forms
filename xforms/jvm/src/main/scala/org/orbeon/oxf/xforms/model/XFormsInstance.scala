@@ -195,13 +195,9 @@ class XFormsInstance(
         val insertedNodes = insertEvent.insertedNodes
 
         if (insertEvent.updateRepeats) {
-
           // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
           // inserted.
-
-          // Find affected repeats and update their node-sets and indexes
-          val controls = container.getContainingDocument.getControls
-          updateRepeatNodesets(controls, insertedNodes)
+          updateRepeatSequences(container.getContainingDocument.getControls, Some(insertedNodes))
         }
 
         // Update index
@@ -213,8 +209,8 @@ class XFormsInstance(
         // New nodes were just deleted
         if (deleteEvent.deletedNodes.nonEmpty) {
           // Find affected repeats and update them
-          val controls = container.getContainingDocument.getControls
-          updateRepeatNodesets(controls, null)
+          if (deleteEvent.updateRepeats)
+            updateRepeatSequences(container.getContainingDocument.getControls, None)
           updateIndexForDelete(deleteEvent.deletedNodes)
         }
       case replaceEvent: XXFormsReplaceEvent ⇒
@@ -228,40 +224,42 @@ class XFormsInstance(
       case _ ⇒
     }
 
-  private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[NodeInfo]): Unit = {
-    val repeatControls = controls.getCurrentControlTree.getRepeatControls
-    if (repeatControls.nonEmpty) {
-      val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
+  private def updateRepeatSequences(controls: XFormsControls, insertedNodes: Option[Seq[NodeInfo]]): Unit =
+    if (containingDocument.isUpdateRepeats) {
 
-      // Copy into `List` as `repeatControls` may change within `updateSequenceForInsertDelete()`
-      val repeatControlsList = repeatControls.to[List]
+      val repeatControls = controls.getCurrentControlTree.getRepeatControls
+      if (repeatControls.nonEmpty) {
+        val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
 
-      // Only update controls within same scope as modified instance
-      //
-      // - This can clearly break with e.g. `xxf:instance()`
-      // - The control may be non-relevant.
-      val candidateRepeatsIt =
-        for {
-          repeatControl ← repeatControlsList.iterator
-          // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
-          newRepeatControl ← Option(containingDocument.getControlByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
-          if newRepeatControl.getResolutionScope == instanceScope
-      } yield
-          newRepeatControl
+        // Copy into `List` as `repeatControls` may change within `updateSequenceForInsertDelete()`
+        val repeatControlsList = repeatControls.to[List]
 
-      // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail
-      if (candidateRepeatsIt.nonEmpty) {
-        // - https://github.com/orbeon/orbeon-forms/issues/2473
-        // - https://github.com/orbeon/orbeon-forms/issues/2474
-        // - https://github.com/orbeon/orbeon-forms/issues/3113
-        model.doRebuild()
-        model.doRecalculateRevalidate()
+        // Only update controls within same scope as modified instance
+        //
+        // - This can clearly break with e.g. `xxf:instance()`
+        // - The control may be non-relevant.
+        val candidateRepeatsIt =
+          for {
+            repeatControl ← repeatControlsList.iterator
+            // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
+            newRepeatControl ← Option(containingDocument.getControlByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
+            if newRepeatControl.getResolutionScope == instanceScope
+        } yield
+            newRepeatControl
+
+        // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail
+        if (candidateRepeatsIt.nonEmpty) {
+          // - https://github.com/orbeon/orbeon-forms/issues/2473
+          // - https://github.com/orbeon/orbeon-forms/issues/2474
+          // - https://github.com/orbeon/orbeon-forms/issues/3113
+          model.doRebuild()
+          model.doRecalculateRevalidate()
+        }
+
+        candidateRepeatsIt foreach
+          (_.updateSequenceForInsertDelete(insertedNodes))
       }
-
-      candidateRepeatsIt foreach
-        (_.updateSequenceForInsertDelete(insertedNodes))
     }
-  }
 
   // Return the instance document as a dom4j Document
   // If the instance is readonly, this returns `None`. Callers should use root() whenever possible.

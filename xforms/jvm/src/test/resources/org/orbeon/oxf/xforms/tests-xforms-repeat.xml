@@ -623,26 +623,36 @@
                             </employee>
                         </xf:instance>
 
-                        <xf:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
+                        <xf:dispatch event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
 
                     </xf:model>
                 </xh:head>
                 <xh:body>
                     <xf:trigger id="test-trigger">
                         <xf:label id="test-trigger-label">Add</xf:label>
-                        <xf:action ev:event="DOMActivate">
+                        <xf:action event="DOMActivate">
                             <!-- For the first insert, there is no employee element yet -->
                             <xf:setvalue ref="instance('template')/first-name">Joe</xf:setvalue>
-                            <xf:insert context="employees" ref="employee"
-                                           origin="instance('template')"/>
+                            <xf:insert
+                                context="employees"
+                                ref="employee"
+                                origin="instance('template')"/>
                             <!-- For the second insert, there is an employee element, and we insert after that element -->
+                            <xf:refresh/>
                             <xf:setvalue ref="instance('template')/first-name">Mary</xf:setvalue>
-                            <xf:insert context="employees" ref="employee"
-                                           origin="instance('template')"/>
+                            <xf:insert
+                                context="employees"
+                                ref="employee"
+                                origin="instance('template')"/>
                             <!-- This should insert between the two existing employees -->
+                            <xf:refresh/>
                             <xf:setvalue ref="instance('template')/first-name">Billy</xf:setvalue>
-                            <xf:insert context="employees" ref="employee" at="index('employee-repeat')" position="before"
-                                           origin="instance('template')"/>
+                            <xf:insert
+                                context="employees"
+                                ref="employee"
+                                at="index('employee-repeat')"
+                                position="before"
+                                origin="instance('template')"/>
                         </xf:action>
 
                     </xf:trigger>
@@ -1416,13 +1426,16 @@
                                         <!-- Insert a node: this will immediately cause a repeat nodeset change -->
                                         <xf:insert ref="value" origin="xf:element('value', count(../value) + 1)"/>
                                         <!-- Delete a node: this will immediately cause a repeat nodeset change  -->
+                                        <xf:refresh/>
                                         <xf:delete ref="value[1]"/>
+                                        <xf:refresh/>
                                         <!-- Change repeat nodeset order without changing instance: this will cause change during refresh -->
                                         <xf:setvalue ref="@order">descending</xf:setvalue>
-                                        <xf:refresh/>
                                         <!-- Remove all items ("going to 0" condition) must not dispatch event -->
+                                        <xf:refresh/>
                                         <xf:delete ref="value"/>
                                         <!-- Insert a new item ("going from 0" condition) must not dispatch event  -->
+                                        <xf:refresh/>
                                         <xf:insert context="." ref="value" origin="xf:element('value', 1)"/>
                                     </xf:action>
 
@@ -2375,7 +2388,9 @@
                         <xf:action ev:event="xforms-ready">
                             <xf:setindex repeat="my-repeat" index="2"/>
                             <xf:insert ref="value" origin="(xf:element('value', 5), xf:element('value', 6))"/>
+                            <xf:refresh/>
                             <xf:delete ref="value" at="6"/>
+                            <xf:refresh/>
                             <xf:delete ref="value"/>
                         </xf:action>
 
@@ -2383,15 +2398,20 @@
                 </xh:head>
                 <xh:body>
                     <xf:group id="my-group">
-                        <xf:insert ev:event="xxforms-index-changed"
-                                       context="instance('events')" ref="*"
-                                       origin="xf:element('event',
-                                                (xf:attribute('type', event('xxf:type')),
-                                                 xf:attribute('target', event('xxf:targetid')),
-                                                 xf:attribute('old', event('xxf:old-index')),
-                                                 xf:attribute('new', event('xxf:new-index'))
-                                                 ))"/>
-
+                        <xf:insert
+                            event="xxforms-index-changed"
+                            context="instance('events')"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    'event',
+                                    (
+                                        xf:attribute('type',   event('xxf:type')),
+                                        xf:attribute('target', event('xxf:targetid')),
+                                        xf:attribute('old',    event('xxf:old-index')),
+                                        xf:attribute('new',    event('xxf:new-index'))
+                                    )
+                                )"/>
                         <xf:repeat ref="value" id="my-repeat"/>
                     </xf:group>
                 </xh:body>
@@ -2630,10 +2650,13 @@
                             <events/>
                         </xf:instance>
 
-                        <xf:insert ev:event="xforms-refresh" context="instance('events')" ref="*"
-                                       origin="xf:element('refresh')"/>
+                        <xf:insert
+                            event="xforms-refresh"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element('refresh')"/>
 
-                        <xf:action ev:event="xforms-ready">
+                        <xf:action event="xforms-ready">
                             <!-- Clear until now -->
                             <xf:refresh/>
                             <!-- This causes a change of repeat nodeset upon next refresh -->
@@ -2642,13 +2665,19 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:insert ev:event="xforms-enabled"
-                                   context="instance('events')" ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
-                                             ))"/>
+                    <xf:insert
+                        event="xforms-enabled"
+                        context="instance('events')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type',    event('xxf:type')),
+                                    xf:attribute('target',  event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <xf:repeat id="my-repeat" ref="value[position() le xs:integer(../@size)]">
                         <xf:input id="my-input" ref="."/>
@@ -2679,7 +2708,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-repeat" index="1"/>
+                            <control effective-id="my-repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -3097,7 +3126,7 @@
                             </values>
                         </xf:instance>
 
-                        <xf:action ev:event="xforms-ready">
+                        <xf:action event="xforms-ready">
                             <xf:insert ref="*"/>
                         </xf:action>
                     </xf:model>
@@ -3121,7 +3150,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-repeat" index="1"/>
+                            <control effective-id="my-repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>

@@ -36,6 +36,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.collection.{mutable ⇒ m}
+import org.orbeon.oxf.util.CoreUtils._
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(
@@ -52,8 +53,13 @@ class XFormsRepeatControl(
 
   override type Control <: RepeatControl
 
-  // TODO: this must be handled following the same pattern as usual refresh events
-  private var refreshInfo: RefreshInfo = null
+  // TODO: Check whether this should be handled following the same pattern as usual refresh events.
+  // 2018-03-07: Since we no longer update, by default, repeats upon `xf:insert`/`xf:delete`, the time
+  // between setting `refreshInfoOpt` in the control and using it is much shorter. The value is set
+  // when control bindings are updated (which usually should not cause any events to be dispatched,
+  // although `xforms-disabled` can be I think), and used in the later `dispatchRefreshEvents()`. A
+  // better mechanism would, for sure, be desirable.
+  private var refreshInfoOpt: Option[RefreshInfo] = None
 
   // Initial local state
   setLocal(new XFormsRepeatControlLocal)
@@ -85,7 +91,7 @@ class XFormsRepeatControl(
     }
 
     // Reset refresh information
-    refreshInfo = null
+    refreshInfoOpt = None
   }
 
   // Set the repeat index. The index is automatically adjusted to fall within bounds.
@@ -129,13 +135,6 @@ class XFormsRepeatControl(
         throw new OXFException("Repeat index was not set for repeat id: " + effectiveId)
     } else
       0
-
-  // Return the iteration corresponding to the current index if any, null otherwise
-  def getIndexIteration =
-    if (children.isEmpty || getIndex < 1)
-      null
-    else
-      children(getIndex - 1)
 
   def doDnD(dndEvent: XXFormsDndEvent): Unit = {
 
@@ -213,10 +212,8 @@ class XFormsRepeatControl(
     // TODO: should dispatch xxforms-move instead of xforms-insert?
   }
 
-  def isDnD = {
-    val dndAttribute = element.attributeValue(XXFORMS_DND_QNAME)
-    dndAttribute != null && dndAttribute != "none"
-  }
+  def isDnD =
+    element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
 
   // Push binding but ignore non-relevant iterations
   override protected def computeBinding(parentContext: BindingContext) = {
@@ -236,7 +233,7 @@ class XFormsRepeatControl(
       contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
   }
 
-  def updateSequenceForInsertDelete(insertedNodeInfos: Seq[NodeInfo]): Unit = {
+  def updateSequenceForInsertDelete(insertedNodeInfos: Option[Seq[NodeInfo]]): Unit = {
 
     // NOTE: This can be called even if we are not relevant!
 
@@ -297,19 +294,17 @@ class XFormsRepeatControl(
   }
 
   /**
-   * Update this repeat's iterations given the old and new node-sets, and a list of inserted nodes if any (used for
-   * index updates). This returns a list of entirely new repeat iterations added, if any. The repeat's index is
-   * adjusted.
-   *
-   * NOTE: The new binding context must have been set on this control before calling.
-   *
-   * @param oldRepeatItems        old items
-   * @param insertedItems         items just inserted by xf:insert if any, or null
-   * @return                      new iterations if any, or an empty list
-   */
+    * Update this repeat's iterations given the old and new sequences, and a list of inserted nodes if any (used for
+    * index updates). This returns a list of entirely new repeat iterations added, if any. The repeat's index is
+    * adjusted.
+    *
+    * This dispatches destruction events for removed iterations, but does not dispatch creation events.
+    *
+    * NOTE: The new binding context must have been set on this control before calling.
+    */
   def updateIterations(
-    oldRepeatItems : Seq[Item],
-    insertedItems  : Seq[NodeInfo],
+    oldRepeatItems : Seq[Item],             // old items
+    insertedItems  : Option[Seq[NodeInfo]], // items just inserted by `xf:insert` if any
     isInsertDelete : Boolean
   ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
@@ -318,26 +313,23 @@ class XFormsRepeatControl(
     val controls = containingDocument.getControls
 
     // Get current (new) nodeset
-    val newRepeatNodeset = bindingContext.nodeset.asScala
-
-    val isInsert = insertedItems ne null
-
+    val newRepeatItems     = bindingContext.nodeset.asScala
     val currentControlTree = controls.getCurrentControlTree
+    val oldRepeatIndex     = getIndex // 1-based
 
-    val oldRepeatIndex = getIndex// 1-based
     var updated = false
 
     val (newIterations, movedIterationsOldPositions, movedIterationsNewPositions, partialFocusRepeatOption) =
-      if (newRepeatNodeset.nonEmpty) {
+      if (newRepeatItems.nonEmpty) {
 
         // This may be set to this repeat or to a nested repeat if focus was within a removed iteration
         var partialFocusRepeatOption: Option[XFormsRepeatControl] = None
 
-        // For each new node, what its old index was, -1 if it was not there
-        val oldIndexes = findNodeIndexes(newRepeatNodeset, oldRepeatItems)
+        // For each new item, what its old index was, -1 if it was not there
+        val oldIndexes = findItemIndexes(newRepeatItems, oldRepeatItems)
 
-        // For each old node, what its new index is, -1 if it is no longer there
-        val newIndexes = findNodeIndexes(oldRepeatItems, newRepeatNodeset)
+        // For each old item, what its new index is, -1 if it is no longer there
+        val newIndexes = findItemIndexes(oldRepeatItems, newRepeatItems)
 
         // Remove control information for iterations that move or just disappear
         val oldChildren = children
@@ -378,36 +370,60 @@ class XFormsRepeatControl(
 
         // Set new repeat index (do this before creating new iterations so that index is available then)
         val didSetIndex =
-          if (isInsert) {
-            // Insert logic
+          insertedItems match {
+            case Some(insertedItems) ⇒
+              // Insert logic
 
-            // We want to point to a new node (case of insert)
+              // We want to point to a new node (case of insert)
 
-            // First, try to point to the last inserted node if found
-            findNodeIndexes(insertedItems, newRepeatNodeset).reverse find (_ != -1) exists { index ⇒
-              val newRepeatIndex = index + 1
+              // First, try to point to the last inserted node if found
+              findItemIndexes(insertedItems, newRepeatItems).reverse find (_ != -1) exists { index ⇒
+                val newRepeatIndex = index + 1
 
-              debug("setting index to new node", Seq(
-                "id"        → getEffectiveId,
-                "new index" → newRepeatIndex.toString
-              ))
+                debug("setting index to new node", Seq(
+                  "id"        → getEffectiveId,
+                  "new index" → newRepeatIndex.toString
+                ))
 
-              setIndexInternal(newRepeatIndex)
-              true
-            }
-          } else
-            false
+                setIndexInternal(newRepeatIndex)
+                true
+              }
+            case None ⇒ false
+          }
 
         if (! didSetIndex) {
           // Non-insert logic (covers delete and other arbitrary changes to the repeat sequence)
 
-          // Try to point to the same node as before
-          if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length && newIndexes(oldRepeatIndex - 1) != -1) {
-            // The index was pointing to a node which is still there, so just move the index
+          val indexOfLastNewIteration = oldIndexes lastIndexOf -1
+
+
+          if (indexOfLastNewIteration != -1) {
+            // Items were inserted so pick as new index the last of the new items, unless they are all new,
+            // in which case we pick the first one.
+            // We could pick another logic, see also: https://github.com/orbeon/orbeon-forms/issues/3503
+            val newRepeatIndex =
+              if (oldRepeatItems.isEmpty)
+                1
+              else
+                indexOfLastNewIteration + 1
+
+            if (newRepeatIndex != oldRepeatIndex) {
+
+              debug("adjusting index for new item", Seq(
+                "id"        → getEffectiveId,
+                "old index" → oldRepeatIndex.toString,
+                "new index" → newRepeatIndex.toString
+              ))
+
+              setIndexInternal(newRepeatIndex)
+            }
+
+          } else if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length && newIndexes(oldRepeatIndex - 1) != -1) {
+            // The index was pointing to an item which is still there, so just move the index
             val newRepeatIndex = newIndexes(oldRepeatIndex - 1) + 1
             if (newRepeatIndex != oldRepeatIndex) {
 
-              debug("adjusting index for existing node", Seq(
+              debug("adjusting index for existing item", Seq(
                 "id"        → getEffectiveId,
                 "old index" → oldRepeatIndex.toString,
                 "new index" → newRepeatIndex.toString
@@ -416,18 +432,18 @@ class XFormsRepeatControl(
               setIndexInternal(newRepeatIndex)
             }
           } else if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length) {
-            // The index was pointing to a node which has been removed
-            if (oldRepeatIndex > newRepeatNodeset.size) {
+            // The index was pointing to an item which has been removed
+            if (oldRepeatIndex > newRepeatItems.size) {
               // "if the repeat index was pointing to one of the deleted repeat items, and if the new size
               // of the collection is smaller than the index, the index is changed to the new size of the
               // collection."
 
-              debug("setting index to the size of the new nodeset", Seq(
+              debug("setting index to the size of the new sequence", Seq(
                 "id"        → getEffectiveId,
-                "new index" → newRepeatNodeset.size.toString
+                "new index" → newRepeatItems.size.toString
               ))
 
-              setIndexInternal(newRepeatNodeset.size)
+              setIndexInternal(newRepeatItems.size)
             } else {
               // "if the new size of the collection is equal to or greater than the index, the index is
               // not changed"
@@ -440,8 +456,8 @@ class XFormsRepeatControl(
           }
         }
 
-        // Iterate over new nodeset to move or add iterations
-        val newSize = newRepeatNodeset.size
+        // Iterate over new sequence to move or add iterations
+        val newSize = newRepeatItems.size
         val newChildren = new ArrayBuffer[XFormsControl](newSize)
         val newIterations = ListBuffer[XFormsRepeatIterationControl]()
         val movedIterationsOldPositions = ListBuffer[Int]()
@@ -450,7 +466,7 @@ class XFormsRepeatControl(
         for (repeatIndex ← 1 to newSize) {
           val currentOldIndex = oldIndexes(repeatIndex - 1)
           if (currentOldIndex == -1) {
-            // This new node was not in the old nodeset so create a new one
+            // This new item was not in the old sequence so create a new one
 
             // Add new iteration
             newChildren +=
@@ -468,7 +484,7 @@ class XFormsRepeatControl(
                 newIteration
               }
           } else {
-            // This new node was in the old nodeset so keep it
+            // This new item was in the old nodeset so keep it
 
             val existingIteration = oldChildren(currentOldIndex)
             val newIterationOldIndex = existingIteration.iterationIndex
@@ -557,43 +573,40 @@ class XFormsRepeatControl(
 
     // Keep information available until refresh events are dispatched, which must happen soon after this method was
     // called
-    this.refreshInfo =
-      if (updated || oldRepeatIndex != getIndex)
+    this.refreshInfoOpt =
+      (updated || oldRepeatIndex != getIndex) option
         RefreshInfo(
           updated,
-          if (updated) newIterations else Nil,
+          if (updated) newIterations               else Nil,
           if (updated) movedIterationsOldPositions else Nil,
           if (updated) movedIterationsNewPositions else Nil,
           oldRepeatIndex
         )
-      else
-        null
 
     (newIterations, partialFocusRepeatOption)
   }
 
   override def dispatchChangeEvents(): Unit =
-    if (refreshInfo ne null) {
-      val refreshInfo = this.refreshInfo
-      this.refreshInfo = null
-      if (refreshInfo.isNodesetChanged) {
-        // Dispatch custom event to xf:repeat to notify that the nodeset has changed
-        Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(this, refreshInfo.newIterations,
-          refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions))
-      }
+    refreshInfoOpt foreach { localRefreshInfo ⇒
 
-      if (refreshInfo.oldRepeatIndex != getIndex) {
-        // Dispatch custom event to notify that the repeat index has changed
-        Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, refreshInfo.oldRepeatIndex, getIndex))
-      }
+      this.refreshInfoOpt = None
+
+      // Dispatch custom event to `xf:repeat` to notify that the nodeset has changed
+      if (localRefreshInfo.isNodesetChanged)
+        Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(this, localRefreshInfo.newIterations,
+          localRefreshInfo.movedIterationsOldPositions, localRefreshInfo.movedIterationsNewPositions))
+
+      // Dispatch custom event to notify that the repeat index has changed
+      if (localRefreshInfo.oldRepeatIndex != getIndex)
+        Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, localRefreshInfo.oldRepeatIndex, getIndex))
     }
 
-  private def findNodeIndexes(nodeset1: Seq[Item], nodeset2: Seq[Item]) = {
+  private def findItemIndexes(items1: Seq[Item], items2: Seq[Item]) = {
 
     def indexOfItem(otherItem: Item) =
-      nodeset2 indexWhere (SaxonUtils.compareItems(_, otherItem))
+      items2 indexWhere (SaxonUtils.compareItems(_, otherItem))
 
-    nodeset1 map indexOfItem toArray
+    items1 map indexOfItem toArray
   }
 
   // Serialize index

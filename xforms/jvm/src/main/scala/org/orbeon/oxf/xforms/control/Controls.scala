@@ -415,7 +415,7 @@ object Controls {
             )
 
             val (newIterations, partialFocusRepeatOption) =
-              repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
+              repeatControl.updateIterations(oldRepeatSeq, None, isInsertDelete = false)
 
             // Remember partial focus out of repeat if needed
             if (this._partialFocusRepeatOption.isEmpty && partialFocusRepeatOption.isDefined)

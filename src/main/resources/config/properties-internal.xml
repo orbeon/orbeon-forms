@@ -104,6 +104,7 @@
     <!-- NOTE: This is only used client-side by dialogs. Unclear why it should default to false. -->
     <property as="xs:boolean" name="oxf.xforms.use-aria"                                  value="false"/>
 
+    <property as="xs:boolean" name="oxf.xforms.update-repeats"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                           value="false"/>
 
     <!-- Whitespace handling for XForms documents -->

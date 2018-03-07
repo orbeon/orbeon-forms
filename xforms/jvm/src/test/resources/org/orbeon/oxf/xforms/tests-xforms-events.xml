@@ -305,10 +305,10 @@
                         <controls>
                             <control effective-id="repeat1" index="2"/>
                             <control effective-id="repeat2" index="3"/>
-                            <control effective-id="repeat3" index="1"/>
-                            <control effective-id="repeat4" index="3"/>
-                            <control effective-id="repeat5" index="1"/>
-                            <control effective-id="repeat6" index="2"/>
+                            <control effective-id="repeat3" index="2"/>
+                            <control effective-id="repeat4" index="1"/>
+                            <control effective-id="repeat5" index="2"/>
+                            <control effective-id="repeat6" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>

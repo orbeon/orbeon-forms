@@ -515,12 +515,18 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
+                            <xf:refresh/>
+
                             <!-- Insert iteration before (focus will move from 2 to 1) -->
-                            <xf:insert ref="value" at="1" position="before"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
+                            <xf:insert ref="value" at="1" position="before"/>
+                            <xf:refresh/>
+
                             <!-- Delete iteration 1 (focus will move from old 1 to new 1) -->
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <xf:delete ref="value[1]"/>
+                            <xf:refresh/>
+
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                         </xf:action>
 

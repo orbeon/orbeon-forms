@@ -434,9 +434,9 @@ object ErrorSummary {
           errorsInstanceDoc.asInstanceOf[DocumentWrapper].wrap(rootElemDomContent(insertionPoint - 1))
 
       XFormsAPI.insert(
-        into   = rootElem,
-        after  = afterElemList,
-        origin = newErrorElem,
+        into          = rootElem,
+        after         = afterElemList,
+        origin        = newErrorElem,
         updateRepeats = false
       )
     }
@@ -452,7 +452,7 @@ object BinarySearching {
     @tailrec
     final def binarySearch[B >: A](elem: B, from: Int, to: Int)(implicit ord: Ordering[B]): SearchResult = {
       if (to == from) InsertionPoint(from) else {
-        val idx = from+(to-from-1)/2
+        val idx = from + (to - from - 1) / 2
         math.signum(ord.compare(elem, coll(idx))) match {
           case -1 ⇒ binarySearch(elem, from, idx)(ord)
           case  1 ⇒ binarySearch(elem, idx + 1, to)(ord)

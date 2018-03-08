@@ -390,7 +390,7 @@ trait XFormsInstanceIndex {
 
   // Iterator over all ids
   // TODO: Not useful for Form Builder, because it must search under `<xh:body>` only.
-  def idsIterator = {
+  def idsIterator: Iterator[String] = {
     createIndexIfNeeded()
     if (idIndex ne null) idIndex.keysIterator else Iterator.empty
   }
@@ -421,23 +421,23 @@ trait XFormsInstanceIndex {
     }
   }
 
-  private def createIndexIfNeeded() =
+  private def createIndexIfNeeded(): Unit =
     if (idIndex eq null) {
       idIndex = m.Map()
       combineMappings(mappingsInSubtree(self.documentInfo))
     }
 
-  def updateIndexForInsert(nodes: Seq[NodeInfo]) =
+  def updateIndexForInsert(nodes: Seq[NodeInfo]): Unit =
     if (idIndex ne null)
       for (node ← nodes)
         combineMappings(mappingsInSubtree(node))
 
-  def updateIndexForDelete(nodes: Seq[NodeInfo]) =
+  def updateIndexForDelete(nodes: Seq[NodeInfo]): Unit =
     if (idIndex ne null)
       for (node ← nodes; (id, element) ← mappingsInSubtree(node))
         removeId(id, element)
 
-  def updateIndexForReplace(formerNode: NodeInfo, currentNode: NodeInfo) =
+  def updateIndexForReplace(formerNode: NodeInfo, currentNode: NodeInfo): Unit =
     if (idIndex ne null) {
       if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
         // Don't use updateIndexForDelete, because formerNode.getParent will fail
@@ -448,7 +448,7 @@ trait XFormsInstanceIndex {
       updateIndexForInsert(Seq(currentNode))
     }
 
-  def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent) =
+  def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent): Unit =
     if ((idIndex ne null) && valueChangeEvent.node.getLocalPart == "id") {
 
       val parentElement = unsafeUnwrapElement(valueChangeEvent.node.parentUnsafe)
@@ -476,7 +476,7 @@ trait XFormsInstanceIndex {
     }
   }
 
-  private def addId(id: String, element: Element) =
+  private def addId(id: String, element: Element): Unit =
     idIndex(id) = element :: (
       idIndex.get(id) match {
         case Some(list) ⇒

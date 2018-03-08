@@ -42,7 +42,7 @@ object ControlEditor {
   private lazy val controlEditorLeft         = $(".fb-control-editor-left")
   private lazy val controlEditorRight        = $(".fb-control-editor-right")
   private var previousCellOpt: Option[Block] = None
-  private var masking: Boolean               = false
+  private var masked: Boolean                = false
 
   // Show/hide editor
   Position.currentContainerChanged(
@@ -52,21 +52,23 @@ object ControlEditor {
       hideEditors()
     },
     becomesCurrent = (cell: Block) ⇒ {
-      if (! masking)
+      if (! masked)
         showEditors(cell)
     }
   )
 
   def mask(): Unit = {
-    masking = true
+    masked = true
     previousCellOpt = currentCellOpt
     hideEditors()
   }
 
   def unmask(): Unit = {
-    masking = false
-    previousCellOpt.foreach(showEditors)
-    previousCellOpt = None
+    masked = false
+    if (! masked) {
+      previousCellOpt.foreach(showEditors)
+      previousCellOpt = None
+    }
   }
 
   private def showEditors(cell: Block): Unit = {

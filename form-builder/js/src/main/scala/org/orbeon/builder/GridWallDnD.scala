@@ -95,6 +95,7 @@ object GridWallDnD {
 
       private val walls                      = new mutable.ListBuffer[JQuery]
       private var dropTarget: Option[JQuery] = None
+      private var mouseOnWall                = false
 
       def show[Underlying](
         gridMode    : GridModel[Underlying],
@@ -159,14 +160,23 @@ object GridWallDnD {
             case Orientation.Vertical   ⇒ dndContainer.height(currentCell.height)
             case Orientation.Horizontal ⇒ dndContainer.width (currentCell.width)
           }
-          dndContainer.on("mouseenter", ControlEditor.mask _)
-          dndContainer.on("mouseleave", ControlEditor.unmask _)
+          dndContainer.on("mouseenter", () ⇒ {
+            mouseOnWall = true
+            ControlEditor.mask()
+          })
+          dndContainer.on("mouseleave", () ⇒ {
+            mouseOnWall = false
+            if (! DndShadow.isDragging)
+              ControlEditor.unmask()
+          })
         }
       }
 
       def hideAll(): Unit = {
         walls.foreach(_.remove())
         walls.clear()
+        mouseOnWall = false
+        ControlEditor.unmask()
       }
 
       def wallOrientation(direction: Direction): Orientation =
@@ -278,9 +288,9 @@ object GridWallDnD {
           }
           Cell.cellWallPossibleDropTargets(currentCell.underlying, startSide).foreach { possibleTargets ⇒
             startCellOpt = Some(StartCell(currentCell, startSide, possibleTargets.statusQuo))
-            ControlEditor.mask()
             DndShadow.show(source)
             DndWall.hideAll()
+            ControlEditor.mask()
             val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.underlying.parentElement, simplify = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
             possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
@@ -299,7 +309,6 @@ object GridWallDnD {
           }
         }
         startCellOpt = None
-        ControlEditor.unmask()
         DndShadow.hide()
         DndWall.hideAll()
         currentCellOpt.foreach(DndSides.show)

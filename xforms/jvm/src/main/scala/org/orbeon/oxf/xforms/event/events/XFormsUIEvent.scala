@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import XFormsEvent._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 
 /**
  * Base class for UI events, that is events only dispatched to controls.
@@ -64,7 +65,8 @@ private object XFormsUIEvent {
     "hint"                      → hint,
     xxfName("hint")             → hint,
     "alert"                     → alert,
-    xxfName("alert")            → alert
+    xxfName("alert")            → alert,
+    xxfName("level")            → level
   )
 
   def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
@@ -76,4 +78,9 @@ private object XFormsUIEvent {
   def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)
   def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint)
   def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
+
+  def level(e: XFormsUIEvent): Option[String] = e.targetControl match {
+    case c: XFormsSingleNodeControl ⇒ c.alertLevel map (_.entryName)
+    case c                          ⇒ None
+  }
 }

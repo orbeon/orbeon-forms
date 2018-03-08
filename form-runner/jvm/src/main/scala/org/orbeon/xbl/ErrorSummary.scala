@@ -25,8 +25,11 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
+import org.orbeon.oxf.xforms.event.events.{XFormsEnabledEvent, XFormsUIEvent, XXFormsConstraintsChangedEvent}
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -144,14 +147,7 @@ object ErrorSummary {
   //@XPathFunction
   def removeUpdateOrInsertError(
     errorsInstanceDoc : DocumentInfo,
-    stateInstanceDoc  : DocumentInfo,
-    absoluteTargetId  : String,
-    eventName         : String,
-    controlPosition   : Int,
-    bindingOpt        : Option[NodeInfo],
-    eventLevelOpt     : Option[String],
-    alertOpt          : Option[String],
-    labelOpt          : Option[String]
+    stateInstanceDoc  : DocumentInfo
   ): Unit = {
 
     // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
@@ -159,20 +155,43 @@ object ErrorSummary {
     if ((errorsInstanceDoc eq null) || (stateInstanceDoc eq null))
       return
 
-    val rootElem = errorsInstanceDoc.rootElement
+    // Get the event here so that we don't have to evaluate all the `event()` properties on the
+    // XBL side. This is good for performance as not all the properties will be needed. For example,
+    // the label is only needed if we are actually inserting or updating an error.
+    val event =
+      inScopeContainingDocument.currentEventOpt getOrElse (throw new IllegalStateException)
+
+    val absoluteTargetId = XFormsId.effectiveIdToAbsoluteId(event.targetObject.getEffectiveId)
 
     val currentErrorOpt = Option(errorsInstanceDoc.selectID(absoluteTargetId))
 
-    // `xforms-invalid` is an error level but doesn't always have constraints associated
-    val actualEventLevelOpt =
-      eventName match {
-        case "xxforms-constraints-changed" ⇒ eventLevelOpt map ValidationLevel.withNameInsensitive
-        case "xforms-invalid"              ⇒ Some(ValidationLevel.ErrorLevel)
-        case _                             ⇒ None
-      }
+    def xxfProperty[T](name: String) =
+      event.property[T](xxfName(name))
+
+    val eventLevelOpt = event match {
+      case e: XXFormsConstraintsChangedEvent ⇒ e.property[String]("level")  map ValidationLevel.withNameInsensitive
+      case e: XFormsEnabledEvent             ⇒ xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
+      case _                                 ⇒ None
+    }
+
+    // Ideally, we would evaluate this lazily, but we use it in the pattern match below
+    val alertOpt =
+      xxfProperty[String]("alert")
+
+    def bindingFromEventOpt =
+      xxfProperty[Seq[Item]]("binding") flatMap (_.headOption)
+
+    def labelFromEventOpt =
+      xxfProperty[String]("label")
+
+    def controlPositionFromEvent =
+      xxfProperty[Int]("control-position") getOrElse (throw new IllegalStateException)
 
     def requiredEmpty =
-      bindingOpt exists (b ⇒ InstanceData.getRequired(b) && b.stringValue.isEmpty)
+      bindingFromEventOpt exists {
+        case n: NodeInfo ⇒ InstanceData.getRequired(n) && n.stringValue.isEmpty
+        case _           ⇒ false
+      }
 
     val previousStatusIsValid =
       (stateInstanceDoc.rootElement elemValue "valid") == "true"
@@ -188,7 +207,7 @@ object ErrorSummary {
         ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ErrorLevel.entryName))
       )
 
-    (currentErrorOpt, actualEventLevelOpt, alertOpt) match {
+    (currentErrorOpt, eventLevelOpt, alertOpt) match {
       case (Some(currentError), Some(actualEventLevel), Some(alert)) ⇒
 
         val levelAtt      = currentError /@ LevelAttName
@@ -196,7 +215,7 @@ object ErrorSummary {
 
         XFormsAPI.setvalue(levelAtt                            , actualEventLevel.entryName)
         XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
-        XFormsAPI.setvalue(currentError /@ LabelAttName        , labelOpt getOrElse "")
+        XFormsAPI.setvalue(currentError /@ LabelAttName        , labelFromEventOpt getOrElse "")
         XFormsAPI.setvalue(currentError /@ RequiredEmptyAttName, requiredEmpty.toString)
 
         if (previousLevel != actualEventLevel) {
@@ -219,10 +238,10 @@ object ErrorSummary {
           errorsInstanceDoc,
           createNewErrorElem(
             absoluteTargetId = absoluteTargetId,
-            controlPosition  = controlPosition,
+            controlPosition  = controlPositionFromEvent,
             level            = actualEventLevel,
             alert            = alert,
-            labelOpt         = labelOpt,
+            labelOpt         = labelFromEventOpt,
             requiredEmpty    = requiredEmpty
           )
         )

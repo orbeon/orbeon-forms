@@ -181,21 +181,14 @@
                         <!-- Control changes validity -->
                         <xf:action
                             xbl:attr="ev:observer=observer"
-                            ev:event="xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid"
+                            ev:event="xforms-enabled xxforms-constraints-changed xforms-disabled"
                             xxf:phantom="true"
                             ev:phase="capture"
                             type="xpath">
 
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
-                                xxf:instance('fr-state-instance')/root(),
-                                event('xxf:absolute-targetid'),
-                                event('xxf:type'),
-                                event('xxf:control-position'),
-                                event('xxf:binding')[1],
-                                event('level'),
-                                event('xxf:alert'),
-                                event('xxf:label')
+                                xxf:instance('fr-state-instance')/root()
                             )
                         </xf:action>
 

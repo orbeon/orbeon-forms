@@ -103,6 +103,9 @@ trait LiferayAPI {
     def getUserId       : Long
     def getScreenName   : String
     def getFullName     : String
+    def getFirstName    : String
+    def getMiddleName   : String
+    def getLastName     : String
     def getEmailAddress : String
     def getGroup        : GroupFacade
     def getRoles        : ju.List[RoleFacade]

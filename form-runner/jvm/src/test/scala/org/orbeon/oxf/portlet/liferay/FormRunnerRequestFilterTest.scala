@@ -73,7 +73,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     class MyUser {
       def getUserId       = 123L
       def getScreenName   = "jsmith"
-      def getFullName     = "John Smith"
+      def getFullName     = "John Paul Smith"
+      def getFirstName    = "John"
+      def getMiddleName   = "Paul"
+      def getLastName     = "Smith"
       def getEmailAddress = "test@orbeon.com"
       def getGroup        = new MyGroup
       def getRoles        = ju.Arrays.asList(MyRole("manager"): RoleFacade, MyRole("employee"): RoleFacade)
@@ -94,7 +97,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
       initialProperties ++ Map(
         "orbeon-liferay-user-id"          → List("123"),
         "orbeon-liferay-user-screen-name" → List("jsmith"),
-        "orbeon-liferay-user-full-name"   → List("John Smith"),
+        "orbeon-liferay-user-full-name"   → List("John Paul Smith"),
+        "orbeon-liferay-user-first-name"  → List("John"),
+        "orbeon-liferay-user-middle-name" → List("Paul"),
+        "orbeon-liferay-user-last-name"   → List("Smith"),
         "orbeon-liferay-user-email"       → List("test@orbeon.com"),
         "orbeon-liferay-user-group-id"    → List("42"),
         "orbeon-liferay-user-group-name"  → List("universe"),

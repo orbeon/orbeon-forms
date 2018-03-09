@@ -188,21 +188,38 @@ body.orbeon { background-color: @frBackground }
     }
 
     .xforms-alert.xforms-active {
+        font-family: sans-serif;
         font-size: 13px;
-        .border-radius(3px);
+        color: white;
+        position: relative;
+        padding: 2px 8px;
+        .border-radius(5px);
+        margin-top: 10px;
+
+        &:before {
+            content: "";
+            position: absolute;
+            left: 10%;
+            top: -10px;
+            border-style: solid;
+            border-width: 0 10px 10px 10px;
+            display: block;
+            width: 0;
+            margin: 0 0 0 -26px;
+        }
+
     }
 
-    .xforms-invalid > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-invalid {
-        color: @error;
+    .fr-alert-color(@color) {
+        background: @color;
+        border: @color solid 1px;
+        &:before {
+            border-color: @color transparent;
+        }
     }
-
-    .xforms-warning > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-warning {
-        color: @warning;
-    }
-
-    .xforms-info > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-info {
-        color: @info;
-    }
+    .xforms-invalid > .xforms-alert.xforms-active { .fr-alert-color(@error  ) }
+    .xforms-warning > .xforms-alert.xforms-active { .fr-alert-color(@warning) }
+    .xforms-info    > .xforms-alert.xforms-active { .fr-alert-color(@info   ) }
 
     .xforms-invalid.xforms-visited {
         &> input, &> textarea, &> select {

@@ -172,13 +172,32 @@
         <xf:var name="template" value="instance('fr-form-instance')"/>
 
         <!-- Set language in all blank @xml:lang on template -->
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/3457 -->
+        <xf:var
+            name="fb-lang"
+            value="
+                let $requested-fb-lang := xxf:trim(xxf:get-request-parameter('fb-language'))[xxf:non-blank()]
+                return
+                    if ($requested-fb-lang = xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code) then
+                        $requested-fb-lang
+                    else
+                        xxf:instance('fr-language-instance')"/>
+
         <xf:setvalue
             iterate="$template//@xml:lang[xxf:is-blank()]"
             ref="."
-            value="xxf:instance('fr-language-instance')"/>
+            value="$fb-lang"/>
 
         <!-- Set initial form and first section titles on template -->
-        <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources"/>
+        <xf:var
+            name="form-resources"
+            model="fr-resources-model"
+            value="
+                (
+                    $fr-form-resources/../resource[@xml:lang = $fb-lang],
+                    $fr-form-resources
+                )[1]"/>
+
         <xf:setvalue
             ref="frf:metadataInstanceRootOpt($template)/title"
             value="$form-resources/template/untitled-form"/>

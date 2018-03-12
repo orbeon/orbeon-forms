@@ -25,6 +25,8 @@ class XXFormsSetvisitedAction extends XFormsAction {
 
     synchronizeAndRefreshIfNeeded(context)
 
+    // This doesn't use `visitWithAncestors()` for now. Assuming that this action is used on targets that make sense,
+    // for example on `fr:attachment`.
     resolveControlAvt("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
 
     //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)

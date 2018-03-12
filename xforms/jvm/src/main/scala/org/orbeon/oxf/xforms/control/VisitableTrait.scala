@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
@@ -28,7 +30,7 @@ trait VisitableTrait extends XFormsControl {
 
   override def visited = _visited
 
-  def visited_=(visited: Boolean) =
+  def visited_=(visited: Boolean): Unit =
     if (visited != _visited && ! (visited && isStaticReadonly)) {
       // This mutation requires a clone. We could use XFormsControlLocal but that is more complex. In addition, most
       // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
@@ -44,6 +46,17 @@ trait VisitableTrait extends XFormsControl {
       containingDocument.requireRefresh()
       _visited = visited
     }
+
+  def visitWithAncestors(): Unit = {
+
+    visited = true
+
+    // See https://github.com/orbeon/orbeon-forms/issues/3508
+    new AncestorOrSelfIterator(this) foreach {
+      case v: XFormsValueComponentControl ⇒ v.visited = true
+      case _ ⇒
+    }
+  }
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState]) = {
     super.onCreate(restoreState, state)
@@ -64,18 +77,18 @@ trait VisitableTrait extends XFormsControl {
     wasVisitedCommit()
   }
 
-  override def performTargetAction(event: XFormsEvent) = {
+  override def performTargetAction(event: XFormsEvent): Unit = {
     event match {
       case _: DOMFocusOutEvent ⇒
-        // Mark control visited upon focus out event. This applies to any control, including grouping controls. We
+        // Mark control visited upon `DOMFocusOut`. This applies to any control, including grouping controls. We
         // do this upon the event reaching the target, so that by the time a regular event listener makes use of the
         // visited property, it is up to date. This seems reasonable since `DOMFocusOut` indicates that the focus has
         // already left the control.
-        visited = true
+        visitWithAncestors()
       case _: XXFormsBlurEvent ⇒
         // The client dispatches `xxforms-blur` when focus goes away from all XForms controls.
         if (containingDocument.getControls.getFocusedControl exists (_ eq this)) {
-          visited = true
+          visitWithAncestors()
           Focus.removeFocus(containingDocument)
         }
       case _ ⇒

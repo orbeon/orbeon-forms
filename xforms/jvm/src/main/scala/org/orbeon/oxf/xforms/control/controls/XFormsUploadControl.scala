@@ -82,7 +82,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         containingDocument.endUpload(getUploadUniqueId)
         UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
-        visited = true
+        visitWithAncestors()
       case _: XXFormsUploadErrorEvent ⇒
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)

@@ -16,14 +16,17 @@ package org.orbeon.xbl
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariableControl}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.om.{SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.value.{AtomicValue, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import shapeless._
+import shapeless.syntax.typeable._
 
 object Wizard {
 
@@ -88,6 +91,15 @@ object Wizard {
         )
       )
     }
+
+  //@XPathFunction
+  def caseIdsForTopLevelSection(topLevelSectionId: String): SequenceIterator =
+    for {
+      control               ← inScopeContainingDocument.resolveObjectByIdInScope("#document", s"$topLevelSectionId-switch", None).toList
+      switchControl         ← control.cast[XFormsSwitchControl].toList
+      subsectionCaseControl ← switchControl.getChildrenCases
+    } yield
+      subsectionCaseControl.getId
 
   private object Private {
 

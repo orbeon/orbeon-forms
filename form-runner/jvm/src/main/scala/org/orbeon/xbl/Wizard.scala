@@ -79,8 +79,8 @@ object Wizard {
     findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
 
   //@XPathFunction
-  def gatherSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
-    gatherSectionStatus(relevantTopLevelSectionIds.to[List]) map { sectionStatus ⇒
+  def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
+    gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to[List]) map { sectionStatus ⇒
       MapFunctions.createValue(
         Map[AtomicValue, ValueRepresentation](
           (SaxonUtils.fixStringValue("name")                 , sectionStatus.name),
@@ -136,7 +136,7 @@ object Wizard {
       case _           ⇒ false
     }
 
-    def gatherSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
+    def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
 
       val topLevelSectionNamesWithErrorsMap =
         ErrorSummary.topLevelSectionsWithErrors(

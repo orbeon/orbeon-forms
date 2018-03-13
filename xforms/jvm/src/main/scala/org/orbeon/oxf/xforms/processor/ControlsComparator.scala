@@ -96,6 +96,10 @@ class ControlsComparator(
                 true
               } else
                 false
+            case _: XFormsCaseControl ⇒
+              // See https://github.com/orbeon/orbeon-forms/issues/3509 and
+              // https://github.com/orbeon/orbeon-forms/issues/3510.
+              false
             case c: XFormsComponentControl ⇒
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")

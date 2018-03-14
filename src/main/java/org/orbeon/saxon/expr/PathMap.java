@@ -56,9 +56,9 @@ public class PathMap implements Cloneable {
     private HashMap<Binding, PathMapNodeSet> pathsForVariables = new HashMap<Binding, PathMapNodeSet>();  // a map from a variable Binding to a PathMapNodeSet
 
     // ORBEON
-    private Map<String, PathMap> inScopeVariables;
+    private scala.collection.immutable.Map<String, PathMap> inScopeVariables;
 
-    public void setInScopeVariables(Map<String, PathMap> inScopeVariables) {
+    public void setInScopeVariables(scala.collection.immutable.Map<String, PathMap> inScopeVariables) {
         this.inScopeVariables = inScopeVariables;
     }
 
@@ -413,7 +413,7 @@ public class PathMap implements Cloneable {
     }
 
     // ORBEON
-    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Object pathMapContext) {
+    public PathMap(Expression exp, scala.collection.immutable.Map<String, PathMap> inScopeVariables, Object pathMapContext) {
 
         setInScopeVariables(inScopeVariables);
         setPathMapContext(pathMapContext);
@@ -476,9 +476,9 @@ public class PathMap implements Cloneable {
         if (pathMapContext != null) {
             // Check external variables
             // Clone the PathMap first because the nodes returned must belong to this PathMap
-            final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
-            if (variablePathMap != null) {
-                final PathMap clonedVariablePathMap = variablePathMap.clone();
+            final scala.Option<PathMap> variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
+            if (variablePathMap.isDefined()) {
+                final PathMap clonedVariablePathMap = variablePathMap.get().clone();
                 addRoots(clonedVariablePathMap.getPathMapRoots());
                 return clonedVariablePathMap.findFinalNodes();
             } else {

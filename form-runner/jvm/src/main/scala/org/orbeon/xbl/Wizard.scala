@@ -64,7 +64,7 @@ object Wizard {
     val resultOpt =
       for {
         model    ← findWizardModel
-        instance ← model.findInstance("available-sections")
+        instance ← model.findInstance("available-top-level-sections")
         root     = instance.rootElement
       } yield
         stringToSet(root.stringValue)

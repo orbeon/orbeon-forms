@@ -224,13 +224,12 @@
                             /*/fr:section
                 "/>
 
+                <!-- Make sure that duplicates are kept, see https://github.com/orbeon/orbeon-forms/issues/3516 -->
                 <xsl:variable
                     name="static-matching-top-level-section-ids"
                     select="
-                        (
-                            for $s in $static-nav-sections-or-grids
-                            return $s/ancestor-or-self::fr:section[last()]
-                        )/@id
+                        for $s in $static-nav-sections-or-grids
+                        return $s/ancestor-or-self::fr:section[last()]/@id/string()
                 "/>
 
                 <xsl:variable
@@ -522,11 +521,12 @@
                                                 )
                                             )"/>
 
-                                <!-- True if we can go to the next top-level section OR if next is not in different top-level section -->
                                 <xf:var
                                     name="allow-next"
                                     value="
+                                        (: We can go to the next top-level section :)
                                         $allow-next-top-level or
+                                        (: Next is not in a different top-level section :)
                                         replace($current-top-level-case-id, '-case$', '') =
                                             $nav-matching-top-level-section-ids[
                                                 index-of(

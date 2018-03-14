@@ -486,7 +486,11 @@
                                 <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
                                 <xf:var
                                     name="current-nav-case-id"
-                                    value="(xxf:instance('local')/current-case-id[xxf:non-blank()]/string(), $relevant-nav-case-ids)[1]"/>
+                                    value="
+                                        (
+                                            xxf:instance('local')/current-case-id[xxf:non-blank()]/string(),
+                                            $relevant-nav-case-ids
+                                        )[1]"/>
 
                                 <xf:var
                                     name="nav-case-index"

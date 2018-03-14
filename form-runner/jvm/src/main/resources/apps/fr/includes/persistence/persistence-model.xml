@@ -441,28 +441,28 @@
             value="frf:xpathFormRunnerStringProperty($process-property-name)"/>
 
         <!-- Run service if defined -->
-        <xf:var
-            name="process-result"
-            value="
-                if (exists($process-property-value)) then
-                    fr:run-process('oxf.fr.detail.process', $process-property-value)
-                else
-                    ()"/>
+        <xf:action if="exists($process-property-value)">
 
-        <xf:setvalue
-            if="exists($process-result)"
-            ref="instance('fr-background-response-instance')/process-success"
-            value="data(.) and $process-result"/>
+            <xf:var
+                name="process-result"
+                value="fr:run-process('oxf.fr.detail.process', $process-property-value)"/>
 
-        <!-- Log error if any -->
-        <xf:message
-            if="not($process-result)"
-            level="xxf:log-error"
-            value="concat('Process failed with error for property: `', $process-property-name, '`')"/>
+            <xf:setvalue
+                if="exists($process-result)"
+                ref="instance('fr-background-response-instance')/process-success"
+                value="data(.) and $process-result"/>
 
-        <xf:message
-            level="xxf:log-debug"
-            value="concat('Result of running process with property: `', $process-property-name, '`: ', $process-result)"/>
+            <!-- Log error if any -->
+            <xf:message
+                if="not($process-result)"
+                level="xxf:log-error"
+                value="concat('Process failed with error for property: `', $process-property-name, '`')"/>
+
+            <xf:message
+                level="xxf:log-debug"
+                value="concat('Result of running process with property: `', $process-property-name, '`: ', $process-result)"/>
+
+        </xf:action>
 
         <!-- When done in background mode, send out service response -->
         <xf:action if="$is-background and event('xxf:type') = 'xforms-ready'">

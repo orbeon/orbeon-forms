@@ -33,8 +33,8 @@ trait XFormsEventTarget extends XFormsObject {
 
   def parentEventObserver: XFormsEventObserver
 
-  def performTargetAction(event: XFormsEvent)
-  def performDefaultAction(event: XFormsEvent)
+  def performTargetAction(event: XFormsEvent): Unit
+  def performDefaultAction(event: XFormsEvent): Unit
 
   def allowExternalEvent(eventName: String): Boolean
 }

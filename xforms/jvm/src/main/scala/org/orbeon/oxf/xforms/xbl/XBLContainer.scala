@@ -326,6 +326,9 @@ trait ContainerResolver {
   def getObjectByEffectiveId(effectiveId: String): XFormsObject =
     allModels map (_.getObjectByEffectiveId(effectiveId)) find (_ ne null) orNull
 
+  def findObjectByEffectiveId(effectiveId: String): Option[XFormsObject] =
+    Option(getObjectByEffectiveId(effectiveId))
+
   /**
    * Return the current repeat index for the given xf:repeat id, -1 if the id is not found.
    *

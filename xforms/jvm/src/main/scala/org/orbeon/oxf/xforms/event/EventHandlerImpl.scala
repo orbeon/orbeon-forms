@@ -308,7 +308,7 @@ object EventHandlerImpl extends Logging {
       } else if (handler.isPhantom) {
         // Special case of a phantom handler
         // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
-        Option(containingDocument.getObjectByEffectiveId(handler.prefixedId))
+        containingDocument.findObjectByEffectiveId(handler.prefixedId)
       } else {
         // See https://github.com/orbeon/orbeon-forms/issues/243
         warn(

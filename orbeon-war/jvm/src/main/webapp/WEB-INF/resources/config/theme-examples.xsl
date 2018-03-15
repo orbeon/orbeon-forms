@@ -58,9 +58,6 @@
                 </xh:div>
                 <xsl:apply-templates select="node()"/>
             </xh:div>
-            <xsl:if test="p:property('oxf.epilogue.show-feedback')">
-                <xsl:copy-of select="doc('oxf:/config/feedback.xhtml')"/>
-            </xsl:if>
         </xsl:copy>
     </xsl:template>
 

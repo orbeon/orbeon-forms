@@ -103,6 +103,33 @@
             }
         }
 
+        // Overrides for minimal appearance
+        &.xforms-grid-appearance-minimal {
+            .fr-grid.fr-grid-css {
+                &.fr-repeat {
+
+                    border-right: none;
+                    border-bottom: none;
+
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: auto 35px;
+                    }
+
+                    .fr-grid-th,
+                    .fr-grid-td,
+                    .fr-repeat-column-left,
+                    .fr-repeat-column-right,
+                    &.fr-repeat-multiple-rows .fr-grid-head {
+                        border: none;
+                    }
+
+                    .fr-grid-repeat-iteration {
+                        border-top: 2px solid #ddd;
+                    }
+                }
+            }
+        }
+
         // Grid displayed with CSS grids, only at design time as of Orbeon Forms 2017.2
         .fr-grid.fr-grid-css {
 
@@ -117,17 +144,13 @@
                 .fr-grid-td,
                 .fr-repeat-column-left,
                 .fr-repeat-column-right,
-                 &.fr-repeat-multiple-rows .fr-grid-head {
+                &.fr-repeat-multiple-rows .fr-grid-head {
                     border-left: 1px solid #ddd;
                     border-top: 1px solid #ddd;
                     padding: 4px 5px;
                     line-height: 20px;
                     vertical-align: top;
                 }
-
-                //tbody + tbody {
-                //    border-top: 2px solid #ddd;
-                //}
 
                 .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                     display: grid;

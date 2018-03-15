@@ -806,23 +806,26 @@
 
                 <!-- TOC: handle section -->
                 <xsl:template match="fr:section" mode="toc-sections">
-                    <xsl:variable name="static-section-id" select="@id"/>
+
+                    <xsl:variable
+                        name="static-current-section"
+                        select="."/>
+                    <xsl:variable
+                        name="static-section-id"
+                        select="$static-current-section/@id"/>
+                    <xsl:variable
+                        name="static-is-top-level-section"
+                        select="empty($static-current-section/ancestor::fr:section)"/>
+                    <xsl:variable
+                        name="static-top-level-section-id"
+                        select="($static-current-section/ancestor-or-self::fr:section/@id)[1]"/>
+                    <xsl:variable
+                        name="static-top-level-section-case-id"
+                        select="concat($static-top-level-section-id, '-case')"/>
+
                     <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
                     <xf:group>
                         <xsl:copy-of select="@model | @context | @bind | @ref"/>
-
-                        <xsl:variable
-                            name="static-current-section"
-                            select="."/>
-                        <xsl:variable
-                            name="static-is-top-level-section"
-                            select="empty($static-current-section/ancestor::fr:section)"/>
-                        <xsl:variable
-                            name="static-top-level-section-id"
-                            select="($static-current-section/ancestor-or-self::fr:section/@id)[1]"/>
-                        <xsl:variable
-                            name="static-top-level-section-case-id"
-                            select="concat($static-top-level-section-id, '-case')"/>
 
                         <xf:var name="top-level-section-available">
                             <xxf:value
@@ -844,15 +847,18 @@
                             name="top-level-section-tokens"
                             value="xxf:split(@fr:section-status)"/>
 
-                        <!-- NOTE: Only make active top-level sections -->
                         <xf:var
                             name="top-level-section-active"
                             value="not($separate-toc-mode) and $current-top-level-case-id = '{concat($static-section-id, '-case')}'"/>
 
+                        <xf:var
+                            name="section-active"
+                            value="not($separate-toc-mode) and $current-nav-case-id = '{concat($static-section-id, '-case')}'"/>
+
                         <xh:li class="{{
                             'disabled'   [not($top-level-section-available)],
-                            'active'     [$top-level-section-active  ],
-                            'started'    [$top-level-section-visited ],
+                            'active'     [$section-active or $top-level-section-active],
+                            'started'    [$top-level-section-visited],
                             $top-level-section-tokens
                         }}">
 

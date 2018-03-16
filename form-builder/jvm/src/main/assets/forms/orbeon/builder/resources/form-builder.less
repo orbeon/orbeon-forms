@@ -220,13 +220,16 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-grid-dnd-wall-container {
 
-        &.fb-grid-dnd-wall-vertical   { width : 7px }
-        &.fb-grid-dnd-wall-horizontal { height: 7px }
+        &.fb-grid-dnd-wall-vertical   { width : 8px }
+        &.fb-grid-dnd-wall-horizontal { height: 8px }
+
+        @accentLight:  #FDCD6D;
+        @accentBright: #FB8604;
 
         position: absolute;
-        background-color: #ccc;
-        &:hover                 { background-color: #AAA    }               // Cue container can be grabbed
-        &.fb-grid-dnd-wall-drop { background-color: #F9A03F }               // On drop, wall will be moved here
+        background-color: @accentLight;
+        &:hover                 { background-color: @accentBright }         // Cue container can be grabbed
+        &.fb-grid-dnd-wall-drop { background-color: @accentBright }         // On drop, wall will be moved here
 
         .fb-grid-dnd-wall-handle {
             height: 100%;

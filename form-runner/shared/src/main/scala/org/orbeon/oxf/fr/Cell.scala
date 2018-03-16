@@ -17,6 +17,7 @@ import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.Try
+import enumeratum._
 
 case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
 
@@ -28,6 +29,13 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
 }
 
 case class GridModel[Underlying](cells: List[List[Cell[Underlying]]])
+
+sealed trait WallPosition extends EnumEntry
+object WallPosition extends Enum[WallPosition] {
+  val values = findValues
+  case object Middle extends WallPosition
+  case object Side   extends WallPosition
+}
 
 trait CellOps[Underlying] {
 
@@ -252,20 +260,30 @@ object Cell {
   def movableWalls[Underlying](
     cellElem         : Underlying)(
     implicit cellOps : CellOps[Underlying]
-  ): List[Direction] = {
+  ): List[(Direction, WallPosition)] = {
 
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
       Direction.values.flatMap { direction ⇒
         val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
         val smallestNeighborOpt = findSmallestNeighbor(direction, neighbors)
-        val directionOK = smallestNeighborOpt.exists(smallestNeighbor ⇒
-          Orientation.fromDirection(direction) match {
-            case Orientation.Horizontal ⇒ originCell.w > 1 || smallestNeighbor.w > 1
-            case Orientation.Vertical ⇒ originCell.h > 1 || smallestNeighbor.h > 1
+        val directionWallPosition = smallestNeighborOpt.flatMap { smallestNeighbor ⇒
+          val (either, both) =
+            Orientation.fromDirection(direction) match {
+              case Orientation.Horizontal ⇒
+                (originCell.w > 1 || smallestNeighbor.w > 1) →
+                (originCell.w > 1 && smallestNeighbor.w > 1)
+              case Orientation.Vertical   ⇒
+                (originCell.h > 1 || smallestNeighbor.h > 1) →
+                (originCell.h > 1 && smallestNeighbor.h > 1)
+            }
+          (either, both) match {
+            case (_, true) ⇒ Some(WallPosition.Middle)
+            case (true, _) ⇒ Some(WallPosition.Side)
+            case _         ⇒ None
           }
-        )
-        directionOK.list(direction)
+        }
+        directionWallPosition.toList.map(direction → _)
       }
     }
   }

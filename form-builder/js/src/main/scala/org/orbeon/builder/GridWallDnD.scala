@@ -19,7 +19,7 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.fr.{Cell, GridModel}
+import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
@@ -77,7 +77,8 @@ object GridWallDnD {
        def show(cell: Block): Unit = {
          val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
          val walls     = Cell.movableWalls(cell.underlying)
-         walls.foreach { direction ⇒
+         walls.foreach { case (direction, wallPosition) ⇒
+           println("direction, wallPosition", direction, wallPosition)
            val wallOrientation = DndWall.wallOrientation(direction)
            val index = direction match {
              case Direction.Left  ⇒ cell.x          - 1
@@ -85,7 +86,11 @@ object GridWallDnD {
              case Direction.Up    ⇒ cell.y          - 1
              case Direction.Down  ⇒ cell.y + cell.h - 1
            }
-           DndWall.show(gridModel, index, wallOrientation, Some(direction))
+           val side = wallPosition match {
+             case WallPosition.Side   ⇒ Some(direction)
+             case WallPosition.Middle ⇒ None
+           }
+           DndWall.show(gridModel, index, wallOrientation, side)
          }
        }
     }

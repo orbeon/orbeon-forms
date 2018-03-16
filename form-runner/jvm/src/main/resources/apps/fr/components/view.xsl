@@ -923,7 +923,11 @@
                                                 $p/fr:name,
                                                 ''',',
                                                 if (exists($p/fr:expr)) then
-                                                    $p/fr:expr
+                                                    concat(
+                                                        'string((',
+                                                        $p/fr:expr,
+                                                        ')[1])'
+                                                    )
                                                 else if (exists($p/fr:controlName)) then
                                                     concat(
                                                         'for $a in fr:control-typed-value(''',

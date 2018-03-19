@@ -496,19 +496,21 @@
 
                                 <xsl:choose>
                                     <xsl:when test="not($use-css-grids-output)">
-                                        <xsl:element name="{$thead-elem}">
-                                            <xsl:attribute name="class">fr-grid-head</xsl:attribute>
-                                            <xsl:element name="{$tr-elem}">
-                                                <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
-                                                <xsl:if test="$left-column">
-                                                    <xsl:copy-of select="$header-side-block"/>
-                                                </xsl:if>
-                                                <xsl:copy-of select="$head-content"/>
-                                                <xsl:if test="$right-column">
-                                                    <xsl:copy-of select="$header-side-block"/>
-                                                </xsl:if>
+                                        <xsl:if test="not($appearance = 'minimal' and $static-row-count gt 1)">
+                                            <xsl:element name="{$thead-elem}">
+                                                <xsl:attribute name="class">fr-grid-head</xsl:attribute>
+                                                <xsl:element name="{$tr-elem}">
+                                                    <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
+                                                    <xsl:if test="$left-column">
+                                                        <xsl:copy-of select="$header-side-block"/>
+                                                    </xsl:if>
+                                                    <xsl:copy-of select="$head-content"/>
+                                                    <xsl:if test="$right-column">
+                                                        <xsl:copy-of select="$header-side-block"/>
+                                                    </xsl:if>
+                                                </xsl:element>
                                             </xsl:element>
-                                        </xsl:element>
+                                        </xsl:if>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:element name="xh:div">

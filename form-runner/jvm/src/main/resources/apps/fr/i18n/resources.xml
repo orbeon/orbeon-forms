@@ -108,6 +108,10 @@
                 <not-started>Not Started</not-started>
                 <edit>Edit</edit>
             </wizard>
+            <error-summary>
+                <show-more>Show More</show-more>
+                <show-less>Show Less</show-less>
+            </error-summary>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -438,6 +442,10 @@
                 <not-started>A remplir</not-started>
                 <edit>Editer</edit>
             </wizard>
+            <error-summary>
+                <show-more>Montrer plus</show-more>
+                <show-less>Montrer moins</show-less>
+            </error-summary>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -772,6 +780,10 @@
                 <not-started>No iniciado</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
@@ -1092,6 +1104,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1410,6 +1426,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1726,6 +1746,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -2055,6 +2079,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -2384,6 +2412,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>
@@ -2713,6 +2745,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
         <errors>
@@ -3042,6 +3078,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Naamloos form</untitled-form>
         <errors>
@@ -3371,6 +3411,10 @@
                 <not-started todo="true">[Not Started]</not-started>
                 <edit todo="true">[Edit]</edit>
             </wizard>
+            <error-summary>
+                <show-more todo="true">[Show More]</show-more>
+                <show-less todo="true">[Show Less]</show-less>
+            </error-summary>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
         <errors>

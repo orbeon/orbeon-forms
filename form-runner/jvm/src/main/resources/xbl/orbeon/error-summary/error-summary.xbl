@@ -60,7 +60,7 @@
             </xbl:handler>
             <xbl:handler event="fr-hide" phase="target">
                 <!-- Hide the error summary entirely -->
-                <xf:setvalue ref="$state/show"         value="false()"/>
+                <xf:setvalue ref="$state/show" value="false()"/>
             </xbl:handler>
             <xbl:handler event="fr-show" phase="target">`
                 <!-- Show the error summary, possibly for specific sections -->
@@ -82,12 +82,12 @@
                 </xf:instance>
 
                 <!-- Instance containing the visible errors (for non-incremental mode) -->
-                <xf:instance id="fr-snapshot-instance">
+                <xf:instance id="fr-snapshot-instance" xxf:exclude-result-prefixes="#all">
                     <errors xmlns=""/>
                 </xf:instance>
 
                 <!-- State instance -->
-                <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
+                <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all" xxf:expose-xpath-types="true">
                     <state xmlns="">
                         <!-- Whether to be visible or not -->
                         <show>true</show>
@@ -102,11 +102,23 @@
                         <!-- Number of alerts, total vs. per level -->
                         <counts         alert="" error="" warning="" info=""/>
                         <visible-counts alert="" error="" warning="" info=""/>
+                        <!-- Number of items (errors/warnings/infos) to show -->
+                        <default-page-size>20</default-page-size>
+                        <current-page-size>20</current-page-size>
                     </state>
                 </xf:instance>
 
+                <xf:bind ref="instance('fr-state-instance')">
+                    <xf:bind ref="show | incremental | valid"            type="xs:boolean"/>
+                    <xf:bind ref="default-page-size | current-page-size" type="xs:integer"
+                             xxf:default="
+                                (
+                                    xxf:component-param-value('page-size'),
+                                    .
+                                )[. castable as xs:integer][1]"/>
+                </xf:bind>
+
                 <xf:var name="state"        value="instance('fr-state-instance')"/>
-                <xf:var name="incremental"  value="$state/incremental != 'false'"/>
                 <xf:var name="section-name" value="$state/section-name[xxf:non-blank()]"/>
 
                 <!-- Errors for controls that have been visited AND which have a non-blank alert message -->
@@ -116,7 +128,7 @@
                     value="
                         for $e in
                             instance(
-                                if ($incremental) then
+                                if (data($state/incremental)) then
                                     'fr-errors-instance'
                                 else
                                     'fr-snapshot-instance'
@@ -159,10 +171,16 @@
                                 - initial errors might have been inserted already or not, depending on where error summary is on page
                                 - but in any case, this means a second refresh has to take place
                             -->
+
+                            <xf:var
+                                xxbl:scope="inner"
+                                name="incremental-or-blank"
+                                xbl:attr="xbl:text=incremental"/>
+
                             <xf:setvalue
                                 xxbl:scope="inner"
                                 ref="$state/incremental"
-                                xbl:attr="xbl:text=incremental"/>
+                                value="not($incremental-or-blank = 'false')"/>
 
                             <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
                             <xf:setvalue
@@ -265,7 +283,7 @@
                             xxbl:scope="inner"
                             id="ig"
                             ref=".[
-                                $state/show = 'true' and (
+                                data($state/show) and (
                                     exists($visible-errors-for-section){
                                         ' or exists($global-errors)'[exists($fr-errors)]
                                     }
@@ -317,7 +335,7 @@
                                 <!-- Controls errors -->
                                 <xf:group ref=".[exists($visible-errors-for-section)]">
                                     <xh:ol class="fr-error-group">
-                                        <xf:repeat ref="$visible-errors-for-section" id="er">
+                                        <xf:repeat ref="$visible-errors-for-section[position() le data($state/current-page-size)]" id="er">
                                             <xh:li class="fr-level-{{@level}} fr-error-{{if (starts-with(@alert, '&lt;ul>')) then 'multiple' else 'single'}}">
                                                 <!-- Clickable / linkable label -->
                                                 <xf:var
@@ -366,6 +384,29 @@
                                             </xh:li>
                                         </xf:repeat>
                                     </xh:ol>
+
+                                    <xf:trigger
+                                        ref=".[count($visible-errors-for-section) gt data($state/current-page-size)]"
+                                        appearance="minimal"
+                                        class="fr-show-more-errors">
+                                        <xf:label value="xxf:r('components.error-summary.show-more', '|fr-fr-resources|')"/>
+                                        <xf:setvalue
+                                            event="DOMActivate"
+                                            ref="$state/current-page-size"
+                                            value="data(.) + data($state/default-page-size)"/>
+                                    </xf:trigger>
+
+                                    <xf:trigger
+                                        ref=".[$state/current-page-size/data(.) gt $state/default-page-size/data(.)]"
+                                        appearance="minimal"
+                                        class="fr-show-less-errors">
+                                        <xf:label value="xxf:r('components.error-summary.show-less', '|fr-fr-resources|')"/>
+                                        <xf:setvalue
+                                            event="DOMActivate"
+                                            ref="$state/current-page-size"
+                                            value="max((data(.) - data($state/default-page-size), data($state/default-page-size)))"/>
+                                    </xf:trigger>
+
                                 </xf:group>
                             </xf:group>
 

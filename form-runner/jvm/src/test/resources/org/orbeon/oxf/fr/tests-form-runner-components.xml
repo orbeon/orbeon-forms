@@ -655,11 +655,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <errors>
-                                    <error id="|first-name-control|" position="109" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙1|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙2|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙3|" position="114" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|last-name-control|" position="117" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
+                                    <error id="|first-name-control|" position="116" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙1|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙2|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙3|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|last-name-control|" position="124" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">
@@ -669,7 +669,7 @@
                                     <!-- Filter on section for which to show errors -->
                                     <section-name/>
                                     <!-- Whether errors are shown incrementally or not -->
-                                    <incremental/>
+                                    <incremental>true</incremental>
                                     <!-- Absolute ids of observers -->
                                     <observers>my-group</observers>
                                     <!-- Whether the form is valid or invalid -->
@@ -677,13 +677,16 @@
                                     <!-- Number of alerts, total vs. per level -->
                                     <counts alert="5" error="5" warning="0" info="0"/>
                                     <visible-counts alert="2" error="2" warning="0" info="0"/>
+                                    <!-- Number of items (errors/warnings/infos) to show -->
+                                    <default-page-size>20</default-page-size>
+                                    <current-page-size>20</current-page-size>
                                 </state>
                             </instance>
                         </instances>
                         <controls>
                             <control effective-id="my-summary≡er" index="1"/>
-                            <control effective-id="my-summary≡xf-82⊙1" case-id="xf-83"/>
-                            <control effective-id="my-summary≡xf-82⊙2" case-id="xf-83"/>
+                            <control effective-id="my-summary≡xf-83⊙1" case-id="xf-84"/>
+                            <control effective-id="my-summary≡xf-83⊙2" case-id="xf-84"/>
                             <control effective-id="repeat" index="2"/>
                         </controls>
                     </dynamic-state>
@@ -691,28 +694,30 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
-                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-77⊙1"/>
-                        <xxf:control id="my-summary≡xf-81⊙1">
+                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-78⊙1"/>
+                        <xxf:control id="my-summary≡xf-82⊙1">
                             <xxf:value>1</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-82⊙1">
-                            <xxf:case id="my-summary≡xf-83⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-90⊙1" visibility="hidden"/>
+                        <xxf:control id="my-summary≡xf-83⊙1">
+                            <xxf:case id="my-summary≡xf-84⊙1" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-91⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-84⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-87&quot;&gt;Invalid note&lt;/span&gt;"/>
-                        <xxf:control id="my-summary≡xf-91⊙1" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-85⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88&quot;&gt;Invalid note&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-92⊙1" relevant="false"/>
-                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-77⊙2"/>
-                        <xxf:control id="my-summary≡xf-81⊙2">
+                        <xxf:control id="my-summary≡xf-93⊙1" relevant="false"/>
+                        <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-78⊙2"/>
+                        <xxf:control id="my-summary≡xf-82⊙2">
                             <xxf:value>2</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-82⊙2">
-                            <xxf:case id="my-summary≡xf-83⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-90⊙2" visibility="hidden"/>
+                        <xxf:control id="my-summary≡xf-83⊙2">
+                            <xxf:case id="my-summary≡xf-84⊙2" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-91⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-84⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-87&quot;&gt;Invalid last name&lt;/span&gt;"/>
-                        <xxf:control id="my-summary≡xf-91⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-85⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88&quot;&gt;Invalid last name&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-92⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-93⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-94" class="fr-show-more-errors" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-97" class="fr-show-less-errors" relevant="false"/>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>

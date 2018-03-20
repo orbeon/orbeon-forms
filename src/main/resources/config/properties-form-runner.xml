@@ -337,8 +337,9 @@
     -->
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
     <property as="xs:boolean" name="oxf.fr.import.allow-invalid-documents.*.*"                  value="false"/>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"               value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>

@@ -199,6 +199,7 @@ class SAXContentHandler(
     }
   }
 
+  // TODO: Change once everything is a concrete `Element`.
   private def addAttributes(element: Element, attributes: Attributes): Unit =
     element match {
       case elem: ConcreteElement ⇒ elem.setAttributes(attributes, namespaceStack, noNamespaceAttributes = false)

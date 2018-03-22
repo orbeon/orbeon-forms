@@ -24,8 +24,6 @@ public class BooleanFromString extends XFormsFunction {
         String value = argument[0].evaluateAsString(c).toString();
         if("1".equals(value) || "true".equalsIgnoreCase(value))
             return BooleanValue.TRUE;
-        else if("0".equals(value) || "false".equalsIgnoreCase(value))
-            return BooleanValue.FALSE;
         else
         	return BooleanValue.FALSE;
     }

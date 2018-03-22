@@ -60,7 +60,7 @@ private object ControlDnD {
         }
         override def mirrorContainer: html.Element =
           // Create the mirror inside the first container, so the proper CSS applies to the mirror
-          $(".fr-body .fr-grid-td").get(0).asInstanceOf[html.Element]
+          $(".fb-body .fr-grid-td").get(0).asInstanceOf[html.Element]
         override def copy(el: html.Element, source: html.Element): Boolean = {
           val cursorClass = if (shiftPressed) CopyClass else MoveClass
           $(el).addClass(cursorClass)

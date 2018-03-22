@@ -240,9 +240,12 @@ abstract class JQueryTooltipConfig extends js.Object {
 }
 
 abstract class TinyMceEditorManager extends js.Object
+
 @JSGlobal("tinymce.EditorManager")
 @js.native
-object TinyMceDefaultEditorManager extends TinyMceEditorManager
+object TinyMceDefaultEditorManager extends TinyMceEditorManager {
+  var baseURL: String = js.native
+}
 
 @js.native
 @JSGlobal("tinymce.Editor")

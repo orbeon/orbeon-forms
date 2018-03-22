@@ -17,6 +17,7 @@ package org.orbeon.builder
 import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.JQueryTooltip._
 import org.orbeon.xforms.facade._
@@ -28,6 +29,8 @@ import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
+
+import PathUtils._
 
 object ControlLabelHintTextEditor {
 
@@ -165,6 +168,9 @@ object ControlLabelHintTextEditor {
 
     object Private {
 
+      // Also in `LiferayURL`!
+      private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
+
       // State
       var tinyMceObject: TinyMceEditor = null
 
@@ -244,6 +250,11 @@ object ControlLabelHintTextEditor {
         mceConfig.plugins += ",autoresize"
         mceConfig.autoresize_min_height = 100
         mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom
+
+        TinyMceDefaultEditorManager.baseURL = {
+          val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
+          href.substring(0, href.length - s"$URLBaseMagic.js".length).appendSlash
+        }
 
         tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMceDefaultEditorManager)
         tinyMceObject.render()

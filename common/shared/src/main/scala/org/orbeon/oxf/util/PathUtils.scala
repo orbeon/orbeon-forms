@@ -19,9 +19,16 @@ import java.net.URLEncoder.{encode ⇒ encodeURL}
 
 object PathUtils {
 
-  def dropTrailingSlash(s: String)   = if (s.isEmpty || s.last != '/') s else s.init
-  def dropStartingSlash(s: String)   = if (s.isEmpty || s.head != '/') s else s.tail
-  def appendStartingSlash(s: String) = if (s.nonEmpty && s.head == '/') s else '/' + s
+  implicit class PathOps(val s: String) extends AnyVal {
+    def dropTrailingSlash = if (s.isEmpty || s.last != '/')  s else s.init
+    def dropStartingSlash = if (s.isEmpty || s.head != '/')  s else s.tail
+    def appendSlash       = if (s.nonEmpty && s.last == '/') s else s + '/'
+    def prependSlash      = if (s.nonEmpty && s.head == '/') s else '/' + s
+  }
+
+  def dropTrailingSlash  (s: String) = s.dropTrailingSlash
+  def dropStartingSlash  (s: String) = s.dropStartingSlash
+  def appendStartingSlash(s: String) = s.prependSlash
 
   // Split out a URL's query part
   def splitQuery(url: String): (String, Option[String]) = {

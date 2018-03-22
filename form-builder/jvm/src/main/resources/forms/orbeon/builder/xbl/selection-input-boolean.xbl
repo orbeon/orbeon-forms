@@ -35,6 +35,7 @@
             </icon>
             <templates>
                 <bind type="xf:boolean"/>
+                <instance>false</instance>
                 <view>
                     <xf:input id="" ref="" xmlns="">
                         <xf:label ref=""/>

@@ -37,13 +37,13 @@
             <display-name lang="sv">Ensam kryssruta</display-name>
             <display-name lang="nl" todo="true">[Single Checkbox]</display-name>
             <display-name lang="pt" todo="true">[Single Checkbox]</display-name>
-            <toolbox show="false"/>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
             <templates>
                 <bind type="xf:boolean"/>
+                <instance>false</instance>
                 <view>
                     <fr:checkbox-input>
                         <xf:label ref=""/>

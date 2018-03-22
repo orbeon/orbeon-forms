@@ -77,8 +77,8 @@
         oxf:/xbl/orbeon/open-select1/open-select1.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select-full.xbl
         oxf:/xbl/orbeon/box-select/box-select.xbl
-        oxf:/xbl/orbeon/yesno-input/yesno-input.xbl
         oxf:/xbl/orbeon/checkbox-input/checkbox-input.xbl
+        oxf:/xbl/orbeon/yesno-input/yesno-input.xbl
         oxf:/forms/orbeon/builder/xbl/selection-input-boolean.xbl
         oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
         oxf:/xbl/orbeon/autocomplete/autocomplete.xbl

@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -222,10 +223,11 @@ trait BindingOps {
   def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
 
     val instanceTemplate = bindingMetadata(binding) / FBTemplatesTest / FBInstanceTest
-
-    if (instanceTemplate.nonEmpty)
-      elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))
-    else
+    if (instanceTemplate.nonEmpty) {
+      // Because `elementInfo` doesn't support being passed text `NodeInfo`!
+      val mutable = TransformerUtils.extractAsMutableDocument(instanceTemplate.head).rootElement
+      elementInfo(controlName, (mutable.head /@ @*) ++ (mutable / (Text || *)))
+    } else
       elementInfo(controlName)
   }
 }

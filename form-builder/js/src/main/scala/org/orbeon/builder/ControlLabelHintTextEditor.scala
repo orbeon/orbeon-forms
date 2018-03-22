@@ -247,8 +247,8 @@ object ControlLabelHintTextEditor {
         }
 
         // Auto-size MCE height based on the content, with min height of 100px
-        mceConfig.plugins += ",autoresize"
-        mceConfig.autoresize_min_height = 100
+        mceConfig.plugins                  += ",autoresize"
+        mceConfig.autoresize_min_height    = 100
         mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom
 
         TinyMceDefaultEditorManager.baseURL = {

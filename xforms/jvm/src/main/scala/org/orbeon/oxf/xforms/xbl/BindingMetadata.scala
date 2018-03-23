@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.dom.Element
+import java.util
+
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
+import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -61,7 +63,7 @@ trait BindingMetadata extends Logging {
       _baselineResources = (scripts, styles)
     }
 
-  def commitBindingIndex() =
+  def commitBindingIndex(): Unit =
     _xblIndex match {
       case Some(index) ⇒
         val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
@@ -111,14 +113,14 @@ trait BindingMetadata extends Logging {
     _checkedPaths = newPaths
 
     if (debugEnabled)
-      bindingOpt foreach { binding ⇒
+      bindingOpt foreach { _ ⇒
         debug("found binding for", List("element" → s"Q{$uri}$localname"))
       }
 
     bindingOpt
   }
 
-  def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding) = {
+  def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding): Unit = {
     bindingsByControlPrefixedId += controlPrefixedId → binding
     binding.path foreach (bindingsPaths += _)
     maxLastModified = maxLastModified max binding.lastModified
@@ -137,7 +139,7 @@ trait BindingMetadata extends Logging {
       val ns = binding.selectorsNamespaces
 
       binding.selectors collectFirst {
-        case s @ Selector(
+        case Selector(
           ElementWithFiltersSelector(
             Some(TypeSelector(Some(Some(prefix)), `localname`)),
             Nil),
@@ -169,7 +171,7 @@ trait BindingMetadata extends Logging {
           val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
 
           currentMappings foreach {
-            case (controlPrefixedId, ib @ InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
+            case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
               currentMappings += controlPrefixedId → newBinding
             case _ ⇒
           }
@@ -197,23 +199,21 @@ trait BindingMetadata extends Logging {
 
   // ==== Other API
 
-  def baselineResources = _baselineResources
-
-  def allBindingsMaybeDuplicates = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
-
-  def getBindingIncludesJava = bindingsPaths.asJava
+  def baselineResources          : (List[String], List[String]) = _baselineResources
+  def allBindingsMaybeDuplicates : Iterable[AbstractBinding]    = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
+  def getBindingIncludesJava     : util.Set[String]             = bindingsPaths.asJava
 
   private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
     val last = rm.lastModified(path, true)
     last != -1 && last <= this.maxLastModified
   }
 
-  def bindingsIncludesAreUpToDate = {
+  def bindingsIncludesAreUpToDate: Boolean = {
     implicit val rm = ResourceManagerWrapper.instance
     bindingsPaths.iterator forall pathExistsAndIsUpToDate
   }
 
-  def debugOutOfDateBindingsIncludesJava = {
+  def debugOutOfDateBindingsIncludesJava: String = {
     implicit val rm = ResourceManagerWrapper.instance
     bindingsPaths.iterator filterNot pathExistsAndIsUpToDate mkString ", "
   }

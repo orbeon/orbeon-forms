@@ -15,12 +15,12 @@
 package org.orbeon.builder
 
 import autowire._
+import org.orbeon.builder.facade.JQueryTooltip._
+import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.xforms._
-import org.orbeon.xforms.facade.JQueryTooltip._
-import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
@@ -29,8 +29,6 @@ import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
-
-import PathUtils._
 
 object ControlLabelHintTextEditor {
 

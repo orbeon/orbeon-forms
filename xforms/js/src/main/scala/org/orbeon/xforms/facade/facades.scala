@@ -84,15 +84,15 @@ object AjaxServerOps {
 
     def ajaxResponseProcessedF(formId: String): Future[Unit] = {
 
-      def getSeqNo =
-        DocumentAPI.getFromClientState(formId, "sequence").toInt
-
-      val initialSeqNo = getSeqNo
-
       val result = Promise[Unit]()
 
+      // When there is a request in progress, we need to wait for the response after the next response processed
+      var skipNext = Globals.requestInProgress
+
       lazy val callback: js.Function = () ⇒ {
-        if (getSeqNo == initialSeqNo + 1) {
+        if (skipNext) {
+          skipNext = false
+        } else {
           Events.ajaxResponseProcessedEvent.unsubscribe(callback)
           result.success(())
         }

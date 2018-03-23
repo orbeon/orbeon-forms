@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -32,7 +33,6 @@ import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.JavaConverters._
 
@@ -52,32 +52,7 @@ class XFormsValueComponentControl(
   override type Control <: ComponentControl with ValueControl
 
   // Don't expose an external value unless explicitly allowed
-  // Q: Should throw if not allowed?
-  override def storeExternalValue(value: String): Unit =
-    if (staticControl.abstractBinding.modeExternalValue)
-      super.storeExternalValue(value)
-
-  // Don't expose an external value unless explicitly allowed
-  override def evaluateExternalValue(): Unit =
-    if (staticControl.abstractBinding.modeExternalValue)
-      super.evaluateExternalValue()
-    else
-      setExternalValue(null)
-
-  // Because of the above, `super.equalsExternalUseExternalValue` returns `true`if just the value has changed, therefore it doesn't
-  // catch and send changes to the `empty` property. So we override and check whether `empty` has changed.
-  // See: https://github.com/orbeon/orbeon-forms/issues/2310
-  override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
-  ): Boolean =
-    previousControl match {
-      case Some(other: XFormsValueComponentControl) ⇒
-        isEmptyValue == other.isEmptyValue &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒
-        false
-    }
+  override def handleExternalValue = staticControl.abstractBinding.modeExternalValue
 
   // TODO
   override def findAriaByControlEffectiveId = None

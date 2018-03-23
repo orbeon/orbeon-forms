@@ -47,6 +47,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   private[XFormsValueControl] var isExternalValueEvaluated: Boolean = false
   private[XFormsValueControl] var externalValue: String = null
 
+  def handleExternalValue = true
+
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
 
@@ -84,8 +86,12 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     setValue(DataModel.getValue(getBoundItem))
 
   def evaluateExternalValue(): Unit =
-    // By default, same as value
-    setExternalValue(getValue)
+    setExternalValue(
+      if (handleExternalValue)
+        getValue // by default, same as value
+      else
+        null
+    )
 
   protected def markExternalValueDirty(): Unit = {
     isExternalValueEvaluated = false
@@ -102,7 +108,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   }
 
   // This usually doesn't need to be overridden (only XFormsUploadControl as of 2012-08-15)
-  def storeExternalValue(externalValue: String) = doStoreExternalValue(externalValue)
+  def storeExternalValue(externalValue: String) =
+    if (handleExternalValue) // Q: Should throw if not allowed?
+      doStoreExternalValue(externalValue)
 
   // Subclasses can override this to translate the incoming external value
   def translateExternalValue(externalValue: String): Option[String] = Option(externalValue)
@@ -227,20 +235,25 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     previousExternalValue : Option[String],
     previousControl       : Option[XFormsControl]
   ): Boolean =
-    previousControl match {
-      case Some(other: XFormsValueControl) ⇒
-        previousExternalValue == other.externalValueOpt &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
-    }
+    handleExternalValue && (
+      previousControl match {
+        case Some(other: XFormsValueControl) ⇒
+          previousExternalValue == other.externalValueOpt &&
+          super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        case _ ⇒ false
+      }
+    )
 
   final def outputAjaxDiffMaybeClientValue(
     clientValue           : Option[String],
     previousControl       : Option[XFormsValueControl])(implicit
     receiver              : XMLReceiver
-  ) =
+  ): Unit =
     outputAjaxDiffUseClientValue(
-      clientValue orElse (previousControl map (_.getExternalValue)),
+      if (handleExternalValue)
+        clientValue orElse (previousControl map (_.getExternalValue))
+      else
+        None,
       previousControl,
       None)(
       new XMLReceiverHelper(receiver)
@@ -254,9 +267,11 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   ): Unit = {
 
     val hasNestedValueContent =
-      previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
-      previousControl.nonEmpty && ! (previousValue contains getExternalValue) ||
-      (previousControl exists (! _.isReadonly)) && isReadonly // https://github.com/orbeon/orbeon-forms/issues/3130
+      handleExternalValue && (
+        previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
+        previousControl.nonEmpty && ! (previousValue contains getExternalValue) ||
+        (previousControl exists (! _.isReadonly)) && isReadonly // https://github.com/orbeon/orbeon-forms/issues/3130
+      )
 
     val hasNestedContent =
       content.isDefined || hasNestedValueContent

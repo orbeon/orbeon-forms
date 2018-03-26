@@ -96,10 +96,14 @@ class ControlsComparator(
                 true
               } else
                 false
-            case _: XFormsCaseControl ⇒
+            case c: XFormsCaseControl ⇒
               // See https://github.com/orbeon/orbeon-forms/issues/3509 and
               // https://github.com/orbeon/orbeon-forms/issues/3510.
-              false
+              // Also do not handle descendants if we are a hidden full update case
+              if (c.getSwitch.staticControl.hasFullUpdate && c.effectiveId != c.getSwitch.getSelectedCaseEffectiveId) {
+                true
+              } else
+                false
             case c: XFormsComponentControl ⇒
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")

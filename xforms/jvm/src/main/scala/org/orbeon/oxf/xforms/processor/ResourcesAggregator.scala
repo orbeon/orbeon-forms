@@ -207,7 +207,12 @@ class ResourcesAggregator extends ProcessorImpl {
               }
 
               def outputJS() = {
-                val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script")(_)
+                val outputJSElement =
+                  outputElement(
+                    resource ⇒ Array("type", "text/javascript", "src", resource , "defer", "defer"),
+                    "script"
+                  )(_)
+
                 aggregate(baselineJS, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
                 aggregate(supplementalJS -- baselineJS, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
                 preservedJS foreach outputPreservedElement

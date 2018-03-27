@@ -74,16 +74,22 @@ object BlockCache {
                 .pipe(Option(_)).filter(_.is("*"))
                 .getOrElse(section)
 
-            val titleAnchor = section.find("a")
+            // Handle both collapsible and non-collapsible title
+            // https://github.com/orbeon/orbeon-forms/issues/3530
+            val titleAnchor =
+              section.find(".fr-section-title .fr-section-label").find("a, .xforms-output-output")
 
-            sectionGridCache.unshift(new Block {
-              override val el          = section
-              override val top         = Position.adjustedOffset(section).top
-              override val left        = Position.adjustedOffset(mostOuterSection).left
-              override val height      = titleAnchor.height()
-              override val width       = mostOuterSection.width()
-              override val titleOffset = Offset(titleAnchor)
-            })
+            // The section content might be empty when Form Builder optimizes non-relevant sections
+            if (titleAnchor.length > 0) {
+              sectionGridCache.unshift(new Block {
+                override val el          = section
+                override val top         = Position.adjustedOffset(section).top
+                override val left        = Position.adjustedOffset(mostOuterSection).left
+                override val height      = titleAnchor.height()
+                override val width       = mostOuterSection.width()
+                override val titleOffset = Offset(titleAnchor)
+              })
+            }
           })
         })
         $(s"$GridSelector:visible").each((grid: dom.Element) ⇒

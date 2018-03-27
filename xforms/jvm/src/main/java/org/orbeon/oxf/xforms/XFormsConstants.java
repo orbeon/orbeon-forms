@@ -92,6 +92,7 @@ public class XFormsConstants {
 
     public static final QName CLASS_QNAME = QName.apply("class");
     public static final QName STYLE_QNAME = QName.apply("style");
+    public static final QName ROLE_QNAME  = QName.apply("role");
 
     public static final QName APPEARANCE_QNAME = QName.apply("appearance");
     public static final QName MEDIATYPE_QNAME = QName.apply("mediatype");

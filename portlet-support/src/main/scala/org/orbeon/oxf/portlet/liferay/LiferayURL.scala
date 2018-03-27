@@ -36,9 +36,9 @@ object LiferayURL {
       splitQuery(encodedURL) match {
         case (path, Some(query)) ⇒
           val parameters = decodeSimpleQuery(query)
-          parameters collect {
+          parameters collectFirst {
             case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId
-          } headOption match {
+          } match {
             case Some(resourceId) ⇒
               val updated =
                 (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)

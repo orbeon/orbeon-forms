@@ -48,7 +48,7 @@ object PathUtils {
   }
 
   // Recombine a path/query and parameters into a resulting URL
-  def recombineQuery(pathQuery: String, params: Seq[(String, String)]) =
+  def recombineQuery(pathQuery: String, params: TraversableOnce[(String, String)]): String =
     pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
   // Decode a query string into a list of pairs
@@ -74,7 +74,7 @@ object PathUtils {
   }
 
   // Encode a sequence of pairs to a query string
-  def encodeSimpleQuery(parameters: Seq[(String, String)]): String =
+  def encodeSimpleQuery(parameters: TraversableOnce[(String, String)]): String =
     parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
 
   // Find a path extension

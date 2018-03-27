@@ -411,7 +411,7 @@ trait ElementRepeats {
 
 object ElementAnalysis {
 
-  val CommonExtensionAttributes = Set(STYLE_QNAME, CLASS_QNAME)
+  val CommonExtensionAttributes = Set(STYLE_QNAME, CLASS_QNAME, ROLE_QNAME)
 
   val propagateBreaks = new Breaks
 

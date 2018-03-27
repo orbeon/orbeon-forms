@@ -74,7 +74,10 @@ object BlockCache {
                 .pipe(Option(_)).filter(_.is("*"))
                 .getOrElse(section)
 
-            val titleAnchor = section.find("a")
+            // Handle both collapsible and non-collapsible title
+            // https://github.com/orbeon/orbeon-forms/issues/3530
+            val titleAnchor =
+              section.find(".fr-section-title .fr-section-label").find("a, .xforms-output-output")
 
             // The section content might be empty when Form Builder optimizes non-relevant sections
             if (titleAnchor.length > 0) {

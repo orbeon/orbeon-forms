@@ -1900,14 +1900,14 @@
                     <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
                     <xh:link rel="stylesheet" href="/css6.css" media="print"/>
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
-                </xh:head>
-                <xh:body>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-fef951f1be577d60aea2cc922215892188020a36.js"/>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-183854d1a36b84dfcab1deee4c8efe3ac8fd9f08.js"/>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-fef951f1be577d60aea2cc922215892188020a36.js" defer="defer"/>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-183854d1a36b84dfcab1deee4c8efe3ac8fd9f08.js" defer="defer"/>
                     <xh:script src="http://example.org/script.js" type="text/javascript"/>
                     <xh:script>function foo()</xh:script>
-                    <xh:script xmlns:f="http://orbeon.org/oxf/xml/formatting" src="/js5.js" type="text/javascript" f:url-norewrite="true"></xh:script>
+                    <xh:script src="/js5.js" type="text/javascript" f:url-norewrite="true"/>
                     <xh:script>function bar()</xh:script>
+                </xh:head>
+                <xh:body>
                     <xh:ul>
                         <xh:li>/css1.css</xh:li>
                         <xh:li>/css2.css</xh:li>

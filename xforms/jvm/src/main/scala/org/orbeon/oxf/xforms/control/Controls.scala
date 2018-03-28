@@ -629,9 +629,8 @@ object Controls {
             if (childrenActions.nonEmpty)
               visitSiblings(listener, childrenActions)
         }
-
-        listener.endVisitControl(currentControl)
       }
+      listener.endVisitControl(currentControl)
     }
 
   // Log a subtree of controls as XML

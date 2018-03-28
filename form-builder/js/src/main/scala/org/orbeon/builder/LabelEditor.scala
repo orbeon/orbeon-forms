@@ -133,8 +133,8 @@ object LabelEditor {
     )                  : Unit = {
 
       val offset  = Position.adjustedOffset(clickInterceptor)
-      val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left)
-      val sectionTitle = section.get.el.find(SectionTitleSelector)
+      val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).get
+      val sectionTitle = section.el.find(SectionTitleSelector)
       updateClass("hover", sectionTitle)
     }
 
@@ -158,7 +158,7 @@ object LabelEditor {
 
       Position.onOffsetMayHaveChanged(() ⇒ {
 
-        val sections = BlockCache.sectionGridCache collect {
+        val sections = BlockCache.sectionGridCache.elems collect {
           case block if block.el.is(BlockCache.SectionSelector) ⇒ block.el
         }
 

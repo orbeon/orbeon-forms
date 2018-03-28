@@ -13,18 +13,16 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.BlockCache.Block
 import org.orbeon.datatypes.Orientation
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Events, Globals}
 import org.scalajs.dom.{document, window}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import org.orbeon.oxf.util.StringUtils._
 
 object Position {
 
@@ -70,27 +68,25 @@ object Position {
 
   // Finds the container, if any, based on a vertical position
   def findInCache(
-    containerCache : js.Array[Block],
+    containerCache : BlockCache,
     top            : Double,
     left           : Double
-  )                : js.UndefOr[Block] = {
-
-    containerCache.find { container ⇒
+  ): Option[Block] =
+    containerCache.elems find { container ⇒
       // Rounding when comparing as the offset of an element isn't always exactly the same as the offset it was set to
       val horizontalPosInside = Math.round(container.left) <= Math.round(left) &&
                                 Math.round(left)           <= Math.round(container.left + container.width)
       val verticalPosInside   = Math.round(container.top ) <= Math.round(top)  &&
                                 Math.round(top)            <= Math.round(container.top  + container.height)
       horizontalPosInside && verticalPosInside
-    }.orUndefined
-  }
+    }
 
   // Container is either a section or grid; calls listeners passing old/new container
   def currentContainerChanged(
-    containerCache : js.Array[Block],
+    containerCache : BlockCache,
     wasCurrent     : (Block) ⇒ Unit,
-    becomesCurrent : (Block) ⇒ Unit)
-                   : Unit = {
+    becomesCurrent : (Block) ⇒ Unit
+  ): Unit = {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
     onUnderPointerChange {
@@ -106,7 +102,7 @@ object Position {
           // Ignore container under the pointer if a dialog is visible
           None
         else
-          findInCache(containerCache, top, left).toOption
+          findInCache(containerCache, top, left)
       notifyChange(newContainer)
     }
   }
@@ -116,8 +112,8 @@ object Position {
   // TODO: replace `Any` by `Unit` once callers are all in Scala
   def notifyOnChange[T](
     was     : (Block) ⇒ Unit,
-    becomes : (Block) ⇒ Unit)
-            : (Option[Block]) ⇒ Unit = {
+    becomes : (Block) ⇒ Unit
+  ): (Option[Block]) ⇒ Unit = {
 
     var currentBlockOpt: Option[Block] = None
 

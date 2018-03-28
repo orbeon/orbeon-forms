@@ -17,12 +17,10 @@ import autowire._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import io.circe.generic.auto._
-import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{AboveBelow, Orientation}
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.{asUnit, _}
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document

@@ -14,7 +14,6 @@
 package org.orbeon.builder
 
 import autowire._
-import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.fr.HtmlElementCell._

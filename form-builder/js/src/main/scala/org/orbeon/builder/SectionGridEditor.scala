@@ -16,7 +16,7 @@ package org.orbeon.builder
 import autowire._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
-import org.orbeon.builder.BlockCache.Block
+import io.circe.generic.auto._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
@@ -24,7 +24,6 @@ import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.jquery.JQuery
-import io.circe.generic.auto._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -38,6 +37,7 @@ object SectionGridEditor {
     sealed trait ContainerEditor extends EnumEntry with Hyphencase {
       def className = s".fb-$entryName"
     }
+
     object ContainerEditor extends Enum[ContainerEditor] {
       val values = findValues
       case object SectionDelete        extends ContainerEditor

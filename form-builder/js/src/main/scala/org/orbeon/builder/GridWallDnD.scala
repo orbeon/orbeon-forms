@@ -14,7 +14,6 @@
 package org.orbeon.builder
 
 import autowire._
-import org.orbeon.builder.BlockCache.Block
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.fr.HtmlElementCell._
@@ -113,7 +112,7 @@ object GridWallDnD {
               case Orientation.Vertical   ⇒ WallVerticalClass
               case Orientation.Horizontal ⇒ WallHorizontalClass
             }
-          val frGridBody       = currentCell.el.parents(".fr-grid-body").first()
+          val frGridBody       = currentCell.el.parents(BlockCache.GridBodySelector).first()
           val frGrid           = frGridBody.parent
           val dndContainer     = $(s"""<div class="$WallContainerClass $orientationClass" data-index="$index">""")
           val dndHandle        = $(s"""<div class="$WallHandleClass">""")

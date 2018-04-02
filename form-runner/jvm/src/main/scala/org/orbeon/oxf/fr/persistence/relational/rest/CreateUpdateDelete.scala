@@ -145,8 +145,8 @@ trait CreateUpdateDelete
 
   private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
-    val idCols = idColumns(req)
-    val table  = tableName(req)
+    val idCols = idColumns(req).filter(_ != "file_name")
+    val table  = tableName(req, master = true)
     val sql =
       s"""|SELECT created
           |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
@@ -158,7 +158,6 @@ trait CreateUpdateDelete
           |                    and form = ?
           |                    ${if (! req.forData)     "and form_version = ?" else ""}
           |                    ${if (req.forData)       "and document_id  = ?" else ""}
-          |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
           |           GROUP BY ${idCols.mkString(", ")}
           |       ) m
           |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
@@ -173,7 +172,6 @@ trait CreateUpdateDelete
       if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
 
       req.dataPart foreach (dataPart ⇒ ps.setString(position.next(), dataPart.documentId))
-      req.filename foreach (filename ⇒ ps.setString(position.next(), filename))
 
       useAndClose(ps.executeQuery()) { resultSet ⇒
 

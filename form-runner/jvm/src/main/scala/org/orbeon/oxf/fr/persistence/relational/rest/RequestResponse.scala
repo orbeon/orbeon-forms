@@ -35,12 +35,12 @@ case class Request(
 
 trait RequestResponse {
 
-  def tableName(request: Request): String =
+  def tableName(request: Request, master: Boolean = false): String =
     Seq(
       Some("orbeon_form"),
-      request.forForm       option "_definition",
-      request.forData       option "_data",
-      request.forAttachment option "_attach"
+      request.forForm                   option "_definition",
+      request.forData                   option "_data",
+      request.forAttachment && ! master option "_attach"
     ).flatten.mkString
 
   def httpRequest = NetUtils.getExternalContext.getRequest

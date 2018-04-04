@@ -234,6 +234,7 @@ trait FormRunnerBaseOps {
       case Some(captchaProperty) ⇒
         val propertyValue = captchaProperty.value.asInstanceOf[String]
         propertyValue match {
+          case ""              ⇒ Array.empty
           case "reCAPTCHA"     ⇒ Array(XMLNames.FR, "fr:recaptcha")
           case "SimpleCaptcha" ⇒ Array(XMLNames.FR, "fr:simple-captcha")
           case captchaName     ⇒

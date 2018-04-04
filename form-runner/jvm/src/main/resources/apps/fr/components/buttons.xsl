@@ -25,7 +25,7 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
-    <!-- 2015-08-07: This is probably here for backward compatibility only. -->
+    <!-- For backward compatibility only with buttons users manually place inside a `<fr:buttons>` inside the `<fr:view>` -->
 
     <!-- Buttons that translate to fr:process-button -->
     <!-- NOTE: Lower priority so that rules below match. -->
@@ -49,33 +49,6 @@
                                                        else 'other'}">
             <xsl:copy-of select="@appearance | @model | @context | @ref | @bind"/>
         </fr:process-button>
-    </xsl:template>
-
-    <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
-    <xsl:template match="fr:pdf-button">
-        <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
-        <fr:href-button
-            xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-            model="fr-persistence-model"
-            ref="instance('fr-triggers-instance')/pdf"
-            href=
-                "/fr/service/{
-                    $app
-                }/{
-                    $form
-                }/pdf/{{
-                    string-join(
-                        (
-                            fr:document-id(),
-                            xxf:document-id(),
-                            frf:filenameOrNull('pdf')[. != '']
-                        ),
-                        '/'
-                    )
-                }}.pdf">
-            <xsl:copy-of select="@appearance | @ref | @class" />
-            <xf:label mediatype="text/html" model="fr-form-model" value="$fr-resources/buttons/pdf"/>
-        </fr:href-button>
     </xsl:template>
 
 </xsl:stylesheet>

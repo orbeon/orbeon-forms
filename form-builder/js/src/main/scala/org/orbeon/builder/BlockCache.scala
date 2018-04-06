@@ -19,11 +19,11 @@ import org.scalajs.dom
 import org.scalajs.jquery.JQuery
 
 case class Block(
-  el          : JQuery,
-  left        : Double,
-  top         : Double,
-  width       : Double,
-  height      : Double
+  el     : JQuery,
+  left   : Double,
+  top    : Double,
+  width  : Double,
+  height : Double
 )
 
 object Block {
@@ -88,11 +88,11 @@ object BlockCache {
             if titleAnchor.length > 0
           } yield
             Block(
-              el          = section,
-              left        = Position.adjustedOffset(mostOuterSection).left,
-              top         = Position.adjustedOffset(section).top,
-              width       = mostOuterSection.width(),
-              height      = titleAnchor.height()
+              el     = section,
+              left   = Position.adjustedOffset(mostOuterSection).left,
+              top    = Position.adjustedOffset(section).top,
+              width  = mostOuterSection.width(),
+              height = titleAnchor.height()
             )
 
         val gridsIt =

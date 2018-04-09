@@ -14,8 +14,7 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet._
-import javax.servlet.http.HttpServletResponse
-
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
@@ -26,9 +25,9 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
+import scala.collection.JavaConverters._
 import scala.collection.breakOut
 import scala.util.control.NonFatal
-import scala.collection.JavaConverters._
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -43,11 +42,53 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     forwardHeaders         : Map[String, String], // lowercase name → original name
     forwardParams          : Set[String],
     forwardProperties      : Map[String, String], // lowercase name → original name
+    keepParams             : Set[String],
     useShortNamespaces     : Boolean,
     resourcesRegex         : String,
     httpClient             : HttpClient
    ) {
     val FormRunnerResourcePath = resourcesRegex.r
+  }
+
+  private class ProxyPortletEmbeddingContextWithResponse(
+    settings           : PortletSettings,
+    context            : PortletContext,
+    request            : PortletRequest,
+    response           : MimeResponse,
+    httpClient         : HttpClient,
+    useShortNamespaces : Boolean
+  ) extends PortletEmbeddingContextWithResponse(
+    context,
+    request,
+    response,
+    httpClient,
+    useShortNamespaces
+  ) {
+    // Modified version which adds specified portal parameters to the decoded URL
+    override def decodeURL(encoded: String): String = {
+
+      if (settings.keepParams.nonEmpty) {
+
+        val (path, originalParams) = splitQueryDecodeParams(super.decodeURL(encoded))
+
+        val newParamsIt =
+          findOriginalServletRequest(request) match {
+            case Some(httpServletRequest) ⇒
+              for {
+                (key, values) ← httpServletRequest.getParameterMap.asScala.iterator
+                if settings.keepParams(key)
+                value ← values
+              } yield
+                key → value
+            case None ⇒
+              Iterator.empty
+          }
+
+        recombineQuery(path, originalParams.iterator ++ newParamsIt)
+      } else {
+        super.decodeURL(encoded)
+      }
+    }
   }
 
   // For BufferedPortlet
@@ -63,6 +104,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         forwardHeaders     = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
         forwardParams      = stringToSet(config.getInitParameter("forward-parameters")),
         forwardProperties  = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
+        keepParams         = stringToSet(config.getInitParameter("keep-parameters")),
         useShortNamespaces = config.getInitParameter("use-short-namespaces") != "false",
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
@@ -77,20 +119,38 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     super.destroy()
   }
 
-  // Try to find getHttpServletRequest only the first time this is accessed
+  // Try to find `getHttpServletRequest` only the first time this is accessed
   private lazy val getHttpServletRequest =
     try Some(LiferayAPI.getHttpServletRequest _)
-    catch { case (_: NoClassDefFoundError) | (_: ClassNotFoundException) ⇒ None }
+    catch { case _: NoClassDefFoundError | _: ClassNotFoundException ⇒ None }
 
-  private def findServletRequest(request: PortletRequest) =
-    getHttpServletRequest flatMap (f ⇒ Option(f(request)))
+  private lazy val getOriginalServletRequest =
+    try Some(LiferayAPI.getOriginalServletRequest _)
+    catch { case _: NoClassDefFoundError | _: ClassNotFoundException ⇒ None }
+
+  private def findServletRequest(request: PortletRequest): Option[HttpServletRequest] =
+    for {
+      f1      ← getHttpServletRequest
+      httpReq ← Option(f1(request))
+    } yield
+      httpReq
+
+  private def findOriginalServletRequest(request: PortletRequest): Option[HttpServletRequest] =
+    for {
+      f1              ← getHttpServletRequest
+      httpReq         ← Option(f1(request))
+      f2              ← getOriginalServletRequest
+      originalHttpReq ← Option(f2(httpReq))
+    } yield
+      originalHttpReq
 
   // Portlet render
   override def doView(request: RenderRequest, response: RenderResponse): Unit =
     settingsOpt foreach { settings ⇒
       withRootException("view render", new PortletException(_)) {
 
-        implicit val ctx = new PortletEmbeddingContextWithResponse(
+        implicit val ctx = new ProxyPortletEmbeddingContextWithResponse(
+          settings,
           getPortletContext,
           request,
           response,
@@ -138,7 +198,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
     settingsOpt foreach { settings ⇒
       withRootException("resource", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContextWithResponse(
+
+        // Use this context so that URLs in XML responses are rewritten with `keep-parameters` as well
+        implicit val ctx = new ProxyPortletEmbeddingContextWithResponse(
+          settings,
           getPortletContext,
           request,
           response,

@@ -65,6 +65,10 @@
             <name>forward-properties</name>
             <value></value>
         </init-param>
+        <init-param>
+            <name>keep-parameters</name>
+            <value></value>
+        </init-param>
 
         <!-- HTTP client configuration -->
         <init-param>

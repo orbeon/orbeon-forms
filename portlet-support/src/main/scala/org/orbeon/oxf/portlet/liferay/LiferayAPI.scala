@@ -56,15 +56,19 @@ trait LiferayAPI {
     liferayClass(suffix).getMethod(name, types: _*)
 
   // Static methods. We can't use structural types as the methods are static.
-  private lazy val getHttpServletRequestMethod = liferayMethod("util.PortalUtil",                       "getHttpServletRequest", classOf[PortletRequest])
-  private lazy val getUserMethod               = liferayMethod("util.PortalUtil",                       "getUser",               classOf[HttpServletRequest])
-  private lazy val getCompanyMethod            = liferayMethod("util.PortalUtil",                       "getCompany",            classOf[HttpServletRequest])
-  private lazy val getUserOrganizationsMethod  = liferayMethod("service.OrganizationLocalServiceUtil",  "getUserOrganizations",  classOf[Long])
-  private lazy val getUserGroupRolesMethod     = liferayMethod("service.UserGroupRoleLocalServiceUtil", "getUserGroupRoles",     classOf[Long])
-  private lazy val hasUserGroupRoleMethod      = liferayMethod("service.UserGroupRoleLocalServiceUtil", "hasUserGroupRole",      classOf[Long], classOf[Long], classOf[String])
+  private lazy val getHttpServletRequestMethod     = liferayMethod("util.PortalUtil",                       "getHttpServletRequest",     classOf[PortletRequest])
+  private lazy val getOriginalServletRequestMethod = liferayMethod("util.PortalUtil",                       "getOriginalServletRequest", classOf[HttpServletRequest])
+  private lazy val getUserMethod                   = liferayMethod("util.PortalUtil",                       "getUser",                   classOf[HttpServletRequest])
+  private lazy val getCompanyMethod                = liferayMethod("util.PortalUtil",                       "getCompany",                classOf[HttpServletRequest])
+  private lazy val getUserOrganizationsMethod      = liferayMethod("service.OrganizationLocalServiceUtil",  "getUserOrganizations",      classOf[Long])
+  private lazy val getUserGroupRolesMethod         = liferayMethod("service.UserGroupRoleLocalServiceUtil", "getUserGroupRoles",         classOf[Long])
+  private lazy val hasUserGroupRoleMethod          = liferayMethod("service.UserGroupRoleLocalServiceUtil", "hasUserGroupRole",          classOf[Long], classOf[Long], classOf[String])
 
   def getHttpServletRequest(req: PortletRequest): HttpServletRequest =
     getHttpServletRequestMethod.invoke(null, req).asInstanceOf[HttpServletRequest]
+
+  def getOriginalServletRequest(req: HttpServletRequest): HttpServletRequest =
+    getOriginalServletRequestMethod.invoke(null, req).asInstanceOf[HttpServletRequest]
 
   def getUser(req: HttpServletRequest): UserFacade =
     getUserMethod.invoke(null, req).asInstanceOf[UserFacade]

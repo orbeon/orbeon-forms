@@ -155,7 +155,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                     "type", "hidden", "name", "$server-events", "value", ""
             });
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "text", "name", "$client-state", "value", "", "class", "xforms-initially-hidden"
+                    "type", "text", "name", "$client-state", "value", "", "style", "display: none"
             });
 
             // Store information about nested repeats hierarchy

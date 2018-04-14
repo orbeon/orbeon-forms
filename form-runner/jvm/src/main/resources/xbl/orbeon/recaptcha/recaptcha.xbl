@@ -25,10 +25,10 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"/>
+    <xbl:script src="https://www.recaptcha.net/recaptcha/api.js"/>
     <xbl:script src="/xbl/orbeon/recaptcha/recaptcha.js"/>
 
-    <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="focus binding lhha">
+    <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="binding lhha">
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
@@ -42,17 +42,19 @@
             <xf:model id="recaptcha-model">
                 <xf:instance id="verify-request">
                     <verify-request>
-                        <privatekey/>
-                        <remoteip>127.0.0.1</remoteip>
-                        <challenge/>
+                        <secret/>
                         <response/>
                     </verify-request>
                 </xf:instance>
-                <xf:instance id="verify-response-text"><verify-response/></xf:instance>
-                <!-- Calls reCAPTCHA API: https://developers.google.com/recaptcha/docs/verify -->
-                <xf:submission id="verify-submission" resource="http://www.google.com/recaptcha/api/verify"
-                        ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
-                        replace="text" targetref="instance('verify-response-text')"/>
+                <xf:instance id="verify-response"><verify-response/></xf:instance>
+                <xf:submission
+                    id="verify-submission"
+                    resource="https://www.google.com/recaptcha/api/siteverify"
+                    ref="instance('verify-request')"
+                    method="post"
+                    serialization="application/x-www-form-urlencoded"
+                    replace="instance"
+                    targetref="instance('verify-response')"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -70,7 +72,7 @@
                             <xf:var name="private-key">
                                 <xxf:value value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxf:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
                             </xf:var>
-                            <xf:setvalue ref="privatekey" value="$private-key"/>
+                            <xf:setvalue ref="secret" value="$private-key"/>
                         </xf:action>
 
                         <xf:action ev:event="fr-verify">
@@ -86,12 +88,10 @@
                                 <xf:message level="xxf:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
                                 <xf:send submission="verify-submission"/>
-                                <!-- Reset challenge and response, so the next time they are changed we only run the verification when both new values are updated -->
-                                <xf:setvalue ref="challenge"/>
+                                <!-- Reset response, so the next time they are changed we only run the verification when both new values are updated -->
                                 <xf:setvalue ref="response"/>
                                 <!-- Parse the response -->
-                                <xf:var name="lines" value="tokenize(instance('verify-response-text'), '\n')"/>
-                                <xf:var name="is-success" value="$lines[1] = 'true'"/>
+                                <xf:var name="is-success" value="instance('verify-response')/success = 'true'"/>
                                 <!-- Dispatch failure event -->
                                 <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
                                     <xf:property name="fr-error-code" value="$lines[2]"/>
@@ -110,14 +110,12 @@
                         <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'lang')"/>
 
-                        <!-- Provides access the reCAPTCHA challenge/response exposed by the JavaScript API
+                        <!-- Provides access the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
-                        <xf:input ref="challenge" class="xbl-fr-recaptcha-challenge xforms-hidden"/>
                         <xf:input ref="response"  class="xbl-fr-recaptcha-response xforms-hidden"/>
 
                         <!-- Div in which the reCAPTCHA is rendered-->
                         <xh:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
-
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

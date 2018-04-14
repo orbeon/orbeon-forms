@@ -21,17 +21,16 @@
     ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Recaptcha, 'xbl-fr-recaptcha');
     YAHOO.xbl.fr.Recaptcha.prototype = {
 
-        challengeId: null,
-        responseId: null,
-        publicKeyPropertyId: null,
-        publicKeyLocalId: null,
+        responseId          : null,
+        publicKeyPropertyId : null,
+        publicKeyLocalId    : null,
+        widgetId            : null,
 
         /**
          * Constructor
          */
         init: function() {
             var recaptchaDiv = $(this.container).find('.xbl-fr-recaptcha-div').get(0);
-            this.challengeId = $(this.container).find('.xbl-fr-recaptcha-challenge').get(0).id;
             this.responseId  = $(this.container).find('.xbl-fr-recaptcha-response').get(0).id;
 
             // Public key comes from property
@@ -46,37 +45,33 @@
             // Default theme is `clean`
             if (theme == "") theme = "clean";
 
-            Recaptcha.create(publicKey, recaptchaDiv.id, {
-               theme: theme,
-               lang: lang,
-               callback: _.bind(this.recaptchaInitialized, this)
-            });
+            var self = this;
+            var renderRecaptcha = function () {
+                if (_.isUndefined(window.grecaptcha)) {
+                    var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
+                    _.delay(renderRecaptcha, shortDelay);
+                } else {
+                    self.widgetId = grecaptcha.render(recaptchaDiv, {
+                        sitekey  : publicKey,
+                        theme    : theme,
+                        callback : _.bind(self.successfulResponse, self)
+                    });
+                }
+            };
+
+            renderRecaptcha();
         },
 
-        /**
-         * When the reCAPTCHA initialized, add a listener on the input to store the challenge/response in XForms controls,
-         * so they are ready to be checked.
-         */
-        recaptchaInitialized: function() {
-            Event.addListener(this.recaptchaInput(), 'change', _.bind(function() {
-                ORBEON.xforms.Document.setValue(this.challengeId, Recaptcha.get_challenge());
-                ORBEON.xforms.Document.setValue(this.responseId, Recaptcha.get_response());
-            }, this));
+        successfulResponse: function() {
+            console.log("successfulResponse");
+            var response = grecaptcha.getResponse(this.widgetId);
+            console.log("response", response);
+            ORBEON.xforms.Document.setValue(this.responseId, response);
         },
 
         reload: function() {
             ORBEON.xforms.Document.setValue(this.responseId, '');
             Recaptcha.reload();
-        },
-
-        xformsFocus: function() {
-            this.recaptchaInput().focus();
-        },
-
-        // Return the recaptcha input created by Recaptcha.create(). We used to search by id but it's unclear whether
-        // the id is always 'recaptcha_response_field'.
-        recaptchaInput: function() {
-            return $(this.container).find('.xbl-fr-recaptcha-div input[type=text]').get(0);
         }
     };
 })();

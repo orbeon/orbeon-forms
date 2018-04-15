@@ -39,11 +39,19 @@
             // Other configurations
             var themeElement     = $(this.container).find('.xbl-fr-recaptcha-theme').get(0);
             var theme            = ORBEON.xforms.Document.getValue(themeElement.id);
-            var langElement      = $(this.container).find('.xbl-fr-recaptcha-lang').get(0);
-            var lang             = ORBEON.xforms.Document.getValue(langElement.id);
 
             // Default theme is `clean`
             if (theme == "") theme = "clean";
+
+            // Load reCAPTCHA script with appropriate language
+            if (_.isUndefined(window.grecaptcha)) {
+                var htmlLang = ORBEON.jQuery('html').attr('lang');
+                var langParameter =
+                    _.isUndefined(htmlLang) ? "" :
+                    "?hl=" + htmlLang;
+                var reCaptchaScript = $('<script src="https://www.recaptcha.net/recaptcha/api.js' + langParameter + '">');
+                $(this.container).append(reCaptchaScript);
+            }
 
             var self = this;
             var renderRecaptcha = function () {
@@ -63,15 +71,8 @@
         },
 
         successfulResponse: function() {
-            console.log("successfulResponse");
             var response = grecaptcha.getResponse(this.widgetId);
-            console.log("response", response);
             ORBEON.xforms.Document.setValue(this.responseId, response);
-        },
-
-        reload: function() {
-            ORBEON.xforms.Document.setValue(this.responseId, '');
-            Recaptcha.reload();
         }
     };
 })();

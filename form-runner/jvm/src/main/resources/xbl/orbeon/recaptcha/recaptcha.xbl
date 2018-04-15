@@ -25,16 +25,12 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="https://www.recaptcha.net/recaptcha/api.js"/>
     <xbl:script src="/xbl/orbeon/recaptcha/recaptcha.js"/>
 
     <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="binding lhha">
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
-            </xbl:handler>
-            <xbl:handler event="fr-reload" phase="target" type="javascript">
-                YAHOO.xbl.fr.Recaptcha.instance(this).reload();
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -93,9 +89,7 @@
                                 <!-- Parse the response -->
                                 <xf:var name="is-success" value="instance('verify-response')/success = 'true'"/>
                                 <!-- Dispatch failure event -->
-                                <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xf:property name="fr-error-code" value="$lines[2]"/>
-                                </xf:dispatch>
+                                <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error"/>
                                 <!-- Dispatch success event -->
                                 <!-- NOTE: With Form Runner this hides the component, so make sure this is done last.
                                      Ideally, we would manage to dispatch the event as the last operation of the whole
@@ -108,7 +102,6 @@
                         <!-- Configuration -->
                         <xsl:copy-of select="xxbl:parameter(., 'public-key')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'lang')"/>
 
                         <!-- Provides access the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->

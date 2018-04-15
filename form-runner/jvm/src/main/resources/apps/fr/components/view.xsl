@@ -381,7 +381,12 @@
                     <xf:refresh/>
                 </xf:action>
                 <!-- Failure: load another challenge -->
-                <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
+                <xf:action event="fr-verify-error">
+                    <xf:dispatch
+                        if="event('fr-error-code') != 'empty'"
+                        targetid="captcha"
+                        name="fr-reload"/>
+                </xf:action>
                 <!-- Captcha component -->
                 <xsl:element
                     namespace="{$captcha-uri-name[1]}"

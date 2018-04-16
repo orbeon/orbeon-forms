@@ -271,30 +271,12 @@
 
     .fr-captcha {
         display: block;                             // By default captcha is inline
-        .fr-border();
-        text-align: right;
 
         .xbl-fr-recaptcha, .xbl-fr-simple-captcha {
             display: inline-block;
 
             & > .xforms-label, & > .xforms-alert {
                 display: none;
-            }
-        }
-
-        .xbl-fr-recaptcha {
-            display: inline-block;
-
-            // Override clean theme
-            #recaptcha_response_field {
-                font-size: @frFontSize;
-            }
-
-            .recaptchatable {
-                border: none !important;
-                .recaptcha_image_cell {
-                    background-color: transparent !important;
-                }
             }
         }
     }

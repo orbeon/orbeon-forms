@@ -337,7 +337,7 @@
                                                  - We don't listen to `xforms-enabled` here because we have `fr-section-shown`.
                                                  - `xxforms-constraints-changed` subsumes `xforms-valid`/`xforms-invalid`.
                                              -->
-                                            <xf:action event="xxforms-constraints-changed xforms-disabled" xxf:phantom="true">
+                                            <xf:action event="xforms-value-changed xxforms-constraints-changed xforms-disabled" xxf:phantom="true">
                                                 <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
                                             </xf:action>
 

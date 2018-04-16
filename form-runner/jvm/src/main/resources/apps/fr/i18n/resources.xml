@@ -3538,7 +3538,7 @@
                 <error-details>Ver detalhes de erros</error-details>
                 <confirm>Confirmar</confirm>
                 <alert>Valor em falta ou incorrecto</alert>
-                Veuillez vérifier votre réponse au défi CAPTCHACAPTCHA</captcha-label>
+                <captcha-label>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-label>
                 <captcha-alert>O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
             <view>

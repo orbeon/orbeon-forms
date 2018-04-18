@@ -1599,9 +1599,15 @@
                             if (newLabel != null)
                                 ORBEON.xforms.Controls.setLabelMessage(documentElement, newLabel);
                             // Store new hint message in control attribute
+                            // See also https://github.com/orbeon/orbeon-forms/issues/3561
                             var newHint = ORBEON.util.Dom.getAttribute(elem, "hint");
-                            if (newHint != null)
+                            if (newHint != null) {
                                 ORBEON.xforms.Controls.setHintMessage(documentElement, newHint);
+                            } else {
+                                var newTitle = ORBEON.util.Dom.getAttribute(elem, "title");
+                                if (newTitle != null)
+                                    ORBEON.xforms.Controls.setHintMessage(documentElement, newTitle);
+                            }
                             // Store new help message in control attribute
                             var newHelp = ORBEON.util.Dom.getAttribute(elem, "help");
                             if (newHelp != null)

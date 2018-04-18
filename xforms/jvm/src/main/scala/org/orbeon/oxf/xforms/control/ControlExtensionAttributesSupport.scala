@@ -64,10 +64,12 @@ trait ControlExtensionAttributesSupport {
   final def addExtensionAttributesExceptClassAndAcceptForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
     for {
       (name, value) ← evaluatedExtensionAttributes
-      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
       if value ne null
+      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
       localName = name.name
-    } attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
+    } locally {
+      attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
+    }
 
   final def addExtensionAttributesExceptClassAndAcceptForAjax(
     previousControlOpt : Option[XFormsControl],

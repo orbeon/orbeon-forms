@@ -251,7 +251,7 @@ trait FormRunnerActions {
 
       val pdfTiffParams =
         for {
-          format      ← SupportedRenderFormats.to[List]
+          format    ← SupportedRenderFormats.to[List]
           (path, _) ← pdfOrTiffPathOpt(
               urlsInstanceRootElem = getUrlsInstanceRootElem,
               format               = format,

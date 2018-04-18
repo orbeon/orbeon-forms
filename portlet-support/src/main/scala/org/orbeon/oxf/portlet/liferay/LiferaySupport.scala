@@ -100,6 +100,7 @@ object LiferaySupport {
   val AllHeaderNamesLower              = AllHeaderNamesLowerList.toSet
   val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLowerList zip AllHeaderNamesList toMap
 
+  // TODO: Use LanguageUtil.getBCP47LanguageId.
   def languageHeader(req: PortletRequest) =
     LanguageUtil.getLanguageId(req).trimAllToOpt map ("Orbeon-Liferay-Language" →)
 

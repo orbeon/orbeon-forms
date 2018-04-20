@@ -22,6 +22,8 @@ import org.scalajs.dom.raw
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
+import scala.scalajs.js.Dynamic.global
+
 @JSExportTopLevel("ORBEON.xforms.server.Server")
 @JSExportAll
 object ServerAPI {
@@ -53,7 +55,8 @@ object ServerAPI {
       fromId orElse fromRepeat orElse fromDelimiter orNull
     }
 
-    js.eval(functionName).asInstanceOf[js.Function].call(
+    // Don't use `eval` as `Content-Security-Policy` header might block it
+    global.selectDynamic(functionName).asInstanceOf[js.Function].call(
       thisArg = getElementOrNull(observerId),
       new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
       rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`

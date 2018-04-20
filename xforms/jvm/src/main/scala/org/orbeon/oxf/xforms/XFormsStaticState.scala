@@ -40,6 +40,7 @@ trait XFormsStaticState {
 
   def functionLibrary                         : FunctionLibrary
   def sanitizeInput                           : String ⇒ String
+  def isInlineResources                       : Boolean
   def assets                                  : XFormsAssets
   def uploadMaxSize                           : MaximumSize
   def uploadMaxSizeAggregate                  : MaximumSize

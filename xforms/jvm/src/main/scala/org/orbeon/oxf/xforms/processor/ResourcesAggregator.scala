@@ -114,13 +114,13 @@ class ResourcesAggregator extends ProcessorImpl {
                 // Gather resources that match
                 localname match {
                   case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒
-                    if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || media != "all" || isNorewrite)
+                    if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || media != "all" || isNorewrite || cssClasses == "xforms-standalone-resource")
                       preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                     else
                       (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href
                     filter = true
                   case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
-                    if (isSeparatePath(src) || NetUtils.urlHasProtocol(src) || isNorewrite)
+                    if (isSeparatePath(src) || NetUtils.urlHasProtocol(src) || isNorewrite || cssClasses == "xforms-standalone-resource")
                       preservedJS += ReferenceElement(localname, new AttributesImpl(attributes))
                     else
                       (if (cssClasses == "xforms-baseline") baselineJS else supplementalJS) += src

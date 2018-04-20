@@ -273,11 +273,10 @@ class XFormsStateManagerTest
 
       // Find document
       val newDoc =
-        XFormsStateManager.findOrRestoreDocument(
+        XFormsStateManager.createDocumentFromStore(
           parameters,
-          isInitialState       = true,
-          disableUpdates       = false,
-          disableDocumentCache = ! isCache
+          isInitialState = true,
+          disableUpdates = true
         )
 
       // can't be the same because either cache is disabled OR we create a duplicate document (could be same if state1 is initial state)

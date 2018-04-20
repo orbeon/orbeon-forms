@@ -60,14 +60,7 @@
             </templates>
         </metadata>
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-fields-date .xforms-control { display: inline; clear: none }
-                .xbl-fr-fields-date .fr-component-group img { vertical-align: middle }
-
-                <!-- For use outside of Form Runner -->
-                .fr-width-2digits input.xforms-input-input { width: 29px }
-                .fr-width-4digits input.xforms-input-input { width: 43px }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/fields-date/fields-date.css"/>
         </xbl:resources>
         <xbl:handlers>
             <!-- Propagate readonly -->

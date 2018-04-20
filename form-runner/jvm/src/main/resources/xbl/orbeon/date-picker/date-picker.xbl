@@ -53,9 +53,7 @@
             </templates>
         </metadata>
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-date-picker .fr-component-group img { vertical-align: middle; margin-top: -4px; margin-left: 4px }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/date-picker/date-picker.css"/>
         </xbl:resources>
         <xbl:template>
             <xf:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">

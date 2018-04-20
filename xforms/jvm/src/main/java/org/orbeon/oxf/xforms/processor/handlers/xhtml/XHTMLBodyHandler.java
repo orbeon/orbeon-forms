@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
@@ -154,8 +155,13 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
             });
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+            if (containingDocument.getStaticState().isInlineResources())
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "text", "name", "$client-state", "value", "", "style", "display: none"
+                });
+            else
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                    "type", "text", "name", "$client-state", "value", "", "class", "xforms-initially-hidden"
             });
 
             // Store information about nested repeats hierarchy

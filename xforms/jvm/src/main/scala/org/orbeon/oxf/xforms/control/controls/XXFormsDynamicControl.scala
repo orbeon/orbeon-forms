@@ -73,7 +73,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   private val xblChanges  = Buffer[(String, Element)]()
   private val bindChanges = Buffer[(String, Element)]()
 
-  // New scripts created during an update (not functional as of 2012-04-19)
+  // New scripts created during an update (not functional as of 2018-05-03)
   // NOTE: This should instead be accumulated at the level of the request.
   private var _newScripts: List[ShareableScript] = Nil
   def newScripts = _newScripts

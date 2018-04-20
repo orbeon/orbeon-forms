@@ -20,8 +20,8 @@ import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
+import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -45,8 +45,8 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
 
 import scala.collection.JavaConverters._
-import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 /**
   * The XForms Server processor handles client requests, including events, and either returns an XML
@@ -139,11 +139,10 @@ object XFormsServer {
               // NOTE: Document is removed from cache if it was found there. This may or may not be desirable.
               // Set disableUpdates = true so that we don't needlessly try to copy the controls tree. Also addresses:
               // #54: "Browser back causes server exception" https://github.com/orbeon/orbeon-forms/issues/54
-              XFormsStateManager.findOrRestoreDocument(
+              XFormsStateManager.createDocumentFromStore(
                 extractParameters(requestDocument, isInitialState = true),
-                isInitialState       = true,
-                disableUpdates       = true,
-                disableDocumentCache = false
+                isInitialState = true,
+                disableUpdates = true
               )
             }
 

@@ -18,6 +18,7 @@ import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
+import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.StatusCode
@@ -26,7 +27,11 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{AssetPath, Caches, Loggers, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler.findScriptDeclarations
+import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -43,12 +48,94 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
   override def start(pipelineContext: PipelineContext): Unit = {
 
     implicit val externalContext = NetUtils.getExternalContext
-    val requestPath = externalContext.getRequest.getRequestPath
 
-    if (requestPath.startsWith(DynamicResourcesPath))
-      serveDynamicResource(requestPath)
-    else
-      serveCSSOrJavaScript(requestPath)
+    val requestPath = externalContext.getRequest.getRequestPath
+    val response    = externalContext.getResponse
+
+    requestPath match {
+      case DynamicResourceRegex(_) ⇒
+        serveDynamicResource(requestPath)
+      case FormDynamicResourcesRegex(uuid) ⇒
+
+        def findJavaScriptInitialDataFromDocument(document: XFormsContainingDocument) =
+          XHTMLHeadHandler.findJavaScriptInitialData(
+            containingDocument   = document,
+            rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+            controlsToInitialize = document.getControls.getCurrentControlTree.rootOpt map XHTMLHeadHandler.gatherJavaScriptInitializations getOrElse Nil
+          )
+
+        // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
+        // any changes to the document, so the document should be in cache and have a sequence number of "1".
+        val (propertiesOpt, scriptDeclarationsOpt, fromCurrentStateOpt) =
+          // TODO: Handle timeout.
+          withDocumentAcquireLock(uuid, 0L) { document ⇒
+
+            val propertiesOpt =
+              XHTMLHeadHandler.findConfigurationProperties(
+                document,
+                URLRewriterUtils.isResourcesVersioned,
+                XFormsStateManager.getHeartbeatDelay(document, externalContext)
+              )
+
+            val scriptDeclarationsOpt = findScriptDeclarations(document)
+
+            val initialDataOpt =
+              if (document.getSequence == 1)
+                Some(findJavaScriptInitialDataFromDocument(document))
+              else
+                None
+
+            (propertiesOpt, scriptDeclarationsOpt, initialDataOpt)
+          }
+
+        // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear the
+        // cost of recreating the document from cache just to get the initial state.
+        def fromInitialStateOpt =
+          findJavaScriptInitialDataFromDocument(
+            XFormsStateManager.createDocumentFromStore(
+              RequestParameters(uuid, None, None, None),
+              isInitialState = true,
+              disableUpdates = true
+            )
+          )
+
+        response.setContentType("application/javascript")
+        // TODO: last modified or etag? The browser could cache it for some amount of time.
+
+        // TODO: Should we wrap JavaScript?
+        useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
+
+          propertiesOpt foreach { content ⇒
+            writer.write(content)
+          }
+
+          scriptDeclarationsOpt foreach{ content ⇒
+            writer.write(content)
+          }
+
+          fromCurrentStateOpt getOrElse fromInitialStateOpt foreach { content ⇒
+            writer.write(content)
+          }
+        }
+
+      case FormStaticResourcesRegex(staticStateDigest) ⇒
+        XFormsStaticStateCache.findDocument(staticStateDigest) foreach { state ⇒
+
+          response.setContentType("application/javascript")
+          // TODO: last modified or etag?
+
+          useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
+            XHTMLHeadHandler.writeScripts(
+              state.topLevelPart.uniqueJsScripts,
+              writer.write
+            )
+          }
+        }
+      case ResourceRegex(hash, ext) ⇒
+        serveCSSOrJavaScript(hash, ext)
+      case _ ⇒
+        response.setStatus(StatusCode.NotFound)
+    }
   }
 
   private def serveDynamicResource(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
@@ -77,7 +164,6 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           response.setContentLength(resource.size.asInstanceOf[Int]) // Q: Why does this API (and Servlet counterpart) take an int?
 
         // TODO: for Safari, try forcing application/octet-stream
-        // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
         response.setContentType(resource.contentType)
 
         // File name visible by the user
@@ -130,94 +216,100 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     }
   }
 
-  private def serveCSSOrJavaScript(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
+  private def serveCSSOrJavaScript(hash: String, ext: String)(implicit externalContext: ExternalContext): Unit = {
 
     val response = externalContext.getResponse
 
-    filename(requestPath) match {
-      case ResourceRegex(hash, ext) ⇒
-
-        val resources = {
-          // New hash-based mechanism
-          val cacheElement = Caches.resourcesCache.get(hash)
-          if (cacheElement ne null) {
-            // Mapping found
-            val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
-            resourcesStrings map (r ⇒ AssetPath(r, hasMin = false))
-          } else {
-            // Not found, either because the hash is invalid, or because the cache lost the mapping
-            response.setStatus(StatusCode.NotFound)
-            return
-          }
-        }
-
-        val isMinimal = false
-
-        // Get last modified date
-        val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resources, isMinimal)
-
-        // Set Last-Modified, required for caching and conditional get
-        if (URLRewriterUtils.isResourcesVersioned)
-          // Use expiration far in the future
-          response.setResourceCaching(combinedLastModified, System.currentTimeMillis + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
-        else
-          // Use standard expiration policy
-          response.setResourceCaching(combinedLastModified, 0)
-
-        // Check If-Modified-Since and don't return content if condition is met
-        if (! response.checkIfModifiedSince(externalContext.getRequest, combinedLastModified)) {
-          response.setStatus(StatusCode.NotModified)
-          return
-        }
-
-        val isCSS = ext == "css"
-
-        response.setContentType(if (isCSS) "text/css; charset=UTF-8" else "application/x-javascript")
-
-        // Namespace to use, must be None if empty
-        def namespaceOpt = {
-          def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
-          def nsFromContainer  = Some(response.getNamespacePrefix)
-
-          nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
-        }
-
-        def debugParameters = Seq("request path" → requestPath)
-
-        if (XFormsProperties.isCacheCombinedResources) {
-
-          // Caching requested
-          XFormsResourceRewriter.cacheAssets(
-            resources,
-            requestPath,
-            namespaceOpt,
-            combinedLastModified,
-            isCSS,
-            isMinimal
-          ) match {
-            case Some(resourceFile) ⇒
-              // Caching could take place, send out cached result
-              debug("serving from cache ", debugParameters)
-              useAndClose(response.getOutputStream) { os ⇒
-                copyStream(new FileInputStream(resourceFile), os)
-              }
-            case None ⇒
-              // Was unable to cache, just serve
-              debug("caching requested but not possible, serving directly", debugParameters)
-              XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
-          }
-        } else {
-          // Should not cache, just serve
-          debug("caching not requested, serving directly", debugParameters)
-          XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
-        }
-      case _ ⇒
+    val resources = {
+      // New hash-based mechanism
+      val cacheElement = Caches.resourcesCache.get(hash)
+      if (cacheElement ne null) {
+        // Mapping found
+        val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
+        resourcesStrings map (r ⇒ AssetPath(r, hasMin = false))
+      } else {
+        // Not found, either because the hash is invalid, or because the cache lost the mapping
         response.setStatus(StatusCode.NotFound)
+        return
+      }
+    }
+
+    val isMinimal = false
+
+    // Get last modified date
+    val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resources, isMinimal)
+
+    // Set Last-Modified, required for caching and conditional get
+    if (URLRewriterUtils.isResourcesVersioned)
+      // Use expiration far in the future
+      response.setResourceCaching(combinedLastModified, System.currentTimeMillis + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+    else
+      // Use standard expiration policy
+      response.setResourceCaching(combinedLastModified, 0)
+
+    // Check If-Modified-Since and don't return content if condition is met
+    if (! response.checkIfModifiedSince(externalContext.getRequest, combinedLastModified)) {
+      response.setStatus(StatusCode.NotModified)
+      return
+    }
+
+    val isCSS = ext == "css"
+
+    response.setContentType(if (isCSS) "text/css; charset=UTF-8" else "application/javascript")
+
+    // Namespace to use, must be None if empty
+    def namespaceOpt = {
+      def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
+      def nsFromContainer  = Some(response.getNamespacePrefix)
+
+      nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
+    }
+
+    val requestPath = externalContext.getRequest.getRequestPath
+
+    def debugParameters = Seq("request path" → requestPath)
+
+    if (XFormsProperties.isCacheCombinedResources) {
+
+      // Caching requested
+      XFormsResourceRewriter.cacheAssets(
+        resources,
+        requestPath,
+        namespaceOpt,
+        combinedLastModified,
+        isCSS,
+        isMinimal
+      ) match {
+        case Some(resourceFile) ⇒
+          // Caching could take place, send out cached result
+          debug("serving from cache ", debugParameters)
+          useAndClose(response.getOutputStream) { os ⇒
+            copyStream(new FileInputStream(resourceFile), os)
+          }
+        case None ⇒
+          // Was unable to cache, just serve
+          debug("caching requested but not possible, serving directly", debugParameters)
+          XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
+      }
+    } else {
+      // Should not cache, just serve
+      debug("caching not requested, serving directly", debugParameters)
+      XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
     }
   }
 }
 
 object XFormsResourceServer {
+
+  val TmpNoInlineResources = true
+
+  val DynamicResourceRegex       = "/xforms-server/dynamic/(.+)".r
+
+  val FormDynamicResourcesPath   = "/xforms-server/form/dynamic/"
+  val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
+
+  val FormStaticResourcesPath    = "/xforms-server/form/static/"
+  val FormStaticResourcesRegex   = s"$FormStaticResourcesPath(.+).js".r
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
   val DynamicResourcesPath       = "/xforms-server/dynamic/"
@@ -375,7 +467,7 @@ object XFormsResourceServer {
     }
   }
 
-  private val ResourceRegex = """orbeon-([0-9|a-f]+)\.(js|css)""".r
+  private val ResourceRegex = """/(?:.+/)?orbeon-([0-9|a-f]+)\.(js|css)""".r
 
   private def filename(requestPath: String) =
     requestPath.substring(requestPath.lastIndexOf('/') + 1)

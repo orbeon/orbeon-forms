@@ -130,6 +130,7 @@ public class XFormsProperties {
     public static final String SANITIZE_PROPERTY = "sanitize";
 
     public static final String ASSETS_BASELINE_EXCLUDES_PROPERTY = "assets.baseline.excludes";
+    public static final String INLINE_RESOURCES_PROPERTY = "inline-resources";
 
     public static class PropertyDefinition {
 
@@ -263,6 +264,7 @@ public class XFormsProperties {
             new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY                   , false,                          false),
             new PropertyDefinition(SANITIZE_PROPERTY                             , "",                             false),
             new PropertyDefinition(ASSETS_BASELINE_EXCLUDES_PROPERTY             , "",                             false),
+            new PropertyDefinition(INLINE_RESOURCES_PROPERTY                     , false,                          false),
 
             // Properties to propagate to the client
             new PropertyDefinition(USE_ARIA                                      , false,                          true),
@@ -414,8 +416,6 @@ public class XFormsProperties {
     public static int getRetryMaxDelay() {
         return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_MAX_DELAY, 30000);
     }
-
-
 
     public static boolean isKeepLocation() {
         return ! Properties.instance().getPropertySet().getString(LOCATION_MODE_PROPERTY, "none").equals("none");

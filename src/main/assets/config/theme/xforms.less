@@ -13,7 +13,10 @@
 .orbeon {
     // ***** Strong rules to hide disabled/non-relevant elements *******************************************************
 
-    // See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden
+    // See also `XHTMLHeadHandler` which contains inline rule for `.xforms-initially-hidden`
+    .xforms-initially-hidden, .xforms-form .xforms-initially-hidden {
+        display: none
+    }
 
     // Make it a strong rule by using an id, as other selectors might use `display:` rules. In portals, CSS must be
     // rewritten properly for this to work.

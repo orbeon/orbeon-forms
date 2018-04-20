@@ -41,7 +41,7 @@ object ControlLabelHintTextEditor {
     val ControlSelector       = ".xforms-control, .xbl-component"
     val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
 
-    var resourceEditorCurrentControl: JQuery = null
+    var resourceEditorCurrentControlOpt: Option[JQuery] = None
     var resourceEditorCurrentLabelHint: JQuery = null
 
     // Heuristic to close the editor based on click and focus events
@@ -70,27 +70,29 @@ object ControlLabelHintTextEditor {
         (event: JQueryEventObject) ⇒ {
 
           // Close current editor, if there is one open
-          if (resourceEditorCurrentControl ne null) resourceEditorEndEdit()
+          resourceEditorEndEdit()
           resourceEditorCurrentLabelHint = $(event.currentTarget)
           // Find control for this label
           val th = resourceEditorCurrentLabelHint.parents(".fr-grid-th")
-          resourceEditorCurrentControl =
-            if (th.is("*")) {
-              // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-              resourceEditorCurrentLabelHint
-            } else {
-              val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
-              val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
-              val parents = $($.merge(explanation, controls))
-              parents.first()
-            }
+          resourceEditorCurrentControlOpt =
+            Some(
+              if (th.is("*")) {
+                // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
+                resourceEditorCurrentLabelHint
+              } else {
+                val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
+                val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
+                val parents = $($.merge(explanation, controls))
+                parents.first()
+              }
+            )
           resourceEditorStartEdit()
         })
 
         // New control added
         controlAdded.add((containerId: String) ⇒ {
           val container = $(document.getElementById(containerId))
-          resourceEditorCurrentControl = container.find(ControlSelector)
+          resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
           val repeat = container.parents(".fr-repeat").first()
           resourceEditorCurrentLabelHint =
               if (repeat.is("*")) {
@@ -114,7 +116,9 @@ object ControlLabelHintTextEditor {
       // Show, position, and populate editor
       // Get position before showing editor, so showing doesn"t move things in the page
       Private.container.width(resourceEditorCurrentLabelHint.outerWidth())
-      Private.container.show()
+      // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
+      // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
+      Private.container.css( "display", "flex")
       Private.startEdit()
       val labelHintOffset = resourceEditorCurrentLabelHint.offset()
       Private.container.offset(labelHintOffset)
@@ -134,33 +138,34 @@ object ControlLabelHintTextEditor {
 
     // Called when users press enter or tab out
     def resourceEditorEndEdit(): Unit = {
-
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
       if (Private.container.is(":visible")) {
-        // Send value to server, handled in FB"s model.xml
-        val controlId   = resourceEditorCurrentControl.attr("id").get
-        val newValue    = Private.getValue
-        val isHTML      = Private.isHTML
+        resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl ⇒
+          // Send value to server, handled in FB"s model.xml
+          val controlId   = resourceEditorCurrentControl.attr("id").get
+          val newValue    = Private.getValue
+          val isHTML      = Private.isHTML
 
-        RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
-          controlId = controlId,
-          lhha      = Private.labelOrHintOrText,
-          value     = newValue,
-          isHTML    = isHTML
-        ).call() // ignoring the `Future` completion
+          RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
+            controlId = controlId,
+            lhha      = Private.labelOrHintOrText,
+            value     = newValue,
+            isHTML    = isHTML
+          ).call() // ignoring the `Future` completion
 
-        // Destroy tooltip, or it doesn't get recreated on startEdit()
-        Private.checkbox.tooltip("destroy")
-        Private.container.hide()
-        Private.endEdit()
-        Private.annotateWithLhhaClass(false)
-        resourceEditorCurrentLabelHint.css("visibility", "")
-        // Update values in the DOM, without waiting for the server to send us the value
-        Private.setLabelHintHtml(isHTML)
-        Private.labelHintValue(newValue)
-        // Clean state
-        resourceEditorCurrentControl = null
-        resourceEditorCurrentLabelHint = null
+          // Destroy tooltip, or it doesn't get recreated on startEdit()
+          Private.checkbox.tooltip("destroy")
+          Private.container.hide()
+          Private.endEdit()
+          Private.annotateWithLhhaClass(false)
+          resourceEditorCurrentLabelHint.css("visibility", "")
+          // Update values in the DOM, without waiting for the server to send us the value
+          Private.setLabelHintHtml(isHTML)
+          Private.labelHintValue(newValue)
+          // Clean state
+          resourceEditorCurrentControlOpt = None
+          resourceEditorCurrentLabelHint = null
+        }
       }
     }
 
@@ -173,10 +178,10 @@ object ControlLabelHintTextEditor {
       var tinyMceObject: TinyMceEditor = null
 
       // Create elements for editing
-      val container     = $("""<div   style="display: none" class = "fb-label-editor"/>""")
-      val textfield     = $("""<input style="display: none" type="text">""")
-      val checkbox      = $("""<input style="display: none" type="checkbox">""")
-      val tinymceAnchor = $("""<div   style="display: none">""")
+      val container     = $("""<div   class="xforms-hidden fb-label-editor"/>""")
+      val textfield     = $("""<input class="xforms-hidden" type="text">""")
+      val checkbox      = $("""<input class="xforms-hidden" type="checkbox">""")
+      val tinymceAnchor = $("""<div   class="xforms-hidden">""")
 
       // Add elements to the page
       locally {
@@ -206,8 +211,8 @@ object ControlLabelHintTextEditor {
         else                                                                     "hint"
 
       def htmlClass: String = "fb-" + labelOrHintOrText + "-is-html"
-      def isLabelHintHtml: Boolean = resourceEditorCurrentControl.is("." + htmlClass)
-      def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControl.toggleClass(htmlClass, isHtml)
+      def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt exists (_.is("." + htmlClass))
+      def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
       def annotateWithLhhaClass(add: Boolean) = container.toggleClass("fb-label-editor-for-" + labelOrHintOrText, add)
 
       def labelHintValue: String =

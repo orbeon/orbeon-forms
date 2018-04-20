@@ -173,8 +173,12 @@ object XFormsStateManager extends XFormsStateLifecycle {
     *
     * @return document, either from cache or from state information
     */
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache : Boolean): XFormsContainingDocument =
-    findOrRestoreDocument(parameters, isInitialState = false, disableUpdates = false, disableDocumentCache = disableDocumentCache)
+  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument =
+    findOrRestoreDocument(
+      parameters           = parameters,
+      disableUpdates       = false,
+      disableDocumentCache = disableDocumentCache
+    )
 
   /**
     * Called after an update.
@@ -203,40 +207,34 @@ object XFormsStateManager extends XFormsStateLifecycle {
   // NOTE: If found in cache, document is removed from cache.
   def findOrRestoreDocument(
     parameters           : RequestParameters,
-    isInitialState       : Boolean, // whether to return the initial state (otherwise return the current state)
     disableUpdates       : Boolean, // whether to disable updates (for recreating initial document upon browser back)
     disableDocumentCache : Boolean  // for testing only
   ): XFormsContainingDocument =
-    if (! isInitialState) {
-      // Try cache first unless the initial state is requested
-      if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
-        // Try to find the document in cache using the UUID
-        // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
-        // we can't know that the property is set to false before trying.
+    // Try cache first unless the initial state is requested
+    if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
+      // Try to find the document in cache using the UUID
+      // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
+      // we can't know that the property is set to false before trying.
 
-        def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument) =
-          ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.getSequence))
+      def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument) =
+        ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.getSequence))
 
-        XFormsDocumentCache.take(parameters.uuid) match {
-          case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  ⇒
-            Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
-            XFormsDocumentCache.remove(parameters.uuid)
-            createDocumentFromStore(parameters, isInitialState, disableUpdates)
-          case Some(cachedDocument) ⇒
-            // Found in cache
-            Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
-            cachedDocument
-          case None ⇒
-            Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
-            createDocumentFromStore(parameters, isInitialState, disableUpdates)
-        }
-      } else {
-        Logger.logDebug(LogType, "Document cache disabled. Retrieving state from store.")
-        createDocumentFromStore(parameters, isInitialState, disableUpdates)
+      XFormsDocumentCache.take(parameters.uuid) match {
+        case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  ⇒
+          Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
+          XFormsDocumentCache.remove(parameters.uuid)
+          createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
+        case Some(cachedDocument) ⇒
+          // Found in cache
+          Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
+          cachedDocument
+        case None ⇒
+          Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
+          createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
       }
     } else {
-      Logger.logDebug(LogType, "Initial document state requested. Retrieving state from store.")
-      createDocumentFromStore(parameters, isInitialState, disableUpdates)
+      Logger.logDebug(LogType, "Document cache disabled. Retrieving state from store.")
+      createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
     }
 
   // Return the static state string to send to the client in the HTML page.
@@ -272,6 +270,67 @@ object XFormsStateManager extends XFormsStateLifecycle {
     session.getAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application) map
       (_.asInstanceOf[ConcurrentLinkedQueue[String]]) getOrElse
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
+
+  def createDocumentFromStore(
+      parameters     : RequestParameters,
+      isInitialState : Boolean,
+      disableUpdates : Boolean
+    ): XFormsContainingDocument = {
+
+    val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
+
+    val xformsState =
+      parameters.encodedClientDynamicStateOpt match {
+        case None ⇒
+
+          assert(isServerState)
+
+          // State must be found by UUID in the store
+          val externalContext = NetUtils.getExternalContext
+
+          if (Logger.isDebugEnabled)
+            Logger.logDebug(
+              LogType,
+              "Getting document state from store.",
+              "current cache size", XFormsDocumentCache.getCurrentSize.toString,
+              "current store size", EhcacheStateStore.getCurrentSize.toString,
+              "max store size", EhcacheStateStore.getMaxSize.toString
+            )
+
+          val session = externalContext.getRequest.getSession(ForceSessionCreation)
+          EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
+            // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
+            // document, yet we didn't find it. This means that somehow state was not placed into or expired from
+            // the state store.
+            throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
+          }
+        case Some(encodedClientDynamicState) ⇒
+          // State comes directly with request
+
+          assert(! isServerState)
+
+          XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
+      }
+
+    // Create document
+    val documentFromStore =
+      new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document ⇒
+        (isServerState && document.getStaticState.isServerStateHandling) ||
+          document.getStaticState.isClientStateHandling
+      }
+
+    // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
+    // possible right now.
+    documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl ⇒
+      XFormsAPI.withContainingDocument(documentFromStore) {
+        documentFromStore.startOutermostActionHandler()
+        Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+        documentFromStore.endOutermostActionHandler()
+      }
+    }
+
+    documentFromStore
+  }
 
   private object Private {
 
@@ -333,67 +392,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
           "document cache max size"     → XFormsDocumentCache.getMaxSize.toString
         )
       )
-    }
-
-    def createDocumentFromStore(
-      parameters     : RequestParameters,
-      isInitialState : Boolean,
-      disableUpdates : Boolean
-    ): XFormsContainingDocument = {
-
-      val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
-
-      val xformsState =
-        parameters.encodedClientDynamicStateOpt match {
-          case None ⇒
-
-            assert(isServerState)
-
-            // State must be found by UUID in the store
-            val externalContext = NetUtils.getExternalContext
-
-            if (Logger.isDebugEnabled)
-              Logger.logDebug(
-                LogType,
-                "Getting document state from store.",
-                "current cache size", XFormsDocumentCache.getCurrentSize.toString,
-                "current store size", EhcacheStateStore.getCurrentSize.toString,
-                "max store size", EhcacheStateStore.getMaxSize.toString
-              )
-
-            val session = externalContext.getRequest.getSession(ForceSessionCreation)
-            EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
-              // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
-              // document, yet we didn't find it. This means that somehow state was not placed into or expired from
-              // the state store.
-              throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
-            }
-          case Some(encodedClientDynamicState) ⇒
-            // State comes directly with request
-
-            assert(! isServerState)
-
-            XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
-        }
-
-      // Create document
-      val documentFromStore =
-        new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document ⇒
-          (isServerState && document.getStaticState.isServerStateHandling) ||
-            document.getStaticState.isClientStateHandling
-        }
-
-      // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
-      // possible right now.
-      documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl ⇒
-        XFormsAPI.withContainingDocument(documentFromStore) {
-          documentFromStore.startOutermostActionHandler()
-          Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
-          documentFromStore.endOutermostActionHandler()
-        }
-      }
-
-      documentFromStore
     }
 
     def addUuidToSession(uuid: String): Boolean =

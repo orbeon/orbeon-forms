@@ -143,6 +143,7 @@
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
+    <property as="xs:boolean" name="oxf.xforms.inline-resources"                            value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select"           value="full"/>
     <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select1"          value="full"/>

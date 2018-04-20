@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
@@ -78,14 +79,20 @@ class XHTMLHeadHandler(
     val isVersionedResources = URLRewriterUtils.isResourcesVersioned
 
     // Include static XForms CSS and JS
-    val requestPath = xformsHandlerContext.getExternalContext.getRequest.getRequestPath
+    val externalContext = xformsHandlerContext.getExternalContext
+    val requestPath = externalContext.getRequest.getRequestPath
 
-    helper.element("", XMLNames.XIncludeURI, "include",
-      Array(
-        "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
-        "fixup-xml-base", "false"
-      )
-    )
+    if (containingDocument.getStaticState.isInlineResources) {
+      helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "style", Array("type", "text/css", "media", "all"))
+
+      val content =
+        """html body form.xforms-initially-hidden, html body .xforms-form .xforms-initially-hidden {
+          |    display: none
+          |}"""
+
+      helper.text(content)
+      helper.endElement()
+    }
 
     val ops = containingDocument.getStaticOps
 
@@ -100,18 +107,74 @@ class XHTMLHeadHandler(
     // Scripts
     locally {
 
-      // Main JavaScript resources
+      // Linked JavaScript resources
       outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)
 
-      // Configuration properties
-      outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
+      if (! containingDocument.getStaticState.isInlineResources) {
 
-      outputScriptDeclarations(xhtmlPrefix)
+        // Static resources
+        if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)
+          helper.element(
+            xhtmlPrefix,
+            XHTML_NAMESPACE_URI,
+            "script",
+            Array(
+              "type", "text/javascript",
+              "class", "xforms-standalone-resource",
+              "defer", "defer",
+              "src", XFormsResourceServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js"
+            )
+          )
 
-      outputJavaScriptInitialData(
-        xhtmlPrefix,
-        containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse Nil
-      )
+        // Dynamic resources
+        helper.element(
+          xhtmlPrefix,
+          XHTML_NAMESPACE_URI,
+          "script",
+          Array(
+            "type", "text/javascript",
+            "class", "xforms-standalone-resource",
+            "defer", "defer",
+            "src", XFormsResourceServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js"
+          )
+        )
+
+      } else {
+
+        def writeContent(content: String): Unit = {
+          helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+          helper.text(escapeJavaScriptInsideScript(content))
+          helper.endElement()
+        }
+
+        // Scripts known statically
+        val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
+
+        if (uniqueClientScripts.nonEmpty) {
+          val sb = new StringBuilder
+          writeScripts(uniqueClientScripts, sb append _)
+          writeContent(sb.toString)
+        }
+
+        // Scripts known dynamically
+
+        findConfigurationProperties(
+          containingDocument = containingDocument,
+          versionedResources = isVersionedResources,
+          heartbeatDelay     = XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
+        ) foreach
+          writeContent
+
+        findScriptDeclarations(containingDocument) foreach
+          writeContent
+
+        findJavaScriptInitialData(
+          containingDocument   = containingDocument,
+          rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+          controlsToInitialize = containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse Nil
+        ) foreach
+          writeContent
+      }
     }
   }
 
@@ -202,12 +265,96 @@ class XHTMLHeadHandler(
       minimal
     )
   }
+}
 
-  private def outputConfigurationProperties(
-    xhtmlPrefix        : String,
-    versionedResources : Boolean)(implicit
-    helper             : XMLReceiverHelper
-  ): Unit = {
+object XHTMLHeadHandler {
+
+  def quoteString(s: String) =
+    s""""${escapeJavaScript(s)}""""
+
+  def escapeJavaScriptInsideScript (js: String): String =
+    // Method from https://stackoverflow.com/a/23983448/5295
+    StringUtils.replace(js, "</script", "</scr\\ipt")
+
+  def writeScripts(shareableScripts: Iterable[ShareableScript], write: String ⇒ Unit): Unit =
+    for (shareableScript ← shareableScripts) {
+
+      val paramsString =
+        if (shareableScript.paramNames.nonEmpty)
+          shareableScript.paramNames mkString (",", ",", "")
+        else
+          ""
+
+      write(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n")
+      write(shareableScript.body)
+      write("}\n")
+    }
+
+  def buildJavaScriptInitializations(
+    containingDocument   : XFormsContainingDocument,
+    prependComma         : Boolean,
+    controlsToInitialize : List[(String, Option[String])],
+    sb                   : jl.StringBuilder
+  ): Unit =
+    if (controlsToInitialize.nonEmpty) {
+      if (prependComma)
+        sb.append(',')
+      sb.append("\"controls\":[")
+      val it = controlsToInitialize.iterator
+      while (it.hasNext) {
+        val (controlId, valueOpt) = it.next()
+
+        val namespacedId = namespaceId(containingDocument, controlId)
+
+        valueOpt match {
+          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(namespacedId)},"value":${quoteString(value)}}""")
+          case None        ⇒ sb.append(s"""{"id":${quoteString(namespacedId)}}""")
+        }
+
+        if (it.hasNext)
+          sb.append(',')
+      }
+      sb.append(']')
+    }
+
+  def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
+
+    val controlsToInitialize = ListBuffer[(String, Option[String])]()
+
+    def addControlToInitialize(effectiveId: String, value: Option[String]) =
+      controlsToInitialize += effectiveId → value
+
+    Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
+      case c: XFormsValueComponentControl ⇒
+        if (c.isRelevant) {
+          val abstractBinding = c.staticControl.abstractBinding
+          if (abstractBinding.modeJavaScriptLifecycle)
+            addControlToInitialize(
+              c.getEffectiveId,
+              if (abstractBinding.modeExternalValue)
+                c.externalValueOpt
+              else
+                None
+            )
+        }
+      case c: XFormsComponentControl ⇒
+        if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
+          addControlToInitialize(c.getEffectiveId, None)
+      case c ⇒
+        // Legacy JavaScript initialization
+        // As of 2016-08-04: xxf:dialog, xf:select1[appearance = compact], xf:range
+        if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
+          addControlToInitialize(c.getEffectiveId, None)
+    }
+
+    controlsToInitialize.result
+  }
+
+  def findConfigurationProperties(
+    containingDocument : XFormsContainingDocument,
+    versionedResources : Boolean,
+    heartbeatDelay     : Long
+  ): Option[String] = {
 
     // Gather all static properties that need to be sent to the client
     val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
@@ -219,10 +366,7 @@ class XHTMLHeadHandler(
 
       // Heartbeat delay is dynamic because it depends on session duration
       def heartbeatOpt =
-        Some(
-          SESSION_HEARTBEAT_DELAY_PROPERTY →
-            XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
-        )
+        Some(SESSION_HEARTBEAT_DELAY_PROPERTY → heartbeatDelay)
 
       // Help events are dynamic because they depend on whether the xforms-help event is used
       // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
@@ -259,16 +403,15 @@ class XHTMLHeadHandler(
     // combine all static and dynamic properties
     val clientProperties = staticProperties ++ dynamicProperties ++ globalProperties
 
-    if (clientProperties.nonEmpty) {
+    clientProperties.nonEmpty option {
 
       val sb = new StringBuilder
 
-      for ((propertyName, propertyValue) ← clientProperties) {
-        if (sb.isEmpty) {
-          // First iteration
-          sb append "var opsXFormsProperties = {"
-          helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-        } else
+      sb append "var opsXFormsProperties = {"
+
+      for (((propertyName, propertyValue), index) ← clientProperties.zipWithIndex) {
+
+        if (index != 0)
           sb append ','
 
         sb append '"'
@@ -286,122 +429,16 @@ class XHTMLHeadHandler(
       }
 
       sb append "};"
-      helper.text(escapeJavaScriptInsideScript(sb.toString))
-      helper.endElement()
+
+      sb.toString
     }
   }
 
-  private def outputScriptDeclarations(xhtmlPrefix: String)(implicit helper: XMLReceiverHelper): Unit = {
-
-    val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
-
-    val errorsToShow      = containingDocument.getServerErrors.asScala
-    val scriptInvocations = containingDocument.getScriptsToRun.asScala
-    val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
-    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
-
-    val dialogsToOpen =
-      for {
-        dialogControl ← containingDocument.getControls.getCurrentControlTree.getDialogControls
-        if dialogControl.isVisible
-      } yield
-        dialogControl
-
-    val javascriptLoads =
-      containingDocument.getLoadsToRun.asScala filter (_.resource.startsWith("javascript:"))
-
-    val hasScriptDefinitions =
-      uniqueClientScripts.nonEmpty
-
-    val mustRunAnyScripts =
-      errorsToShow.nonEmpty       ||
-      scriptInvocations.nonEmpty  ||
-      focusElementIdOpt.isDefined ||
-      messagesToRun.nonEmpty      ||
-      dialogsToOpen.nonEmpty      ||
-      javascriptLoads.nonEmpty
-
-    if (hasScriptDefinitions || mustRunAnyScripts) {
-      helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-
-      if (hasScriptDefinitions)
-        outputScripts(uniqueClientScripts)
-
-      if (mustRunAnyScripts) {
-        val sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ")
-
-        // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
-
-        // Initial script actions executions if present
-        for (script ← scriptInvocations) {
-          val name     = script.script.shared.clientName
-          val target   = namespaceId(containingDocument, script.targetEffectiveId)
-          val observer = namespaceId(containingDocument, script.observerEffectiveId)
-
-          val paramsString =
-          if (script.paramValues.nonEmpty)
-            script.paramValues map ('"' + escapeJavaScript(_) + '"') mkString (",", ",", "")
-          else
-            ""
-
-          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer"$paramsString);"""
-        }
-
-        // javascript: loads
-        for (load ← javascriptLoads) {
-          val body = escapeJavaScript(load.resource.substring("javascript:".size))
-          sb append s"""(function(){$body})();"""
-        }
-
-        // Initial modal xf:message to run if present
-        if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
-          quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
-        }
-
-        // Initial dialogs to open
-        for (dialogControl ← dialogsToOpen) {
-          val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
-          val neighbor = (
-            dialogControl.neighborControlId
-            map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
-            getOrElse "null"
-          )
-
-          sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
-        }
-
-        // Initial setfocus if present
-        // Seems reasonable to do this after dialogs as focus might be within a dialog
-        focusElementIdOpt foreach { id ⇒
-          sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
-        }
-
-        // Initial errors
-        if (errorsToShow.nonEmpty) {
-
-          val title   = "Non-fatal error"
-          val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
-          val formId  = XFormsUtils.getFormId(containingDocument)
-
-          sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
-        }
-
-        sb append " }"
-
-        helper.text(escapeJavaScriptInsideScript(sb.toString))
-      }
-      helper.endElement()
-    }
-  }
-
-  private def outputJavaScriptInitialData(
-    xhtmlPrefix          : String,
-    controlsToInitialize : List[(String, Option[String])])(implicit
-    helper               : XMLReceiverHelper
-  ): Unit = {
-
-    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+  def findJavaScriptInitialData(
+    containingDocument   : XFormsContainingDocument,
+    rewriteResource      : String ⇒ String,
+    controlsToInitialize : List[(String, Option[String])]
+  ): Option[String] = {
 
     // Produce JSON output
     val hasPaths                = true
@@ -410,16 +447,10 @@ class XHTMLHeadHandler(
     val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
     val outputInitData          = hasPaths || hasControlsToInitialize || hasKeyListeners || hasServerEvents
 
-    if (outputInitData) {
+    outputInitData option {
       val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
       sb.append(XFormsUtils.getFormId(containingDocument))
       sb.append("\"] = {")
-
-      val rewriteResource =
-        xformsHandlerContext.getExternalContext.getResponse.rewriteResourceURL(
-          _: String,
-          REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-        )
 
       // Output path information
       if (hasPaths) {
@@ -491,92 +522,104 @@ class XHTMLHeadHandler(
         sb.append(']')
       }
       sb.append("};")
-      helper.text(escapeJavaScriptInsideScript(sb.toString))
+      sb.toString
     }
-    helper.endElement()
   }
-}
 
-object XHTMLHeadHandler {
+  def findScriptDeclarations(containingDocument: XFormsContainingDocument): Option[String] = {
 
-  def quoteString(s: String) =
-    s""""${escapeJavaScript(s)}""""
+    val errorsToShow      = containingDocument.getServerErrors.asScala
+    val scriptInvocations = containingDocument.getScriptsToRun.asScala
+    val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
+    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
-  def escapeJavaScriptInsideScript (js: String): String =
-    // Method from https://stackoverflow.com/a/23983448/5295
-    StringUtils.replace(js, "</script", "</scr\\ipt")
+    val dialogsToOpen =
+      for {
+        dialogControl ← containingDocument.getControls.getCurrentControlTree.getDialogControls
+        if dialogControl.isVisible
+      } yield
+        dialogControl
 
-  def outputScripts(shareableScripts: Iterable[ShareableScript])(implicit helper: XMLReceiverHelper) =
-    for (shareableScript ← shareableScripts) {
+    val javascriptLoads =
+      containingDocument.getLoadsToRun.asScala filter (_.resource.startsWith("javascript:"))
 
-      val paramsString =
-        if (shareableScript.paramNames.nonEmpty)
-          shareableScript.paramNames mkString (",", ",", "")
-        else
-          ""
+    val mustRunAnyScripts =
+      errorsToShow.nonEmpty       ||
+      scriptInvocations.nonEmpty  ||
+      focusElementIdOpt.isDefined ||
+      messagesToRun.nonEmpty      ||
+      dialogsToOpen.nonEmpty      ||
+      javascriptLoads.nonEmpty
 
-      helper.text(escapeJavaScriptInsideScript(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n"))
-      helper.text(escapeJavaScriptInsideScript(shareableScript.body))
-      helper.text(escapeJavaScriptInsideScript("}\n"))
-    }
+    mustRunAnyScripts option {
 
-  def buildJavaScriptInitializations(
-    containingDocument   : XFormsContainingDocument,
-    prependComma         : Boolean,
-    controlsToInitialize : List[(String, Option[String])],
-    sb                   : jl.StringBuilder
-  ): Unit =
-    if (controlsToInitialize.nonEmpty) {
-      if (prependComma)
-        sb.append(',')
-      sb.append("\"controls\":[")
-      val it = controlsToInitialize.iterator
-      while (it.hasNext) {
-        val (controlId, valueOpt) = it.next()
+      val sb = new StringBuilder
 
-        val namespacedId = namespaceId(containingDocument, controlId)
+      if (mustRunAnyScripts) {
 
-        valueOpt match {
-          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(namespacedId)},"value":${quoteString(value)}}""")
-          case None        ⇒ sb.append(s"""{"id":${quoteString(namespacedId)}}""")
+        sb append "\nfunction xformsPageLoadedServer() { "
+
+        // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
+
+        // Initial script actions executions if present
+        for (script ← scriptInvocations) {
+          val name     = script.script.shared.clientName
+          val target   = namespaceId(containingDocument, script.targetEffectiveId)
+          val observer = namespaceId(containingDocument, script.observerEffectiveId)
+
+          val paramsString =
+          if (script.paramValues.nonEmpty)
+            script.paramValues map ('"' + escapeJavaScript(_) + '"') mkString (",", ",", "")
+          else
+            ""
+
+          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer"$paramsString);"""
         }
 
-        if (it.hasNext)
-          sb.append(',')
+        // javascript: loads
+        for (load ← javascriptLoads) {
+          val body = escapeJavaScript(load.resource.substring("javascript:".size))
+          sb append s"""(function(){$body})();"""
+        }
+
+        // Initial modal xf:message to run if present
+        if (messagesToRun.nonEmpty) {
+          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
+          quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
+        }
+
+        // Initial dialogs to open
+        for (dialogControl ← dialogsToOpen) {
+          val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
+          val neighbor = (
+            dialogControl.neighborControlId
+            map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
+            getOrElse "null"
+          )
+
+          sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
+        }
+
+        // Initial setfocus if present
+        // Seems reasonable to do this after dialogs as focus might be within a dialog
+        focusElementIdOpt foreach { id ⇒
+          sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
+        }
+
+        // Initial errors
+        if (errorsToShow.nonEmpty) {
+
+          val title   = "Non-fatal error"
+          val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
+          val formId  = XFormsUtils.getFormId(containingDocument)
+
+          sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
+        }
+
+        sb append " }"
       }
-      sb.append(']')
+
+      sb.toString
     }
-
-  def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
-
-    val controlsToInitialize = ListBuffer[(String, Option[String])]()
-
-    def addControlToInitialize(effectiveId: String, value: Option[String]) =
-      controlsToInitialize += effectiveId → value
-
-    Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
-      case c: XFormsValueComponentControl ⇒
-        if (c.isRelevant) {
-          val abstractBinding = c.staticControl.abstractBinding
-          if (abstractBinding.modeJavaScriptLifecycle)
-            addControlToInitialize(
-              c.getEffectiveId,
-              if (abstractBinding.modeExternalValue)
-                c.externalValueOpt
-              else
-                None
-            )
-        }
-      case c: XFormsComponentControl ⇒
-        if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
-          addControlToInitialize(c.getEffectiveId, None)
-      case c ⇒
-        // Legacy JavaScript initialization
-        // As of 2016-08-04: xxf:dialog, xf:select1[appearance = compact], xf:range
-        if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
-          addControlToInitialize(c.getEffectiveId, None)
-    }
-
-    controlsToInitialize.result
   }
 }

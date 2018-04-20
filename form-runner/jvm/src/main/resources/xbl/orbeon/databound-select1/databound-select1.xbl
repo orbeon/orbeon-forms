@@ -125,9 +125,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style>
-                div.xbl-fr-databound-select1 { display: inline; }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/databound-select1/databound-select1.css"/>
         </xbl:resources>
         <xbl:implementation>
             <xf:model id="xbl-model">

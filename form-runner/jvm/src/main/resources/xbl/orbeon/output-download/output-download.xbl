@@ -26,12 +26,6 @@
         xxbl:container="span"
         xxbl:mode="binding value lhha custom-lhha">
 
-        <xbl:resources>
-            <xbl:style>
-
-            </xbl:style>
-        </xbl:resources>
-
         <xbl:template>
             <xh:a
                 class="btn btn-success btn-large"

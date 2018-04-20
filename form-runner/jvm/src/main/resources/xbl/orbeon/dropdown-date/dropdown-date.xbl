@@ -64,10 +64,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-dropdown-date .fr-component-group select.xforms-select1-appearance-minimal,
-                    .xbl-fr-dropdown-date .fr-component-group span.xforms-select1-appearance-minimal select { width: auto }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/dropdown-date/dropdown-date.css"/>
         </xbl:resources>
         <xbl:handlers>
             <!-- Propagate readonly -->

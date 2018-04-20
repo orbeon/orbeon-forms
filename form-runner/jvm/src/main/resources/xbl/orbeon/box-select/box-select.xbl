@@ -61,24 +61,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-box-select {
-                    display: inline-block;
-                    box-sizing: border-box;
-                    -moz-box-sizing: border-box;
-                    width: 100%;
-                }
-                .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
-                    display: block;
-                    box-sizing: border-box;
-                    -moz-box-sizing: border-box;
-                    border: 1px solid gray;
-                    height: 78px;
-                    width: 100%;
-                    overflow-y: scroll;
-                    background-color: white;
-                }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/box-select/box-select.css"/>
         </xbl:resources>
         <xbl:template>
             <xf:select appearance="full" ref="xxf:binding('fr-box-select-binding')" xbl:attr="xxf:encrypt-item-values">

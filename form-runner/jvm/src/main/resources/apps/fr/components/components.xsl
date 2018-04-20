@@ -666,9 +666,6 @@
 
         </xsl:copy>
 
-        <!-- Handle checking dirty status -->
-        <xi:include href="oxf:/apps/fr/includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
-
     </xsl:template>
 
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:instance[1]">

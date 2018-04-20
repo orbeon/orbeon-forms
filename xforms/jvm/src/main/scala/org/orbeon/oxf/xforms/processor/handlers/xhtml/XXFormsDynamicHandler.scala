@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 
 class XXFormsDynamicHandler(
@@ -52,10 +54,12 @@ class XXFormsDynamicHandler(
         case control: XXFormsDynamicControl ⇒
           // Output new scripts upon update if any
           // NOTE: Not implemented as of 2016-01-18.
-          if (! containingDocument.isInitializing && control.newScripts.nonEmpty) {
+          if (! containingDocument.isInitializing && control.newScripts.nonEmpty && containingDocument.getStaticState.isInlineResources) {
             implicit val helper = new XMLReceiverHelper(contentHandler)
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-            XHTMLHeadHandler.outputScripts(control.newScripts)
+            // NOTE: As of 2018-05-03, this is still not functional, so there is no impact
+            // for https://github.com/orbeon/orbeon-forms/issues/3565
+            XHTMLHeadHandler.writeScripts(control.newScripts, s ⇒ helper.text(XHTMLHeadHandler.escapeJavaScriptInsideScript(s)))
             helper.endElement()
             control.clearNewScripts()
           }

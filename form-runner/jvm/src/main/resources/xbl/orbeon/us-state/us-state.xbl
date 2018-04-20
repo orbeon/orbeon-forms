@@ -51,10 +51,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-us-state .xforms-select1-appearance-minimal,
-                    .xbl-fr-us-state span.xforms-select1-appearance-minimal select { width: auto }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/us-state/us-state.css"/>
         </xbl:resources>
         <xbl:implementation>
             <xf:model>

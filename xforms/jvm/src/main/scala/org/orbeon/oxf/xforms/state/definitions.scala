@@ -50,7 +50,6 @@ trait XFormsStateLifecycle {
 
   def findOrRestoreDocument(
     parameters           : RequestParameters,
-    isInitialState       : Boolean,
     updates              : Boolean,
     disableDocumentCache : Boolean
   ): XFormsContainingDocument

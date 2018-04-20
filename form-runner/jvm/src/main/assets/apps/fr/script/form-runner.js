@@ -21,7 +21,9 @@
 
                     // Listener for clicks on toc links
                     var onClick = function(event) {
-                        var eventObserver = this; // "the Event Utility automatically adjusts the execution scope so that this refers to the DOM element to which the event was attached"
+                        // "the Event Utility automatically adjusts the execution scope so that this refers to the DOM element to
+                        // which the event was attached"
+                        var eventObserver = this;
                         var linkTarget = document.getElementById(eventObserver.getAttribute("href").substring(1));
                         if (linkTarget)
                             window.parent.scrollTo(0, YAHOO.util.Dom.getY(linkTarget) + YAHOO.util.Dom.getY(window.frameElement));
@@ -39,4 +41,24 @@
             }
         });
     }
+
+    // See https://github.com/orbeon/orbeon-forms/issues/3579 for improving this.
+    // $(window).on('beforeunload', function() {
+    $(window).on('beforeunload', function() {
+        try{
+            if (! ORBEON.xforms.Document.isReloading()) {
+
+                var dirty =
+                    _.find(_.values(ORBEON.xforms.Globals.ns), function(prefix) {
+                        var control = window.document.getElementById(prefix + 'fr-data-safe');
+                        return control && ORBEON.xforms.Document.getValue(control) != 'true';
+                    });
+
+                // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
+                if (! _.isUndefined(dirty))
+                    return "You may lose some unsaved changes.";
+            }
+
+        } catch (ex) {}
+    });
 })();

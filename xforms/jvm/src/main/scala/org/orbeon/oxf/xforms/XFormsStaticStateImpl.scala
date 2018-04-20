@@ -72,8 +72,8 @@ class XFormsStaticStateImpl(
   lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
   lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),     P.XPATH_ANALYSIS_PROPERTY)
   lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)
-
   lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
+  lazy val isInlineResources       = staticBooleanProperty(P.INLINE_RESOURCES_PROPERTY)
 
   lazy val assets: XFormsAssets = {
 

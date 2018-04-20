@@ -28,10 +28,10 @@ object XFormsStaticStateCache {
   def storeDocument(staticState: XFormsStaticState): Unit =
     cache.add(createCacheKey(staticState.digest), ConstantValidity, staticState)
 
-  def getDocumentJava(digest: String) =
+  def getDocumentJava(digest: String): XFormsStaticState =
     findDocument(digest).orNull
 
-  def findDocument(digest: String) =
+  def findDocument(digest: String): Option[XFormsStaticState] =
     Option(cache.findValid(createCacheKey(digest), ConstantValidity).asInstanceOf[XFormsStaticState])
 
   private object Private {

@@ -221,7 +221,7 @@ trait ProcessInterpreter extends Logging {
 
   // Main entry point for starting a literal process
   //@XPathFunction
-  def runProcess(scope: String, process: String): Try[Any] = {
+  def runProcess(scope: String, process: String): Try[Any] =
     withDebug("process: running", Seq("process" → process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
@@ -240,7 +240,6 @@ trait ProcessInterpreter extends Logging {
           error(OrbeonFormatter.format(t))
           Try(processError(t))
           Failure(t)
-        }
         }
       }
     }

@@ -38,7 +38,10 @@
 
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config><include>/request/container-namespace</include></config>
+            <config>
+                <include>/request/container-namespace</include>
+                <include>/request/parameters/parameter</include>
+            </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
@@ -97,7 +100,8 @@
 
     <!-- Call up persistence layer to obtain the PDF file -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('root', #form-document, #parameters)" transform="oxf:unsafe-xslt">
+        <!-- NOTE: Depend on #request for request parameters to avoid caching issues -->
+        <p:input name="config" href="aggregate('root', #form-document, #parameters, #request)" transform="oxf:unsafe-xslt">
             <config xsl:version="2.0">
 
                 <xsl:variable name="form"   select="/*/*[1]"/>

@@ -531,7 +531,7 @@ object Controls {
   ) extends Iterator[XFormsControl] {
 
     private val children = start match {
-      case c: XFormsSwitchControl if followVisible ⇒ c.selectedCase.iterator
+      case c: XFormsSwitchControl if followVisible ⇒ c.selectedCaseIfRelevantOpt.iterator
       case c: XFormsContainerControl               ⇒ c.children.iterator
       case _                                       ⇒ Iterator.empty
     }

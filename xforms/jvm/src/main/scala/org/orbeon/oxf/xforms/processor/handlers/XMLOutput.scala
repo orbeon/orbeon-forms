@@ -147,7 +147,7 @@ object XMLOutput extends XMLReceiverSupport {
   def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
     case c: XFormsSwitchControl if c.isRelevant ⇒
       implicit val _xmlReceiver = xmlReceiver
-      element("switch", atts = List("selected" → (c.selectedCase map (_.getId) orNull)))
+      element("switch", atts = List("selected" → (c.selectedCaseIfRelevantOpt map (_.getId) orNull)))
   }
 
   def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {

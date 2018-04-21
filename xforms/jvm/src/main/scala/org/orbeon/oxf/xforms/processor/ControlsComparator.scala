@@ -90,9 +90,11 @@ class ControlsComparator(
                 false
             case c: XFormsSwitchControl ⇒
               val otherSwitchControlOpt = control1Opt.asInstanceOf[Option[XFormsSwitchControl]]
-              // TODO: relevance
               if (c.staticControl.hasFullUpdate && c.getSelectedCaseEffectiveId != c.getOtherSelectedCaseEffectiveId(otherSwitchControlOpt)) {
-                processFullUpdateForContent(c, getMarkOrThrow(c.selectedCase.get).replay)
+                c.selectedCaseIfRelevantOpt match {
+                  case Some(selectedCase) ⇒ processFullUpdateForContent(c, getMarkOrThrow(selectedCase).replay)
+                  case None               ⇒ processFullUpdateForContent(c, _ ⇒ ())
+                }
                 true
               } else
                 false

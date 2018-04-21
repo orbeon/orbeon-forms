@@ -187,7 +187,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
     require(caseControlToSelect.parent eq this, s"xf:case '${caseControlToSelect.effectiveId}' is not child of current xf:switch")
 
-    val previouslySelectedCaseControl = selectedCase.get
+    val previouslySelectedCaseControl = selectedCaseIfRelevantOpt.get
 
     if (staticControl.caseref.isDefined) {
       // "by performing a setvalue action if the caseref attribute is specified and indicates a node. If the
@@ -267,7 +267,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     } else
       null
 
-  def selectedCase =
+  def selectedCaseIfRelevantOpt =
     isRelevant option containingDocument.getControlByEffectiveId(getSelectedCaseEffectiveId).asInstanceOf[XFormsCaseControl]
 
   override def getBackCopy: AnyRef = {
@@ -297,7 +297,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   override def focusableControls =
     if (isRelevant)
-      selectedCase.iterator flatMap (_.focusableControls)
+      selectedCaseIfRelevantOpt.iterator flatMap (_.focusableControls)
     else
       Iterator.empty
 

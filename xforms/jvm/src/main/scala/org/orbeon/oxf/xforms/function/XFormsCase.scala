@@ -27,7 +27,7 @@ class XFormsCase extends XFormsFunction {
     for {
       control      ← relevantControl(0)(xpathContext)
       switch       ← collectByErasedType[XFormsSwitchControl](control)
-      selectedCase ← switch.selectedCase
+      selectedCase ← switch.selectedCaseIfRelevantOpt
     } yield
       selectedCase.getId
 }

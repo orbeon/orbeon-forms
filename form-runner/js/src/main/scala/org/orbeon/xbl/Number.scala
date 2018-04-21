@@ -95,7 +95,7 @@ object Number {
             // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
             // - or it didn't, and we force `updateVisibleValue()` after the response is processed
             //
-            AjaxServer.ajaxResponseProcessedF(formId) foreach { _ ⇒
+            AjaxServer.ajaxResponseProcessedForCurrentEventQueueF(formId) foreach { _ ⇒
               updateVisibleValue()
             }
           }

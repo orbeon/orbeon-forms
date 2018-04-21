@@ -82,7 +82,7 @@ object AjaxServerOps {
       result.future
     }
 
-    def ajaxResponseProcessedF(formId: String): Future[Unit] = {
+    def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {
 
       val result = Promise[Unit]()
 

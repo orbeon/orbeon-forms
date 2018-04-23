@@ -163,6 +163,10 @@
             popover.children('.arrow').css('top', arrowTop + '%');
         } else if (_.contains(['top', 'bottom'], placement)) {
             popover.children('.arrow').css('left', '10%');
+            // Smaller max-width to avoid popover having no padding on the right, especially for mobile
+            var altMaxWidth = $(window).width() - 2 * popoverOffset.left;
+            if (popover.width() > altMaxWidth)
+                popover.css("max-width", altMaxWidth + "px");
         }
     }
 

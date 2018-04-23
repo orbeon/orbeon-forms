@@ -134,10 +134,7 @@
     // Box that contains the Bootstrap popover used for help
     .popover.xforms-help-popover {
 
-        width: 400px;       // Unfortunately, we need to the width of the help popover as when used in Form Builder, since the
-                            // control is in a <div> with position: relative, if we don't set the width, when the popover is moved to
-                            // the side of the control, its width is reduced to the minimum.
-        max-width: none;    // Overrides max set by default by Bootstrap
+        max-width: 400px;    // Overrides max set by default by Bootstrap
 
         .close {
             // Positioning of the close 'x', using padding so this also extends the clickable area

@@ -74,10 +74,16 @@
     </xh:div>
     <!-- Set value when dialog opens -->
     <xf:setvalue ev:event="xxforms-dialog-open" ref="instance()" value="event('fr-content')"/>
-    <!-- Clear value when dialog closes -->
-    <xf:setvalue ev:event="xxforms-dialog-close" ref="instance()"/>
     <!-- Local model -->
     <xf:model id="fr-submission-result-model">
+
+        <!-- Clear value when dialog closes -->
+        <!-- NOTE: Put in model here because of https://github.com/orbeon/orbeon-forms/issues/134 -->
+        <xf:setvalue
+            event="xxforms-dialog-close"
+            observer="fr-submission-result-dialog"
+            ref="instance()"/>
+
         <xf:instance id="fr-submission-result-instance">
             <content xmlns=""/>
         </xf:instance>

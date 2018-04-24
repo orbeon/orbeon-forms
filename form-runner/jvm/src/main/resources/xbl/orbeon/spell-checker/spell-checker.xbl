@@ -35,6 +35,12 @@
 
                 <xf:model id="fr-spell-checker-model">
 
+                    <!-- On close, apply replacements and do cleanup -->
+                    <!-- NOTE: Put in model here because of https://github.com/orbeon/orbeon-forms/issues/134 -->
+                    <xf:action event="xxforms-dialog-close" observer="fr-spell-checking-dialog">
+                        <xf:setvalue iterate="instance('fr-spell-checker-internal')/*" ref="."/>
+                    </xf:action>
+
                     <!-- Request to spell checker -->
                     <xf:instance id="fr-spell-checker-request">
                         <spellrequest textalreadyclipped="0" ignoredups="1" ignoredigits="1" ignoreallcaps="1">
@@ -151,11 +157,6 @@
                 <xf:action ev:event="xxforms-dialog-open">
                     <xf:setfocus if="exists($current-c)" control="suggestion"/>
                     <xf:setfocus if="empty($current-c)" control="close"/>
-                </xf:action>
-
-                <!-- On close, apply replacements and do cleanup -->
-                <xf:action ev:event="xxforms-dialog-close">
-                    <xf:setvalue iterate="instance('fr-spell-checker-internal')/*" ref="."/>
                 </xf:action>
 
                 <xf:group ref=".[exists($current-c)]" class="xbl-fr-spell-checker-correcting" id="correcting">

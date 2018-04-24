@@ -910,7 +910,7 @@
         </output>
     </test>
 
-    <test description="Focus and dialog" name="oxf:pipeline">
+    <test description="Focus and dialog" name="oxf:pipeline" only="true">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -969,11 +969,12 @@
                         <xf:input id="my-input-2" ref="value"/>
                     </xxf:dialog>
 
+                    <!-- Focus to external control upon close -->
+                    <xf:setfocus ev:event="xxforms-dialog-close" ev:observer="my-dialog-2" control="my-input-1"/>
+
                     <xxf:dialog id="my-dialog-2">
                         <!-- Focus to second control upon open -->
                         <xf:setfocus ev:event="xxforms-dialog-open" control="my-input-4"/>
-                        <!-- Focus to external control upon close -->
-                        <xf:setfocus ev:event="xxforms-dialog-close" control="my-input-1"/>
 
                         <xf:input id="my-input-3" ref="value"/>
                         <xf:input id="my-input-4" ref="value"/>

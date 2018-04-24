@@ -1082,6 +1082,12 @@
             </fr:positive-choice>
         </fr:alert-dialog>
 
+        <xf:action event="xxforms-dialog-close" observer="fr-credentials-dialog">
+            <xf:action type="xpath">
+                fr:run-process-by-name('oxf.fr.home.process', if (event('fr-connect')) then 'credentials-ok' else 'credentials-cancel')
+            </xf:action>
+        </xf:action>
+
         <!-- Credentials dialog -->
         <xxf:dialog id="fr-credentials-dialog" level="modal" close="true" draggable="true" class="fr-dialog fr-credentials-dialog">
 
@@ -1144,12 +1150,6 @@
                 </xf:action>
                 <xf:action if="not(event('xxf:targetid') = 'cancel-button') and not(valid(($remote-server/username, $remote-server/password)))">
                     <xxf:setvisited control="fr-credentials-dialog" recurse="true"/>
-                </xf:action>
-            </xf:action>
-
-            <xf:action event="xxforms-dialog-close">
-                <xf:action type="xpath">
-                    fr:run-process-by-name('oxf.fr.home.process', if (event('fr-connect')) then 'credentials-ok' else 'credentials-cancel')
                 </xf:action>
             </xf:action>
 

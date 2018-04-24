@@ -225,7 +225,7 @@
                     <xf:setfocus control="fr-dialog-select1-dialog"/>
                     <xxf:show dialog="fr-dialog-select1-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
                 </xf:action>
-                <xf:action ev:event="xxforms-dialog-close">
+                <xf:action ev:event="xxforms-dialog-close" xxf:if-non-relevant="true">
                     <xf:dispatch name="fr-edit-done" targetid="{callback-id}">
                         <xf:property name="fr-new-values" value="selected"/>
                     </xf:dispatch>

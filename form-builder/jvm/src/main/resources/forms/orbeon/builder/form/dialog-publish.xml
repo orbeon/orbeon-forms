@@ -265,17 +265,18 @@
     <!-- Initialize dialog -->
     <xf:toggle event="xxforms-dialog-open" case="fb-publish-dialog-message-start"/>
 
-    <!-- Clean-up upon close -->
-    <xf:action event="xxforms-dialog-close">
-        <xf:setvalue
-            ref="instance('fr-create-update-submission-response')"/>
-        <xf:insert
-            ref="instance('fb-publish-form-metadata')"
-            origin="xf:element('dummy')"/>
-    </xf:action>
-
     <!-- Local model -->
     <xf:model id="fb-publish-model">
+
+        <!-- Clean-up upon close -->
+        <!-- NOTE: Put in model here because of https://github.com/orbeon/orbeon-forms/issues/134 -->
+        <xf:action event="xxforms-dialog-close" observer="fb-publish-dialog">
+            <xf:setvalue
+                ref="xxf:instance('fr-create-update-submission-response')"/>
+            <xf:insert
+                ref="instance('fb-publish-form-metadata')"
+                origin="xf:element('dummy')"/>
+        </xf:action>
 
         <xf:instance id="fb-publish-instance">
             <publish>

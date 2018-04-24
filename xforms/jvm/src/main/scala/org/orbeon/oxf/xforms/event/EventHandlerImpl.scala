@@ -82,6 +82,7 @@ class EventHandlerImpl(
   val keyModifiers = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME)
   val keyText      = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
   val isPhantom    = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
+  val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
 
   assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
 
@@ -251,21 +252,36 @@ class EventHandlerImpl(
           }
       }
 
-    // Run the action within the context
-    try {
-      val actionInterpreter = new XFormsActionInterpreter(container, xpathContext, element, handlerEffectiveId, event, eventObserver)
-      XFormsAPI.withScalaAction(actionInterpreter) {
-        actionInterpreter.runAction(self)
+    val handlerIsRelevant =
+      containingDocument.findControlByEffectiveId(handlerEffectiveId) map (_.isRelevant) getOrElse {
+        // Actions in models do not have a dynamic representation and so are not indexed at this time. In such
+        // cases, we look at the relevance of the container.
+        container.isRelevant
       }
-    } catch {
-      case NonFatal(t) ⇒
-        // Something bad happened while running the action: dispatch error event to the root of the current scope
-        // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
-        // target. We thought about dispatching to the root control of the current scope, BUT in case the action
-        // is running within a model before controls are created, that won't be available. SO the answer is to
-        // dispatch to what we know exists, and that is the current observer or the target. The observer is
-        // "closer" from the action, so we dispatch to that.
-        Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
+
+    if (handlerIsRelevant || isIfNonRelevant) {
+      try {
+        val actionInterpreter = new XFormsActionInterpreter(container, xpathContext, element, handlerEffectiveId, event, eventObserver)
+        XFormsAPI.withScalaAction(actionInterpreter) {
+          actionInterpreter.runAction(self)
+        }
+      } catch {
+        case NonFatal(t) ⇒
+          // Something bad happened while running the action: dispatch error event to the root of the current scope
+          // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
+          // target. We thought about dispatching to the root control of the current scope, BUT in case the action
+          // is running within a model before controls are created, that won't be available. SO the answer is to
+          // dispatch to what we know exists, and that is the current observer or the target. The observer is
+          // "closer" from the action, so we dispatch to that.
+          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
+      }
+    } else {
+      debug("skipping non-relevant handler", List(
+        "event"        → event.name,
+        "observer"     → event.targetObject.getEffectiveId,
+        "handler name" → localName,
+        "handler id"   → handlerEffectiveId
+      ))
     }
   }
 

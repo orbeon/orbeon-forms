@@ -55,9 +55,9 @@ class EventHandlerImpl(
   import EventHandlerImpl._
 
   // NOTE: We check attributes in the ev:* or no namespace. We don't need to handle attributes in the xbl:* namespace.
-  private def att(name: QName): String = element.attributeValue(name)
-  private def attOption(name: QName): Option[String] = Option(att(name))
-  private def att(name1: QName, name2: QName) =  attOption(name1) orElse attOption(name2) orNull
+  private def att(name: QName)               : String         = element.attributeValue(name)
+  private def attOption(name: QName)         : Option[String] = element.attributeValueOpt(name)
+  private def att(name1: QName, name2: QName)          =  attOption(name1) orElse attOption(name2) orNull
 
   val eventNames = attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++ attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
 
@@ -79,9 +79,9 @@ class EventHandlerImpl(
   // "true" means "perform", "false" means "cancel"
   val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
 
-  val keyModifiers = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME)
-  val keyText      = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-  val isPhantom    = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
+  val keyModifiers    = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME)
+  val keyText         = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+  val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
   val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
 
   assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")

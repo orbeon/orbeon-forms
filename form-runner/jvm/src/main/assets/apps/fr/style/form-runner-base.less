@@ -156,10 +156,15 @@
 
     .xforms-select1-appearance-full,
     .xforms-select-appearance-full  {
+
+        // So the block takes just the space it needs, which improves positing of the help popover
         .xforms-selected,
-        .xforms-deselected {
+        .xforms-deselected,
+        .xforms-items {
             display: block;
+            float: left; clear: left;
         }
+
         label.radio,
         label.checkbox {
             display: inline-block;

@@ -56,6 +56,14 @@
                     value="(event('wizard-mode')[. = ('free', 'lax', 'strict')], 'default')[1]"/>
 
                 <xf:setvalue
+                    ref="$i/wizard-subsections-nav"
+                    value="(event('wizard-subsections-nav')[. = ('true', 'false')], 'default')[1]"/>
+
+                <xf:setvalue
+                    ref="$i/wizard-subsections-toc"
+                    value="(event('wizard-subsections-toc')[. = ('active', 'all', 'none')], 'default')[1]"/>
+
+                <xf:setvalue
                     ref="$i/labels"
                     value="(xxf:split(event('labels'))[. = 'full'], 'default')[1]"/>
 
@@ -137,6 +145,8 @@
                     <xf:property name="attachment-mediatypes"         value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
                     <xf:property name="wizard"                        value="$i/wizard/string()"/>
                     <xf:property name="wizard-mode"                   value="$i/wizard-mode/string()"/>
+                    <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
+                    <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
 
                     <xf:property
@@ -181,6 +191,8 @@
                         <singleton/>
                         <wizard/>
                         <wizard-mode/>
+                        <wizard-subsections-nav/>
+                        <wizard-subsections-toc/>
                         <attachment-max-size/>
                         <attachment-max-size-aggregate/>
                         <attachment-mediatypes/>
@@ -425,6 +437,34 @@
                                                              if (@id = 1) then 'free'
                                                         else if (@id = 2) then 'lax'
                                                         else if (@id = 3) then 'strict'
+                                                        else                   'default'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="wizard-subsections-nav" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/wizard-subsections-nav/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/wizard-subsections-nav/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="wizard-subsections-toc" appearance="full">
+                                                <xf:label ref="$resources/dialog-form-settings/wizard-subsections-toc/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/wizard-subsections-toc/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/wizard-subsections-toc/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="
+                                                             if (@id = 1) then 'active'
+                                                        else if (@id = 2) then 'all'
+                                                        else if (@id = 3) then 'none'
                                                         else                   'default'"/>
                                                 </xf:itemset>
                                             </xf:select1>

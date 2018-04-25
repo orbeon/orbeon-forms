@@ -162,7 +162,7 @@
                 'full'
             )[1]"/>
 
-     <xsl:variable
+    <xsl:variable
         name="wizard-mode"
         as="xs:string"
         select="
@@ -177,6 +177,34 @@
                     )
                 ],
                 'free'
+            )[1]"/>
+
+    <xsl:variable
+        name="wizard-subsections-nav"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/wizard-subsections-nav[
+                    . = ('true', 'false')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $app, $form), '.'))[
+                    . = ('true', 'false')
+                ],
+                'false'
+            )[1]"/>
+
+    <xsl:variable
+        name="wizard-subsections-toc"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/wizard-subsections-toc[
+                    . = ('active', 'all', 'none')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-toc', $app, $form), '.'))[
+                    . = ('active', 'all', 'none')
+                ],
+                'active'
             )[1]"/>
 
     <xsl:variable

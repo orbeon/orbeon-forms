@@ -355,6 +355,8 @@
                 <xf:property name="attachment-mediatypes"         value="()"/>
                 <xf:property name="wizard"                        value="()"/>
                 <xf:property name="wizard-mode"                   value="()"/>
+                <xf:property name="wizard-subsections-nav"        value="()"/>
+                <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
             </xf:dispatch>
@@ -373,6 +375,8 @@
                 <xf:property name="attachment-mediatypes"         value="()"/>
                 <xf:property name="wizard"                        value="()"/>
                 <xf:property name="wizard-mode"                   value="()"/>
+                <xf:property name="wizard-subsections-nav"        value="()"/>
+                <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
             </xxf:show>
@@ -385,13 +389,15 @@
             <xf:bind ref="xf:model[@id = 'fr-form-model']" id="fb-form-model-bind">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*" id="metadata-bind">
-                    <xf:bind id="application-name-bind" ref="application-name"/>
-                    <xf:bind id="form-name-bind"        ref="form-name"/>
-                    <xf:bind id="title-bind"            ref="title[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="description-bind"      ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="singleton-bind"        ref="singleton"/>
-                    <xf:bind id="wizard-bind"           ref="wizard"/>
-                    <xf:bind id="wizard-mode-bind"      ref="wizard-mode"/>
+                    <xf:bind id="application-name-bind"       ref="application-name"/>
+                    <xf:bind id="form-name-bind"              ref="form-name"/>
+                    <xf:bind id="title-bind"                  ref="title[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="description-bind"            ref="description[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="singleton-bind"              ref="singleton"/>
+                    <xf:bind id="wizard-bind"                 ref="wizard"/>
+                    <xf:bind id="wizard-mode-bind"            ref="wizard-mode"/>
+                    <xf:bind id="wizard-subsections-nav-bind" ref="wizard-subsections-nav"/>
+                    <xf:bind id="wizard-subsections-toc-bind" ref="wizard-subsections-toc"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*" id="attachments-bind">

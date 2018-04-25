@@ -307,6 +307,18 @@
                 <item id="2">Lax</item>
                 <item id="3">Strict</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label>Wizard Subsections Navigation</label>
+                <hint>Whether the wizard enables navigation for sections and grids within top-level sections</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label>Maximum Attachment Size per Control</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
@@ -1096,7 +1108,7 @@
             <rename>renommage</rename>
             <delete-control>suppression du contrôle</delete-control>
             <delete-container>suppression du conteneur</delete-container>
-            <merge-section-template>intégration du modèle de section</merge-section-template>xxx
+            <merge-section-template>intégration du modèle de section</merge-section-template>
             <move-control>déplacement du contrôle</move-control>
             <move-container>déplacement du conteneur</move-container>
             <update-settings>mise à jour des réglages</update-settings>
@@ -1343,6 +1355,18 @@
                 <item id="2">Permissif</item>
                 <item id="3">Strict</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label>Navigation des sous-sections</label>
+                <hint>Est-ce que le wizard permet la navigation des sections et grilles sous les sections au sommet</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Table des matières pour les sous-sections du wizard</label>
+                <hint>Façon de montrer la table des matières pour les sous-sections</hint>
+                <item id="0">Utiliser le défaut</item>
+                <item id="1">Montrer les sous-sections pour la section active seulement</item>
+                <item id="2">Montrer les sous-sections pour toutes les sections</item>
+                <item id="3">Ne pas montrer les sous-sections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label>Taille maximale des fichiers joints par contrôle</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
@@ -2381,6 +2405,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -3447,6 +3483,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -4513,6 +4561,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -5571,6 +5631,18 @@
                 <item id="2">Lax</item>
                 <item id="3">Streng</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
                 <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
@@ -6632,6 +6704,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -7690,6 +7774,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -8749,6 +8845,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -9814,6 +9922,18 @@
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
             </wizard-mode>
+            <wizard-subsections-nav>
+                <label todo="true">[Wizard Subsections Navigation]</label>
+                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            </wizard-subsections-nav>
+            <wizard-subsections-toc>
+                <label>Wizard Subsections Table of Contents</label>
+                <hint>How the wizard table of contents shows subsections</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Show Subsections for the Active Section Only</item>
+                <item id="2">Show Subsections for All Sections</item>
+                <item id="3">Don't Show Subsections</item>
+            </wizard-subsections-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>

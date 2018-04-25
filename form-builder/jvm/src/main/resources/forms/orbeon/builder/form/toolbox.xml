@@ -51,6 +51,8 @@
                             <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
                             <xf:property name="wizard"                        value="bind('wizard-bind')"/>
                             <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
+                            <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
+                            <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
                         </xxf:show>

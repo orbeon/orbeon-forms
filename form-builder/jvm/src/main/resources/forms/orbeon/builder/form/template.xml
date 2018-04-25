@@ -28,7 +28,7 @@
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title/>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">

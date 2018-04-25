@@ -359,6 +359,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
+                <xf:property name="analysis-calculate"            value="()"/>
             </xf:dispatch>
 
             <xxf:show
@@ -379,6 +380,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
+                <xf:property name="analysis-calculate"            value="()"/>
             </xxf:show>
         </xf:action>
     </xf:action>
@@ -410,6 +412,7 @@
                 <xf:bind id="attachment-mediatypes-bind"         ref="@xxf:upload.mediatypes"/>
                 <xf:bind id="labels-bind"                        ref="@xxf:label.appearance"/>
                 <xf:bind id="hints-bind"                         ref="@xxf:hint.appearance"/>
+                <xf:bind id="analysis-calculate-bind"            ref="@xxf:analysis.calculate"/>
             </xf:bind>
         </xf:bind>
         <!-- Keep all @edit-ref attributes pointing to the right spot -->

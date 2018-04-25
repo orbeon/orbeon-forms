@@ -359,6 +359,13 @@
                                             context="bind('fb-form-model-bind')"
                                             origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
+                                        <xf:delete
+                                            bind="analysis-calculate-bind"/>
+                                        <xf:insert
+                                            if="event('analysis-calculate') = ('true', 'false')"
+                                            context="bind('fb-form-model-bind')"
+                                            origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
+
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action

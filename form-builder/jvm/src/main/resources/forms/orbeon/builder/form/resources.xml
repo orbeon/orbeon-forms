@@ -345,6 +345,10 @@
             <placeholders>
                 <label>Use Placeholder for Text Fields and Text Areas</label>
             </placeholders>
+            <analysis-calculate>
+                <label>Automatic calculation dependencies</label>
+                <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -1393,6 +1397,10 @@
             <placeholders>
                 <label>Placer en ligne dans les champs et zones de texte</label>
             </placeholders>
+            <analysis-calculate>
+                <label>Dépendances automatiques des formules de calculs</label>
+                <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -2443,6 +2451,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -3521,6 +3533,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -4599,6 +4615,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -5669,6 +5689,10 @@
             <placeholders>
                 <label>Platzhalter für Textfelder und mehrzeilige Textfelder benutzen</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -6742,6 +6766,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -7812,6 +7840,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -8883,6 +8915,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -9960,6 +9996,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <analysis-calculate>
+                <label todo="true">[Automatic calculation dependencies]</label>
+                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            </analysis-calculate>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>

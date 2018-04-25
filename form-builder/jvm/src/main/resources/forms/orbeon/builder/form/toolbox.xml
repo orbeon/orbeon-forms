@@ -55,6 +55,7 @@
                             <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
+                            <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
                         </xxf:show>
                     </xf:action>
                 </xf:trigger>

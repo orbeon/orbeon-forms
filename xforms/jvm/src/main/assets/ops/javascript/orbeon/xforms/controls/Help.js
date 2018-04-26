@@ -105,15 +105,20 @@
         var arrowHeight   = popover.children('.arrow').outerHeight();
 
         // Constraint height if taller than viewport
-        var maxHeight =
-            // When left/right, viewport height sets the limit
-            _.contains(['right', 'left', 'over'], placement) ?
-                $(window).height() - 2*padding - elPos.margins.top - elPos.margins.bottom
-            // When bottom, space below
-            : placement == 'bottom' ?
-                $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height + arrowHeight + padding)
-            // When top, space above
-            : elPos.offset.top - elPos.scrollTop - padding - arrowHeight;
+        var maxHeight = (function() {
+            switch (true) {
+                case _.contains(['right', 'left', 'over'], placement):
+                    // Viewport height sets the limit
+                    return $(window).height() - 2 * padding;
+                case  placement == 'bottom':
+                    // Space below
+                    return $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height + arrowHeight + padding);
+                case  placement == 'top':
+                    // Space above
+                    return elPos.offset.top - elPos.scrollTop - padding - arrowHeight;
+            }
+        })();
+
         if (popover.outerHeight() > maxHeight) {
             var title   = popover.children('.popover-title');
             var content = popover.children('.popover-content');
@@ -134,7 +139,8 @@
                 case placement == 'top':
                     return elPos.offset.top - popover.outerHeight() - arrowHeight;
                 case placement == 'over':
-                    return elPos.offset.top + padding;
+                    // Center relative to viewport
+                    return Math.max(0, (($(window).height() - popover.outerHeight()) / 2) + $(window).scrollTop())
                 default:
                     return popoverOffset.top;
             }
@@ -148,7 +154,8 @@
                 case _.contains(['top', 'bottom'], placement):
                     return elPos.offset.left;
                 case placement == 'over':
-                    return elPos.offset.left + elPos.width - popover.outerWidth() - padding;
+                    // Center relative to viewport
+                    return Math.max(0, (($(window).width() - popover.outerWidth()) / 2) + $(window).scrollLeft())
                 default:
                     return popoverOffset.top;
             }

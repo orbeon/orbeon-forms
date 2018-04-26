@@ -375,8 +375,11 @@
                 return
                     if (
                         $mode = 'view' or (
-                            $mode = ('pdf', 'email') and
-                            not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
+                            $mode = ('pdf', 'email') and (
+                                (: TODO: Consider `fr:use-pdf-template()` function :)
+                                xxf:get-request-parameter('fr-use-pdf-template') = 'false' or
+                                not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
+                            )
                         )
                     ) then
                         'static'
@@ -387,7 +390,9 @@
                 for $mode in fr:mode()
                 return not(
                     $mode = ('pdf', 'email') and
-                    xxf:instance('fr-form-attachments')/pdf/xxf:trim() != ''
+                    (: TODO: Consider `fr:use-pdf-template()` function :)
+                    xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '' and
+                    not(xxf:get-request-parameter('fr-use-pdf-template') = 'false')
                 )
             }}"
             xxf:order="{{

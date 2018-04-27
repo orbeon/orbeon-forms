@@ -237,15 +237,28 @@ trait CreateUpdateDelete
           Nil
 
         tablesToDeleteDraftsFrom.foreach { table ⇒
-          val deleteFromTables =
-            s"""|DELETE FROM $table
+
+          val fromWhere =
+            s"""|
+                |       FROM $table
                 |      WHERE document_id = ?   AND
                 |            draft       = 'Y'
                 |""".stripMargin
-          useAndClose(connection.prepareStatement(deleteFromTables)) { ps ⇒
-            ps.setString(1, dataPart.documentId)
-            ps.executeUpdate()
-          }
+          val select = "     SELECT count(*) count" + fromWhere
+          val delete = "     DELETE" + fromWhere
+          val count =
+            useAndClose(connection.prepareStatement(select)) { ps ⇒
+              ps.setString(1, dataPart.documentId)
+              useAndClose(ps.executeQuery()) { rs ⇒
+                rs.next()
+                rs.getInt("count")
+              }
+            }
+          if (count > 0)
+            useAndClose(connection.prepareStatement(delete)) { ps ⇒
+              ps.setString(1, dataPart.documentId)
+              ps.executeUpdate()
+            }
         }
 
       case _ ⇒

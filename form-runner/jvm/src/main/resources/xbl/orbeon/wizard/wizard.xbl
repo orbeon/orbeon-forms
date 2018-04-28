@@ -440,7 +440,11 @@
                                 </xf:action>
                             </xf:group>
 
-                            <xf:group appearance="xxf:internal" xxbl:scope="outer" id="fr-wizard-outer-group">
+                            <xf:group
+                                xxbl:scope="outer"
+                                id="fr-wizard-outer-group"
+                                class="fr-wizard-toc-inner"
+                                xxf:element="div">
 
                                 <!-- Statically-known section and grid ids -->
                                 <xf:var

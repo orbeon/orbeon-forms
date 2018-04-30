@@ -288,15 +288,16 @@ object DataMigration {
 
     // Remove all `fr:*` elements and attributes
     def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
+
       // Delete elements from concrete `List` to avoid possible laziness
       val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
 
       frElements.foreach (delete(_, doDispatch = false))
 
-      // Attributes OTOH can be deleted in document order just fine
+      // Attributes: see https://github.com/orbeon/orbeon-forms/issues/3568
       val allElements = mutableData descendant *
 
-      val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR)
+      val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR) toList
 
       frAttributes.foreach (delete(_, doDispatch = false))
 

@@ -188,8 +188,10 @@ trait FormRunnerBaseOps {
   def appendQueryString(urlString: String, queryString: String): String = NetUtils.appendQueryString(urlString, queryString)
 
   // Return specific Form Runner instances
-  def formInstance                : XFormsInstance = topLevelInstance(FormModel,         FormInstance)                get
-  def metadataInstance            : Option[XFormsInstance] = topLevelInstance(FormModel, MetadataInstance)
+  def formInstance                : XFormsInstance = topLevelInstance(FormModel,                FormInstance)         get
+  def metadataInstance            : Option[XFormsInstance] = topLevelInstance(FormModel,        MetadataInstance)
+  def urlsInstance                : Option[XFormsInstance] = topLevelInstance(PersistenceModel, "fr-urls-instance")
+  def formAttachmentsInstance     : Option[XFormsInstance] = topLevelInstance(FormModel,        "fr-form-attachments")
 
   def parametersInstance          : XFormsInstance = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
   def errorSummaryInstance        : XFormsInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get

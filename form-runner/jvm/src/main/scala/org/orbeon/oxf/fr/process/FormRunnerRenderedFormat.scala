@@ -107,12 +107,15 @@ object FormRunnerRenderedFormat {
     } yield
       path → node.localname
 
-  private def extractPdfTemplates(attachmentsRootElem : NodeInfo) =
+  def listPdfTemplates: Seq[PdfTemplate] =
+    formAttachmentsInstance map (_.rootElement) map extractPdfTemplates getOrElse Nil
+
+  private def extractPdfTemplates(attachmentsRootElem: NodeInfo) =
     for {
       pdfElem ← attachmentsRootElem child PdfElemName
       path    ← pdfElem.stringValue.trimAllToOpt
     } yield
-      PdfTemplate(path, pdfElem.attValueOpt("name"), pdfElem.attValueOpt("lang"))
+      PdfTemplate(path, pdfElem.attValueOpt("name") flatMap (_.trimAllToOpt), pdfElem.attValueOpt("lang") flatMap (_.trimAllToOpt))
 
   private def selectPdfTemplate(
     attachmentsRootElem : NodeInfo,

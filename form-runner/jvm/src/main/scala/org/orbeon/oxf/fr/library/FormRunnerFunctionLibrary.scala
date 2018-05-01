@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.library
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.process.SimpleProcess
+import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
@@ -24,16 +24,16 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
-import org.orbeon.saxon.ArrayFunctions
+import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.function.{AncestorOrganizations, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
-import org.orbeon.saxon.om.{EmptyIterator, Item, SequenceIterator, StructuredQName}
+import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
+import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
@@ -109,6 +109,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
   }
 }
 
@@ -307,5 +309,19 @@ private object FormRunnerFunctions {
         .orElse(searchWithoutAppForm)
         .orNull
     }
+  }
+
+  class FRListPdfTemplates extends FunctionSupport with RuntimeDependentFunction {
+
+    override def iterate(context: XPathContext): SequenceIterator =
+      FormRunnerRenderedFormat.listPdfTemplates map { template ⇒
+        MapFunctions.createValue(
+          Map[AtomicValue, ValueRepresentation](
+            (SaxonUtils.fixStringValue("path"), template.path),
+            (SaxonUtils.fixStringValue("name"), template.nameOpt map stringToStringValue getOrElse EmptySequence.getInstance),
+            (SaxonUtils.fixStringValue("lang"), template.langOpt map stringToStringValue getOrElse EmptySequence.getInstance)
+          )
+        )
+      }
   }
 }

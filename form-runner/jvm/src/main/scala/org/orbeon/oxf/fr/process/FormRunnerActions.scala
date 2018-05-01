@@ -573,10 +573,10 @@ trait FormRunnerActions {
     }
 
   def getUrlsInstanceRootElem: NodeInfo =
-    topLevelInstance(PersistenceModel, s"fr-urls-instance") map (_.rootElement) get
+    urlsInstance map (_.rootElement) get
 
   def findFrFormAttachmentsRootElemOpt: Option[NodeInfo] =
-    topLevelInstance(FormModel, "fr-form-attachments") map (_.rootElement)
+    formAttachmentsInstance map (_.rootElement)
 
   // Create if needed and return the element key name
   private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[String] =

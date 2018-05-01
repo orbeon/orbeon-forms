@@ -171,7 +171,6 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         "fr",
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateNameParam" → "",
           "fr-remember-language"      → "false",
           "fr-language"               → "fr"
         )
@@ -188,7 +187,6 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateNameParam" → "",
           "fr-remember-language" →  "false",
           "fr-language"          →  "fr"
         )

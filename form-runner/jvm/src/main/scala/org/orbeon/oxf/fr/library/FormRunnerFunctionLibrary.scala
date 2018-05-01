@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.library
 
+import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.SimpleProcess
@@ -20,6 +21,7 @@ import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
@@ -102,6 +104,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE)
+    )
+
+    Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
     )
   }
 }
@@ -283,6 +289,23 @@ private object FormRunnerFunctions {
     }
   }
 
+  // For instance, `fr:component-param-value('decimal-separator')`
+  // returns the value of `oxf.xforms.xbl.fr.currency.decimal-separator.*.*`
+  class FRComponentParam extends FunctionSupport with RuntimeDependentFunction {
 
+    override def evaluateItem(context: XPathContext): Item = {
 
+      implicit val ctx  = context
+      val frParams      = FormRunner.FormRunnerParams()
+      val appNameSuffix = List(frParams.app, frParams.form)
+      val paramName     = QName(stringArgument(0))
+
+      def searchWithAppForm    : Option[AtomicValue] = XXFormsComponentParam.evaluate(paramName, appNameSuffix)
+      def searchWithoutAppForm : Option[AtomicValue] = XXFormsComponentParam.evaluate(paramName, Nil)
+
+      searchWithAppForm
+        .orElse(searchWithoutAppForm)
+        .orNull
+    }
+  }
 }

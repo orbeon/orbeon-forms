@@ -104,6 +104,7 @@ object XBLTransformer {
             boundElement.attributeValueOpt,
             identity,
             paramName,
+            Nil,
             abstractBinding
           ) map (_.getStringValue)
         }

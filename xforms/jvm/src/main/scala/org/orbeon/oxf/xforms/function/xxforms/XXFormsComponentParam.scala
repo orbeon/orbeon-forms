@@ -26,11 +26,21 @@ import org.orbeon.xforms.XFormsId
 class XXFormsComponentParam extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
-
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
+    XXFormsComponentParam.evaluate(paramName, Nil).orNull
+  }
+}
 
+object XXFormsComponentParam {
+
+  def evaluate(
+    paramName   : QName,
+    paramSuffix : List[String]
+  ): Option[AtomicValue] = {
+
+    val prefixedId = XFormsId.getPrefixedId(XFormsFunction.context.sourceEffectiveId)
     val containerForSourceScope =
-      XFormsFunction.context.container.findScopeRoot(XFormsId.getPrefixedId(getSourceEffectiveId): String)
+      XFormsFunction.context.container.findScopeRoot(prefixedId)
 
     containerForSourceScope.associatedControlOpt collect
       { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒
@@ -45,19 +55,17 @@ class XXFormsComponentParam extends XFormsFunction {
         concreteBinding.boundElementAtts.lift,
         c.evaluateAvt,
         paramName,
+        paramSuffix,
         staticControl.abstractBinding
       )
-
-    } orNull
+    }
   }
-}
-
-object XXFormsComponentParam {
 
   def evaluateUsePropertiesIfNeeded(
     atts            : QName ⇒ Option[String],
     evaluateAvt     : String ⇒ String,
     paramName       : QName,
+    paramSuffix     : List[String],
     abstractBinding : AbstractBinding
   ): Option[AtomicValue] = {
 
@@ -70,7 +78,7 @@ object XXFormsComponentParam {
 
     def propertyName =
       abstractBinding.directName map { qName ⇒
-        List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) mkString "."
+        List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) ++ paramSuffix mkString "."
       }
 
     // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is

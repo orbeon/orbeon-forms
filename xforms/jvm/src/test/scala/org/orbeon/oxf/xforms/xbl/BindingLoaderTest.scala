@@ -128,19 +128,19 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     val ExpectedStyles =
       ExpectedScripts map (_.replace(".js", ".css"))
 
-    var currentIndex: BindingIndex[IndexableBinding] = GlobalBindingIndex.Empty
+    var currentIndexOpt: Option[BindingIndex[IndexableBinding]] = None
 
     // Initial library load
     locally {
       val (newIndex, checkedPaths, scripts, styles) =
-        Loader.getUpToDateLibraryAndBaseline(currentIndex, checkUpToDate = true)
-      currentIndex = newIndex
+        Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
+      currentIndexOpt = Some(newIndex)
 
-      assert(ExpectedCheckedPaths.size === BindingIndex.distinctBindings(currentIndex).size)
+      assert(ExpectedCheckedPaths.size === BindingIndex.distinctBindings(newIndex).size)
 
-      assert(2 === currentIndex.nameAndAttSelectors.size)
-      assert(1 === currentIndex.attOnlySelectors.size)
-      assert(3 === currentIndex.nameOnlySelectors.size)
+      assert(2 === newIndex.nameAndAttSelectors.size)
+      assert(1 === newIndex.attOnlySelectors.size)
+      assert(3 === newIndex.nameOnlySelectors.size)
 
       assert(ExpectedCheckedPaths === checkedPaths)
       assert(ExpectedScripts      === scripts)
@@ -151,10 +151,10 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     locally {
       Loader.contentRead.clear()
       val (newIndex, _, _, _) =
-        Loader.getUpToDateLibraryAndBaseline(currentIndex, checkUpToDate = true)
+        Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index object not modified
-      assert(currentIndex eq newIndex)
+      assert(currentIndexOpt exists (_ eq newIndex))
 
       // Nothing read
       assert(Loader.contentRead.isEmpty)
@@ -165,11 +165,11 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       Loader.lastModified += 1
       Loader.contentRead.clear()
       val (newIndex, _, _, _) =
-        Loader.getUpToDateLibraryAndBaseline(currentIndex, checkUpToDate = true)
+        Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index modified
-      assert(currentIndex ne newIndex)
-      currentIndex = newIndex
+      assert(! (currentIndexOpt exists (_ eq newIndex)))
+      currentIndexOpt = Some(newIndex)
 
       // All bindings reloaded
       assert(ExpectedCheckedPaths.size === Loader.contentRead.size)
@@ -180,11 +180,11 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       Loader.propertySet = newPropertySet
       Loader.contentRead.clear()
       val (newIndex, _, _, _) =
-        Loader.getUpToDateLibraryAndBaseline(currentIndex, checkUpToDate = true)
+        Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index modified
-      assert(currentIndex ne newIndex)
-      currentIndex = newIndex
+      assert(! (currentIndexOpt exists (_ eq newIndex)))
+      currentIndexOpt = Some(newIndex)
 
       // All bindings reloaded
       assert(ExpectedCheckedPaths.size === Loader.contentRead.size)
@@ -204,7 +204,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     // Initial library load
     locally {
       val (newIndex, newCheckedPaths, _, _) =
-        Loader.getUpToDateLibraryAndBaseline(currentIndex, checkUpToDate = true)
+        Loader.getUpToDateLibraryAndBaseline(None, checkUpToDate = true)
 
       currentIndex = newIndex
       checkedPaths = newCheckedPaths

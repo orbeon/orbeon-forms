@@ -38,11 +38,11 @@ trait BindingLoader extends Logging {
   def contentAsDOM4J(path: String): Document
 
   def getUpToDateLibraryAndBaseline(
-    index         : BindingIndex[IndexableBinding],
+    indexOpt      : Option[BindingIndex[IndexableBinding]],
     checkUpToDate : Boolean // 2016-10-06: always set to `true`
   ): (BindingIndex[IndexableBinding], Set[String], List[String], List[String]) = {
 
-    var originalOrUpdatedIndex = index
+    var originalOrUpdatedIndexOpt = indexOpt
 
     val (scripts, styles, checkedPaths) = {
 
@@ -51,11 +51,10 @@ trait BindingLoader extends Logging {
       val libraryProperty  = propertySet.getPropertyOrThrow(XBLLibraryProperty)
       val baselineProperty = propertySet.getPropertyOrThrow(XBLBaselineProperty)
 
-      def reloadLibraryAndBaseline = {
+      def readAndIndexBindings: (List[AbstractBinding], Set[String]) = {
 
         debug("reloading library and baseline")
 
-        // 1: Read and index bindings
         val urlMappings = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
@@ -89,22 +88,39 @@ trait BindingLoader extends Logging {
             foundLibraryPathsNotInBaseline
           )
 
-        originalOrUpdatedIndex = newIndex
-
-        // 2: Collect resource baselines
-        import XBLAssets._
-
-        def collectUniqueReferenceElements(getHeadElements : AbstractBinding ⇒ Seq[HeadElement]) =
-          (orderedHeadElements(baselineBindings, getHeadElements).collect{ case e: ReferenceElement ⇒ e.src }(breakOut): mutable.LinkedHashSet[String]).to[List]
-
         val allCheckedPaths =
           foundBaselinePaths    ++
           notFoundBaselinePaths ++
           foundLibraryPaths     ++
           notFoundLibraryPaths
 
+        // Side effect!
+        originalOrUpdatedIndexOpt = Some(newIndex)
+
+        (baselineBindings, allCheckedPaths)
+      }
+
+      def collectResourceBaselines(baselineBindings: List[AbstractBinding], allCheckedPaths: Set[String]) = {
+
+        debug("collecting resource baselines")
+
+        import XBLAssets._
+
+        def collectUniqueReferenceElements(getHeadElements : AbstractBinding ⇒ Seq[HeadElement]) =
+          (orderedHeadElements(baselineBindings, getHeadElements).collect{ case e: ReferenceElement ⇒ e.src }(breakOut): mutable.LinkedHashSet[String]).to[List]
+
         (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles), allCheckedPaths)
       }
+
+      lazy val lazyIndexAndBindings = readAndIndexBindings
+
+      // If the original index is empty, force the evaluation of the library and baseline
+      // https://github.com/orbeon/orbeon-forms/issues/3327
+      if (indexOpt.isEmpty)
+        lazyIndexAndBindings
+
+      def reloadLibraryAndBaseline: (List[String], List[String], Set[String]) =
+        (collectResourceBaselines _).tupled(lazyIndexAndBindings)
 
       // We read and associate the value with 2 properties, but evaluation occurs at most once
       lazy val lazyEvaluatedValue = reloadLibraryAndBaseline
@@ -113,13 +129,19 @@ trait BindingLoader extends Logging {
       libraryProperty.associatedValue(evaluate)
       baselineProperty.associatedValue(evaluate)
 
-      // Right here, `reloadLibraryAndBaseline` has been called exactly once if a property has changed, and none otherwise
+      // Right here, `reloadLibraryAndBaseline` has been called exactly once if a property has changed, and none otherwise. The index
+      // `originalOrUpdatedIndexOpt` is updated in this case, and also if the original index was empty.
     }
 
     // If the index is unmodified, it might contain out-of-date bindings. If it is modified, it is guaranteed by
     // evaluate() above to be a new index with up-to-date library bindings.
-    if (checkUpToDate && (originalOrUpdatedIndex eq index))
-      originalOrUpdatedIndex = updateOutOfDateBindings(index, checkedPaths)
+    if (checkUpToDate)
+      for {
+        index ← indexOpt
+        if originalOrUpdatedIndexOpt exists (_ eq index)
+      } locally {
+        originalOrUpdatedIndexOpt = Some(updateOutOfDateBindings(index, checkedPaths))
+      }
 
     debug(
       "library and baseline paths",
@@ -130,7 +152,7 @@ trait BindingLoader extends Logging {
       )
     )
 
-    (originalOrUpdatedIndex, checkedPaths, scripts, styles)
+    (originalOrUpdatedIndexOpt getOrElse (throw new IllegalStateException), checkedPaths, scripts, styles)
   }
 
   def findMostSpecificBinding(

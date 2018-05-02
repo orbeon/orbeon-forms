@@ -181,8 +181,8 @@ object GlobalBindingIndex {
   val Empty = BindingIndex[AbstractBinding](Nil, Nil, Nil)
 
   // The immutable, shared index, which is updated atomically each time a form has completed compilation
-  @volatile private var _index = Empty
+  @volatile private var _index: Option[BindingIndex[AbstractBinding]] = None
 
-  def currentIndex = _index
-  def updateIndex(index: BindingIndex[AbstractBinding]) = _index = index
+  def currentIndex: Option[BindingIndex[AbstractBinding]] = _index
+  def updateIndex(index: BindingIndex[AbstractBinding]): Unit = _index = Some(index)
 }

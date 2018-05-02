@@ -4,7 +4,7 @@ dist: trusty
 group: deprecated-2017Q2
 language: java
 jdk:
-- oraclejdk7
+- oraclejdk8
 node_js:
 - node
 env:

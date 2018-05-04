@@ -193,11 +193,11 @@ trait FormRunnerBaseOps {
   def urlsInstance                : Option[XFormsInstance] = topLevelInstance(PersistenceModel, "fr-urls-instance")
   def formAttachmentsInstance     : Option[XFormsInstance] = topLevelInstance(FormModel,        "fr-form-attachments")
 
-  def parametersInstance          : XFormsInstance = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
-  def errorSummaryInstance        : XFormsInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
-  def persistenceInstance         : XFormsInstance = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
-  def authorizedOperationsInstance: XFormsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
-  def documentMetadataInstance    : XFormsInstance = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
+  def parametersInstance          : Option[XFormsInstance] = topLevelInstance(ParametersModel,   "fr-parameters-instance")
+  def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
+  def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
+  def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
+  def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
 
   // See also FormRunnerHome
   private val CreateOps = Set("*", "create")
@@ -269,7 +269,7 @@ trait FormRunnerBaseOps {
 
   object FormRunnerParams {
     def apply(): FormRunnerParams = {
-      val params = parametersInstance.rootElement
+      val params = parametersInstance.get.rootElement
 
       FormRunnerParams(
         app         = params elemValue "app",

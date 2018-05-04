@@ -119,7 +119,7 @@ trait FormRunnerActions {
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
-      val modeElement = parametersInstance.rootElement / "mode"
+      val modeElement = parametersInstance.get.rootElement / "mode"
       val isNew       = modeElement.stringValue == "new"
 
       import DataMigration._
@@ -178,7 +178,7 @@ trait FormRunnerActions {
 
   def tryNewToEdit(params: ActionParams): Try[Any] = Try {
 
-    val modeElement = parametersInstance.rootElement / "mode"
+    val modeElement = parametersInstance.get.rootElement / "mode"
     val isNew       = modeElement.stringValue == "new"
 
     if (isNew && canUpdate) {

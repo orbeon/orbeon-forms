@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
@@ -298,12 +299,16 @@ private object FormRunnerFunctions {
     override def evaluateItem(context: XPathContext): Item = {
 
       implicit val ctx  = context
-      val frParams      = FormRunner.FormRunnerParams()
-      val appNameSuffix = List(frParams.app, frParams.form)
       val paramName     = QName(stringArgument(0))
 
-      def searchWithAppForm    : Option[AtomicValue] = XXFormsComponentParam.evaluate(paramName, appNameSuffix)
       def searchWithoutAppForm : Option[AtomicValue] = XXFormsComponentParam.evaluate(paramName, Nil)
+      def searchWithAppForm    : Option[AtomicValue] = {
+        FormRunner.parametersInstance.isDefined.flatOption {
+          val frParams      = FormRunner.FormRunnerParams()
+          val appNameSuffix = List(frParams.app, frParams.form)
+          XXFormsComponentParam.evaluate(paramName, appNameSuffix)
+        }
+      }
 
       searchWithAppForm
         .orElse(searchWithoutAppForm)

@@ -21,6 +21,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.common.PEVersion._
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
@@ -190,10 +191,10 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
     licenses foreach { case (license, expectedClass) ⇒
 
       val thrown = intercept[Exception] {
-        tryLicenseInfo(license).rootFailure.get
+        tryLicenseInfo(license).get
       }
-
-      assert(expectedClass === thrown.getClass)
+      val thrownCauses = Iterator.iterateFrom(thrown, (e: Throwable) ⇒ Option(e.getCause)).toList
+      assert(thrownCauses.map(_.getClass).contains(expectedClass))
     }
   }
 

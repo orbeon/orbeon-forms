@@ -52,6 +52,14 @@ object CollectionUtils {
 
   // Extensions on Iterator object
   object IteratorExt {
+    def iterateFrom[T](start: T, gen: T ⇒ Option[T]): Iterator[T] = {
+      var next: Option[T] = Some(start)
+      iterateWhileDefined {
+        val result = next
+        next = next.flatMap(gen)
+        result
+      }
+    }
     def iterateWhile[T](cond: ⇒ Boolean, elem: ⇒ T): Iterator[T] =
       iterateWhileDefined(cond option elem)
 

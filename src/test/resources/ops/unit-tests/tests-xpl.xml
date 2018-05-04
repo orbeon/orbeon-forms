@@ -64,7 +64,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>http://www.orbeon.com/i-dont-exist</url>
+                            <url>http://httpbin.org/status/404</url>
                             <mode>text</mode>
                         </config>
                     </p:input>

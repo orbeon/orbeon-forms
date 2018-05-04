@@ -26,22 +26,9 @@
         publicKeyLocalId    : null,
         widgetId            : null,
 
-        /**
-         * Constructor
-         */
-        init: function() {
+        render: function(publicKey, theme) {
             var recaptchaDiv = $(this.container).find('.xbl-fr-recaptcha-div').get(0);
             this.responseId  = $(this.container).find('.xbl-fr-recaptcha-response').get(0).id;
-
-            // Public key comes from property
-            var publicKeyElement = $(this.container).find('.xbl-fr-recaptcha-public-key').get(0);
-            var publicKey        = ORBEON.xforms.Document.getValue(publicKeyElement.id);
-            // Other configurations
-            var themeElement     = $(this.container).find('.xbl-fr-recaptcha-theme').get(0);
-            var theme            = ORBEON.xforms.Document.getValue(themeElement.id);
-
-            // Default theme is `clean`
-            if (theme == "") theme = "clean";
 
             // Load reCAPTCHA script with appropriate language
             if (_.isUndefined(window.grecaptcha)) {

@@ -24,13 +24,7 @@
 
     <xh:head>
         <xh:title>XBL - reCAPTCHA</xh:title>
-        <xf:model id="main-model">
-            <xf:instance id="config">
-                <config>
-                    <public-key>6LesxAYAAAAAAEF9eTyysdkOF6O2OsPLO9zAiyzX</public-key>
-                    <private-key>6LesxAYAAAAAAJIXoxMvErqbisKkt7W-CPoE_Huo</private-key>
-                </config>
-            </xf:instance>
+        <xf:model id="main-model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
             <xf:instance id="ui">
                 <ui>
                     <error-code/>
@@ -43,8 +37,6 @@
             <xf:case id="recaptcha-case">
                 <!-- The reCAPTCHA component -->
                 <fr:recaptcha id="recaptcha">
-                    <fr:public-key ref="instance('config')/public-key"/>
-                    <fr:private-key ref="instance('config')/private-key"/>
                     <xf:toggle ev:event="fr-verify-done" case="success-case"/>
                     <xf:action ev:event="fr-verify-error">
                         <xf:setvalue ref="instance('ui')/error-code" value="event('fr-error-code')"/>

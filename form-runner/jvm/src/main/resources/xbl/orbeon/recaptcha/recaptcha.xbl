@@ -62,7 +62,11 @@
 
                         <!-- Init event -->
                         <xf:action id="xf-en" ev:event="xforms-enabled">
-                            <xf:action type="javascript">YAHOO.xbl.fr.Recaptcha.instance(this).init();</xf:action>
+                            <xf:action type="javascript">
+                                <xf:param name="publicKey" value="fr:component-param-value('public-key')"/>
+                                <xf:param name="theme"     value="fr:component-param-value('theme')"/>
+                                <xf:body>YAHOO.xbl.fr.Recaptcha.instance(this).render(publicKey, theme);</xf:body>
+                            </xf:action>
                             <!-- Copy value of private key to local model -->
                             <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
                             <xf:var name="private-key">

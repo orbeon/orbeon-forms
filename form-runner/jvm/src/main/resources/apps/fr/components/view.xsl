@@ -322,10 +322,10 @@
         <xh:span class="xforms-hidden">
             <!-- Hidden field to communicate to the client whether the data is safe -->
             <xf:output
-                    model="fr-persistence-model"
-                    ref="instance('fr-persistence-instance')/data-safe"
-                    id="fr-data-safe"
-                    class="xforms-hidden"/>
+                model="fr-persistence-model"
+                ref="instance('fr-persistence-instance')/data-safe"
+                id="fr-data-safe"
+                class="xforms-hidden"/>
 
             <!-- Expose document id to JavaScript -->
             <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" class="xforms-hidden"/>

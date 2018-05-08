@@ -31,7 +31,7 @@ object Grid {
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
   val globalMenuElem: js.UndefOr[html.Element] = $(".fr-grid-dropdown-menu")(0)
 
-  val ListenerSuffix = ".orbeon.grid"
+  val ListenerSuffix = ".orbeon-grid"
 
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {

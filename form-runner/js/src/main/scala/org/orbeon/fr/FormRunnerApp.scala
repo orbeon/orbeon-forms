@@ -29,6 +29,7 @@ object FormRunnerApp {
       xbl.WPaint
       xbl.HrefButton
       xbl.Grid
+      DataSafe
       xforms.XFormsApp.main(Array.empty)
     }
 

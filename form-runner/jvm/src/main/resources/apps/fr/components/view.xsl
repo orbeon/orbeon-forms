@@ -320,12 +320,18 @@
 
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
         <xh:span class="xforms-hidden">
-            <!-- Hidden field to communicate to the client whether the data is safe -->
-            <xf:output
+
+            <!-- Communicate to the client whether the data is safe -->
+            <xf:var
+                name="fr-data-safe"
                 model="fr-persistence-model"
                 ref="instance('fr-persistence-instance')/data-safe"
-                id="fr-data-safe"
-                class="xforms-hidden"/>
+                value="data(.)">
+                <xf:action type="javascript" event="xforms-enabled xforms-value-changed">
+                    <xf:param name="safe" value="."/>
+                    <xf:body>ORBEON.fr.private.API.setDataStatus(safe == "true")</xf:body>
+                </xf:action>
+            </xf:var>
 
             <!-- Expose document id to JavaScript -->
             <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" class="xforms-hidden"/>

@@ -233,8 +233,8 @@ private object FormRunnerPersistenceProxy {
         // Ask the request generator first, as the body might have been read already
         // Q: Could this be handled automatically in ExternalContext?
         val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
-          case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-          case _               ⇒ request.getInputStream
+          case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
+          case None          ⇒ request.getInputStream
         }
 
         StreamedContent(

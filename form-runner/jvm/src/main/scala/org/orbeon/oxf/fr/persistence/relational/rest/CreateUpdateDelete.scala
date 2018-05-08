@@ -69,8 +69,8 @@ object RequestReader {
 
   def requestInputStream(): InputStream =
     RequestGenerator.getRequestBody(PipelineContext.get) match {
-      case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-      case _               ⇒ NetUtils.getExternalContext.getRequest.getInputStream
+      case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
+      case None          ⇒ NetUtils.getExternalContext.getRequest.getInputStream
     }
 
   def bytes(): Array[Byte] = {

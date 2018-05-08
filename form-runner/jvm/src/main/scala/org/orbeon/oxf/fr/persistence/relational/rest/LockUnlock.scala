@@ -94,8 +94,8 @@ trait LockUnlock extends RequestResponse {
 
       import LeaseStatus._
       val bodyInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-        case _               ⇒ NetUtils.getExternalContext.getRequest.getInputStream
+        case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
+        case None          ⇒ NetUtils.getExternalContext.getRequest.getInputStream
       }
 
       val reqLockInfo = LockInfo.parse(bodyInputStream)

@@ -626,8 +626,8 @@ public class RequestGenerator extends ProcessorImpl {
         return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
     }
 
-    public static String getRequestBody(PipelineContext pipelineContext) {
+    public static scala.Option<String> getRequestBody(PipelineContext pipelineContext) {
         final Object result = pipelineContext.getAttribute(BODY_REQUEST_ATTRIBUTE);
-        return (result instanceof String) ? ((String) result) : null;
+        return scala.Option.apply((result instanceof String) ? ((String) result) : null);
     }
 }

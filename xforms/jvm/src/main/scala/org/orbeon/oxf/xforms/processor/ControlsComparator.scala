@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsCaseControl, XFormsRepeatControl, XFormsSwitchControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XHTMLHeadHandler, XXFormsAttributeHandler}
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 
@@ -315,11 +315,11 @@ class ControlsComparator(
         controller.endDocument()
       }
 
-      val controlsToInitialize = XHTMLHeadHandler.gatherJavaScriptInitializations(control)
+      val controlsToInitialize = ScriptBuilder.gatherJavaScriptInitializations(control)
       if (controlsToInitialize.nonEmpty) {
         val sb = new jl.StringBuilder
         sb.append('{')
-        XHTMLHeadHandler.buildJavaScriptInitializations(
+        ScriptBuilder.buildJavaScriptInitializations(
           containingDocument   = document,
           prependComma         = false,
           controlsToInitialize = controlsToInitialize,

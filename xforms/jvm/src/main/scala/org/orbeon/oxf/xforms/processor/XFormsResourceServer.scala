@@ -29,8 +29,6 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler.findScriptDeclarations
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 
 import scala.util.Try
@@ -60,10 +58,10 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
       case FormDynamicResourcesRegex(uuid) ⇒
 
         def findJavaScriptInitialDataFromDocument(document: XFormsContainingDocument) =
-          XHTMLHeadHandler.findJavaScriptInitialData(
+          ScriptBuilder.findJavaScriptInitialData(
             containingDocument   = document,
             rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-            controlsToInitialize = document.getControls.getCurrentControlTree.rootOpt map XHTMLHeadHandler.gatherJavaScriptInitializations getOrElse Nil
+            controlsToInitialize = document.getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
           )
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
@@ -73,13 +71,13 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document ⇒
 
             val propertiesOpt =
-              XHTMLHeadHandler.findConfigurationProperties(
+              ScriptBuilder.findConfigurationProperties(
                 document,
                 URLRewriterUtils.isResourcesVersioned,
                 XFormsStateManager.getHeartbeatDelay(document, externalContext)
               )
 
-            val scriptDeclarationsOpt = findScriptDeclarations(document)
+            val scriptDeclarationsOpt = ScriptBuilder.findScriptDeclarations(document)
 
             val initialDataOpt =
               if (document.getSequence == 1)
@@ -139,7 +137,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
           useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
-            XHTMLHeadHandler.writeScripts(
+            ScriptBuilder.writeScripts(
               state.topLevelPart.uniqueJsScripts,
               writer.write
             )

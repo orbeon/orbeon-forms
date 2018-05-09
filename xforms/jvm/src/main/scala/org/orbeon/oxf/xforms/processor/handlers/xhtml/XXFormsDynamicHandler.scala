@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
+import org.orbeon.oxf.xforms.processor.ScriptBuilder
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
-import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 
 class XXFormsDynamicHandler(
   uri            : String,
@@ -59,7 +58,7 @@ class XXFormsDynamicHandler(
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
             // NOTE: As of 2018-05-03, this is still not functional, so there is no impact
             // for https://github.com/orbeon/orbeon-forms/issues/3565
-            XHTMLHeadHandler.writeScripts(control.newScripts, s ⇒ helper.text(XHTMLHeadHandler.escapeJavaScriptInsideScript(s)))
+            ScriptBuilder.writeScripts(control.newScripts, s ⇒ helper.text(ScriptBuilder.escapeJavaScriptInsideScript(s)))
             helper.endElement()
             control.clearNewScripts()
           }

@@ -14,22 +14,47 @@
 package org.orbeon.oxf.servlet
 
 import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
-
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 import org.orbeon.oxf.fr.FormRunnerAuth
+import org.orbeon.oxf.util.StringUtils._
+import org.slf4j.LoggerFactory
 
 class FormRunnerAuthFilter extends Filter {
 
-  def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) =
-    chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+  import FormRunnerAuthFilter.Logger._
 
-  def init(filterConfig: FilterConfig) = ()
-  def destroy() = ()
+  private case class FilterSettings(contentSecurityPolicy: Option[String])
+
+  private var settingsOpt: Option[FilterSettings] = None
+
+  def init(filterConfig: FilterConfig): Unit = {
+    info("initializing")
+    val settings = FilterSettings(Option(filterConfig.getInitParameter("content-security-policy")) flatMap (_.trimAllToOpt))
+    info(s"configuring: $settings")
+    settingsOpt = Some(settings)
+  }
+
+  def destroy(): Unit = {
+    info(s"destroying")
+    settingsOpt = None
+  }
+
+  def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
+
+    // Set `Content-Security-Policy` response header if configured
+    settingsOpt flatMap (_.contentSecurityPolicy) foreach { value ⇒
+      res.asInstanceOf[HttpServletResponse].addHeader("Content-Security-Policy", value)
+    }
+
+    chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+  }
 }
 
 object FormRunnerAuthFilter {
 
   import scala.collection.JavaConverters._
+
+  val Logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 

@@ -141,6 +141,12 @@
     <filter>
         <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>
         <filter-class>org.orbeon.oxf.servlet.FormRunnerAuthFilter</filter-class>
+        <!--
+        <init-param>
+            <param-name>content-security-policy</param-name>
+            <param-value>default-src 'self'</param-value>
+        </init-param>
+        -->
     </filter>
     <filter-mapping>
         <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>

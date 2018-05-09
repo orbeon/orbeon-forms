@@ -69,8 +69,8 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
         val (propertiesOpt, scriptDeclarationsOpt, fromCurrentStateOpt) =
-          // TODO: Handle timeout.
-          withDocumentAcquireLock(uuid, 0L) { document ⇒
+          // NOTE: Use the same timeout as upload for now. If the timeout expires, this throws an exception.
+          withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document ⇒
 
             val propertiesOpt =
               XHTMLHeadHandler.findConfigurationProperties(
@@ -125,6 +125,12 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         }
 
       case FormStaticResourcesRegex(staticStateDigest) ⇒
+
+        // Security consideration: Unlike in the dynamic case, where knowledge of the transient UUID is required, here we don't require
+        // particular access rights to request the static state functions. This shouldn't be a problem, as what is returned is, in effect,
+        // just a list of customer scripts which are either part of Form Runner, or part of XBL components. There is no form-specific
+        // data returned. So this should be no different than having access to the combined JavaScript resource, for example.
+
         XFormsStaticStateCache.findDocument(staticStateDigest) foreach { case (state, validity) ⇒
 
           // NOTE: The validity is the time the static state was put in cache. We could do better by finding the last modified time

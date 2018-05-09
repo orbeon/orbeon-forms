@@ -62,6 +62,7 @@ object XFormsContainingDocumentSupport {
       case Some(containingDocument) ⇒
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
       case None ⇒
+        // This happens if the timeout expires!
         throw new IllegalStateException
     }
   }

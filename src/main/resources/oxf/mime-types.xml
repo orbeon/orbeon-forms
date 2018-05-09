@@ -267,7 +267,7 @@
         <pattern>*.class</pattern>
     </mime-type>
     <mime-type>
-        <name>application/x-javascript;charset=utf-8</name>
+        <name>application/javascript;charset=utf-8</name>
         <pattern>*.js</pattern>
     </mime-type>
     <mime-type>

@@ -33,6 +33,7 @@ object FormRunnerRenderedFormat {
   }
 
   val PdfTemplateNameParam = "pdf-template-name"
+  val PdfTemplateLangParam = "pdf-template-lang"
   val UsePdfTemplateParam  = "use-pdf-template"
 
   private val PdfElemName  = "pdf"
@@ -42,15 +43,15 @@ object FormRunnerRenderedFormat {
     frFormAttachmentsRootElemOpt : Option[NodeInfo],
     format                       : String,
     pdfTemplateNameOrNull        : String,
-    requestedLangOrNull          : String
+    pdfTemplateLangOrNull        : String
   ): String = {
 
     val pdfTemplateNameOpt = pdfTemplateNameOrNull.trimAllToOpt
-    val requestedLangOpt   = requestedLangOrNull.trimAllToOpt
+    val pdfTemplateLangOpt = pdfTemplateLangOrNull.trimAllToOpt
 
-    val  params =
+    val params =
       (pdfTemplateNameOpt map (Some(PdfTemplateNameParam) → ) toList) :::
-      (requestedLangOpt   map (Some("lang") → )               toList)
+      (pdfTemplateLangOpt map (Some(PdfTemplateLangParam) → ) toList)
 
     val pdfTemplateOpt =
       findPdfTemplate(
@@ -126,7 +127,7 @@ object FormRunnerRenderedFormat {
 
     val pdfTemplates = extractPdfTemplates(attachmentsRootElem)
 
-    // NOTE: We have a choice here is no name is requested:
+    // NOTE: We have a choice here if no name is requested:
     // - return entries without a name only
     // - return all entries, which is what we do below
     val matchingEntriesForNameOpt =
@@ -134,7 +135,8 @@ object FormRunnerRenderedFormat {
         case Some(name) ⇒
           val matches = pdfTemplates collect { case v @ PdfTemplate(_, Some(`name`), _) ⇒ v }
           matches.nonEmpty option matches
-        case None ⇒ Some(pdfTemplates)
+        case None ⇒
+          Some(pdfTemplates)
       }
 
     matchingEntriesForNameOpt flatMap { matchingEntriesForName ⇒
@@ -145,7 +147,6 @@ object FormRunnerRenderedFormat {
             case v @ PdfTemplate(_, _, Some(`requestedLang`)) ⇒ v
           }
         case None ⇒
-
           matchingEntriesForName collectFirst {
             case v @ PdfTemplate(_, _, `defaultLang`) ⇒ v
           } orElse
@@ -173,7 +174,7 @@ object FormRunnerRenderedFormat {
         selectPdfTemplate(
           attachmentsRootElem = rootElem,
           pdfTemplateNameOpt  = requestedPdfTemplateNameOpt,
-          requestedLangOpt    = paramByName(params, "lang") flatMap trimAllToOpt,
+          requestedLangOpt    = paramByName(params, PdfTemplateLangParam) flatMap trimAllToOpt,
           defaultLang         = defaultLang
         )
       } getOrElse {
@@ -195,7 +196,7 @@ object FormRunnerRenderedFormat {
 
     def langParamForPdfTemplateOpt =
       (pdfTemplateOpt flatMap (_.langOpt)) map { lang ⇒
-        ("fr-remember-language" → "false") :: (LanguageParam → lang) :: Nil
+        (PdfTemplateLangParam → lang) :: Nil
       }
 
     def langParamForPdfAutomatic = {
@@ -204,7 +205,10 @@ object FormRunnerRenderedFormat {
     }
 
     def langParamList =
-      langParamForPdfTemplateOpt getOrElse langParamForPdfAutomatic
+      pdfTemplateOpt match {
+        case Some(_) ⇒ langParamForPdfTemplateOpt getOrElse Nil
+        case None    ⇒ langParamForPdfAutomatic
+      }
 
     (s"fr-$UsePdfTemplateParam" → pdfTemplateOpt.isDefined.toString) :: nameParamList ::: langParamList
   }

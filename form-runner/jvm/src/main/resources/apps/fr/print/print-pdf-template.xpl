@@ -109,7 +109,7 @@
 
                 <xsl:variable name="format"            select="$params/mode"/>
                 <xsl:variable name="pdf-template-name" select="p:get-request-parameter('fr-pdf-template-name')"/>
-                <xsl:variable name="fr-language"       select="p:get-request-parameter('fr-language')"/>
+                <xsl:variable name="pdf-template-lang" select="p:get-request-parameter('pdf-template-lang')"/>
 
                 <xsl:variable name="attach" select="$form//xf:instance[@id = 'fr-form-attachments']/*"/>
 
@@ -122,7 +122,7 @@
                                     $attach,
                                     $format,
                                     $pdf-template-name,
-                                    $fr-language
+                                    $pdf-template-lang
                                 ),
                                 true()
                             )"/>

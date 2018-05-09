@@ -156,9 +156,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         Map.empty,
         "en",
         List(
-          s"fr-$UsePdfTemplateParam" → "true",
-          "fr-remember-language"     → "false",
-          "fr-language"              → "en"
+          s"fr-$UsePdfTemplateParam" → "true"
         )
       ),
       (
@@ -170,9 +168,8 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         Map.empty,
         "fr",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          "fr-remember-language"      → "false",
-          "fr-language"               → "fr"
+          s"fr-$UsePdfTemplateParam" → "true",
+          PdfTemplateLangParam       → "fr"
         )
       ),
       (
@@ -186,9 +183,8 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         ),
         "en",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          "fr-remember-language" →  "false",
-          "fr-language"          →  "fr"
+          s"fr-$UsePdfTemplateParam" → "true",
+          PdfTemplateLangParam       → "fr"
         )
       ),
       (
@@ -206,8 +202,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
           s"fr-$PdfTemplateNameParam" → "bar",
-          "fr-remember-language"      → "false",
-          "fr-language"               → "fr"
+          PdfTemplateLangParam        → "fr"
         )
       ),
       (
@@ -226,8 +221,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
           s"fr-$PdfTemplateNameParam" → "bar",
-          "fr-remember-language"      → "false",
-          "fr-language"               → "fr"
+          PdfTemplateLangParam        → "fr"
         )
       ),
       (

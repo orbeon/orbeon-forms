@@ -22,7 +22,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.fr.private.API")
 @JSExportAll
-object DataSafe {
+object FormRunnerPrivateAPI {
 
   private val ListenerSuffix = ".orbeon-beforeunload"
   private val ListenerEvents = s"beforeunload$ListenerSuffix"

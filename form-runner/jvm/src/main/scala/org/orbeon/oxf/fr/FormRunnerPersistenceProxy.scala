@@ -14,16 +14,18 @@
 package org.orbeon.oxf.fr
 
 
-import java.io.{InputStream, OutputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
-import javax.xml.transform.stream.StreamResult
 
+import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.QName
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.fr.FormRunner.ControlBindPathHoldersResources
 import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{HttpMethod, _}
@@ -35,11 +37,14 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
+import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.oxf.xforms.submission.RelevanceHandling._
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -84,10 +89,10 @@ private object FormRunnerPersistenceProxy {
   def proxyRequest(request: Request, response: Response): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
-      case FormPath(path, app, form, _)                ⇒ proxyRequest(request, response, app, form, FormOrData.Form, path)
-      case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
-      case DataCollectionPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
-      case SearchPath(path, app, form)                 ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
+      case FormPath(path, app, form, _)                ⇒ proxyRequest    (request, response, app, form, FormOrData.Form, path)
+      case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
+      case DataCollectionPath(path, app, form)         ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
+      case SearchPath(path, app, form)                 ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
       case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                 ⇒ proxyReindex(request, response)
       case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
@@ -96,16 +101,36 @@ private object FormRunnerPersistenceProxy {
 
   // Proxy the request depending on app/form name and whether we are accessing form or data
   def proxyRequest(
-    request    : Request,
-    response   : Response,
-    app        : String,
-    form       : String,
-    formOrData : FormOrData,
-    path       : String
+    request        : Request,
+    response       : Response,
+    app            : String,
+    form           : String,
+    formOrData     : FormOrData,
+    path           : String
   ): Unit = {
 
     // Throws if there is an incompatibility
     checkDataFormatVersions(request, app, form, formOrData)
+
+    val requestContent = Connection.requiresRequestBody(request.getMethod) option {
+
+      val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
+        case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
+        case None          ⇒ request.getInputStream
+      }
+
+      implicit val logger = new IndentedLogger(ProcessorImpl.logger)
+      val (bodyInputStream, bodyContentLength) =
+        FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form)
+          .getOrElse(requestInputStream → request.contentLengthOpt)
+
+      StreamedContent(
+        bodyInputStream,
+        Option(request.getContentType),
+        bodyContentLength,
+        None
+      )
+    }
 
     // Get persistence implementation target URL and configuration headers
     val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
@@ -115,6 +140,7 @@ private object FormRunnerPersistenceProxy {
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 
+    // Transformation pruning non-relevant nodes, if we're asked to do it
     val transform =
       findRequestedRelevanceHandlingForGet(request, formOrData) match {
         case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
@@ -123,7 +149,7 @@ private object FormRunnerPersistenceProxy {
         case None            ⇒ None
       }
 
-    proxyRequest(request, serviceURI, headers, response, transform)
+    proxyRequest(request, requestContent, serviceURI, headers, response, transform)
   }
 
   def checkDataFormatVersions(
@@ -175,29 +201,31 @@ private object FormRunnerPersistenceProxy {
   }
 
   def proxyRequest(
-    request    : Request,
-    serviceURI : String,
-    headers    : Map[String, String],
-    response   : Response,
-    transform  : Option[(InputStream, OutputStream) ⇒ Unit]
+    request        : Request,
+    requestContent : Option[StreamedContent],
+    serviceURI     : String,
+    headers        : Map[String, String],
+    response       : Response,
+    transformOpt   : Option[(InputStream, OutputStream) ⇒ Unit]
   ): Unit =
-    useAndClose(proxyEstablishConnection(request, serviceURI, headers)) { cxr ⇒
+    useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr ⇒
       // Proxy status code
       response.setStatus(cxr.statusCode)
       // Proxy incoming headers
       cxr.content.contentType foreach (response.setHeader(Headers.ContentType, _))
       proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
 
-      (transform getOrElse (copyStream(_: InputStream, _: OutputStream)))(
+      (transformOpt getOrElse (copyStream(_: InputStream, _: OutputStream)))(
         cxr.content.inputStream,
         response.getOutputStream
       )
     }
 
   def proxyEstablishConnection(
-    request : Request,
-    uri     : String,
-    headers : Map[String, String]
+    request        : Request,
+    requestContent : Option[StreamedContent],
+    uri            : String,
+    headers        : Map[String, String]
   ): ConnectionResult = {
 
     val outgoingURL =
@@ -227,23 +255,6 @@ private object FormRunnerPersistenceProxy {
 
     if (! SupportedMethods(method))
       throw new OXFException(s"Unsupported method: $method")
-
-    val requestContent =
-      Connection.requiresRequestBody(method) option {
-        // Ask the request generator first, as the body might have been read already
-        // Q: Could this be handled automatically in ExternalContext?
-        val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
-          case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
-          case None          ⇒ request.getInputStream
-        }
-
-        StreamedContent(
-          is,
-          Option(request.getContentType),
-          request.contentLengthOpt,
-          None
-        )
-      }
 
     Connection(
       method      = method,
@@ -291,7 +302,7 @@ private object FormRunnerPersistenceProxy {
       } yield {
         // Read all the forms for the current service
         val serviceURI = NetUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
-        val cxr        = proxyEstablishConnection(request, serviceURI, headers)
+        val cxr        = proxyEstablishConnection(request, None, serviceURI, headers)
 
         ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
           val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
@@ -322,7 +333,7 @@ private object FormRunnerPersistenceProxy {
       dataProvidersWithIndexSupport, p ⇒ {
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
-        proxyRequest(request, serviceURI, headers, response, None)
+        proxyRequest(request, None, serviceURI, headers, response, None)
       }
     )
   }

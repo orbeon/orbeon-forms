@@ -163,16 +163,27 @@ public class MemoryCacheImpl implements Cache {
     }
 
     // Find valid entry and move it to the first position
+    public scala.Option<scala.Tuple2<Object, Object>> findValidWithValidity(CacheKey key, Object validity) {
+        final CacheEntry entry = getValidEntry(key,  validity, false);
+        if (entry == null)
+            return scala.Option.<scala.Tuple2<Object, Object>>apply(null);
+        else
+            return scala.Option.apply(new scala.Tuple2<Object, Object>(entry.cacheable, entry.validity));
+    }
+
+    // Find valid entry and move it to the first position
     public Object findValid(CacheKey key, Object validity) {
-        return getValid(key,  validity, false);
+        final CacheEntry result = getValidEntry(key,  validity, false);
+        return (result == null) ? null : result.cacheable;
     }
 
     // Like findValid but remove from the cache (with removed() notification)
     public Object takeValid(CacheKey key, Object validity) {
-        return getValid(key,  validity, true);
+        final CacheEntry result = getValidEntry(key,  validity, true);
+        return (result == null) ? null : result.cacheable;
     }
 
-    private synchronized Object getValid(CacheKey key, Object validity, boolean remove) {
+    private synchronized CacheEntry getValidEntry(CacheKey key, Object validity, boolean remove) {
         final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
 
@@ -185,15 +196,15 @@ public class MemoryCacheImpl implements Cache {
                 entry.listEntry = linkedList.addFirst(entry);
             }
 
-            return entry.cacheable;
+            return entry;
         } else {
             // Not latest validity
             return null;
         }
     }
 
+    // CHECK: Make `synchronized`? Used by `URLGenerator` only.
     public CacheEntry findAny(CacheKey key) {
-        // Don't update statistics here
         return keyToEntryMap.get(key);
     }
 

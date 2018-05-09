@@ -19,6 +19,7 @@ public interface Cache {
     void add(CacheKey key, Object validity, Object object);
     void remove(CacheKey key);
     int removeAll();
+    scala.Option<scala.Tuple2<Object, Object>> findValidWithValidity(CacheKey key, Object validity);
     Object findValid(CacheKey key, Object validity);
     Object takeValid(CacheKey key, Object validity);
     CacheEntry findAny( CacheKey key);

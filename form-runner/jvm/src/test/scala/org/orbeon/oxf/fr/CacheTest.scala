@@ -38,7 +38,7 @@ class CacheTest
         events
         collectFirst { case StaticState(_, digest) ⇒ digest}
         flatMap XFormsStaticStateCache.findDocument
-        map (_.template.isDefined)
+        map (_._1.template.isDefined)
       )
 
       // First time may or may not pass

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.cache._
+import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.xforms.XFormsStaticState
 
 object XFormsStaticStateCache {
@@ -26,13 +27,15 @@ object XFormsStaticStateCache {
   }
 
   def storeDocument(staticState: XFormsStaticState): Unit =
-    cache.add(createCacheKey(staticState.digest), ConstantValidity, staticState)
+    cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
 
   def getDocumentJava(digest: String): XFormsStaticState =
-    findDocument(digest).orNull
+    findDocument(digest) map (_._1) orNull
 
-  def findDocument(digest: String): Option[XFormsStaticState] =
-    Option(cache.findValid(createCacheKey(digest), ConstantValidity).asInstanceOf[XFormsStaticState])
+  def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
+    cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) ⇒
+      o.asInstanceOf[XFormsStaticState] → ProcessorImpl.findLastModified(validity)
+    }
 
   private object Private {
 

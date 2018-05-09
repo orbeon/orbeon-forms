@@ -52,6 +52,8 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     val requestPath = externalContext.getRequest.getRequestPath
     val response    = externalContext.getResponse
 
+    val requestTime = System.currentTimeMillis
+
     requestPath match {
       case DynamicResourceRegex(_) ⇒
         serveDynamicResource(requestPath)
@@ -99,10 +101,14 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
             )
           )
 
-        response.setContentType("application/javascript")
-        // TODO: last modified or etag? The browser could cache it for some amount of time.
+        response.setContentType(ContentTypes.JavaScriptContentType)
+        // The document cannot be cached "forever", but upon browser back it can be required again. So some small duration of caching
+        // can make sense for the client.
+        response.setResourceCaching(
+          lastModified = requestTime,
+          expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
+        )
 
-        // TODO: Should we wrap JavaScript?
         useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
 
           propertiesOpt foreach { content ⇒
@@ -119,10 +125,12 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         }
 
       case FormStaticResourcesRegex(staticStateDigest) ⇒
-        XFormsStaticStateCache.findDocument(staticStateDigest) foreach { state ⇒
+        XFormsStaticStateCache.findDocument(staticStateDigest) foreach { case (state, validity) ⇒
 
-          response.setContentType("application/javascript")
-          // TODO: last modified or etag?
+          // NOTE: The validity is the time the static state was put in cache. We could do better by finding the last modified time
+          // of the form definition, but that information is harder to obtain right now.
+          response.setContentType(ContentTypes.JavaScriptContentType)
+          response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
           useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
             XHTMLHeadHandler.writeScripts(
@@ -132,7 +140,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           }
         }
       case ResourceRegex(hash, ext) ⇒
-        serveCSSOrJavaScript(hash, ext)
+        serveCSSOrJavaScript(requestTime, hash, ext)
       case _ ⇒
         response.setStatus(StatusCode.NotFound)
     }
@@ -216,7 +224,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     }
   }
 
-  private def serveCSSOrJavaScript(hash: String, ext: String)(implicit externalContext: ExternalContext): Unit = {
+  private def serveCSSOrJavaScript(requestTime: Long, hash: String, ext: String)(implicit externalContext: ExternalContext): Unit = {
 
     val response = externalContext.getResponse
 
@@ -242,7 +250,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     // Set Last-Modified, required for caching and conditional get
     if (URLRewriterUtils.isResourcesVersioned)
       // Use expiration far in the future
-      response.setResourceCaching(combinedLastModified, System.currentTimeMillis + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+      response.setResourceCaching(combinedLastModified, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
     else
       // Use standard expiration policy
       response.setResourceCaching(combinedLastModified, 0)
@@ -255,7 +263,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     val isCSS = ext == "css"
 
-    response.setContentType(if (isCSS) "text/css; charset=UTF-8" else "application/javascript")
+    response.setContentType(if (isCSS) ContentTypes.CssContentTypeWithCharset else ContentTypes.JavaScriptContentType)
 
     // Namespace to use, must be None if empty
     def namespaceOpt = {
@@ -300,8 +308,6 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 }
 
 object XFormsResourceServer {
-
-  val TmpNoInlineResources = true
 
   val DynamicResourceRegex       = "/xforms-server/dynamic/(.+)".r
 

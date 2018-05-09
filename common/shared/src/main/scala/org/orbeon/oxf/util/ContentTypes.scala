@@ -17,14 +17,18 @@ import org.orbeon.oxf.util.StringUtils._
 
 object ContentTypes {
 
-  val XmlContentType     = "application/xml"
-  val JsonContentType    = "application/json"
-  val HtmlContentType    = "text/html"
-  val SoapContentType    = "application/soap+xml"
-  val UnknownContentType = "content/unknown"
+  val XmlContentType            = "application/xml"
+  val JsonContentType           = "application/json"
+  val HtmlContentType           = "text/html"
+  val JavaScriptContentType     = "application/javascript"
+  val CssContentType            = "text/css"
+  val SoapContentType           = "application/soap+xml"
+  val UnknownContentType        = "content/unknown"
 
-  val CharsetParameter   = "charset"
-  val ActionParameter    = "action"
+  val CharsetParameter          = "charset"
+  val ActionParameter           = "action"
+
+  val CssContentTypeWithCharset = s"$CssContentType; $CharsetParameter=UTF-8"
 
   private val XmlTextContentType    = "text/xml"
   private val TextContentTypePrefix = "text/"

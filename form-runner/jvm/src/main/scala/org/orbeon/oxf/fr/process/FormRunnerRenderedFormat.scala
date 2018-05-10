@@ -196,7 +196,7 @@ object FormRunnerRenderedFormat {
 
     def langParamForPdfTemplateOpt =
       (pdfTemplateOpt flatMap (_.langOpt)) map { lang ⇒
-        (PdfTemplateLangParam → lang) :: Nil
+        (s"fr-$PdfTemplateLangParam" → lang) :: Nil
       }
 
     def langParamForPdfAutomatic = {

@@ -13,22 +13,24 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.junit.Test
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.ProcessParser._
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
 import org.parboiled.errors.ParsingException
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
 import scala.collection.mutable.ListBuffer
 import scala.util.{Success, Try}
 
 
-class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class SimpleProcessTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
   val ConstantProcessId = "9fbcdd2e3caf46045e2d545c26d54ffd5b241e97"
 
@@ -75,7 +77,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
 
   def normalize(s: String) = "(" + s.trimAllToEmpty + ")"
 
-  @Test def serialization(): Unit = {
+  describe("serialization") {
 
     val processes = Seq(
       """save""",
@@ -85,20 +87,24 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
     )
 
     for (p ← processes)
-      assert(normalize(p) === parse(p).serialize)
+      it(s"must pass with `$p`") {
+        assert(normalize(p) === parse(p).serialize)
+      }
   }
 
-  @Test def invalid(): Unit = {
+  describe("invalid") {
     val processes = Seq(
       """if ("xpath") then a1 then a2 else a3""",
       """if ("xpath") a1 then a2"""
     )
 
     for (p ← processes)
-      intercept[ParsingException](parse(p))
+      it(s"must pass with `$p`") {
+        intercept[ParsingException](parse(p))
+      }
   }
 
-  @Test def suspendResume(): Unit = {
+  describe("suspendResume") {
 
     val interpreter = new TestProcessInterpreter {
 
@@ -123,15 +129,19 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
     )
 
     for ((process, context, continuation, trace) ← expected) {
-      interpreter.xpathContext = context
-      interpreter.runProcessByName("", process)
-      assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
-      assert(trace === interpreter.trace)
-      interpreter.runProcess("", "resume").get
+      it(s"must pass with `$process/$context`") {
+        withTestExternalContext { _ ⇒
+          interpreter.xpathContext = context
+          interpreter.runProcessByName("", process)
+          assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
+          assert(trace === interpreter.trace)
+          interpreter.runProcess("", "resume").get
+        }
+      }
     }
   }
 
-  @Test def renderedFormatParametersSelection(): Unit = {
+  describe("renderedFormatParametersSelection") {
 
     import FormRunnerRenderedFormat._
     import org.orbeon.scaxon.NodeConversions._
@@ -168,8 +178,8 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         Map.empty,
         "fr",
         List(
-          s"fr-$UsePdfTemplateParam" → "true",
-          PdfTemplateLangParam       → "fr"
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateLangParam" → "fr"
         )
       ),
       (
@@ -179,12 +189,12 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
           <pdf name="" lang="fr">data:</pdf>
         </attachments>,
         Map(
-          Some("lang") → "fr"
+          Some(PdfTemplateLangParam) → "fr"
         ),
         "en",
         List(
-          s"fr-$UsePdfTemplateParam" → "true",
-          PdfTemplateLangParam       → "fr"
+          s"fr-$UsePdfTemplateParam"  → "true",
+          s"fr-$PdfTemplateLangParam" → "fr"
         )
       ),
       (
@@ -202,7 +212,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
           s"fr-$PdfTemplateNameParam" → "bar",
-          PdfTemplateLangParam        → "fr"
+          s"fr-$PdfTemplateLangParam" → "fr"
         )
       ),
       (
@@ -214,14 +224,14 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
           <pdf name="bar" lang="fr">data:</pdf>
         </attachments>,
         Map(
-          Some("lang")               → "fr",
+          Some(PdfTemplateLangParam) → "fr",
           Some(PdfTemplateNameParam) → "bar"
         ),
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  → "true",
           s"fr-$PdfTemplateNameParam" → "bar",
-          PdfTemplateLangParam        → "fr"
+          s"fr-$PdfTemplateLangParam" → "fr"
         )
       ),
       (
@@ -239,15 +249,16 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
       )
     )
 
-    for ((description, elem, params, defaultLang, expected) ← Tests) {
-      assert(
-        expected ===
-          createPdfOrTiffParams(
-            Some(elem),
-            params,
-            defaultLang
-          )
-      )
-    }
+    for ((description, elem, params, defaultLang, expected) ← Tests)
+      it(s"must pass with $description") {
+        assert(
+          expected ===
+            createPdfOrTiffParams(
+              Some(elem),
+              params,
+              defaultLang
+            )
+        )
+      }
   }
 }

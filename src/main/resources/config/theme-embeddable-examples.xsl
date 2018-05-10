@@ -70,11 +70,11 @@
             <!-- Body -->
             <xh:div class="container-fluid">
                 <xh:div class="orbeon-portlet-body">
-                    <xsl:apply-templates select="/xh:html/xh:body/node()"/>
+                    <xsl:apply-templates select="/xh:html/xh:body/(node() except xh:script)"/>
                 </xh:div>
             </xh:div>
-            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
-            <xsl:apply-templates select="/xh:html/xh:script"/>
+            <!-- Handle body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xh:html/xh:body/xh:script"/>
         </xh:div>
     </xsl:template>
 

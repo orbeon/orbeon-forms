@@ -40,13 +40,23 @@
                 <xsl:value-of select="xpl:setTitle(normalize-space(/xh:html/xh:head/xh:title))"/>
             </xsl:if>
             <!-- Handle head scripts if present -->
-            <xsl:apply-templates select="/xh:html/xh:head/xh:script"/>
+            <xsl:for-each select="/xh:html/xh:head/xh:script">
+                <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
+                    <xsl:copy-of select="@* except @defer"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:for-each>
             <!-- Body -->
             <xh:div class="orbeon-portlet-body">
-                <xsl:apply-templates select="/xh:html/xh:body/node()"/>
+                <xsl:apply-templates select="/xh:html/xh:body/(node() except xh:script)"/>
             </xh:div>
-            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
-            <xsl:apply-templates select="/xh:html/xh:script"/>
+            <!-- Handle body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:for-each select="/xh:html/xh:body/xh:script">
+                <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
+                    <xsl:copy-of select="@* except @defer"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:for-each>
         </xh:div>
     </xsl:template>
 

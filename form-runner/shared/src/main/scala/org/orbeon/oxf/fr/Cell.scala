@@ -301,7 +301,7 @@ object Cell {
         }
       val splitX = (originCell.w > 1).list(Direction.Left)
       val splitY = (originCell.h > 1).list(Direction.Up  )
-      merge ++ splitX ++ splitY
+      merge ::: splitX ::: splitY
     }
   }
 

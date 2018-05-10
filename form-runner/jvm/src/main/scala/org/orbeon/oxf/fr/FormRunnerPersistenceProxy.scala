@@ -48,6 +48,7 @@ import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
+import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 /**
@@ -140,16 +141,24 @@ private object FormRunnerPersistenceProxy {
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 
-    // Transformation pruning non-relevant nodes, if we're asked to do it
-    val transform =
-      findRequestedRelevanceHandlingForGet(request, formOrData) match {
-        case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
-        case Some(Remove)    ⇒ Some(parsePruneAndSerializeXmlData _)
-        case Some(r @ Empty) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
-        case None            ⇒ None
-      }
+    val requestForData = formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET
+    val transforms     = requestForData.flatList {
 
-    proxyRequest(request, requestContent, serviceURI, headers, response, transform)
+        // Prune non-relevant nodes, if we're asked to do it
+        val removeNonRelevantTransform = {
+          val nonrelevantParamValue      = request.getFirstParamAsString(NonRelevantName)
+          val requestedRelevanceHandling = nonrelevantParamValue.flatMap(RelevanceHandling.withNameLowercaseOnlyOption)
+          requestedRelevanceHandling match {
+            case Some(Keep)      | None ⇒ None
+            case Some(Remove)           ⇒ Some(parsePruneAndSerializeXmlData _)
+            case Some(r @ Empty)        ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
+          }
+        }
+
+      removeNonRelevantTransform.toList
+    }
+
+    proxyRequest(request, requestContent, serviceURI, headers, response, transforms)
   }
 
   def checkDataFormatVersions(
@@ -206,7 +215,7 @@ private object FormRunnerPersistenceProxy {
     serviceURI     : String,
     headers        : Map[String, String],
     response       : Response,
-    transformOpt   : Option[(InputStream, OutputStream) ⇒ Unit]
+    transforms     : List[(InputStream, OutputStream) ⇒ Unit]
   ): Unit =
     useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr ⇒
       // Proxy status code
@@ -215,10 +224,24 @@ private object FormRunnerPersistenceProxy {
       cxr.content.contentType foreach (response.setHeader(Headers.ContentType, _))
       proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
 
-      (transformOpt getOrElse (copyStream(_: InputStream, _: OutputStream)))(
-        cxr.content.inputStream,
-        response.getOutputStream
-      )
+      @tailrec
+      def applyTransforms(
+        startInputStream : InputStream,
+        endOutputStream  : OutputStream,
+        transforms       : List[(InputStream, OutputStream) ⇒ Unit]
+      ): Unit = {
+        transforms match {
+          case Nil                             ⇒ copyStream(startInputStream, endOutputStream)
+          case List(transform)                 ⇒ transform(startInputStream, endOutputStream)
+          case headTransform :: tailTransforms ⇒
+            val intermediateOutputStream = new ByteArrayOutputStream
+            headTransform(startInputStream, intermediateOutputStream)
+            val intermediateInputStream = new ByteArrayInputStream(intermediateOutputStream.toByteArray)
+            applyTransforms(intermediateInputStream, endOutputStream, tailTransforms)
+        }
+      }
+
+      applyTransforms(cxr.content.inputStream, response.getOutputStream, transforms)
     }
 
   def proxyEstablishConnection(
@@ -333,7 +356,7 @@ private object FormRunnerPersistenceProxy {
       dataProvidersWithIndexSupport, p ⇒ {
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
-        proxyRequest(request, None, serviceURI, headers, response, None)
+        proxyRequest(request, None, serviceURI, headers, response, Nil)
       }
     )
   }

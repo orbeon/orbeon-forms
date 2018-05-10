@@ -35,8 +35,6 @@
                     <xsl:apply-templates/>
                 </xsl:element>
             </xsl:for-each>
-            <!-- See https://github.com/orbeon/orbeon-forms/issues/2311 -->
-            <xsl:apply-templates select="/xh:html/xh:head/comment()[starts-with(., '[if')]"/>
             <!-- Try to get a title and set it on the portlet -->
             <xsl:if test="normalize-space(/xh:html/xh:head/xh:title)">
                 <xsl:value-of select="xpl:setTitle(normalize-space(/xh:html/xh:head/xh:title))"/>

@@ -51,7 +51,7 @@
     <xf:setfocus event="xxforms-dialog-open" control="fr-validation-dialog-cancel"/>
 
     <!-- Run the "abort" process when the dialog is closed unless a process is specified -->
-    <xf:action event="xxforms-dialog-close" type="xpath">
+    <xf:action event="xxforms-dialog-close" type="xpath" xxf:if-non-relevant="true">
         fr:run-process-by-name('oxf.fr.detail.process', (event('process'), 'validation-dialog-review')[1])
     </xf:action>
 

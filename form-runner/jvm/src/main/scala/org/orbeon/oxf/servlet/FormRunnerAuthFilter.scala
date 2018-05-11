@@ -43,7 +43,7 @@ class FormRunnerAuthFilter extends Filter {
 
     // Set `Content-Security-Policy` response header if configured
     settingsOpt flatMap (_.contentSecurityPolicy) foreach { value ⇒
-      res.asInstanceOf[HttpServletResponse].addHeader("Content-Security-Policy", value)
+      res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
     }
 
     chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)

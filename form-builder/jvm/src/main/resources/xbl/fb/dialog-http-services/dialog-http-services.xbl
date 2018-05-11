@@ -357,7 +357,17 @@
                     <xf:bind ref="instance-id"   calculate="concat(../name, '-instance')"/>
 
                     <xf:bind ref="request">
-                        <xf:bind ref="resource" required="true()"/>
+                        <xf:bind
+                            ref="resource"
+                            required="true()"
+                            xxf:whitespace="trim"
+                            constraint="
+                                (: https://github.com/orbeon/orbeon-forms/issues/3577 :)
+                                starts-with(., '/')       or
+                                starts-with(., 'http://') or
+                                starts-with(., 'https://')
+                            "/>
+
                         <xf:bind ref="is-soap | is-auth" type="xs:boolean"/>
 
                         <xf:bind

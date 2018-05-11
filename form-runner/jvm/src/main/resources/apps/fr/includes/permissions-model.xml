@@ -13,11 +13,12 @@
 -->
 <!-- NOTE: This is a Form Builder feature, but the Home and Summary pages depend on it. -->
 <xf:model
-    id="fb-permissions-model"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+
+    id="fb-permissions-model">
 
     <xf:action event="xforms-model-construct-done">
 

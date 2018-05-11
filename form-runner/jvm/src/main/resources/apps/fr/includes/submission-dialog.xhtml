@@ -11,16 +11,21 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxf:dialog xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:saxon="http://saxon.sf.net/"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        id="fr-submission-result-dialog" level="modal" close="false" draggable="true" class="fr-dialog fr-submission-result-dialog" model="fr-submission-result-model">
+<xxf:dialog
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+
+    id="fr-submission-result-dialog"
+    level="modal"
+    close="false"
+    draggable="true"
+    class="fr-dialog fr-submission-result-dialog"
+    model="fr-submission-result-model">
 
     <xf:label model="fr-form-model" ref="$fr-resources/detail/messages/submit-dialog-title"/>
     <xf:var   model="fr-form-model" name="fr-resources" value="$fr-resources"/>

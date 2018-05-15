@@ -173,7 +173,7 @@ case class BindingContext(
   }
   */
 
-  // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
+  // NOTE: This is as of 2018-05-15 used only to determine the submission instance based on a submission node.
   def instance: Option[XFormsInstance] =
     singleNodeOpt flatMap { node ⇒
       modelOpt flatMap (_.containingDocument.instanceForNodeOpt(node))

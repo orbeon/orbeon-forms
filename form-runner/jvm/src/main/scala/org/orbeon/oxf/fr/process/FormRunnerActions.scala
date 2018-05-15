@@ -86,6 +86,10 @@ trait FormRunnerActions {
   // Validate form data and fail if invalid
   def tryValidate(params: ActionParams): Try[Any] =
     Try {
+
+      // Q: We should do an `synchronizeAndRefresh()` later in all cases then, right?
+      ensureDataCalculationsAreUpToDate()
+
       val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
       val controlId = paramByNameOrDefault(params, "control") getOrElse "fr-view-component"
 
@@ -107,9 +111,16 @@ trait FormRunnerActions {
       dispatch(name = "fr-update-validity", targetId = "fr-view-component")
     }
 
+  // It makes sense to update all calculations as needed before saving data
+  // https://github.com/orbeon/orbeon-forms/issues/3591
+  private def ensureDataCalculationsAreUpToDate(): Unit =
+    formInstance.model.doRecalculateRevalidate()
+
   def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
     Try {
       val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
+
+      ensureDataCalculationsAreUpToDate()
 
       val isDraft       = booleanParamByName(params, "draft", default = false)
       val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
@@ -238,6 +249,8 @@ trait FormRunnerActions {
     Try {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 
+      ensureDataCalculationsAreUpToDate()
+
       val selectedRenderFormatOpt =
         SupportedRenderFormats find { format ⇒
           booleanFormRunnerProperty(s"oxf.fr.email.attach-$format")
@@ -295,6 +308,8 @@ trait FormRunnerActions {
     Try {
 
       implicit val formRunnerParams @ FormRunnerParams(app, form, formVersion, document, _) = FormRunnerParams()
+
+      ensureDataCalculationsAreUpToDate()
 
       val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -526,6 +541,8 @@ trait FormRunnerActions {
   def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
     Try {
       val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+
+      ensureDataCalculationsAreUpToDate()
 
       val format = (
         paramByName(params, "format")

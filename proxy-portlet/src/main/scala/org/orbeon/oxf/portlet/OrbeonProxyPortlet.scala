@@ -50,6 +50,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     val FormRunnerResourcePath = resourcesRegex.r
   }
 
+  // We extend the context just to provide a custom `decodeURL`
+  // See https://github.com/orbeon/orbeon-forms/issues/3526
   private class ProxyPortletEmbeddingContextWithResponse(
     settings           : PortletSettings,
     context            : PortletContext,
@@ -64,27 +66,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     httpClient,
     useShortNamespaces
   ) {
-    // Modified version which adds specified portal parameters to the decoded URL
+
     override def decodeURL(encoded: String): String = {
 
       if (settings.keepParams.nonEmpty) {
-
         val (path, originalParams) = splitQueryDecodeParams(super.decodeURL(encoded))
-
-        val newParamsIt =
-          findOriginalServletRequest(request) match {
-            case Some(httpServletRequest) ⇒
-              for {
-                (key, values) ← httpServletRequest.getParameterMap.asScala.iterator
-                if settings.keepParams(key)
-                value ← values
-              } yield
-                key → value
-            case None ⇒
-              Iterator.empty
-          }
-
-        recombineQuery(path, originalParams.iterator ++ newParamsIt)
+        recombineQuery(path, originalParams.iterator ++ keepFromPortalQueryIt(request, settings.keepParams))
       } else {
         super.decodeURL(encoded)
       }
@@ -232,7 +219,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref): Option[String] =
     if (getBooleanPreference(request, EnableURLParameters))
-      portalQuery(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
+      portalQueryFromOriginalServletRequestIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
     else
       None
 
@@ -303,8 +290,26 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     )
   }
 
-  private def portalQuery(request: PortletRequest) =
-    collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Nil
+  // This obtains the portal query from the original servlet request. We used to use `javax.servlet.forward.query_string`, but that
+  // doesn't appear to work for resource URLs.
+  private def portalQueryFromOriginalServletRequestIt(request: PortletRequest): Iterator[(String, String)] =
+    findOriginalServletRequest(request) match {
+      case Some(httpServletRequest) ⇒
+        for {
+          (key, values) ← httpServletRequest.getParameterMap.asScala.iterator
+          value ← values
+        } yield
+          key → value
+      case None ⇒
+        Iterator.empty
+    }
+
+  private def keepFromPortalQueryIt(request: PortletRequest, keep: String ⇒ Boolean): Iterator[(String, String)] =
+    for {
+      pair @ (key, _) ← portalQueryFromOriginalServletRequestIt(request)
+      if keep(key)
+    } yield
+      pair
 
   private def publicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] =
     for {
@@ -375,12 +380,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       APISupport.headersToForward(portletReqHeaders, settings.forwardProperties ++ userHeadersToForward) ++
       languageHeader
 
-    val paramsToSet =
-      for {
-        pair @ (name, _) ← portalQuery(request)
-        if settings.forwardParams(name)
-      } yield
-        pair
+    val paramsToSet = keepFromPortalQueryIt(request, settings.forwardParams).to[List]
 
     APISupport.Logger.debug(s"outgoing request headers: $headersToSet")
     APISupport.Logger.debug(s"outgoing request parameters: $paramsToSet")

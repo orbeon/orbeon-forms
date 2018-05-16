@@ -78,7 +78,7 @@ class PortletEmbeddingContextWithResponse(
 // This doesn't deal direct with ProcessorService or HTTP proxying
 trait BufferedPortlet {
 
-  def title(request: RenderRequest): String
+  def findTitle(request: RenderRequest): Option[String]
   def portletContext: PortletContext
 
   // Immutable response with parameters
@@ -165,7 +165,7 @@ trait BufferedPortlet {
     ctx             : EmbeddingContextWithResponse
   ): Unit = {
     // Set title and content type
-    responseContent.title orElse Option(title(request)) foreach response.setTitle
+    responseContent.title orElse findTitle(request) foreach response.setTitle
     responseContent.contentType foreach response.setContentType
 
     // Write response out directly

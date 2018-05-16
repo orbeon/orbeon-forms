@@ -92,7 +92,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   }
 
   // For BufferedPortlet
-  def title(request: RenderRequest) = getTitle(request)
+  def findTitle(request: RenderRequest) = Option(getTitle(request))
 
   private var settingsOpt: Option[PortletSettings] = None
 

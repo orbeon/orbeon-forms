@@ -51,7 +51,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   private implicit val logger = ProcessorService.Logger
 
   // For BufferedPortlet
-  def title(request: RenderRequest) = getTitle(request)
+  def findTitle(request: RenderRequest) = Option(getTitle(request))
   def portletContext = getPortletContext
 
   // For ServletPortlet

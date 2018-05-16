@@ -112,7 +112,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     )
   }
 
-  override def destroy() = {
+  override def destroy(): Unit = {
     APISupport.Logger.info("destroying Form Runner proxy portlet")
     settingsOpt foreach (_.httpClient.shutdown())
     settingsOpt = None

@@ -372,7 +372,7 @@ object APISupport {
     //
     // - render requests
     // - resources: typically image, CSS, JavaScript, etc.
-    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
+    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): HttpResponse =
       ctx.httpClient.connect(
         url         = recombineQuery(requestDetails.url, requestDetails.params),
         credentials = None,

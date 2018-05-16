@@ -67,7 +67,7 @@ object PathUtils {
       decodedName → decodedValue
 
   // Get the first query parameter value for the given name
-  def getFirstQueryParameter(url: String, name: String) = {
+  def getFirstQueryParameter(url: String, name: String): Option[String] = {
     val (_, params) = splitQueryDecodeParams(url)
 
     params collectFirst { case (`name`, v) ⇒ v }

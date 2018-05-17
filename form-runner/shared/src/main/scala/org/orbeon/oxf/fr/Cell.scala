@@ -131,6 +131,8 @@ object Cell {
 
       if (simplify && actualGridWidth != 0 && Cell.StandardGridWidth % actualGridWidth == 0)
         actualGridWidth
+      else if (simplify && actualGridWidth == 5)
+        6
       else
         StandardGridWidth
     }

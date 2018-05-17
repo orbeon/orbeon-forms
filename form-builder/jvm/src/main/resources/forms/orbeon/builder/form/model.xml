@@ -359,7 +359,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
-                <xf:property name="analysis-calculate"            value="()"/>
+                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
             </xf:dispatch>
 
             <xxf:show
@@ -380,7 +380,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
-                <xf:property name="analysis-calculate"            value="()"/>
+                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
             </xxf:show>
         </xf:action>
     </xf:action>

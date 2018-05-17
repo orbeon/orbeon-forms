@@ -592,7 +592,6 @@
         ORBEON.jQuery('.fb-test-iframe')[0].contentWindow.location.href = "about:blank";
         ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
     </xf:action>
-    // xxx blur
 
     <!-- Dispatched from the client, see above action -->
     <xf:action ev:event="fb-show-test-dialog">

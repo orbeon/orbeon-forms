@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import java.io.File
 import java.net.URI
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.{Cookie, HttpServletRequest}
@@ -68,8 +69,13 @@ class Connection(
     val urlString = url.toString
     val scheme    = url.getScheme
 
+    def isTemporaryFile(path: String) =
+      path.startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath)
+
     try {
-      if (method == GET && SupportedNonHttpReadonlySchemes(scheme)) {
+      if (scheme == "file" && ! isTemporaryFile(url.getPath)) {
+        throw new OXFException(s"URL scheme not allowed: $scheme")
+      } else if (method == GET && SupportedNonHttpReadonlySchemes(scheme)) {
         // GET for supported but non-http: or https: schemes
 
         // Create URL connection object

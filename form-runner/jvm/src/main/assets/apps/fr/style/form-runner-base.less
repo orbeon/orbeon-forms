@@ -162,7 +162,18 @@
         .xforms-deselected,
         .xforms-items {
             display: block;
-            float: left; clear: left;
+            float: left;
+            clear: left;
+        }
+
+        // Don't clear float for horizontal display
+        &.xforms-select1-appearance-xxforms-horizontal,
+        &.xforms-select-appearance-xxforms-horizontal {
+            .xforms-selected,
+            .xforms-deselected,
+            .xforms-items {
+                clear: none;
+            }
         }
 
         label.radio,

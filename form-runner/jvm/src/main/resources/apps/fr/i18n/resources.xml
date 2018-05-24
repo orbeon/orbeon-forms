@@ -283,8 +283,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="icon-ban-circle"/&gt; Unpublish</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Make Unavailable</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Make Available</publish>
                 <cancel>Cancel</cancel>
                 <connect>Connect</connect>
                 <select>Select</select>
@@ -293,16 +293,16 @@
                 <stop-reindex>Stop reindexing</stop-reindex>
                 <all>All</all>
                 <none>None</none>
-                <unpublished-local>Unpublished local forms</unpublished-local>
-                <published-local>Published local forms</published-local>
-                <unpublished-remote>Unpublished remote forms</unpublished-remote>
-                <published-remote>Published remote forms</published-remote>
+                <unpublished-local>Unavailable local forms</unpublished-local>
+                <published-local>Available local forms</published-local>
+                <unpublished-remote>Unavailable remote forms</unpublished-remote>
+                <published-remote>Available remote forms</published-remote>
                 <newer-local>Forms that are newer locally</newer-local>
                 <newer-remote>Forms that are newer remotely</newer-remote>
-                <publish-local>Publish local forms</publish-local>
-                <unpublish-local>Unpublish local forms</unpublish-local>
-                <publish-remote>Publish remote forms</publish-remote>
-                <unpublish-remote>Unpublish remote forms</unpublish-remote>
+                <publish-local>Make available local forms</publish-local>
+                <unpublish-local>Make unavailable local forms</unpublish-local>
+                <publish-remote>Make available remote forms</publish-remote>
+                <unpublish-remote>Make unavailable remote forms</unpublish-remote>
                 <push-to-remote>Push to remote</push-to-remote>
                 <pull-from-remote>Pull from remote</pull-from-remote>
                 <navigate-summary>Navigate to Summary</navigate-summary>
@@ -311,7 +311,7 @@
                 <upgrade-remote>Upgrade remote form definitions</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Confirm Form Publish/Unpublish</publish-confirmation>
+                <publish-confirmation>Confirm Form Availability Change</publish-confirmation>
                 <credentials>Remote Server Credentials</credentials>
                 <status>Status</status>
                 <app>Application</app>
@@ -327,7 +327,7 @@
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
-                <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+                <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
             </messages>
             <labels>
@@ -620,8 +620,8 @@
         <home>
             <title>Accueil Form Runner</title>
             <buttons>
-                <unpublish>&lt;i class="icon-ban-circle"/&gt; Dépublier</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Rendre non disponible</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Rendre disponible</publish>
                 <cancel>Annuler</cancel>
                 <connect>Connecter</connect>
                 <select>Sélectionner</select>
@@ -630,16 +630,16 @@
                 <stop-reindex>Arrêter le réindexage</stop-reindex>
                 <all>Tous</all>
                 <none>Aucun</none>
-                <unpublished-local>Formulaires locaux non publiés</unpublished-local>
-                <published-local>Formulaires locaux publiés</published-local>
-                <unpublished-remote>Formulaires distants non publiés</unpublished-remote>
-                <published-remote>Formulaires distants publiés</published-remote>
+                <unpublished-local>Formulaires locaux non disponibles</unpublished-local>
+                <published-local>Formulaires locaux disponibles</published-local>
+                <unpublished-remote>Formulaires distants non disponibles</unpublished-remote>
+                <published-remote>Formulaires distants disponibles</published-remote>
                 <newer-local>Formulaires locaux plus récents</newer-local>
                 <newer-remote>Formulaires distants plus récents</newer-remote>
-                <publish-local>Publier les formulaires locaux</publish-local>
-                <unpublish-local>Dépublier les formulaires locaux</unpublish-local>
-                <publish-remote>Publier les formulaires distants</publish-remote>
-                <unpublish-remote>Dépublier les formulaires distants</unpublish-remote>
+                <publish-local>Rendre disponible les formulaires locaux</publish-local>
+                <unpublish-local>Rendre non disponible les formulaires locaux</unpublish-local>
+                <publish-remote>Rendre disponible les formulaires distants</publish-remote>
+                <unpublish-remote>Rendre non disponible les formulaires distants</unpublish-remote>
                 <push-to-remote>Transférer vers le serveur distant</push-to-remote>
                 <pull-from-remote>Transférer depuis le serveur distant</pull-from-remote>
                 <navigate-summary>Naviguer à la page de sommaire</navigate-summary>
@@ -648,7 +648,7 @@
                 <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Confirmer la publication/dépublication de formulaire</publish-confirmation>
+                <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>
                 <credentials>Autorisation du serveur distant</credentials>
                 <status>Status</status>
                 <app>Application</app>
@@ -664,7 +664,7 @@
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
-                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
             </messages>
             <labels>
@@ -943,7 +943,7 @@
         <home>
             <title>Inicio Form Runner</title>
             <buttons>
-                <unpublish>&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
+                <unpublish todo="true">&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Conectar</connect>
@@ -953,16 +953,16 @@
                 <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Todos</all>
                 <none>Ninguno</none>
-                <unpublished-local>Despublicar formularios locales</unpublished-local>
-                <published-local>Publicar formularios locales</published-local>
-                <unpublished-remote>Despublicar formularios remotos</unpublished-remote>
-                <published-remote>Publicar formularios remotos</published-remote>
+                <unpublished-local todo="true">Despublicar formularios locales</unpublished-local>
+                <published-local todo="true">Publicar formularios locales</published-local>
+                <unpublished-remote todo="true">Despublicar formularios remotos</unpublished-remote>
+                <published-remote todo="true">Publicar formularios remotos</published-remote>
                 <newer-local>Fomularios locales nuevos</newer-local>
                 <newer-remote>Formularios remotos nuevos</newer-remote>
-                <publish-local>Publicar formularios locales</publish-local>
-                <unpublish-local>Despublicar formularios locales</unpublish-local>
-                <publish-remote>Publicar formularios remotos</publish-remote>
-                <unpublish-remote>Despublicar formularios remotos</unpublish-remote>
+                <publish-local todo="true">Publicar formularios locales</publish-local>
+                <unpublish-local todo="true">Despublicar formularios locales</unpublish-local>
+                <publish-remote todo="true">Publicar formularios remotos</publish-remote>
+                <unpublish-remote todo="true">Despublicar formularios remotos</unpublish-remote>
                 <push-to-remote>Poner como Remoto</push-to-remote>
                 <pull-from-remote>Sacar Remoto</pull-from-remote>
                 <navigate-summary>Ir al resumen</navigate-summary>
@@ -971,7 +971,7 @@
                 <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
+                <publish-confirmation todo="true">Confirmar Publicación/Despublicación</publish-confirmation>
                 <credentials>Credenciales del Servidor Remoto</credentials>
                 <status>Estado</status>
                 <app>Aplicación</app>
@@ -987,7 +987,7 @@
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
@@ -1275,7 +1275,7 @@
                 <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all todo="true">[All]</all>
                 <none todo="true">[None]</none>
-                <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
+                <unpublished-local todo="true">[Unavailable local forms]</unpublished-local>
                 <published-local todo="true">[Published local forms]</published-local>
                 <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
                 <published-remote todo="true">[Published remote forms]</published-remote>
@@ -1595,7 +1595,7 @@
                 <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all todo="true">[All]</all>
                 <none todo="true">[None]</none>
-                <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
+                <unpublished-local todo="true">[Unavailable local forms]</unpublished-local>
                 <published-local todo="true">[Published local forms]</published-local>
                 <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
                 <published-remote todo="true">[Published remote forms]</published-remote>
@@ -1919,7 +1919,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Nascondi</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+                <publish todo="true">&lt;i class="icon-globe"/&gt; Pubblica</publish>
                 <cancel>Cancella</cancel>
                 <connect>Connetti</connect>
                 <select>Seleziona</select>
@@ -1928,15 +1928,15 @@
                 <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Tutti</all>
                 <none>Nessuno</none>
-                <unpublished-local>Moduli locali non pubblicati</unpublished-local>
-                <published-local>Moduli locali pubblicati</published-local>
-                <unpublished-remote>Moduli remoti non pubblicati</unpublished-remote>
+                <unpublished-local todo="true">Moduli locali non pubblicati</unpublished-local>
+                <published-local todo="true">Moduli locali pubblicati</published-local>
+                <unpublished-remote todo="true">Moduli remoti non pubblicati</unpublished-remote>
                 <published-remote>Moduli remoti pubblicati</published-remote>
                 <newer-local>Moduli locali che sono più recenti</newer-local>
                 <newer-remote>Moduli remoti che sono più recenti</newer-remote>
-                <publish-local>Pubblica moduli locali</publish-local>
+                <publish-local todo="true">Pubblica moduli locali</publish-local>
                 <unpublish-local>Annulla la pubblicazione dei moduli locali</unpublish-local>
-                <publish-remote>Pubblica moduli remoti</publish-remote>
+                <publish-remote todo="true">Pubblica moduli remoti</publish-remote>
                 <unpublish-remote>Annulla la pubblicazione dei moduli remoti</unpublish-remote>
                 <push-to-remote>Invia a remoto </push-to-remote>
                 <pull-from-remote>Prendi da remoto</pull-from-remote>
@@ -1946,7 +1946,7 @@
                 <upgrade-remote>Aggiorna le definizioni dei moduli remoti</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
+                <publish-confirmation todo="true">Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
                 <credentials>Credenziali server remoto</credentials>
                 <status>Stato</status>
                 <app>Applicazione</app>
@@ -1962,7 +1962,7 @@
             </titles>
             <messages>
                 <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
-                <publish-confirmation>Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
@@ -2252,7 +2252,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+                <publish todo="true">&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
                 <cancel>Abbrechen</cancel>
                 <connect>Verbinden</connect>
                 <select>Auswählen</select>
@@ -2261,15 +2261,15 @@
                 <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Alle</all>
                 <none>Keine</none>
-                <unpublished-local>Unveröffentlichte lokale Formulare</unpublished-local>
-                <published-local>Veröffentlichte lokale Formulare</published-local>
-                <unpublished-remote>Unveröffentlichte Formulare auf Remote-System</unpublished-remote>
-                <published-remote>Veröffentlichte Formulare auf Remote-System</published-remote>
+                <unpublished-local todo="true">Unveröffentlichte lokale Formulare</unpublished-local>
+                <published-local todo="true">Veröffentlichte lokale Formulare</published-local>
+                <unpublished-remote todo="true">Unveröffentlichte Formulare auf Remote-System</unpublished-remote>
+                <published-remote todo="true">Veröffentlichte Formulare auf Remote-System</published-remote>
                 <newer-local>Aktuellste lokale Formulare</newer-local>
                 <newer-remote>Aktuellste Formulare auf Remote-System</newer-remote>
-                <publish-local>Lokale Formulare veröffentlichen</publish-local>
+                <publish-local todo="true">Lokale Formulare veröffentlichen</publish-local>
                 <unpublish-local>Lokale Formulare verbergen</unpublish-local>
-                <publish-remote>Formulare auf Remote-System veröffentlichen</publish-remote>
+                <publish-remote todo="true">Formulare auf Remote-System veröffentlichen</publish-remote>
                 <unpublish-remote>Formulare auf Remote-System verbergen</unpublish-remote>
                 <push-to-remote>An Remote-System senden</push-to-remote>
                 <pull-from-remote>Aus dem Remote-System holen</pull-from-remote>
@@ -2279,7 +2279,7 @@
                 <upgrade-remote>Formulardefinition auf Remote-System aktualisieren</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Veröffentlichen/Verbergen bestätigen</publish-confirmation>
+                <publish-confirmation todo="true">Veröffentlichen/Verbergen bestätigen</publish-confirmation>
                 <credentials>Remote-Server Anmeldeinformationen</credentials>
                 <status>Status</status>
                 <app>Anwendung</app>
@@ -2295,7 +2295,7 @@
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
-                <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
+                <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>

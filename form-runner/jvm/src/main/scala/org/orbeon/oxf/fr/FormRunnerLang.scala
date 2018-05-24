@@ -41,8 +41,8 @@ trait FormRunnerLang {
   def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
   def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)
 
-  def currentLang          = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("lang")
-  def currentFRLang        = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-lang")
+  def currentLang          = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("lang").stringValue
+  def currentFRLang        = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-lang").stringValue
   def currentFRResources   = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-fr-resources")
   //@XPathFunction
   def currentFormResources = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-form-resources")

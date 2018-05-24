@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.util.Try
@@ -220,6 +221,16 @@ trait FormRunnerBaseOps {
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
+
+  //@XPathFunction
+  def formTitleFromMetadata: Option[String] = {
+
+    val metadataElem = metadataInstance map (_.rootElement) toList
+
+    metadataElem.elemWithLangOpt("title", currentLang) orElse
+      metadataElem.firstChildOpt("title")              map
+      (_.stringValue)
+  }
 
   // Captcha support
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"

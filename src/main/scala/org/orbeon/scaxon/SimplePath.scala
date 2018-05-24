@@ -188,6 +188,9 @@ object SimplePath {
       case s     ⇒ Some(s.stringValue)
     }
 
+    def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
+      /(elemName) find { _ attValueOpt "*:lang" contains lang }
+
     def idOpt = attValueOpt("id")
 
     def self(test: Test) = find(Axis.SELF, test)
@@ -312,6 +315,9 @@ object SimplePath {
     def /@(attName: QName): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
+
+    def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
+      seq flatMap (_.elemWithLangOpt(elemName, lang)) headOption
 
     def ids: Seq[String] = seq flatMap (_.idOpt)
 

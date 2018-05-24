@@ -260,7 +260,7 @@ trait FormRunnerActions {
         selectedRenderFormatOpt foreach
           (tryCreatePdfOrTiffIfNeeded(params, _).get)
 
-      val currentFormLang = FormRunner.currentLang.stringValue
+      val currentFormLang = FormRunner.currentLang
 
       val pdfTiffParams =
         for {
@@ -336,7 +336,7 @@ trait FormRunnerActions {
         case name @ "form-version"        ⇒ name → formVersion.toString
         case name @ "document"            ⇒ name → document.get
         case name @ "valid"               ⇒ name → dataValid.toString
-        case name @ "language"            ⇒ name → currentLang.stringValue
+        case name @ "language"            ⇒ name → currentLang
         case name @ DataFormatVersionName ⇒ name → dataVersion
       }
 
@@ -424,7 +424,7 @@ trait FormRunnerActions {
     }
 
   private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
-    LanguageParam   → (() ⇒ currentLang.stringValue, _ ⇒ false  ),
+    LanguageParam   → (() ⇒ currentLang,             _ ⇒ false  ),
     EmbeddableParam → (() ⇒ isEmbeddable.toString,   _ == "true")
   )
 
@@ -559,7 +559,7 @@ trait FormRunnerActions {
         s"$filename.$format"
       }
 
-      val currentFormLang = FormRunner.currentLang.stringValue
+      val currentFormLang = FormRunner.currentLang
 
       recombineQuery(
         s"/fr/$app/$form/$format/$document",
@@ -599,7 +599,7 @@ trait FormRunnerActions {
   private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[String] =
     Try {
 
-      val currentFormLang = FormRunner.currentLang.stringValue
+      val currentFormLang = FormRunner.currentLang
       val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang))
 
       pdfOrTiffPathOpt(

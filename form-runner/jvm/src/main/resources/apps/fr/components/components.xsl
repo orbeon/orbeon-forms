@@ -290,11 +290,6 @@
                  xml:lang="{{xxf:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@*"/>
 
-            <!-- Title from the current form's metadata -->
-            <xf:var
-                name="title-from-metadata"
-                value="xxf:instance('fr-form-metadata')/title[@xml:lang = xxf:instance('fr-language-instance')], xxf:instance('fr-form-metadata')/title"/>
-
             <!-- Title from the current page's xf:output under HTML title -->
             <xsl:choose>
                 <xsl:when test="xh:head/xh:title/xf:output">
@@ -314,7 +309,17 @@
             <xf:var
                 name="title"
                 model="fr-form-model"
-                value="string(($title-from-metadata, $title-from-output, '{replace(xh:head/xh:title, '''', '''''')}', $fr-resources/untitled-form)[normalize-space()][1])"/>
+                value="
+                    string(
+                        (
+                            frf:formTitleFromMetadata(),
+                            $title-from-output,
+                            '{replace(xh:head/xh:title, '''', '''''')}',
+                            $fr-resources/untitled-form
+                        )[
+                            normalize-space()
+                        ][1]
+                    )"/>
 
             <xsl:apply-templates select="node()"/>
         </xh:html>

@@ -122,7 +122,8 @@ private object FormRunnerFunctions {
     "app-name"                    → (() ⇒ FormRunner.FormRunnerParams().app),
     "form-name"                   → (() ⇒ FormRunner.FormRunnerParams().form),
     "document-id"                 → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
-    "lang"                        → (() ⇒ FormRunner.currentLang.stringValue),
+    "form-title"                  → (() ⇒ FormRunner.formTitleFromMetadata.orNull),
+    "lang"                        → (() ⇒ FormRunner.currentLang),
     "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
     "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull)
   )

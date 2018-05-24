@@ -41,6 +41,8 @@ case class ConnectionResult(
 
   def close() = content.close()
 
+  def isSuccessResponse = NetUtils.isSuccessCode(statusCode)
+
   val mediatype =
     content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeMediaType(ct))
 
@@ -160,7 +162,7 @@ object ConnectionResult {
   def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream ⇒ T): Try[T] = Try {
     try {
       cxr match {
-        case ConnectionResult(_, statusCode, _, StreamedContent(inputStream, _, _, _), _, _) if NetUtils.isSuccessCode(statusCode) ⇒
+        case ConnectionResult(_, _, _, StreamedContent(inputStream, _, _, _), _, _) if cxr.isSuccessResponse ⇒
           val result = body(inputStream)
           if (closeOnSuccess)
             cxr.close() // this eventually calls InputStream.close()

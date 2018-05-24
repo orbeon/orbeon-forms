@@ -151,7 +151,8 @@ private object SubmitResponseEvent {
 
         val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
 
-        if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
+        // See https://github.com/orbeon/orbeon-forms/issues/3082
+        if (XFormsProperties.getErrorLogging.contains("submission-error-body") && ! cxr.isSuccessResponse)
           result map asString foreach { value ⇒
             logger.logError("xforms-submit-done|error", "setting body document", "body", s"\n$value")
           }

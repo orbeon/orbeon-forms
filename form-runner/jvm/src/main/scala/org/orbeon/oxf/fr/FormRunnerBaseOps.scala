@@ -222,7 +222,6 @@ trait FormRunnerBaseOps {
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
 
-  //@XPathFunction
   def formTitleFromMetadata: Option[String] = {
 
     val metadataElem = metadataInstance map (_.rootElement) toList

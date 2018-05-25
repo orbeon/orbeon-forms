@@ -312,7 +312,7 @@
                 value="
                     string(
                         (
-                            frf:formTitleFromMetadata(),
+                            fr:form-title(),
                             $title-from-output,
                             '{replace(xh:head/xh:title, '''', '''''')}',
                             $fr-resources/untitled-form

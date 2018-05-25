@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -382,24 +382,36 @@ class FormBuilderFunctionsTest
 
   describe("Analyze known constraint") {
 
+    import org.orbeon.oxf.xforms.XFormsConstants._
     import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction.analyzeKnownConstraint
 
     val Library = XFormsFunctionLibrary
+
+    val Mapping =
+      NamespaceMapping(
+        Map(
+          XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
+          XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
+          XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
+          XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI
+        )
+      )
+
     val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
     it("must pass all common constraints") {
-      assert(Some("max-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:max-length(5)",                                   Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length(5)",                                   Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length('5')",                                 Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("(xxf:min-length(5))",                                 Library)(Logger))
-      assert(Some("non-negative"      → None)                               === analyzeKnownConstraint("(xxf:non-negative())",                                Library)(Logger))
-      assert(Some("negative"          → None)                               === analyzeKnownConstraint("(xxf:negative())",                                    Library)(Logger))
-      assert(Some("non-positive"      → None)                               === analyzeKnownConstraint("(xxf:non-positive())",                                Library)(Logger))
-      assert(Some("positive"          → None)                               === analyzeKnownConstraint("(xxf:positive())",                                    Library)(Logger))
-      assert(Some("upload-max-size"   → Some("3221225472"))                 === analyzeKnownConstraint("xxf:upload-max-size(3221225472)",                     Library)(Logger))
-      assert(Some("upload-mediatypes" → Some("image/jpeg application/pdf")) === analyzeKnownConstraint("xxf:upload-mediatypes('image/jpeg application/pdf')", Library)(Logger))
-      assert(None                                                           === analyzeKnownConstraint("xxf:min-length(foo)",                                 Library)(Logger))
-      assert(None                                                           === analyzeKnownConstraint("xxf:foobar(5)",                                       Library)(Logger))
+      assert(Some("max-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:max-length(5)",                                   Mapping, Library)(Logger))
+      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length(5)",                                   Mapping, Library)(Logger))
+      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length('5')",                                 Mapping, Library)(Logger))
+      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("(xxf:min-length(5))",                                 Mapping, Library)(Logger))
+      assert(Some("non-negative"      → None)                               === analyzeKnownConstraint("(xxf:non-negative())",                                Mapping, Library)(Logger))
+      assert(Some("negative"          → None)                               === analyzeKnownConstraint("(xxf:negative())",                                    Mapping, Library)(Logger))
+      assert(Some("non-positive"      → None)                               === analyzeKnownConstraint("(xxf:non-positive())",                                Mapping, Library)(Logger))
+      assert(Some("positive"          → None)                               === analyzeKnownConstraint("(xxf:positive())",                                    Mapping, Library)(Logger))
+      assert(Some("upload-max-size"   → Some("3221225472"))                 === analyzeKnownConstraint("xxf:upload-max-size(3221225472)",                     Mapping, Library)(Logger))
+      assert(Some("upload-mediatypes" → Some("image/jpeg application/pdf")) === analyzeKnownConstraint("xxf:upload-mediatypes('image/jpeg application/pdf')", Mapping, Library)(Logger))
+      assert(None                                                           === analyzeKnownConstraint("xxf:min-length(foo)",                                 Mapping, Library)(Logger))
+      assert(None                                                           === analyzeKnownConstraint("xxf:foobar(5)",                                       Mapping, Library)(Logger))
     }
   }
 

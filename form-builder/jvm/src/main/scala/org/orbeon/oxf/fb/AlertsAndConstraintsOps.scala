@@ -480,8 +480,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
+      // NOTE: We use the namespaces in scope on the model, not the bind containing the constraint. This is
+      // a simplification and implies a constraint that there are no new namespace declarations on binds
+      // compared to the model.
       val analyzed = ValidationFunction.analyzeKnownConstraint(
         expression,
+        ctx.formBuilderModel.getOrElse(throw new IllegalStateException).staticModel.namespaceMapping,
         inScopeContainingDocument.getFunctionLibrary
       )
 

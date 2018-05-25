@@ -174,21 +174,32 @@
                 <part name="text" content-type="text/plain">
                     <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
                 </part>
-                <!-- XML attachment if needed -->
-                <xsl:if test="p:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
-                    <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
-                </xsl:if>
-                <!-- PDF attachment if needed -->
-                <xsl:if test="p:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
-                    <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
-                </xsl:if>
-                <!-- TIFF attachment if needed -->
-                <xsl:if test="p:property(string-join(('oxf.fr.email.attach-tiff', $app, $form), '.'))">
-                    <part name="form-tiff" content-type="image/tiff" content-disposition="attachment; filename=&quot;form.tiff&quot;" src="input:form-tiff"/>
-                </xsl:if>
+                <!-- XML, PDF and TIFF attachments if needed -->
+                <xsl:for-each select="'xml', 'pdf', 'tiff'">
+
+                    <xsl:variable name="type" select="."/>
+
+                    <xsl:if test="p:property(string-join((concat('oxf.fr.email.attach-', $type), $app, $form), '.'))">
+
+                        <xsl:variable
+                            name="filename"
+                            select="(frf:emailAttachmentFilename($data, $type, $app, $form), concat('form.', $type))[1]"/>
+
+                        <part
+                            name="form-{$type}"
+                            content-type="{if ($type = 'tiff') then 'image/tiff' else concat('application/', $type)}"
+                            content-disposition="attachment; filename=&quot;{$filename}&quot;"
+                            src="input:form-{$type}"/>
+                    </xsl:if>
+                </xsl:for-each>
+
                 <!-- Other attachments if needed -->
                 <xsl:for-each select="$attachments/attachment">
-                    <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="attachment; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
+                    <part
+                        name="attachment-{position()}"
+                        content-type="{@mediatype}"
+                        content-disposition="attachment; filename=&quot;{@filename}&quot;"
+                        src="input:attachment-{position()}"/>
                 </xsl:for-each>
             </body>
         </message>

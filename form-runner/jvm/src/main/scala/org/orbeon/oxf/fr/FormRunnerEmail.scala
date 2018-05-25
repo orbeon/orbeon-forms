@@ -73,6 +73,24 @@ trait FormRunnerEmail {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
       case ControlBindPathHoldersResources(_, _, _, None         , _) ⇒ Nil
     }
+
+  //@XPathFunction
+  def emailAttachmentFilename(
+    data           : NodeInfo,
+    attachmentType : String,
+    app            : String,
+    form           : String
+  ): Option[String] = {
+
+    implicit val params = FormRunnerParams()
+
+    formRunnerProperty(s"oxf.fr.email.$attachmentType.filename") flatMap (_.trimAllToOpt) map { expr ⇒
+      val name = process.SimpleProcess.evaluateString(expr, data)
+      // This appears necessary for non-ASCII characters to make it through.
+      // Verified that this works with GMail.
+      javax.mail.internet.MimeUtility.encodeText(name, "UTF-8", null)
+    }
+  }
 }
 
 object FormRunnerEmail extends FormRunnerEmail

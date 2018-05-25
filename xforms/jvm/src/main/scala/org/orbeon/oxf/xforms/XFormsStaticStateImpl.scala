@@ -200,7 +200,7 @@ class XFormsStaticStateImpl(
 object XFormsStaticStateImpl {
 
   val BASIC_NAMESPACE_MAPPING =
-    NamespaceMapping.apply(Map(
+    NamespaceMapping(Map(
       XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
       XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
       XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,

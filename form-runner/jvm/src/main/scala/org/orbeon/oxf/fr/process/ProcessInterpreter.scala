@@ -15,14 +15,17 @@ package org.orbeon.oxf.fr.process
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.oxf.{util ⇒ u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
@@ -312,7 +315,7 @@ trait ProcessInterpreter extends Logging {
     evalOne(
       item            = item,
       expr            = expr,
-      namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      namespaces      = ProcessInterpreter.StandardNamespaceMapping,
       functionContext = xpathFunctionContext
     )
 
@@ -320,7 +323,7 @@ trait ProcessInterpreter extends Logging {
     eval(
       item            = item,
       expr            = expr,
-      namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      namespaces      = ProcessInterpreter.StandardNamespaceMapping,
       functionContext = xpathFunctionContext
     )
 
@@ -331,12 +334,28 @@ trait ProcessInterpreter extends Logging {
       evalValueTemplate(
         item            = xpathContext,
         expr            = valueTemplate,
-        namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+        namespaces      = ProcessInterpreter.StandardNamespaceMapping,
         functionContext = xpathFunctionContext
       )
 }
 
 object ProcessInterpreter {
+
+  val StandardNamespaceMapping =
+    NamespaceMapping(
+      Map(
+        XSD_PREFIX           → XMLConstants.XSD_URI,
+        XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
+        XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
+        XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
+        XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
+        XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI,
+        XMLNames.FRPrefix    → XMLNames.FR
+      )
+    )
 
   type ActionParams = Map[Option[String], String]
 

@@ -148,6 +148,33 @@
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.quality.*.*"                 value="0.8"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
+    <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.pdf'
+        )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.email.tiff.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.tiff'
+        )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.email.xml.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xml'
+        )
+    </property>
+
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                         value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>

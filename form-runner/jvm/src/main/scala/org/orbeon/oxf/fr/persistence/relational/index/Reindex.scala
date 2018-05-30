@@ -75,22 +75,29 @@ trait Reindex extends FormDefinition {
 
     // Clean index
     locally {
-      val deleteWhereClause = whereConditions match {
-        case Nil ⇒ ""
-        case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
-      }
-      val deleteFromValueIndexSql = "DELETE FROM orbeon_i_control_text " + (
-        whatToReindex match {
-          case AllData ⇒ ""
-          case _ ⇒
-            s"""|WHERE data_id IN (
-                |   SELECT data_id
-                |     FROM orbeon_i_current
-                |   $deleteWhereClause
-                | )
-                |""".stripMargin
+      val deleteWhereClause = {
+
+        val conditionsWhere = whereConditions match {
+          case Nil ⇒ ""
+          case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
         }
-      )
+        s"""WHERE data_id IN (
+           |        SELECT data_id
+           |        FROM (
+           |                 SELECT   data_id
+           |                 FROM     orbeon_i_current
+           |                 $conditionsWhere
+           |             ) c
+           |        ORDER BY data_id
+           |    )
+         """.stripMargin
+      }
+
+      val deleteFromValueIndexSql =
+        s"""|DELETE FROM orbeon_i_control_text
+            |$deleteWhereClause
+            |""".stripMargin
+
       val deleteFromCurrentIndex =
         s"""|DELETE FROM orbeon_i_current
             |$deleteWhereClause

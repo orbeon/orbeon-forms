@@ -516,8 +516,8 @@ trait FormRunnerActions {
       def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
 
       def fromProperties = {
-        val property =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
-        formRunnerProperty(property)
+        val propertyName =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
+        formRunnerProperty(propertyName)
       }
 
       fromParams orElse fromProperties map evaluateValueTemplate flatMap trimAllToOpt get
@@ -550,6 +550,8 @@ trait FormRunnerActions {
         filter    SupportedRenderFormats
         getOrElse "pdf"
       )
+
+      // TODO: Use namespaces from appropriate scope.
       val fullFilename = {
         val filenameProperty            = s"oxf.fr.detail.$format.filename"
         val filenamePropertyValue       = formRunnerProperty(filenameProperty)(FormRunnerParams()).flatMap(trimAllToOpt)

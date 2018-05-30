@@ -305,20 +305,30 @@ trait ProcessInterpreter extends Logging {
       item = item
     ).asInstanceOf[BooleanValue].getBooleanValue
 
-  def evaluateString(expr: String, item: Item = xpathContext): String =
+  def evaluateString(
+    expr    : String,
+    item    : Item             = xpathContext,
+    mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+  ): String =
     evaluateOne(
-      expr = u.XPath.makeStringExpression(expr),
-      item = item
+      expr    = u.XPath.makeStringExpression(expr),
+      item    = item,
+      mapping = mapping
     ).getStringValue
 
-  def evaluateOne(expr: String, item: Item = xpathContext): Item =
+  def evaluateOne(
+    expr    : String,
+    item    : Item             = xpathContext,
+    mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
+  ): Item =
     evalOne(
       item            = item,
       expr            = expr,
-      namespaces      = ProcessInterpreter.StandardNamespaceMapping,
+      namespaces      = mapping,
       functionContext = xpathFunctionContext
     )
 
+  // TODO
   def evaluate(expr: String, item: Item = xpathContext): Seq[AnyRef] =
     eval(
       item            = item,
@@ -327,6 +337,7 @@ trait ProcessInterpreter extends Logging {
       functionContext = xpathFunctionContext
     )
 
+  // TODO
   def evaluateValueTemplate(valueTemplate: String): String =
     if (! XFormsUtils.maybeAVT(valueTemplate))
       valueTemplate

@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -174,6 +175,9 @@ trait FormRunnerBaseOps {
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
+
+  def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
+    properties.getPropertyOpt(buildPropertyName(name)) map { p ⇒ (p.value.toString, p.namespaceMapping) }
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =

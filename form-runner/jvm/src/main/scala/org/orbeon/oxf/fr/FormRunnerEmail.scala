@@ -84,8 +84,11 @@ trait FormRunnerEmail {
 
     implicit val params = FormRunnerParams()
 
-    formRunnerProperty(s"oxf.fr.email.$attachmentType.filename") flatMap (_.trimAllToOpt) map { expr ⇒
-      val name = process.SimpleProcess.evaluateString(expr, data)
+    for {
+      (expr, mapping) ← formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
+      trimmedExpr     ← expr.trimAllToOpt
+      name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
+    } yield {
       // This appears necessary for non-ASCII characters to make it through.
       // Verified that this works with GMail.
       javax.mail.internet.MimeUtility.encodeText(name, "UTF-8", null)

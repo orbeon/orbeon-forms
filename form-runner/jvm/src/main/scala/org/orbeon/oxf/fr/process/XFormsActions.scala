@@ -78,6 +78,7 @@ trait XFormsActions {
           val valueToSet = params.get(Some("value")) match {
             case None            ⇒ ""
             case Some(valueExpr) ⇒
+              // TODO: Use namespaces from appropriate scope.
               evaluateString(
                 item = nodeInfo,
                 expr = valueExpr

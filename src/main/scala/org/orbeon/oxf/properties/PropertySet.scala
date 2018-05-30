@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.JavaConverters._
@@ -36,6 +36,8 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
       _associatedValue = Option(evaluate(this))
     _associatedValue.get.asInstanceOf[U]
   }
+
+  def namespaceMapping = NamespaceMapping(namespaces)
 }
 
 private class PropertyNode {

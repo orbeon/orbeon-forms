@@ -1048,11 +1048,15 @@
                     </xf:group>
                 </xf:group>
             </fr:row>
-            <fr:row>
-                <!--xxx<xf:output value="string-join(for $i in instance('fr-paging-instance')/* return (name($i), string($i)), ' ')"/>-->
-                <!--xxx <xf:output value="saxon:serialize(instance('fr-metadata'), 'xml')"/>-->
-                <fr:version/>
-            </fr:row>
+            <xf:group ref=".[$any-has-admin-permission]">
+                <fr:row>
+                    <xh:div class="fr-orbeon-version">
+                        <xf:output
+                            value="version:VersionString()"
+                            xmlns:version="java:org.orbeon.oxf.common.Version"/>
+                    </xh:div>
+                </fr:row>
+            </xf:group>
         </fr:view>
 
         <!-- Confirmation dialogs -->

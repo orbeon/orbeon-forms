@@ -13,6 +13,7 @@
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="oxf:/config/properties-internal.xml"/>
@@ -54,5 +55,18 @@
     <property as="xs:string"   name="oxf.fr.persistence.provider.tests.*.form"              value="resource"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.tests.noscript-false-pdf-template-wizard-true" value="wizard"/>
+
+    <!-- So that email tests doesn't depend on the presence of a Form Runner form at runtime -->
+    <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
+        'form.pdf'
+    </property>
+
+    <property as="xs:string" name="oxf.fr.email.tiff.filename.*.*">
+        'form.tiff'
+    </property>
+
+    <property as="xs:string" name="oxf.fr.email.xml.filename.*.*">
+        'form.xml'
+    </property>
 
 </properties>

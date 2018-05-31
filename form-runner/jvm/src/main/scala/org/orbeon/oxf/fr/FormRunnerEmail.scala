@@ -82,7 +82,16 @@ trait FormRunnerEmail {
     form           : String
   ): Option[String] = {
 
-    implicit val params = FormRunnerParams()
+    // NOTE: We don't use `FormRunnerParams()` for that this works in tests.
+    // Callees only require, as of 2018-05-31, `app` and `form`.
+    implicit val params =
+      FormRunnerParams(
+        app         = app,
+        form        = form,
+        formVersion = 1,
+        document    = None,
+        mode        = "email"
+      )
 
     for {
       (expr, mapping) ← formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")

@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.File
 import java.net.URI
 import java.util.{Map ⇒ JMap}
-import javax.servlet.http.{Cookie, HttpServletRequest}
 
+import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
+import org.orbeon.io.{FileUtils, UriScheme}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -67,168 +67,151 @@ class Connection(
   def connect(saveState: Boolean): ConnectionResult = {
 
     val urlString = url.toString
-    val scheme    = url.getScheme
-
-    def isTemporaryFileUri(uri: URI): Boolean = {
-      uri.getScheme == "file" && {
-        val uriPath = uri.normalize.getPath
-        val tmpPath = new java.io.File(System.getProperty("java.io.tmpdir")).toURI.normalize.getPath
-
-        uriPath.startsWith(tmpPath)
-      }
-    }
 
     try {
-      if (scheme == "file" && ! isTemporaryFileUri(url)) {
-        throw new OXFException(s"URL scheme not allowed: $scheme")
-      } else if (method == GET && SupportedNonHttpReadonlySchemes(scheme)) {
-        // GET for supported but non-http: or https: schemes
+      UriScheme.withName(url.getScheme) match {
+        case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(url) ⇒
+          throw new OXFException(s"URL scheme `$scheme` not allowed")
+        case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) ⇒
 
-        // Create URL connection object
-        val urlConnection = URLFactory.createURL(urlString).openConnection
-        urlConnection.connect()
+          // Create URL connection object
+          val urlConnection = URLFactory.createURL(urlString).openConnection
+          urlConnection.connect()
 
-        // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
-        // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
-        def contentTypeFromConnection =
-          if (scheme == "data") Option(urlConnection.getContentType) else None
+          // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
+          // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
+          def contentTypeFromConnection =
+            if (scheme == UriScheme.Data) Option(urlConnection.getContentType) else None
 
-        def contentTypeFromPath =
-          Option(url.getPath) flatMap Mediatypes.findMediatypeForPath
+          def contentTypeFromPath =
+            Option(url.getPath) flatMap Mediatypes.findMediatypeForPath
 
-        def contentTypeHeader =
-          contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
+          def contentTypeHeader =
+            contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
 
-        val headers =
-          urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+          val headers =
+            urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
 
-        val headersWithContentType =
-          headers ++ contentTypeHeader.toList
+          val headersWithContentType =
+            headers ++ contentTypeHeader.toList
 
-        // Create result
-        val connectionResult = ConnectionResult.apply(
-          url        = urlString,
-          statusCode = 200,
-          headers    = headersWithContentType,
-          content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
-        )
-
-        if (debugEnabled) {
-          connectionResult.logResponseDetailsOnce(Level.DEBUG)
-          connectionResult.logResponseBody(Level.DEBUG, logBody)
-        }
-
-        connectionResult
-
-      } else if (isHTTPOrHTTPS(scheme)) {
-        // Any method with http: or https:
-
-        val cleanCapitalizedHeaders = {
-
-          // Capitalize only headers which are entirely lowercase.
-          //
-          // See https://github.com/orbeon/orbeon-forms/issues/3135
-          //
-          // We used to capitalize all headers, but we want to keep the original capitalization for:
-          //
-          // 1. custom headers
-          // 2. headers forwarded by name, where the header name is provided via configuration
-          //
-          // So could we just not capitalize anything at all? I can see some examples where old code
-          // would have the explicit or forwarded header names lowercase, and that would break. Anything
-          // else?
-
-          val capitalizedHeaders =
-            for {
-              (name, values) ← headers.to[List]
-              if values ne null
-              value ← values
-              if value ne null
-            } yield
-              (
-                if (name == name.toLowerCase)
-                  capitalizeCommonOrSplitHeader(name)
-                else
-                  name
-              ) → value
-
-          combineValues[String, String, List](capitalizedHeaders).toMap
-        }
-
-        val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
-        cookieStoreOpt = Some(cookieStore)
-
-        val (effectiveConnectionURL, client) =
-          findInternalURL(urlString) match {
-            case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
-            case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
-          }
-
-        val response =
-          client.connect(
-            effectiveConnectionURL,
-            credentials,
-            cookieStore,
-            method,
-            cleanCapitalizedHeaders,
-            content
+          // Create result
+          val connectionResult = ConnectionResult(
+            url        = urlString,
+            statusCode = 200,
+            headers    = headersWithContentType,
+            content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
           )
 
-        ifDebug {
-
-          def replacePassword(s: String) = {
-            val colonIndex = s.indexOf(':')
-            if (colonIndex != -1)
-              s.substring(0, colonIndex + 1) + "xxxxxxxx"
-            else
-              s
+          if (debugEnabled) {
+            connectionResult.logResponseDetailsOnce(Level.DEBUG)
+            connectionResult.logResponseBody(Level.DEBUG, logBody)
           }
 
-          val connectionURI =
-            new URI(
-              url.getScheme,
-              Option(url.getUserInfo) map replacePassword orNull,
-              url.getHost,
-              url.getPort,
-              url.getPath,
-              url.getQuery,
-              url.getFragment
+          connectionResult
+
+        case UriScheme.Http | UriScheme.Https ⇒
+
+          val cleanCapitalizedHeaders = {
+
+            // Capitalize only headers which are entirely lowercase.
+            //
+            // See https://github.com/orbeon/orbeon-forms/issues/3135
+            //
+            // We used to capitalize all headers, but we want to keep the original capitalization for:
+            //
+            // 1. custom headers
+            // 2. headers forwarded by name, where the header name is provided via configuration
+            //
+            // So could we just not capitalize anything at all? I can see some examples where old code
+            // would have the explicit or forwarded header names lowercase, and that would break. Anything
+            // else?
+
+            val capitalizedHeaders =
+              for {
+                (name, values) ← headers.to[List]
+                if values ne null
+                value ← values
+                if value ne null
+              } yield
+                (
+                  if (name == name.toLowerCase)
+                    capitalizeCommonOrSplitHeader(name)
+                  else
+                    name
+                ) → value
+
+            combineValues[String, String, List](capitalizedHeaders).toMap
+          }
+
+          val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
+          cookieStoreOpt = Some(cookieStore)
+
+          val (effectiveConnectionURL, client) =
+            findInternalURL(urlString) match {
+              case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
+              case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
+            }
+
+          val response =
+            client.connect(
+              effectiveConnectionURL,
+              credentials,
+              cookieStore,
+              method,
+              cleanCapitalizedHeaders,
+              content
             )
 
-          debug("opening URL connection",
-            List(
-              "method" → method.entryName,
-              "URL"    → connectionURI.toString
-            ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
-        }
+          ifDebug {
 
-        // Create result
-        val connectionResult = ConnectionResult.apply(
-          url        = urlString,
-          statusCode = response.statusCode,
-          headers    = response.headers,
-          content    = response.content
-        )
+            def replacePassword(s: String) = {
+              val colonIndex = s.indexOf(':')
+              if (colonIndex != -1)
+                s.substring(0, colonIndex + 1) + "xxxxxxxx"
+              else
+                s
+            }
 
-        ifDebug {
-          connectionResult.logResponseDetailsOnce(Level.DEBUG)
-          connectionResult.logResponseBody(Level.DEBUG, logBody)
-        }
+            val connectionURI =
+              new URI(
+                url.getScheme,
+                Option(url.getUserInfo) map replacePassword orNull,
+                url.getHost,
+                url.getPort,
+                url.getPath,
+                url.getQuery,
+                url.getFragment
+              )
 
-        // Save state if possible
-        if (saveState)
-          saveHttpState()
+            debug("opening URL connection",
+              List(
+                "method" → method.entryName,
+                "URL"    → connectionURI.toString
+              ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
+          }
 
-        connectionResult
+          // Create result
+          val connectionResult = ConnectionResult.apply(
+            url        = urlString,
+            statusCode = response.statusCode,
+            headers    = response.headers,
+            content    = response.content
+          )
 
-      } else if (method != GET && Set("file", "oxf")(scheme)) {
-        // Writing to file: and oxf: SHOULD be supported
-        throw new OXFException("submission URL scheme not yet implemented: " + scheme)
-      } else if (scheme == "mailto") {
-        // MAY be supported
-        throw new OXFException("submission URL scheme not yet implemented: " + scheme)
-      } else {
-        throw new OXFException("submission URL scheme not supported: " + scheme)
+          ifDebug {
+            connectionResult.logResponseDetailsOnce(Level.DEBUG)
+            connectionResult.logResponseBody(Level.DEBUG, logBody)
+          }
+
+          // Save state if possible
+          if (saveState)
+            saveHttpState()
+
+          connectionResult
+
+        case scheme ⇒
+          throw new OXFException(s"URL scheme `$scheme` not supported for method `$method`")
       }
     } catch {
       case NonFatal(t) ⇒ throw new ValidationException(t, new LocationData(url.toString, -1, -1))
@@ -316,7 +299,7 @@ private object ConnectionState {
 
 object Connection extends Logging {
 
-  private val SupportedNonHttpReadonlySchemes = Set("file", "oxf", "data")
+  private val SupportedNonHttpReadonlySchemes = Set[UriScheme](UriScheme.File, UriScheme.Oxf, UriScheme.Data)
 
   private val HttpInternalPathsProperty               = "oxf.http.internal-paths"
   private val HttpForwardCookiesProperty              = "oxf.http.forward-cookies"
@@ -342,8 +325,11 @@ object Connection extends Logging {
     val connection =
       new Connection(method, url, credentials, content, headers, logBody)
 
+    def isHttpOrHttps(scheme: UriScheme): Boolean =
+      scheme == UriScheme.Http || scheme == UriScheme.Https
+
     // Get connection state if possible
-    if (loadState && isHTTPOrHTTPS(url.getScheme))
+    if (loadState && isHttpOrHttps(UriScheme.withName(url.getScheme)))
       connection.loadHttpState()
 
     connection
@@ -408,12 +394,12 @@ object Connection extends Logging {
   private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT, LOCK, UNLOCK)
   def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)
 
-  private def schemeRequiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
-  private def isHTTPOrHTTPS(scheme: String)         = Set("http", "https")(scheme)
+  private def schemeRequiresHeaders(scheme: UriScheme) =
+    ! (scheme == UriScheme.File || scheme == UriScheme.Oxf)
 
   // Build all the connection headers
   def buildConnectionHeadersCapitalizedIfNeeded(
-    scheme           : String,
+    scheme           : UriScheme,
     hasCredentials   : Boolean,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
@@ -436,7 +422,7 @@ object Connection extends Logging {
     logger              : IndentedLogger
   ): Map[String, List[String]] =
     buildConnectionHeadersCapitalizedIfNeeded(
-      scheme,
+      UriScheme.withName(scheme),
       hasCredentials,
       Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
       valueAs[Set](headersToForward),
@@ -446,7 +432,7 @@ object Connection extends Logging {
     )
 
   def buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-    scheme           : String,
+    scheme           : UriScheme,
     method           : HttpMethod,
     hasCredentials   : Boolean,
     mediatype        : String,

@@ -20,6 +20,7 @@ import java.net.URI
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
@@ -266,7 +267,7 @@ private object FormRunnerPersistenceProxy {
 
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = outgoingURL.getScheme,
+        scheme           = UriScheme.withName(outgoingURL.getScheme),
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,
         headersToForward = Set(),                                   // handled by proxyAndCapitalizeHeaders()

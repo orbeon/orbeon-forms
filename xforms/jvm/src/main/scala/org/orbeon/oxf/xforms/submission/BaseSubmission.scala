@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.IOException
 import java.util.concurrent.Callable
 
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, LocalResponse, URLRewriter}
@@ -141,7 +142,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     // Determine headers
     val requestHeadersCapitalized =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme            = "http",
+        scheme            = UriScheme.Http,
         method            = httpMethod,
         hasCredentials    = false,
         mediatype         = actualRequestMediatype,

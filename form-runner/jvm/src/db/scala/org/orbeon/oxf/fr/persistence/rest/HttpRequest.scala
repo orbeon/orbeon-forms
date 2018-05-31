@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.io.ByteArrayOutputStream
 
 import org.orbeon.dom.Document
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
@@ -62,7 +63,7 @@ private object HttpRequest {
       val headers = (timeoutHeader.toList ++ versionHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = "http",
+        scheme           = UriScheme.Http,
         hasCredentials   = false,
         customHeaders    = headers,
         headersToForward = Connection.headersToForwardFromProperty,

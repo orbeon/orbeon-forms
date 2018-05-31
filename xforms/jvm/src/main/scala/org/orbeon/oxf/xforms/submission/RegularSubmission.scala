@@ -18,6 +18,7 @@ package org.orbeon.oxf.xforms.submission
 import java.net.URI
 import java.util.concurrent.Callable
 
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.http.Headers.{ContentType, firstHeaderIgnoreCase}
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
@@ -43,7 +44,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        absoluteResolvedURL.getScheme,
+        UriScheme.withName(absoluteResolvedURL.getScheme),
         p.httpMethod,
         p2.credentialsOpt.isDefined,
         sp.actualRequestMediatype,

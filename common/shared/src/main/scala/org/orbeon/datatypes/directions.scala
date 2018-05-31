@@ -15,7 +15,6 @@ package org.orbeon.datatypes
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.datatypes.Direction.findValues
 
 sealed abstract class Direction extends EnumEntry with Lowercase
 

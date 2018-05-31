@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.InputStream
 import java.net.URI
 
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
@@ -85,7 +86,7 @@ object SubmissionUtils {
       credentials     = None,
       content         = None,
       headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = url.getScheme,
+        scheme           = UriScheme.withName(url.getScheme),
         hasCredentials   = false,
         customHeaders    = Map(),
         headersToForward = Connection.headersToForwardFromProperty,

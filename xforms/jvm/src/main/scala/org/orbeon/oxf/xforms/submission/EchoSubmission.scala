@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayInputStream
 
-import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
+import org.orbeon.io.UriScheme
+import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
 
 /**
@@ -52,7 +53,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-      scheme           = "http",
+      scheme           = UriScheme.Http,
       method           = p.httpMethod,
       hasCredentials   = p2.credentialsOpt.isDefined,
       mediatype        = sp.actualRequestMediatype,

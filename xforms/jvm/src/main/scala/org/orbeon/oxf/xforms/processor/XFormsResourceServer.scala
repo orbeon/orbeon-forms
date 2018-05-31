@@ -17,6 +17,7 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -358,7 +359,7 @@ object XFormsResourceServer {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = serviceURI.getScheme,
+        scheme           = UriScheme.withName(serviceURI.getScheme),
         hasCredentials   = false,
         customHeaders    = customHeaders,
         headersToForward = headersToForward,

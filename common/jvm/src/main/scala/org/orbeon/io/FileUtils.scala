@@ -1,0 +1,28 @@
+/**
+  * Copyright (C) 2018 Orbeon, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify it under the terms of the
+  * GNU Lesser General Public License as published by the Free Software Foundation; either version
+  *  2.1 of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  * See the GNU Lesser General Public License for more details.
+  *
+  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  */
+package org.orbeon.io
+
+import java.io.File
+import java.net.URI
+
+object FileUtils {
+
+  def isTemporaryFileUri(uri: URI): Boolean =
+    uri.getScheme == "file" && {
+      val uriPath = uri.normalize.getPath
+      val tmpPath = new File(System.getProperty("java.io.tmpdir")).toURI.normalize.getPath
+
+      uriPath.startsWith(tmpPath)
+    }
+}

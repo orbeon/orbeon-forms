@@ -18,6 +18,7 @@ import java.net.URI
 import java.{util ⇒ ju}
 
 import enumeratum._
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
@@ -231,7 +232,7 @@ trait FormRunnerPersistence {
     val url = new URI(rewrittenURLString)
 
     val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-      scheme           = url.getScheme,
+      scheme           = UriScheme.withName(url.getScheme),
       hasCredentials   = false,
       customHeaders    = Map(),
       headersToForward = Connection.headersToForwardFromProperty,

@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.junit.Test
 import org.mockito.Mockito
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
@@ -58,7 +59,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
     val headersCapitalized =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme            = "http",
+        scheme            = UriScheme.Http,
         method            = GET,
         hasCredentials    = false,
         mediatype         = null,
@@ -107,7 +108,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
 
     val headersCapitalized =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme           = "http",
+        scheme           = UriScheme.Http,
         method           = method,
         hasCredentials   = false,
         mediatype        = bodyMediaType,

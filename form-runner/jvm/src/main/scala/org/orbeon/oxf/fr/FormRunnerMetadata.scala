@@ -28,9 +28,8 @@ import org.orbeon.xbl.ErrorSummary
 
 import scala.xml.Elem
 
-trait FormRunnerMetadata {
+object FormRunnerMetadata {
 
-  //noinspection MapFlatten
   //@XPathFunction
   def createFormMetadataDocument(data: NodeInfo): NodeInfo = {
 
@@ -137,5 +136,3 @@ trait FormRunnerMetadata {
     <metadata>{groupedMetadata}</metadata>
   }
 }
-
-object FormRunnerMetadata extends FormRunnerMetadata

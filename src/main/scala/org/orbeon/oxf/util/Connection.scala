@@ -69,11 +69,17 @@ class Connection(
     val urlString = url.toString
     val scheme    = url.getScheme
 
-    def isTemporaryFile(path: String) =
-      path.startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath)
+    def isTemporaryFileUri(uri: URI): Boolean = {
+      uri.getScheme == "file" && {
+        val uriPath = uri.normalize.getPath
+        val tmpPath = new java.io.File(System.getProperty("java.io.tmpdir")).toURI.normalize.getPath
+
+        uriPath.startsWith(tmpPath)
+      }
+    }
 
     try {
-      if (scheme == "file" && ! isTemporaryFile(url.getPath)) {
+      if (scheme == "file" && ! isTemporaryFileUri(url)) {
         throw new OXFException(s"URL scheme not allowed: $scheme")
       } else if (method == GET && SupportedNonHttpReadonlySchemes(scheme)) {
         // GET for supported but non-http: or https: schemes

@@ -1291,6 +1291,7 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1611,6 +1612,7 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>

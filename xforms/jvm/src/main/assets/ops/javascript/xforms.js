@@ -262,7 +262,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
             stringToDom: function(xmlString) {
                 if (document.implementation.createDocument) {
-                    return (new DOMParser()).parseFromString(xmlString, "application/xml");
+                    try {
+                        return (new DOMParser()).parseFromString(xmlString, "application/xml");
+                    } catch (ex) {
+                        // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
+                        // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
+                        return document.createElement("parsererror");
+                    }
                 } else if (window.ActiveXObject) {
                     var dom = new ActiveXObject("Microsoft.XMLDOM");
                     dom.async = "false";

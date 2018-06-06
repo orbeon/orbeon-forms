@@ -29,4 +29,13 @@ class XFormsSecretControl(
   element,
   effectiveId
 ) with XFormsValueControl
-  with FocusableTrait
+  with FocusableTrait {
+
+  override def getFormattedValue: Option[String] = {
+    Some(XFormsSecretControl.HiddenPasswordPlaceholder)
+  }
+}
+
+private object XFormsSecretControl {
+  val HiddenPasswordPlaceholder = "••••••••"
+}

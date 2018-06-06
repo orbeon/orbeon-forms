@@ -24,7 +24,7 @@
     <xbl:binding
         id="fr-databound-select1"
         element="fr|databound-select1"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value selection"
         xxbl:label-for="select1">
 
         <metadata

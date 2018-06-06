@@ -143,6 +143,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   final protected def getValueUseFormat(format: Option[String]) =
     format flatMap valueWithSpecifiedFormat orElse valueWithDefaultFormat
 
+  // Convenience method for handler: return a formatted value for read-only output
+  def getFormattedValue: Option[String] = Option(getExternalValue())
+
   // Format value according to format attribute
   final protected def valueWithSpecifiedFormat(format: String): Option[String] = {
     assert(isRelevant)

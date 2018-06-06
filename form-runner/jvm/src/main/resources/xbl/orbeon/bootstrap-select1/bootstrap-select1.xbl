@@ -23,7 +23,7 @@
     <xbl:binding
         id="fr-bootstrap-select1-binding"
         element="fr|bootstrap-select1, xf|select1[appearance ~= bootstrap]"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value selection"
         xxbl:container="span">
 
         <xbl:template>

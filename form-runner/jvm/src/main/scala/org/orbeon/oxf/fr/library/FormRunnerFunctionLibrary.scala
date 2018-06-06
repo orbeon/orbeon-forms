@@ -18,7 +18,7 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
-import org.orbeon.oxf.fr.{FormRunner, XMLNames}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -125,7 +125,8 @@ private object FormRunnerFunctions {
     "form-title"                  → (() ⇒ FormRunner.formTitleFromMetadata.orNull),
     "lang"                        → (() ⇒ FormRunner.currentLang),
     "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
-    "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull)
+    "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
+    "relevant-form-values-string" → (() ⇒ FormRunnerMetadata.findAllControlsWithValues)
   )
 
   val BooleanGettersByName = List(

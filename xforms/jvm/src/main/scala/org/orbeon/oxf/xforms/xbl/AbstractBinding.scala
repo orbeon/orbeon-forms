@@ -79,6 +79,7 @@ case class AbstractBinding(
   def modeFocus               = xblMode("focus")
   def modeLHHACustom          = modeLHHA && xblMode("custom-lhha")
   def modeItemset             = xblMode("itemset") // NIY as of 2012-11-20
+  def modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
   def modeHandlers            = ! xblMode("nohandlers")
 
   val labelFor                = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)

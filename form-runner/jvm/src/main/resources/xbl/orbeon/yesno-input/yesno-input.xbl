@@ -23,7 +23,7 @@
     <xbl:binding
         id="fr-yesno-input-binding"
         element="fr|yesno-input, xf|input:xxf-type('xs:boolean')[appearance ~= yesno]"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value selection"
         xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

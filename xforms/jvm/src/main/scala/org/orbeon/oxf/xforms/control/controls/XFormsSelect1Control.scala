@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableCo
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -108,18 +108,21 @@ class XFormsSelect1Control(
     val itemset       = getItemset ensuring (_ ne null)
 
     setExternalValue(
-      if (! isStaticReadonly) {
-        // Find the position of the first matching value
-        itemset.allItemsIterator              find
-          (_.value == internalValue)          map
-          (_.externalValue(mustEncodeValues)) orNull
-      } else {
-        // External value is the label
-        itemset.selectedItems(internalValue)  map
-        (_.label.htmlValue(getLocationData))  mkString
-        " - "
-      }
+      if (! isStaticReadonly)
+        findSelectedItem map (_.externalValue(mustEncodeValues)) orNull
+      else
+        findSelectedItem map (_.label.htmlValue(getLocationData)) orNull // external value is the label
     )
+  }
+
+  def findSelectedItems: List[Item] = findSelectedItem.toList
+
+  def findSelectedItem: Option[Item] = {
+
+    val internalValue = getValue   ensuring (_ ne null)
+    val itemset       = getItemset ensuring (_ ne null)
+
+    itemset.allItemsIterator find (_.value == internalValue)
   }
 
   override def translateExternalValue(externalValue: String) = {

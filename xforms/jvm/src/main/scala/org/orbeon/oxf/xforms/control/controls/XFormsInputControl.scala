@@ -138,9 +138,8 @@ class XFormsInputControl(
     result getOrElse ""
   }
 
-  // Convenience method for handler: return a formatted value for read-only output
-  def getReadonlyValue: String =
-    getValueUseFormat(format) getOrElse getExternalValue
+  override def getFormattedValue: Option[String] =
+    getValueUseFormat(format) orElse Option(getExternalValue)
 
   private def formatSubValue(valueType: String, value: String) = {
     val variables = Map[String, ValueRepresentation]("v" → stringToStringValue(value))

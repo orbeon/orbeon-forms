@@ -54,6 +54,11 @@ class XFormsValueComponentControl(
   // Don't expose an external value unless explicitly allowed
   override def handleExternalValue = staticControl.abstractBinding.modeExternalValue
 
+  // Try to use the value type and associated format
+  // TODO: Later: declarative support for formatted values in XBL controls.
+  // See https://github.com/orbeon/orbeon-forms/issues/2428
+  override def getFormattedValue: Option[String] = valueWithDefaultFormat
+
   // TODO
   override def findAriaByControlEffectiveId = None
 }

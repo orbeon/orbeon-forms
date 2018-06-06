@@ -20,7 +20,12 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding id="fr-us-state-binding" element="fr|us-state" xxbl:container="span" xxbl:mode="lhha binding value" xxbl:label-for="select1">
+    <xbl:binding
+        id="fr-us-state-binding"
+        element="fr|us-state"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value selection"
+        xxbl:label-for="select1">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">

@@ -221,9 +221,9 @@ class XFormsInputHandler(
         if (isRelevantControl) {
           val atts = List("class" → "xforms-field")
           withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts) {
-            val outputValue = inputControl.getReadonlyValue
-            if (outputValue ne null)
-              xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)
+            inputControl.getFormattedValue foreach { value ⇒
+              xmlReceiver.characters(value.toCharArray, 0, value.length)
+            }
           }
         }
       }

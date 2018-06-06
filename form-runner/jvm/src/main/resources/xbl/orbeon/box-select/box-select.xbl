@@ -27,7 +27,10 @@
     <!--
         Selection control appearing like a box containing rows of checkboxes.
      -->
-    <xbl:binding id="fr-box-select-binding" element="fr|box-select, xf|select[appearance ~= scroll]" xxbl:mode="lhha binding value">
+    <xbl:binding
+        id="fr-box-select-binding"
+        element="fr|box-select, xf|select[appearance ~= scroll]"
+        xxbl:mode="lhha binding value selection">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

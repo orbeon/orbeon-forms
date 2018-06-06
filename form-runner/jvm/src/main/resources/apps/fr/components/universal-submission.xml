@@ -35,7 +35,7 @@
                 if ($params = ('pdf', 'pdf-url', 'tiff', 'tiff-url')) then
                    xxf:instance('fr-urls-instance')/*[name() = instance('fr-send-submission-params')/@binary-content-key]
                 else if ($params = 'metadata') then
-                   metadata:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+                   metadata:createFormMetadataDocument()
                 else
                    (
                        (: Migrate if needed :)

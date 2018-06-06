@@ -24,7 +24,7 @@
         id="fr-dropdown-select1"
         element="fr|dropdown-select1, xf|select1[appearance ~= dropdown]"
         xxbl:container="span"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value selection"
         xxbl:label-for="select1">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

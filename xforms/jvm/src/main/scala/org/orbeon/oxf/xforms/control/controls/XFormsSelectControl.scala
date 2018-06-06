@@ -96,14 +96,32 @@ class XFormsSelectControl(
 
   override def evaluateExternalValue(): Unit = {
 
+    val selectedItems = findSelectedItems
+
+    val updatedValue =
+      if (selectedItems.isEmpty) {
+        ""
+      } else {
+
+        val localMustEncodeValues = mustEncodeValues
+
+        // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
+        // there might be duplicates.
+        selectedItems.iterator map (_.externalValue(localMustEncodeValues)) mkString " "
+      }
+
+    setExternalValue(updatedValue)
+  }
+
+  override def findSelectedItems: List[Item] = {
+
     // If the control is relevant, its internal value and itemset must be defined
     val internalValue = getValue   ensuring (_ ne null)
     val itemset       = getItemset ensuring (_ ne null)
 
-    val updatedValue =
-      if (internalValue == "") {
-        // This means that nothing is selected
-        internalValue
+    if (internalValue == "") {
+        // Nothing is selected
+        Nil
       } else {
         // Values in the itemset
         val instanceValues = valueAsSet(internalValue)
@@ -114,14 +132,10 @@ class XFormsSelectControl(
             item ← itemset.allItemsIterator
             if instanceValues(item.value)
           } yield
-            item.externalValue(mustEncodeValues)
+            item
 
-        // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
-        // there might be duplicates.
-        intersection mkString " "
+        intersection.to[List]
       }
-
-    setExternalValue(updatedValue)
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {

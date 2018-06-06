@@ -15,16 +15,19 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
-import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Option;
 
 /**
  * Handle xf:secret.
  */
 public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
-
-    private static final String HIDDEN_PASSWORD = "••••••••";
 
     public XFormsSecretHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
         super(uri, localname, qName, attributes, matched, handlerContext, false, false);
@@ -74,10 +77,10 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
 
-                final String value = secretControl.getValue();
-                // TODO: Make sure that Ajax response doesn't send the value back
-                if (value != null && value.length() > 0)
-                    contentHandler.characters(HIDDEN_PASSWORD.toCharArray(), 0, HIDDEN_PASSWORD.length());
+                final Option<String> value = secretControl.getFormattedValue();
+                if (value.isDefined())
+                    contentHandler.characters(value.get().toCharArray(), 0, value.get().length());
+
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
         }

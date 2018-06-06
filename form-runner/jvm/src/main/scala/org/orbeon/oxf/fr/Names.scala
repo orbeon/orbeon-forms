@@ -30,4 +30,5 @@ object Names {
 
   val Resource          = "resource"
   val Item              = "item"
+  val Value             = "value"
 }

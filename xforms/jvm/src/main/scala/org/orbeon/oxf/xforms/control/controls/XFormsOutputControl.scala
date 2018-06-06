@@ -101,7 +101,7 @@ class XFormsOutputControl(
       } else {
         // Other mediatypes
         valueAttributeOpt match {
-          case Some(valueAttribute) ⇒
+          case Some(_) ⇒
             // There is a @value attribute, don't use format
             internalValue
           case None ⇒

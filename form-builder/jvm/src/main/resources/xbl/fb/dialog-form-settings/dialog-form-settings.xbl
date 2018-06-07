@@ -790,40 +790,35 @@
 
                             <!-- Email (put last for now because it has a repeat) -->
                             <fr:tab ref="email/(subject, body)" visible="$is-form-settings">
-                                <!-- TODO: i18n -->
-                                <fr:label value="if (local-name() = 'subject') then 'Email Subject' else 'Email Body'"/>
+                                <fr:label ref="$resources/dialog-form-settings/email/*[name() = local-name(context())]"/>
 
-                                <!--<fr:label-->
-                                    <!--ref="-->
-                                        <!--$resources/dialog-control-details/*[-->
-                                            <!--name() = concat('control-', local-name(context()))-->
-                                        <!--]/label"/>-->
-
-                                <xf:var name="template" value="template[@xml:lang = $i/lang]"/>
+                                <xf:var name="is-subject" value="local-name() = 'subject'"/>
+                                <xf:var name="template"   value="template[@xml:lang = $i/lang]"/>
 
                                 <fr:grid>
                                     <fr:c x="1" y="1" w="6">
                                         <fr:checkbox-input ref="$template/@properties">
-                                            <!-- TODO: i18n -->
-                                            <xf:label>Template from Properties</xf:label>
+                                            <xf:label ref="$resources/dialog-form-settings/email/from-properties"/>
                                         </fr:checkbox-input>
                                     </fr:c>
                                     <fr:c x="6" y="1" w="6">
-                                        <fr:checkbox-input ref="$template/@html" appearance="full">
+                                        <fr:checkbox-input ref="$template/@html[not($is-subject)]" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/use-html"/>
                                         </fr:checkbox-input>
                                     </fr:c>
                                     <fr:c x="1" y="2" w="12">
                                         <xf:var name="is-html" value="$template/@html = true()"/>
-                                        <xf:textarea ref="if ($template/@properties = true()) then '' else $template[not($is-html)]">
-                                            <!-- TODO: i18n -->
-                                            <xf:label ref="$resources/xxx/label"/>
-                                            <xf:hint  ref="$resources/xxx/hint"/>
+                                        <xf:input ref="if ($is-subject) then (if ($template/@properties = true()) then '' else $template[not($is-html)]) else ()">
+                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
+                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
+                                        </xf:input>
+                                        <xf:textarea ref="if (not($is-subject)) then (if ($template/@properties = true()) then '' else $template[not($is-html)]) else ()">
+                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
+                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
                                         </xf:textarea>
-                                        <fr:tinymce ref="$template[$is-html and @properties = false()]">
-                                            <!-- TODO: i18n -->
-                                            <xf:label ref="$resources/xxx/label"/>
-                                            <xf:hint  ref="$resources/xxx/hint"/>
+                                        <fr:tinymce ref="if (not($is-subject)) then ($template[$is-html and @properties = false()]) else ()">
+                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
+                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
                                         </fr:tinymce>
                                     </fr:c>
                                     <fr:c x="1" y="3" w="12">

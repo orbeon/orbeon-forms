@@ -349,6 +349,14 @@
                 <label>Automatic calculation dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject>Email Subject</subject>
+                <body>Email Body</body>
+                <from-properties>Template from Properties</from-properties>
+                <template>
+                    <label>Template</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -560,7 +568,7 @@
             <validation-details><label>Validation Details</label></validation-details>
             <level><label>Level</label></level>
             <use-html>Use HTML</use-html>
-            <parameters>Parameters</parameters>
+            <parameters>Template Parameters</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Section/Grid Settings</label>
@@ -1401,6 +1409,14 @@
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
             </analysis-calculate>
+            <email>
+                <subject>Sujet email</subject>
+                <body>Corps email</body>
+                <from-properties>Le modèle vient des propriétés</from-properties>
+                <template>
+                    <label>Modèle</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -1612,7 +1628,7 @@
             <validation-details><label>Détails de validation</label></validation-details>
             <level><label>Niveau</label></level>
             <use-html>En HTML</use-html>
-            <parameters>Paramètres</parameters>
+            <parameters>Paramètres du modèle</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Paramètres de la section/grille</label>
@@ -2455,6 +2471,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -2667,7 +2691,7 @@
             <validation-details><label todo="true">[Validation Details]</label></validation-details>
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Rediger seksjonsdetaljer</label>
@@ -3537,6 +3561,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -3748,7 +3780,7 @@
             <validation-details><label todo="true">[Validation Details]</label></validation-details>
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Настройки раздела</label>
@@ -4619,6 +4651,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -4830,7 +4870,7 @@
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Impostazioni sezione/griglia</label>
@@ -5693,6 +5733,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -5904,7 +5952,7 @@
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
@@ -6770,6 +6818,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -6981,7 +7037,7 @@
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label todo="true">Lohkon yksityiskohdat</label>
@@ -7844,6 +7900,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -8055,7 +8119,7 @@
             <validation-details><label>Detalles de Validación</label></validation-details>
             <level><label>Nivel</label></level>
             <use-html>Usa HTML</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Detalles de Sección/Grilla</label>
@@ -8919,6 +8983,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -9130,7 +9202,7 @@
             <validation-details><label>Detalhes de Validação</label></validation-details>
             <level><label>Nível</label></level>
             <use-html>Usar HTML</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Configurações da Secção/Grelha</label>
@@ -10000,6 +10072,14 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <email>
+                <subject todo="true">[Email Subject]</subject>
+                <body todo="true">[Email Body]</body>
+                <from-properties todo="true">[Template from Properties]</from-properties>
+                <template>
+                    <label todo="true">[Template]</label>
+                </template>
+            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>
@@ -10211,7 +10291,7 @@
             <validation-details><label>Valideringsdetaljer</label></validation-details>
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
-            <parameters todo="true">[Parameters]</parameters>
+            <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Sektions-/rutnätsinställningar</label>

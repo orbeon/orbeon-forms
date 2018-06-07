@@ -18,6 +18,7 @@
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:metadata="java:org.orbeon.oxf.fr.FormRunnerMetadata"
 
     version="2.0">
 
@@ -26,6 +27,8 @@
     <xsl:variable name="request"      select="doc('input:request')/*"      as="element(request)"/>
     <xsl:variable name="fr-resources" select="doc('input:fr-resources')/*" as="element(resources)"/>
     <xsl:variable name="attachments"  select="doc('input:attachments')/*"  as="element(attachments)"/>
+
+    <xsl:variable name="metadata"     select="frf:metadataInstanceRootOpt($xhtml)" as="element(metadata)"/>
 
     <!-- Language requested -->
     <xsl:variable
@@ -172,7 +175,47 @@
             <body content-type="multipart/related">
                 <!-- Email body -->
                 <part name="text" content-type="text/plain">
-                    <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
+
+                    <xsl:choose>
+                        <xsl:when test="exists($metadata/email/body/template) and empty($metadata/email/body/fr:param)">
+                            <!-- Just a template -->
+                            <xsl:value-of select="$metadata/email/body/template[@xml:lang = $request-language]"/>
+                        </xsl:when>
+                        <xsl:when test="exists($metadata/email/body/fr:param)">
+                            <!-- Parameters to a template -->
+                            <xsl:value-of
+                                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+                                xmlns:saxon="http://saxon.sf.net/"
+                                select="
+                                    p:process-template(
+                                        (
+                                            $metadata/email/body/template[@xml:lang = $request-language],
+                                            $fr-resources/resource[@xml:lang = $request-language]/email/body
+                                        )[1],
+                                        'en',
+                                        map:merge(
+                                            for $p in $metadata/email/body/fr:param
+                                            return
+                                                map:entry(
+                                                    $p/fr:name,
+                                                    if ($p/@type = 'ExpressionParam') then
+                                                        string(($data/saxon:evaluate($p/fr:expr))[1])   (: NOTE: Form Runner function library os not in scope. :)
+                                                    else if ($p/@type = 'ControlValueParam') then
+                                                        error()                                         (: TODO: Not implemented yet. :)
+                                                    else if ($p/@type = 'AllControlValuesParam') then
+                                                        metadata:findAllControlsWithValues()
+                                                    else
+                                                        error()
+                                                )
+                                        )
+                                    )
+                                "/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- Use the body from resources or properties -->
+                            <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </part>
                 <!-- XML, PDF and TIFF attachments if needed -->
                 <xsl:for-each select="'xml', 'pdf', 'tiff'">

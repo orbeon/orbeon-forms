@@ -206,7 +206,7 @@
                         </xf:switch>
 
                         <xh:div class="fb-param-buttons">
-                            <xh:i class="icon-align-justify fb-param-grab"/>
+                            <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
                             <xf:trigger
                                 appearance="minimal"
                                 ref="if ($can-remove-param) then $i else ''">

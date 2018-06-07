@@ -291,7 +291,7 @@
 
                             </xh:div>
                             <xh:div class="fb-action-buttons">
-                                <xh:i class="icon-align-justify fb-action-grab"/>
+                                <xh:i class="fa fa-fw fa-bars fb-action-grab"/>
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
@@ -390,7 +390,7 @@
 
                             </xh:div>
                             <xh:div class="fb-action-buttons">
-                                <xh:i class="icon-align-justify fb-action-grab"/>
+                                <xh:i class="fa fa-fw fa-bars fb-action-grab"/>
                                 <xf:trigger
                                     appearance="minimal"
                                     ref="if ($can-remove-action) then $request-actions-container else ''">
@@ -560,7 +560,7 @@
                         </xh:div>
 
                         <xh:div class="fb-action-buttons">
-                            <xh:i class="icon-align-justify fb-action-grab"/>
+                            <xh:i class="fa fa-fw fa-bars fb-action-grab"/>
                             <xf:trigger
                                 appearance="minimal"
                                 ref="if ($can-remove-action) then $response-actions-container else ''">

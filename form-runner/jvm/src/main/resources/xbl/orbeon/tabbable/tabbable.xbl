@@ -113,7 +113,7 @@
                                                         </xf:output>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
-                                                <xh:i class="icon-align-justify fr-tabbable-grab"/>
+                                                <xh:i class="fa fa-fw fa-bars fr-tabbable-grab"/>
                                             </xh:a>
                                         </xh:li>
                                     </xsl:variable>

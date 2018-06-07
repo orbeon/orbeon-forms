@@ -33,10 +33,6 @@
             <xbl:style src="/xbl/fb/parameters-editor/parameters-editor.css"/>
         </xbl:resources>
 
-        <xbl:handlers>
-
-        </xbl:handlers>
-
         <xbl:implementation>
             <xf:model id="model">
 
@@ -122,24 +118,23 @@
                         }">
 
                         <xf:input ref="$current-param/fr:name" class="fb-param-name">
-                            <!-- TODO i18n -->
-                            <xf:label appearance="minimal">Name</xf:label>
-                            <xf:alert>Missing or incorrect value</xf:alert>
+                            <xf:label appearance="minimal" ref="$resources/components/parameters-editor/name/label"/>
+                            <xf:alert ref="$resources/components/parameters-editor/name/alert"/>
                         </xf:input>
 
                         <xf:select1 ref="$current-param/@type" class="fb-param-type">
                             <xf:label>Type</xf:label>
 
                             <xf:item>
-                                <xf:label>Control Value</xf:label>
+                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 0]"/>
                                 <xf:value>ControlValueParam</xf:value>
                             </xf:item>
                             <xf:item>
-                                <xf:label>XPath Expression</xf:label>
+                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 1]"/>
                                 <xf:value>ExpressionParam</xf:value>
                             </xf:item>
                             <xf:item>
-                                <xf:label>All Control Values</xf:label>
+                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 2]"/>
                                 <xf:value>AllControlValuesParam</xf:value>
                             </xf:item>
 
@@ -167,17 +162,15 @@
                         <xf:switch caseref="$current-param/@type" class="fb-param-details">
                             <xf:case value="'ExpressionParam'">
                                 <xf:input ref="$current-param/fr:expr">
-                                    <!-- TODO i18n -->
-                                    <xf:label appearance="minimal">XPath Expression</xf:label>
-                                    <xf:alert>Incorrect XPath expression</xf:alert>
+                                    <xf:label appearance="minimal" ref="$resources/components/parameters-editor/xpath/label"/>
+                                    <xf:alert ref="$resources/components/parameters-editor/xpath/alert"/>
                                 </xf:input>
                             </xf:case>
                             <xf:case value="'ControlValueParam'">
                                 <xf:var name="current-resources" value="fbf:currentResources()"/>
                                 <fr:dropdown-select1 ref="$current-param/fr:controlName">
-                                    <!-- TODO i18n -->
-                                    <xf:label appearance="minimal">Control</xf:label>
-                                    <xf:alert>Missing value</xf:alert>
+                                    <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
+                                    <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
 
                                     <!--  NOTE: If the form has lots of controls (say, > 1000), showing all controls in the itemset is
                                           costly (say, takes > 10 seconds). We need something different in this case, like a search

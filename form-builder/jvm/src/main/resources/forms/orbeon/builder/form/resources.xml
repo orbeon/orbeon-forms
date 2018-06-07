@@ -279,6 +279,27 @@
         <or>
             <label>or</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label>Name</label>
+                    <alert>Missing or incorrect value</alert>
+                </name>
+                <xpath>
+                    <label>XPath Expression</label>
+                    <alert>Incorrect XPath expression</alert>
+                </xpath>
+                <control>
+                    <label>Control</label>
+                    <alert>Missing value</alert>
+                </control>
+                <type>
+                    <item id="0">Control Value</item>
+                    <item id="1">XPath Expression</item>
+                    <item id="2">All Control Values</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
@@ -1339,6 +1360,27 @@
         <or>
             <label>ou</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label>Nom</label>
+                    <alert>Valeur manquante ou incorrecte</alert>
+                </name>
+                <xpath>
+                    <label>Expression XPath</label>
+                    <alert>Expression XPath incorrecte</alert>
+                </xpath>
+                <control>
+                    <label>Contrôle</label>
+                    <alert>Valeur manquante</alert>
+                </control>
+                <type>
+                    <item id="0">Valeur de contrôle</item>
+                    <item id="1">Expression XPath</item>
+                    <item id="2">Toutes les valeurs</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Paramètres du formulaire</label>
             <save-as>Sauvegarder sous…</save-as>
@@ -2401,6 +2443,27 @@
         <or>
             <label>eller</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
@@ -3491,6 +3554,27 @@
         <or>
             <label>или</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
@@ -4581,6 +4665,27 @@
         <or>
             <label>o</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Impostazioni modulo</label>
             <save-as>Salva con nome…</save-as>
@@ -5663,6 +5768,27 @@
         <or>
             <label>oder</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Formulareinstellungen</label>
             <save-as>Speichern unter...</save-as>
@@ -6748,6 +6874,27 @@
         <or>
             <label>tai</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Lomakeasetukset</label>
             <save-as>Tallenna nimellä</save-as>
@@ -7830,6 +7977,27 @@
         <or>
             <label>o</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Configuración del Formulario</label>
             <save-as>Guardar como…</save-as>
@@ -8913,6 +9081,27 @@
         <or>
             <label>ou</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Configurações do Formulário</label>
             <save-as>Guardar como…</save-as>
@@ -10002,6 +10191,27 @@
         <or>
             <label>eller</label>
         </or>
+        <components>
+            <parameters-editor>
+                <name>
+                    <label todo="true">[Name]</label>
+                    <alert todo="true">[Missing or incorrect value]</alert>
+                </name>
+                <xpath>
+                    <label todo="true">[XPath Expression]</label>
+                    <alert todo="true">[Incorrect XPath expression]</alert>
+                </xpath>
+                <control>
+                    <label todo="true">[Control]</label>
+                    <alert todo="true">[Missing value]</alert>
+                </control>
+                <type>
+                    <item id="0" todo="true">[Control Value]</item>
+                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="2" todo="true">[All Control Values]</item>
+                </type>
+            </parameters-editor>
+        </components>
         <dialog-form-settings>
             <label>Inställningar för formulär</label>
             <save-as>Spara som…</save-as>

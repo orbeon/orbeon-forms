@@ -78,6 +78,12 @@
                     </fr:param>
                 </xf:instance>
 
+                <!-- NOTE: This could be generated automatically. -->
+                <xf:instance id="all-control-values-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <fr:param type="AllControlValuesParam">
+                        <fr:name/>
+                    </fr:param>
+                </xf:instance>
 
                 <xf:var name="template" value="instance('control-value-template')"/>
 
@@ -132,6 +138,10 @@
                                 <xf:label>XPath Expression</xf:label>
                                 <xf:value>ExpressionParam</xf:value>
                             </xf:item>
+                            <xf:item>
+                                <xf:label>All Control Values</xf:label>
+                                <xf:value>AllControlValuesParam</xf:value>
+                            </xf:item>
 
                             <xf:action event="xforms-select">
                                 <xf:var name="name" value="../fr:name"/>
@@ -144,6 +154,8 @@
                                                 instance('expression-param-template')
                                             else if (event('xxf:item-value') = 'ControlValueParam') then
                                                 instance('control-value-template')
+                                            else if (event('xxf:item-value') = 'AllControlValuesParam') then
+                                                instance('all-control-values-template')
                                             else
                                                 error()
                                         )/*
@@ -187,6 +199,9 @@
                                         <xf:value value="."/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
+                            </xf:case>
+                            <xf:case value="'AllControlValuesParam'">
+                                <!-- No configuration -->
                             </xf:case>
                         </xf:switch>
 

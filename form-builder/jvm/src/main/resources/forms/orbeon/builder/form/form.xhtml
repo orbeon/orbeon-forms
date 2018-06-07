@@ -146,6 +146,7 @@
                                         <xf:delete ref="$resources/resource[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/title[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/description[@xml:lang = $fb-lang]"/>
+                                        <xf:delete ref="$metadata-instance/email/(subject | body)/template[@xml:lang = $fb-lang]"/>
                                         <xf:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
 
                                         <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
@@ -272,7 +273,12 @@
                                 <xf:action ev:event="#all" ev:propagate="stop"/>
 
                                 <!-- Form settings dialog -->
-                                <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources" body-ref="$body">
+                                <fb:dialog-form-settings
+                                    id="dialog-form-settings"
+                                    resources-ref="$form-resources"
+                                    fr-resources-ref="$fr-resources"
+                                    body-ref="$body">
+
                                     <!-- Update title/description -->
                                     <xf:action ev:event="fb-update-metadata">
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
@@ -365,6 +371,15 @@
                                             if="event('analysis-calculate') = ('true', 'false')"
                                             context="bind('fb-form-model-bind')"
                                             origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
+
+                                        <!-- TODO: Set/update relevant xml:lang -->
+                                        <xf:delete
+                                            bind="email-bind"/>
+                                        <xf:insert
+                                            if="exists(event('email'))"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="event('email')"/>
 
                                     </xf:action>
                                     <!-- Update app/form name if changed -->

@@ -344,6 +344,8 @@
                     if="$valid-app-form-params"
                     name="fb-update-metadata"
                     targetid="dialog-form-settings">
+                <xf:property name="lang"                          value="$fb-lang"/>
+                <xf:property name="langs"                         value="$resources/resource/@xml:lang/string()"/>
                 <xf:property name="mode"                          value="'new'"/>
                 <xf:property name="app"                           value="$requested-app"/>
                 <xf:property name="form"                          value="$requested-form"/>
@@ -360,11 +362,14 @@
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
+                <xf:property name="email"                         value="()"/>
             </xf:dispatch>
 
             <xxf:show
                     if="not($valid-app-form-params)"
                     dialog="dialog-form-settings">
+                <xf:property name="lang"                          value="$fb-lang"/>
+                <xf:property name="langs"                         value="$resources/resource/@xml:lang/string()"/>
                 <xf:property name="mode"                          value="'new'"/>
                 <xf:property name="app"                           value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"                          value="($requested-form,        bind('form-name-bind'))[1]"/>
@@ -381,6 +386,7 @@
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
+                <xf:property name="email"                         value="()"/>
             </xxf:show>
         </xf:action>
     </xf:action>
@@ -400,6 +406,7 @@
                     <xf:bind id="wizard-mode-bind"            ref="wizard-mode"/>
                     <xf:bind id="wizard-subsections-nav-bind" ref="wizard-subsections-nav"/>
                     <xf:bind id="wizard-subsections-toc-bind" ref="wizard-subsections-toc"/>
+                    <xf:bind id="email-bind"                  ref="email"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*" id="attachments-bind">

@@ -30,7 +30,12 @@
             <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
 
                 <!-- Clear local values -->
-                <xf:setvalue iterate="*[not(*)]" ref="."/>
+                <xf:setvalue iterate="$i//*[not(*)]" ref="."/>
+                <xf:setvalue iterate="$i//@*"        ref="."/>
+
+                <xf:setvalue
+                    ref="$i/lang"
+                    value="event('lang')"/>
 
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
@@ -82,6 +87,55 @@
                 <xf:setvalue
                     ref="$i/analysis-calculate"
                     value="(event('analysis-calculate')[. = ('true', 'false')], 'default')[1]"/>
+
+                <!-- Email settings -->
+                <xf:action iterate="$i/email/(subject | body)">
+
+                    <xf:var name="local" value="."/>
+                    <xf:var name="meta"  value="event('email')/*[local-name() = local-name($local)]"/>
+
+                    <xf:delete ref="$local/template"/>
+                    <xf:delete ref="$local/params/*"/>
+
+                    <xf:action if="empty($meta/template)">
+
+                        <xf:insert
+                            context="$local"
+                            origin="
+                                for $lang in event('langs')
+                                return
+                                    xf:element(
+                                        'template',
+                                        (
+                                            xf:attribute('xml:lang',   $lang),
+                                            xf:attribute('html',       false()),
+                                            xf:attribute('properties', true())
+                                        )
+                                    )"/>
+
+                    </xf:action>
+
+                    <!-- Copy and adjust data from external format to internal one -->
+                    <xf:insert
+                        context="$local"
+                        origin="
+                            for $t in $meta/template
+                            return
+                                xf:element(
+                                    'template',
+                                    (
+                                        $t/@xml:lang,
+                                        xf:attribute('html',       $t/@mediatype = 'text/html'),
+                                        xf:attribute('properties', false()),
+                                        $t/string()
+                                    )
+                                )"/>
+
+                    <xf:insert
+                        context="$local/params"
+                        origin="$meta/fr:param"/>
+
+                </xf:action>
 
                 <!--  Sanitize as caller might pass an initial app name which is not allowed by current permissions -->
                 <xf:action if="$has-roles and not($allowed-apps-if-has-roles = ('*', event('app')))">
@@ -155,6 +209,50 @@
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
 
                     <xf:property
+                        name="email"
+                        value="
+                            if (
+                                $i/email/(subject, body)/template[@xml:lang = $i/lang]/@properties = false() or
+                                exists($i/email/(subject, body)/params/fr:param)
+                            ) then
+                                xf:element(
+                                    'email',
+                                    for $elem in $i/email/(subject, body)
+                                    return
+                                        if (
+                                            $elem/template[@xml:lang = $i/lang]/@properties = false() or
+                                            exists($elem/params/fr:param)
+                                        ) then
+                                            xf:element(
+                                                local-name($elem),
+                                                (
+                                                    if ($elem/template[@xml:lang = $i/lang]/@properties = false()) then
+                                                        for $t in $elem/template
+                                                        return
+                                                            xf:element(
+                                                                'template',
+                                                                (
+                                                                    $t/@xml:lang,
+                                                                    if ($t/@html = true()) then
+                                                                        xf:attribute('mediatype', 'text/html')
+                                                                    else
+                                                                        (),
+                                                                    $t/string()
+                                                                )
+                                                            )
+                                                    else
+                                                        (),
+                                                    (: NOTE: We choose to use the `fr` namespace out of consistency with LHHA :)
+                                                    $elem/params/fr:param
+                                                )
+                                            )
+                                        else
+                                            ()
+                                )
+                            else
+                                ()"/>
+
+                    <xf:property
                         name="labels"
                         value="
                             if ($i/labels = 'default') then
@@ -190,6 +288,7 @@
             <xf:model id="model">
                 <xf:instance id="local">
                     <instance>
+                        <lang/>
                         <app/>
                         <form/>
                         <title/>
@@ -208,6 +307,16 @@
                         <hints-placeholders/>
                         <mode/>
                         <analysis-calculate/>
+                        <email>
+                            <subject>
+                                <template html="" properties=""/>
+                                <params/>
+                            </subject>
+                            <body>
+                                <template html="" properties=""/>
+                                <params/>
+                            </body>
+                        </email>
                     </instance>
                 </xf:instance>
 
@@ -273,6 +382,15 @@
                 <xf:bind
                     ref="mode"
                     constraint=". = ('new', 'edit', 'save-as')"/>
+                <xf:bind ref="email/(subject | body)/template">
+                    <xf:bind
+                        ref="@html | @properties"
+                        type="xs:boolean"/>
+                    <xf:bind
+                        ref="@html"
+                        readonly="../@properties = true()"/>
+                </xf:bind>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -609,7 +727,6 @@
 
                             </fr:tab>
 
-
                             <!-- Stats -->
                             <fr:tab class="fb-dialog-form-settings-stats" visible="$is-form-settings">
                                 <fr:label value="$resources/dialog-form-settings/stats"/>
@@ -671,7 +788,56 @@
                                 </fr:tab>
                             </xsl:if>
 
+                            <!-- Email (put last for now because it has a repeat) -->
+                            <fr:tab ref="email/(subject, body)" visible="$is-form-settings">
+                                <!-- TODO: i18n -->
+                                <fr:label value="if (local-name() = 'subject') then 'Email Subject' else 'Email Body'"/>
+
+                                <!--<fr:label-->
+                                    <!--ref="-->
+                                        <!--$resources/dialog-control-details/*[-->
+                                            <!--name() = concat('control-', local-name(context()))-->
+                                        <!--]/label"/>-->
+
+                                <xf:var name="template" value="template[@xml:lang = $i/lang]"/>
+
+                                <fr:grid>
+                                    <fr:c x="1" y="1" w="6">
+                                        <fr:checkbox-input ref="$template/@properties">
+                                            <!-- TODO: i18n -->
+                                            <xf:label>Template from Properties</xf:label>
+                                        </fr:checkbox-input>
+                                    </fr:c>
+                                    <fr:c x="6" y="1" w="6">
+                                        <fr:checkbox-input ref="$template/@html" appearance="full">
+                                            <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                        </fr:checkbox-input>
+                                    </fr:c>
+                                    <fr:c x="1" y="2" w="12">
+                                        <xf:var name="is-html" value="$template/@html = true()"/>
+                                        <xf:textarea ref="if ($template/@properties = true()) then '' else $template[not($is-html)]">
+                                            <!-- TODO: i18n -->
+                                            <xf:label ref="$resources/xxx/label"/>
+                                            <xf:hint  ref="$resources/xxx/hint"/>
+                                        </xf:textarea>
+                                        <fr:tinymce ref="$template[$is-html and @properties = false()]">
+                                            <!-- TODO: i18n -->
+                                            <xf:label ref="$resources/xxx/label"/>
+                                            <xf:hint  ref="$resources/xxx/hint"/>
+                                        </fr:tinymce>
+                                    </fr:c>
+                                    <fr:c x="1" y="3" w="12">
+                                        <fb:parameters-editor ref="params" resources-ref="$resources">
+                                            <xf:label ref="$resources/dialog-control-details/parameters"/>
+                                        </fb:parameters-editor>
+                                    </fr:c>
+                                </fr:grid>
+
+                            </fr:tab>
+
                         </fr:tabbable>
+
+                        <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
                         <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                         <xh:div class="fr-dialog-buttons" xml:space="preserve">

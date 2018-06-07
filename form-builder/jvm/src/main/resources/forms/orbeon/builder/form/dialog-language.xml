@@ -77,6 +77,10 @@
                             <xf:insert context="." ref="title | description" origin="title[1] | description[1]"/>
                             <xf:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
                             <xf:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
+                            <xf:action iterate="email/(subject, body)">
+                                <xf:insert context="." ref="template" origin="template[1]"/>
+                                <xf:setvalue ref="template[last()]/@xml:lang" value="$variables/new-language"/>
+                            </xf:action>
                         </xf:action>
                         <!-- Change current language -->
                         <xf:setvalue ref="$fb-lang" value="$variables/new-language"/>

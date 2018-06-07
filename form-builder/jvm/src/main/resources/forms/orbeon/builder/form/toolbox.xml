@@ -40,6 +40,8 @@
                     <xf:action ev:event="DOMActivate">
                         <!-- Open the dialog in "edit" mode -->
                         <xxf:show dialog="dialog-form-settings">
+                            <xf:property name="lang"                          value="$fb-lang"/>
+                            <xf:property name="langs"                         value="$resources/resource/@xml:lang/string()"/>
                             <xf:property name="mode"                          value="'edit'"/>
                             <xf:property name="app"                           value="bind('application-name-bind')"/>
                             <xf:property name="form"                          value="bind('form-name-bind')"/>
@@ -56,6 +58,7 @@
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
                             <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
+                            <xf:property name="email"                         value="bind('email-bind')"/>
                         </xxf:show>
                     </xf:action>
                 </xf:trigger>

@@ -184,13 +184,13 @@ object SerializationParameters {
                 )
             }
           }
-        case serialization @ ("text/html" | "application/xhtml+xml") ⇒
+        case serialization @ (ContentTypes.HtmlContentType | ContentTypes.XhtmlContentType) ⇒
           // HTML or XHTML serialization
           try {
             val identity = TransformerUtils.getIdentityTransformer
             TransformerUtils.applyOutputProperties(
               identity,
-              if (serialization == "text/html") "html" else "xhtml",
+              if (serialization == ContentTypes.HtmlContentType) "html" else "xhtml",
               p2.versionOpt.orNull,
               null,
               null,

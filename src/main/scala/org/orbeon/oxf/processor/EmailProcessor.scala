@@ -43,9 +43,7 @@ import scala.collection.JavaConverters._
  *
  * TODO:
  *
- * - revise support of text/html
  * - built-in support for HTML could handle src="cid:*" with part/message ids
- * - support text/xml? or just XHTML?
  * - build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 class EmailProcessor extends ProcessorImpl {
@@ -275,16 +273,23 @@ class EmailProcessor extends ProcessorImpl {
           case None ⇒
             // Content of the part is inline
 
-            // In the cases of text/html and XML, there must be exactly one root element
-            val needsRootElement = mediatype == ContentTypes.HtmlContentType// || ProcessorUtils.isXMLContentType(contentType);
+            // For HTML, we support inline HTML or inline XHTML for backward compatibility
+            val needsRootElement   = mediatype == ContentTypes.XhtmlContentType
+            val mayHaveRootElement = mediatype == ContentTypes.HtmlContentType
+
             if (needsRootElement && partOrBodyElement.elements.size != 1)
-              throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html", partOrBodyElement.getData.asInstanceOf[LocationData])
+              throw new ValidationException(
+                s"The `<body>` or `<part>` element must contain exactly one element for ${ContentTypes.XhtmlContentType}",
+                partOrBodyElement.getData.asInstanceOf[LocationData]
+              )
+
+            val hasRootElement = needsRootElement || mayHaveRootElement && ! partOrBodyElement.elements.isEmpty
 
             // Create Document and convert it into a String
-            val rootElement = if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
+            val rootElement = if (hasRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
             val partDocument = DocumentFactory.createDocument
             partDocument.setRootElement(rootElement.deepCopy.asInstanceOf[Element])
-            Right(handleInlinePartContent(partDocument, mediatype))
+            Right(handleInlinePartContent(partDocument, mediatype, hasRootElement))
         }
 
       if (! ContentTypes.isTextOrJSONContentType(mediatype)) {
@@ -326,9 +331,9 @@ class EmailProcessor extends ProcessorImpl {
       //part.setContentID(contentId);
     }
 
-    def handleInlinePartContent(document: Document, contentType: String) =
-      if (contentType == "text/html") {
-        // Convert XHTML into an HTML String
+    def handleInlinePartContent(document: Document, contentType: String, hasRootElement: Boolean) =
+      if (hasRootElement) {
+        // Convert nested XHTML into an HTML String
         val writer = new StringBuilderWriter
         val identity = TransformerUtils.getIdentityTransformerHandler
         identity.getTransformer.setOutputProperty(OutputKeys.METHOD, "html")

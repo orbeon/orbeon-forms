@@ -20,6 +20,7 @@ object ContentTypes {
   val XmlContentType            = "application/xml"
   val JsonContentType           = "application/json"
   val HtmlContentType           = "text/html"
+  val XhtmlContentType   = "application/xhtml+xml"
   val JavaScriptContentType     = "application/javascript"
   val CssContentType            = "text/css"
   val SoapContentType           = "application/soap+xml"

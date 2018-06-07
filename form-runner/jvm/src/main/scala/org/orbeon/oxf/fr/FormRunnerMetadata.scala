@@ -51,7 +51,7 @@ object FormRunnerMetadata {
   case class MultipleControlValue(storageValue: String, formattedValues: List[String]) extends ControlValue
 
   //@XPathFunction
-  def findAllControlsWithValues: String = {
+  def findAllControlsWithValues(html: Boolean): String = {
 
     val controlDetails = createFormMetadataDocument2(XFormsAPI.inScopeContainingDocument)
 
@@ -74,7 +74,10 @@ object FormRunnerMetadata {
         }
       }
 
-    linesIt mkString "\n"
+    if (html)
+      linesIt mkString ("<ul><li>", "</li><li>", "</li></ul>")
+    else
+      linesIt mkString "\n"
   }
 
   //@XPathFunction

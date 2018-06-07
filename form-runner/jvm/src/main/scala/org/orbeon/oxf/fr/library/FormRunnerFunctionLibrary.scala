@@ -126,7 +126,7 @@ private object FormRunnerFunctions {
     "lang"                        → (() ⇒ FormRunner.currentLang),
     "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
     "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
-    "relevant-form-values-string" → (() ⇒ FormRunnerMetadata.findAllControlsWithValues)
+    "relevant-form-values-string" → (() ⇒ FormRunnerMetadata.findAllControlsWithValues(html = false))
   )
 
   val BooleanGettersByName = List(

@@ -67,6 +67,60 @@
         />
     </xsl:function>
 
+    <xsl:function name="fr:build-message" as="xs:string">
+
+        <xsl:param name="type"    as="xs:string"/>
+        <xsl:param name="is-html" as="xs:boolean"/>
+
+        <xsl:variable name="metadata-elem" select="$metadata/email/*[local-name() = $type]"/>
+        <xsl:variable name="resource-elem" select="$fr-resources/resource[@xml:lang = $request-language]/email/*[local-name() = $type]"/>
+
+        <xsl:choose>
+            <xsl:when test="exists($metadata-elem/template) and empty($metadata-elem/fr:param)">
+                <!-- Just a template -->
+                <xsl:value-of select="$metadata-elem/template[@xml:lang = $request-language]"/>
+            </xsl:when>
+            <xsl:when test="exists($metadata-elem/fr:param)">
+                <!-- Parameters to a template -->
+                <xsl:variable
+                    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+                    xmlns:saxon="http://saxon.sf.net/"
+                    name="string-value"
+                    select="
+                        p:process-template(
+                            (
+                                $metadata-elem/template[@xml:lang = $request-language],
+                                $resource-elem
+                            )[1],
+                            'en',
+                            map:merge(
+                                for $p in $metadata-elem/fr:param
+                                return
+                                    map:entry(
+                                        $p/fr:name,
+                                        if ($p/@type = 'ExpressionParam') then
+                                            string(($data/saxon:evaluate($p/fr:expr))[1])   (: NOTE: Form Runner function library is not in scope. :)
+                                        else if ($p/@type = 'ControlValueParam') then
+                                            error()                                         (: TODO: Not implemented yet. :)
+                                        else if ($p/@type = 'AllControlValuesParam') then
+                                            metadata:findAllControlsWithValues($is-html)
+                                        else
+                                            error()
+                                    )
+                            )
+                        )
+                    "/>
+
+                <xsl:value-of select="concat('', $string-value, '')"/>
+
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Use the value from resources or properties -->
+                <xsl:value-of select="$resource-elem"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
     <xsl:template match="/">
         <message>
 
@@ -162,60 +216,26 @@
             <subject>
                 <xsl:choose>
                     <xsl:when test="count($subject-values) > 0">
+                        <!-- LEGACY, see https://github.com/orbeon/orbeon-forms/issues/2428 -->
                         <!-- Append subject values to static subject, comma-separated -->
                         <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, ' ', string-join($subject-values, ', '))"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- Just put static subject -->
-                        <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
+                        <xsl:value-of select="fr:build-message('subject', false())"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </subject>
             <!-- Multipart body -->
             <body content-type="multipart/related">
                 <!-- Email body -->
-                <part name="text" content-type="text/plain">
 
-                    <xsl:choose>
-                        <xsl:when test="exists($metadata/email/body/template) and empty($metadata/email/body/fr:param)">
-                            <!-- Just a template -->
-                            <xsl:value-of select="$metadata/email/body/template[@xml:lang = $request-language]"/>
-                        </xsl:when>
-                        <xsl:when test="exists($metadata/email/body/fr:param)">
-                            <!-- Parameters to a template -->
-                            <xsl:value-of
-                                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-                                xmlns:saxon="http://saxon.sf.net/"
-                                select="
-                                    p:process-template(
-                                        (
-                                            $metadata/email/body/template[@xml:lang = $request-language],
-                                            $fr-resources/resource[@xml:lang = $request-language]/email/body
-                                        )[1],
-                                        'en',
-                                        map:merge(
-                                            for $p in $metadata/email/body/fr:param
-                                            return
-                                                map:entry(
-                                                    $p/fr:name,
-                                                    if ($p/@type = 'ExpressionParam') then
-                                                        string(($data/saxon:evaluate($p/fr:expr))[1])   (: NOTE: Form Runner function library os not in scope. :)
-                                                    else if ($p/@type = 'ControlValueParam') then
-                                                        error()                                         (: TODO: Not implemented yet. :)
-                                                    else if ($p/@type = 'AllControlValuesParam') then
-                                                        metadata:findAllControlsWithValues()
-                                                    else
-                                                        error()
-                                                )
-                                        )
-                                    )
-                                "/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- Use the body from resources or properties -->
-                            <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                <xsl:variable
+                    name="is-html"
+                    select="$metadata/email/body/template[@xml:lang = $request-language]/@mediatype = 'text/html'"/>
+
+                <part name="text" content-type="{if ($is-html) then 'text/html' else 'text/plain'}">
+                    <xsl:value-of select="fr:build-message('body', $is-html)"/>
                 </part>
                 <!-- XML, PDF and TIFF attachments if needed -->
                 <xsl:for-each select="'xml', 'pdf', 'tiff'">

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import java.util.Locale
 
+import org.orbeon.saxon.function.ProcessTemplate
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -96,7 +97,7 @@ class XXFormsResourceTest extends FunSpec {
     for (((template, params), expected) ← Expected)
       it(s"must replace template to `$expected`") {
         assert(
-          expected === XXFormsResource.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))
+          expected === ProcessTemplate.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))
         )
       }
 

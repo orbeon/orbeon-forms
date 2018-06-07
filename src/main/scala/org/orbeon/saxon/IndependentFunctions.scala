@@ -15,7 +15,7 @@ package org.orbeon.saxon
 
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.`type`.Type._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.function._
@@ -213,5 +213,11 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     )
 
     Fun("create-document", classOf[CreateDocument], op = 0, min = 0, Type.NODE_TYPE, EXACTLY_ONE)
+
+    Fun("process-template", classOf[ProcessTemplate], op = 0, min = 2, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE) // `map(*)`
+    )
   }
 }

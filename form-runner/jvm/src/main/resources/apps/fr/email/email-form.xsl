@@ -81,6 +81,7 @@
                 <xsl:value-of select="$metadata-elem/template[@xml:lang = $request-language]"/>
             </xsl:when>
             <xsl:when test="exists($metadata-elem/fr:param)">
+
                 <!-- Parameters to a template -->
                 <xsl:variable
                     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
@@ -111,7 +112,7 @@
                         )
                     "/>
 
-                <xsl:value-of select="concat('', $string-value, '')"/>
+                <xsl:value-of select="$string-value"/>
 
             </xsl:when>
             <xsl:otherwise>

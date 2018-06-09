@@ -372,15 +372,6 @@
                                             context="bind('fb-form-model-bind')"
                                             origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
 
-                                        <!-- TODO: Set/update relevant xml:lang -->
-                                        <xf:delete
-                                            bind="email-bind"/>
-                                        <xf:insert
-                                            if="exists(event('email'))"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="event('email')"/>
-
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action
@@ -416,6 +407,24 @@
                                         </xf:action>
                                     </xf:action>
                                 </fb:dialog-form-settings>
+
+                                <fb:dialog-email-settings
+                                    id="dialog-email-settings"
+                                    resources-ref="$form-resources"
+                                    fr-resources-ref="$fr-resources"
+                                    body-ref="$body">
+
+                                    <xf:action ev:event="fb-update">
+                                        <xf:delete
+                                            bind="email-bind"/>
+                                        <xf:insert
+                                            if="exists(event('email'))"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="event('email')"/>
+                                    </xf:action>
+
+                                </fb:dialog-email-settings>
 
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>

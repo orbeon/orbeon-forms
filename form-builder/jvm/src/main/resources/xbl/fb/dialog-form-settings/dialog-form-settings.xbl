@@ -88,55 +88,6 @@
                     ref="$i/analysis-calculate"
                     value="(event('analysis-calculate')[. = ('true', 'false')], 'default')[1]"/>
 
-                <!-- Email settings -->
-                <xf:action iterate="$i/email/(subject | body)">
-
-                    <xf:var name="local" value="."/>
-                    <xf:var name="meta"  value="event('email')/*[local-name() = local-name($local)]"/>
-
-                    <xf:delete ref="$local/template"/>
-                    <xf:delete ref="$local/params/*"/>
-
-                    <xf:action if="empty($meta/template)">
-
-                        <xf:insert
-                            context="$local"
-                            origin="
-                                for $lang in event('langs')
-                                return
-                                    xf:element(
-                                        'template',
-                                        (
-                                            xf:attribute('xml:lang',   $lang),
-                                            xf:attribute('html',       false()),
-                                            xf:attribute('properties', true())
-                                        )
-                                    )"/>
-
-                    </xf:action>
-
-                    <!-- Copy and adjust data from external format to internal one -->
-                    <xf:insert
-                        context="$local"
-                        origin="
-                            for $t in $meta/template
-                            return
-                                xf:element(
-                                    'template',
-                                    (
-                                        $t/@xml:lang,
-                                        xf:attribute('html',       $t/@mediatype = 'text/html'),
-                                        xf:attribute('properties', false()),
-                                        $t/string()
-                                    )
-                                )"/>
-
-                    <xf:insert
-                        context="$local/params"
-                        origin="$meta/fr:param"/>
-
-                </xf:action>
-
                 <!--  Sanitize as caller might pass an initial app name which is not allowed by current permissions -->
                 <xf:action if="$has-roles and not($allowed-apps-if-has-roles = ('*', event('app')))">
                     <xf:setvalue
@@ -209,50 +160,6 @@
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
 
                     <xf:property
-                        name="email"
-                        value="
-                            if (
-                                $i/email/(subject, body)/template[@xml:lang = $i/lang]/@properties = false() or
-                                exists($i/email/(subject, body)/params/fr:param)
-                            ) then
-                                xf:element(
-                                    'email',
-                                    for $elem in $i/email/(subject, body)
-                                    return
-                                        if (
-                                            $elem/template[@xml:lang = $i/lang]/@properties = false() or
-                                            exists($elem/params/fr:param)
-                                        ) then
-                                            xf:element(
-                                                local-name($elem),
-                                                (
-                                                    if ($elem/template[@xml:lang = $i/lang]/@properties = false()) then
-                                                        for $t in $elem/template
-                                                        return
-                                                            xf:element(
-                                                                'template',
-                                                                (
-                                                                    $t/@xml:lang,
-                                                                    if ($t/@html = true()) then
-                                                                        xf:attribute('mediatype', 'text/html')
-                                                                    else
-                                                                        (),
-                                                                    $t/string()
-                                                                )
-                                                            )
-                                                    else
-                                                        (),
-                                                    (: NOTE: We choose to use the `fr` namespace out of consistency with LHHA :)
-                                                    $elem/params/fr:param
-                                                )
-                                            )
-                                        else
-                                            ()
-                                )
-                            else
-                                ()"/>
-
-                    <xf:property
                         name="labels"
                         value="
                             if ($i/labels = 'default') then
@@ -307,16 +214,6 @@
                         <hints-placeholders/>
                         <mode/>
                         <analysis-calculate/>
-                        <email>
-                            <subject>
-                                <template html="" properties=""/>
-                                <params/>
-                            </subject>
-                            <body>
-                                <template html="" properties=""/>
-                                <params/>
-                            </body>
-                        </email>
                     </instance>
                 </xf:instance>
 
@@ -382,15 +279,6 @@
                 <xf:bind
                     ref="mode"
                     constraint=". = ('new', 'edit', 'save-as')"/>
-                <xf:bind ref="email/(subject | body)/template">
-                    <xf:bind
-                        ref="@html | @properties"
-                        type="xs:boolean"/>
-                    <xf:bind
-                        ref="@html"
-                        readonly="../@properties = true()"/>
-                </xf:bind>
-
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -794,48 +682,6 @@
                                     </xsl:element>
                                 </fr:tab>
                             </xsl:if>
-
-                            <!-- Email (put last for now because it has a repeat) -->
-                            <fr:tab ref="email/(subject, body)" visible="$is-form-settings">
-                                <fr:label ref="$resources/dialog-form-settings/email/*[name() = local-name(context())]"/>
-
-                                <xf:var name="is-subject" value="local-name() = 'subject'"/>
-                                <xf:var name="template"   value="template[@xml:lang = $i/lang]"/>
-
-                                <fr:grid>
-                                    <fr:c x="1" y="1" w="6">
-                                        <fr:checkbox-input ref="$template/@properties">
-                                            <xf:label ref="$resources/dialog-form-settings/email/from-properties"/>
-                                        </fr:checkbox-input>
-                                    </fr:c>
-                                    <fr:c x="6" y="1" w="6">
-                                        <fr:checkbox-input ref="$template/@html[not($is-subject)]" appearance="full">
-                                            <xf:label ref="$resources/dialog-control-details/use-html"/>
-                                        </fr:checkbox-input>
-                                    </fr:c>
-                                    <fr:c x="1" y="2" w="12">
-                                        <xf:var name="is-html" value="$template/@html = true()"/>
-                                        <xf:input ref="if ($is-subject) then (if ($template/@properties = true()) then '' else $template[not($is-html)]) else ()">
-                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
-                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
-                                        </xf:input>
-                                        <xf:textarea ref="if (not($is-subject)) then (if ($template/@properties = true()) then '' else $template[not($is-html)]) else ()">
-                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
-                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
-                                        </xf:textarea>
-                                        <fr:tinymce ref="if (not($is-subject)) then ($template[$is-html and @properties = false()]) else ()">
-                                            <xf:label ref="$resources/dialog-form-settings/email/template/label"/>
-                                            <xf:hint  ref="$resources/dialog-form-settings/email/template/hint"/>
-                                        </fr:tinymce>
-                                    </fr:c>
-                                    <fr:c x="1" y="3" w="12">
-                                        <fb:parameters-editor ref="params" resources-ref="$resources">
-                                            <xf:label ref="$resources/dialog-control-details/parameters"/>
-                                        </fb:parameters-editor>
-                                    </fr:c>
-                                </fr:grid>
-
-                            </fr:tab>
 
                         </fr:tabbable>
 

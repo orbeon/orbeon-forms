@@ -374,14 +374,6 @@
                 <label>Automatic calculation dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject>Email Subject</subject>
-                <body>Email Body</body>
-                <from-properties>Template from Properties</from-properties>
-                <template>
-                    <label>Template</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -1050,6 +1042,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label>Email Settings</label>
+            <subject>Email Subject</subject>
+            <body>Email Body</body>
+            <from-properties>Template from Properties</from-properties>
+            <template>
+                <label>Template</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions>Enable permissions for this form</enable-permissions>
@@ -1463,14 +1464,6 @@
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
             </analysis-calculate>
-            <email>
-                <subject>Sujet email</subject>
-                <body>Corps email</body>
-                <from-properties>Le modèle vient des propriétés</from-properties>
-                <template>
-                    <label>Modèle</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -2140,6 +2133,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label>Paramètres Email</label>
+            <subject>Sujet email</subject>
+            <body>Corps email</body>
+            <from-properties>Le modèle vient des propriétés</from-properties>
+            <template>
+                <label>Modèle</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions>Activer les permissions pour ce formulaire</enable-permissions>
@@ -2554,14 +2556,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -3259,6 +3253,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions todo="true">[Enable permissions for this form]</enable-permissions>
@@ -3673,14 +3676,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -4377,6 +4372,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Настройка прав</label>
             <enable-permissions>Включить для этой формы управление доступом</enable-permissions>
@@ -4792,14 +4796,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -5488,6 +5484,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Autorizzazioni</label>
             <enable-permissions>Abilita autorizzazioni per questo modulo</enable-permissions>
@@ -5903,14 +5908,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -6600,6 +6597,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Berechtigungen</label>
             <enable-permissions>Aktiviere Berechtigungen für dieses Formular</enable-permissions>
@@ -7017,14 +7023,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -7714,6 +7712,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Käyttöoikeudet</label>
             <enable-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</enable-permissions>
@@ -8128,14 +8135,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -8825,6 +8824,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Permisos</label>
             <enable-permissions>Habilitar permisos para este formulario</enable-permissions>
@@ -9240,14 +9248,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -9943,6 +9943,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Permissões</label>
             <enable-permissions>Activar as permissões para este formulário</enable-permissions>
@@ -10358,14 +10367,6 @@
                 <label todo="true">[Automatic calculation dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
-            <email>
-                <subject todo="true">[Email Subject]</subject>
-                <body todo="true">[Email Body]</body>
-                <from-properties todo="true">[Template from Properties]</from-properties>
-                <template>
-                    <label todo="true">[Template]</label>
-                </template>
-            </email>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>
@@ -11062,6 +11063,15 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-email-settings>
+            <label todo="true">[Email Settings]</label>
+            <subject todo="true">[Email Subject]</subject>
+            <body todo="true">[Email Body]</body>
+            <from-properties todo="true">[Template from Properties]</from-properties>
+            <template>
+                <label todo="true">[Template]</label>
+            </template>
+        </dialog-email-settings>
         <dialog-permissions>
             <label>Rättigheter</label>
             <enable-permissions>Tillämpa rättigheter för detta formulär</enable-permissions>

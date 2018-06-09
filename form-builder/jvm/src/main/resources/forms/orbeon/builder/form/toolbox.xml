@@ -283,6 +283,19 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
                         </xf:trigger>
+                        <xf:trigger ref=".[instance('fb-metadata-instance')/toolbox/email]">
+                            <xf:label>
+                                <xh:i class="fa fa-envelope fa-fw"/>
+                                <xf:output value="$form-resources/dialog-email-settings/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
+                                    <xf:property name="lang"  value="$fb-lang"/>
+                                    <xf:property name="email" value="bind('email-bind')"/>
+                                </xf:dispatch>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
+                            </xf:action>
+                        </xf:trigger>
 
                         <!-- Edit Source -->
                         <xf:trigger class="fb-edit-source-button" ref="instance('fb-metadata-instance')/toolbox/edit-source">

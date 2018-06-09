@@ -1055,12 +1055,9 @@
 
                             <fr:grid>
                                 <fr:c x="1" y="1" w="12">
-                                    <xf:select ref="@isHTML" appearance="full">
-                                        <xf:item>
-                                            <xf:value>true</xf:value>
-                                            <xf:label ref="$resources/dialog-control-details/use-html"/>
-                                        </xf:item>
-                                    </xf:select>
+                                    <fr:checkbox-input ref="@isHTML">
+                                        <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                    </fr:checkbox-input>
                                     <xf:var name="is-html" value="@isHTML = 'true'"/>
                                     <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value">
                                         <xf:label ref="$resource/label"/>

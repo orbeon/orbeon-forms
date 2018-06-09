@@ -204,6 +204,10 @@
 
         .fr-grid {
 
+            .fr-grid-th, .fr-grid-td {
+                overflow-x: hidden;                             // We don't want large content to change the size of the cells
+            }
+
             .xforms-help {
                 float: left;
                 margin-top: (@baseLineHeight - 14)/2 + 1;      // Vertically center help image on first line
@@ -318,6 +322,8 @@
             .fr-grid-head .fr-grid-th {
                 .xforms-label { display: block }                                    // Label in repeat table header is block so yellow background in FB takes the whole width
                 .xforms-help { margin-top: @frGridCellPadding }
+
+                word-wrap: break-word;
             }
 
             .fr-repeat-column-left, .fr-repeat-column-right {

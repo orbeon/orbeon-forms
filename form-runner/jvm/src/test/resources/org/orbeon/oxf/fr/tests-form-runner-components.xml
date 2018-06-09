@@ -805,7 +805,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-currency" init="true"/>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-10"/>
+                        <xxf:control class="fr-width-max-10em input-prepend" id="my-currency≡xf-10"/>
                         <xxf:control id="my-currency≡xf-12" class="add-on"/>
                         <xxf:control id="my-currency≡xf-13">
                             <xxf:value>$</xxf:value>

@@ -296,6 +296,7 @@
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
                                     <xf:property name="lang"  value="$fb-lang"/>
+                                    <xf:property name="langs" value="$resources/resource/@xml:lang/string()"/>
                                     <xf:property name="email" value="bind('email-bind')"/>
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />

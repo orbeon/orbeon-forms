@@ -305,6 +305,7 @@
             <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
             <options>Form Options</options>
+            <wizard-options>Wizard Options</wizard-options>
             <stats>Form Statistics</stats>
             <sections>Sections</sections>
             <repeats>Repeats</repeats>
@@ -1386,6 +1387,7 @@
             <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
             <options>Options</options>
+            <wizard-options>Options wizard</wizard-options>
             <stats>Statistiques</stats>
             <sections>Sections</sections>
             <repeats>Grilles répétées</repeats>
@@ -2469,6 +2471,7 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form settings]</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats todo="true">[Form Statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -3580,6 +3583,7 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form Settings]</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats todo="true">[Form statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -4691,6 +4695,7 @@
             <save-as>Salva con nome…</save-as>
             <open><label>Impostazioni modulo</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Statistiche del modulo</stats>
             <sections>Sezioni</sections>
             <repeats>Ripetizioni</repeats>
@@ -5794,6 +5799,7 @@
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
             <options>Formulareinstellungen</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
@@ -6900,6 +6906,7 @@
             <save-as>Tallenna nimellä</save-as>
             <open><label>Lomakeasetukset</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Lomatilastot</stats>
             <sections>Lohkot</sections>
             <repeats>Toistot</repeats>
@@ -8003,6 +8010,7 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configuración del Formulario</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Estadísticas del Formulario</stats>
             <sections>Secciones</sections>
             <repeats>Repeticiones</repeats>
@@ -9107,6 +9115,7 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configurações do Formulário</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Estatística do Formulário</stats>
             <sections>Secções</sections>
             <repeats>Repetições</repeats>
@@ -10217,6 +10226,7 @@
             <save-as>Spara som…</save-as>
             <open><label>Inställningar för formulär</label></open>
             <options todo="true">[Form Options]</options>
+            <wizard-options todo="true">[Wizard Options]</wizard-options>
             <stats>Formulärstatistik</stats>
             <sections>Sektioner</sections>
             <repeats>Upprepningar</repeats>

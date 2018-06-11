@@ -52,8 +52,6 @@
                     typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ?
                     TINYMCE_CUSTOM_CONFIG :
                     YAHOO.xbl.fr.Tinymce.DefaultConfig;
-                // Our onchange listener, not using onChange as it doesn't work with the fullscreen plugin
-                config.onchange_callback = _.bind(this._clientToServer, this);
                 return config;
             }).call(this);
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
@@ -61,6 +59,8 @@
             this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig, tinymce.EditorManager);
             var xformsValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
             this.onInit(_.bind(function() {
+                // Send value to the server on blur
+                this.myEditor.on("blur", _.bind(this._clientToServer, this));
                 // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
                 $(this.container).find('a[accesskey]').detach();
                 this.myEditor.setContent(xformsValue);
@@ -91,17 +91,14 @@
         // Send value in MCE to server
         _clientToServer: function() {
             var editor = arguments[0];
-            // Check the change event is for the editor corresponding to this component instance
-            if (editor.id == this.myEditor.id) {
-                var content = editor.getContent();
-                // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
-                if (content == '<div>\xa0</div>') content = '';
-                ORBEON.xforms.Document.dispatchEvent({
-                    targetId:   this.container.id,
-                    eventName:  'fr-set-client-value',
-                    properties: { 'fr-value': content }
-                });
-            }
+            var content = this.myEditor.getContent();
+            // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+            if (content == '<div>\xa0</div>') content = '';
+            ORBEON.xforms.Document.dispatchEvent({
+                targetId:   this.container.id,
+                eventName:  'fr-set-client-value',
+                properties: { 'fr-value': content }
+            });
         },
 
         // TinyMCE got the focus

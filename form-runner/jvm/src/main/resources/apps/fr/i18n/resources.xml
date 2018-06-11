@@ -901,7 +901,7 @@
                 <confirm>Confirmar</confirm>
                 <alert>Valor ausente o incorrecto</alert>
                 <captcha-label>CAPTCHA</captcha-label>
-                <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
+                <captcha-alert todo="true">El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -1548,7 +1548,7 @@
                 <alert>Значение неверное или отсутствует</alert>
 
                 <captcha-label>Защита от спама</captcha-label>
-                <captcha-alert>Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
+                <captcha-alert todo="true">Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -1878,7 +1878,7 @@
                 <alert>Campo obbligatorio o valore errato</alert>
 
                 <captcha-label>Codice di sicurezza</captcha-label>
-                <captcha-alert>Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
+                <captcha-alert todo="true">Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -2211,7 +2211,7 @@
                 <alert>Pflichtfeld oder fehlerhafter Wert</alert>
 
                 <captcha-label>Sicherheitscode</captcha-label>
-                <captcha-alert>Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
+                <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -2544,7 +2544,7 @@
                 <alert>Puuttuva tai virheellinen arvo</alert>
 
                 <captcha-label>Kuvavarmenne</captcha-label>
-                <captcha-alert>Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
+                <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -2877,7 +2877,7 @@
                 <alert>Utelämnat eller felaktigt värde</alert>
 
                 <captcha-label>Robotfilter</captcha-label>
-                <captcha-alert>Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
+                <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -3209,7 +3209,7 @@
                 <confirm>Bevestigen</confirm>
                 <alert>Ontbrekende of incorrecte waarde</alert>
                 <captcha-label>CAPTCHA</captcha-label>
-                <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
+                <captcha-alert todo="true">De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -3541,7 +3541,7 @@
                 <confirm>Confirmar</confirm>
                 <alert>Valor em falta ou incorrecto</alert>
                 <captcha-label>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-label>
-                <captcha-alert>O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
+                <captcha-alert todo="true">O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
             <view>
                 <explanation>

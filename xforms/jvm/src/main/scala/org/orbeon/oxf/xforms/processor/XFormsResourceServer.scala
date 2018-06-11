@@ -19,7 +19,6 @@ import java.net.{URI, URLEncoder}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.StatusCode
@@ -58,47 +57,21 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         serveDynamicResource(requestPath)
       case FormDynamicResourcesRegex(uuid) ⇒
 
-        def findJavaScriptInitialDataFromDocument(document: XFormsContainingDocument) =
-          ScriptBuilder.findJavaScriptInitialData(
-            containingDocument   = document,
-            rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-            controlsToInitialize = document.getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
-          )
-
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
-        val (propertiesOpt, scriptDeclarationsOpt, fromCurrentStateOpt) =
+        val fromCurrentStateOpt =
           // NOTE: Use the same timeout as upload for now. If the timeout expires, this throws an exception.
           withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document ⇒
-
-            val propertiesOpt =
-              ScriptBuilder.findConfigurationProperties(
-                document,
-                URLRewriterUtils.isResourcesVersioned,
-                XFormsStateManager.getHeartbeatDelay(document, externalContext)
-              )
-
-            val scriptDeclarationsOpt = ScriptBuilder.findScriptDeclarations(document)
-
-            val initialDataOpt =
-              if (document.getSequence == 1)
-                Some(findJavaScriptInitialDataFromDocument(document))
-              else
-                None
-
-            (propertiesOpt, scriptDeclarationsOpt, initialDataOpt)
+            document.initialClientScript
           }
 
         // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear the
-        // cost of recreating the document from cache just to get the initial state.
+        // cost of getting the state from cache.
         def fromInitialStateOpt =
-          findJavaScriptInitialDataFromDocument(
-            XFormsStateManager.createDocumentFromStore(
+            XFormsStateManager.getStateFromParamsOrStore(
               RequestParameters(uuid, None, None, None),
-              isInitialState = true,
-              disableUpdates = true
-            )
-          )
+              isInitialState = true
+            ).dynamicState flatMap (_.initialClientScript)
 
         response.setContentType(ContentTypes.JavaScriptContentType)
         // The document cannot be cached "forever", but upon browser back it can be required again. So some small duration of caching
@@ -109,16 +82,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         )
 
         useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
-
-          propertiesOpt foreach { content ⇒
-            writer.write(content)
-          }
-
-          scriptDeclarationsOpt foreach{ content ⇒
-            writer.write(content)
-          }
-
-          fromCurrentStateOpt getOrElse fromInitialStateOpt foreach { content ⇒
+          fromCurrentStateOpt orElse fromInitialStateOpt foreach { content ⇒
             writer.write(content)
           }
         }

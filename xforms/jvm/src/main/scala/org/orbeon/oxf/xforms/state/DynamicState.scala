@@ -42,7 +42,8 @@ case class DynamicState(
   pendingUploads      : Seq[Byte],
   lastAjaxResponse    : Seq[Byte],
   instances           : Seq[Byte],
-  controls            : Seq[Byte]
+  controls            : Seq[Byte],
+  initialClientScript : Option[String]
 ) {
   // Decode individual bits
   def decodePathMatchers           = fromByteSeq[List[PathMatcher]](pathMatchers)
@@ -261,21 +262,22 @@ object DynamicState {
     // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
     //    be something to experiment with.
     DynamicState(
-      uuid               = document.getUUID,
-      sequence           = document.getSequence,
-      deploymentType     = Option(document.getDeploymentType) map (_.toString),
-      requestContextPath = Option(document.getRequestContextPath),
-      requestPath        = Option(document.getRequestPath),
-      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
-      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
-      containerType      = Option(document.getContainerType),
-      containerNamespace = Option(document.getContainerNamespace),
-      pathMatchers       = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
-      focusedControl     = document.getControls.getFocusedControl map (_.getEffectiveId),
-      pendingUploads     = toByteSeq(document.getPendingUploads.asScala.toSet),
-      lastAjaxResponse   = toByteSeq(Option(document.getLastAjaxResponse)),
-      instances          = toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
-      controls           = toByteSeq(controlsToSerialize)
+      uuid                = document.getUUID,
+      sequence            = document.getSequence,
+      deploymentType      = Option(document.getDeploymentType) map (_.toString),
+      requestContextPath  = Option(document.getRequestContextPath),
+      requestPath         = Option(document.getRequestPath),
+      requestHeaders      = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
+      requestParameters   = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
+      containerType       = Option(document.getContainerType),
+      containerNamespace  = Option(document.getContainerNamespace),
+      pathMatchers        = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
+      focusedControl      = document.getControls.getFocusedControl map (_.getEffectiveId),
+      pendingUploads      = toByteSeq(document.getPendingUploads.asScala.toSet),
+      lastAjaxResponse    = toByteSeq(Option(document.getLastAjaxResponse)),
+      instances           = toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+      controls            = toByteSeq(controlsToSerialize),
+      initialClientScript = document.initialClientScript
     )
   }
 

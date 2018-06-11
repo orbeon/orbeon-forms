@@ -287,12 +287,12 @@ object ScriptBuilder {
     }
   }
 
-  def findScriptDeclarations(containingDocument: XFormsContainingDocument): Option[String] = {
+  def findScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
     val scriptInvocations = containingDocument.getScriptsToRun.asScala
     val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
-    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
+    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.level == "modal")
 
     val dialogsToOpen =
       for {
@@ -345,7 +345,7 @@ object ScriptBuilder {
 
         // Initial modal xf:message to run if present
         if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
+          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.message)}"""")
           quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
         }
 

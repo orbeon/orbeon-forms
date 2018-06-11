@@ -31,39 +31,41 @@ class DatasetsTest
       val (processorService, Some(doc), _) =
         runFormRunner("tests", "datasets", "new", document = "", initialize = true)
 
-      withFormRunnerDocument(processorService, doc) {
+      withTestExternalContext { _ ⇒
+        withFormRunnerDocument(processorService, doc) {
 
-        def sectionTemplateResolver(sectionId: String) = {
+          def sectionTemplateResolver(sectionId: String) = {
 
-          val sectionControl  = resolveObject[XFormsComponentControl](sectionId)
-          val sectionTemplate = FormRunner.sectionTemplateForSection(sectionControl.get).get
+            val sectionControl  = resolveObject[XFormsComponentControl](sectionId)
+            val sectionTemplate = FormRunner.sectionTemplateForSection(sectionControl.get).get
 
-          sectionTemplate.nestedContainer → sectionTemplate.innerRootControl.effectiveId
-        }
+            sectionTemplate.nestedContainer → sectionTemplate.innerRootControl.effectiveId
+          }
 
-        for ((container, sourceEffectiveId) ← List(document → DocId, sectionTemplateResolver("main-section-section-template-control"))) {
+          for ((container, sourceEffectiveId) ← List(document → DocId, sectionTemplateResolver("main-section-section-template-control"))) {
 
-          val weatherControl             = resolveObject[XFormsValueControl]("weather-control",               sourceEffectiveId = sourceEffectiveId, container = container).get
-          val activityControl            = resolveObject[XFormsValueControl]("activity-control",              sourceEffectiveId = sourceEffectiveId, container = container).get
-          val weatherFromDatasetControl  = resolveObject[XFormsValueControl]("weather-from-dataset-control",  sourceEffectiveId = sourceEffectiveId, container = container).get
-          val activityFromDatasetControl = resolveObject[XFormsValueControl]("activity-from-dataset-control", sourceEffectiveId = sourceEffectiveId, container = container).get
+            val weatherControl             = resolveObject[XFormsValueControl]("weather-control",               sourceEffectiveId = sourceEffectiveId, container = container).get
+            val activityControl            = resolveObject[XFormsValueControl]("activity-control",              sourceEffectiveId = sourceEffectiveId, container = container).get
+            val weatherFromDatasetControl  = resolveObject[XFormsValueControl]("weather-from-dataset-control",  sourceEffectiveId = sourceEffectiveId, container = container).get
+            val activityFromDatasetControl = resolveObject[XFormsValueControl]("activity-from-dataset-control", sourceEffectiveId = sourceEffectiveId, container = container).get
 
-          assert("sunny"  === weatherControl.getValue)
-          assert("hiking" === activityControl.getValue)
-          assert("sunny"  === weatherFromDatasetControl.getValue)
-          assert("hiking" === activityFromDatasetControl.getValue)
-        }
+            assert("sunny"  === weatherControl.getValue)
+            assert("hiking" === activityControl.getValue)
+            assert("sunny"  === weatherFromDatasetControl.getValue)
+            assert("hiking" === activityFromDatasetControl.getValue)
+          }
 
-        // TODO: Uncomment once #3132 is fixed.
-        for ((container, sourceEffectiveId) ← List(document → DocId/*, sectionTemplateResolver("initial-values-section-section-template-control")*/)) {
+          // TODO: Uncomment once #3132 is fixed.
+          for ((container, sourceEffectiveId) ← List(document → DocId/*, sectionTemplateResolver("initial-values-section-section-template-control")*/)) {
 
-          val initialValueFromDatasetControl                   = resolveObject[XFormsValueControl]("initial-value-from-dataset-control"                     , container = container).get
-          val staticInitialValueNotOverwrittenByDatasetControl = resolveObject[XFormsValueControl]("static-initial-value-not-overwritten-by-dataset-control", container = container).get
-          val valueFromAfterDataServiceControl                 = resolveObject[XFormsValueControl]("value-from-after-data-service-control"                  , container = container).get
+            val initialValueFromDatasetControl                   = resolveObject[XFormsValueControl]("initial-value-from-dataset-control"                     , container = container).get
+            val staticInitialValueNotOverwrittenByDatasetControl = resolveObject[XFormsValueControl]("static-initial-value-not-overwritten-by-dataset-control", container = container).get
+            val valueFromAfterDataServiceControl                 = resolveObject[XFormsValueControl]("value-from-after-data-service-control"                  , container = container).get
 
-          assert("42" === initialValueFromDatasetControl.getValue)
-          assert(""   === staticInitialValueNotOverwrittenByDatasetControl.getValue)
-          assert("43" === valueFromAfterDataServiceControl.getValue)
+            assert("42" === initialValueFromDatasetControl.getValue)
+            assert(""   === staticInitialValueNotOverwrittenByDatasetControl.getValue)
+            assert("43" === valueFromAfterDataServiceControl.getValue)
+          }
         }
       }
     }

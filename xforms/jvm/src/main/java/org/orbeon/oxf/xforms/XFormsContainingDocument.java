@@ -87,11 +87,13 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     private Callable<SubmissionResult> replaceAllCallable;
     private boolean gotSubmissionReplaceAll;
     private boolean gotSubmissionRedirect;
+
     private List<Message> messagesToRun;
     private List<Load> loadsToRun;
     private List<ScriptInvocation> scriptsToRun;
-    private String helpEffectiveControlId;
     private List<ServerError> serverErrors;
+
+    private String helpEffectiveControlId;
     private Set<String> controlsStructuralChanges;
 
     private final XPathDependencies xpathDependencies;
@@ -502,24 +504,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
             return Collections.emptyList();
     }
 
-    public static class Message {
-        private String message;
-        private String level;
-
-        public Message(String message, String level) {
-            this.message = message;
-            this.level = level;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public String getLevel() {
-            return level;
-        }
-    }
-
     public void addScriptToRun(ScriptInvocation scriptInvocation) {
         if (activeSubmissionFirstPass != null &&
                 activeSubmissionFirstPass.getActiveSubmissionParameters() != null &&
@@ -643,6 +627,10 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         this.response = null;           // same as above
         this.initializing = false;
 
+        // Do this before clearing the client state
+        if (! getStaticState().isInlineResources())
+            setInitialClientScript();
+
         clearClientState(); // client state can contain e.g. focus information, etc. set during initialization
 
         // Tell dependencies
@@ -684,6 +672,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     public void afterUpdateResponse() {
 
         getRequestStats().afterUpdateResponse();
+
+        if (! getStaticState().isInlineResources())
+            clearInitialClientScript();
 
         clearClientState();
         xformsControls.afterUpdateResponse();

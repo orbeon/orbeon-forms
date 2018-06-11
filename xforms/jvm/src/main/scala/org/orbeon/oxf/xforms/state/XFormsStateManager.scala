@@ -188,7 +188,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
   def afterUpdate(
     containingDocument   : XFormsContainingDocument,
     keepDocument         : Boolean,
-    disableDocumentCache : Boolean): Unit = {
+    disableDocumentCache : Boolean
+  ): Unit = {
     if (keepDocument) {
       // Re-add document to the cache
       Logger.logDebug(LogType, "Keeping document in cache.")
@@ -279,38 +280,9 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
-    val xformsState =
-      parameters.encodedClientDynamicStateOpt match {
-        case None ⇒
+    implicit val externalContext = NetUtils.getExternalContext
 
-          assert(isServerState)
-
-          // State must be found by UUID in the store
-          val externalContext = NetUtils.getExternalContext
-
-          if (Logger.isDebugEnabled)
-            Logger.logDebug(
-              LogType,
-              "Getting document state from store.",
-              "current cache size", XFormsDocumentCache.getCurrentSize.toString,
-              "current store size", EhcacheStateStore.getCurrentSize.toString,
-              "max store size", EhcacheStateStore.getMaxSize.toString
-            )
-
-          val session = externalContext.getRequest.getSession(ForceSessionCreation)
-          EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
-            // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
-            // document, yet we didn't find it. This means that somehow state was not placed into or expired from
-            // the state store.
-            throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
-          }
-        case Some(encodedClientDynamicState) ⇒
-          // State comes directly with request
-
-          assert(! isServerState)
-
-          XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
-      }
+    val xformsState = getStateFromParamsOrStore(parameters, isInitialState)
 
     // Create document
     val documentFromStore =
@@ -330,6 +302,45 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
     documentFromStore
+  }
+
+  def getStateFromParamsOrStore(
+      parameters      : RequestParameters,
+      isInitialState  : Boolean)(implicit
+      externalContext : ExternalContext
+    ): XFormsState = {
+
+    val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
+
+    parameters.encodedClientDynamicStateOpt match {
+      case None ⇒
+
+        assert(isServerState)
+
+        // State must be found by UUID in the store
+        if (Logger.isDebugEnabled)
+          Logger.logDebug(
+            LogType,
+            "Getting document state from store.",
+            "current cache size", XFormsDocumentCache.getCurrentSize.toString,
+            "current store size", EhcacheStateStore.getCurrentSize.toString,
+            "max store size", EhcacheStateStore.getMaxSize.toString
+          )
+
+        val session = externalContext.getRequest.getSession(ForceSessionCreation)
+        EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
+          // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
+          // document, yet we didn't find it. This means that somehow state was not placed into or expired from
+          // the state store.
+          throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
+        }
+      case Some(encodedClientDynamicState) ⇒
+        // State comes directly with request
+
+        assert(! isServerState)
+
+        XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
+    }
   }
 
   private object Private {

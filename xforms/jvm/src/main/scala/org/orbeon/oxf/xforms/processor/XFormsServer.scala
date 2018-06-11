@@ -443,7 +443,7 @@ object XFormsServer {
     }
 
     def outputMessagesInfo(
-      messages    : Seq[XFormsContainingDocument.Message])(implicit
+      messages    : Seq[Message])(implicit
       xmlReceiver : XMLReceiver
     ): Unit =
       for (message ← messages)
@@ -451,8 +451,8 @@ object XFormsServer {
           localName = "message",
           prefix    = "xxf",
           uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
-          atts      = List("level" → message.getLevel),
-          text      = message.getMessage
+          atts      = List("level" → message.level),
+          text      = message.message
         )
 
     def outputLoadsInfo(

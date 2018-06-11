@@ -152,7 +152,7 @@ class XHTMLHeadHandler(
         ) foreach
           writeContent
 
-        findScriptDeclarations(containingDocument) foreach
+        findScriptInvocations(containingDocument) foreach
           writeContent
 
         findJavaScriptInitialData(

@@ -18,8 +18,8 @@ import java.{util ⇒ ju}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
-import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -41,7 +41,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -115,6 +115,8 @@ object XFormsContainingDocumentSupport {
   }
 }
 
+case class Message(message: String, level: String)
+
 case class Load(resource: String, target: Option[String], urlType: String, isReplace: Boolean, isShowProgress: Boolean)
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
@@ -134,9 +136,13 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     with ContainingDocumentRequestStats
     with ContainingDocumentRequest
     with ContainingDocumentDelayedEvents
+    with ContainingDocumentClientState
     with XFormsDocumentLifecycle
     with Cacheable
-    with XFormsObject
+    with XFormsObject {
+
+  self: XFormsContainingDocument ⇒
+}
 
 
 trait ContainingDocumentTransientState {
@@ -627,6 +633,42 @@ trait ContainingDocumentDelayedEvents {
 
     processRemainingBatchesRecursively()
   }
+}
+
+trait ContainingDocumentClientState {
+
+  self: XFormsContainingDocument ⇒
+
+  private var _initialClientScript: Option[String] = None
+
+  def initialClientScript: Option[String] =
+    _initialClientScript
+
+  def setInitialClientScript(): Unit = {
+
+    implicit val externalContext = NetUtils.getExternalContext
+
+    val response = externalContext.getResponse
+
+    val scripts =
+      ScriptBuilder.findScriptInvocations(this).toList :::
+      ScriptBuilder.findConfigurationProperties(
+        this,
+        URLRewriterUtils.isResourcesVersioned,
+        XFormsStateManager.getHeartbeatDelay(this, NetUtils.getExternalContext)
+      ).toList :::
+      ScriptBuilder.findJavaScriptInitialData(
+        containingDocument   = this,
+        rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+        controlsToInitialize = getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
+      ).toList
+
+    _initialClientScript = Some(scripts.fold("")(_ + _))
+  }
+
+
+  def clearInitialClientScript(): Unit =
+    _initialClientScript = None
 }
 
 case class DelayedEvent(

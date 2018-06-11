@@ -107,11 +107,6 @@
             Events.focus(event);                                    // Forward to the "XForms engine"
         },
 
-        // The server tells us to set the focus on the TinyMCE
-        xformsFocus: function() {
-            this.myEditor.focus();
-        },
-
         hasFocus: function() {
             var activeElement = $(document.activeElement);
             return activeElement.parents().is(this.container) ||    // Focus on an element inside the component (most likely the edition iframe)
@@ -136,8 +131,9 @@
             else this.myEditor.on("init", bound);
         },
 
-        readonly:   function() { this.onInit(function() { this.myEditor.getBody().contentEditable = false; })},
-        readwrite:  function() { this.onInit(function() { this.myEditor.getBody().contentEditable = true; })}
+        xformsFocus: function() { this.onInit(function() { this.myEditor.focus(); })},
+        readonly:    function() { this.onInit(function() { this.myEditor.getBody().contentEditable = false; })},
+        readwrite:   function() { this.onInit(function() { this.myEditor.getBody().contentEditable = true; })}
     };
 
 })();

@@ -11,11 +11,6 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 .xbl-fr-tinymce {
-    &.xforms-readonly { .mceToolbar, .mceStatusbar { display: none } }  // Hide the toolbar and status bar when readonly
+    &.xforms-readonly { .mce-top-part { display: none } }               // Hide the toolbar when readonly
     .xbl-fr-tinymce-div { min-width: 1px }                              // So we can use jQuery's :visible selector
-
-    .mce-tinymce {
-        box-shadow: none;
-        -webkit-box-shadow: none;
-    }
 }

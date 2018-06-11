@@ -141,7 +141,7 @@ object ControlLabelHintTextEditor {
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
       if (Private.container.is(":visible")) {
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl ⇒
-          // Send value to server, handled in FB"s model.xml
+          // Send value to server, handled in FB's model.xml
           val controlId   = resourceEditorCurrentControl.attr("id").get
           val newValue    = Private.getValue
           val isHTML      = Private.isHTML

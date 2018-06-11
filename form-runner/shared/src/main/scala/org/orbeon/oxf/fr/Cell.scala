@@ -445,6 +445,7 @@ object Cell {
     }
   }
 
+  // For tests
   def makeASCII[Underlying](
     gridModel       : GridModel[Underlying],
     existingMapping : Map[Underlying, Char] = Map.empty[Underlying, Char]

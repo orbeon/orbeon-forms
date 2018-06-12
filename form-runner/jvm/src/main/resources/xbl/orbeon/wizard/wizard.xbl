@@ -36,6 +36,15 @@
             <xbl:style src="/xbl/orbeon/wizard/wizard.css"/>
         </xbl:resources>
         <xbl:handlers>
+
+            <xbl:handler event="xxforms-refresh-done" observer="#document" xxbl:scope="outer">
+                <!--
+                    - `fr:error-summary` listens to events during the capture phase so that it is up to
+                       date once the wizard processes them.
+                -->
+                <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
+            </xbl:handler>
+
             <xbl:handler event="fr-prev" phase="target">
                 <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
                 <xf:dispatch
@@ -109,10 +118,7 @@
                     context="$section-binding"
                     origin="xf:attribute('fr:section-status', '')"/>
 
-                <xf:dispatch
-                    name="fr-update-section-status"
-                    targetid="fr-wizard-outer-group"
-                    xxbl:scope="outer"/>
+                <!-- NOTE: No need to update the section status here, as the `xf:insert` will cause a subsequent refresh. -->
 
             </xbl:handler>
         </xbl:handlers>
@@ -249,7 +255,6 @@
 
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal">
-
                         <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
 
                             <!-- FIXME: Don't like that this is a top-level `switch` id! -->
@@ -336,20 +341,6 @@
                                         </xf:action>
 
                                         <xf:group appearance="xxf:internal">
-
-                                            <!-- Update section status upon incremental changes to controls.
-
-                                                 - `fr:error-summary` listens to events during the capture phase so that it is up to
-                                                   date once the wizard processes them.
-                                                 - We don't listen to `xforms-enabled` here because we have `fr-section-shown`.
-                                                 - `xxforms-constraints-changed` subsumes `xforms-valid`/`xforms-invalid`.
-                                             -->
-                                            <xf:action
-                                                event="xforms-value-changed xxforms-constraints-changed xforms-disabled"
-                                                xxf:phantom="true">
-                                                <xf:dispatch name="fr-update-section-status" targetid="fr-wizard-outer-group"/>
-                                            </xf:action>
-
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @open)"/>
@@ -613,9 +604,19 @@
                                                 value="
                                                     distinct-values(
                                                         (
-                                                            $existing-tokens[not(. = ('incomplete', 'invalid'))]  , (: these toggle so remove them first                      :)
-                                                            'incomplete'    [map:get($map, 'has-incomplete-fields')],
-                                                            'invalid'       [map:get($map, 'has-error-fields')]
+                                                            $existing-tokens[
+                                                                not(. = (
+                                                                    'incomplete',
+                                                                    'invalid',
+                                                                    'visible-incomplete',
+                                                                    'visible-invalid'
+                                                                    )
+                                                                )
+                                                            ], (: these toggle so remove them first :)
+                                                            'incomplete'        [map:get($map, 'has-incomplete-fields')],
+                                                            'invalid'           [map:get($map, 'has-error-fields')],
+                                                            'visible-incomplete'[map:get($map, 'has-visible-incomplete-fields')],
+                                                            'visible-invalid'   [map:get($map, 'has-visible-error-fields')]
                                                         )
                                                     )"/>
 
@@ -646,12 +647,6 @@
                                              in a well-designed form (that would be very user unfriendly). If xf:case supported
                                              relevance, we might be able to let this behavior be handled by the XForms engine.
                                          -->
-
-                                        <!-- Initial status (unless `xxforms-constraints-changed` ran before) -->
-                                        <xf:dispatch
-                                            name="fr-update-section-status"
-                                            targetid="fr-wizard-outer-group"/>
-
                                         <!-- Find the last available AND visited section -->
                                         <xf:var
                                             name="last-available-and-visited-top-level-section-id"
@@ -882,6 +877,9 @@
                             'last-top-level-page'[$relevant-top-level-case-ids[last()] = '{concat($static-section-id, '-case')}'],
                             'last-page'          [$relevant-nav-case-ids[last()]       = '{concat($static-section-id, '-case')}']
                         }}">
+
+                            <!-- For debugging -->
+                            <!--<xf:output value="string-join($top-level-section-tokens, '/')"/>-->
 
                             <xf:var
                                 name="section-label"

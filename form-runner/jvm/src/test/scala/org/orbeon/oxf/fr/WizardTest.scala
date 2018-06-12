@@ -70,7 +70,7 @@ class WizardTest
               assert(Set("section-1") === Wizard.wizardAvailableSections)
               assertIsFirstPage()
 
-              assert("incomplete" ===  (section1Holder attValue "*:section-status"))
+              assert("incomplete visible-incomplete" ===  (section1Holder attValue "*:section-status"))
               assert(! (section2Holder hasAtt "*:section-status"))
               assert(! (section3Holder hasAtt "*:section-status"))
             }

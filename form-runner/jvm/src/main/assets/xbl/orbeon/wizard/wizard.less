@@ -69,22 +69,22 @@
                 .text-overflow();
             }
 
-            .invalid > span > a {
+            .visible-invalid > span > a {
                 color: @error;
             }
 
-            .active.invalid > span > a {
+            .active.visible-invalid > span > a {
                 color: @white;
                 background-color: @error;
             }
 
-            .invalid.active > span > a {
-                color: @white;
+            .visible-incomplete > span > a {
+                color: @error;
             }
 
-            .incomplete > span > a {
-                //color: @white;
-                //background-color: green;
+            .active.visible-incomplete > span > a {
+                color: @white;
+                background-color: @error;
             }
 
             li {

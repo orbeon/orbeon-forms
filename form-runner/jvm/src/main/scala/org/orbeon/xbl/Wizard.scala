@@ -83,11 +83,13 @@ object Wizard {
     gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to[List]) map { sectionStatus ⇒
       MapFunctions.createValue(
         Map[AtomicValue, ValueRepresentation](
-          (SaxonUtils.fixStringValue("name")                 , sectionStatus.name),
-          (SaxonUtils.fixStringValue("is-visited")           , sectionStatus.isVisited),
-          (SaxonUtils.fixStringValue("has-incomplete-fields"), sectionStatus.hasIncompleteFields),
-          (SaxonUtils.fixStringValue("has-error-fields")     , sectionStatus.hasErrorFields),
-          (SaxonUtils.fixStringValue("is-available")         , sectionStatus.isAccessible)
+          (SaxonUtils.fixStringValue("name")                         , sectionStatus.name),
+          (SaxonUtils.fixStringValue("is-visited")                   , sectionStatus.isVisited),
+          (SaxonUtils.fixStringValue("has-incomplete-fields")        , sectionStatus.hasIncompleteFields),
+          (SaxonUtils.fixStringValue("has-error-fields")             , sectionStatus.hasErrorFields),
+          (SaxonUtils.fixStringValue("has-visible-incomplete-fields"), sectionStatus.hasVisibleIncompleteFields),
+          (SaxonUtils.fixStringValue("has-visible-error-fields")     , sectionStatus.hasVisibleErrorFields),
+          (SaxonUtils.fixStringValue("is-available")                 , sectionStatus.isAccessible)
         )
       )
     }
@@ -104,11 +106,13 @@ object Wizard {
   private object Private {
 
     case class SectionStatus(
-      name                : String,
-      isVisited           : Boolean,
-      hasIncompleteFields : Boolean,
-      hasErrorFields      : Boolean,
-      isAccessible        : Boolean
+      name                       : String,
+      isVisited                  : Boolean,
+      hasIncompleteFields        : Boolean,
+      hasErrorFields             : Boolean,
+      hasVisibleIncompleteFields : Boolean,
+      hasVisibleErrorFields      : Boolean,
+      isAccessible               : Boolean
     )
 
     def findWizardContainer =
@@ -138,11 +142,13 @@ object Wizard {
 
     def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
 
+      val sectionNames = relevantTopLevelSectionIds flatMap controlNameFromIdOpt toSet
+
       val topLevelSectionNamesWithErrorsMap =
-        ErrorSummary.topLevelSectionsWithErrors(
-          relevantTopLevelSectionIds flatMap controlNameFromIdOpt toSet,
-          onlyVisible = false
-       )
+        ErrorSummary.topLevelSectionsWithErrors(sectionNamesSet = sectionNames, onlyVisible = false)
+
+      val visibleTopLevelSectionNamesWithErrorsMap =
+        ErrorSummary.topLevelSectionsWithErrors(sectionNamesSet = sectionNames, onlyVisible = true)
 
       val wizardMode = getWizardValidatedMode
 
@@ -169,13 +175,18 @@ object Wizard {
               case "strict" ⇒ strictIsAccessible
             }
 
+          val incompleteAndErrorCounts        = topLevelSectionNamesWithErrorsMap.get(sectionName)
+          val visibleIncompleteAndErrorCounts = visibleTopLevelSectionNamesWithErrorsMap.get(sectionName)
+
           Some(
             SectionStatus(
-              name                = sectionName,
-              isVisited           = isVisited,
-              hasIncompleteFields = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._1 > 0),
-              hasErrorFields      = topLevelSectionNamesWithErrorsMap.get(sectionName) exists (_._2 > 0),
-              isAccessible        = isAccessible
+              name                       = sectionName,
+              isVisited                  = isVisited,
+              hasIncompleteFields        = incompleteAndErrorCounts exists (_._1 > 0),
+              hasErrorFields             = incompleteAndErrorCounts exists (_._2 > 0),
+              hasVisibleIncompleteFields = visibleIncompleteAndErrorCounts exists (_._1 > 0),
+              hasVisibleErrorFields      = visibleIncompleteAndErrorCounts exists (_._2 > 0),
+              isAccessible               = isAccessible
             )
           )
         }

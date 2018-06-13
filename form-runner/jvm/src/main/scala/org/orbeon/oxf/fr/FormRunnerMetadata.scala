@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.{XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -38,6 +38,7 @@ object FormRunnerMetadata {
   case class ControlDetails(
     name         : String,
     typ          : String,
+    level        : Int,
     datatype     : Option[String],
     lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[Item]))],
     value        : Option[ControlValue],
@@ -50,34 +51,99 @@ object FormRunnerMetadata {
   case class SingleControlValue(storageValue: String, formattedValue: Option[String]) extends ControlValue
   case class MultipleControlValue(storageValue: String, formattedValues: List[String]) extends ControlValue
 
+  private val Debug            = false
+
+  // TODO: Localize, must come from resources
+  val NotAvailableString       = "N/A"
+
+  val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature")
+
+  val SelectedCheckboxString   = "☒"
+  val DeselectedCheckboxString = "☐"
+
   //@XPathFunction
   def findAllControlsWithValues(html: Boolean): String = {
 
     val controlDetails = createFormMetadataDocument2(XFormsAPI.inScopeContainingDocument)
 
-    val linesIt =
-      controlDetails.iterator.zipWithIndex map { case (ControlDetails(_, typ, _, lhhaAndItems, value, _), index) ⇒
+    def createLine(control: ControlDetails, isFirst: Boolean): Option[String] =
+      control match { case ControlDetails(name, typ, level, _, lhhaAndItems, value, _) ⇒
 
-        val (lhhas, items) = lhhaAndItems.head._2 // TODO: use current/requested lang
+        val (lhhas, _) = lhhaAndItems.head._2 // TODO: use current/requested lang
+
+        // TODO: escape values when in HTML
 
         val lhhasMap = lhhas.toMap
 
         val valueOpt =
           value flatMap {
-            case SingleControlValue  (_, formattedValue)  ⇒ formattedValue
-            case MultipleControlValue(_, formattedValues) ⇒ formattedValues.nonEmpty option (formattedValues mkString ", ")
+            case SingleControlValue  (_, formattedValue)  ⇒
+              formattedValue
+            case MultipleControlValue(_, formattedValues) ⇒
+              formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
           }
 
-        typ match {
-          case "section" ⇒ (if (index > 0) "\n" else "") + lhhasMap(LHHA.Label) + "\n"
-          case _         ⇒ lhhasMap(LHHA.Label) + ": " + (valueOpt getOrElse "N/A")
+        def combineLabelAndValue(label: String, value: Option[String]): Option[String] = {
+
+          val normalizedLabel =
+            label.trimAllToOpt map { l ⇒
+              if (l.endsWith(":")) l.init else l
+            }
+
+          val normalizedValue =
+            value map (_.trimAllToOpt getOrElse NotAvailableString)
+
+          val list = normalizedLabel.toList ::: normalizedValue.toList
+
+          list.nonEmpty option (list mkString ": ")
         }
+
+        val r =
+          typ match {
+            case "section" ⇒ lhhasMap.get(LHHA.Label)
+            case _         ⇒ combineLabelAndValue(lhhasMap(LHHA.Label), valueOpt)
+          }
+
+          r map (_ + (if (Debug) s" [$name/$typ]" else ""))
       }
 
+    val sb = new StringBuilder
+
+    def processNext(it: List[ControlDetails], level: Int): Unit =
+      it match {
+        case Nil ⇒
+        case sectionControl :: rest if sectionControl.typ == "section" ⇒
+
+          val sectionLevel = sectionControl.level
+          val nextLevel    = level + 1
+
+          createLine(sectionControl, isFirst = false) foreach { line ⇒
+            sb ++= s"<h$nextLevel>"
+            sb ++= line
+            sb ++= s"</h$nextLevel>"
+          }
+
+          sb ++= "<ul>"
+          processNext(rest.takeWhile(_.level > sectionLevel), nextLevel)
+          sb ++= "</ul>"
+          processNext(rest.dropWhile(_.level > sectionLevel), level)
+        case ignoredControl :: rest if ControlsToIgnore(ignoredControl.typ) ⇒
+          processNext(rest, level)
+        case control :: rest ⇒
+          createLine(control, isFirst = false) foreach { line ⇒
+            sb ++= "<li>"
+            sb ++= line
+            sb ++= "</li>"
+          }
+          processNext(rest, level)
+      }
+
+    processNext(controlDetails, 1)
+
     if (html)
-      linesIt mkString ("<ul><li>", "</li><li>", "</li></ul>")
+      sb.toString()
     else
-      linesIt mkString "\n"
+      sb.toString()
   }
 
   //@XPathFunction
@@ -283,20 +349,40 @@ object FormRunnerMetadata {
 
               case c: XFormsSelect1Control ⇒
 
-                val selectedLabels = c.findSelectedItem map (_.label.label) // TODO: HTML
+                val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
 
-                SingleControlValue(c.getValue, selectedLabels) // TODO
+                SingleControlValue(c.getValue, selectedLabel) // TODO
 
               case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection ⇒
 
-                val selectedLabels  =
-                  for {
-                    (select1Control, _) ← XXFormsItemset.itemsetFromControl(c).toList
-                    selectedItem ← select1Control.findSelectedItems
-                  } yield
-                    selectedItem.label.label // TODO: HTML
+                val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
 
-                MultipleControlValue(c.getValue, selectedLabels) // TODO
+                selectionControlOpt match {
+                  case Some(c: XFormsSelectControl) ⇒
+                    val selectedLabels = c.findSelectedItems map (_.label.label)  // TODO: HTML
+                    MultipleControlValue(c.getValue, selectedLabels) // TODO
+                  case Some(c) ⇒
+                    val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
+                    SingleControlValue(c.getValue, selectedLabel) // TODO
+                  case None ⇒
+                    throw new IllegalStateException
+                }
+
+              case c: XFormsOutputControl ⇒
+
+                // Special case: if there is a "Calculated Value" control, but which has a blank value in the
+                // instance and no initial/calculated expressions, then consider that this control doesn't have
+                // a formatted value.
+                val noCalculationAndIsEmpty =
+                  ! c.bind.get.staticBind.hasDefaultOrCalculateBind && c.getValue.trimAllToOpt.isEmpty
+
+                val formattedValue =
+                  if (noCalculationAndIsEmpty)
+                    None
+                  else
+                    c.getFormattedValue orElse Option(c.getValue)
+
+                SingleControlValue(c.getValue, formattedValue)
 
               case c: XFormsValueControl ⇒
 
@@ -306,6 +392,7 @@ object FormRunnerMetadata {
           ControlDetails(
             name         = controlName,
             typ          = staticControl.localName,
+            level        = ErrorSummary.ancestorSectionsIt(control).size,
             datatype     = control.getTypeLocalNameOpt,
             lhhaAndItems = lhhaAndItemsList,
             value        = valueOpt,

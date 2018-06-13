@@ -23,7 +23,7 @@
     <xbl:binding
         id="fr-checkbox-input-binding"
         element="fr|checkbox-input, xf|input:xxf-type('xs:boolean')[appearance ~= checkbox]"
-        xxbl:mode="lhha custom-lhha binding value"
+        xxbl:mode="lhha custom-lhha binding value selection"
         xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

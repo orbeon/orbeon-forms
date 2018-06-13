@@ -85,12 +85,17 @@ object ErrorSummary {
       val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
       val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
       controlOpt.toIterable flatMap { control ⇒
-        val containingSections = sectionsIt(control)
+        val containingSections = ancestorSectionsIt(control)
         containingSections.map(_.getId).flatMap(FormRunner.controlNameFromIdOpt)
       }
     }
     sectionsWithErrorsIt.toList
   }
+
+  def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
+    new AncestorOrSelfIterator(control.parent) collect {
+      case section: XFormsComponentControl if section.localName == "section" ⇒ section
+    }
 
   // Return a sorting string for the given control absolute id, taking repeats into account
   def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
@@ -377,12 +382,7 @@ object ErrorSummary {
 
     def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
       inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId)) flatMap { control ⇒
-        sectionsIt(control).lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
-      }
-
-    def sectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
-      new AncestorOrSelfIterator(control) collect {
-        case section: XFormsComponentControl if section.localName == "section" ⇒ section
+        ancestorSectionsIt(control).lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
       }
 
     def createNewErrorElem(

@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
@@ -30,9 +29,10 @@ class XXFormsItemset extends XFormsFunction {
 
     val jsonOrXMLOpt =
       for {
-        control                   ← relevantControl(0)
-        valueControl              ← control.cast[XFormsValueControl]
-        (select1Control, itemset) ← XXFormsItemset.itemsetFromControl(valueControl)
+        control        ← relevantControl(0)
+        valueControl   ← control.cast[XFormsValueControl]
+        select1Control ← XXFormsItemset.findSelectionControl(valueControl)
+        itemset        = select1Control.getItemset
       } yield {
 
         val format   = stringArgument(1)
@@ -54,17 +54,13 @@ class XXFormsItemset extends XFormsFunction {
 
 object XXFormsItemset {
 
-  def itemsetFromControl(control: XFormsControl): Option[(XFormsSelect1Control, Itemset)] =
+  def findSelectionControl(control: XFormsControl): Option[XFormsSelect1Control] =
     control match {
       case c: XFormsSelect1Control ⇒
-        Option(c.getItemset) map (c → _)
+        Some(c)
       case c: XFormsComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection ⇒
         // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
-        for {
-          select1Control ← ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control ⇒ c }
-          itemset ← Option(select1Control.getItemset)
-        } yield
-          select1Control → itemset
+        ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control ⇒ c }
       case _ ⇒
         None
     }

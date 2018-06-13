@@ -299,6 +299,8 @@ class StaticBind(
 
   bindTree.hasNonPreserveWhitespace ||= nonPreserveWhitespaceMIPOpt.isDefined
 
+  def hasDefaultOrCalculateBind = getXPathMIPs(Default.name).nonEmpty || getXPathMIPs(Calculate.name).nonEmpty
+
   def addBind(bindElement: Element, precedingId: Option[String]): Unit =
     _children = _children :+ new StaticBind(bindTree, bindElement, staticBind, None)// NOTE: preceding not handled for now
 

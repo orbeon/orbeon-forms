@@ -29,7 +29,7 @@
                 xf|textarea[appearance ~= character-counter],
                 xf|secret[appearance ~= character-counter],
                 fr|tinymce[appearance ~= character-counter]"
-            xxbl:mode="binding lhha"
+            xxbl:mode="binding lhha value"
             xxbl:label-for="field"
             xxbl:container="span">
 

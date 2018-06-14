@@ -81,7 +81,7 @@ object ErrorSummary {
   // Returns all sections that contain an invalid control, either directly or indirectly through a subsection
   def sectionsWithVisibleErrors: List[String] = {
     val invalidControlIds    = visibleErrorsIt.map(_.attValue(IdAttName))
-    val sectionsWithErrorsIt = invalidControlIds.flatMap { (absoluteControlId) ⇒
+    val sectionsWithErrorsIt = invalidControlIds.flatMap { absoluteControlId ⇒
       val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
       val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
       controlOpt.toIterable flatMap { control ⇒
@@ -98,6 +98,7 @@ object ErrorSummary {
     }
 
   // Return a sorting string for the given control absolute id, taking repeats into account
+  // TODO: This should be part of the ordering and not converted to a String.
   def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
 
     val effectiveId = XFormsId.absoluteIdToEffectiveId(absoluteId)
@@ -336,8 +337,8 @@ object ErrorSummary {
   private object Private {
 
     val ErrorSummaryIds          = List("error-summary-control-top", "error-summary-control-bottom")
-    val MaxRepeatDepthForSorting = 4
-    val Digits                   = "0" * 5
+    val MaxRepeatDepthForSorting = 4       // TODO: This must not be a constant. See `repeatDepthAcrossParts`.
+    val Digits                   = "0" * 5 // TODO: Same.
 
     val ErrorElemName            = "error"
     val IdAttName                = "id"

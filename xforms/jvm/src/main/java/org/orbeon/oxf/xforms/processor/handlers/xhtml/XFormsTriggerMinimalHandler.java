@@ -42,8 +42,8 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         final AttributesImpl htmlAnchorAttributes =
             getEmptyNestedControlAttributesMaybeWithId(getEffectiveId(), triggerControl, true);
 
-        htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0"   );
-        htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "link");
+        htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0");
+        htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "button");
 
         if (triggerControl != null) {
             // Output xxf:* extension attributes

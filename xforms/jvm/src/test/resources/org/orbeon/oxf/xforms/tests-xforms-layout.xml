@@ -490,7 +490,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xh:a id="my-new-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="link">My label</xh:a>
+                    <xh:a id="my-new-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button">My label</xh:a>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -500,7 +500,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-modal-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xh:a id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="link">My label</xh:a>
+                    <xh:a id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button">My label</xh:a>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -512,7 +512,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-template">
-                    <xh:a id="my-new-minimal-trigger≡≡c" tabindex="0" role="link"/>
+                    <xh:a id="my-new-minimal-trigger≡≡c" tabindex="0" role="button"/>
                     <xh:span class="xforms-disabled xforms-help"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -522,7 +522,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-modal-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-repeat-template">
-                    <xh:a id="my-new-modal-minimal-trigger≡≡c" tabindex="0" role="link"/>
+                    <xh:a id="my-new-modal-minimal-trigger≡≡c" tabindex="0" role="button"/>
                     <xh:span class="xforms-disabled xforms-help"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>

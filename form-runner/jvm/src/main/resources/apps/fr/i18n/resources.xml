@@ -88,14 +88,30 @@
                 <other>Other</other>
             </labels>
             <grid>
+                <menu>Menu</menu>
                 <insert-above>Insert Above</insert-above>
                 <insert-below>Insert Below</insert-below>
                 <move-up>Move Up</move-up>
                 <move-down>Move Down</move-down>
-                <remove>Remove</remove>
-                <menu>Menu</menu>
-                <add-another>Add Another</add-another>
+                <remove>
+                    <label>Remove</label>
+                    <hint>Remove Line from the Repeated Grid</hint>
+                </remove>
+                <add-another>
+                    <label>Add Another</label>
+                    <hint>Add Another Line to the Repeated Grid</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Remove</label>
+                    <hint>Remove Iteration from the Repeated Section</hint>
+                </remove>
+                <add-another>
+                    <label>Add Another</label>
+                    <hint>Add Another Iteration to the Repeated Section</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Year</year>
                 <month>Month</month>
@@ -421,14 +437,30 @@
                 <other>Autre</other>
             </labels>
             <grid>
+                <menu>Menu</menu>
                 <insert-above>Insérer dessus</insert-above>
                 <insert-below>Insérer dessous</insert-below>
                 <move-up>Déplacer vers le haut</move-up>
                 <move-down>Déplacer vers le bas</move-down>
-                <remove>Supprimer</remove>
-                <menu>Menu</menu>
-                <add-another>Ajouter une ligne</add-another>
+                <remove>
+                    <label>Supprimer</label>
+                    <hint>Supprimer la ligne du tableau répété</hint>
+                </remove>
+                <add-another>
+                    <label>Ajouter une ligne</label>
+                    <hint>Ajouter une nouvelle ligne au tableau répété</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Remove</label>
+                    <hint>Remove Iteration from the Repeated Section</hint>
+                </remove>
+                <add-another>
+                    <label>Add Another</label>
+                    <hint>Add Another Iteration to the Repeated Section</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Année</year>
                 <month>Mois</month>
@@ -758,14 +790,30 @@
                 <other>Otro</other>
             </labels>
             <grid>
+                <menu>Menú</menu>
                 <insert-above>Insertar Arriba</insert-above>
                 <insert-below>Insertar Debajo</insert-below>
                 <move-up>Mover Arriba</move-up>
                 <move-down>Mover Debajo</move-down>
-                <remove>Remover</remove>
-                <menu>Menú</menu>
-                <add-another>Agregar Otro</add-another>
+                <remove>
+                    <label>Remover</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label>Agregar Otro</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Remover</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label>Agregar Otro</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Año</year>
                 <month>Mes</month>
@@ -1081,14 +1129,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu todo="true">Menu</menu>
                 <insert-above todo="true">[Insert Above]</insert-above>
                 <insert-below todo="true">[Insert Below]</insert-below>
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year todo="true">Year</year>
                 <month todo="true">Month</month>
@@ -1404,14 +1468,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu>Menu</menu>
                 <insert-above todo="true">[Insert Above]</insert-above>
                 <insert-below todo="true">[Insert Below]</insert-below>
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year todo="true">Year</year>
                 <month todo="true">Month</month>
@@ -1725,14 +1805,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu>Menu</menu>
                 <insert-above>Inserisci sopra</insert-above>
                 <insert-below>Inserisci sotto</insert-below>
                 <move-up>Sposta in sù</move-up>
                 <move-down>Sposta in giù</move-down>
-                <remove>Rimuovi</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label>Rimuovi</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Rimuovi</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Anno</year>
                 <month>Mese</month>
@@ -2058,14 +2154,30 @@
                 <other>Sonstige</other>
             </labels>
             <grid>
+                <menu todo="true">Menu</menu>
                 <insert-above>Darüber einfügen</insert-above>
                 <insert-below>Darunter einfügen</insert-below>
                 <move-up>Nach oben verschieben</move-up>
                 <move-down>Nach unten verschieben</move-down>
-                <remove>Löschen</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">Linie hinzufügen</add-another>
+                <remove>
+                    <label>Löschen</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Löschen</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Jahr</year>
                 <month>Monat</month>
@@ -2391,14 +2503,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu todo="true">Menu</menu>
                 <insert-above>Liitä ylle</insert-above>
                 <insert-below>Liitä alle</insert-below>
                 <move-up>Siirrä ylös</move-up>
                 <move-down>Siirrä alas</move-down>
-                <remove>Poista</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label>Poista</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Poista</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Vuosi</year>
                 <month>Kuukausi</month>
@@ -2724,14 +2852,30 @@
                 <other>Annat</other>
             </labels>
             <grid>
+                <menu>Meny</menu>
                 <insert-above>Infoga ovanför</insert-above>
                 <insert-below>Infoga nedanför</insert-below>
                 <move-up>Flytta upp</move-up>
                 <move-down>Flytta ned</move-down>
-                <remove>Ta bort</remove>
-                <menu>Meny</menu>
-                <add-another>Lägg till rad</add-another>
+                <remove>
+                    <label>Ta bort</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label>Lägg till rad</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Ta bort</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label>Lägg till rad</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>År</year>
                 <month>Månad</month>
@@ -3057,14 +3201,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu todo="true">Menu</menu>
                 <insert-above>Boven invoegen</insert-above>
                 <insert-below>Onder invoegen</insert-below>
                 <move-up>Omhoog</move-up>
                 <move-down>Omlaag</move-down>
-                <remove>Verwijderen</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label>Verwijderen</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label>Verwijderen</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Jaar</year>
                 <month>Maand</month>
@@ -3389,14 +3549,30 @@
                 <other todo="true">[Other]</other>
             </labels>
             <grid>
+                <menu todo="true">Menu</menu>
                 <insert-above>Insere em Cima</insert-above>
                 <insert-below>Insere em Baixo</insert-below>
                 <move-up>Move para Cima</move-up>
                 <move-down>Move para Baixo</move-down>
-                <remove>Remove</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                </add-another>
             </grid>
+            <section>
+                <remove>
+                    <label todo="true">[Remove]</label>
+                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                </remove>
+                <add-another>
+                    <label todo="true">[Add Another]</label>
+                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                </add-another>
+            </section>
             <date-time>
                 <year>Ano</year>
                 <month>Mês</month>

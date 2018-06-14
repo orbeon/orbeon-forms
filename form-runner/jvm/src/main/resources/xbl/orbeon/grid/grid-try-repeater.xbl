@@ -64,7 +64,7 @@
                     <!--</li>-->
                     <!--<li class="divider"/>-->
                     <!--<li class="fr-remove">-->
-                        <!--<a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>-->
+                        <!--<a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>-->
                     <!--</li>-->
                 <!--</ul>-->
             <!--</div>-->

@@ -72,7 +72,7 @@
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>
@@ -394,7 +394,7 @@
                                                     ref="$repeat-context[$can-add]"
                                                     id="fr-grid-add"
                                                     tabindex="-1"
-                                                    xxf:title="{{xxf:r('components.grid.add-another', '|fr-fr-resources|')}}">
+                                                    xxf:title="{{xxf:r('components.grid.add-another.hint', '|fr-fr-resources|')}}">
                                                     <!--<xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>-->
                                                     <xf:label><xh:i class="icon-plus-sign "/></xf:label>
                                                 </xf:trigger>
@@ -560,8 +560,7 @@
                                                     ref="$repeat-context[$can-remove]"
                                                     id="fr-grid-remove"
                                                     tabindex="-1"
-                                                    xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
-
+                                                    xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
                                                     <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                                     <xf:dispatch
                                                         event="DOMActivate"
@@ -915,8 +914,12 @@
 
                         <xsl:if test="$is-repeat and $appearance = 'minimal' and not($readonly)">
                             <xf:group ref="$repeat-context[not($view-mode)]" class="fr-grid-bottom-buttons">
-                                <xf:trigger appearance="minimal" id="fr-grid-add-bottom" ref="$repeat-context[$can-add]">
-                                    <xf:label value="xxf:r('components.grid.add-another', '|fr-fr-resources|')"/>
+                                <xf:trigger
+                                    appearance="minimal"
+                                    id="fr-grid-add-bottom"
+                                    ref="$repeat-context[$can-add]"
+                                    xxf:title="{{xxf:r('components.grid.add-another.hint',  '|fr-fr-resources|')}}">
+                                    <xf:label value="xxf:r('components.grid.add-another.label', '|fr-fr-resources|')"/>
                                 </xf:trigger>
 
                                 <xsl:if test="$remove-at-bottom">
@@ -930,8 +933,12 @@
                                     />
 
                                     <!-- Show only if can remove -->
-                                    <xf:trigger appearance="minimal" id="fr-grid-remove-bottom" ref="$repeat-context[$can-remove]">
-                                        <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        id="fr-grid-remove-bottom"
+                                        ref="$repeat-context[$can-remove]"
+                                        xxf:title="{{xxf:r('components.grid.remove.hint',  '|fr-fr-resources|')}}">
+                                        <xf:label value="xxf:r('components.grid.remove.label', '|fr-fr-resources|')"/>
                                     </xf:trigger>
                                 </xsl:if>
                             </xf:group>

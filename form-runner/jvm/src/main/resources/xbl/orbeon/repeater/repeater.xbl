@@ -61,7 +61,7 @@
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>
@@ -355,8 +355,12 @@
 
                         <xsl:if test="$appearance = 'minimal' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-bottom-buttons">
-                                <xf:trigger appearance="minimal" id="fr-repeater-add-bottom" ref="$repeat-context[$can-add]">
-                                    <xf:label value="xxf:r('components.grid.add-another', '|fr-fr-resources|')"/>
+                                <xf:trigger
+                                    appearance="minimal"
+                                    id="fr-repeater-add-bottom"
+                                    ref="$repeat-context[$can-add]"
+                                    xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
+                                    <xf:label value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/>
                                 </xf:trigger>
 
                                 <xsl:if test="$remove-at-bottom">
@@ -370,8 +374,12 @@
                                     />
 
                                     <!-- Show only if can remove -->
-                                    <xf:trigger appearance="minimal" id="fr-repeater-remove-bottom" ref="$repeat-context[$can-remove]">
-                                        <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        id="fr-repeater-remove-bottom"
+                                        ref="$repeat-context[$can-remove]"
+                                        xxf:title="{{xxf:r('components.section.remove.hint',  '|fr-fr-resources|')}}">
+                                        <xf:label value="xxf:r('components.section.remove.label', '|fr-fr-resources|')"/>
                                     </xf:trigger>
                                 </xsl:if>
                             </xf:group>

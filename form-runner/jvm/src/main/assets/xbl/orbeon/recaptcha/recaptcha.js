@@ -42,7 +42,7 @@
 
             var self = this;
             var renderRecaptcha = function () {
-                if (_.isUndefined(window.grecaptcha)) {
+                if (_.isUndefined(window.grecaptcha) || _.isUndefined(window.grecaptcha.render)) {
                     var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
                     _.delay(renderRecaptcha, shortDelay);
                 } else {

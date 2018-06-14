@@ -13,8 +13,9 @@
  */
 
 (function() {
-    var $ = ORBEON.jQuery;
-    var Event = YAHOO.util.Event;
+    var $               = ORBEON.jQuery;
+    var Event           = YAHOO.util.Event;
+    var ReCaptchaScript = "https://www.recaptcha.net/recaptcha/api.js";
 
     YAHOO.namespace('xbl.fr');
     YAHOO.xbl.fr.Recaptcha = function() {};
@@ -25,36 +26,45 @@
         publicKeyPropertyId : null,
         publicKeyLocalId    : null,
         widgetId            : null,
+        rendered            : false,
 
         render: function(publicKey, theme) {
             var recaptchaDiv = $(this.container).find('.xbl-fr-recaptcha-div').get(0);
             this.responseId  = $(this.container).find('.xbl-fr-recaptcha-response').get(0).id;
 
+            // Find if the reCAPTCHA has been loaded already
+            var notLoadedYet = _.isUndefined(_.find(document.scripts, function (script) {
+                return script.src.indexOf(ReCaptchaScript) == 0;
+            }));
+
             // Load reCAPTCHA script with appropriate language
-            if (_.isUndefined(window.grecaptcha)) {
+            if (notLoadedYet) {
                 var htmlLang = ORBEON.jQuery('html').attr('lang');
                 var langParameter =
                     _.isUndefined(htmlLang) ? "" :
                     "?hl=" + htmlLang;
-                var reCaptchaScript = $('<script src="https://www.recaptcha.net/recaptcha/api.js' + langParameter + '">');
+                var reCaptchaScript = $('<script src="' + ReCaptchaScript + langParameter + '">');
                 $(this.container).append(reCaptchaScript);
             }
 
-            var self = this;
-            var renderRecaptcha = function () {
-                if (_.isUndefined(window.grecaptcha) || _.isUndefined(window.grecaptcha.render)) {
-                    var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
-                    _.delay(renderRecaptcha, shortDelay);
-                } else {
-                    self.widgetId = grecaptcha.render(recaptchaDiv, {
-                        sitekey  : publicKey,
-                        theme    : theme,
-                        callback : _.bind(self.successfulResponse, self)
-                    });
-                }
-            };
+            if (! this.rendered) {
+                this.rendered = true;
+                var self = this;
+                var renderRecaptcha = function () {
+                    if (_.isUndefined(window.grecaptcha) || _.isUndefined(window.grecaptcha.render)) {
+                        var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
+                        _.delay(renderRecaptcha, shortDelay);
+                    } else {
+                        self.widgetId = grecaptcha.render(recaptchaDiv, {
+                            sitekey  : publicKey,
+                            theme    : theme,
+                            callback : _.bind(self.successfulResponse, self)
+                        });
+                    }
+                };
 
-            renderRecaptcha();
+                renderRecaptcha();
+            }
         },
 
         successfulResponse: function() {

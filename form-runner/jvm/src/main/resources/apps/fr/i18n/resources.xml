@@ -37,7 +37,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validate</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
@@ -72,7 +72,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok>OK</ok>
             <previous>Previous</previous>
@@ -387,7 +387,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valider</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
@@ -422,7 +422,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
             <ok>OK</ok>
             <previous>Précédent</previous>
@@ -740,7 +740,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
@@ -775,7 +775,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok>Aceptar</ok>
             <previous>Previo</previous>
@@ -1079,7 +1079,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Epost</email>
-            <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
@@ -1114,7 +1114,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</save-publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Tilbake</previous>
@@ -1418,7 +1418,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
@@ -1453,7 +1453,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</save-publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Назад</previous>
@@ -1755,7 +1755,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Valida</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valida</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Presenta</submit>
@@ -1790,7 +1790,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Indietro</previous>
@@ -2104,7 +2104,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Senden</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validieren</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
@@ -2139,7 +2139,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nein</no>
             <ok todo="true">OK</ok>
             <previous>Zurück</previous>
@@ -2453,7 +2453,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Sähköposti</email>
-            <validate>&lt;i class="icon-ok"/&gt; Tarkista oikeellisuus</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Tarkista oikeellisuus</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Toimita</submit>
@@ -2488,7 +2488,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</save-publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Paluu</previous>
@@ -2802,7 +2802,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Mejla</email>
-            <validate>&lt;i class="icon-ok"/&gt; Godkänn</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Godkänn</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Skicka</submit>
@@ -2837,7 +2837,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</save-publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
+            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nej</no>
             <ok>OK</ok>
             <previous>Tillbaka</previous>
@@ -3151,7 +3151,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; E-mail</email>
-            <validate>&lt;i class="icon-ok"/&gt; Valideren</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valideren</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Indienen</submit>
@@ -3186,7 +3186,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</save-publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Vorige</previous>
@@ -3499,7 +3499,7 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
+            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Submeter</submit>
@@ -3534,7 +3534,7 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Anterior</previous>

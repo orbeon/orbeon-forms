@@ -231,8 +231,25 @@ body.orbeon {
     }
 
     // Force white icons
-    .btn-danger i, .btn-warning i, .btn-primary i, .btn-inverse i,
-    .xforms-trigger-appearance-xxforms-danger i, .xforms-trigger-appearance-xxforms-warning i,
+    .btn-danger,
+    .btn-warning,
+    .btn-primary,
+    .btn-inverse,
+    .xforms-trigger-appearance-xxforms-danger,
+    .xforms-trigger-appearance-xxforms-warning,
+    .xforms-trigger-appearance-xxforms-primary,
+    .xforms-trigger-appearance-xxforms-inverse {
+
+        i[class ^= "icon-"] {
+            background-image: url(bootstrap/img/glyphicons-halflings-white.png);
+        }
+
+        i.fa {
+            color: white;
+        }
+
+    }
+
     .navbar-inverse i { color: white }
 
     // Make disabled icons a bit opaque

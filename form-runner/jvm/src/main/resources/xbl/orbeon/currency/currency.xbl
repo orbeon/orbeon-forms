@@ -39,8 +39,7 @@
             <display-name lang="nl">Valuta</display-name>
             <display-name lang="pt">Moeda</display-name>
             <icon lang="en">
-                <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
+                <icon-class>fa fa-fw fa-dollar-sign fa-usd</icon-class>
             </icon>
             <templates>
                 <bind type="xf:decimal" constraint="xxf:fraction-digits(2)"/>

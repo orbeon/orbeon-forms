@@ -39,8 +39,7 @@
             <fb:display-name lang="nl">Uitleg</fb:display-name>
             <fb:display-name lang="sv">Förklaring</fb:display-name>
             <fb:icon lang="en">
-                <fb:small-icon>/apps/fr/style/images/silk/layout.png</fb:small-icon>
-                <fb:large-icon>/apps/fr/style/images/silk/layout.png</fb:large-icon>
+                <fb:icon-class>fa fa-fw fa-comment</fb:icon-class>
             </fb:icon>
             <fb:templates>
                 <fb:resources>

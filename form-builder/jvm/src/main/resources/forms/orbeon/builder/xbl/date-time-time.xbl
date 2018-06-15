@@ -31,6 +31,8 @@
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/time.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
+                <!-- Need Font Awesome ugprade -->
+                <!--<icon-class>fa fa-fw fa-clock</icon-class>-->
             </icon>type>
             <templates>
                 <bind type="xf:time"/>

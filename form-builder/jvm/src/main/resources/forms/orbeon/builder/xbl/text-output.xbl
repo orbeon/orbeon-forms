@@ -26,8 +26,7 @@
             <display-name lang="sv">Beräknat värde</display-name>
             <display-name lang="pt" todo="true">Saída de Texto</display-name>
             <icon lang="en">
-                <small-icon>/apps/fr/style/images/other/calculator-16.png</small-icon>
-                <large-icon>/apps/fr/style/images/other/calculator-16.png</large-icon>
+                <icon-class>fa fa-fw fa-calculator</icon-class>
             </icon>
             <templates>
                 <view>

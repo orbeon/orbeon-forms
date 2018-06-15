@@ -199,8 +199,7 @@
                         <xsl:value-of select="*[name() = $section-name]/help"/>
                     </description>
                     <icon lang="{$lang}">
-                        <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                        <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
+                        <icon-class>fa fa-fw fa-puzzle-piece</icon-class>
                     </icon>
                 </xsl:for-each>
 

@@ -387,12 +387,21 @@ div.orbeon.orbeon-portlet-div {
                         }
                         img {
                             margin-top: -3px;        // so that Bootstrap icons are better aligned
+                            width: 16px;
+                            height: 16px;
                         }
 
                         i, img { margin-right: 3px } // space between icon and text
 
                         &:hover {
                             #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
+                        }
+
+                        i.fa {
+                            width: 14px;
+                            font-size: 14px;
+                            margin-left: 1px;
+                            margin-right: 4px;
                         }
                     }
                 }

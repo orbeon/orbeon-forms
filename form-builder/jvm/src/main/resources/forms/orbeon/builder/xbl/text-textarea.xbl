@@ -27,8 +27,7 @@
             <display-name lang="sv">Textyta</display-name>
             <display-name lang="pt">Área de Texto</display-name>
             <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
+                <icon-class>fa fa-fw fa-align-left</icon-class>
             </icon>
             <templates>
                 <view>

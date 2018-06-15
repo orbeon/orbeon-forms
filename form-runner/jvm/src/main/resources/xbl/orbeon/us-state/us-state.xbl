@@ -40,8 +40,7 @@
             <display-name lang="pt">Estados dos EUA</display-name>
             <display-name lang="sv">Amerikansk delstat</display-name>
             <icon lang="en">
-                <small-icon>/xbl/orbeon/us-state/us-flag.png</small-icon>
-                <large-icon>/xbl/orbeon/us-state/us-flag.png</large-icon>
+                <icon-class>fa fa-fw fa-flag</icon-class>
             </icon>
             <templates>
                 <view>

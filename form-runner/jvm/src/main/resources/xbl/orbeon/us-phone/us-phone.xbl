@@ -39,8 +39,7 @@
             <display-name lang="pt">Número de telefone EUA</display-name>
             <display-name lang="sv">Telefonnummer i USA</display-name>
             <icon lang="en">
-                <small-icon>/apps/fr/style/images/silk/telephone.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/telephone.png</large-icon>
+                <icon-class>fa fa-fw fa-phone</icon-class>
             </icon>
             <templates>
                 <!-- Value is valid if it is empty or if it matches a normalized string of 10 digits -->

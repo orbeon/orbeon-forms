@@ -21,14 +21,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Review</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Delete</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Delete</delete>
             <import>&lt;i class="icon-upload"/&gt; Import</import>
-            <new>&lt;i class="icon-plus"/&gt; New</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Duplicate</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; New</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicate</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Save</save>
@@ -36,7 +36,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
 
             <!-- Legacy buttons -->
@@ -46,17 +46,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Summary</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Summary</summary>
             <close>&lt;i class="icon-remove"/&gt; Close</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Clear</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Clear</clear>
             <cancel>Cancel</cancel>
             <save-locally>Save Locally</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Refresh"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
-            <wizard-toc>&lt;i class="icon-list"/&gt; Content</wizard-toc>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Content</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Clear and close</submit-dialog-clear>
@@ -68,9 +68,9 @@
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Continue</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Test</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publish</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -171,7 +171,7 @@
             </titles>
             <search>
                 <search>Search</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Search forms</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Search forms</search-forms>
                 <show-options>Show search options</show-options>
                 <close-options>Close search options</close-options>
             </search>
@@ -300,7 +300,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Make Unavailable</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Make Available</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Make Available</publish>
                 <cancel>Cancel</cancel>
                 <connect>Connect</connect>
                 <select>Select</select>
@@ -370,14 +370,15 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Accueil</home>
+
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Accueil</home>
             <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Supprimer</delete>
             <import>&lt;i class="icon-upload"/&gt; Importer</import>
-            <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Dupliquer</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nouveau</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliquer</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
@@ -385,7 +386,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
 
             <!-- Legacy buttons -->
@@ -395,17 +396,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommaire</summary>
             <close>&lt;i class="icon-remove"/&gt; Fermer</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Effacer</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Effacer</clear>
             <cancel>Annuler</cancel>
             <save-locally>Enreg. Local</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Rafraîchir"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
-            <wizard-toc>&lt;i class="icon-list"/&gt; Contenu</wizard-toc>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenu</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
@@ -417,9 +418,9 @@
             <validation-dialog-review>Revoir</validation-dialog-review>
             <validation-dialog-continue>Continuer</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Tester</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publier</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Tester</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
@@ -653,7 +654,7 @@
             <title>Accueil Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Rendre non disponible</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Rendre disponible</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Rendre disponible</publish>
                 <cancel>Annuler</cancel>
                 <connect>Connecter</connect>
                 <select>Sélectionner</select>
@@ -723,14 +724,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Inicio</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Inicio</home>
             <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Eliminar</delete>
             <import>&lt;i class="icon-upload"/&gt; Importar</import>
-            <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuevo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
@@ -738,7 +739,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
 
             <!-- Legacy buttons -->
@@ -748,17 +749,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Resumen</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Resumen</summary>
             <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Limpiar</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Limpiar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Actualizar"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
@@ -770,9 +771,9 @@
             <validation-dialog-review>Revisar</validation-dialog-review>
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Testear</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publicar</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testear</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -867,7 +868,7 @@
             </titles>
             <search>
                 <search>Buscar</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Buscar formulario</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Buscar formulario</search-forms>
                 <show-options>Mostrar opciones de búsqueda</show-options>
                 <close-options>Cerrar opciones de búsqueda</close-options>
             </search>
@@ -992,7 +993,7 @@
             <title>Inicio Form Runner</title>
             <buttons>
                 <unpublish todo="true">&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Conectar</connect>
                 <select>Seleccionar</select>
@@ -1062,14 +1063,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Hjem</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
             <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Slett</delete>
             <import>&lt;i class="icon-upload"/&gt; Importer</import>
-            <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
-            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nytt skjema</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
@@ -1077,7 +1078,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
-            <email>&lt;i class="icon-envelope"/&gt; Epost</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Epost</email>
             <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
@@ -1087,17 +1088,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
             <close>&lt;i class="icon-remove"/&gt; Lukk</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Tøm innhold</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tøm innhold</clear>
             <cancel>Angre</cancel>
             <save-locally>Lagre lokalt</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Oppdater"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -1109,9 +1110,9 @@
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Test</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publiser…</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publiser…</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -1330,7 +1331,7 @@
             <title todo="true">[Form Runner Home]</title>
             <buttons>
                 <unpublish todo="true">[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
-                <publish todo="true">[&lt;i class="icon-globe"/&gt; Publish]</publish>
+                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"/&gt; Publish]</publish>
                 <cancel todo="true">[Cancel]</cancel>
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
@@ -1401,14 +1402,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; На главную</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; На главную</home>
             <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Удалить</delete>
             <import>&lt;i class="icon-upload"/&gt; Импорт</import>
-            <new>&lt;i class="icon-plus"/&gt; Новая</new>
-            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Новая</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
@@ -1416,7 +1417,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
@@ -1426,17 +1427,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
             <close>&lt;i class="icon-remove"/&gt; Закрыть</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Очистить</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Очистить</clear>
             <cancel>Отменить</cancel>
             <save-locally>Сохр.на диск</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Обновить"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Обновить"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
@@ -1448,9 +1449,9 @@
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Тестировать</test>
-            <publish>&lt;i class="icon-globe"/&gt; Публиковать</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Публиковать</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Тестировать</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -1667,7 +1668,7 @@
             <title todo="true">[Form Runner Home]</title>
             <buttons>
                 <unpublish todo="true">[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
-                <publish todo="true">[&lt;i class="icon-globe"/&gt; Publish]</publish>
+                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"/&gt; Publish]</publish>
                 <cancel todo="true">[Cancel]</cancel>
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
@@ -1738,14 +1739,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</delete>
             <import>&lt;i class="icon-upload"/&gt; Importa</import>
-            <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Copia</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuovo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Copia</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Salva</save>
@@ -1753,7 +1754,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Valida</validate>
 
             <!-- Legacy buttons -->
@@ -1763,17 +1764,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Sommario</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommario</summary>
             <close>&lt;i class="icon-remove"/&gt; Chiudi</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Cancella</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</clear>
             <cancel>Cancella</cancel>
             <save-locally>Salva localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Aggiorna"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aggiorna"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
@@ -1785,9 +1786,9 @@
             <validation-dialog-review>Recensione</validation-dialog-review>
             <validation-dialog-continue>Continua</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Prova</test>
-            <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Pubblica</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Prova</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -1888,7 +1889,7 @@
             </titles>
             <search>
                 <search>Cerca</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Cerca moduli</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Cerca moduli</search-forms>
                 <show-options>Mostra opzioni di ricerca</show-options>
                 <close-options>Chiudi opzioni di ricerca</close-options>
             </search>
@@ -2017,7 +2018,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Nascondi</unpublish>
-                <publish todo="true">&lt;i class="icon-globe"/&gt; Pubblica</publish>
+                <publish todo="true">&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</publish>
                 <cancel>Cancella</cancel>
                 <connect>Connetti</connect>
                 <select>Seleziona</select>
@@ -2087,14 +2088,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Löschen</delete>
             <import>&lt;i class="icon-upload"/&gt; Importieren</import>
-            <new>&lt;i class="icon-plus"/&gt; Neu</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Kopieren</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Neu</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopieren</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
@@ -2102,7 +2103,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Senden</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
 
             <!-- Legacy buttons -->
@@ -2112,17 +2113,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Senden</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Übersicht</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Übersicht</summary>
             <close>&lt;i class="icon-remove"/&gt; Schließen</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Zurücksetzen</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Zurücksetzen</clear>
             <cancel>Abbrechen</cancel>
             <save-locally>Lokal speichern</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Aktualisieren"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
@@ -2134,9 +2135,9 @@
             <validation-dialog-review>Überprüfung</validation-dialog-review>
             <validation-dialog-continue>Weiter</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Test</test>
-            <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nein</no>
@@ -2237,7 +2238,7 @@
             </titles>
             <search>
                 <search>Suchen</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Formular suchen</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Formular suchen</search-forms>
                 <show-options>Suchoptionen anzeigen</show-options>
                 <close-options>Suchoptionen schließen</close-options>
             </search>
@@ -2366,7 +2367,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
-                <publish todo="true">&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+                <publish todo="true">&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</publish>
                 <cancel>Abbrechen</cancel>
                 <connect>Verbinden</connect>
                 <select>Auswählen</select>
@@ -2436,14 +2437,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Koti</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Koti</home>
             <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
-            <pdf>&lt;i class="icon-print"/&gt; Näytä PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; Näytä PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Poista</delete>
             <import>&lt;i class="icon-upload"/&gt; Tuo</import>
-            <new>&lt;i class="icon-plus"/&gt; Uusi</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Kopioi</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Uusi</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopioi</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
@@ -2451,7 +2452,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
-            <email>&lt;i class="icon-envelope"/&gt; Sähköposti</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Sähköposti</email>
             <validate>&lt;i class="icon-ok"/&gt; Tarkista oikeellisuus</validate>
 
             <!-- Legacy buttons -->
@@ -2461,17 +2462,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Lähetä</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Yhteenveto</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Yhteenveto</summary>
             <close>&lt;i class="icon-remove"/&gt; Sulje</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Tyhjennä</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tyhjennä</clear>
             <cancel>Peruuta</cancel>
             <save-locally>Tallenna paikallisesti</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
@@ -2483,9 +2484,9 @@
             <validation-dialog-review>Käy läpi</validation-dialog-review>
             <validation-dialog-continue>Jatka</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Testaa</test>
-            <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Julkaise</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testaa</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -2715,7 +2716,7 @@
             <title>Form Runner Koti</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Poista julkaisu</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</publish>
                 <cancel>Peruuta</cancel>
                 <connect>Yhdistä</connect>
                 <select>Valitse</select>
@@ -2785,14 +2786,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Start</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
             <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Ta bort</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Ta bort</delete>
             <import>&lt;i class="icon-upload"/&gt; Importera</import>
-            <new>&lt;i class="icon-plus"/&gt; Skapa</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Duplicera</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Skapa</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicera</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Spara</save>
@@ -2800,7 +2801,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
-            <email>&lt;i class="icon-envelope"/&gt; Mejla</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Mejla</email>
             <validate>&lt;i class="icon-ok"/&gt; Godkänn</validate>
 
             <!-- Legacy buttons -->
@@ -2810,17 +2811,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Skicka</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Lista</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Lista</summary>
             <close>&lt;i class="icon-remove"/&gt; Stäng</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Rensa</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Rensa</clear>
             <cancel>Avbryt</cancel>
             <save-locally>Spara lokalt</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Visa på nytt"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
@@ -2832,9 +2833,9 @@
             <validation-dialog-review>Granskning</validation-dialog-review>
             <validation-dialog-continue>Fortsätt</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Testa</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publicera</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testa</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nej</no>
@@ -2935,7 +2936,7 @@
             </titles>
             <search>
                 <search>Sök</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Sök formulär</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Sök formulär</search-forms>
                 <show-options>Visa sökalternativ</show-options>
                 <close-options>Dölj sökalternativ</close-options>
             </search>
@@ -3064,7 +3065,7 @@
             <title>Start av formulärmotorn</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Upphäv publicering</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</publish>
                 <cancel>Avbryt</cancel>
                 <connect>Anslut</connect>
                 <select>Välj</select>
@@ -3134,14 +3135,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Review</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Verwijderen</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Verwijderen</delete>
             <import>&lt;i class="icon-upload"/&gt; Importeren</import>
-            <new>&lt;i class="icon-plus"/&gt; Nieuw</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Dupliceren</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nieuw</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliceren</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
@@ -3149,7 +3150,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
-            <email>&lt;i class="icon-envelope"/&gt; E-mail</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; E-mail</email>
             <validate>&lt;i class="icon-ok"/&gt; Valideren</validate>
 
             <!-- Legacy buttons -->
@@ -3159,17 +3160,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Sturen</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Samenvatting</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Samenvatting</summary>
             <close>&lt;i class="icon-remove"/&gt; Sluiten</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Wissen</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Wissen</clear>
             <cancel>Anulleren</cancel>
             <save-locally>Lokaal bewaren</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Verversen"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
@@ -3181,9 +3182,9 @@
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Testen</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publiceren</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publiceren</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testen</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -3284,7 +3285,7 @@
             </titles>
             <search>
                 <search>Zoeken</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Forms zoeken</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Forms zoeken</search-forms>
                 <show-options>Zoekopties tonen</show-options>
                 <close-options>Zoektopties sluiten</close-options>
             </search>
@@ -3412,7 +3413,7 @@
             <title>Form Runner Home</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Publicatie verwijderen</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publiceren</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
                 <cancel>Annuleren</cancel>
                 <connect>Verbinden</connect>
                 <select>Selecteren</select>
@@ -3482,14 +3483,14 @@
             </formats>
         </common>
         <buttons>
-            <home>&lt;i class="icon-home"/&gt; Início</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Início</home>
             <review>&lt;i class="icon-eye-open"/&gt; Rever</review>
-            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
-            <delete>&lt;i class="icon-remove-sign"/&gt; Apagar</delete>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</delete>
             <import>&lt;i class="icon-upload"/&gt; Importar</import>
-            <new>&lt;i class="icon-plus"/&gt; Novo</new>
-            <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
+            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Novo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
@@ -3497,7 +3498,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
-            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
 
             <!-- Legacy buttons -->
@@ -3507,17 +3508,17 @@
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="icon-list"/&gt; Sumário</summary>
+            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sumário</summary>
             <close>&lt;i class="icon-remove"/&gt; Fechar</close>
-            <clear>&lt;i class="icon-remove-sign"/&gt; Apagar</clear>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh" aria-label="Refrescar"/&gt;</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refrescar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Apagar e fechar</submit-dialog-clear>
@@ -3529,9 +3530,9 @@
             <validation-dialog-review>Rever</validation-dialog-review>
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
-            <test>&lt;i class="icon-cog"/&gt; Testar</test>
-            <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
-            <save-publish>&lt;i class="icon-globe"/&gt; Publicar</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testar</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -3632,7 +3633,7 @@
             </titles>
             <search>
                 <search>Procurar</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Procurar formulários</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Procurar formulários</search-forms>
                 <show-options>Mostrar opções de procura</show-options>
                 <close-options>Fechar opções de procura</close-options>
             </search>
@@ -3760,7 +3761,7 @@
             <title>Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Não publicar</unpublish>
-                <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Ligar</connect>
                 <select>Seleccionar</select>

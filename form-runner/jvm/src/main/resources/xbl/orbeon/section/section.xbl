@@ -180,7 +180,7 @@
                                                                     class="btn btn-mini fr-repeater-dropdown-button"
                                                                     aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
                                                                     aria-expanded="false">
-                                                                    <xh:span class="caret"/>
+                                                                    <xh:i class="fa fa-fw fa-caret-down"/>
                                                                 </xh:button>
                                                             </xh:div>
                                                         </xsl:if>
@@ -193,11 +193,11 @@
                                                                     <xh:button
                                                                         class="btn btn-link fr-repeater-remove-button"
                                                                         aria-label="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
-                                                                        <xh:i class="icon-minus-sign"/>
+                                                                        <xh:i class="fa fa-fw fa-minus-circle"/>
                                                                     </xh:button>
                                                                 </xf:group>
                                                                 <xf:group ref=".[not($fr-repeater-can-remove)]">
-                                                                    <xh:i class="icon-minus-sign disabled"/>
+                                                                    <xh:i class="fa fa-fw fa-minus-circle disabled"/>
                                                                 </xf:group>
                                                             </xh:div>
                                                         </xsl:if>

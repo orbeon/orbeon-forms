@@ -47,21 +47,21 @@
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li role="presentation"  class="fr-insert-above">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
                     </li>
                     <li role="presentation" class="fr-insert-below">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-move-up">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
                     </li>
                     <li role="presentation" class="fr-move-down">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>
@@ -180,8 +180,7 @@
                         <xsl:if test="$appearance = 'full' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1" id="fr-repeater-add">
-                                    <!--<xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>-->
-                                    <xf:label><xh:i class="icon-plus-sign"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>
+                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>
                                 </xf:trigger>
                             </xf:group>
                         </xsl:if>

@@ -100,9 +100,18 @@
                                     map:entry(
                                         $p/fr:name,
                                         if ($p/@type = 'ExpressionParam') then
-                                            string(($data/saxon:evaluate($p/fr:expr))[1])   (: NOTE: Form Runner function library is not in scope. :)
+                                            (: NOTE: The Form Runner function library is not in scope in this XSLT transformation.
+                                               Could we scope it? :)
+                                            string(($data/saxon:evaluate($p/fr:expr))[1])
                                         else if ($p/@type = 'ControlValueParam') then
-                                            error()                                         (: TODO: Not implemented yet. :)
+                                            (: 1. Just match by element name. This will also catch values in section templates if any. We
+                                               could either use `fr:control-[string|typed]-value()`, or use `searchControlsTopLevelOnly`
+                                               and `searchHoldersForClassUseSectionTemplates` which operate on the form definition and
+                                               section templates without a live document. :)
+                                            (: 2. Value is not formatted at all. Would need to be formatted properly like we should do
+                                               with #3627. :)
+                                            (: 3. It would be good to have a way to configure the values separator. :)
+                                            string-join($data//*[empty(*) and name() = $p/fr:controlName]/string(), ', ')
                                         else if ($p/@type = 'AllControlValuesParam') then
                                             metadata:findAllControlsWithValues($is-html)
                                         else

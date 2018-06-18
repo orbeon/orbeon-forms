@@ -38,7 +38,7 @@
             <display-name lang="sv">Dollar (tusental)</display-name>
             <display-name lang="nl">Dollars (duizend)</display-name>
             <display-name lang="pt">Dólares (milhares)</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>

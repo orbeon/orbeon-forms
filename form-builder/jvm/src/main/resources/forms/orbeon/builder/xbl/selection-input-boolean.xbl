@@ -29,7 +29,7 @@
             <display-name lang="sv">Booleskt värde</display-name>
             <display-name lang="pt">Entrada Booleana</display-name>
             <toolbox show="false"/>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>

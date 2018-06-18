@@ -37,7 +37,7 @@
             <display-name lang="sv">Ensam kryssruta</display-name>
             <display-name lang="nl" todo="true">[Single Checkbox]</display-name>
             <display-name lang="pt" todo="true">[Single Checkbox]</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>

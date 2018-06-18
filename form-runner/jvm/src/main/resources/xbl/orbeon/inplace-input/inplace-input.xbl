@@ -42,7 +42,7 @@
             <display-name lang="sv">Inmatning</display-name>
             <display-name lang="nl">Directe invoer</display-name>
             <display-name lang="pt">Inserir no local</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>

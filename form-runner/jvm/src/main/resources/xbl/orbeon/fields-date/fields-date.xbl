@@ -43,7 +43,7 @@
             <display-name lang="sv">Datumväljare med separata fält</display-name>
             <display-name lang="nl">Datumvelden</display-name>
             <display-name lang="pt">Campos de Data</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>

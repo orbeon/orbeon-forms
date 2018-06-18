@@ -41,7 +41,7 @@
             <display-name lang="sv">Formaterad HTML-text</display-name>
             <display-name lang="nl">Tekst met opmaak</display-name>
             <display-name lang="pt">Texto Formatado</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-html5</icon-class>
             </icon>
             <templates>

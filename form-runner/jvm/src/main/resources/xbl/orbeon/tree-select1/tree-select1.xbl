@@ -43,7 +43,7 @@
             <display-name lang="sv" todo="true">[Tree Selector]</display-name>
             <display-name lang="nl" todo="true">[Tree Selector]</display-name>
             <display-name lang="pt" todo="true">[Tree Selector]</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
                 <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
             </icon>

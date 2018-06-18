@@ -37,7 +37,7 @@
             <display-name lang="sv">Ja/Nej-val</display-name>
             <display-name lang="nl" todo="true">[Yes/No Answer]</display-name>
             <display-name lang="pt" todo="true">[Yes/No Answer]</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/apps/fr/style/images/other/yesno-16.png</small-icon>
                 <large-icon>/apps/fr/style/images/other/yesno-16.png</large-icon>
             </icon>

@@ -48,7 +48,7 @@
             <display-name lang="sv">Autoförslag</display-name>
             <display-name lang="nl">Auto-aanvullen</display-name>
             <display-name lang="pt">Autocompletar</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/autocomplete.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
             </icon>

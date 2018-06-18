@@ -40,7 +40,7 @@
             <display-name lang="sv">Dialog med flera val</display-name>
             <display-name lang="nl">Dialoog meervoudige selectie</display-name>
             <display-name lang="pt">Diálogo Multi-Selecção</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>

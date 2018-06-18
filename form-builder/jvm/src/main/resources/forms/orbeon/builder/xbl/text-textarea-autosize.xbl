@@ -28,7 +28,7 @@
             <display-name lang="sv">Med storleksändring</display-name>
             <display-name lang="pt" todo="true">[With Resizing]</display-name>
             <toolbox show="false"/>
-            <icon lang="en">
+            <icon>
                 <small-icon>/apps/fr/style/images/other/resize-vertically-16.png</small-icon>
                 <large-icon>/apps/fr/style/images/other/resize-vertically-16.png</large-icon>
             </icon>

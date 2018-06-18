@@ -26,7 +26,7 @@
             <display-name lang="nl">Knop</display-name>
             <display-name lang="sv">Knapp</display-name>
             <display-name lang="pt">Botão</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
             </icon>

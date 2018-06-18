@@ -12,7 +12,7 @@
             <display-name lang="ru">Шаблоны разделов</display-name>
             <display-name lang="de">Templates der Abschnitte</display-name>
             <display-name lang="it">Templates della sezione</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
@@ -21,7 +21,7 @@
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                 <display-name lang="en">US Address</display-name>
                 <description lang="en"/>
-                <icon lang="en">
+                <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
                     <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
@@ -308,7 +308,7 @@
             <display-name lang="ru">Шаблоны разделов</display-name>
             <display-name lang="de">Templates der Abschnitte</display-name>
             <display-name lang="it">Templates della sezione</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
@@ -317,7 +317,7 @@
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                 <display-name lang="en">One repeated grid</display-name>
                 <description lang="en"/>
-                <icon lang="en">
+                <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
                     <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
@@ -474,7 +474,7 @@
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                 <display-name lang="en">Two repeated grids</display-name>
                 <description lang="en"/>
-                <icon lang="en">
+                <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
                     <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>

@@ -38,7 +38,7 @@
             <display-name lang="nl">Amerikaans telefoonnummer</display-name>
             <display-name lang="pt">Número de telefone EUA</display-name>
             <display-name lang="sv">Telefonnummer i USA</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-phone</icon-class>
             </icon>
             <templates>

@@ -38,7 +38,7 @@
             <display-name lang="nl">Uitklapmenu</display-name>
             <display-name lang="pt">Menu Lista de Opções</display-name>
             <display-name lang="sv">Rullgardinsmeny</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>

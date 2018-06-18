@@ -27,7 +27,7 @@
             <display-name lang="nl">E-mailadres</display-name>
             <display-name lang="sv">Mejladress</display-name>
             <display-name lang="pt">Endereço de Email</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-envelope</icon-class>
             </icon>
             <templates>

@@ -37,7 +37,7 @@
             <display-name lang="sv">Fil som bilaga</display-name>
             <display-name lang="nl">Bestandsbijlage</display-name>
             <display-name lang="pt">Anexar ficheiro</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-paperclip</icon-class>
             </icon>
             <templates>

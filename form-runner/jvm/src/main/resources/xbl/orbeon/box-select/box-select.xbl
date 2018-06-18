@@ -44,7 +44,7 @@
             <display-name lang="sv">Rullbart multival</display-name>
             <display-name lang="nl">Schuifbare keuzevakjes</display-name>
             <display-name lang="pt">Lista de Caixas de Verificação</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>

@@ -41,7 +41,7 @@
             <display-name lang="sv">Karta</display-name>
             <display-name lang="nl">Kaart</display-name>
             <display-name lang="pt">Mapa</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>

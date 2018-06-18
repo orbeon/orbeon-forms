@@ -105,7 +105,7 @@
                 <display-name lang="ru"><xsl:value-of select="fr:title('ru', 'Шаблоны разделов')"/></display-name>
                 <display-name lang="de"><xsl:value-of select="fr:title('de', 'Templates der Abschnitte')"/></display-name>
                 <display-name lang="it"><xsl:value-of select="fr:title('it', 'Templates della sezione')"/></display-name>
-                <icon lang="en">
+                <icon>
                     <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                     <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
                 </icon>

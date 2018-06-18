@@ -39,7 +39,7 @@
             <display-name lang="nl">Amerikaanse staat</display-name>
             <display-name lang="pt">Estados dos EUA</display-name>
             <display-name lang="sv">Amerikansk delstat</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-flag</icon-class>
             </icon>
             <templates>

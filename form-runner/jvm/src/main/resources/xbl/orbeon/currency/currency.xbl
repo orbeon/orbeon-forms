@@ -38,7 +38,7 @@
             <display-name lang="sv">Valuta</display-name>
             <display-name lang="nl">Valuta</display-name>
             <display-name lang="pt">Moeda</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-dollar-sign fa-usd</icon-class>
             </icon>
             <templates>

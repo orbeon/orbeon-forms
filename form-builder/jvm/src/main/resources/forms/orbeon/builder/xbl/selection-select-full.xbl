@@ -26,7 +26,7 @@
             <display-name lang="nl">Selectievakjes</display-name>
             <display-name lang="sv">Multival</display-name>
             <display-name lang="pt">Caixas de Verificação</display-name>
-            <icon lang="en">
+            <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>

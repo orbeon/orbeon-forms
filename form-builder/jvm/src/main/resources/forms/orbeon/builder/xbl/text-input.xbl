@@ -27,7 +27,7 @@
             <display-name lang="nl">Invoerveld</display-name>
             <display-name lang="sv">Textrad</display-name>
             <display-name lang="pt">Campo de Texto</display-name>
-            <icon lang="en">
+            <icon>
                 <icon-class>fa fa-fw fa-font</icon-class>
             </icon>
             <templates>

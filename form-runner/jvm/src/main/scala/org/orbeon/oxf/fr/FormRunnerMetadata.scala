@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
@@ -30,6 +31,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.ErrorSummary
+import org.orbeon.xforms.XFormsId
 
 import scala.xml.Elem
 
@@ -39,6 +41,8 @@ object FormRunnerMetadata {
     name         : String,
     typ          : String,
     level        : Int,
+    repeated     : Boolean,
+    iterations   : List[Int],
     datatype     : Option[String],
     lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[Item]))],
     value        : Option[ControlValue],
@@ -67,7 +71,7 @@ object FormRunnerMetadata {
     val controlDetails = createFormMetadataDocument2(XFormsAPI.inScopeContainingDocument)
 
     def createLine(control: ControlDetails, isFirst: Boolean): Option[String] =
-      control match { case ControlDetails(name, typ, level, _, lhhaAndItems, value, _) ⇒
+      control match { case ControlDetails(name, typ, level, _, _, _, lhhaAndItems, value, _) ⇒
 
         val (lhhas, _) = lhhaAndItems.head._2 // TODO: use current/requested lang
 
@@ -112,10 +116,32 @@ object FormRunnerMetadata {
     def processNext(it: List[ControlDetails], level: Int): Unit =
       it match {
         case Nil ⇒
+        case gridControl :: rest if gridControl.typ == "grid" && gridControl.repeated ⇒
+
+          val gridLevel = gridControl.level
+          val nextLevel = gridLevel + 1
+
+          def f(c: ControlDetails) = c.level > gridLevel
+
+          val grouped = rest.takeWhile(f).groupBy(_.iterations.headOption)
+
+          grouped.toList.sortBy(_._1) foreach {
+            case (Some(iteration), content) ⇒
+              sb ++= "<li>"
+              sb ++= s"Iteration $iteration"
+              sb ++= "<ul>"
+              processNext(content, nextLevel)
+              sb ++= "</ul>"
+              sb ++= "</li>"
+            case _ ⇒ // ignore
+          }
+
+          processNext(rest.dropWhile(f), level)
+
         case sectionControl :: rest if sectionControl.typ == "section" ⇒
 
           val sectionLevel = sectionControl.level
-          val nextLevel    = level + 1
+          val nextLevel    = sectionLevel + 1
 
           createLine(sectionControl, isFirst = false) foreach { line ⇒
             sb ++= s"<h$nextLevel>"
@@ -123,10 +149,12 @@ object FormRunnerMetadata {
             sb ++= s"</h$nextLevel>"
           }
 
+          def f(c: ControlDetails) = c.level > sectionLevel
+
           sb ++= "<ul>"
-          processNext(rest.takeWhile(_.level > sectionLevel), nextLevel)
+          processNext(rest.takeWhile(f), nextLevel)
           sb ++= "</ul>"
-          processNext(rest.dropWhile(_.level > sectionLevel), level)
+          processNext(rest.dropWhile(f), level)
         case ignoredControl :: rest if ControlsToIgnore(ignoredControl.typ) ⇒
           processNext(rest, level)
         case control :: rest ⇒
@@ -263,13 +291,26 @@ object FormRunnerMetadata {
     def resourcesInstance(control: XFormsSingleNodeControl): Option[XFormsInstance] =
       instanceInScope(control, FormResources)
 
-    def isBoundToFormDataInScope(control: XFormsSingleNodeControl): Boolean = {
+    def isBoundToFormDataInScope(control: XFormsControl): Boolean = control match {
+      case c: XFormsSingleNodeControl ⇒
 
-      val boundNode = control.boundNode
-      val data      = instanceInScope(control, FormInstance)
+        val boundNode = c.boundNode
+        val data      = instanceInScope(c, FormInstance)
 
-      (boundNode map (_.getDocumentRoot)) == (data map (_.root))
+        (boundNode map (_.getDocumentRoot)) == (data map (_.root))
+      case _ ⇒
+        false
     }
+
+    def isSection(c: XFormsControl) = c.localName == "section"
+    def isGrid   (c: XFormsControl) = c.localName == "grid"
+    def isRepeat (c: XFormsControl) = c.staticControl.element.attributeValue("repeat") == "content"
+
+    def isRepeatedGridComponent(control: XFormsControl): Boolean =
+      control match {
+        case c: XFormsComponentControl if c.localName == "grid" && isRepeat(c) ⇒ true
+        case _                                                                 ⇒ false
+      }
 
     def iterateResources(resourcesInstance: XFormsInstance): Iterator[(Lang, NodeInfo)] =
       for (resource ← resourcesInstance.rootElement / Resource iterator)
@@ -310,7 +351,9 @@ object FormRunnerMetadata {
     }
 
     val selectedControls =
-      (controls.values map collectByErasedType[XFormsSingleNodeControl] flatten) filter (_.isRelevant) filter isBoundToFormDataInScope
+      controls.values  filter
+        (_.isRelevant) filter
+        (c ⇒ isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
 
     val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
 
@@ -322,20 +365,27 @@ object FormRunnerMetadata {
 
     val controlMetadata =
       for {
-        control           ← sortedControls
-        staticControl     ← collectByErasedType[StaticLHHASupport](control.staticControl)
-        resourcesInstance ← resourcesInstance(control)
+        control       ← sortedControls
+        staticControl = control.staticControl
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
-        controlName       ← FormRunner.controlNameFromIdOpt(control.getId)
-        boundNode         ← control.boundNode
-        dataHash          = SubmissionUtils.dataNodeHash(boundNode)
-      } yield
-        dataHash → {
+        controlName   ← FormRunner.controlNameFromIdOpt(control.getId)
+      } yield {
+
+        val singleNodeControlOpt = collectByErasedType[XFormsSingleNodeControl](control)
+
+        val resourcesInstanceOpt = singleNodeControlOpt flatMap resourcesInstance
+        val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNode)
+        val dataHashOpt          = boundNodeOpt map SubmissionUtils.dataNodeHash
+
+        dataHashOpt → {
 
           val lhhaAndItemsIt =
-            for ((lang, resourcesRoot) ← iterateResources(resourcesInstance))
-              yield
-                lang → resourcesForControl(staticControl, lang, resourcesRoot, controlName)
+            for {
+              resourcesInstance     ← resourcesInstanceOpt.iterator
+              lhhaStaticControl     ←  collectByErasedType[StaticLHHASupport](staticControl).iterator
+              (lang, resourcesRoot) ← iterateResources(resourcesInstance)
+            } yield
+              lang → resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
 
           val lhhaAndItemsList = lhhaAndItemsIt.to[List]
 
@@ -389,19 +439,33 @@ object FormRunnerMetadata {
                 SingleControlValue(c.getValue, c.getFormattedValue orElse Option(c.getValue))
             }
 
+          // Include sections and repeated grids only
+          def ancestorLevelContainers(control: XFormsControl): Iterator[XFormsComponentControl] =
+            new AncestorOrSelfIterator(control.parent) collect {
+              case c: XFormsComponentControl if isSection(c)             ⇒ c
+              case c: XFormsComponentControl if isGrid(c) && isRepeat(c) ⇒ c
+            }
+
+          val repeatDepth = control.staticControl.ancestorRepeatsAcrossParts.size
+
+          val id = XFormsId.fromEffectiveId(control.effectiveId)
+
           ControlDetails(
             name         = controlName,
             typ          = staticControl.localName,
-            level        = ErrorSummary.ancestorSectionsIt(control).size,
-            datatype     = control.getTypeLocalNameOpt,
+            level        = ancestorLevelContainers(control).size,
+            repeated     = isRepeat(control),
+            iterations   = id.iterations drop (repeatDepth - 1),
+            datatype     = collectByErasedType[XFormsSelectControl](control) flatMap (_.getTypeLocalNameOpt),
             lhhaAndItems = lhhaAndItemsList,
             value        = valueOpt,
             forHashes    = Nil
           )
         }
+      }
 
     controlMetadata groupByKeepOrder (x ⇒ x._2) map { case (elem, hashes) ⇒
-      elem.copy(forHashes = hashes map (_._1))
+      elem.copy(forHashes = hashes flatMap (_._1))
     }
   }
 }

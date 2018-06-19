@@ -67,7 +67,6 @@ class XHTMLHeadHandler(
 
     // Include static XForms CSS and JS
     val externalContext = xformsHandlerContext.getExternalContext
-    val requestPath = externalContext.getRequest.getRequestPath
 
     if (containingDocument.getStaticState.isInlineResources) {
       helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "style", Array("type", "text/css", "media", "all"))

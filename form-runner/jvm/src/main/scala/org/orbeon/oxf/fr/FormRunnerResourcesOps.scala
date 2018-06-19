@@ -49,7 +49,6 @@ trait FormRunnerResourcesOps {
       (findResourceHoldersWithLang(controlName, _)) getOrElse
       Nil
 
-
   // Find control resource holders with their language
   def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     for {

@@ -165,6 +165,13 @@ div.orbeon.orbeon-portlet-div {
 
     .fr-view .fr-section-container .fr-grid.fr-editable {                   // Tons of classes to take precedence over FR styling
         .fr-grid-td, .fr-grid-th {
+
+            // See https://github.com/orbeon/orbeon-forms/issues/3616
+            // See grid.xbl comment. We only do this at design-time for now.
+            .fr-grid-th, .fr-grid-td {
+                overflow-x: hidden;                                         // We don't want large content to change the size of the cells
+            }
+
             &:hover {
                 .xforms-label, .xforms-hint, .xforms-text .xforms-output-output {
                     &:empty:before {

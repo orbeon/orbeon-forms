@@ -204,9 +204,12 @@
 
         .fr-grid {
 
-            .fr-grid-th, .fr-grid-td {
-                overflow-x: hidden;                             // We don't want large content to change the size of the cells
-            }
+            // NOTE: Commented-out for runtime because the old autocomplete control is clipped when using `overflow-x`.
+            // See https://github.com/orbeon/orbeon-forms/issues/3616
+            // See form-builder.less
+            //.fr-grid-th, .fr-grid-td {
+            //    overflow-x: hidden;                             // We don't want large content to change the size of the cells
+            //}
 
             .xforms-help {
                 float: left;

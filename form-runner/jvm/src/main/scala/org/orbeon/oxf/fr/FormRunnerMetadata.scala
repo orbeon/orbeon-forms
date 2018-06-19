@@ -59,6 +59,7 @@ object FormRunnerMetadata {
 
   private val Debug            = false
 
+  val FrExcludeFromEmailBody   = "fr-exclude-from-email-body"
   val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature")
 
   val SelectedCheckboxString   = "☒"
@@ -310,9 +311,10 @@ object FormRunnerMetadata {
         false
     }
 
-    def isSection(c: XFormsControl) = c.localName == "section"
-    def isGrid   (c: XFormsControl) = c.localName == "grid"
-    def isRepeat (c: XFormsControl) = c.staticControl.element.attributeValue("repeat") == "content"
+    def isSection (c: XFormsControl) = c.localName == "section"
+    def isGrid    (c: XFormsControl) = c.localName == "grid"
+    def isRepeat  (c: XFormsControl) = c.staticControl.element.attributeValue("repeat") == "content"
+    def isExcluded(c: XFormsControl) = c.staticControl.element.attributeValue("class").splitTo[Set]().contains(FrExcludeFromEmailBody)
 
     def isRepeatedGridComponent(control: XFormsControl): Boolean =
       control match {
@@ -360,7 +362,8 @@ object FormRunnerMetadata {
 
     val selectedControls =
       controls.values  filter
-        (_.isRelevant) filter
+        (_.isRelevant) filterNot
+        isExcluded     filter
         (c ⇒ isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
 
     val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
@@ -390,13 +393,13 @@ object FormRunnerMetadata {
           val lhhaAndItemsIt =
             for {
               resourcesInstance     ← resourcesInstanceOpt.iterator
-              lhhaStaticControl     ←  collectByErasedType[StaticLHHASupport](staticControl).iterator
+              lhhaStaticControl     ← collectByErasedType[StaticLHHASupport](staticControl).iterator
               (lang, resourcesRoot) ← iterateResources(resourcesInstance)
             } yield
               lang → resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
 
           val lhhaAndItemsList = lhhaAndItemsIt.to[List]
-          
+
           val valueOpt =
             control collect {
               case c: XFormsSelectControl  ⇒

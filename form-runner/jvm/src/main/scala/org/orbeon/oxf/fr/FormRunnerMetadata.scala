@@ -68,7 +68,7 @@ object FormRunnerMetadata {
   //@XPathFunction
   def findAllControlsWithValues(html: Boolean): String = {
 
-    val currentLang = FormRunnerLang.currentFRLang.stringValue
+    val currentLang = FormRunnerLang.currentFRLang
     val currentFormRunnerResources = FormRunnerLang.currentFRResources
 
     val naString = currentFormRunnerResources / "email" / "na" stringValue

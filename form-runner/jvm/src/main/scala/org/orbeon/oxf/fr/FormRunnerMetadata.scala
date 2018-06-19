@@ -388,7 +388,7 @@ object FormRunnerMetadata {
               lang → resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
 
           val lhhaAndItemsList = lhhaAndItemsIt.to[List]
-
+          
           val valueOpt =
             control collect {
               case c: XFormsSelectControl  ⇒

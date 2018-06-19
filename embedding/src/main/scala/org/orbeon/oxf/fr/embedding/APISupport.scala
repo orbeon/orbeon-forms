@@ -378,7 +378,7 @@ object APISupport {
         credentials = None,
         cookieStore = getOrCreateCookieStore,
         method      = if (requestDetails.content.isEmpty) GET else POST,
-        headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient → List("portlet")),
+        headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient → List(ctx.client)),
         content     = requestDetails.content
       )
 

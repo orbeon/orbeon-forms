@@ -36,6 +36,8 @@ class ServletEmbeddingContext(
   def getSessionAttribute(name: String)                = Option(session.getAttribute(name))
   def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)             = session.removeAttribute(name)
+
+  val client = Headers.EmbeddedClient
 }
 
 class ServletEmbeddingContextWithResponse(

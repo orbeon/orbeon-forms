@@ -68,7 +68,7 @@ class XHTMLHeadHandler(
     // Include static XForms CSS and JS
     val externalContext = xformsHandlerContext.getExternalContext
 
-    if (containingDocument.getStaticState.isInlineResources) {
+    if (containingDocument.isServeInlineResources) {
       helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "style", Array("type", "text/css", "media", "all"))
 
       val content =
@@ -96,7 +96,7 @@ class XHTMLHeadHandler(
       // Linked JavaScript resources
       outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)
 
-      if (! containingDocument.getStaticState.isInlineResources) {
+      if (! containingDocument.isServeInlineResources) {
 
         // Static resources
         if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)

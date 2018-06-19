@@ -48,6 +48,7 @@ trait EmbeddingContext {
   def setSessionAttribute(name: String, value: AnyRef) : Unit
   def removeSessionAttribute(name: String)             : Unit
   def httpClient                                       : HttpClient
+  def client                                           : String
 }
 
 trait EmbeddingContextWithResponse extends EmbeddingContext{

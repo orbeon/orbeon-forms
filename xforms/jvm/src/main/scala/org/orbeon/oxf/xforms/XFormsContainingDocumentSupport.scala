@@ -440,15 +440,18 @@ trait ContainingDocumentRequestStats {
 
 trait ContainingDocumentRequest {
 
-  private var _deploymentType       : DeploymentType = null
-  private var _requestContextPath   : String = null
-  private var _requestPath          : String = null
-  private var _requestHeaders       : Map[String, List[String]] = null
-  private var _requestParameters    : Map[String, List[String]] = null
-  private var _containerType        : String = null
-  private var _containerNamespace   : String = null
-  private var _versionedPathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
-  private var _isEmbedded           : Boolean = false
+  def getStaticState : XFormsStaticState
+
+  private var _deploymentType             : DeploymentType = null
+  private var _requestContextPath         : String = null
+  private var _requestPath                : String = null
+  private var _requestHeaders             : Map[String, List[String]] = null
+  private var _requestParameters          : Map[String, List[String]] = null
+  private var _containerType              : String = null
+  private var _containerNamespace         : String = null
+  private var _versionedPathMatchers      : ju.List[URLRewriterUtils.PathMatcher] = null
+  private var _isEmbedded                 : Boolean = false
+  private var _isPortletContainerOrRemote : Boolean = false
 
   def getDeploymentType        = _deploymentType
   def getRequestContextPath    = _requestContextPath
@@ -461,11 +464,15 @@ trait ContainingDocumentRequest {
 
   def headersGetter: String ⇒ Option[List[String]] = getRequestHeaders.get
 
-  def isPortletContainer       = _containerType == "portlet"
-  def isEmbedded               = _isEmbedded
+  def isPortletContainer         = _containerType == "portlet"
+  def isEmbedded                 = _isEmbedded
+  def isServeInlineResources     = getStaticState.isInlineResources && ! _isPortletContainerOrRemote
 
   private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
     Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
+
+  private def isPortletContainerOrRemoteFromHeaders(headers: Map[String, List[String]]) =
+    (Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient) || isPortletContainer
 
   protected def initializeRequestInformation(): Unit =
     Option(NetUtils.getExternalContext.getRequest) match {
@@ -503,6 +510,7 @@ trait ContainingDocumentRequest {
 
         _containerType = request.getContainerType
         _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
+        _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
       case None ⇒
         // Special case when we run outside the context of a request
         _deploymentType = DeploymentType.standalone
@@ -513,6 +521,7 @@ trait ContainingDocumentRequest {
         _requestParameters = Map.empty
         _containerType = "servlet"
         _containerNamespace = ""
+        _isPortletContainerOrRemote = false
     }
 
   protected def initializePathMatchers(): Unit =
@@ -524,14 +533,15 @@ trait ContainingDocumentRequest {
     dynamicState.deploymentType match {
       case Some(_) ⇒
         // Normal case where information below was previously serialized
-        _deploymentType     = DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
-        _requestContextPath = dynamicState.decodeRequestContextPathJava
-        _requestPath        = dynamicState.decodeRequestPathJava
-        _requestHeaders     = dynamicState.requestHeaders.toMap
-        _isEmbedded         = isEmbeddedFromHeaders(_requestHeaders)
-        _requestParameters  = dynamicState.requestParameters.toMap
-        _containerType      = dynamicState.decodeContainerTypeJava
-        _containerNamespace = dynamicState.decodeContainerNamespaceJava
+        _deploymentType             = DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
+        _requestContextPath         = dynamicState.decodeRequestContextPathJava
+        _requestPath                = dynamicState.decodeRequestPathJava
+        _requestHeaders             = dynamicState.requestHeaders.toMap
+        _isEmbedded                 = isEmbeddedFromHeaders(_requestHeaders)
+        _requestParameters          = dynamicState.requestParameters.toMap
+        _containerType              = dynamicState.decodeContainerTypeJava
+        _containerNamespace         = dynamicState.decodeContainerNamespaceJava
+        _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
       case None ⇒
         // Use information from the request
         // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases

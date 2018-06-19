@@ -155,7 +155,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
             });
-            if (containingDocument.getStaticState().isInlineResources())
+            if (containingDocument.isServeInlineResources())
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "text", "name", "$client-state", "value", "", "style", "display: none"
                 });

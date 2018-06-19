@@ -55,7 +55,10 @@ object Headers {
   val CreatedLower            = Created.toLowerCase
   val TimeoutLower            = Timeout.toLowerCase
 
-  val EmbeddedClientValues    = Set("embedded", "portlet")
+  val EmbeddedClient          = "embedded"
+  val PortletClient           = "portlet"
+
+  val EmbeddedClientValues    = Set(EmbeddedClient, PortletClient)
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //

@@ -146,6 +146,8 @@
         <email>
             <subject>Orbeon Forms Confirmation</subject>
             <body>Please find attached the form in PDF and XML format.</body>
+            <na>N/A</na>
+            <iteration>Iteration {$iteration}</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -500,6 +502,8 @@
         <email>
             <subject>Orbeon Forms Confirmation</subject>
             <body>Veuillez trouver en attachement le formulaire au formats XML et PDF.</body>
+            <na>-</na>
+            <iteration>Répétition {$iteration}</iteration>
         </email>
         <print>
             <formats>
@@ -843,6 +847,8 @@
         <email>
             <subject>Confirmación de formulario Orbeon</subject>
             <body>Por favor encuentre los formatos PDF y XML adjuntos al mail</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -1182,6 +1188,8 @@
         <email>
             <subject>Orbeon Forms Bekreftelse</subject>
             <body>Vedlagt er skjema i PDF- og XML-format.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -1521,6 +1529,8 @@
         <email>
             <subject>Подтверждение формы</subject>
             <body>Ваша форма в форматах PDF и XML во вложении.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -1864,6 +1874,8 @@
         <email>
             <subject>Orbeon Forms confermazione</subject>
             <body>Si allega il modulo in formato PDF e XML.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -2213,6 +2225,8 @@
         <email>
             <subject>Orbeon Forms: Bestätigung</subject>
             <body>Im Anhang finden Sie das Formular im PDF- und XML-Format</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -2562,6 +2576,8 @@
         <email>
             <subject>Orbeon-lomakkeiden vahvistus</subject>
             <body>Ole hyvä ja katso PDF- ja XML-formaatissa olevaa lomaketta.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -2911,6 +2927,8 @@
         <email>
             <subject>Orbeon Forms bekräftelse</subject>
             <body>Formuläret bifogas på PDF- och XML-format.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -3260,6 +3278,8 @@
         <email>
             <subject>Orbeon Forms bevestiging</subject>
             <body>Bijgevoegd het form in PDF en XML-structuur.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -3608,6 +3628,8 @@
         <email>
             <subject>Confirmação Orbeon Forms</subject>
             <body>Segue em anexo o formulário em formato PDF e XML.</body>
+            <na todo="true">[N/A]</na>
+            <iteration todo="true">[Iteration {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>

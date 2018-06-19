@@ -27,6 +27,8 @@ import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
+import org.orbeon.saxon.Configuration
+import org.orbeon.saxon.function.ProcessTemplate
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -57,9 +59,6 @@ object FormRunnerMetadata {
 
   private val Debug            = false
 
-  // TODO: Localize, must come from resources
-  val NotAvailableString       = "N/A"
-
   val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature")
 
   val SelectedCheckboxString   = "☒"
@@ -67,6 +66,15 @@ object FormRunnerMetadata {
 
   //@XPathFunction
   def findAllControlsWithValues(html: Boolean): String = {
+
+    val currentLang = FormRunnerLang.currentFRLang.stringValue
+    val currentFormRunnerResources = FormRunnerLang.currentFRResources
+
+    val naString = currentFormRunnerResources / "email" / "na" stringValue
+    val iterationResource = currentFormRunnerResources / "email" / "iteration" stringValue
+
+    def iterationString(it: Int) =
+      ProcessTemplate.processTemplateWithNames(iterationResource, List(("iteration", it)), Configuration.getLocale(currentLang))
 
     val controlDetails = createFormMetadataDocument2(XFormsAPI.inScopeContainingDocument)
 
@@ -95,7 +103,7 @@ object FormRunnerMetadata {
             }
 
           val normalizedValue =
-            value map (_.trimAllToOpt getOrElse NotAvailableString)
+            value map (_.trimAllToOpt getOrElse naString)
 
           val list = normalizedLabel.toList ::: normalizedValue.toList
 
@@ -128,7 +136,7 @@ object FormRunnerMetadata {
           grouped.toList.sortBy(_._1) foreach {
             case (Some(iteration), content) ⇒
               sb ++= "<li>"
-              sb ++= s"Iteration $iteration"
+              sb ++= iterationString(iteration)
               sb ++= "<ul>"
               processNext(content, nextLevel)
               sb ++= "</ul>"

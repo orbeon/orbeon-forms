@@ -119,9 +119,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def moveWall(cellId: String, startSide: Direction, target: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveWall(resolveId(cellId).get, startSide, target) foreach { case (originCellId, initialPosition) ⇒
-      Undo.pushUserUndoAction(MoveWall(originCellId, startSide, initialPosition))
-    }
+    FormBuilder.moveWall(resolveId(cellId).get, startSide, target) foreach Undo.pushUserUndoAction
   }
 
   def mergeRight(cellId: String): Unit = {

@@ -19,7 +19,6 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.XMLNames.{FR, XF}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -696,8 +695,6 @@ object FormBuilderXPathApi {
           ControlSettings(newName, oldName, newXcvElem)
         }
       case MoveWall(cellId, startSide, target) ⇒
-        FormBuilder.moveWall(FormBuilderRpcApiImpl.resolveId(cellId).get, startSide, target) map { case (originCellId, initialPosition) ⇒
-          MoveWall(originCellId, startSide, initialPosition)
-        }
+        FormBuilder.moveWall(FormBuilderRpcApiImpl.resolveId(cellId).get, startSide, target)
     }
 }

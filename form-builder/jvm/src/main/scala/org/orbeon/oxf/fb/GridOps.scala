@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
-import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow}
+import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow, MoveWall}
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -369,7 +369,7 @@ trait GridOps extends ContainerOps {
     startSide    : Direction,
     target       : Int)(
     implicit ctx : FormBuilderDocContext
-  ): Option[(String, Int)] = {
+  ): Option[UndoAction] = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
     Cell.findOriginCell(cells, cellElem) map { originCell ⇒
 
@@ -395,14 +395,14 @@ trait GridOps extends ContainerOps {
         }
       }
 
-      val initial = moveCellWall(originCell, startSide, target)
+      val initialPosition = moveCellWall(originCell, startSide, target)
 
       val neighbors = Cell.findOriginNeighbors(originCell, startSide, cells)
       val mirrorSide = Direction.mirror(startSide)
       neighbors.foreach(moveCellWall(_, mirrorSide, target))
 
       // Return undo information
-      originCell.u.get.id → initial
+      MoveWall(originCell.u.get.id, startSide, initialPosition)
     }
   }
 

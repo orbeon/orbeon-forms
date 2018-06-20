@@ -14,9 +14,12 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
+import org.orbeon.builder.rpc.FormBuilderRpcApiImpl.resolveId
+import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike
@@ -34,11 +37,16 @@ class FormBuilderUndoTest
     val containerDetails =
       withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
         findNestedContainers(ctx.bodyElem) map  { container ⇒
-          (container.id, IsGrid(container), findNestedControls(container) map (_.id) head)
+          (
+            container.id,
+            IsGrid(container),
+            container descendant NodeInfoCell.CellTest map (_.id) head,
+            findNestedControls(container) map (_.id) head
+          )
         } toList
       }
 
-    containerDetails foreach { case (containerId, isGrid, nestedControlId) ⇒
+    containerDetails foreach { case (containerId, isGrid, firstCellId, nestedControlId) ⇒
       it(s"Must be able to undo delete of ${if (isGrid) "grid" else "section"} `$containerId` and nested control `$nestedControlId`") {
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
 
@@ -84,7 +92,7 @@ class FormBuilderUndoTest
           }
 
           // Delete nested control
-          {
+          locally {
             FormBuilderRpcApiImpl.controlDelete(nestedControlId)
 
             assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
@@ -101,6 +109,29 @@ class FormBuilderUndoTest
 
             assert(initialContainerCount    === countContainers)
             assert(initialNonContainerCount === countNonContainers)
+          }
+        }
+      }
+    }
+
+    containerDetails filter (_._2) foreach { case (containerId, _, firstCellId, _) ⇒
+      it(s"Must be able to move cell walls of grid `$containerId`") {
+        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+
+          val doc = ctx.formDefinitionRootElem
+
+          // Move grid wall
+          locally {
+            val cell = resolveId(firstCellId).get
+            FormBuilderRpcApiImpl.moveWall(firstCellId, Direction.Right, 7)
+            assert(Some(7) === NodeInfoCellOps.w(cell))
+          }
+
+          // Undo move wall
+          locally {
+            FormBuilderXPathApi.undoAction()
+            val cell = resolveId(firstCellId).get
+            assert(Some(6) === NodeInfoCellOps.w(cell))
           }
         }
       }

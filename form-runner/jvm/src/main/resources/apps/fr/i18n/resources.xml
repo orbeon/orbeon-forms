@@ -763,7 +763,7 @@
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenido</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
@@ -802,21 +802,21 @@
                 <move-down>Mover Debajo</move-down>
                 <remove>
                     <label>Remover</label>
-                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                    <hint>Remover Fila de Grilla Repetible</hint>
                 </remove>
                 <add-another>
                     <label>Agregar Otro</label>
-                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                    <hint>Agregar Fila a Grilla Repetible</hint>
                 </add-another>
             </grid>
             <section>
                 <remove>
                     <label>Remover</label>
-                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                    <hint>Remover Iteracción de Sección Repetible</hint>
                 </remove>
                 <add-another>
                     <label>Agregar Otro</label>
-                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                    <hint>Agregar Iteracción a Grilla Repetible</hint>
                 </add-another>
             </section>
             <date-time>
@@ -829,11 +829,11 @@
                 <incomplete>Incompleto</incomplete>
                 <complete>Completar</complete>
                 <not-started>No iniciado</not-started>
-                <edit todo="true">[Edit]</edit>
+                <edit>Editar</edit>
             </wizard>
             <error-summary>
-                <show-more todo="true">[Show More]</show-more>
-                <show-less todo="true">[Show Less]</show-less>
+                <show-more>Mostrar Más</show-more>
+                <show-less>Mostrar Menos</show-less>
             </error-summary>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
@@ -846,9 +846,9 @@
         </errors>
         <email>
             <subject>Confirmación de formulario Orbeon</subject>
-            <body>Por favor encuentre los formatos PDF y XML adjuntos al mail</body>
-            <na todo="true">[N/A]</na>
-            <iteration todo="true">[Iteration {$iteration}]</iteration>
+            <body>Por favor encuentre los datos del formulario adjuntos al mail</body>
+            <na>N/A</na>
+            <iteration>Iteracción {$iteration}</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -930,9 +930,9 @@
                 <upload-done>Subidad de archivos completada</upload-done>
                 <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
                 <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
-                <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
-                <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
+                <upload-error-mediatype>El archivo subido es de tipo incorrecto.</upload-error-mediatype>
+                <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado.  Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>
+                <lost-attachments>Algunos archivos se perdieron debido a un incidente con el servidor. Verifique todos los adjuntos y subalos nuevamente si es necesario.</lost-attachments>
             </messages>
             <draft-singleton>
                 <found-draft>Borrador encontrado</found-draft>
@@ -956,7 +956,7 @@
                 <confirm>Confirmar</confirm>
                 <alert>Valor ausente o incorrecto</alert>
                 <captcha-label>CAPTCHA</captcha-label>
-                <captcha-alert todo="true">El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
+                <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
             <view>
                 <explanation>
@@ -964,15 +964,15 @@
                 </explanation>
             </view>
             <lease>
-                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
-                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
-                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
-                <current-user-right todo="true">.]</current-user-right>
-                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
-                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
-                <relinquish todo="true">[Relinquish lease]</relinquish>
-                <renew todo="true">[Renew lease]</renew>
-                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <renew-lease-title>Renovar Bloqueo</renew-lease-title>
+                <renew-lease-message>Su bloqueo esta por expirar. Desea renovarlo ahora ?</renew-lease-message>
+                <current-user-left>Usted posee un bloqueo sobre este documento para otro</current-user-left>
+                <current-user-right>.]</current-user-right>
+                <relinquished>Usted ya no posee un bloqueo sobre este documento.</relinquished>
+                <other-user>Otro usuario con nombre "{0}" posee actualmente un bloqueo sobre este documento</other-user>
+                <relinquish>Libherar Bloqueo</relinquish>
+                <renew>Renovar Bloqueo</renew>
+                <try-acquire>Intentar adquirir Bloqueo</try-acquire>
             </lease>
         </detail>
         <save-locally>
@@ -998,26 +998,26 @@
         <home>
             <title>Inicio Form Runner</title>
             <buttons>
-                <unpublish todo="true">&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Conectar</connect>
                 <select>Seleccionar</select>
                 <operation>Operación</operation>
-                <reindex todo="true">[Reindex database(s)]</reindex>
-                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
+                <reindex>Reindexar base de datos</reindex>
+                <stop-reindex>Detener reindexación</stop-reindex>
                 <all>Todos</all>
                 <none>Ninguno</none>
-                <unpublished-local todo="true">Despublicar formularios locales</unpublished-local>
-                <published-local todo="true">Publicar formularios locales</published-local>
-                <unpublished-remote todo="true">Despublicar formularios remotos</unpublished-remote>
-                <published-remote todo="true">Publicar formularios remotos</published-remote>
+                <unpublished-local>Despublicar formularios locales</unpublished-local>
+                <published-local>Publicar formularios locales</published-local>
+                <unpublished-remote>Despublicar formularios remotos</unpublished-remote>
+                <published-remote>Publicar formularios remotos</published-remote>
                 <newer-local>Fomularios locales nuevos</newer-local>
                 <newer-remote>Formularios remotos nuevos</newer-remote>
-                <publish-local todo="true">Publicar formularios locales</publish-local>
-                <unpublish-local todo="true">Despublicar formularios locales</unpublish-local>
-                <publish-remote todo="true">Publicar formularios remotos</publish-remote>
-                <unpublish-remote todo="true">Despublicar formularios remotos</unpublish-remote>
+                <publish-local>Publicar formularios locales</publish-local>
+                <unpublish-local>Despublicar formularios locales</unpublish-local>
+                <publish-remote>Publicar formularios remotos</publish-remote>
+                <unpublish-remote>Despublicar formularios remotos</unpublish-remote>
                 <push-to-remote>Poner como Remoto</push-to-remote>
                 <pull-from-remote>Sacar Remoto</pull-from-remote>
                 <navigate-summary>Ir al resumen</navigate-summary>
@@ -1026,7 +1026,7 @@
                 <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation todo="true">Confirmar Publicación/Despublicación</publish-confirmation>
+                <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
                 <credentials>Credenciales del Servidor Remoto</credentials>
                 <status>Estado</status>
                 <app>Aplicación</app>
@@ -1038,12 +1038,12 @@
                 <remote>Remoto</remote>
                 <form-identification>Identificación de Fomulario</form-identification>
                 <last-modified>Modificado</last-modified>
-                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
-                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1053,10 +1053,10 @@
                 <remote-server>Servidor Remoto</remote-server>
                 <username>Usuario</username>
                 <password>Contraseña</password>
-                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
-                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
-                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
-                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reindexing-generic>Reindexando &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider>Reindexando ({1,number}/{2,number}]</reindexing-provider>
+                <reindexing-stopping>La reindexación se esta deteniendo &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished>La reindexación ha finalizado</reindexing-finished>
             </labels>
         </home>
     </resource>

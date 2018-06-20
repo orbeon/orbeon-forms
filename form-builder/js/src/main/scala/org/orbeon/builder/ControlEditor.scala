@@ -37,20 +37,21 @@ object ControlEditor {
   )
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
-  private var currentCellOpt: Option[Block]  = None
+  private var currentCellOpt : Option[Block] = None
   private lazy val controlEditorLeft         = $(".fb-control-editor-left")
   private lazy val controlEditorRight        = $(".fb-control-editor-right")
-  private var previousCellOpt: Option[Block] = None
+  private lazy val controlEditors            = controlEditorLeft.get ++ controlEditorRight.get
   private var masked: Boolean                = false
 
   // Show/hide editor
   Position.currentContainerChanged(
     containerCache = BlockCache.cellCache,
     wasCurrent     = _ ⇒ {
-      previousCellOpt = None
+      currentCellOpt = None
       hideEditors()
     },
     becomesCurrent = (cell: Block) ⇒ {
+      currentCellOpt = Some(cell)
       if (! masked)
         showEditors(cell)
     }
@@ -58,21 +59,15 @@ object ControlEditor {
 
   def mask(): Unit = {
     masked = true
-    previousCellOpt = currentCellOpt
     hideEditors()
   }
 
   def unmask(): Unit = {
     masked = false
-    if (! masked) {
-      previousCellOpt.foreach(showEditors)
-      previousCellOpt = None
-    }
+    currentCellOpt.foreach(showEditors)
   }
 
   private def showEditors(cell: Block): Unit = {
-
-    currentCellOpt = Some(cell)
 
     // Position editors
     def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
@@ -82,8 +77,13 @@ object ControlEditor {
         top  = cell.top - Position.scrollTop()
       ))
     }
-    val cellContent = cell.el.children()
-    val controlElOpt = (cellContent.length > 0).option(cellContent.first())
+
+    val controlElOpt = {
+      // Make sure we don't take control editors as the control
+      val cellContent = cell.el.children().get.filter(! controlEditors.contains(_))
+      (cellContent.length > 0).option($(cellContent(0)))
+    }
+
     controlElOpt.foreach { controlEl ⇒
       // Control editor is only show when the cell isn't empty
       controlEl.append(controlEditorRight)
@@ -108,7 +108,6 @@ object ControlEditor {
   }
 
   private def hideEditors(): Unit = {
-    currentCellOpt = None
     controlEditorLeft.hide()
     controlEditorRight.hide()
     controlEditorLeft.detach()

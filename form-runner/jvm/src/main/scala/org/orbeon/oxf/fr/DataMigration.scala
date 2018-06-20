@@ -92,7 +92,7 @@ object DataMigration {
     data          : DocumentInfo,
     metadataOpt   : Option[DocumentInfo],
     pruneMetadata : Boolean
-  ): (DocumentInfo, String) = {
+  ): DocumentInfo = {
 
     val srcDataFormatVersion = FormRunnerPersistence.FormRunnerCurrentInternalDataFormatVersion
     val dstDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
@@ -112,7 +112,7 @@ object DataMigration {
       doDispatch = false
     )
 
-    databaseData → dstDataFormatVersion
+    databaseData
   }
 
   //@XPathFunction

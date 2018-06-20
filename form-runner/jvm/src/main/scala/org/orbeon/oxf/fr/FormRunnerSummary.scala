@@ -33,6 +33,7 @@ trait FormRunnerSummary {
 
     putWithAttachments(
       data               = data.root,
+      migrate            = identity,
       toBaseURI          = "", // local save
       fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),

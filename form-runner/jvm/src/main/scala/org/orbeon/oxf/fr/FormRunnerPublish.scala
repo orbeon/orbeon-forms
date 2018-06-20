@@ -48,6 +48,7 @@ trait FormRunnerPublish {
     val (beforeURLs, _, publishedVersion) =
       putWithAttachments(
         data              = xhtml.root,
+        migrate           = identity,
         toBaseURI         = toBaseURI,
         fromBasePath      = fromBasePath,
         toBasePath        = createFormDefinitionBasePath(app, form),

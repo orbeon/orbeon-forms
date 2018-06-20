@@ -358,6 +358,7 @@ trait FormRunnerPersistence {
 
   def putWithAttachments(
     data              : DocumentInfo,
+    migrate           : DocumentInfo ⇒ DocumentInfo,
     toBaseURI         : String,
     fromBasePath      : String,
     toBasePath        : String,
@@ -394,9 +395,9 @@ trait FormRunnerPersistence {
         setvalue(holder, resource)
       }
 
-    def saveXmlData() =
+    def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
-        "holder"       → Some(data.rootElement),
+        "holder"       → Some(migratedData.rootElement),
         "resource"     → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
         "username"     → username,
         "password"     → password,
@@ -414,7 +415,7 @@ trait FormRunnerPersistence {
 
         // Save and try to retrieve returned version
         for {
-          done     ← saveXmlData()
+          done     ← saveXmlData(migrate(data)) // https://github.com/orbeon/orbeon-forms/issues/3629
           headers  ← done.headers
           versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
           version  ← versions.headOption

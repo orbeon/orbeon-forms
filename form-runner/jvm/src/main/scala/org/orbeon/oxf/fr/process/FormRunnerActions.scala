@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
-import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner}
+import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.ErrorSummary
@@ -135,18 +135,21 @@ trait FormRunnerActions {
 
       import DataMigration._
 
-      val (dataMaybeMigrated, databaseDataFormatVersion) =
+      val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
+
+      def maybeMigrateData(originalData: DocumentInfo) =
         dataMaybeMigratedToDatabaseFormat(
           app,
           form,
-          formInstance.root,
+          originalData,
           metadataInstance map (_.root),
           pruneMetadata
         )
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(
-        data              = dataMaybeMigrated,
+        data              = formInstance.root,
+        migrate           = maybeMigrateData,
         toBaseURI         = "", // local save
         fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),

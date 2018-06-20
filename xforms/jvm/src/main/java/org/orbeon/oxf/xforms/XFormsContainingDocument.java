@@ -505,24 +505,10 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     }
 
     public void addScriptToRun(ScriptInvocation scriptInvocation) {
-        if (activeSubmissionFirstPass != null &&
-                activeSubmissionFirstPass.getActiveSubmissionParameters() != null &&
-                activeSubmissionFirstPass.getActiveSubmissionParameters().xxfTargetOpt().isEmpty()) {
+        if (scriptsToRun == null)
+            scriptsToRun = new ArrayList<ScriptInvocation>();
 
-            // Scripts occurring after a submission without a target takes place should not run
-            // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger().logWarning(
-                "",
-                "script will be ignored because two-pass submission started",
-                "script id", scriptInvocation.script().prefixedId()
-            );
-        } else {
-
-            if (scriptsToRun == null)
-                scriptsToRun = new ArrayList<ScriptInvocation>();
-
-            scriptsToRun.add(scriptInvocation);
-        }
+        scriptsToRun.add(scriptInvocation);
     }
 
     public List<ScriptInvocation> getScriptsToRun() {

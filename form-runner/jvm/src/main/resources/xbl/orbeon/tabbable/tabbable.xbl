@@ -43,7 +43,7 @@
                     <resources>
                         <resource xml:lang="en"><add>Add One</add></resource>
                         <resource xml:lang="fr"><add>Ajouter</add></resource>
-                        <resource xml:lang="es"><add>[Add One]</add></resource>
+                        <resource xml:lang="es"><add>Agregar Uno</add></resource>
                         <resource xml:lang="no"><add>[Add One]</add></resource>
                         <resource xml:lang="ru"><add>[Add One]</add></resource>
                         <resource xml:lang="it"><add>[Add One]</add></resource>

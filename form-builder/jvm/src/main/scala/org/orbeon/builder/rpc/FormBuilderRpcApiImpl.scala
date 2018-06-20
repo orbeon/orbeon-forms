@@ -124,22 +124,22 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def mergeRight(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.merge(resolveId(cellId).get, Direction.Right)
+    FormBuilder.merge(resolveId(cellId).get, Direction.Right) foreach Undo.pushUserUndoAction
   }
 
   def mergeDown(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.merge(resolveId(cellId).get, Direction.Down)
+    FormBuilder.merge(resolveId(cellId).get, Direction.Down) foreach Undo.pushUserUndoAction
   }
 
   def splitX(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.split(resolveId(cellId).get, Direction.Left)
+    FormBuilder.split(resolveId(cellId).get, Direction.Left, None) foreach Undo.pushUserUndoAction
   }
 
   def splitY(cellId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.split(resolveId(cellId).get, Direction.Up)
+    FormBuilder.split(resolveId(cellId).get, Direction.Up, None) foreach Undo.pushUserUndoAction
   }
 
   def sectionDelete(sectionId: String): Unit = {

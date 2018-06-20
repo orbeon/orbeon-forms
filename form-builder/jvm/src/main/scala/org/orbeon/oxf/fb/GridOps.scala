@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
-import org.orbeon.oxf.fb.UndoAction.{DeleteRow, InsertRow, MoveWall}
+import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -322,47 +322,59 @@ trait GridOps extends ContainerOps {
     cellElem     : NodeInfo,
     direction    : Direction)(
     implicit ctx : FormBuilderDocContext
-  ): Unit = {
-    if (Cell.canChangeSize(cellElem).contains(direction)) {
+  ): Option[UndoAction] =
+    Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-      findOriginCell(cells, cellElem).foreach { originCell ⇒
+      findOriginCell(cells, cellElem) map { originCell ⇒
         val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
-        direction match {
-          case Direction.Right ⇒ NodeInfoCellOps.updateW(cellElem, originCell.w + neighbors.head.w)
-          case Direction.Down  ⇒ NodeInfoCellOps.updateH(cellElem, originCell.h + neighbors.head.h)
-          case _               ⇒ throw new IllegalStateException
-        }
+        val originalSize =
+          direction match {
+            case Direction.Right ⇒
+              val size = originCell.w
+              NodeInfoCellOps.updateW(cellElem, size + neighbors.head.w)
+              size
+            case Direction.Down ⇒
+              val size = originCell.h
+              NodeInfoCellOps.updateH(cellElem, size + neighbors.head.h)
+              size
+            case _ ⇒
+              throw new IllegalStateException
+          }
         neighbors.foreach(_.u.foreach { neighborCellElem ⇒
           deleteControlWithinCell(neighborCellElem)
           delete(neighborCellElem)
         })
+
+        MergeCell(originCell.u.get.id, Direction.mirror(direction), originalSize)
       }
     }
-  }
 
   def split(
     cellElem     : NodeInfo,
-    direction    : Direction)(
+    direction    : Direction,
+    size         : Option[Int])(
     implicit ctx : FormBuilderDocContext
-  ): Unit = {
-    if (Cell.canChangeSize(cellElem).contains(direction)) {
+  ): Option[UndoAction] =
+    Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val gridModel = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-      findOriginCell(gridModel, cellElem).foreach { originCell ⇒
+      findOriginCell(gridModel, cellElem) map { originCell ⇒
+
         direction match {
           case Direction.Left ⇒
-            val newCellW = (originCell.w + 1) / 2
+            val newCellW = size getOrElse (originCell.w + 1) / 2
             NodeInfoCellOps.updateW(cellElem, newCellW)
             insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x + newCellW, originCell.y, originCell.w - newCellW, originCell.h)
           case Direction.Up ⇒
-            val newCellH = (originCell.h + 1) / 2
+            val newCellH = size getOrElse (originCell.h + 1) / 2
             NodeInfoCellOps.updateH(cellElem, newCellH)
             insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x, originCell.y + newCellH, originCell.w, originCell.h - newCellH)
           case _ ⇒
             throw new IllegalStateException
-        }
+          }
+
+        SplitCell(originCell.u.get.id, Direction.mirror(direction))
       }
     }
-  }
 
   def moveWall(
     cellElem     : NodeInfo,

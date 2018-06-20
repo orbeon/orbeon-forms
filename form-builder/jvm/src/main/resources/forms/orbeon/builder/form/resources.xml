@@ -70,6 +70,9 @@
             <delete-row>delete row</delete-row>
             <insert-row>insert row</insert-row>
             <control-settings>control settings</control-settings>
+            <move-wall>move wall</move-wall>
+            <split-cell>split cell</split-cell>
+            <merge-cell>merge cell</merge-cell>
         </undo-redo>
         <merge-section>
             <label>Merge Section Template</label>
@@ -1156,6 +1159,9 @@
             <delete-row>suppression d'une rangée</delete-row>
             <insert-row>insertion d'une rangée</insert-row>
             <control-settings>réglage du contrôle</control-settings>
+            <move-wall>déplacement de la séparation</move-wall>
+            <split-cell>partage de cellule</split-cell>
+            <merge-cell>combinaison de cellule</merge-cell>
         </undo-redo>
         <merge-section>
             <label>Intégrer modèle de section</label>
@@ -1260,16 +1266,16 @@
             <label>Editer les choix</label>
         </edit-items>
         <merge-right-icon>
-            <label>Etendre avec la cellule à droite</label>
+            <label>Combiner avec la cellule de droite</label>
         </merge-right-icon>
         <split-horizontally-icon>
-            <label>Rétrécir horizontalement</label>
+            <label>Partager horizontalement</label>
         </split-horizontally-icon>
         <merge-below-icon>
-            <label>Etendre avec la cellule ci-dessous</label>
+            <label>Combiner avec la cellule de dessous</label>
         </merge-below-icon>
         <split-vertically-icon>
-            <label>Rétrécir verticalement</label>
+            <label>Partager verticalement</label>
         </split-vertically-icon>
         <delete-control-icon>
             <label>Supprimer le contrôle</label>
@@ -2244,6 +2250,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -3360,6 +3369,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -4476,6 +4488,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -5584,6 +5599,9 @@
             <delete-row>Zeile entfernen</delete-row>
             <insert-row>Zeile einfügen</insert-row>
             <control-settings>Steuerelement-Einstellungen</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label>Abschnittsvorlage zusammenführen</label>
@@ -6694,6 +6712,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -7803,6 +7824,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -8912,6 +8936,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>
@@ -10027,6 +10054,9 @@
             <delete-row todo="true">[delete row]</delete-row>
             <insert-row todo="true">[insert row]</insert-row>
             <control-settings todo="true">[control settings]</control-settings>
+            <move-wall todo="true">[move wall]</move-wall>
+            <split-cell todo="true">[split cell]</split-cell>
+            <merge-cell todo="true">[merge cell]</merge-cell>
         </undo-redo>
         <merge-section>
             <label todo="true">[Merge Section Template]</label>

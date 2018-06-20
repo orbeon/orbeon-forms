@@ -115,7 +115,7 @@ class FormBuilderUndoTest
     }
 
     containerDetails filter (_._2) foreach { case (containerId, _, firstCellId, _) ⇒
-      it(s"Must be able to move cell walls of grid `$containerId`") {
+      it(s"Must be able to move cell walls, merge and split cells of grid `$containerId`") {
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
 
           val doc = ctx.formDefinitionRootElem
@@ -132,6 +132,42 @@ class FormBuilderUndoTest
             FormBuilderXPathApi.undoAction()
             val cell = resolveId(firstCellId).get
             assert(Some(6) === NodeInfoCellOps.w(cell))
+          }
+
+          // Merge cell
+          locally {
+            val cell = resolveId(firstCellId).get
+
+            FormBuilderRpcApiImpl.moveWall(firstCellId, Direction.Right, 8)
+            assert(Some(8) === NodeInfoCellOps.w(cell))
+
+            FormBuilderRpcApiImpl.mergeRight(firstCellId)
+            assert(Some(12) === NodeInfoCellOps.w(cell))
+          }
+
+          // Undo merge cell
+          locally {
+            FormBuilderXPathApi.undoAction()
+            val cell = resolveId(firstCellId).get
+            assert(Some(8) === NodeInfoCellOps.w(cell))
+          }
+
+          // Split cell
+          locally {
+            val cell = resolveId(firstCellId).get
+
+            FormBuilderRpcApiImpl.moveWall(firstCellId, Direction.Right, 8)
+            assert(Some(8) === NodeInfoCellOps.w(cell))
+
+            FormBuilderRpcApiImpl.splitX(firstCellId)
+            assert(Some(4) === NodeInfoCellOps.w(cell))
+          }
+
+          // Undo split cell
+          locally {
+            FormBuilderXPathApi.undoAction()
+            val cell = resolveId(firstCellId).get
+            assert(Some(8) === NodeInfoCellOps.w(cell))
           }
         }
       }

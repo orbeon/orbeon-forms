@@ -696,5 +696,9 @@ object FormBuilderXPathApi {
         }
       case MoveWall(cellId, startSide, target) ⇒
         FormBuilder.moveWall(FormBuilderRpcApiImpl.resolveId(cellId).get, startSide, target)
+      case SplitCell(cellId, direction) ⇒
+        FormBuilder.merge(FormBuilderRpcApiImpl.resolveId(cellId).get, direction)
+      case MergeCell(cellId, direction, size) ⇒
+        FormBuilder.split(FormBuilderRpcApiImpl.resolveId(cellId).get, direction, Some(size))
     }
 }

@@ -46,7 +46,7 @@ object ControlEditor {
   // Show/hide editor
   Position.currentContainerChanged(
     containerCache = BlockCache.cellCache,
-    wasCurrent     = (_) ⇒ {
+    wasCurrent     = _ ⇒ {
       previousCellOpt = None
       hideEditors()
     },
@@ -84,14 +84,14 @@ object ControlEditor {
     }
     val cellContent = cell.el.children()
     val controlElOpt = (cellContent.length > 0).option(cellContent.first())
-    controlElOpt.foreach((controlEl) ⇒ {
+    controlElOpt.foreach { controlEl ⇒
       // Control editor is only show when the cell isn't empty
       controlEl.append(controlEditorRight)
       positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
       // Show/hide itemset icon
       val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
       itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
-    })
+    }
     controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
     positionEditor(controlEditorLeft, 0)
 
@@ -116,10 +116,10 @@ object ControlEditor {
   }
 
   // Control actions
-  ControlActionNames.foreach((actionName) ⇒ {
+  ControlActionNames.foreach { actionName ⇒
     val actionEl = controlEditorRight.find(s".fb-control-$actionName")
     actionEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
-      currentCellOpt.foreach((currentCell) ⇒ {
+      currentCellOpt.foreach { currentCell ⇒
 
         val controlId = currentCell.el.children().attr("id").get
 
@@ -128,9 +128,9 @@ object ControlEditor {
           case "edit-details" ⇒ RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
           case "edit-items"   ⇒ RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
         }
-      })
+      }
     })
-  })
+  }
 
   // Expand/shrink actions
   for (((cssClass, _), ops) ← SplitMergeCssClassDirectionOps) {

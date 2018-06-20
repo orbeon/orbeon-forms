@@ -106,7 +106,7 @@ object GridWallDnD {
         orientation : Orientation,
         side        : Option[Direction]
       ): Unit = {
-        currentCellOpt.foreach { (currentCell) ⇒
+        currentCellOpt.foreach { currentCell ⇒
           val orientationClass =
             orientation match {
               case Orientation.Vertical   ⇒ WallVerticalClass
@@ -188,7 +188,7 @@ object GridWallDnD {
           case Direction.Up   | Direction.Down  ⇒ Orientation.Horizontal
         }
 
-      def markClosestAsDropTarget(pointerPosition: Double, position: (JQuery) ⇒ Double): Unit = {
+      def markClosestAsDropTarget(pointerPosition: Double, position: JQuery ⇒ Double): Unit = {
 
         val closestContainer: Option[JQuery] = {
           def distance(container: JQuery) = Math.abs(position(container) - pointerPosition)
@@ -246,7 +246,7 @@ object GridWallDnD {
       }
 
       Position.onUnderPointerChange {
-        dndShadowOpt.foreach { (dndShadow) ⇒
+        dndShadowOpt.foreach { dndShadow ⇒
           startCellOpt.foreach { case StartCell(_, startSide, _) ⇒
             DndWall.wallOrientation(startSide) match {
               case Orientation.Vertical ⇒
@@ -281,7 +281,7 @@ object GridWallDnD {
         }
       )
 
-      drake.onDrag { (el: html.Element, source: html.Element) ⇒
+      drake.onDrag { (_, source) ⇒
         currentCellOpt.foreach { currentCell ⇒
           val startSide = {
             val wallIndex = source.getAttribute("data-index").toInt
@@ -301,8 +301,8 @@ object GridWallDnD {
         }
       }
 
-      drake.onDragend {(el: html.Element) ⇒
-        DndWall.getDropTarget.foreach { (dropTarget) ⇒
+      drake.onDragend { el ⇒
+        DndWall.getDropTarget.foreach { dropTarget ⇒
           startCellOpt foreach { case StartCell(block, startSide, startIndex) ⇒
             val targetIndex  = dropTarget.attr("data-index").get.toInt
             if (targetIndex != startIndex) {

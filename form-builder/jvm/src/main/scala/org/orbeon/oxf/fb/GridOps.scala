@@ -369,35 +369,40 @@ trait GridOps extends ContainerOps {
     startSide    : Direction,
     target       : Int)(
     implicit ctx : FormBuilderDocContext
-  ): Unit = {
+  ): Option[(String, Int)] = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-    Cell.findOriginCell(cells, cellElem) foreach {  originCell ⇒
+    Cell.findOriginCell(cells, cellElem) map { originCell ⇒
 
       def moveCellWall(
         cell   : Cell[NodeInfo],
         side   : Direction,
         target : Int
-      ): Unit = {
+      ): Int = {
         cell match {
           case Cell(Some(u), _, x, y, h, w) ⇒
-            val (newX, newW, newY, newH) = side match {
-              case Direction.Left  ⇒ (target + 1 , w - (target + 1 - x) , y          , h)
-              case Direction.Right ⇒ (x          , target + 1 - x       , y          , h)
-              case Direction.Up    ⇒ (x          , w                    , target + 1 , h - (target + 1 - y))
-              case Direction.Down  ⇒ (x          , w                    , y          , target + 1 - y)
+            val (newX, newW, newY, newH, initial) = side match {
+              case Direction.Left  ⇒ (target + 1 , w - (target + 1 - x) , y          , h                    , x - 1)
+              case Direction.Right ⇒ (x          , target + 1 - x       , y          , h                    , x + w - 1)
+              case Direction.Up    ⇒ (x          , w                    , target + 1 , h - (target + 1 - y) , y - 1)
+              case Direction.Down  ⇒ (x          , w                    , y          , target + 1 - y       , y + h - 1)
             }
             if (x != newX) NodeInfoCellOps.updateX(u, newX)
             if (w != newW) NodeInfoCellOps.updateW(u, newW)
             if (y != newY) NodeInfoCellOps.updateY(u, newY)
             if (h != newH) NodeInfoCellOps.updateH(u, newH)
+            initial
           case _ ⇒ throw new IllegalStateException
         }
       }
 
+      val initial = moveCellWall(originCell, startSide, target)
+
       val neighbors = Cell.findOriginNeighbors(originCell, startSide, cells)
       val mirrorSide = Direction.mirror(startSide)
-      moveCellWall(originCell, startSide, target)
       neighbors.foreach(moveCellWall(_, mirrorSide, target))
+
+      // Return undo information
+      originCell.u.get.id → initial
     }
   }
 

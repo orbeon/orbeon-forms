@@ -68,6 +68,10 @@ object UndoAction {
                                     newName    : String,
                                     xcv        : NodeInfo)                                extends UndoAction
 
+  case class MoveWall              (cellId     : String,
+                                    startSide  : Direction,
+                                    target     : Int)                                     extends UndoAction
+
   // From https://github.com/lloydmeta/enumeratum/blob/92b28ca1ceb72cebd58c1b3b1b763a6add875be3/enumeratum-core/src/main/scala/enumeratum/EnumEntry.scala#L34
   import java.util.regex.Pattern
 

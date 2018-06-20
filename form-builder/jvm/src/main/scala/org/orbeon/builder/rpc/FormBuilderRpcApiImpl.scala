@@ -14,7 +14,7 @@
 package org.orbeon.builder.rpc
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
-import org.orbeon.oxf.fb.UndoAction.ControlSettings
+import org.orbeon.oxf.fb.UndoAction.{ControlSettings, MoveWall}
 import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps, Undo}
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -119,7 +119,9 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def moveWall(cellId: String, startSide: Direction, target: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.moveWall(resolveId(cellId).get, startSide, target)
+    FormBuilder.moveWall(resolveId(cellId).get, startSide, target) foreach { case (originCellId, initialPosition) ⇒
+      Undo.pushUserUndoAction(MoveWall(originCellId, startSide, initialPosition))
+    }
   }
 
   def mergeRight(cellId: String): Unit = {
@@ -207,6 +209,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     )
   }
 
-  private def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+  def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     FormRunner.findInViewTryIndex(ctx.formDefinitionRootElem, XFormsId.getStaticIdFromId(id))
 }

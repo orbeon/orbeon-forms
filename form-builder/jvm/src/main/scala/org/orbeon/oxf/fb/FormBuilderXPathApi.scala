@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fb
 
+import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
@@ -693,6 +694,10 @@ object FormBuilderXPathApi {
           }
 
           ControlSettings(newName, oldName, newXcvElem)
+        }
+      case MoveWall(cellId, startSide, target) ⇒
+        FormBuilder.moveWall(FormBuilderRpcApiImpl.resolveId(cellId).get, startSide, target) map { case (originCellId, initialPosition) ⇒
+          MoveWall(originCellId, startSide, initialPosition)
         }
     }
 }

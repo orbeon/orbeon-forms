@@ -419,8 +419,16 @@ trait CreateUpdateDelete
       Index.reindex(req.provider, connection, whatToReindex)
 
       // Create flat view if needed
-      if (requestFlatView && FlatView.SupportedProviders(req.provider) && req.forForm && ! req.forAttachment && ! delete && req.form != "library")
+      if (
+        requestFlatView                           &&
+        FlatView.SupportedProviders(req.provider) &&
+        req.forForm                               &&
+        ! req.forAttachment                       &&
+        ! delete                                  &&
+        req.form != Names.LibraryFormName
+      ) locally {
         FlatView.createFlatView(req, connection)
+      }
 
       // Inform caller of the form definition version used
       httpResponse.setHeader(OrbeonFormDefinitionVersion, versionSet.toString)

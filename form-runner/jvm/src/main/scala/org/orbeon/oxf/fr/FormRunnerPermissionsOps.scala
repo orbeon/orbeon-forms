@@ -175,8 +175,8 @@ trait FormRunnerPermissionsOps {
       val keepForm =
         isAdmin ||                                 // admins can see everything, otherwise:
         ! (
-          formName == "library" ||                 // filter libraries
-          operations.isEmpty    ||                 // filter forms on which user can't possibly do anything
+          formName == Names.LibraryFormName ||     // filter libraries
+          operations.isEmpty                ||     // filter forms on which user can't possibly do anything
           formEl.elemValue("available") == "false" // filter forms marked as not available
         )
 

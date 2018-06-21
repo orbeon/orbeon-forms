@@ -40,6 +40,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
   def jSelectedItems(value: String): JIterable[Item] =
     selectedItems(value).asJava
 
+  // TODO: Not used by XFormsSelect1Control, why?
   def selectedItems(value: String): List[Item] =
     allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList
 

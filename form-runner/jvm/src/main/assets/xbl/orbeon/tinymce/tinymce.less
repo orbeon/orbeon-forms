@@ -14,9 +14,15 @@
 @import (reference) "../../../../../../../../bootstrap-src/less/mixins";
 
 .xbl-fr-tinymce {
-    &.xforms-readonly { .mce-top-part { display: none } }               // Hide the toolbar when readonly
-    .xbl-fr-tinymce-div { min-width: 1px }                              // So we can use jQuery's :visible selector
-    .xbl-fr-tinymce .mce-container {
+    &.xforms-readonly {
+        .mce-top-part {
+            display: none;  // Hide the toolbar when readonly
+        }
+    }
+    .xbl-fr-tinymce-div {
+        min-width: 1px;     // So we can use jQuery's :visible selector
+    }
+    .mce-container {
         .box-shadow(none);
     }
 }

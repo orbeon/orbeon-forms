@@ -283,7 +283,7 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger ref=".[instance('fb-metadata-instance')/toolbox/email]">
+                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/email">
                             <xf:label>
                                 <xh:i class="fa fa-envelope fa-fw"/>
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>

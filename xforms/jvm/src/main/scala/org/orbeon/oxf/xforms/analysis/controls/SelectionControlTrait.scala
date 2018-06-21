@@ -251,13 +251,13 @@ extends InputValueControl
 
             currentContainer.addChildItem(
               Item(
-                position   = position,
-                isMultiple = isMultiple,
-                attributes = SelectionControlUtil.getAttributes(element),
                 label      = label,
                 help       = help,
                 hint       = hint,
-                value      = value
+                value      = value,
+                attributes = SelectionControlUtil.getAttributes(element)
+              )(
+                position   = position
               )
             )
             position += 1
@@ -273,13 +273,13 @@ extends InputValueControl
 
             findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
               val newContainer = Item(
-                position   = position,
-                isMultiple = isMultiple,
-                attributes = SelectionControlUtil.getAttributes(element),
                 label      = label,
                 help       = None,
                 hint       = None,
-                value      = null
+                value      = null,
+                attributes = SelectionControlUtil.getAttributes(element)
+              )(
+                position   = position
               )
               position += 1
               currentContainer.addChildItem(newContainer)

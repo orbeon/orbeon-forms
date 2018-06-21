@@ -362,13 +362,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             isMultiple,
             fullItemType,
             Item.apply(
-                0,
-                isMultiple,
-                List$.MODULE$.<Tuple2<QName, String>>empty(), // make sure the value "$xforms-template-value$" is not encrypted
                 new LHHAValue("$xforms-template-label$", false),
                 Option.apply(new LHHAValue("$xforms-template-help$", false)),
                 Option.apply(new LHHAValue("$xforms-template-hint$", false)),
-                "$xforms-template-value$"
+                "$xforms-template-value$",
+                List$.MODULE$.<Tuple2<QName, String>>empty(), // make sure the value "$xforms-template-value$" is not encrypted
+                0
             ),
             true,
             false,

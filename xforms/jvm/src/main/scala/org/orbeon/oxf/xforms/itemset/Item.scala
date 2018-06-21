@@ -85,16 +85,3 @@ extends ItemContainer {
       hint          map ("hint"  →)
     ).flatten
 }
-
-object Item {
-  def apply(
-    position   : Int,
-    isMultiple : Boolean,
-    attributes : List[(QName, String)],
-    label      : LHHAValue,
-    help       : Option[LHHAValue],
-    hint       : Option[LHHAValue],
-    value      : String
-  ): Item =
-    Item(label, help, hint, value, attributes)(position)
-}

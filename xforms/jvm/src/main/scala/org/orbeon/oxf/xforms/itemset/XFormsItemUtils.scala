@@ -79,9 +79,8 @@ object XFormsItemUtils {
         staticItemset
       case None ⇒
 
-        val isMultiple = staticControl.isMultiple
         val container = select1Control.container
-        val result = new Itemset(isMultiple)
+        val result = new Itemset(multiple = staticControl.isMultiple)
 
         // Set binding on this control, after saving the current context because the context stack must
         // remain unmodified.
@@ -108,13 +107,13 @@ object XFormsItemUtils {
 
                   currentContainer.addChildItem(
                     Item(
-                      position   = position,
-                      isMultiple = isMultiple,
-                      attributes = getAttributes(elem),
                       label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
                       help       = getLabelValue(elem.element(HELP_QNAME),  required = false),
                       hint       = getLabelValue(elem.element(HINT_QNAME),  required = false),
-                      value      = lang3.StringUtils.defaultString(getValueValueOrNull(elem.element(XFORMS_VALUE_QNAME)))
+                      value      = lang3.StringUtils.defaultString(getValueValueOrNull(elem.element(XFORMS_VALUE_QNAME))),
+                      attributes = getAttributes(elem)
+                    )(
+                      position   = position
                     )
                   )
                   position += 1
@@ -174,13 +173,13 @@ object XFormsItemUtils {
                         case Some(valueElem) if valueElem.getQName == XFORMS_VALUE_QNAME ⇒
                           currentContainer.addChildItem(
                             Item(
-                              position   = position,
-                              isMultiple = isMultiple,
-                              attributes = getAttributes(elem),
                               label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
                               help       = getLabelValue(elem.element(HELP_QNAME),  required = false),
                               hint       = getLabelValue(elem.element(HINT_QNAME),  required = false),
-                              value      = getValueValueOrNull(valueElem) // NOTE: can be null if evaluation failed
+                              value      = getValueValueOrNull(valueElem), // NOTE: can be null if evaluation failed,
+                              attributes = getAttributes(elem)
+                            )(
+                              position   = position
                             )
                           )
                           position += 1
@@ -200,13 +199,13 @@ object XFormsItemUtils {
                   val labelElem = elem.element(LABEL_QNAME)
                   if (labelElem ne null) {
                     val newContainer = Item(
-                      position   = position,
-                      isMultiple = isMultiple,
-                      attributes = getAttributes(elem),
                       label      = getLabelValue(labelElem, required = true).orNull, // NOTE: returned label can be null in some cases
                       help       = None,
                       hint       = None,
-                      value      = null
+                      value      = null,
+                      attributes = getAttributes(elem)
+                    )(
+                      position   = position
                     )
                     currentContainer.addChildItem(newContainer)
                     currentContainer = newContainer

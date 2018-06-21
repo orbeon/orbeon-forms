@@ -80,13 +80,13 @@ class XFormsInputHandler(
       // encode = false,
       itemset.addChildItem(
         Item(
-          position   = 0,
-          isMultiple = isMultiple,
-          attributes = Nil,
           label      = null,
           help       = None,
           hint       = None,
-          value      = "true"
+          value      = "true",
+          attributes = Nil
+        )(
+          position   = 0
         )
       )
 

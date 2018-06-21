@@ -1,24 +1,12 @@
-<!--
-  Copyright (C) 2010 Orbeon, Inc.
-
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:xpath-analysis="true">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
+                  xxf:help-tooltip="false"
+                  xxf:xpath-analysis="true">
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
 
@@ -127,8 +115,8 @@
             </xs:schema>
 
             <!-- Instance that contains all the books -->
-            <xf:instance id="fr-form-instance" xxf:validation="strict">
-                <form xmlns="">
+            <xf:instance id="fr-form-instance" xxf:validation="strict" xxf:index="id">
+                <form>
                     <details>
                         <title/>
                         <author/>
@@ -151,12 +139,15 @@
 
             <xf:bind id="fr-form-binds" ref=".">
                 <xf:bind id="details-bind" ref="details">
-                    <xf:bind id="title-bind" name="title" ref="title" required="true()" xxf:whitespace="trim"/>
-                    <xf:bind id="author-bind" name="author" ref="author" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="title-bind" name="title" ref="title" required="true()"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="author-bind" name="author" ref="author" required="true()"
+                             xxf:whitespace="trim"/>
                     <xf:bind id="language-bind" name="language" ref="language"/>
                     <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
                     <xf:bind id="rating-bind" name="rating" ref="rating"/>
-                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year" xxf:whitespace="trim"/>
+                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year"
+                             xxf:whitespace="trim"/>
                     <xf:bind id="review-bind" name="review" ref="review"/>
                     <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
                 </xf:bind>
@@ -170,20 +161,34 @@
             </xf:bind>
 
             <!-- Metadata -->
-            <xf:instance id="fr-form-metadata" xxf:readonly="true">
-                <metadata xmlns="">
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>bookshelf</form-name>
                     <title xml:lang="en">Orbeon Forms Bookshelf</title>
                     <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
                     <title xml:lang="fr">Orbeon Forms Bookshelf</title>
                     <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
+                    <email>
+                        <subject>
+                            <template xml:lang="en">Orbeon Forms Bookshelf form for `{$title}` by {$author}</template>
+                            <template xml:lang="fr">Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</template>
+                            <fr:param type="ControlValueParam">
+                                <fr:name>title</fr:name>
+                                <fr:controlName>title</fr:controlName>
+                            </fr:param>
+                            <fr:param type="ControlValueParam">
+                                <fr:name>author</fr:name>
+                                <fr:controlName>author</fr:controlName>
+                            </fr:param>
+                        </subject>
+                    </email>
                 </metadata>
             </xf:instance>
 
             <!-- Attachments -->
             <xf:instance id="fr-form-attachments">
-                <attachments xmlns="">
+                <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <!-- Fix this once we have proper template -->
                     <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
@@ -193,7 +198,7 @@
 
             <!-- XForms instance containing all the resources -->
             <xf:instance id="fr-form-resources">
-                <resources xmlns="">
+                <resources>
                     <resource xml:lang="en">
                         <details>
                             <label>Book Details</label>
@@ -260,6 +265,7 @@
                             <hint>Your rating</hint>
                             <help>This contains your rating about the book. For example...</help>
                             <alert>The rating selected is invalid</alert>
+
                             <item>
                                 <label>None</label>
                                 <value/>
@@ -374,6 +380,7 @@
                             <hint>Votre évaluation</hint>
                             <help>Ce champ contient votre évaluation du livre, par exemple...</help>
                             <alert>L'évaluation sélectionnée est invalide</alert>
+
                             <item>
                                 <label>Aucune</label>
                                 <value/>
@@ -425,8 +432,8 @@
                 </resources>
             </xf:instance>
 
-            <xf:instance id="note-template">
-                <note-iteration xmlns="">
+            <xf:instance xxf:exclude-result-prefixes="#all" id="note-template">
+                <note-iteration>
                     <note-text/>
                 </note-iteration>
             </xf:instance>
@@ -435,40 +442,40 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="3">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search fr-email-subject">
+                    <fr:grid columns="3" id="grid-1-grid">
+                        <fr:c y="1" x="1" w="4">
+                                <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
                                     <xf:label ref="$form-resources/title/label"/>
                                     <xf:hint ref="$form-resources/title/hint"/>
                                     <xf:help ref="$form-resources/title/help"/>
                                     <xf:alert ref="$form-resources/title/alert"/>
                                 </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search fr-email-subject">
+                            </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                                <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search">
                                     <xf:label ref="$form-resources/author/label"/>
                                     <xf:hint ref="$form-resources/author/hint"/>
                                     <xf:help ref="$form-resources/author/help"/>
                                     <xf:alert ref="$form-resources/author/alert"/>
                                 </xf:input>
-                            </xh:td>
-                            <xh:td rowspan="3">
+                            </fr:c>
+                        <fr:c y="1" x="9" h="3" w="4">
                                 <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
                                     <xf:label ref="$form-resources/image/label"/>
                                     <xf:hint ref="$form-resources/image/hint"/>
                                     <xf:help ref="$form-resources/image/help"/>
                                     <xf:alert ref="$form-resources/image/alert"/>
                                 </fr:image-attachment>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search fr-width-10em">
+                            </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                                <xf:select1 id="language-control" bind="language-bind"
+                                        class="fr-summary fr-search fr-width-10em">
                                     <xf:label ref="$form-resources/language/label"/>
                                     <xf:hint ref="$form-resources/language/hint"/>
                                     <xf:help ref="$form-resources/language/help"/>
@@ -482,66 +489,63 @@
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select1>
-                            </xh:td>
-                            <xh:td>
+                            </fr:c>
+                        <fr:c y="2" x="5" w="4">
                                 <xf:input id="link-control" bind="link-bind">
                                     <xf:label ref="$form-resources/link/label"/>
                                     <xf:hint ref="$form-resources/link/hint"/>
                                     <xf:help ref="$form-resources/link/help"/>
                                     <xf:alert ref="$form-resources/link/alert"/>
                                 </xf:input>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select1 id="rating-control" bind="rating-bind" appearance="minimal" class="fr-width-5em">
+                            </fr:c>
+                        <fr:c y="3" x="1" w="4">
+                                <xf:select1 id="rating-control" bind="rating-bind" class="fr-width-5em"
+                                        appearance="full xxf:horizontal">
                                     <xf:label ref="$form-resources/rating/label"/>
                                     <xf:hint ref="$form-resources/rating/hint"/>
-                                    <xf:help ref="$form-resources/rating/help"/>
+                                <xf:help ref="$form-resources/rating/help"/>
                                     <xf:alert ref="$form-resources/rating/alert"/>
+
                                     <xf:itemset ref="$form-resources/rating/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select1>
-                            </xh:td>
-                            <xh:td>
+                            </fr:c>
+                        <fr:c y="3" x="5" w="4">
                                 <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
                                     <xf:label ref="$form-resources/publication-year/label"/>
                                     <xf:hint ref="$form-resources/publication-year/hint"/>
                                     <xf:help ref="$form-resources/publication-year/help"/>
                                     <xf:alert ref="$form-resources/publication-year/alert"/>
                                 </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                            </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1">
-                        <xh:tr>
-                            <xh:td>
+                    <fr:grid columns="1" id="grid-2-grid">
+                        <fr:c y="1" x="1" w="12">
                                 <fr:tinymce id="review-control" bind="review-bind">
                                     <xf:label ref="$form-resources/review/label"/>
                                     <xf:hint ref="$form-resources/review/hint"/>
                                     <xf:help ref="$form-resources/review/help"/>
                                     <xf:alert ref="$form-resources/review/alert"/>
                                 </fr:tinymce>
-                            </xh:td>
-                        </xh:tr>
+                            </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
-                    <fr:grid repeat="content" bind="note-bind" id="note-grid" template="instance('note-template')" min="0">
-                        <xh:tr>
-                            <xh:td>
+                    <fr:grid repeat="content" bind="note-bind" id="note-grid"
+                             template="instance('note-template')"
+                             min="0">
+                        <fr:c y="1" x="1" w="12">
                                 <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
                                     <xf:label ref="$form-resources/note-text/label"/>
                                     <xf:hint ref="$form-resources/note-text/hint"/>
                                     <xf:help ref="$form-resources/note-text/help"/>
                                     <xf:alert ref="$form-resources/note-text/alert"/>
                                 </xf:textarea>
-                            </xh:td>
-                        </xh:tr>
+                            </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

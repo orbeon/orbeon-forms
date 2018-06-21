@@ -117,7 +117,7 @@
 
         <xf:action type="xpath">
             fbf:initializeGrids($temp),
-            fbf:deleteSectionTemplateContentHolders($temp)
+            fbf:updateSectionTemplateContentHolders($temp)
         </xf:action>
 
         <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->

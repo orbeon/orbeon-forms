@@ -23,6 +23,7 @@ object FormRunner
   with FormRunnerBaseOps
   with FormRunnerControlOps
   with FormRunnerContainerOps
+  with FormRunnerSectionTemplateOps
   with FormRunnerActionsOps
   with FormRunnerSummary
   with FormRunnerHome

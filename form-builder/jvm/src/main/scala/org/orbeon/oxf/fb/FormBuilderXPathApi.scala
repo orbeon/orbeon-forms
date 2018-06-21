@@ -18,6 +18,7 @@ import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
+import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
@@ -193,25 +194,31 @@ object FormBuilderXPathApi {
     FormBuilder.createTemplateContentFromBindName(name, Option(bindings) getOrElse Nil)(FormBuilderDocContext(inDoc))
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
+  // See: https://github.com/orbeon/orbeon-forms/issues/3073
   //@XPathFunction
-  def deleteSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {
+  def updateSectionTemplateContentHolders(inDoc: NodeInfo): Unit = {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
     implicit val ctx = FormBuilderDocContext(inDoc)
 
     // Find data holders for all section templates
-    val holders =
+    val holdersWithRoots =
       for {
-        section     ← FormRunner.findSectionsWithTemplates(ctx.bodyElem)
-        controlName ← FormRunner.getControlNameOpt(section).toList
-        holder      ← FormBuilder.findDataHolders(controlName)
+        sectionNode   ← FormRunner.findSectionsWithTemplates(ctx.bodyElem)
+        controlName   ← FormRunner.getControlNameOpt(sectionNode).toList
+        holder        ← FormBuilder.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
+        componentNode ← FormRunner.findComponentNodeForSection(sectionNode)
+        xblNode       ← FormRunner.findXblXblForSectionTemplateNamespace(ctx.bodyElem, componentNode.namespaceURI)
+        bindingNode   ← FormRunner.findXblBindingForLocalname(xblNode, componentNode.localname)
+        instance      ← FormRunner.findXblInstance(bindingNode, fr.Names.FormTemplate)
+        instanceRoot  ← instance / * headOption
       } yield
-        holder
+        holder → instanceRoot
 
-    // Delete all elements underneath those holders
-    holders foreach { holder ⇒
-      delete(holder / *)
+    holdersWithRoots foreach { case (holder, instanceRoot) ⇒
+        delete(holder / *)
+        insert(into = holder, origin = instanceRoot / *)
     }
   }
 

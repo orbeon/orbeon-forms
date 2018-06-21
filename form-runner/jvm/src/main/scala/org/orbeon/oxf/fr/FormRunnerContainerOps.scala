@@ -13,19 +13,12 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
-
-  val MatchesComponentUriLibraryRegex = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
-  val MatchesSectionTemplateUriRegex  = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
   def isFBBody(node: NodeInfo): Boolean =
     (node self XFGroupTest effectiveBooleanValue) && node.attClasses("fb-body")
@@ -67,18 +60,6 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def controlRequiresNestedIterationElement(node: NodeInfo) =
     isRepeat(node)
 
-  def isSectionWithTemplateContent(containerElem: NodeInfo): Boolean =
-    IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)
-
-  def isSectionTemplateContent(containerElem: NodeInfo): Boolean =
-    (containerElem parent * exists IsSection) && MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
-
-  def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
-    section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
-
-  def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter IsSection filter (_ / * exists isSectionTemplateContent)
-
   // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
   def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
@@ -86,20 +67,6 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     val elementQName        = firstElementCSSName.replace('|', ':')
 
     bindingElem.resolveURIQualifiedName(elementQName)
-  }
-
-  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
-
-    // All xbl:binding elements available for section templates
-    def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
-      componentBindings filter (_.attClasses("fr-section-component"))
-
-    val bindingsForSectionTemplates =
-      availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
-
-    bindingsForSectionTemplates map { binding ⇒
-      bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
-    } toMap
   }
 
   // Get the name for a section or grid element or null (the empty sequence)
@@ -168,21 +135,4 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
-
-  def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
-
-    def matchesComponentURI(uri: String) =
-      MatchesComponentUriLibraryRegex.findFirstIn(uri).isDefined
-
-    // Find the concrete section template component (component:foo)
-    // A bit tricky because there might not be an id on the component element:
-    // <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
-    val sectionTemplateElementOpt =
-      frSectionComponent.staticControl.descendants find
-      (c ⇒ matchesComponentURI(c.element.getNamespaceURI))
-
-    sectionTemplateElementOpt flatMap
-      (e ⇒ frSectionComponent.resolve(e.staticId)) flatMap
-      collectByErasedType[XFormsComponentControl]
-  }
 }

@@ -263,7 +263,7 @@
                     <xh:div class="fb-tool">
 
                         <!-- Workflow and permissions -->
-                        <xf:trigger ref=".[instance('fb-metadata-instance')/toolbox/workflow]">
+                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/workflow">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-workflow/label"/>
@@ -273,7 +273,7 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger ref=".[instance('fb-metadata-instance')/toolbox/permissions]">
+                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/permissions">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>

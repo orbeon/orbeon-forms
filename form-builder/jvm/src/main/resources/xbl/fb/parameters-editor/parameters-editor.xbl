@@ -133,10 +133,10 @@
                                 <xf:label ref="$resources/components/parameters-editor/type/item[@id = 1]"/>
                                 <xf:value>ExpressionParam</xf:value>
                             </xf:item>
-                            <xf:item>
+                            <xf:itemset ref=".[xxf:component-param-value('all-control-values') = 'true']">
                                 <xf:label ref="$resources/components/parameters-editor/type/item[@id = 2]"/>
                                 <xf:value>AllControlValuesParam</xf:value>
-                            </xf:item>
+                            </xf:itemset>
 
                             <xf:action event="xforms-select">
                                 <xf:var name="name" value="../fr:name"/>

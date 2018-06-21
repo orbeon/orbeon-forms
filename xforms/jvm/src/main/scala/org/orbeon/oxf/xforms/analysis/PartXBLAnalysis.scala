@@ -120,14 +120,6 @@ trait PartXBLAnalysis extends TransientState {
 
   def getGlobals = xblBindings.allGlobals
 
-  def createShadowTree(existingComponent: ComponentControl, elemInSource: Element): Unit = {
-
-    assert(! isTopLevel)
-
-    existingComponent.setConcreteBinding(elemInSource)
-    analyzeSubtree(existingComponent)
-  }
-
   def clearShadowTree(existingComponent: ComponentControl): Unit = {
     assert(! isTopLevel)
     existingComponent.removeConcreteBinding()

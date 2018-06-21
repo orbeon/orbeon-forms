@@ -31,6 +31,7 @@ class ComponentControl(
 
   // Set the component's binding
   // Might not create the binding if the binding does not have a template.
+  // Also called indirectly by `XXFormsDynamicControl`.
   def setConcreteBinding(elemInSource: Element): Unit = {
 
     assert(_concreteBindingOpt.isEmpty)

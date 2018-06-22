@@ -54,9 +54,9 @@ class ProcessTemplate extends DefaultFunctionSupport {
 
     implicit val ctx = xpathContext
 
-    val resourceKeyArgument = stringArgument(0)
-    val langArgument        = stringArgument(1)
-    val templateParamsOpt   = itemsArgumentOpt(2) map (it ⇒ MapFunctions.collectMapValues(it.iterator).next())
+    val templateArgument  = stringArgument(0)
+    val langArgument      = stringArgument(1)
+    val templateParamsOpt = itemsArgumentOpt(2) map (it ⇒ MapFunctions.collectMapValues(it.iterator).next())
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
@@ -74,7 +74,7 @@ class ProcessTemplate extends DefaultFunctionSupport {
           resourceOrTemplate
       }
 
-    stringToStringValue(processResourceString(resourceKeyArgument))
+    stringToStringValue(processResourceString(templateArgument))
   }
 
   // TODO: PathMap

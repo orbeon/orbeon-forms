@@ -207,7 +207,25 @@
                 </xh:span>
             </xf:group>
             <!-- Static readonly mode -->
-            <xf:input ref="$binding[$view]" xxf:format="string-join(($prefix, $formatted, $suffix), ' ')"/>
+            <xf:input
+                ref="$binding[$view]"
+                xxf:format="
+                    string-join(
+                        (
+                            xxf:component-param-value('prefix'),
+                            NumberSupport:getDisplayAndEditValueJava(
+                                xxf:binding('fr-number'),
+                                xxf:component-param-value('decimal-separator'),
+                                xxf:component-param-value('grouping-separator'),
+                                xxf:component-param-value('prefix'),
+                                xxf:component-param-value('digits-after-decimal'),
+                                string(xxf:component-param-value('round-when-formatting')) = 'true',
+                                string(xxf:component-param-value('round-when-storing'))    = 'true'
+                            )[1],
+                            xxf:component-param-value('suffix')
+                        ),
+                        ' '
+                    )"/>
 
         </xbl:template>
     </xbl:binding>

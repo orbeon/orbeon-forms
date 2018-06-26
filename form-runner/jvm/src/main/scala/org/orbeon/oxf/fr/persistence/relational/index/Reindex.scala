@@ -75,28 +75,28 @@ trait Reindex extends FormDefinition {
 
     // Clean index
     locally {
-      val deleteWhereClause = {
 
-        val conditionsWhere = whereConditions match {
-          case Nil ⇒ ""
-          case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
-        }
-        s"""WHERE data_id IN (
-           |        SELECT data_id
-           |        FROM (
-           |                 SELECT   data_id
-           |                 FROM     orbeon_i_current
-           |                 $conditionsWhere
-           |             ) c
-           |        ORDER BY data_id
-           |    )
-         """.stripMargin
+      val deleteWhereClause = whereConditions match {
+        case Nil ⇒ ""
+        case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
+      }
+      val orderByClause = provider match {
+        case Provider.MySQL ⇒ " ORDER BY data_id"
+        case _              ⇒ ""
       }
 
-      val deleteFromValueIndexSql =
-        s"""|DELETE FROM orbeon_i_control_text
-            |$deleteWhereClause
-            |""".stripMargin
+      val deleteFromValueIndexSql = "DELETE FROM orbeon_i_control_text " + (
+        whatToReindex match {
+          case AllData ⇒ ""
+          case _ ⇒
+            s"""|WHERE data_id IN (
+                |   SELECT data_id
+                |     FROM orbeon_i_current
+                |   $deleteWhereClause
+                | )
+                |""".stripMargin
+        }
+      )
 
       val deleteFromCurrentIndex =
         s"""|DELETE FROM orbeon_i_current
@@ -107,7 +107,7 @@ trait Reindex extends FormDefinition {
         deleteFromValueIndexSql,
         deleteFromCurrentIndex
       ).foreach { deleteSql ⇒
-        useAndClose(connection.prepareStatement(deleteSql)) { ps ⇒
+        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps ⇒
           paramSetter(ps)
           ps.executeUpdate()
         }

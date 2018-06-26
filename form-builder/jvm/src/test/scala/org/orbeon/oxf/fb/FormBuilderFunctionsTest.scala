@@ -30,6 +30,8 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike
 
+import scala.collection.mutable
+
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.
 class FormBuilderFunctionsTest
   extends DocumentTestBase
@@ -529,22 +531,42 @@ class FormBuilderFunctionsTest
 
   describe("Section template merging") {
 
-    val SectionNames = 1 to 4 map ("section-" +)
-    val SectionIds = SectionNames map (_ + "-section")
+    val SectionsNamesAndControls = List(
+      "section-1" → 1,
+      "section-2" → 3,
+      "section-3" → 0,
+      "section-4" → 0,
+      "section-5" → 2
+    )
+
+    val SectionNames = SectionsNamesAndControls map (_._1)
+    val SectionIds   = SectionNames map (_ + "-section")
 
     def assertSectionsKeepName()(implicit ctx: FormBuilderDocContext) =
       for (sectionName ← SectionNames)
-        assert(findControlByName(ctx.formDefinitionRootElem, sectionName).isDefined)
+        assert(findControlByName(ctx.formDefinitionRootElem, sectionName).isDefined, s"for $sectionName")
+
+    def assertUniqueIds()(implicit ctx: FormBuilderDocContext) = {
+
+      val visited = mutable.Set[String]()
+
+      idsIterator(Right(ctx.formDefinitionRootElem)) foreach { id ⇒
+        assert(! visited(id), s"duplicate id `$id`")
+        visited += id
+      }
+    }
 
     it("Must merge all section templates without errors") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
 
         assertSectionsKeepName()
+        assertUniqueIds()
 
         for (sectionId ← SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
 
         assertSectionsKeepName()
+        assertUniqueIds()
       }
     }
 
@@ -552,6 +574,7 @@ class FormBuilderFunctionsTest
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
 
         assertSectionsKeepName()
+        assertUniqueIds()
 
         // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
         // section templates and using `my-` would cause conflicts.
@@ -559,15 +582,16 @@ class FormBuilderFunctionsTest
           ToolboxOps.containerMerge(sectionId, "my-", "")
 
         assertSectionsKeepName()
+        assertUniqueIds()
 
-        for ((sectionName, expectedCount) ← SectionNames.zip(List(1, 3, 0, 0))) {
+        for ((sectionName, expectedCount) ← SectionsNamesAndControls) {
 
           val nestedControlsStartingWithMyCount =
             findNestedControls(findControlByName(ctx.formDefinitionRootElem, sectionName).get) flatMap
             getControlNameOpt count
             (_ startsWith "my-")
 
-          assert(expectedCount === nestedControlsStartingWithMyCount)
+          assert(expectedCount === nestedControlsStartingWithMyCount, s"for `$sectionName`")
         }
       }
     }

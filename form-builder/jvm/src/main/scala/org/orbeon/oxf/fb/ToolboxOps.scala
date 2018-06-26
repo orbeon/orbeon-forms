@@ -571,6 +571,7 @@ object ToolboxOps {
 
     require(xcvElem.isElement)
 
+    // Remove the `ignore` set. This is for the case where we don't want to rename the enclosing section.
     val xcvNamesInUse =
       mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem)) -- ignore toList
 
@@ -590,9 +591,14 @@ object ToolboxOps {
         (allSections flatMap getControlNameOpt toSet, allGrids flatMap getControlNameOpt toSet)
       }
 
-      val newControlNamesIt = nextIds("control", needRenameWithAutomaticIds.size, xcvNamesInUse).iterator map controlNameFromId
-      val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size, xcvNamesInUse).iterator map controlNameFromId
-      val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size, xcvNamesInUse).iterator map controlNameFromId
+      // We do not want to generate a new id that matches the `ignore`d id, so we add `ignore` here.
+      // The caller has already removed the section template section from the document so we explicitly
+      // make sure here that the enclosing section name is not allowed.
+      val namesInUseForNewIds = xcvNamesInUse ++ ignore
+
+      val newControlNamesIt = nextIds("control", needRenameWithAutomaticIds.size, namesInUseForNewIds).iterator map controlNameFromId
+      val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size, namesInUseForNewIds).iterator map controlNameFromId
+      val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size, namesInUseForNewIds).iterator map controlNameFromId
 
       // Produce `section-` and `grid-` for sections and grids
       def newName(name: String) =

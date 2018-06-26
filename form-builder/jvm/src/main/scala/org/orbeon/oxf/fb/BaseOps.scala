@@ -94,7 +94,7 @@ trait BaseOps extends Logging {
   def nextTmpId()(implicit ctx: FormBuilderDocContext): String =
     nextTmpIds(count = 1).head
 
-  private def idsIterator(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] = {
+  def idsIterator(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] = {
 
     val formDefinitionRootElem = docWithIdsInstanceOrElem match {
       case Left(instance)  ⇒ instance.rootElement

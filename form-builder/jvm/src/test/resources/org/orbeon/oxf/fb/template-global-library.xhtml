@@ -32,6 +32,10 @@
                             </grid-4>
                         </nested-section>
                     </section-template-2>
+                    <section-template-3>
+                        <control-1/>
+                        <control-2/>
+                    </section-template-3>
                 </form>
             </xf:instance>
 
@@ -51,6 +55,10 @@
                         <xf:bind id="control-2111-bind" ref="control-2111" name="control-2111"/>
                     </xf:bind>
                     <xf:bind id="control-21-bind" ref="control-21" name="control-21" xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="section-template-3-bind" ref="section-template-3" name="section-template-3">
+                    <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"/>
+                    <xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim"/>
                 </xf:bind>
             </xf:bind>
 
@@ -76,6 +84,14 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <control-1>
+                            <label>Control 1</label>
+                            <hint/>
+                        </control-1>
+                        <control-2>
+                            <label>Control 2</label>
+                            <hint/>
+                        </control-2>
                         <control-2111>
                             <label>Control 2.2.1.1</label>
                             <hint/>
@@ -84,6 +100,9 @@
                             <label>Control 2.2.2.1</label>
                             <hint/>
                         </control-2221>
+                        <section-template-3>
+                            <label>Section template 3</label>
+                        </section-template-3>
                         <control-21>
                             <label>Control 2.1</label>
                             <hint/>
@@ -107,7 +126,7 @@
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance xxf:readonly="true" id="grid-4-template" xxf:exclude-result-prefixes="#all">
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-4-template">
                 <grid-4-iteration>
                     <control-2221/>
                 </grid-4-iteration>
@@ -177,6 +196,27 @@
                             <fr:c x="7" y="1" w="6"/>
                         </fr:grid>
                     </fr:section>
+                </fr:section>
+                <fr:section id="section-template-3-section" bind="section-template-3-bind">
+                    <xf:label ref="$form-resources/section-template-3/label"/>
+                    <fr:grid id="grid-5-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-1-control" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="control-2-control" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
                 </fr:section>
             </fr:body>
         </fr:view>

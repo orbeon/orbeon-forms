@@ -20,8 +20,14 @@
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
+                    <section-0>
+                        <control-1/>
+                        <control-2/>
+                    </section-0>
                     <section-1>
                         <control-11/>
+
+
                     </section-1>
                     <section-2>
                         <control-21/>
@@ -33,9 +39,15 @@
                                 </grid-4-iteration>
                             </grid-4>
                         </nested-section>
+
+
+
+
                     </section-2>
                     <section-3>
                         <control-11/>
+
+
                     </section-3>
                     <section-4>
                         <control-21/>
@@ -47,16 +59,31 @@
                                 </grid-4-iteration>
                             </grid-4>
                         </nested-section>
+
+
+
+
                     </section-4>
+                    <section-5>
+                        <control-1/>
+                        <control-2/>
+
+
+                    </section-5>
                 </form>
             </xf:instance>
 
             <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-0-bind" ref="section-0" name="section-0">
+                    <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"/>
+                    <xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim"/>
+                </xf:bind>
                 <xf:bind id="section-1-bind" ref="section-1" name="section-1"/>
                 <xf:bind id="section-2-bind" ref="section-2" name="section-2"/>
                 <xf:bind id="section-3-bind" ref="section-3" name="section-3"/>
                 <xf:bind id="section-4-bind" ref="section-4" name="section-4"/>
+                <xf:bind id="section-5-bind" ref="section-5" name="section-5"/>
             </xf:bind>
 
             <!-- Metadata -->
@@ -81,10 +108,22 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <control-1>
+                            <label>Control 1.1</label>
+                            <hint/>
+                        </control-1>
+                        <control-2>
+                            <label>Control 1.2</label>
+                            <hint/>
+                        </control-2>
                         <section-1>
                             <label>Section 1</label>
                             <help/>
                         </section-1>
+                        <section-0>
+                            <label>Section with existing names</label>
+
+                        </section-0>
                         <section-2>
                             <label>Section 2</label>
                             <help/>
@@ -97,6 +136,10 @@
                             <label>Section 4</label>
                             <help/>
                         </section-4>
+                        <section-5>
+                            <label>Section 5</label>
+
+                        </section-5>
 
                     </resource>
                 </resources>
@@ -107,6 +150,31 @@
         <fr:view>
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-0-section" bind="section-0-bind">
+                    <xf:label ref="$form-resources/section-0/label"/>
+                    <fr:grid id="grid-1-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="control-1-control" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="control-2-control" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
                     <component:section-template-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
@@ -137,6 +205,14 @@
                                                   xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                   xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
+                </fr:section>
+                <fr:section id="section-5-section" bind="section-5-bind">
+                    <xf:label ref="$form-resources/section-5/label"/>
+                    <component:section-template-3 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
+                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                                   xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
                 </fr:section>
             </fr:body>

@@ -105,7 +105,8 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         case PUT            ⇒ new HttpPut(uri)
         case DELETE         ⇒ new HttpDelete(uri)
         case TRACE          ⇒ new HttpTrace(uri)
-        case LOCK | UNLOCK  ⇒ throw new UnsupportedOperationException
+        case LOCK           ⇒ new HttpLock(uri)
+        case UNLOCK         ⇒ new HttpUnlock(uri)
       }
 
     val skipAuthorizationHeader = credentials.isDefined

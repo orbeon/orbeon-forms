@@ -229,6 +229,10 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
         pdf tiff wizard-prev wizard-next review
     </property>
+    <property as="xs:string"  name="oxf.fr.detail.button.review.enabled.orbeon.controls">
+        fr:is-wizard-last-page()
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 

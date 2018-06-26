@@ -590,9 +590,9 @@ object ToolboxOps {
         (allSections flatMap getControlNameOpt toSet, allGrids flatMap getControlNameOpt toSet)
       }
 
-      val newControlNamesIt = nextIds("control", needRenameWithAutomaticIds.size).iterator map controlNameFromId
-      val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size).iterator map controlNameFromId
-      val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size).iterator map controlNameFromId
+      val newControlNamesIt = nextIds("control", needRenameWithAutomaticIds.size, xcvNamesInUse).iterator map controlNameFromId
+      val newSectionNamesIt = nextIds("section", allSectionNamesInUse      .size, xcvNamesInUse).iterator map controlNameFromId
+      val newGridNamesIt    = nextIds("grid",    allGridNamesInUse         .size, xcvNamesInUse).iterator map controlNameFromId
 
       // Produce `section-` and `grid-` for sections and grids
       def newName(name: String) =

@@ -246,9 +246,9 @@
                             <xsl:variable name="resources" select="$fr-resources-instance/*"/>
                             <xsl:for-each select="$resources/resource">
                                 <xsl:variable name="lang" select="@xml:lang" as="xs:string"/>
-
                                 <resource xml:lang="{$lang}">
-                                    <xsl:copy-of select="fbf:iterateSelfAndDescendantBindsResourceHolders($section-bind, $lang, $resources)"/>
+                                    <xsl:copy-of
+                                        select="fbf:iterateSelfAndDescendantBindsResourceHolders($section-bind, $lang, $resources)"/>
                                 </resource>
                             </xsl:for-each>
                         </resources>

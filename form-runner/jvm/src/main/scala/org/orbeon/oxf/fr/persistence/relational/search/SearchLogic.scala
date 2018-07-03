@@ -56,9 +56,9 @@ trait SearchLogic extends SearchRequest {
         val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
         Operations.allowsAny(authorizedOperations, SearchOperations)
       },
-      authorizedIfOrganizationMatch = SearchOps.authorizedIfOrganizationMatch(formPermissions, user),
       authorizedIfUsername          = hasPermissionCond("owner")       .option(request.username).flatten,
-      authorizedIfGroup             = hasPermissionCond("group-member").option(request.group).flatten
+      authorizedIfGroup             = hasPermissionCond("group-member").option(request.group).flatten,
+      authorizedIfOrganizationMatch = SearchOps.authorizedIfOrganizationMatch(formPermissions, user)
     )
   }
 
@@ -67,9 +67,10 @@ trait SearchLogic extends SearchRequest {
     val user             = PermissionsAuthorization.currentUserFromSession
     val permissions      = computePermissions(request, user)
     val hasNoPermissions =
-      ! permissions.authorizedBasedOnRole &&
-      permissions.authorizedIfUsername.isEmpty &&
-      permissions.authorizedIfGroup.isEmpty
+      ! permissions.authorizedBasedOnRole               &&
+      permissions.authorizedIfUsername         .isEmpty &&
+      permissions.authorizedIfGroup            .isEmpty &&
+      permissions.authorizedIfOrganizationMatch.isEmpty
 
     if (hasNoPermissions)
       // There is no chance we can access any data, no need to run any SQL

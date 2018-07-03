@@ -637,8 +637,8 @@ object Connection extends Logging {
       def fromSession =
         externalContext.getSessionOpt(false).map(session ⇒ {
           val propertySet   = Properties.instance.getPropertySet
-          val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty)
-          val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty)
+          val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty, default = "")
+          val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty, default = "")
           val sessionId     = session.getId
           val sessionCookie = s"$sessionCookieName=$prefix$sessionId$suffix"
           Headers.Cookie    → List(sessionCookie)

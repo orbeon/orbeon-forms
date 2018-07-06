@@ -266,50 +266,9 @@
                 <!-- Send a "Not Found" error if the form is not available -->
                 <xf:action if="$source-form-metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
 
-                <!-- Same code in relational search.xpl but in XSLT -->
-                <!-- TODO: Remove redundancy once relational support is rewritten in Scala -->
-                <!-- 2017-04-27: Well it is now written in Scala! -->
-                <!-- Also similar code in persistence-model.xml, but that code is disabled for the Summary page -->
-                <xf:var name="permissions"                value="$source-form-metadata/permissions"/>
-                <xf:var name="search-operations"          value="('*', 'read', 'update', 'delete')"/>
-                <xf:var name="search-permissions"         value="$permissions/permission[xxf:split(@operations) = $search-operations]"/>
-
                 <!-- Are we authorized to see all the data based because of our role? -->
+                <xf:var name="permissions"                value="$source-form-metadata/permissions"/>
                 <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRolesXPath($permissions)"/>
-                <xf:var name="authorized-based-on-role"   value="$operations-from-role = $search-operations"/>
-
-                <!-- Are we authorized to see data if we are the owner / group member? -->
-                <xf:var name="authorized-if-owner"        value="exists($search-permissions[owner])"/>
-                <xf:var name="authorized-if-group-member" value="exists($search-permissions[group-member])"/>
-
-                <!-- Whether the current user is anonymous -->
-                <xf:var name="anonymous" value="xxf:is-blank(xxf:username())"/>
-
-                <xf:message level="xxf:log-debug">
-                    AUTHORIZED OPERATIONS ON FORM (SUMMARY MODE): <xf:output value="string-join($operations-from-role, ' ')"/>
-                    AUTHORIZED BASED ON ROLE: <xf:output value="$authorized-based-on-role"/>
-                    AUTHORIZED IF OWNER: <xf:output value="$authorized-if-owner"/>
-                    AUTHORIZED IF GROUP MEMBER: <xf:output value="$authorized-if-group-member"/>
-                    ANONYMOUS: <xf:output value="$anonymous"/>
-                </xf:message>
-
-                <!-- Send an "Unauthorized" error for the page if the user doesn't have role-based permission and we
-                     know that we cannot get further permissions from the persistence layer. This is the case if:
-
-                     1. The user is anonymous.
-                     2. Or there are no owner/group permissions specified for the form.
-                     3. Or the persistence implementation doesn't support owner/group permissions.
-                 -->
-                <xf:action
-                    type="xpath"
-                    if="not($operations-from-role = $search-operations)
-                        and (
-                            $anonymous
-                            or not($authorized-if-owner or $authorized-if-group-member)
-                            or not(frf:ownerGroupPermissionsSupported($app, $form))
-                        )">
-                    frf:sendError(403)
-                </xf:action>
 
                 <!-- Remember global operations -->
                 <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($operations-from-role, ' ')"/>

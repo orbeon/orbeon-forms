@@ -475,9 +475,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                 if (! isBooleanInput) {
 
+                    // Don't show item hints in static-readonly, for consistency with control hints
+                    final boolean showHint = item.hint().isDefined() && ! isStaticReadonly;
+
                     // <span class="xforms-hint-region"> or plain <span>
                     reusableAttributes.clear();
-                    if (item.hint().isDefined())
+                    if (showHint)
                         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint-region");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                     outputLabelText(xformsHandlerContextForItem.getController().getOutput(), null, itemLabel.label(), xhtmlPrefix, itemLabel.isHTML());
@@ -498,7 +501,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     // <span class="xforms-hint">
                     {
                         final Option<LHHAValue> hintOpt = item.hint();
-                        if (hintOpt.isDefined()) {
+                        if (showHint) {
                             final LHHAValue hint = hintOpt.get();
 
                             reusableAttributes.clear();

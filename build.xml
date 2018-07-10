@@ -186,6 +186,7 @@
             <rule pattern="scala.**"                                           result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                           result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                           result="org.orbeon.private.spray.@1"/>
+            <rule pattern="enumeratum.**"                                      result="org.orbeon.private.enumeratum.@1"/>
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
@@ -236,6 +237,7 @@
             <rule pattern="scala.**"                                                    result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                                    result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                                    result="org.orbeon.private.spray.@1"/>
+            <rule pattern="enumeratum.**"                                               result="org.orbeon.private.enumeratum.@1"/>
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
@@ -276,6 +278,7 @@
             <rule pattern="scala.**"                                   result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                   result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                   result="org.orbeon.private.spray.@1"/>
+            <rule pattern="enumeratum.**"                              result="org.orbeon.private.enumeratum.@1"/>
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>

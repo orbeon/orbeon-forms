@@ -17,8 +17,12 @@
 
         display: block;
 
-        padding-bottom: 4px; // in Form Builder, when sections are collapsed, some spacing is helpful
+        padding-top: 20px;   // Spacing between section, so the new section doesn't start right after the previous grid
+        padding-bottom: 4px; // In Form Builder, when sections are collapsed, some spacing is helpful
 
+        &:first-of-type {
+            padding-top: 0;
+        }
         &:last-of-type {
             padding-bottom: 0;
         }

@@ -377,21 +377,6 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
-    private void outputJSONTreeInfo(
-        XFormsValueControl control,
-        Itemset itemset,
-        boolean encode,
-        ContentHandler contentHandler
-    ) throws SAXException {
-        if (control != null && ! xformsHandlerContext.isTemplate()) {
-            // Produce a JSON fragment with hierarchical information
-            final String result = itemset.asJSON(control.getValue(), encode, xformsHandlerContext.getLocationData());
-            contentHandler.characters(result.toCharArray(), 0, result.length());
-        } else {
-            // Don't produce any content when generating a template
-        }
-    }
-
     public static void handleItemFull(
         XFormsBaseHandlerXHTML baseHandler,
         ContentHandler contentHandler,

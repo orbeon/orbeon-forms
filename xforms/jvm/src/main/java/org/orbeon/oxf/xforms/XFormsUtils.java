@@ -760,6 +760,7 @@ public class XFormsUtils {
         value = StringUtils.replace(value, "\\", "\\\\");
         value = StringUtils.replace(value, "\"", "\\\"");
         value = StringUtils.replace(value, "\n", "\\n");
+        value = StringUtils.replace(value, "\t", "\\t");
         return value;
     }
 

@@ -132,7 +132,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
         throw new NotImplementedError("redirect not supported when serving resource")
       case s @ StreamedContent(_, contentType, _, _) ⇒
         contentType foreach response.setContentType
-        APISupport.writeResponseBody(s)
+        APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(s)
     }
   }
 }

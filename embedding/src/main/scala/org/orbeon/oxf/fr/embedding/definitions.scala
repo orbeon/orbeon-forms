@@ -29,6 +29,7 @@ case   object View extends Mode { val name = "view" }
 case class RequestDetails(
   content : Option[StreamedContent],
   url     : String,
+  path    : String, // this is the path used to create the URL
   headers : immutable.Seq[(String, String)],
   params  : immutable.Seq[(String, String)]
 ) {

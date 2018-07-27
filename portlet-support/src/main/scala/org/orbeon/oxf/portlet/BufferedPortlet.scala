@@ -14,9 +14,10 @@
 package org.orbeon.oxf.portlet
 
 import java.{util ⇒ ju}
-import javax.portlet._
 
+import javax.portlet._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
+import org.orbeon.oxf.fr.embedding.APISupport.mustRewriteForMediatype
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
@@ -171,7 +172,7 @@ trait BufferedPortlet {
     responseContent.contentType foreach response.setContentType
 
     // Write response out directly
-    APISupport.writeResponseBody(responseContent)
+    APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(responseContent)
   }
 
   protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =

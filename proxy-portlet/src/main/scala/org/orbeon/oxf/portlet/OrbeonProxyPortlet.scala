@@ -205,7 +205,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 settings,
                 request,
                 contentFromRequest(request, response.getNamespace),
-                url
+                url,
+                sanitizedResourcePath
               )
 
             APISupport.proxyResource(requestDetails)
@@ -286,7 +287,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       settings,
       request,
       contentFromRequest(request, namespace),
-      APISupport.formRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true)
+      APISupport.formRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true),
+      path
     )
   }
 
@@ -336,7 +338,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     settings: PortletSettings,
     request : PortletRequest,
     content : Option[StreamedContent],
-    url     : String
+    url     : String,
+    path    : String
   ): RequestDetails = {
 
     val sendLanguage = getBooleanPreference(request, SendLiferayLanguage)
@@ -388,6 +391,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     RequestDetails(
       content = content,
       url     = url,
+      path    = path,
       headers = headersToSet.to[List],
       params  = paramsToSet
     )

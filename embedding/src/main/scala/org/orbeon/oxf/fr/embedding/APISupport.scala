@@ -54,11 +54,11 @@ object APISupport {
     implicit ctx : EmbeddingContextWithResponse
   ): Unit = {
 
-    val url  = formRunnerURL(baseURL, path, embeddable = true)
+    val url = formRunnerURL(baseURL, path, embeddable = true)
 
-    callService(RequestDetails(None, url, headers, params))._1 match {
+    callService(RequestDetails(None, url, path, headers, params))._1 match {
       case content: StreamedContent ⇒
-        useAndClose(content)(writeResponseBody)
+        useAndClose(content)(writeResponseBody(mustRewriteForMediatype))
       case Redirect(_, _) ⇒
         throw new UnsupportedOperationException
     }
@@ -98,6 +98,7 @@ object APISupport {
             RequestDetails(
               content = contentFromRequest,
               url     = url,
+              path    = sanitizedResourcePath,
               headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
               params  = Nil
             )
@@ -130,10 +131,13 @@ object APISupport {
           title         = None
         )
 
+      val path = "/xforms-server-submit"
+
       val (contentOrRedirect, httpResponse) =
         APISupport.callService(RequestDetails(
           content = Some(contentFromRequest),
-          url     = dropTrailingSlash(settings.formRunnerURL) + "/xforms-server-submit",
+          url     = dropTrailingSlash(settings.formRunnerURL) + path,
+          path    = path,
           headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true).to[List],
           params  = Nil
         ))
@@ -150,7 +154,7 @@ object APISupport {
 
           proxyCapitalizeAndCombineHeaders(httpResponse.headers, request = false) foreach (ctx.setHeader _).tupled
 
-          useAndClose(content)(APISupport.writeResponseBody)
+          useAndClose(content)(APISupport.writeResponseBody(mustRewriteForMediatype))
       }
     }
 
@@ -165,7 +169,7 @@ object APISupport {
 
     proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 
-    useAndClose(res.content)(writeResponseBody)
+    useAndClose(res.content)(writeResponseBody(mediatype ⇒ mustRewriteForMediatype(mediatype) && mustRewriteForPath(requestDetails.path)))
   }
 
   def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
@@ -175,7 +179,7 @@ object APISupport {
     appendQueryString("/fr/", query getOrElse "")
 
   def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-    appendQueryString(dropTrailingSlash(baseURL) + path, if(embeddable) "orbeon-embeddable=true" else "")
+    appendQueryString(dropTrailingSlash(baseURL) + path, if (embeddable) "orbeon-embeddable=true" else "")
 
   def requestHeaders(req: HttpServletRequest) =
     for {
@@ -211,9 +215,22 @@ object APISupport {
     redirectOrContent → cx
   }
 
-  def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
+  def mustRewriteForMediatype(mediatype: String): Boolean =
+    ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype)
+
+  // TODO: Duplicated from `XFormsResourceServer`
+  val FormDynamicResourcesPath   = "/xforms-server/form/dynamic/"
+  val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
+
+  def mustRewriteForPath(path: String): Boolean =
+    path match {
+      case FormDynamicResourcesRegex(_) ⇒ true
+      case _                            ⇒ false
+    }
+
+  def writeResponseBody(doRewrite: String ⇒ Boolean)(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
     content.contentType flatMap ContentTypes.getContentTypeMediaType match {
-      case Some(mediatype) if ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype) ⇒
+      case Some(mediatype) if doRewrite(mediatype) ⇒
         // Text/JSON/XML content type: rewrite response content
         val encoding        = content.contentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
         val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
@@ -231,7 +248,7 @@ object APISupport {
           ctx.writer
         )
       case other ⇒
-        // All other types: just output
+        // All other types: just copy
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
         useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
     }

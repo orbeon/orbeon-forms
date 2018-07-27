@@ -466,13 +466,13 @@ trait ContainingDocumentRequest {
 
   def isPortletContainer         = _containerType == "portlet"
   def isEmbedded                 = _isEmbedded
-  def isServeInlineResources     = getStaticState.isInlineResources && ! _isPortletContainerOrRemote
+  def isServeInlineResources     = getStaticState.isInlineResources || _isPortletContainerOrRemote
 
   private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
     Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
 
   private def isPortletContainerOrRemoteFromHeaders(headers: Map[String, List[String]]) =
-    (Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient) || isPortletContainer
+    isPortletContainer || (Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
 
   protected def initializeRequestInformation(): Unit =
     Option(NetUtils.getExternalContext.getRequest) match {

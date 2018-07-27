@@ -127,7 +127,7 @@ trait BufferedPortlet {
         // Just update the render parameters to simulate a redirect within the portlet
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
-          case (Some(query)) ⇒
+          case Some(query) ⇒
             val m = NetUtils.decodeQueryString(query)
             m.put(PathParameter, Array(path))
             ju.Collections.unmodifiableMap[String, Array[String]](m)

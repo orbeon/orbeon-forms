@@ -73,7 +73,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
               isInitialState = true
             ).dynamicState flatMap (_.initialClientScript)
 
-        response.setContentType(ContentTypes.JavaScriptContentType)
+        response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
         // The document cannot be cached "forever", but upon browser back it can be required again. So some small duration of caching
         // can make sense for the client.
         response.setResourceCaching(
@@ -98,7 +98,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
           // NOTE: The validity is the time the static state was put in cache. We could do better by finding the last modified time
           // of the form definition, but that information is harder to obtain right now.
-          response.setContentType(ContentTypes.JavaScriptContentType)
+          response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
           useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
@@ -232,7 +232,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     val isCSS = ext == "css"
 
-    response.setContentType(if (isCSS) ContentTypes.CssContentTypeWithCharset else ContentTypes.JavaScriptContentType)
+    response.setContentType(if (isCSS) ContentTypes.CssContentTypeWithCharset else ContentTypes.JavaScriptContentTypeWithCharset)
 
     // Namespace to use, must be None if empty
     def namespaceOpt = {
@@ -278,16 +278,18 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
 object XFormsResourceServer {
 
-  val DynamicResourceRegex       = "/xforms-server/dynamic/(.+)".r
+  val XFormServerPrefix          = "/xforms-server/"
 
-  val FormDynamicResourcesPath   = "/xforms-server/form/dynamic/"
+  val DynamicResourceRegex       = (XFormServerPrefix + "dynamic/(.+)").r
+
+  val FormDynamicResourcesPath   = XFormServerPrefix + "form/dynamic/"
   val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
 
-  val FormStaticResourcesPath    = "/xforms-server/form/static/"
+  val FormStaticResourcesPath    = XFormServerPrefix + "form/static/"
   val FormStaticResourcesRegex   = s"$FormStaticResourcesPath(.+).js".r
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
-  val DynamicResourcesPath       = "/xforms-server/dynamic/"
+  val DynamicResourcesPath       = XFormServerPrefix + "dynamic/"
   val NamespaceParameter         = "ns"
 
   implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")

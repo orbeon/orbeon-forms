@@ -169,7 +169,7 @@ object APISupport {
 
     proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 
-    useAndClose(res.content)(writeResponseBody(mediatype ⇒ mustRewriteForMediatype(mediatype) && mustRewriteForPath(requestDetails.path)))
+    useAndClose(res.content)(writeResponseBody(mediatype ⇒ mustRewriteForMediatype(mediatype) || mustRewriteForPath(requestDetails.path)))
   }
 
   def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
@@ -219,7 +219,8 @@ object APISupport {
     ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype)
 
   // TODO: Duplicated from `XFormsResourceServer`
-  val FormDynamicResourcesPath   = "/xforms-server/form/dynamic/"
+  val XFormServerPrefix          = "/xforms-server/"
+  val FormDynamicResourcesPath   = XFormServerPrefix + "form/dynamic/"
   val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
 
   def mustRewriteForPath(path: String): Boolean =

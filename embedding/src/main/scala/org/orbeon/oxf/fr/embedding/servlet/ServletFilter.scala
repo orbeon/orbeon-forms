@@ -15,10 +15,11 @@ package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
 import java.{util ⇒ ju}
+
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
+import org.orbeon.oxf.fr.embedding.APISupport.FormDynamicResourcesRegex
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.{NetUtils, PathUtils}
@@ -60,7 +61,12 @@ class ServletEmbeddingContextWithResponse(
   def decodeURL(encoded: String) = {
 
     def namespaceResource(path: String) =
-      path == "/xforms-server" || path.endsWith(".css")
+      path match {
+        case "/xforms-server"              ⇒ true
+        case path if path.endsWith(".css") ⇒ true
+        case FormDynamicResourcesRegex(_)  ⇒ true
+        case _                             ⇒ false
+      }
 
     def createResourceURL(resourceId: String) =
       req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else APISupport.NamespacePrefix) + resourceId

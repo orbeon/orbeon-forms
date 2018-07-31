@@ -16,4 +16,5 @@
     <xi:include href="tests-form-runner-components.xml"/>
     <xi:include href="tests-form-runner-grids.xml"/>
     <xi:include href="tests-email.xml"/>
+    <xi:include href="tests-xpath-functions.xml"/>
 </tests>

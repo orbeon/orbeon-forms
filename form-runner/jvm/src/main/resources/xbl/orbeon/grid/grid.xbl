@@ -789,9 +789,10 @@
                                                         <xf:var name="source"   value="$items[$p]"/>
                                                         <xf:var name="instance" value="$source/root()"/>
 
-                                                        <!-- Delete source node in any case. It's ok because we have a
-                                                             reference to it for operations that still require it. -->
-                                                        <xf:delete ref="$source"/>
+                                                        <!-- We have a reference to the source for operations that still require it. -->
+                                                        <xf:delete
+                                                            if="event('xxf:type') = ('fr-remove', 'fr-move-up', 'fr-move-down')"
+                                                            ref="$source"/>
 
                                                         <xf:action if="event('xxf:type') = 'fr-remove'">
                                                             <!-- Handle itemset metadata -->
@@ -863,9 +864,9 @@
 
                                                             <xf:insert
                                                                 context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template), $source"
-                                                                position="after"
+                                                                ref="$items[$p]"
+                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
+                                                                position="before"
                                                                 xxf:defaults="{$apply-defaults}"/>
 
                                                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
@@ -880,10 +881,12 @@
 
                                                         <xf:action if="event('xxf:type') = 'fr-insert-below'">
 
+                                                            <!--<xf:message value=""/>-->
+
                                                             <xf:insert
                                                                 context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$source, frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
+                                                                ref="$items[$p]"
+                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                                                 position="after"
                                                                 xxf:defaults="{$apply-defaults}"/>
 

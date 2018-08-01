@@ -1007,7 +1007,7 @@
             </items>
             <item-label>
                 <label>Label XPath expression</label>
-                <hint>Relative to choice tem node</hint>
+                <hint>Relative to choice node</hint>
             </item-label>
             <item-value>
                 <label>Value XPath expression</label>

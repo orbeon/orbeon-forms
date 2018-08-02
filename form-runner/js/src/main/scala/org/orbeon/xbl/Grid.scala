@@ -77,13 +77,18 @@ object Grid {
   }
 
   // Move the menu just below the button
+  // Both callers are in response to  events flowing through `.fr-grid-dropdown-button`.
   def moveMenu(e: JQueryEventObject): Unit = {
-    val dropdown = $(e.target).closest(".dropdown")
 
-    val dropdownOffset = Offset(dropdown)
+    val jTarget = $(e.target)
+
+    val button    = jTarget.closest(".fr-grid-dropdown-button")(0)
+    val jDropdown = jTarget.closest(".dropdown")
+
+    val dropdownOffset = Offset(jDropdown)
 
     $(globalMenuElem).css("position", "absolute")
-    Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + dropdown.height()))
+    Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + jDropdown.height()))
 
     Operation.values foreach { op ⇒
       $(globalMenuElem).find(".dropdown-menu").children(s".fr-${op.entryName}").toggleClass(
@@ -92,7 +97,7 @@ object Grid {
       )
     }
 
-    gridId(e).zip(findGridIterationsForElemWithId(e.target.asInstanceOf[html.Element])) foreach {
+    gridId(e).zip(findGridIterationsForElemWithId(button)) foreach {
       case (currentGridId, currentGridIteration) ⇒ currentGridOpt = Some(CurrentGrid(currentGridId, currentGridIteration))
     }
   }

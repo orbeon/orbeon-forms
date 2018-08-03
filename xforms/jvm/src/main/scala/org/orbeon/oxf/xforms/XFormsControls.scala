@@ -20,6 +20,8 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.control.Controls.{BindingUpdater, ControlsIterator}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.control.{Controls, Focus, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.events.XXFormsRefreshDoneEvent
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -215,6 +217,11 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
           currentControlTree.dispatchRefreshEvents(controlsEffectiveIds)
           // Handle focus changes
           Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
+
+          // Dispatch to the root control
+          getCurrentControlTree.rootOpt foreach { root ⇒
+            Dispatch.dispatchEvent(new XXFormsRefreshDoneEvent(root))
+          }
         }
       }
     }

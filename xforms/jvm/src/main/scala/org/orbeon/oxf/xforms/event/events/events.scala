@@ -287,3 +287,8 @@ class XXFormsRepeatActivateEvent(target: XFormsEventTarget, properties: Property
   extends XFormsEvent(XXFORMS_REPEAT_ACTIVATE, target, properties, bubbles = false, cancelable = false) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
+
+class XXFormsRefreshDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XXFORMS_REFRESH_DONE, target, properties, bubbles = true, cancelable = false) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}

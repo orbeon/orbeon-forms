@@ -1539,12 +1539,19 @@
                 </xh:head>
                 <xh:body>
 
-                    <xf:insert ev:event="#all"
-                                   context="instance('events')" ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                    <xf:insert
+                        event="xforms-enabled xforms-disabled xforms-select xforms-deselect xxforms-visible xxforms-hidden xforms-value-changed xxforms-constraints-changed xforms-valid xforms-invalid"
+                        context="instance('events')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <xf:switch id="my-switch">
                         <xf:case id="case1">
@@ -1622,12 +1629,19 @@
                 </xh:head>
                 <xh:body>
 
-                    <xf:insert ev:event="#all"
-                                   context="instance('events')" ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                    <xf:insert
+                        event="xforms-enabled xforms-disabled xforms-select xforms-deselect xxforms-visible xxforms-hidden xforms-value-changed xxforms-constraints-changed xforms-valid xforms-invalid"
+                        context="instance('events')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <xf:switch id="my-switch">
                         <xf:case id="case1">
@@ -1963,12 +1977,19 @@
                 </xh:head>
                 <xh:body>
 
-                    <xf:insert ev:event="#all"
-                                   context="instance('events')" ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                    <xf:insert
+                        event="xforms-enabled xforms-disabled xforms-select xforms-deselect xxforms-visible xxforms-hidden xforms-value-changed xxforms-constraints-changed xforms-valid xforms-invalid"
+                        context="instance('events')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <!-- 1. Bindings and values are evaluated -->
                     <xf:group id="my-group">
@@ -2036,12 +2057,20 @@
                 </xh:head>
                 <xh:body>
 
-                    <xf:insert ev:event="#all"
-                                   model="events-model" context="." ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                    <xf:insert
+                        event="xforms-enabled xforms-disabled xforms-select xforms-deselect xxforms-visible xxforms-hidden xforms-value-changed xxforms-constraints-changed xforms-valid xforms-invalid"
+                        model="events-model"
+                        context="."
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <xf:repeat ref="text" id="my-repeat">
                         <xf:input ref="." id="my-input"/>

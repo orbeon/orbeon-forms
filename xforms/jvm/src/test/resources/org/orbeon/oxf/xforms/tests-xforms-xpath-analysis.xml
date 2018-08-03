@@ -2573,11 +2573,19 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:insert ev:event="#all"
-                                   model="events-model" context="." ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid'))))"/>
+                    <xf:insert
+                        event="xforms-valid xxforms-constraints-changed"
+                        model="events-model"
+                        context="."
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid'))
+                                )
+                            )"/>
 
                     <xf:output id="g11" ref="a"/>
 

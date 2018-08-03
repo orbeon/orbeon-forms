@@ -38,6 +38,7 @@ public class XFormsEvents {
     public static final String XXFORMS_SETINDEX = "xxforms-setindex";
     public static final String XXFORMS_REPEAT_ACTIVATE = "xxforms-repeat-activate";
     public static final String XXFORMS_ACTION_ERROR = "xxforms-action-error";
+    public static final String XXFORMS_REFRESH_DONE = "xxforms-refresh-done";
 
     public static final String XXFORMS_UPLOAD_START    = "xxforms-upload-start";
     public static final String XXFORMS_UPLOAD_PROGRESS = "xxforms-upload-progress";

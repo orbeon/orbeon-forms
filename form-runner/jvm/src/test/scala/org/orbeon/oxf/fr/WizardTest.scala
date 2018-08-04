@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.scaxon.SimplePath._
@@ -65,23 +66,26 @@ class WizardTest
 
           locally {
 
-            def assertFirstPageStatus() = {
+            def assertFirstPageStatus(section1HasVisibleIncomplete: Boolean) = {
 
               assert(Set("section-1") === Wizard.wizardAvailableSections)
               assertIsFirstPage()
 
-              assert("incomplete visible-incomplete" ===  (section1Holder attValue "*:section-status"))
+              val expectedSectionStatus =
+                Set("incomplete") ++ (section1HasVisibleIncomplete list "visible-incomplete")
+
+              assert(expectedSectionStatus ===  (section1Holder attTokens "*:section-status"))
               assert(! (section2Holder hasAtt "*:section-status"))
               assert(! (section3Holder hasAtt "*:section-status"))
             }
 
             // Initial state
-            assertFirstPageStatus()
+            assertFirstPageStatus(section1HasVisibleIncomplete = false)
 
             // Next must fail
             locally {
               doNext()
-              assertFirstPageStatus()
+              assertFirstPageStatus(section1HasVisibleIncomplete = true)
             }
           }
 
@@ -91,22 +95,25 @@ class WizardTest
 
             doNext()
 
-            assert(Set("changed", "invalid") ===  (section1Holder attTokens "*:section-status"))
+            assert(Set("changed", "invalid", "visible-invalid") ===  (section1Holder attTokens "*:section-status"))
             assert(! (section2Holder hasAtt "*:section-status"))
             assert(! (section3Holder hasAtt "*:section-status"))
           }
 
           locally {
 
-            def assertSecondPage() = {
+            def assertSecondPage(section2HasVisibleIncomplete: Boolean) = {
 
               assert(Set("section-1", "section-2") === Wizard.wizardAvailableSections)
 
               assert(! Wizard.isWizardFirstPage)
               assert(! Wizard.isWizardLastPage)
 
-              assert("changed"    === (section1Holder attValue "*:section-status"))
-              assert("incomplete" === (section2Holder attValue "*:section-status"))
+              val expectedSection2Status =
+                Set("incomplete") ++ (section2HasVisibleIncomplete list "visible-incomplete")
+
+              assert("changed"              === (section1Holder attValue "*:section-status"))
+              assert(expectedSection2Status === (section2Holder attTokens  "*:section-status"))
               assert(! (section3Holder hasAtt "*:section-status"))
             }
 
@@ -115,13 +122,13 @@ class WizardTest
               setControlValue(resolveControlStaticId("control-11-control"), "Mickey")
 
               doNext()
-              assertSecondPage()
+              assertSecondPage(section2HasVisibleIncomplete = false)
             }
 
             // Next must fail
             locally {
               doNext()
-              assertSecondPage()
+              assertSecondPage(section2HasVisibleIncomplete = true)
             }
           }
 
@@ -130,15 +137,18 @@ class WizardTest
 
           locally {
 
-            def assertThirdPage() = {
+            def assertThirdPage(section3HasVisibleIncomplete: Boolean) = {
 
               assertAllSectionsAvailable()
 
               assertIsLastPage()
 
-              assert("changed"    === (section1Holder attValue "*:section-status"))
-              assert("changed"    === (section2Holder attValue "*:section-status"))
-              assert("incomplete" === (section3Holder attValue "*:section-status"))
+              val expectedSection3Status =
+                Set("incomplete") ++ (section3HasVisibleIncomplete list "visible-incomplete")
+
+              assert("changed"              === (section1Holder attValue "*:section-status"))
+              assert("changed"              === (section2Holder attValue "*:section-status"))
+              assert(expectedSection3Status === (section3Holder attTokens "*:section-status"))
             }
 
             // Next must succeed after valid value
@@ -146,13 +156,13 @@ class WizardTest
               setControlValue(resolveControlStaticId("control-21-control"), "Minnie")
 
               doNext()
-              assertThirdPage()
+              assertThirdPage(section3HasVisibleIncomplete = false)
             }
 
             // Next must fail
             locally {
               doNext()
-              assertThirdPage()
+              assertThirdPage(section3HasVisibleIncomplete = true)
             }
           }
 
@@ -195,9 +205,9 @@ class WizardTest
               assert(Set("section-1") === Wizard.wizardAvailableSections)
               assertIsFirstPage()
 
-              assert(Set("changed", "incomplete") === (section1Holder attTokens "*:section-status"))
-              assert("changed"                    === (section2Holder attValue  "*:section-status"))
-              assert("changed"                    === (section3Holder attValue  "*:section-status"))
+              assert(Set("changed", "incomplete", "visible-incomplete") === (section1Holder attTokens "*:section-status"))
+              assert("changed"                                          === (section2Holder attValue  "*:section-status"))
+              assert("changed"                                          === (section3Holder attValue  "*:section-status"))
             }
 
             // Clear first value

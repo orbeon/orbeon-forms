@@ -166,19 +166,28 @@
             clear: left;
         }
 
-        // Don't clear float for horizontal display
         &.xforms-select1-appearance-xxforms-horizontal,
         &.xforms-select-appearance-xxforms-horizontal {
+
+            // Don't clear float for horizontal display
             .xforms-selected,
             .xforms-deselected,
             .xforms-items {
                 clear: none;
             }
 
+            // Make sure there is more space between items
+            .xforms-selected,
+            .xforms-deselected {
+                label {
+                    margin-right: 12px;
+                }
+            }
+
             &.xforms-static.xforms-readonly {
                 .xforms-selected,
                 .xforms-deselected {
-                    margin-right: 10px;
+                    margin-right: 12px;
                 }
             }
         }

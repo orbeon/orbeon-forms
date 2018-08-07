@@ -589,7 +589,7 @@ trait FormRunnerActions {
 
   def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
     Try {
-      ErrorSummary.sectionsWithVisibleErrors.foreach { (sectionName) ⇒
+      ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName ⇒
         val sectionId = FormRunner.sectionId(sectionName)
         dispatch(name = "fr-expand", targetId = sectionId)
       }

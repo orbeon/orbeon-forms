@@ -42,7 +42,7 @@ class ErrorSummaryTest
                 <xf:bind ref="." constraint="false()"/>
                 <xf:dispatch
                   event="xforms-ready"
-                  name="fr-visit-all"
+                  name="fr-show-relevant-errors"
                   targetid="error-summary"/>
               </xf:model>
             </xh:head>

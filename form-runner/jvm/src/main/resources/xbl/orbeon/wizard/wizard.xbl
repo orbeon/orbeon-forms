@@ -76,7 +76,7 @@
                     targetid="fr-wizard-update-validity"
                     xxbl:scope="outer"/>
             </xbl:handler>
-            <xbl:handler event="fr-visit-all" phase="target">
+            <xbl:handler event="fr-visit-all fr-show-relevant-errors" phase="target">
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
                 <xf:var
                     xxbl:scope="outer"

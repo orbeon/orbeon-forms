@@ -211,7 +211,7 @@
 
                         <!-- Keep markup even in `view` mode for form caching. -->
                         <xxf:setvisited
-                            event="fr-visit-all"
+                            event="fr-visit-all fr-show-relevant-errors"
                             target="#observer"
 
                             control="fr-view-component"

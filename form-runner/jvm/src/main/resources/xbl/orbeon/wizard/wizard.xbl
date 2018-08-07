@@ -110,6 +110,7 @@
 
             </xbl:handler>
             <!-- When a page/section is shown, create the associated `fr:section-status` attribute if needed -->
+            <!-- NOTE: 2018-08-07: This is done only for *top-level* pages. -->
             <xbl:handler event="fr-section-shown" phase="target">
 
                 <xf:var
@@ -982,9 +983,26 @@
                                         <xf:setvalue
                                             ref="$local/show-toc"
                                             value="false()"/>
-                                        <xf:setvalue
-                                            ref="$local/show-body"
-                                            value="true()"/>
+
+                                        <!-- See https://github.com/orbeon/orbeon-forms/issues/3668 -->
+                                        <xf:action if="not($local/show-body/data(.))">
+
+                                            <xf:var
+                                                name="current-top-level-section-id"
+                                                value="replace($current-top-level-case-id, '-case$', '')"/>
+
+                                            <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
+                                                <xf:property name="section-binding" value="xxf:binding($current-top-level-section-id)"              xxbl:scope="outer"/>
+                                                <xf:property name="section-name"    value="frf:controlNameFromIdOpt($current-top-level-section-id)" xxbl:scope="outer"/>
+                                                <xf:property name="validate"        value="xxf:instance('local')/validate/data(.)"/>
+                                                <xf:property name="separate-toc"    value="xxf:instance('local')/separate-toc/data(.)"/>
+                                            </xf:dispatch>
+
+                                            <xf:setvalue
+                                                ref="$local/show-body"
+                                                value="true()"/>
+                                        </xf:action>
+
                                     </xf:action>
                                 </xf:action>
                             </xf:trigger>

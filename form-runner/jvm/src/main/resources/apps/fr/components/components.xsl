@@ -553,7 +553,7 @@
             </xf:action>
 
             <!-- Mark all controls as visited -->
-            <xf:action ev:event="fr-visit-all">
+            <xf:action ev:event="fr-visit-all fr-show-relevant-errors">
 
                 <!-- When the wizard is in use, we don't want to visit *all* controls. -->
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
@@ -563,7 +563,7 @@
                     recurse="true"/>
 
                 <xf:dispatch
-                    name="fr-visit-all"
+                    name="fr-show-relevant-errors"
                     targetid="fr-view-component"/>
             </xf:action>
 

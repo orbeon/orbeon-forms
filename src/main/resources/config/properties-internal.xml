@@ -288,11 +288,11 @@
         recover (error-message("upload-in-progress") then success)
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*">
-        visit-all
+        show-relevant-errors
         then captcha
         then validate("error")
         recover (
-            visit-all
+            show-relevant-errors
             then expand-invalid
             then error-message("form-validation-error")
             then success

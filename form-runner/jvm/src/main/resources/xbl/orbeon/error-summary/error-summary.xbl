@@ -32,7 +32,7 @@
             <xbl:style src="/xbl/orbeon/error-summary/error-summary.css"/>
         </xbl:resources>
         <xbl:handlers>
-            <xbl:handler event="fr-visit-all" phase="target">
+            <xbl:handler event="fr-visit-all fr-show-relevant-errors" phase="target">
                 <!-- Mark all controls as visited -->
                 <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>

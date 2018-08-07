@@ -78,19 +78,22 @@
             </xbl:handler>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
+                <xf:var
+                    xxbl:scope="outer"
+                    name="target-name"
+                    value="
+                        if (xxf:instance('local')/validate/data(.) = 'free') then
+                            'fr-wizard-visit-all'
+                        else
+                            'fr-wizard-visit-all-available'
+                "/>
+
                 <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
-
                 <xf:dispatch
-                    if="xxf:instance('local')/validate/data(.) = 'free'"
-                    name="fr-wizard-visit-all"
-                    targetid="fr-wizard-visit-all"
+                    name="{$target-name}"
+                    targetid="{$target-name}"
                     xxbl:scope="outer"/>
 
-                <xf:dispatch
-                    if="xxf:instance('local')/validate/data(.) != 'free'"
-                    name="fr-wizard-visit-all-to-current"
-                    targetid="fr-wizard-visit-all-to-current"
-                    xxbl:scope="outer"/>
             </xbl:handler>
             <!-- For client-side API -->
             <xbl:handler event="fr-wizard-focus" phase="target">
@@ -673,7 +676,6 @@
                                                     )
                                                 )[last()]"/>
 
-
                                         <!-- Set initial current section -->
                                         <xf:action if="exists($last-available-and-visited-top-level-section-id)">
 
@@ -781,9 +783,19 @@
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                             <xxf:setvisited
                                                 event="fr-wizard-visit-all-to-current"
-                                                if="$validated-mode"
 
                                                 iterate="$prev-nav-case-ids, $current-nav-case-id"
+                                                control="{{.}}"
+                                                visited="true"
+                                                recurse="true"/>
+                                        </xf:group>
+                                        <xf:group id="fr-wizard-visit-all-available" appearance="xxf:internal">
+                                            <xxf:setvisited
+                                                event="fr-wizard-visit-all-to-last-available"
+
+                                                iterate="
+                                                    for $s in xxf:split(xxf:instance('available-top-level-sections'))
+                                                    return concat($s, '-section-case')"
                                                 control="{{.}}"
                                                 visited="true"
                                                 recurse="true"/>

@@ -24,5 +24,7 @@ YAHOO.xbl.fr.Tinymce.DefaultConfig = {
     theme_advanced_path:                    false,
     // Override default TinyMCE class on tables, which adds borders. We can't leave this just empty, otherwise
     // TinyMCE puts its own CSS class.
-    visual_table_class:                     "fr-tinymce-table"
+    visual_table_class:                     "fr-tinymce-table",
+    // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    skin:                                   false
 };

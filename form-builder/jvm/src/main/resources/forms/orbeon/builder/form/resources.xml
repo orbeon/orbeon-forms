@@ -259,7 +259,7 @@
             <label>Custom CSS classes</label>
         </classes>
         <default-always-never>
-            <item id="0">Use Default</item>
+            <item id="0">Use default</item>
             <item id="1">Always</item>
             <item id="2">Never</item>
         </default-always-never>
@@ -601,11 +601,11 @@
             <options>
                 <label>Options</label>
                 <item>
-                    <label>Initially Open</label>
+                    <label>Initially open</label>
                     <value>fr-initially-open</value>
                 </item>
                 <item>
-                    <label>Page Break Before</label>
+                    <label>Page break before</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -623,10 +623,10 @@
                 <hint>Boolean XPath expression</hint>
             </readonly>
             <repeat>
-                <label>Repeat Content</label>
+                <label>Repeat content</label>
             </repeat>
             <custom-iteration-name>
-                <label>Enable Custom Iteration Name</label>
+                <label>Enable custom iteration name</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
@@ -645,10 +645,10 @@
                 <hint>Positive number or XPath expression</hint>
             </max>
             <apply-defaults>
-                <label>Apply Initial Value Formulas when Adding Iterations</label>
+                <label>Apply initial value formulas when adding iterations</label>
             </apply-defaults>
             <initial-iterations>
-                <label>Initial Number of Iterations Uses Template</label>
+                <label>Initial number of iterations uses template</label>
             </initial-iterations>
             <other>Other</other>
             <one>One repetition</one>
@@ -2788,7 +2788,7 @@
                     <value>fr-initially-open</value>
                 </item>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label todo="true">[Page break before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -2806,10 +2806,10 @@
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Content]</label>
+                <label todo="true">[Repeat content]</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
@@ -2828,10 +2828,10 @@
                 <hint todo="true">[Positive number or XPath expression]</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">[Initial number of iterations uses template]</label>
             </initial-iterations>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
@@ -3907,7 +3907,7 @@
                     <value>fr-initially-open</value>
                 </item>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label todo="true">[Page break before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -3925,10 +3925,10 @@
                 <hint>Булево выражение XPath</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Content]</label>
+                <label todo="true">[Repeat content]</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
@@ -3947,10 +3947,10 @@
                 <hint todo="true">Положительное число [or XPath expression]</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">[Initial number of iterations uses template]</label>
             </initial-iterations>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
@@ -5067,10 +5067,10 @@
                 <hint>Numero positivo o espressione XPath</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">[Initial number of iterations uses template]</label>
             </initial-iterations>
             <other>Altro</other>
             <one>Una ripetizione</one>
@@ -7294,10 +7294,10 @@
                 <hint>Positiivinen numero tai XPath-lauseke</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">[Initial number of iterations uses template]</label>
             </initial-iterations>
             <other>Muu</other>
             <one>Yksi toisto</one>
@@ -9519,10 +9519,10 @@
                 <hint>Número positivo</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">[Initial number of iterations uses template]</label>
             </initial-iterations>
             <other>Outros</other>
             <one>Uma repetição</one>

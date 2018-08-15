@@ -83,7 +83,7 @@
             <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
             <xbl:handler
                 phase="target"
-                event="xxforms-visible xforms-value-changed fr-iteration-moved DOMFocusOut">
+                event="xxforms-visible xforms-value-changed xxforms-iteration-moved DOMFocusOut">
 
                 <xf:var
                     name="display-and-edit-values"

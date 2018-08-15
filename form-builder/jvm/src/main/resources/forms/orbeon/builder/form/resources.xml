@@ -327,7 +327,7 @@
             <wizard-mode>
                 <label>Wizard Navigation Validation Mode</label>
                 <hint>How wizard navigation behaves when data is not valid</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use default</item>
                 <item id="1">Free</item>
                 <item id="2">Lax</item>
                 <item id="3">Strict</item>
@@ -339,10 +339,10 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
-                <item id="1">Show Subsections for the Active Section Only</item>
-                <item id="2">Show Subsections for All Sections</item>
-                <item id="3">Don't Show Subsections</item>
+                <item id="0">Use default</item>
+                <item id="1">Show subsections for the active section only</item>
+                <item id="2">Show subsections for all sections</item>
+                <item id="3">Don't show subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
                 <label>Maximum Attachment Size per Control</label>
@@ -363,7 +363,7 @@
                 <label>Appearance of Control Hints</label>
             </hints>
             <appearances>
-                <item id="0">Use Default</item>
+                <item id="0">Use default</item>
                 <item id="1">Inline</item>
                 <item id="2">Tooltip</item>
             </appearances>
@@ -371,7 +371,7 @@
                 <label>Use Placeholder for Text Fields and Text Areas</label>
             </placeholders>
             <analysis-calculate>
-                <label>Automatic calculation dependencies</label>
+                <label>Automatic Calculations Dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -2553,7 +2553,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -3673,7 +3673,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -4793,7 +4793,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -5905,7 +5905,7 @@
                 <label>Platzhalter für Textfelder und mehrzeilige Textfelder benutzen</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -7020,7 +7020,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -8132,7 +8132,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -9245,7 +9245,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>
@@ -10364,7 +10364,7 @@
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
             <analysis-calculate>
-                <label todo="true">[Automatic calculation dependencies]</label>
+                <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
         </dialog-form-settings>

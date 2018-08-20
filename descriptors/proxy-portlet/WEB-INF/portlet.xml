@@ -13,7 +13,7 @@
         </init-param>
         <init-param>
             <name>use-short-namespaces</name>
-            <value>true</value>
+            <value>false</value>
         </init-param>
         <init-param>
             <name>enable-url-parameters</name>

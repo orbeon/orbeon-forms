@@ -150,7 +150,7 @@
                     - `min`: makes control natively invalid as the user types, if the value cannot be negative
                 -->
                 <xh:span
-                    class="fr-width-max-10em {
+                    class="{
                         (
                             'input-prepend'[xxf:non-blank($prefix)],
                             'input-append' [xxf:non-blank($suffix)]

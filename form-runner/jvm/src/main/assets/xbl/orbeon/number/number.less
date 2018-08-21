@@ -13,6 +13,29 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
+
+    .xbl-fr-number, .xbl-fr-currency {
+
+        max-width: 10em; // legacy: we had `fr-width-max-10em` in number.xbl proper
+
+        .input-prepend, .input-append {
+
+            display: flex;
+
+            .add-on {
+                flex-grow: 0;
+                .xforms-output-output {
+                    white-space: nowrap;
+                }
+            }
+
+            .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
+                flex-grow: 1;
+                width: 1%;
+            }
+        }
+    }
+
     @media print {
         .xbl-fr-number, .xbl-fr-currency {
             // Help Flying Saucer align fields when label is empty
@@ -20,3 +43,4 @@
         }
     }
 }
+

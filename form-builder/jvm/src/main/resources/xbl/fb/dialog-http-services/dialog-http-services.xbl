@@ -357,6 +357,8 @@
                     <xf:bind ref="instance-id"   calculate="concat(../name, '-instance')"/>
 
                     <xf:bind ref="request">
+
+                        <!-- TODO: validate as XPath 2 XVT -->
                         <xf:bind
                             ref="resource"
                             required="true()"

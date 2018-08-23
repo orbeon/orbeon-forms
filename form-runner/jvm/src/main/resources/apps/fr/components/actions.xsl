@@ -400,6 +400,12 @@
 
                 <xsl:copy>
                     <xsl:copy-of select="$action/@*"/>
+
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/3685 -->
+                    <xsl:if test="$action/@if = '$fr-mode=''new'''">
+                        <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
+                    </xsl:if>
+
                     <!-- Choose to iterate or not on `$iterate-control-name` -->
                     <!-- Also store the absolute id of the source in the request -->
                     <xsl:choose>

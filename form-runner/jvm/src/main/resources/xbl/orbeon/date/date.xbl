@@ -50,6 +50,7 @@
                 <!--<icon-class>fa fa-fw fa-calendar-alt</icon-class>-->
             </icon>
             <templates>
+                <!--<bind type="xf:date"/>-->
                 <view>
                     <fr:date id="" ref="" xmlns="">
                         <xf:label ref=""/>

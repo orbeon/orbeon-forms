@@ -51,14 +51,18 @@ private class DateCompanion extends XBLCompanion {
 
   override def xformsUpdateValue(newValue: String): Unit = {
     if (xformsGetValue() != newValue) {
-      val dateParts = newValue.splitTo[List]("-")
-      // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-      val jsDate = new js.Date(
-        year  = dateParts(0).toInt,
-        month = dateParts(1).toInt - 1,
-        date  = dateParts(2).toInt,
-        0, 0, 0, 0)
-      datePicker.setDate(jsDate)
+      try {
+        val dateParts = newValue.splitTo[List]("-")
+        // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
+        val jsDate = new js.Date(
+          year  = dateParts(0).toInt,
+          month = dateParts(1).toInt - 1,
+          date  = dateParts(2).toInt,
+          0, 0, 0, 0)
+        datePicker.setDate(jsDate)
+      } catch {
+        case _: Exception ⇒ // Ignore values we can't parse as dates
+      }
     }
   }
 

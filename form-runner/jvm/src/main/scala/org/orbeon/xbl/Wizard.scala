@@ -19,13 +19,14 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariableControl}
+import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.MapFunctions
-import org.orbeon.saxon.om.{SequenceIterator, ValueRepresentation}
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.value.{AtomicValue, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import shapeless._
 import shapeless.syntax.typeable._
 
 object Wizard {
@@ -115,24 +116,24 @@ object Wizard {
       isAccessible               : Boolean
     )
 
-    def findWizardContainer =
+    def findWizardContainer: Option[XBLContainer] =
       XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") map (_.nestedContainer)
 
-    def findWizardModel =
+    def findWizardModel: Option[XFormsModel] =
       for {
         container ← findWizardContainer
         model     ← container.defaultModel
       } yield
         model
 
-    def findWizardState =
+    def findWizardState: Option[NodeInfo] =
       for {
         model     ← findWizardModel
         instance  ← model.defaultInstanceOpt
       } yield
         instance.rootElement
 
-    def findWizardVariableValue(staticOrAbsoluteId: String) =
+    def findWizardVariableValue(staticOrAbsoluteId: String): Option[ValueRepresentation] =
       XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
 
     def booleanValue(value: ValueRepresentation) = value match {

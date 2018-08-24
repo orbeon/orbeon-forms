@@ -729,50 +729,6 @@
         </output>
     </test>
 
-    <test description="xf:setfocus on fr:date" name="oxf:pipeline">
-        <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model">
-                        <xf:instance id="instance">
-                            <instance>
-                                <date>2010-01-13</date>
-                            </instance>
-                        </xf:instance>
-
-                        <xf:action ev:event="xforms-ready">
-                            <xf:setfocus control="my-date"/>
-                        </xf:action>
-
-                    </xf:model>
-                    <xi:include href="oxf:/xbl/orbeon/date/date.xbl" xxi:omit-xml-base="true"/>
-                </xh:head>
-                <xh:body>
-                    <fr:date id="my-date" ref="date"/>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <xxf:event-response>
-                <xxf:dynamic-state>
-                    <dynamic-state/>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-date≡xf-6">
-                            <xxf:value>2010-01-13</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-date≡xf-8" class="xbl-fr-date-mindate xforms-hidden"/>
-                        <xxf:control id="my-date≡xf-10" class="xbl-fr-date-maxdate xforms-hidden"/>
-                        <xxf:control id="my-date≡xf-12" class="xbl-fr-date-pagedate xforms-hidden"/>
-                    </xxf:control-values>
-                    <xxf:focus control-id="my-date≡xf-6"/>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
     <test description="xf:setfocus on fr:currency" name="oxf:pipeline">
         <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
         <input name="document">

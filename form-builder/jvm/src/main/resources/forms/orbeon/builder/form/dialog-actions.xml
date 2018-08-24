@@ -660,7 +660,7 @@
             </xf:trigger>
         </xf:group>
 
-        <fr:xforms-inspector/>
+        <!--<fr:xforms-inspector/>-->
 
     </xh:div>
 

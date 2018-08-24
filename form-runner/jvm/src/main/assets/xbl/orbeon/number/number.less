@@ -18,22 +18,6 @@
 
         max-width: 10em; // legacy: we had `fr-width-max-10em` in number.xbl proper
 
-        .input-prepend, .input-append {
-
-            display: flex;
-
-            .add-on {
-                flex-grow: 0;
-                .xforms-output-output {
-                    white-space: nowrap;
-                }
-            }
-
-            .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
-                flex-grow: 1;
-                width: 1%;
-            }
-        }
     }
 
     @media print {

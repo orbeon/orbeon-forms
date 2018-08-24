@@ -79,8 +79,6 @@
         <property name="versioned-proxy-portlet-name"   value="orbeon-${release.number}-proxy-portlet"/>
         <property name="unversioned-proxy-portlet-name" value="orbeon-proxy-portlet"/>
 
-        <property name="examples-cli-src.dir"           value="src/examples-cli"/>
-
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
         <echo message="Using Ant ${ant.version}"/>
@@ -667,7 +665,6 @@
             <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>
             <zipfileset dir="third-party-licenses" prefix="${versioned-name}/third-party-licenses"/>
-            <zipfileset dir="${examples-cli-src.dir}" prefix="${versioned-name}/examples-cli"/>
         </zip>
         <!-- Fix EOL for Windows platform -->
         <delete dir="build/temp/distrib"/>

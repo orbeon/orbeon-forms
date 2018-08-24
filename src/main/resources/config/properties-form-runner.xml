@@ -272,7 +272,7 @@
         xf:show("fr-clear-confirm-dialog")
         then suspend
         then xf:dispatch(name = "fr-clear", targetid = "fr-persistence-model")
-    </property>~
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.close.*.*">
         relinquish-lease
         then navigate("oxf.fr.detail.close.uri")

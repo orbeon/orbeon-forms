@@ -47,7 +47,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Summary</summary>
-            <close>&lt;i class="icon-remove"/&gt; Close</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Close</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Clear</clear>
             <cancel>Cancel</cancel>
             <save-locally>Save Locally</save-locally>
@@ -73,7 +73,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no>&lt;i class="icon-remove"/&gt; No</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok>OK</ok>
             <previous>Previous</previous>
             <next>Next</next>
@@ -399,7 +399,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommaire</summary>
-            <close>&lt;i class="icon-remove"/&gt; Fermer</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Fermer</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Effacer</clear>
             <cancel>Annuler</cancel>
             <save-locally>Enreg. Local</save-locally>
@@ -425,7 +425,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Oui</yes>
-            <no>&lt;i class="icon-remove"/&gt; Non</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; Non</no>
             <ok>OK</ok>
             <previous>Précédent</previous>
             <next>Suivant</next>
@@ -754,7 +754,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Resumen</summary>
-            <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Cerrar</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Limpiar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
@@ -780,7 +780,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sí</yes>
-            <no>&lt;i class="icon-remove"/&gt; No</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok>Aceptar</ok>
             <previous>Previo</previous>
             <next>Próximo</next>
@@ -1095,7 +1095,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
-            <close>&lt;i class="icon-remove"/&gt; Lukk</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Lukk</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tøm innhold</clear>
             <cancel>Angre</cancel>
             <save-locally>Lagre lokalt</save-locally>
@@ -1121,7 +1121,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</save-publish>
 
             <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Tilbake</previous>
             <next>Neste</next>
@@ -1435,7 +1435,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
-            <close>&lt;i class="icon-remove"/&gt; Закрыть</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Закрыть</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Очистить</clear>
             <cancel>Отменить</cancel>
             <save-locally>Сохр.на диск</save-locally>
@@ -1461,7 +1461,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</save-publish>
 
             <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Назад</previous>
             <next>Вперед</next>
@@ -1773,7 +1773,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommario</summary>
-            <close>&lt;i class="icon-remove"/&gt; Chiudi</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Chiudi</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</clear>
             <cancel>Cancella</cancel>
             <save-locally>Salva localmente</save-locally>
@@ -1799,7 +1799,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sì</yes>
-            <no>&lt;i class="icon-remove"/&gt; No</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Indietro</previous>
             <next>Avanti</next>
@@ -2124,7 +2124,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Übersicht</summary>
-            <close>&lt;i class="icon-remove"/&gt; Schließen</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Schließen</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Zurücksetzen</clear>
             <cancel>Abbrechen</cancel>
             <save-locally>Lokal speichern</save-locally>
@@ -2150,7 +2150,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="icon-remove"/&gt; Nein</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nein</no>
             <ok todo="true">OK</ok>
             <previous>Zurück</previous>
             <next>Weiter</next>
@@ -2475,7 +2475,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Yhteenveto</summary>
-            <close>&lt;i class="icon-remove"/&gt; Sulje</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Sulje</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tyhjennä</clear>
             <cancel>Peruuta</cancel>
             <save-locally>Tallenna paikallisesti</save-locally>
@@ -2501,7 +2501,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</save-publish>
 
             <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Paluu</previous>
             <next>Seuraava</next>
@@ -2826,7 +2826,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Lista</summary>
-            <close>&lt;i class="icon-remove"/&gt; Stäng</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Stäng</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Rensa</clear>
             <cancel>Avbryt</cancel>
             <save-locally>Spara lokalt</save-locally>
@@ -2852,7 +2852,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</save-publish>
 
             <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="icon-remove"/&gt; Nej</no>
+            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nej</no>
             <ok>OK</ok>
             <previous>Tillbaka</previous>
             <next>Nästa</next>
@@ -3177,7 +3177,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Samenvatting</summary>
-            <close>&lt;i class="icon-remove"/&gt; Sluiten</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Sluiten</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Wissen</clear>
             <cancel>Anulleren</cancel>
             <save-locally>Lokaal bewaren</save-locally>
@@ -3203,7 +3203,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</save-publish>
 
             <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Vorige</previous>
             <next>Volgende</next>
@@ -3527,7 +3527,7 @@
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sumário</summary>
-            <close>&lt;i class="icon-remove"/&gt; Fechar</close>
+            <close>&lt;i class="fa fa-fw fa-times"/&gt; Fechar</close>
             <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
@@ -3553,7 +3553,7 @@
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
 
             <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Anterior</previous>
             <next>Próximo</next>

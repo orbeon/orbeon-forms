@@ -188,8 +188,7 @@ This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided
 under W3C Software License. The schemas are available at the following
 locations:
 
-    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
-    jar:orbeon-resources-private.jar!/ops/xforms/schema/*.rn[c|g]
+    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/*.xsd
 
 This product makes use of the [Silk Icons](<http://www.famfamfam.com/lab/icons/silk/>), released
 under a Creative Commons Attribution 2.5 License.

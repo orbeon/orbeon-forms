@@ -91,8 +91,8 @@ Documentation
 
 All documentation is available online:
 
-- [Orbeon Forms documentation](http://doc.orbeon.com/)
-- [Frequently Asked Questions (FAQ)](http://doc.orbeon.com/faq/)
+- [Orbeon Forms documentation](https://doc.orbeon.com/)
+- [Frequently Asked Questions (FAQ)](https://doc.orbeon.com/faq/)
 
 
 What's happening?
@@ -108,7 +108,7 @@ Compiling Orbeon Forms
 ----------------------
 
 You usually don't have to compile Orbeon Forms yourself. But if you want to, see
-[Building Orbeon Forms](http://doc.orbeon.com/contributors/building-orbeon-forms.html).
+[Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
 The source code is available on [github](https://github.com/orbeon/orbeon-forms/).
 
 Orbeon Forms is written mainly using the following languages and technologies:

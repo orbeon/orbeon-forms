@@ -44,19 +44,27 @@
     border: 1px solid darken(@wellBackground, 7%);
 }
 
-.help-icon(@path) {
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    text-indent: 1px;
-    background: none;
+.help-icon() {
 
-    // Set so the icon doesn't take space when empty, is 14x14 when text is present
-    max-width : 14px;
-    max-height: 14px;
+    display: none;
 
-    &:before {
-        content: "\f05a";
-        margin-right: 2px;
+    &:not(:empty) {
+
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        text-indent: 1px;
+        background: none;
+        max-width : 14px;
+        max-height: 14px;
+
+        margin-left: 0;
+        overflow: hidden;
+        cursor: pointer;
+
+        &:before {
+            content: "\f05a";
+            margin-right: 2px;
+        }
     }
 }
 

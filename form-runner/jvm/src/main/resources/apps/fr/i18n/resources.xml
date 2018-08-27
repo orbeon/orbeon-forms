@@ -22,7 +22,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Delete</delete>
@@ -31,10 +31,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicate</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Save</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Save</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Save</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Edit</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validate</validate>
@@ -42,7 +42,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Edit</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Edit</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
@@ -372,9 +372,8 @@
             </formats>
         </common>
         <buttons>
-
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Accueil</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Visualiser</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Supprimer</delete>
@@ -383,10 +382,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliquer</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Enregistrer</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Enregistrer</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editer</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valider</validate>
@@ -394,7 +393,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editer</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
 
             <!-- Other standard buttons -->
@@ -729,7 +728,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Inicio</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Ver</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Eliminar</delete>
@@ -738,10 +737,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
@@ -749,7 +748,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Ver</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->
@@ -1070,7 +1069,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Vis</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Slett</delete>
@@ -1079,10 +1078,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Lagre</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Lagre</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Epost</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
@@ -1090,7 +1089,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
@@ -1410,7 +1409,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; На главную</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Проверить</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Удалить</delete>
@@ -1419,10 +1418,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Сохранить</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Сохранить</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Править</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
@@ -1430,7 +1429,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Править</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Править</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
 
             <!-- Other standard buttons -->
@@ -1748,7 +1747,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Recensione</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</delete>
@@ -1757,10 +1756,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Copia</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Salva</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Salva</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Salva</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Salva</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Modifica</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valida</validate>
@@ -1768,7 +1767,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Presenta</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Esamina</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Modifica</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Modifica</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
 
             <!-- Other standard buttons -->
@@ -2099,7 +2098,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Übersicht</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Löschen</delete>
@@ -2108,10 +2107,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopieren</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Speichern</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Speichern</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Speichern</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Ändern</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Senden</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validieren</validate>
@@ -2119,7 +2118,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Ändern</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Ändern</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Senden</workflow-send>
 
             <!-- Other standard buttons -->
@@ -2450,7 +2449,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Koti</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Käy läpi</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; Näytä PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Poista</delete>
@@ -2459,10 +2458,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopioi</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Tallenna</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Tallenna</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Tallenna</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Muokkaa</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Sähköposti</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Tarkista oikeellisuus</validate>
@@ -2470,7 +2469,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Toimita</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Muokkaa</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Lähetä</workflow-send>
 
             <!-- Other standard buttons -->
@@ -2801,7 +2800,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Granska</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Ta bort</delete>
@@ -2810,10 +2809,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicera</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Spara</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Spara</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Spara</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Spara</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Redigera</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Mejla</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Godkänn</validate>
@@ -2821,7 +2820,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Skicka</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Granska</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Redigera</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Redigera</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Skicka</workflow-send>
 
             <!-- Other standard buttons -->
@@ -3152,7 +3151,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Verwijderen</delete>
@@ -3161,10 +3160,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliceren</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Opslaan</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Opslaan</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Opslaan</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Bewerken</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; E-mail</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valideren</validate>
@@ -3172,7 +3171,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Indienen</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Bewerken</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Sturen</workflow-send>
 
             <!-- Other standard buttons -->
@@ -3502,7 +3501,7 @@
         </common>
         <buttons>
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Início</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Rever</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Rever</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</delete>
@@ -3511,10 +3510,10 @@
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
-            <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
@@ -3522,7 +3521,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Submeter</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Rever</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->

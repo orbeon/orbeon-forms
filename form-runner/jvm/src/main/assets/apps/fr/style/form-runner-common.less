@@ -44,19 +44,20 @@
     border: 1px solid darken(@wellBackground, 7%);
 }
 
-// icon-info from Bootstrap sprites.less
 .help-icon(@path) {
     display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-indent: 1px;
+    background: none;
 
     // Set so the icon doesn't take space when empty, is 14x14 when text is present
-    max-width : 20px; // 20 instead of 14 to add some space to the right
+    max-width : 14px;
     max-height: 14px;
 
-
-    // Select help icon from background
-    background-image: url("@{path}bootstrap/img/glyphicons-halflings.png");
-    background-repeat: no-repeat;
-    background-position: -120px -96px;
+    &:before {
+        content: "\f05a";
+        margin-right: 2px;
+    }
 }
 
 .narrow-td {

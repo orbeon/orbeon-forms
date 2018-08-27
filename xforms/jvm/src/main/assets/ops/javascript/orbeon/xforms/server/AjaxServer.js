@@ -1866,7 +1866,7 @@
                                             var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
                                             if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
                                                 var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
-                                                if (oldItemDelimiter != null) {
+                                                if (oldItemDelimiter != null) { // https://github.com/orbeon/orbeon-forms/issues/3689
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
                                                            (! $(cursor).is('.xforms-repeat-delimiter')
@@ -1890,13 +1890,15 @@
                                             var newIndex = newRepeatIndexes[repeatId];
                                             if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
                                                 var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
-                                                var cursor = newItemDelimiter.nextSibling;
-                                                while (cursor.nodeType != ELEMENT_TYPE ||
-                                                       (! $(cursor).is('.xforms-repeat-delimiter')
-                                                               && ! $(cursor).is('.xforms-repeat-begin-end'))) {
-                                                    if (cursor.nodeType == ELEMENT_TYPE)
-                                                        YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
-                                                    cursor = cursor.nextSibling;
+                                                if (newItemDelimiter != null) { // https://github.com/orbeon/orbeon-forms/issues/3689
+                                                    var cursor = newItemDelimiter.nextSibling;
+                                                    while (cursor.nodeType != ELEMENT_TYPE ||
+                                                           (! $(cursor).is('.xforms-repeat-delimiter')
+                                                                   && ! $(cursor).is('.xforms-repeat-begin-end'))) {
+                                                        if (cursor.nodeType == ELEMENT_TYPE)
+                                                            YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
+                                                        cursor = cursor.nextSibling;
+                                                    }
                                                 }
                                             }
                                         }

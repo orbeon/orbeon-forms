@@ -713,7 +713,7 @@
                                                     <!-- https://github.com/orbeon/orbeon-forms/issues/723
                                                          https://github.com/orbeon/orbeon-forms/issues/1042 -->
                                                     <xf:label>
-                                                        <xh:i class="icon-chevron-left"/>&#x200b;
+                                                        <xh:i class="fa fa-fw fa-chevron-left"/>&#x200b;
                                                     </xf:label>
                                                     <xf:action event="DOMActivate">
                                                         <xf:setvalue
@@ -738,7 +738,7 @@
                                             <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
                                                 <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
                                                     <xf:label>
-                                                        <xh:i class="icon-chevron-right"/>&#x200b;
+                                                        <xh:i class="fa fa-fw fa-chevron-right"/>&#x200b;
                                                     </xf:label>
                                                     <!-- DOMActivate handler which depends on `$static-validation-mode` -->
                                                     <xsl:copy-of select="$do-next-handler"/>

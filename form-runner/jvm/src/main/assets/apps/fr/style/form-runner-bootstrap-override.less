@@ -253,8 +253,15 @@ body.orbeon {
     .navbar-inverse i { color: white }
 
     // Make disabled icons a bit opaque
-    .disabled[class^="icon-"], .disabled [class^="icon-"] {
-        .opacity(40)
+    .disabled[class^="icon-"],
+    .disabled [class^="icon-"],
+    .xforms-trigger.xforms-readonly .fa,
+    .fa.disabled {
+        .opacity(40);
+    }
+
+    .xforms-trigger .fa {
+        color: @textColor;
     }
 
     // NAV LIST

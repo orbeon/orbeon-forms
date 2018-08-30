@@ -218,9 +218,9 @@
                                                     concat(
                                                         (: Icon :)
                                                         if (exists($metadata/fb:icon/fb:small-icon)) then
-                                                            concat('&lt;img src=&quot;', $metadata/fb:icon/fb:small-icon[1], '&quot; alt=&quot;&quot;/>')
+                                                            concat('&lt;img src=&quot;', ($metadata/fb:icon/fb:small-icon)[1], '&quot; alt=&quot;&quot;/>')
                                                         else if (exists($metadata/fb:icon/fb:icon-class)) then
-                                                            concat('&lt;i class=&quot;', $metadata/fb:icon/fb:icon-class[1], '&quot;/>')
+                                                            concat('&lt;i class=&quot;', ($metadata/fb:icon/fb:icon-class)[1], '&quot;/>')
                                                         else
                                                             '&lt;i class=&quot;fa fa-fw fa-puzzle-piece&quot;/>',
                                                         (: Description :)

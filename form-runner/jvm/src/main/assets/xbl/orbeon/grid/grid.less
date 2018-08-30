@@ -111,8 +111,10 @@
                     border-right: none;
                     border-bottom: none;
 
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: auto 35px;
+                    &:not(.fr-grid-readonly) {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: auto 35px;
+                        }
                     }
 
                     .fr-grid-th,
@@ -155,7 +157,18 @@
                 .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                     display: grid;
                     width: 100%;
-                    grid-template-columns: 35px auto;
+                }
+
+                &.fr-grid-readonly {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: auto;
+                    }
+                }
+
+                &:not(.fr-grid-readonly) {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: 35px auto;
+                    }
                 }
             }
 

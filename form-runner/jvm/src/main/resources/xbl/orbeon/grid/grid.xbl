@@ -335,6 +335,7 @@
                                         'table-condensed'
                                     ) else
                                         (),
+                                    'fr-grid-readonly'[$readonly],
                                     if ($is-repeat) then (
                                         'fr-repeat',
                                         if ($static-row-count le 1) then

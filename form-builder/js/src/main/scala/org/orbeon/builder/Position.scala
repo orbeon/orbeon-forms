@@ -23,6 +23,7 @@ import org.scalajs.dom.{document, window}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
+import scala.util.Try
 
 object Position {
 
@@ -156,7 +157,7 @@ object Position {
     gridBody
       .css(cssProperty)
       .splitTo[List]()
-      .map((w) ⇒ w.substring(0, w.indexOf("px")))
-      .map(_.toDouble)
+      .map(w ⇒ w.substring(0, w.indexOf("px")))
+      .flatMap(v ⇒ Try(v.toDouble).toOption) // https://github.com/orbeon/orbeon-forms/issues/3700
   }
 }

@@ -15,8 +15,15 @@
 .orbeon {
 
     // Menu is placed at the top-level in the markup
-    .dropdown-menu i {
-        margin-right: 5px;
+    .dropdown-menu {
+
+        li .xforms-output-output {
+            white-space: nowrap; // https://github.com/orbeon/orbeon-forms/issues/3702
+        }
+
+        i {
+            margin-right: 5px;
+        }
     }
 
     // Mixin as Flying Saucer doesn't support `:not()`!

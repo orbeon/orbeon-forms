@@ -32,7 +32,7 @@ object RowEditor {
 
   var currentGridBodyOpt : Option[Block] = None
   var currentRowPosOpt   : Option[Int]   = None
-  lazy val rowEditorContainer                       = $(".fb-row-editor")
+  lazy val rowEditorContainer            = $(".fb-row-editor")
 
   def withCurrentGridBody[T](f: Block ⇒ T): Option[T] =
     currentGridBodyOpt flatMap { currentGridBody ⇒
@@ -92,7 +92,7 @@ object RowEditor {
       val containerLeft = Offset(gridEl).left
 
       // Position row editor
-      pointerRowTopBottomIndexOpt.foreach((pointerRowTopBottom) ⇒ {
+      pointerRowTopBottomIndexOpt.foreach(pointerRowTopBottom ⇒ {
         rowEditorContainer.show()
         rowEditorContainer.children().hide()
 
@@ -101,7 +101,7 @@ object RowEditor {
         val rowHeight = rowBottom - rowTop
         val rowIndex  = pointerRowTopBottom._2
 
-        def positionElWithClass(selector: String, topOffset: (JQuery) ⇒ Double): Unit = {
+        def positionElWithClass(selector: String, topOffset: JQuery ⇒ Double): Unit = {
           val elem = rowEditorContainer.children(selector)
           elem.show()
           Offset.offset(
@@ -114,10 +114,10 @@ object RowEditor {
         }
 
         currentRowPosOpt = Some(rowIndex + 1)
-        positionElWithClass(RowEditor.InsertAbove.className, (_) ⇒ rowTop)
+        positionElWithClass(RowEditor.InsertAbove.className, _ ⇒ rowTop)
         if (currentGridBody.el.closest(".fr-grid").is(".fb-can-delete-row"))
-          positionElWithClass(RowEditor.Delete.className, (e) ⇒ rowTop + rowHeight/2 - e.height()/2)
-        positionElWithClass(RowEditor.InsertBelow.className, (e) ⇒ rowBottom - e.height())
+          positionElWithClass(RowEditor.Delete.className, e ⇒ rowTop + rowHeight/2 - e.height()/2)
+        positionElWithClass(RowEditor.InsertBelow.className, e ⇒ rowBottom - e.height())
       })
     }
   }

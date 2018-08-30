@@ -85,8 +85,8 @@ object Position {
   // Container is either a section or grid; calls listeners passing old/new container
   def currentContainerChanged(
     containerCache : BlockCache,
-    wasCurrent     : (Block) ⇒ Unit,
-    becomesCurrent : (Block) ⇒ Unit
+    wasCurrent     : Block ⇒ Unit,
+    becomesCurrent : Block ⇒ Unit
   ): Unit = {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
@@ -112,9 +112,9 @@ object Position {
   // will when appropriate notify the listeners `was` and `becomes` of the old and new value
   // TODO: replace `Any` by `Unit` once callers are all in Scala
   def notifyOnChange[T](
-    was     : (Block) ⇒ Unit,
-    becomes : (Block) ⇒ Unit
-  ): (Option[Block]) ⇒ Unit = {
+    was     : Block ⇒ Unit,
+    becomes : Block ⇒ Unit
+  ): Option[Block] ⇒ Unit = {
 
     var currentBlockOpt: Option[Block] = None
 

@@ -61,8 +61,8 @@ trait FormRunnerActions {
     "review"                 → tryNavigateToReview,
     "edit"                   → tryNavigateToEdit,
     "open-rendered-format"   → tryOpenRenderedFormat,
-    "visit-all"              → tryVisitAll,
-    "show-relevant-errors"   → tryVisitAll,
+    "visit-all"              → tryShowRelevantErrors,
+    "show-relevant-errors"   → tryShowRelevantErrors,
     "unvisit-all"            → tryUnvisitAll,
     "expand-all"             → tryExpandAllSections,
     "expand-invalid"         → tryExpandInvalidSections,
@@ -579,8 +579,8 @@ trait FormRunnerActions {
       )
 
   // Visit/unvisit controls
-  def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
-  def tryUnvisitAll(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
+  def tryShowRelevantErrors(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
+  def tryUnvisitAll(params: ActionParams)        : Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
 
   // Collapse/expand sections
   def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))

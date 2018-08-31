@@ -403,8 +403,11 @@
                                         ),
                                         '; '
                                     )
+                                else if (../serialization != 'none') then
+                                    ../serialization
                                 else
-                                    ../serialization"
+                                    ''
+                            "
                         />
                         <xf:bind
                             ref="body"

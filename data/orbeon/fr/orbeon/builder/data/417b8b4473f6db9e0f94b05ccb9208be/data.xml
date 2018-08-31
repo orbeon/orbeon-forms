@@ -736,8 +736,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off"
-                                           class="fr-width-10em">
+                                <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
                                     <xf:label ref="$form-resources/secret/label"/>
                                     <xf:hint ref="$form-resources/secret/hint"/>
                                 </xf:secret>
@@ -775,7 +774,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             </xh:td>
                             <xh:td>
                                 <fr:number id="number-control" digits-after-decimal="0" bind="number-bind"
-                                           class="fr-width-10em"
                                            suffix="m/s">
                                     <xf:label ref="$form-resources/number/label"/>
                                     <xf:hint ref="$form-resources/number/hint"/>
@@ -785,14 +783,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <fr:currency bind="currency-bind" id="currency-control" class="fr-width-10em">
+                                <fr:currency bind="currency-bind" id="currency-control">
                                     <xf:label ref="$form-resources/currency/label"/>
                                     <xf:hint ref="$form-resources/currency/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:currency>
                             </xh:td>
                             <xh:td>
-                                <fr:us-state bind="us-state-bind" id="us-state-control" class="fr-width-10em">
+                                <fr:us-state bind="us-state-bind" id="us-state-control">
                                     <xf:label ref="$form-resources/us-state/label"/>
                                     <xf:hint ref="$form-resources/us-state/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>

@@ -475,7 +475,7 @@
                             </fr:c>
                         <fr:c y="2" x="1" w="4">
                                 <xf:select1 id="language-control" bind="language-bind"
-                                        class="fr-summary fr-search fr-width-10em">
+                                        class="fr-summary fr-search">
                                     <xf:label ref="$form-resources/language/label"/>
                                     <xf:hint ref="$form-resources/language/hint"/>
                                     <xf:help ref="$form-resources/language/help"/>

@@ -216,20 +216,22 @@
         }
     }
 
-    .input-prepend, .input-append {
+    .xbl-component {
+        .input-prepend, .input-append {
 
-        display: flex;
+            display: flex;
 
-        .add-on {
-            flex-grow: 0;
-            .xforms-output-output {
-                white-space: nowrap;
+            .add-on {
+                flex-grow: 0;
+                .xforms-output-output {
+                    white-space: nowrap;
+                }
             }
-        }
 
-        .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
-            flex-grow: 1;
-            width: 1%;
+            .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
+                flex-grow: 1;
+                width: 1%;
+            }
         }
     }
 

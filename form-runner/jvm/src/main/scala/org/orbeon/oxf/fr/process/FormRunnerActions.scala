@@ -255,14 +255,13 @@ trait FormRunnerActions {
 
       ensureDataCalculationsAreUpToDate()
 
-      val selectedRenderFormatOpt =
-        SupportedRenderFormats find { format ⇒
+      val selectedRenderFormats =
+        SupportedRenderFormats filter { format ⇒
           booleanFormRunnerProperty(s"oxf.fr.email.attach-$format")
         }
 
-      val formatKeyOpt =
-        selectedRenderFormatOpt foreach
-          (tryCreatePdfOrTiffIfNeeded(params, _).get)
+      selectedRenderFormats foreach
+        (tryCreatePdfOrTiffIfNeeded(params, _).get)
 
       val currentFormLang = FormRunner.currentLang
 

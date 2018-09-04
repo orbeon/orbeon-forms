@@ -61,6 +61,10 @@ Event.onDOMReady ->
         Controls.typeChangedEvent.subscribe (event) ->
             initUnder event.control if appliesToControl event.control
 
+        # When a full update occurs, initialize as well (https://github.com/orbeon/orbeon-forms/issues/3707)
+        Controls.fullUpdateEvent.subscribe (event) ->
+            initUnder event.control
+
         # Fire change event on blur, as Mobile Safari doesn't fire the change event (http://goo.gl/jnMFj)
         Events.blurEvent.subscribe (event) ->
             dateOrTimeClasses = ["xforms-type-date", "xforms-type-time", "xforms-type-dateTime"]

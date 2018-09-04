@@ -1678,6 +1678,8 @@
                                 $(documentElement).children().detach();
                                 documentElement.innerHTML = innerHTML;
                                 ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
+                                // Special case for https://github.com/orbeon/orbeon-forms/issues/3707
+                                Controls.fullUpdateEvent.fire({control: documentElement});
                             } else {
                                 // Insertion between delimiters
                                 function insertBetweenDelimiters(prefix) {

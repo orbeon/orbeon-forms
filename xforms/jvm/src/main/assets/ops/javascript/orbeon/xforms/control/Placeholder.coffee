@@ -12,10 +12,6 @@
 
 $ = ORBEON.jQuery
 Controls = ORBEON.xforms.Controls
-Event = YAHOO.util.Event
-Events = ORBEON.xforms.Events
-Init = ORBEON.xforms.Init
-YD = YAHOO.util.Dom
 
 findInputOrTextarea = (control) ->
     input = (control.getElementsByTagName "input")[0]
@@ -23,24 +19,6 @@ findInputOrTextarea = (control) ->
         input
     else
         (control.getElementsByTagName "textarea")[0]
-
-# Populate the value with the placeholder (when users aren't editing the field)
-showPlaceholder = (control) ->
-    inputOrTextarea = findInputOrTextarea control
-    if $(control).is('.xforms-placeholder')
-        # Already showing the placeholder, update it
-        inputOrTextarea.value = $(inputOrTextarea).attr('placeholder')
-    else if inputOrTextarea.value == ""
-        # Field is empty, then we can show the placeholder
-        YD.addClass control, "xforms-placeholder"
-        inputOrTextarea.value = $(inputOrTextarea).attr('placeholder')
-
-# Remove placeholder
-hidePlaceholder = (control) ->
-    inputOrTextarea = findInputOrTextarea control
-    if $(control).is('.xforms-placeholder')
-        YD.removeClass control, "xforms-placeholder"
-        inputOrTextarea.value = ""
 
 # When the label/hint changes, set the value of the placeholder
 do ->

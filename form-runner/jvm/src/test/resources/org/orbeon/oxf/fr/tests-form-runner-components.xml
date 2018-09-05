@@ -138,7 +138,6 @@
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/fQuery.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/StringOps.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/FiniteStateMachine.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Control.min.js" class="xforms-baseline"/>

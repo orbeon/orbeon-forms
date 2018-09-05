@@ -128,7 +128,7 @@ Event.onDOMReady ->
             # - the calendar image with the minimal appearance.
             isDate = $(event.target).is('.xforms-input-input.xforms-type-date')
 
-            canWrite = not f$.is '.xforms-readonly', $ event.control
+            canWrite = not $(event.control).is('.xforms-readonly')
             if isDate and canWrite
 
                 control = event.control

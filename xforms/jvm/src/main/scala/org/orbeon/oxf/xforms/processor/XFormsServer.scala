@@ -236,14 +236,6 @@ object XFormsServer {
                 delayedEvent.writeAsSAX(currentTime)
             }
 
-            // Check if we need to tell the client to perform a form submission
-            if (requireClientSubmission)
-              outputSubmissionInfo(
-                Option(containingDocument.getClientActiveSubmissionFirstPass),
-                containingDocument.isPortletContainer || containingDocument.isEmbedded,
-                NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
-              )
-
             // TODO: the following should be ordered in the order they were requested
             // Output messages to display
             val messages = containingDocument.getMessagesToRun.asScala
@@ -292,6 +284,14 @@ object XFormsServer {
             Option(containingDocument.getClientHelpControlEffectiveId) foreach { helpControlEffectiveId ⇒
               outputHelpInfo(containingDocument, helpControlEffectiveId)
             }
+
+            // Check if we need to tell the client to perform a form submission
+            if (requireClientSubmission)
+              outputSubmissionInfo(
+                Option(containingDocument.getClientActiveSubmissionFirstPass),
+                containingDocument.isPortletContainer || containingDocument.isEmbedded,
+                NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
+              )
 
           }
         }

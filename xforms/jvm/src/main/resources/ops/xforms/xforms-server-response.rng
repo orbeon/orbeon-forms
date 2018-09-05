@@ -356,25 +356,6 @@
                                 <data type="string"/>
                             </element>
                         </zeroOrMore>
-                        <optional>
-                            <element name="xxf:submission">
-                                <optional>
-                                    <attribute name="action"/>
-                                </optional>
-                                <attribute name="method"/>
-                                <optional>
-                                    <attribute name="show-progress">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="target"/>
-                                </optional>
-                            </element>
-                        </optional>
                         <zeroOrMore>
                             <element name="xxf:message">
                                 <attribute name="level"/>
@@ -428,6 +409,25 @@
                         <optional>
                             <element name="xxf:help">
                                 <attribute name="control-id"/>
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="xxf:submission">
+                                <optional>
+                                    <attribute name="action"/>
+                                </optional>
+                                <attribute name="method"/>
+                                <optional>
+                                    <attribute name="show-progress">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="target"/>
+                                </optional>
                             </element>
                         </optional>
                     </element>

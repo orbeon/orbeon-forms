@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, Simpl
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.webapp.{SessionFacade, UserRolesFacade}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
@@ -104,12 +105,12 @@ object FormRunnerAuth {
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
-    def headersAsJSONString(headers: List[(String, Array[String])]) = {
+    def headersAsJSONString(headers: List[(String, Array[String])]): String = {
 
       val headerAsJSONStrings =
         headers map {
           case (name, values) ⇒
-            val valuesAsString = values.mkString("""["""", """", """", """"]""")
+            val valuesAsString = values.map(XFormsUtils.escapeJavaScript).mkString("""["""", """", """", """"]""")
             s""""$name": $valuesAsString"""
         }
 

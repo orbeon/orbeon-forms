@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
-import org.orbeon.oxf.xforms.event.events.{XFormsEnabledEvent, XFormsUIEvent, XXFormsConstraintsChangedEvent}
+import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.Implicits._
@@ -175,9 +175,10 @@ object ErrorSummary {
       event.property[T](xxfName(name))
 
     val eventLevelOpt = event match {
-      case e: XXFormsConstraintsChangedEvent ⇒ e.property[String]("level")  map ValidationLevel.withNameInsensitive
-      case e: XFormsEnabledEvent             ⇒ xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
-      case _                                 ⇒ None
+      case e: XXFormsConstraintsChangedEvent           ⇒ e.property[String]("level")  map ValidationLevel.withNameInsensitive
+      case _: XFormsEnabledEvent                       ⇒ xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
+      case _: XFormsValidEvent | _: XFormsInvalidEvent ⇒ Some(ValidationLevel.ErrorLevel)
+      case _                                           ⇒ None
     }
 
     // Ideally, we would evaluate this lazily, but we use it in the pattern match below

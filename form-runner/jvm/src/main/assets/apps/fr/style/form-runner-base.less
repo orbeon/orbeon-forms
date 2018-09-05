@@ -219,9 +219,11 @@
     .xbl-component {
         .input-prepend, .input-append {
 
-            display: flex;
+            display: -ms-flexbox;
+            display: flex; // for IE10
 
             .add-on {
+                -ms-flex: 0 auto; // for IE10
                 flex-grow: 0;
                 .xforms-output-output {
                     white-space: nowrap;
@@ -229,6 +231,7 @@
             }
 
             .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
+                -ms-flex: 1 auto; // for IE10
                 flex-grow: 1;
                 width: 1%;
             }

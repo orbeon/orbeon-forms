@@ -365,7 +365,9 @@
                             xxf:whitespace="trim"
                             constraint="
                                 (: https://github.com/orbeon/orbeon-forms/issues/3577 :)
+                                (: https://github.com/orbeon/orbeon-forms/issues/3720 :)
                                 starts-with(., '/')       or
+                                starts-with(., '{')       or
                                 starts-with(., 'http://') or
                                 starts-with(., 'https://')
                             "/>

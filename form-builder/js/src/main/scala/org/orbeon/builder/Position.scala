@@ -154,8 +154,18 @@ object Position {
       case Orientation.Horizontal ⇒ "grid-template-rows"
       case Orientation.Vertical   ⇒ "grid-template-columns"
     }
-    gridBody
-      .css(cssProperty)
+    val cssValue = gridBody.css(cssProperty)
+
+    // In the value of the CSS property returned by the browser, replace `repeat(X Ypx)` by `X` times `Ypx`
+    // Unlike other browsers, Edge 17 returns values that contains `repeat()`
+    val repeatRegex      = "repeat\\(([0-9]+), ([0-9\\.]+px)\\)".r
+    val cssValueExpanded = repeatRegex.replaceAllIn(cssValue,  m ⇒ {
+      val count = m.group(1).toInt
+      val value = m.group(2)
+      (value + " ") * (count - 1) + value
+    })
+
+    cssValueExpanded
       .splitTo[List]()
       .map(w ⇒ w.substring(0, w.indexOf("px")))
       .flatMap(v ⇒ Try(v.toDouble).toOption) // https://github.com/orbeon/orbeon-forms/issues/3700

@@ -162,7 +162,7 @@ object Position {
     val cssValueExpanded = repeatRegex.replaceAllIn(cssValue,  m ⇒ {
       val count = m.group(1).toInt
       val value = m.group(2)
-      (value + " ") * (count - 1) + value
+      (1 to count).map(_ ⇒ value).mkString(" ")
     })
 
     cssValueExpanded

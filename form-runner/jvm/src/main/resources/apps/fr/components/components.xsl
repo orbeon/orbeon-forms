@@ -62,7 +62,7 @@
     <xsl:variable name="min-toc"              select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]"                       as="xs:integer"/>
     <xsl:variable name="has-toc"              select="$min-toc ge 0"                                                                                   as="xs:boolean"/>
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
-    <xsl:variable name="default-logo-uri"     select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))"                          as="xs:string?"/>
+    <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
     <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))"                        as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>

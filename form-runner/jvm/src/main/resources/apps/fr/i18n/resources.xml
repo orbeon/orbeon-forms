@@ -21,6 +21,11 @@
             </formats>
         </common>
         <buttons>
+            <create>&lt;i class="fa fa-fw fa-plus"/&gt; Create</create>
+            <view>&lt;i class="fa fa-fw fa-eye"/&gt; View</view>
+            <approve>&lt;i class="icon-ok-circle"/&gt; Approve</approve>
+            <reject>&lt;i class="icon-ban-circle"/&gt; Reject</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -327,6 +332,7 @@
                 <navigate-new>Navigate to New</navigate-new>
                 <upgrade-local>Upgrade local form definitions</upgrade-local>
                 <upgrade-remote>Upgrade remote form definitions</upgrade-remote>
+                <reencrypt>Re-encrypt form definitions</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Confirm Form Availability Change</publish-confirmation>
@@ -342,11 +348,13 @@
                 <form-identification>Form Identification</form-identification>
                 <last-modified>Modified</last-modified>
                 <reindexing-confirmation>Confirm Reindexing</reindexing-confirmation>
+                <reencrypt-confirmation>Confirm Re-encryption</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
                 <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
+                <reencrypt-confirmation>We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Available</available>
@@ -360,6 +368,9 @@
                 <reindexing-provider>Reindexing {0} ({1,number}/{2,number})</reindexing-provider>
                 <reindexing-stopping>Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
                 <reindexing-finished>The reindexing operation is finished</reindexing-finished>
+                <reencrypt-state>Re-encrypting {0,number}/{1,number}</reencrypt-state>
+                <reencrypt-started>Re-encryption started</reencrypt-started>
+                <reencrypt-finished>Re-encryption finished</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -372,6 +383,11 @@
             </formats>
         </common>
         <buttons>
+            <create>&lt;i class="fa fa-fw fa-plus"/&gt; Créer</create>
+            <view>&lt;i class="fa fa-fw fa-eye"/&gt; Visualiser</view>
+            <approve>&lt;i class="icon-ok-circle"/&gt; Approuver</approve>
+            <reject>&lt;i class="icon-ban-circle"/&gt; Rejeter</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Accueil</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Visualiser</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -682,6 +698,7 @@
                 <navigate-new>Naviguer à la page de création</navigate-new>
                 <upgrade-local>Mettre à jour les formulaires locaux</upgrade-local>
                 <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
+                <reencrypt>Réencrypter les formulaires</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>
@@ -697,11 +714,13 @@
                 <form-identification>Identification du formulaire</form-identification>
                 <last-modified>Modification</last-modified>
                 <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
+                <reencrypt-confirmation>Confirmer le recryptage</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
                 <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
+                <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Disponible</available>
@@ -715,6 +734,9 @@
                 <reindexing-provider>En cours de réindexage {0} ({1,number}/{2,number})</reindexing-provider>
                 <reindexing-stopping>Réindexage en cours d'arrêt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
                 <reindexing-finished>L'opération de réindexage est terminée</reindexing-finished>
+                <reencrypt-state>Recryptage en cours {0,number}/{1,number}</reencrypt-state>
+                <reencrypt-started>Recryptage commencé</reencrypt-started>
+                <reencrypt-finished>Recryptage terminé</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -727,6 +749,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Inicio</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Ver</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -966,7 +993,7 @@
                 <renew-lease-title>Renovar Bloqueo</renew-lease-title>
                 <renew-lease-message>Su bloqueo esta por expirar. Desea renovarlo ahora ?</renew-lease-message>
                 <current-user-left>Usted posee un bloqueo sobre este documento para otro</current-user-left>
-                <current-user-right>.]</current-user-right>
+                <current-user-right>.</current-user-right>
                 <relinquished>Usted ya no posee un bloqueo sobre este documento.</relinquished>
                 <other-user>Otro usuario con nombre "{0}" posee actualmente un bloqueo sobre este documento</other-user>
                 <relinquish>Libherar Bloqueo</relinquish>
@@ -1023,6 +1050,7 @@
                 <navigate-new>Ir a nuevo</navigate-new>
                 <upgrade-local>Actualizar Formularios locales</upgrade-local>
                 <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
@@ -1038,11 +1066,13 @@
                 <form-identification>Identificación de Fomulario</form-identification>
                 <last-modified>Modificado</last-modified>
                 <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
                 <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1056,6 +1086,9 @@
                 <reindexing-provider>Reindexando ({1,number}/{2,number}]</reindexing-provider>
                 <reindexing-stopping>La reindexación se esta deteniendo &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished>La reindexación ha finalizado</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -1068,6 +1101,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Vis</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -1363,6 +1401,7 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1378,11 +1417,13 @@
                 <form-identification todo="true">[Form Identification]</form-identification>
                 <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1396,6 +1437,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -1408,6 +1452,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; На главную</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Проверить</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -1701,6 +1750,7 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1716,11 +1766,13 @@
                 <form-identification todo="true">[Form Identification]</form-identification>
                 <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1734,6 +1786,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -1746,6 +1801,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Recensione</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -2052,6 +2112,7 @@
                 <navigate-new>Passa a Nuovo</navigate-new>
                 <upgrade-local>Aggiorna le definizioni dei moduli locali</upgrade-local>
                 <upgrade-remote>Aggiorna le definizioni dei moduli remoti</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
@@ -2067,11 +2128,13 @@
                 <form-identification>Identificazione del modulo</form-identification>
                 <last-modified>Modificato</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
                 <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -2085,6 +2148,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -2097,6 +2163,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Übersicht</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -2403,6 +2474,7 @@
                 <navigate-new>Gehe zu Neu</navigate-new>
                 <upgrade-local>Lokale Formulardefinition aktualisieren</upgrade-local>
                 <upgrade-remote>Formulardefinition auf Remote-System aktualisieren</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">Veröffentlichen/Verbergen bestätigen</publish-confirmation>
@@ -2418,11 +2490,13 @@
                 <form-identification>Formular Identifikation</form-identification>
                 <last-modified>Geändert am</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
                 <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
@@ -2436,6 +2510,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -2448,6 +2525,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Koti</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Käy läpi</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; Näytä PDF</pdf>
@@ -2754,6 +2836,7 @@
                 <navigate-new>Luo uusi</navigate-new>
                 <upgrade-local>Päivitä paikallisen lomakkeen määritykset</upgrade-local>
                 <upgrade-remote>Päivitä etälomakkeen määritykset</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
@@ -2769,11 +2852,13 @@
                 <form-identification>Lomakkeen tunnistetiedot</form-identification>
                 <last-modified>Muokattu</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
                 <publish-confirmation>Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Saatavilla</available>
@@ -2787,6 +2872,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -2799,6 +2887,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Granska</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -3105,6 +3198,7 @@
                 <navigate-new>Gå till Skapa</navigate-new>
                 <upgrade-local>Uppgradera lokala formulärdefinitioner</upgrade-local>
                 <upgrade-remote>Uppgradera formulärdefinitioner på servern</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
@@ -3120,11 +3214,13 @@
                 <form-identification>Identifiering av formulär</form-identification>
                 <last-modified>Senast ändrad</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
                 <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Tillgänglig</available>
@@ -3138,6 +3234,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -3150,6 +3249,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -3455,6 +3559,7 @@
                 <navigate-new>Naar nieuw</navigate-new>
                 <upgrade-local>Upgrade lokale formdefinities</upgrade-local>
                 <upgrade-remote>Upgrade externe formdefinities</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
@@ -3470,11 +3575,13 @@
                 <form-identification>Form-identificatie</form-identification>
                 <last-modified>Bewerkt</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
                 <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>
@@ -3488,6 +3595,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>
@@ -3500,6 +3610,11 @@
             </formats>
         </common>
         <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Início</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Rever</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
@@ -3805,6 +3920,7 @@
                 <navigate-new>Ir para Novo</navigate-new>
                 <upgrade-local>Actualizar definições de formulário local</upgrade-local>
                 <upgrade-remote>Actualizar definições de formulário remoto</upgrade-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>
@@ -3820,11 +3936,13 @@
                 <form-identification>Identificação do Formulário</form-identification>
                 <last-modified>Modificado</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
                 <publish-confirmation>Tem a certeza que quer {0,choice,0#publicar|1#não publicar} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Disponível</available>
@@ -3838,6 +3956,9 @@
                 <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
                 <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
                 <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
     </resource>

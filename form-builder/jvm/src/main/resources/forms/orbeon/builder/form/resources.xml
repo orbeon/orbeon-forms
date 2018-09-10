@@ -396,6 +396,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label>Encrypt data at rest</label>
+                    <value>fr-encrypt</value>
+                </item>
+                <item>
                     <label>Email Recipient</label>
                     <value>fr-email-recipient</value>
                 </item>
@@ -1065,6 +1069,41 @@
             <update>Update</update>
             <delete>Delete</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label>Workflow and Permissions</label>
+
+            <operations>Operations</operations>
+
+            <custom-operations>Define custom operations for this form</custom-operations>
+            <operation-label>Label</operation-label>
+            <predefined-label>Predefined</predefined-label>
+            <custom-label>Custom</custom-label>
+            <available-to>Available To</available-to>
+            <availability-to-anyone>Anyone</availability-to-anyone>
+            <availability-to-no-one>No One</availability-to-no-one>
+            <availability-to-users>Users matching the following rule</availability-to-users>
+            <availability-to-users-before>Users matching</availability-to-users-before>
+            <availability-to-users-after>of the following rules</availability-to-users-after>
+            <workflow-stage>Workflow Stage</workflow-stage>
+            <workflow-role>Workflow Role</workflow-role>
+            <authentication-role>Authentication Role</authentication-role>
+            <show-button>Show button on detail page</show-button>
+            <any>Any</any>
+            <all>All</all>
+            <actions>Actions</actions>
+            <no-action>No Action</no-action>
+            <change-stage-action>Change Stage</change-stage-action>
+            <run-process-action>Run Process</run-process-action>
+            <remove-operation>Remove Operation</remove-operation>
+            <is>is</is>
+            <is-not>is Not</is-not>
+
+            <stages>Stages</stages>
+
+            <stage-name>Stage Name</stage-name>
+            <default-stage>Default</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -1484,6 +1523,10 @@
                 <item>
                     <label>Inclure dans la recherche</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Crypter les données au repos</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Destinataire email</label>
@@ -2156,6 +2199,41 @@
             <update>Mettre à jour</update>
             <delete>Supprimer</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label>Workflow et Permissions</label>
+
+            <operations>Opérations</operations>
+
+            <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
+            <operation-label>Libellé</operation-label>
+            <predefined-label>Prédéfini</predefined-label>
+            <custom-label>Personalisé</custom-label>
+            <available-to>Disponible à</available-to>
+            <availability-to-anyone>Toute personne</availability-to-anyone>
+            <availability-to-no-one>Personne</availability-to-no-one>
+            <availability-to-users>Utilisateurs satisfaisant la règle suivante</availability-to-users>
+            <availability-to-users-before>Utilisateurs satisfaisant</availability-to-users-before>
+            <availability-to-users-after>règles suivantes</availability-to-users-after>
+            <workflow-stage>Etape workflow</workflow-stage>
+            <workflow-role>Role workflow</workflow-role>
+            <authentication-role>Role d'authentification</authentication-role>
+            <show-button>Montrer le bouton sur la page de détail</show-button>
+            <any>Au moins une des</any>
+            <all>Toutes les</all>
+            <actions>Actions</actions>
+            <no-action>Pas d'action</no-action>
+            <change-stage-action>Changer l'étape</change-stage-action>
+            <run-process-action>Exécuter le processus</run-process-action>
+            <remove-operation>Supprimer l'opération</remove-operation>
+            <is>est</is>
+            <is-not>n'est pas</is-not>
+
+            <stages>Etapes</stages>
+
+            <stage-name>Nom de l'étape</stage-name>
+            <default-stage>Défaut</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
@@ -2576,6 +2654,10 @@
                 <item>
                     <label>Vis i søk</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Epostmottaker</label>
@@ -3276,6 +3358,41 @@
             <update>Update</update>
             <delete>Delete</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
@@ -3696,6 +3813,10 @@
                 <item>
                     <label>Показывать в поиске</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Адрес получателя почты</label>
@@ -4395,6 +4516,41 @@
             <update>редактировать</update>
             <delete>Удалять</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>
@@ -4816,6 +4972,10 @@
                 <item>
                     <label>Mostra in cerca</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Destinatario email</label>
@@ -5507,6 +5667,41 @@
             <update>Aggiorna</update>
             <delete>Cancella</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Sei sicuro di voler cancellare la sezione attuale?</delete-section>
@@ -5928,6 +6123,10 @@
                 <item>
                     <label>In Suche anzeigen</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>E-Mail-Empfänger</label>
@@ -6620,6 +6819,41 @@
             <update>Update</update>
             <delete>Löschen</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
@@ -7043,6 +7277,10 @@
                 <item>
                     <label>Näytä haussa</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Sähköpostin vastaanottaja</label>
@@ -7735,6 +7973,41 @@
             <update>Päivitä</update>
             <delete>Poista</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
@@ -8155,6 +8428,10 @@
                 <item>
                     <label>Mostrar en Búsquedas</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Es receptor del Emails</label>
@@ -8847,6 +9124,41 @@
             <update>Modificar</update>
             <delete>Eliminar</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Está seguro de eliminar la Sección actual?</delete-section>
@@ -9268,6 +9580,10 @@
                 <item>
                     <label>Mostrar na Pesquisa</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Receptor do Email</label>
@@ -9966,6 +10282,41 @@
             <update>Actualizar</update>
             <delete>Apagar</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
@@ -10387,6 +10738,10 @@
                 <item>
                     <label>Visa i sökning</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Encrypt data at rest]</label>
+                    <value>fr-encrypt</value>
                 </item>
                 <item>
                     <label>Mottagare av mejl</label>
@@ -11086,6 +11441,41 @@
             <update>Ändra</update>
             <delete>Ta bort</delete>
         </dialog-permissions>
+        <dialog-workflow>
+            <label todo="true">[Workflow and Permissions]</label>
+
+            <operations todo="true">[Operations]</operations>
+
+            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <operation-label todo="true">[Label]</operation-label>
+            <predefined-label todo="true">[Predefined]</predefined-label>
+            <custom-label todo="true">[Custom]</custom-label>
+            <available-to todo="true">[Available To]</available-to>
+            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
+            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
+            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
+            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
+            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
+            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
+            <authentication-role todo="true">[Authentication Role]</authentication-role>
+            <show-button> todo="true"S[how button on detail page]</show-button>
+            <any todo="true">[Any]</any>
+            <all todo="true">[All]</all>
+            <actions todo="true">[Actions]</actions>
+            <no-action todo="true">[No Action]</no-action>
+            <change-stage-action todo="true">[Change Stage]</change-stage-action>
+            <run-process-action todo="true">[Run Process]</run-process-action>
+            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <is todo="true">[is]</is>
+            <is-not todo="true">[is Not]</is-not>
+
+            <stages todo="true">[Stages]</stages>
+
+            <stage-name todo="true">[Stage Name]</stage-name>
+            <default-stage todo="true">[Default]</default-stage>
+
+        </dialog-workflow>
         <!-- Messages -->
         <messages>
             <delete-section>Bekräfta att du vill ta bort denna sektion</delete-section>

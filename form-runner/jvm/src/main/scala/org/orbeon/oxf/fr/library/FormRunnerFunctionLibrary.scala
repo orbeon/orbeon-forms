@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
@@ -130,6 +131,7 @@ private object FormRunnerFunctions {
   )
 
   val BooleanGettersByName = List(
+    "is-pe"                       → (() ⇒ Version.isPE),
     "is-design-time"              → (() ⇒ FormRunner.isDesignTime),
     "is-readonly-mode"            → (() ⇒ FormRunner.isReadonlyMode),
     "is-noscript"                 → (() ⇒ false),

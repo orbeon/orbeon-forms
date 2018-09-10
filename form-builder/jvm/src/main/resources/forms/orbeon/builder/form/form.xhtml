@@ -124,7 +124,7 @@
 
                             <!-- Add/remove language -->
                             <!--suppress XmlUnusedNamespaceDeclaration -->
-                            <xf:group class="fb-language-triggers pull-right" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+                            <xf:group class="fb-language-triggers pull-right" ref=".[fr:is-pe()]">
                                 <xf:trigger appearance="minimal" id="fb-add-language">
                                     <xf:label><xh:i class="fa fa-plus-circle" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>

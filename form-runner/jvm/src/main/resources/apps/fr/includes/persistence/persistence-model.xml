@@ -67,14 +67,13 @@
 
     <xf:var
         name="is-background"
-        xmlns:version="java:org.orbeon.oxf.common.Version"
         value="
             starts-with(xxf:get-request-path(), '/fr/service/') and
             (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
                probably, as they also need to send an XML response back. :)
             $mode = ('new', 'edit') and
             (: PE only :)
-            (version:isPE() or frf:sendError(404))"/>
+            (fr:is-pe() or frf:sendError(404))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
@@ -812,15 +811,13 @@
                            or xxf:non-blank(xxf:username())"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
-                 relevant="not((xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')) or version:isPE()"
-                 xmlns:version="java:org.orbeon.oxf.common.Version"
+                 relevant="not((xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')) or fr:is-pe()"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
 
         <!-- Don't show the TIFF button at all in CE version -->
         <xf:bind ref="tiff"
-                 relevant="version:isPE()"
-                 xmlns:version="java:org.orbeon.oxf.common.Version"
+                 relevant="fr:is-pe()"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
     </xf:bind>

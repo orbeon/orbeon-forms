@@ -44,7 +44,7 @@
                 xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                 xmlns:version="java:org.orbeon.oxf.common.Version"
                 event="xforms-model-construct-done"
-                if="not(version:isPE())"
+                if="not(fr:is-pe())"
                 type="xpath">
 
                 frf:sendError(404)

@@ -43,7 +43,7 @@
 
                 <xf:var
                     name="initialize-remotes"
-                    value="version:isPE() and $has-any-matching-roles"/>
+                    value="fr:is-pe() and $has-any-matching-roles"/>
 
                 <xf:action if="$initialize-remotes">
                     <xf:var
@@ -106,7 +106,7 @@
                 <xf:dispatch name="fr-clear" targetid="fr-form-model"/>
 
                 <xf:action type="xpath">
-                    if (not(version:isPE()) or instance()/current-remote-server = 0) then
+                    if (not(fr:is-pe()) or instance()/current-remote-server = 0) then
                         fr:run-process-by-name('oxf.fr.home.process', 'load-local')
                     else if ($remote-set) then
                         fr:run-process('oxf.fr.home.process', 'load-start-with-remote')

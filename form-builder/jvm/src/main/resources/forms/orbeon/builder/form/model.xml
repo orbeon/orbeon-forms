@@ -44,7 +44,7 @@
     <!-- Public variable pointing to the current language -->
     <xf:var name="fb-lang" value="instance('fb-language-instance')"/>
 
-    <xf:var name="is-pe" value="xpl:isPE()" as="xs:boolean" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
+    <xf:var name="is-pe" value="fr:is-pe()" as="xs:boolean"/>
 
     <!-- Other variables -->
     <!-- TODO: don't duplicate logic with what's in FormBuilderFunctions -->

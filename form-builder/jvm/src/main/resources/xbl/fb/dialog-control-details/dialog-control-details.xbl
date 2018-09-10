@@ -683,6 +683,8 @@
                                                                 $is-attachment or value != 'fr-email-attachment'
                                                             ) and not(
                                                                 ($is-attachment or $is-static-attachment) and value = ('fr-email-recipient', 'fr-email-subject')
+                                                            ) and (
+                                                                fr:is-pe() or value != 'fr-encrypt'
                                                             )
                                                         ]
                                                     "/>

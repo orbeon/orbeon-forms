@@ -2614,10 +2614,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                                 }
                             }
                         }
-                    } else if (! ORBEON.util.Utils.isIOS() &&
+                    } else if (
+                        ! ORBEON.util.Utils.isIOS()      &&
+                        ! $(target).is(".xbl-component") &&
                         (
-                            $(target).is('.xforms-type-time, .xforms-type-dateTime')
-                            || ($(target).is('.xforms-type-date') && ! $(target).is('.xforms-input-appearance-minimal'))
+                            $(target).is('.xforms-type-time')     ||
+                            $(target).is('.xforms-type-dateTime') ||
+                            ($(target).is('.xforms-type-date') && ! $(target).is('.xforms-input-appearance-minimal'))
                         )
                     ) {
                         // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value

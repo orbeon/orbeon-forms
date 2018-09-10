@@ -3201,8 +3201,8 @@
             <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</save-publish>
 
-            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; Nee</no>
             <ok todo="true">OK</ok>
             <previous>Vorige</previous>
             <next>Volgende</next>
@@ -3212,9 +3212,9 @@
                 <open-section>Sectie tonen</open-section>
                 <close-section>Sectie verbergen</close-section>
                 <section-name>Sectienaam</section-name>
-                <yes todo="true">[Yes]</yes>
-                <no todo="true">[No]</no>
-                <other todo="true">[Other]</other>
+                <yes todo="true">[Ja]</yes>
+                <no todo="true">[Nee]</no>
+                <other todo="true">[Anders]</other>
             </labels>
             <grid>
                 <menu todo="true">Menu</menu>
@@ -3224,21 +3224,21 @@
                 <move-down>Omlaag</move-down>
                 <remove>
                     <label>Verwijderen</label>
-                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                    <hint todo="true">[Verwijdert de regel van het Repeated Grid]</hint>
                 </remove>
                 <add-another>
-                    <label todo="true">[Add Another]</label>
-                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                    <label todo="true">[Nog een toevoegen]</label>
+                    <hint todo="true">[Voegt nog een regel toe aan het Repeated Grid]</hint>
                 </add-another>
             </grid>
             <section>
                 <remove>
                     <label>Verwijderen</label>
-                    <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
+                    <hint todo="true">[Verwijdert iteratie van de Repeated Section]</hint>
                 </remove>
                 <add-another>
-                    <label todo="true">[Add Another]</label>
-                    <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
+                    <label todo="true">[Nog een toevoegen]</label>
+                    <hint todo="true">[Voegt nog een iteratie toe aan de Repeated Section]</hint>
                 </add-another>
             </section>
             <date-time>
@@ -3247,15 +3247,15 @@
                 <day>Dag</day>
             </date-time>
             <wizard>
-                <errors todo="true">[Errors]</errors>
-                <incomplete todo="true">[Incomplete]</incomplete>
-                <complete todo="true">[Complete]</complete>
-                <not-started todo="true">[Not Started]</not-started>
-                <edit todo="true">[Edit]</edit>
+                <errors todo="true">[Fouten]</errors>
+                <incomplete todo="true">[Incompleet]</incomplete>
+                <complete todo="true">[Compleet]</complete>
+                <not-started todo="true">[Niet gestart]</not-started>
+                <edit todo="true">[Wijzigen]</edit>
             </wizard>
             <error-summary>
-                <show-more todo="true">[Show More]</show-more>
-                <show-less todo="true">[Show Less]</show-less>
+                <show-more todo="true">[Toon meer]</show-more>
+                <show-less todo="true">[Toon minder]</show-less>
             </error-summary>
         </components>
         <untitled-form>Naamloos form</untitled-form>
@@ -3275,8 +3275,8 @@
         <email>
             <subject>Orbeon Forms bevestiging</subject>
             <body>Bijgevoegd het form in PDF en XML-structuur.</body>
-            <na todo="true">[N/A]</na>
-            <iteration todo="true">[Iteration {$iteration}]</iteration>
+            <na todo="true">[N.V.T.]</na>
+            <iteration todo="true">[Iteratie {$iteration}]</iteration>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -3361,9 +3361,9 @@
                 <upload-done>Upload voltooid</upload-done>
                 <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
                 <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0,number,integer} bytes en de huidige, ontvangen grootte is {1,number,integer} bytes.</upload-error-size>
-                <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
-                <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
+                <upload-error-mediatype todo="true">[Het geüploade bestand heeft een onjuist type.]</upload-error-mediatype>
+                <upload-error-file-scan todo="true">[Het geüploade bestand is geweigerd door de bestandenscanner. Zorg dat dit geen geïnfecteerd bestand is. De melding uit de bestandenscanner was: "{0}".]</upload-error-file-scan>
+                <lost-attachments todo="true">[Sommige bijlagen zijn verloren gegaan door een serverprobleem. Controleer uw bijlagen en upload deze opnieuw indien nodig.]</lost-attachments>
             </messages>
             <draft-singleton>
                 <found-draft>Concept gevonden</found-draft>
@@ -3375,9 +3375,9 @@
                 <open-draft>Open auto-bewaard concept</open-draft>
                 <view-drafts>Toon auto-bewaarde concepten</view-drafts>
                 <start-new>Start opnieuw</start-new>
-                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
-                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
-                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+                <multiple-docs-title todo="true">[Bestaande formgegevens gevonden]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[U kunt geen nieuwe gegevens maken voor deze formdefinitie, maar u kunt mogelijk wel de bestaande formgegevens aanpassen.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[Bestaande formgegevens tonen]</multiple-docs-view-data>
             </draft-singleton>
             <labels>
                 <language-choice>Taal</language-choice>
@@ -3395,15 +3395,15 @@
                 </explanation>
             </view>
             <lease>
-                <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
-                <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
-                <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+                <renew-lease-title todo="true">[Lease vernieuwen?]</renew-lease-title>
+                <renew-lease-message todo="true">[Uw lease staat op het punt te verlopen. Wilt u deze nu vernieuwen?]</renew-lease-message>
+                <current-user-left todo="true">[U hebt een lease op dit document voor een andere </current-user-left>
                 <current-user-right todo="true">.]</current-user-right>
-                <relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
-                <other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
-                <relinquish todo="true">[Relinquish lease]</relinquish>
-                <renew todo="true">[Renew lease]</renew>
-                <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <relinquished todo="true">[U hebt geen lease meer voor dit document.]</relinquished>
+                <other-user todo="true">[Een andere gebruiker met gebruikersnaam "{0}", heeft momenteel een lease op dit document.]</other-user>
+                <relinquish todo="true">[Lease afstaan]</relinquish>
+                <renew todo="true">[Lease vernieuwen]</renew>
+                <try-acquire todo="true">[Lease proberen te krijgen]</try-acquire>
             </lease>
         </detail>
         <save-locally>
@@ -3435,8 +3435,8 @@
                 <connect>Verbinden</connect>
                 <select>Selecteren</select>
                 <operation>Bewerking</operation>
-                <reindex todo="true">[Reindex database(s)]</reindex>
-                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
+                <reindex todo="true">[Database(s) herindexeren]</reindex>
+                <stop-reindex todo="true">[Stoppen herindexeren]</stop-reindex>
                 <all>Alles</all>
                 <none>Niets</none>
                 <unpublished-local>Niet-gepubliceerde lokale forms</unpublished-local>
@@ -3469,25 +3469,25 @@
                 <remote>Extern</remote>
                 <form-identification>Form-identificatie</form-identification>
                 <last-modified>Bewerkt</last-modified>
-                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
+                <reindexing-confirmation todo="true">[Bevestigen herindexeren]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
                 <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
-                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+                <reindexing-confirmation todo="true">[Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>
                 <unavailable>Niet-beschikbaar</unavailable>
-                <library>Library</library>
+                <library>Bibliotheek</library>
                 <newer>Nieuwer</newer>
-                <remote-server todo="true">[Remote server]</remote-server>
+                <remote-server todo="true">[Externe server]</remote-server>
                 <username>Gebruiker</username>
                 <password>Wachtwoord</password>
-                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
-                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
-                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
-                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
+                <reindexing-generic todo="true">[Herindexeren &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Herindexeren {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Herindexeren wordt gestopt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[Herindexeren is gestopt]</reindexing-finished>
             </labels>
         </home>
     </resource>

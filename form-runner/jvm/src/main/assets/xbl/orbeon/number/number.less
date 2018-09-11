@@ -16,7 +16,11 @@
 
     .xbl-fr-number, .xbl-fr-currency {
 
-        max-width: 10em; // legacy: we had `fr-width-max-10em` in number.xbl proper
+        .xforms-group {
+            // Legacy: we had `fr-width-max-10em` in number.xbl proper
+            display: block;
+            max-width: 10em;
+        }
 
         .input-prepend, .input-append {
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.UndoAction._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
@@ -56,7 +56,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   private val TopLevelBindTemplate: NodeInfo =
     <xf:bind
-      id="fr-form-binds"
+      id={Names.FormBinds}
       ref="instance('fr-form-instance')"
       xmlns:xf="http://www.w3.org/2002/xforms"/>
 

@@ -148,7 +148,7 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def metadataInstanceRootOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElem(inDoc, MetadataInstance)
 
-  private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
+  private val TopLevelBindIds = Set(Names.FormBinds, "fb-form-binds")
 
   // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
   def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =

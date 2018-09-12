@@ -66,6 +66,10 @@
         <priority value="debug"/>
     </category>
 
+    <category name="org.orbeon.fr.data-migration">
+        <priority value="debug"/>
+    </category>
+
     <category name="org.orbeon.xforms.analysis.calculate">
         <priority value="debug"/>
     </category>

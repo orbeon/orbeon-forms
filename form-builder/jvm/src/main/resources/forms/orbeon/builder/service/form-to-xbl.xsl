@@ -281,12 +281,37 @@
                              elements, it means that the data has not yet been copied out (the section could also be
                              empty, but this is not allowed currently). See also:
                              https://github.com/orbeon/orbeon-forms/issues/786 -->
-                        <xf:action if="empty(instance()/*)">
-                            <!-- Copy again from the template (the mirror copies it out too) -->
-                            <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>>
+                        <xf:var name="is-empty" value="empty(instance()/*)"/>
+                        <!-- If empty, initialize from the template (the mirror copies it out too) -->
+                        <xf:action if="$is-empty">
+                            <xf:insert
+                                context="instance()"
+                                origin="instance('fr-form-template')/*"/>>
                             <!-- RRR with defaults -->
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>
+                        </xf:action>
+                        <!-- If not empty, update with instance where holes have been filled if necessary -->
+                        <xf:action if="not($is-empty)">
+                            <xf:var
+                                name="simply-migrated"
+                                value="
+                                    migration:dataMaybeWithSimpleMigration(
+                                        event('xxf:absolute-targetid'),
+                                        instance('fr-form-template'),
+                                        instance()
+                                    )"
+                                xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"/>
+
+                            <xf:action if="exists($simply-migrated)">
+                                <xf:delete ref="instance()/*"/>
+                                <xf:insert
+                                    context="instance()"
+                                    origin="$simply-migrated/*"/>
+                                <!-- RRR with defaults -->
+                                <xf:rebuild/>
+                                <xf:recalculate xxf:defauls="true"/>
+                            </xf:action>
                         </xf:action>
                     </xf:action>
 

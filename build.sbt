@@ -28,6 +28,7 @@ val CoreLibraryDependencies = Seq(
   "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
   "io.spray"                    %% "spray-json"                     % "1.3.2",
   "org.scala-lang.modules"      %% "scala-xml"                      % "1.0.6",
+  "com.typesafe.scala-logging"  %% "scala-logging"                  % "3.9.0",
   "joda-time"                   %  "joda-time"                      % "2.1",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
   "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5

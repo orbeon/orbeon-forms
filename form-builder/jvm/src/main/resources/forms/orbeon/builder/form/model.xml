@@ -361,6 +361,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
+                <xf:property name="data-migration"                value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
                 <xf:property name="email"                         value="()"/>
             </xf:dispatch>
@@ -385,6 +386,7 @@
                 <xf:property name="wizard-subsections-toc"        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
+                <xf:property name="data-migration"                value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
                 <xf:property name="email"                         value="()"/>
             </xxf:show>
@@ -407,6 +409,7 @@
                     <xf:bind id="wizard-subsections-nav-bind" ref="wizard-subsections-nav"/>
                     <xf:bind id="wizard-subsections-toc-bind" ref="wizard-subsections-toc"/>
                     <xf:bind id="email-bind"                  ref="email"/>
+                    <xf:bind id="data-migration-bind"         ref="data-migration"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*" id="attachments-bind">

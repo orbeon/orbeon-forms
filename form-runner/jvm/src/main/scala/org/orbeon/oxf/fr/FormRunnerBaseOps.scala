@@ -137,9 +137,11 @@ trait FormRunnerBaseOps {
   def inlineInstanceRootElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     instanceElem(inDoc, id).toList / * headOption
 
+  def isTemplateId(id: String) = id endsWith TemplateSuffix
+
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
-    getModelElem(inDoc) / XFInstanceTest filter (_.id endsWith TemplateSuffix)
+    getModelElem(inDoc) / XFInstanceTest filter (e ⇒ isTemplateId(e.id))
 
   // Get the root element of instances
   //@XPathFunction
@@ -273,8 +275,8 @@ trait FormRunnerBaseOps {
 
   private val ReadonlyModes = Set("view", "pdf", "email", "controls")
 
-  def isDesignTime: Boolean = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
-  def isReadonlyMode = ReadonlyModes(FormRunner.FormRunnerParams().mode)
+  def isDesignTime(implicit p: FormRunnerParams): Boolean = p.app == "orbeon" && p.form == "builder"
+  def isReadonlyMode(implicit p: FormRunnerParams) = ReadonlyModes(p.mode)
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 

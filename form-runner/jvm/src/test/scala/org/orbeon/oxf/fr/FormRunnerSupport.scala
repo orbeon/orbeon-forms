@@ -14,10 +14,11 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerSupport._
-import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -61,16 +62,17 @@ trait FormRunnerSupport extends DocumentTestBase {
     mode        : String,
     formVersion : String  = "", // not used yet
     document    : String  = "", // not used yet
-    uuid        : String  = "",
-    initialize  : Boolean = true
+    query       : TraversableOnce[(String, String)] = Nil,
+    initialize  : Boolean = true,
+    content     : Option[StreamedContent] = None
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val (processorService, response, _, events) =
       TestHttpClient.connect(
-        url         = s"/fr/$app/$form/$mode",
-        method      = GET,
+        url         = PathUtils.recombineQuery(s"/fr/$app/$form/$mode", query),
+        method      = if (content.isDefined) POST else GET,
         headers     = Map.empty,
-        content     = None
+        content     = content
       )
 
     val responseContent = BufferedContent(response.content)

@@ -366,6 +366,14 @@
                                             origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
                                         <xf:delete
+                                            bind="data-migration-bind"/>
+                                        <xf:insert
+                                            if="event('data-migration') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('data-migration', event('data-migration'))"/>
+
+                                        <xf:delete
                                             bind="analysis-calculate-bind"/>
                                         <xf:insert
                                             if="event('analysis-calculate') = ('true', 'false')"

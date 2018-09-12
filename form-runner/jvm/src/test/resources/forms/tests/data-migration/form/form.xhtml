@@ -1,0 +1,395 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:saxon="http://saxon.sf.net/" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" fr:data-format-version="4.0.0">
+    <xh:head>
+        <xh:title>Versioning: support basic data migration #1523</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-2>
+                        <s1input1/>
+                    </section-2>
+                    <section-1>
+                        <section-1-iteration>
+                            <s2field1/>
+                            <grid-2>
+                                <grid-2-iteration>
+                                    <s2attachment filename="" mediatype="" size=""/>
+                                    <s2number/>
+                                </grid-2-iteration>
+                                <grid-2-iteration>
+                                    <s2attachment filename="" mediatype="" size=""/>
+                                    <s2number/>
+                                </grid-2-iteration>
+                            </grid-2>
+                        </section-1-iteration>
+                    </section-1>
+                    <section-4><st1field1/><st1image1 filename="" mediatype="" size=""/><st1num1/><st1grid2>
+                            <st1grid2-iteration>
+                                <st1area1/>
+                                <st1currency1/>
+                            </st1grid2-iteration>
+                        </st1grid2>
+
+
+
+
+                    </section-4>
+                    <section-3><st1field1/><st1image1 filename="" mediatype="" size=""/><st1num1/><st1grid2>
+                            <st1grid2-iteration>
+                                <st1area1/>
+                                <st1currency1/>
+                            </st1grid2-iteration>
+                        </st1grid2>
+
+
+
+
+                    </section-3><section-5><st1image1/></section-5>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
+                    <xf:bind id="s1input1-bind" ref="s1input1" name="s1input1" xxf:whitespace="trim"/>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3"/><xf:bind id="section-5-bind" ref="section-5" name="section-5"><xf:bind id="st1image1-bind" ref="st1image1" name="st1image1" xxf:whitespace="trim"/></xf:bind>
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="section-1-iteration-bind" ref="section-1-iteration" name="section-1-iteration">
+                        <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                            <xf:bind id="grid-2-iteration-bind" ref="grid-2-iteration" name="grid-2-iteration">
+                                <xf:bind id="s2attachment-bind" ref="s2attachment" name="s2attachment" type="xf:anyURI"/>
+                                <xf:bind id="s2number-bind" ref="s2number" name="s2number" type="xf:decimal"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:bind id="s2field1-bind" ref="s2field1" name="s2field1" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-4-bind" ref="section-4" name="section-4"/>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>issue1523</form-name>
+                    <title xml:lang="en">Versioning: support basic data migration #1523</title>
+                    <description xml:lang="en"/>
+                    <wizard>false</wizard>
+                    <data-migration>true</data-migration>
+                <migration version="4.8.0">[{ "path": "section-1/section-1-iteration/grid-2", "iteration-name": "grid-2-iteration" },{ "path": "section-4/st1grid2", "iteration-name": "st1grid2-iteration" },{ "path": "section-3/st1grid2", "iteration-name": "st1grid2-iteration" }]</migration></metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><st1image1><label>Control with name `st1image1` at the end</label><hint/></st1image1>
+                        <s2field1>
+                            <label>S2 Field 1</label>
+                            <hint/>
+                        </s2field1>
+                        <s1input1>
+                            <label>S2 Field 1</label>
+                            <hint/>
+                        </s1input1>
+                        <section-1>
+                            <label>Section 2 (Repeated)</label>
+                        </section-1>
+                        <s2attachment>
+                            <label>Attachment</label>
+                            <hint/>
+                        </s2attachment>
+                        <s2number>
+                            <label>Number</label>
+                            <hint/>
+                        </s2number>
+                        <section-2>
+                            <label>Section 1</label>
+                            <help/>
+                        </section-2>
+                        <section-4>
+                            <label>Section with fields 1</label>
+                            <help/>
+                        </section-4>
+                        <section-3>
+                            <label>Section with fields 2</label>
+                            <help/>
+                        </section-3><section-5><label>Section 3 (At the End)</label><help/></section-5>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template"><grid-2-iteration><s2attachment filename="" mediatype="" size=""/><s2number/></grid-2-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="section-1-template"><section-1-iteration><grid-2><grid-2-iteration><s2attachment filename="" mediatype="" size=""/><s2number/></grid-2-iteration><grid-2-iteration><s2attachment filename="" mediatype="" size=""/><s2number/></grid-2-iteration></grid-2><s2field1/></section-1-iteration></xf:instance>
+        </xf:model><xbl:xbl xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"><xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component"><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><address>
+                        <street-number/>
+                        <street-name/>
+                        <apt-suite/>
+                        <city/>
+                        <state/>
+                        <zip/>
+                    </address></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
+                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer" level="warning" xxf:whitespace="trim"/>
+                    </xf:bind><xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/><xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/><xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/><xf:bind id="state-bind" name="state" ref="state" required="true()"/><xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><address>
+                            <label>US Address</label>
+                            <help/>
+                        </address><street-number>
+                            <label>Street Number</label>
+                            <hint/>
+                            <alert>The street number is usually a number</alert>
+                        </street-number><street-name>
+                            <label>Street Name</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name><apt-suite>
+                            <label>Apt/Suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite><city>
+                            <label>City</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city><state>
+                            <label>State</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state><zip>
+                            <label>Zip</label>
+                            <hint/>
+                        </zip></resource><resource xml:lang="fr"><address>
+                            <label>Adresse US</label>
+                            <help/>
+                        </address><street-number>
+                            <label>Numéro de rue</label>
+                            <hint/>
+                            <alert>Le numéro de rue est en général un nombre</alert>
+                        </street-number><street-name>
+                            <label>Nom de rue</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name><apt-suite>
+                            <label>Appartement/suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite><city>
+                            <label>Ville</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city><state>
+                            <label>Etat</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state><zip>
+                            <label>Code postal</label>
+                            <hint/>
+                        </zip></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+
+                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.DataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-model"><xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/address/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3" id="grid-1-grid">
+                        <fr:c y="1" x="1" w="4">
+                            <xf:input id="street-number-control" bind="street-number-bind">
+                                <xf:label ref="$form-resources/street-number/label"/>
+                                <xf:hint ref="$form-resources/street-number/hint"/>
+                                <xf:alert ref="$form-resources/street-number/alert" validation="constraint-8-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="street-name-control" bind="street-name-bind">
+                                <xf:label ref="$form-resources/street-name/label"/>
+                                <xf:hint ref="$form-resources/street-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="apt-suite-control" bind="apt-suite-bind">
+                                <xf:label ref="$form-resources/apt-suite/label"/>
+                                <xf:hint ref="$form-resources/apt-suite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="city-control" bind="city-bind">
+                                <xf:label ref="$form-resources/city/label"/>
+                                <xf:hint ref="$form-resources/city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="state-control" bind="state-bind">
+                                <xf:label ref="$form-resources/state/label"/>
+                                <xf:hint ref="$form-resources/state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4">
+                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="zip-control" bind="zip-bind">
+                                <xf:label ref="$form-resources/zip/label"/>
+                                <xf:hint ref="$form-resources/zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding id="orbeon-section-with-fields-component" element="component|section-with-fields" class="fr-section-component"><xbl:implementation><xf:model id="section-with-fields-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><section-with-fields>
+                        <st1field1/>
+                        <st1image1 filename="" mediatype="" size=""/>
+                        <st1num1/>
+                        <st1grid2>
+                            <st1grid2-iteration>
+                                <st1area1/>
+                                <st1currency1/>
+                            </st1grid2-iteration>
+                        </st1grid2>
+                    </section-with-fields></xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="st1grid2-template">
+                <st1grid2-iteration>
+                    <st1area1/>
+                    <st1currency1/>
+                </st1grid2-iteration>
+            </xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="st1field1-bind" ref="st1field1" name="st1field1" xxf:whitespace="trim"/><xf:bind id="st1image1-bind" ref="st1image1" name="st1image1" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/><xf:bind id="st1grid2-bind" ref="st1grid2" name="st1grid2">
+                        <xf:bind id="st1grid2-iteration-bind" ref="st1grid2-iteration" name="st1grid2-iteration">
+                            <xf:bind id="st1area1-bind" ref="st1area1" name="st1area1"/>
+                            <xf:bind id="st1currency1-bind" ref="st1currency1" name="st1currency1" type="xf:decimal" constraint="xxf:fraction-digits(2)"/>
+                        </xf:bind>
+                    </xf:bind><xf:bind id="st1num1-bind" ref="st1num1" name="st1num1" type="xf:decimal"/></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><section-with-fields>
+                            <label>Section with fields</label>
+                        </section-with-fields><st1field1>
+                            <label>Field 1</label>
+                            <hint/>
+                        </st1field1><st1image1>
+                            <label>Image 1</label>
+                            <hint/>
+                        </st1image1><st1area1>
+                            <label>Area 1</label>
+                            <hint/>
+                        </st1area1><st1currency1>
+                            <label>Currency 1</label>
+                            <hint/>
+                        </st1currency1><st1num1>
+                            <label>Number 1</label>
+                            <hint/>
+                        </st1num1></resource><resource xml:lang="fr"><section-with-fields>
+                            <label/>
+                        </section-with-fields><st1field1>
+                            <label/>
+                            <hint/>
+                        </st1field1><st1image1>
+                            <label/>
+                            <hint/>
+                        </st1image1><st1area1>
+                            <label/>
+                            <hint/>
+                        </st1area1><st1currency1>
+                            <label/>
+                            <hint/>
+                        </st1currency1><st1num1>
+                            <label/>
+                            <hint/>
+                        </st1num1></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+
+                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.DataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$simply-migrated/*"/><xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="section-with-fields-model"><xf:var name="context" id="context" value="xxf:binding-context('orbeon-section-with-fields-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/section-with-fields/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" id="grid-2-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="st1field1-control" bind="st1field1-bind">
+                                <xf:label ref="$form-resources/st1field1/label"/>
+                                <xf:hint ref="$form-resources/st1field1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" id="st1image1-control" bind="st1image1-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/st1image1/label"/>
+                                <xf:hint ref="$form-resources/st1image1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="st1num1-control" bind="st1num1-bind">
+                                <xf:label ref="$form-resources/st1num1/label"/>
+                                <xf:hint ref="$form-resources/st1num1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:number>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
+                    </fr:grid><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" id="st1grid2-grid" bind="st1grid2-bind" repeat="content" min="1" template="instance('st1grid2-template')" apply-defaults="true" fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:textarea id="st1area1-control" bind="st1area1-bind">
+                                <xf:label ref="$form-resources/st1area1/label"/>
+                                <xf:hint ref="$form-resources/st1area1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="1">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" id="st1currency1-control" bind="st1currency1-bind">
+                                <xf:label ref="$form-resources/st1currency1/label"/>
+                                <xf:hint ref="$form-resources/st1currency1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:currency>
+                        </fr:c>
+                    </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-3-grid">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="s1input1-control" bind="s1input1-bind">
+                                <xf:label ref="$form-resources/s1input1/label"/>
+                                <xf:hint ref="$form-resources/s1input1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-section" bind="section-1-bind" repeat="content" min="1" template="instance('section-1-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="s2field1-control" bind="s2field1-bind">
+                                <xf:label ref="$form-resources/s2field1/label"/>
+                                <xf:hint ref="$form-resources/s2field1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind" repeat="content" min="1" template="instance('grid-2-template')" apply-defaults="true" fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="s2attachment-control" bind="s2attachment-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/s2attachment/label"/>
+                                <xf:hint ref="$form-resources/s2attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="s2number-control" bind="s2number-bind">
+                                <xf:label ref="$form-resources/s2number/label"/>
+                                <xf:hint ref="$form-resources/s2number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:number>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-4-section" bind="section-4-bind">
+                    <xf:label ref="$form-resources/section-4/label"/>
+                    <component:section-with-fields xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+                </fr:section>
+                <fr:section id="section-3-section" bind="section-3-bind">
+                    <xf:label ref="$form-resources/section-3/label"/>
+                    <component:section-with-fields xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+                </fr:section><fr:section id="section-5-section" bind="section-5-bind">
+          <xf:label ref="$form-resources/section-5/label"/><fr:grid id="grid-4-grid">
+              <fr:c x="1" y="1" w="6"><xf:input id="st1image1-control" bind="st1image1-bind">
+                        <xf:label ref="$form-resources/st1image1/label"/>
+                        <xf:hint ref="$form-resources/st1image1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="1" w="6"/>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>
+

@@ -132,8 +132,8 @@ private object FormRunnerFunctions {
 
   val BooleanGettersByName = List(
     "is-pe"                       → (() ⇒ Version.isPE),
-    "is-design-time"              → (() ⇒ FormRunner.isDesignTime),
-    "is-readonly-mode"            → (() ⇒ FormRunner.isReadonlyMode),
+    "is-design-time"              → (() ⇒ FormRunner.isDesignTime(FormRunnerParams())),
+    "is-readonly-mode"            → (() ⇒ FormRunner.isReadonlyMode(FormRunnerParams())),
     "is-noscript"                 → (() ⇒ false),
     "is-form-data-valid"          → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
     "is-form-data-saved"          → (() ⇒ FormRunner.isFormDataSaved),

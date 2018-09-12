@@ -123,6 +123,7 @@
 
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
                 `/new` below. Here seems to be a good start. -->
+            <!-- Q: What about `fr-get-instance-from-service` above? -->
             <xf:insert ref="instance('fr-initial-instance')" origin="xxf:instance('fr-form-instance')"/>
 
             <!-- NOTE: We used to do a sort of permission check here for submits. Since #75 is implemented and there is
@@ -150,14 +151,26 @@
                 <xf:insert
                     context="xxf:instance('fr-form-instance')/root()"
                     origin="
-                        (
-                            if (not(xxf:get-request-parameter('data-format-version') = 'edge')) then
-                                migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
+                        let $format-migrated :=
+                            (
+                                if (not(xxf:get-request-parameter('data-format-version') = 'edge')) then
+                                    migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
+                                else
+                                    (),
+                                $form-data
+                            )[1]/root()/*,
+                            $simply-migrated :=
+                                migration:dataMaybeWithSimpleMigration(
+                                    xxf:absolute-id('fr-form-model'),
+                                    instance('fr-initial-instance'),
+                                    $format-migrated
+                                )
+                        return
+                            if (exists($simply-migrated)) then
+                                $simply-migrated
                             else
-                                (),
-                            $form-data
-                        )[1]"
-                    />
+                                $format-migrated
+                    "/>
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
@@ -693,7 +706,27 @@
     <xf:action event="xforms-submit-done" observer="fr-get-document-submission">
         <xf:insert
             context="xxf:instance('fr-form-instance')/root()"
-            origin="migration:dataMaybeMigratedFromDatabaseFormat($app, $form, root(), xxf:instance('fr-form-metadata')/root())"/>
+            origin="
+                let
+                    $format-migrated :=
+                        migration:dataMaybeMigratedFromDatabaseFormat(
+                            $app,
+                            $form,
+                            root(),
+                            xxf:instance('fr-form-metadata')/root()
+                        )/root()/*,
+                    $simply-migrated :=
+                        migration:dataMaybeWithSimpleMigration(
+                            xxf:absolute-id('fr-form-model'),
+                            instance('fr-initial-instance'),
+                            $format-migrated
+                        )
+                return
+                    if (exists($simply-migrated)) then
+                        $simply-migrated
+                    else
+                        $format-migrated
+                "/>
     </xf:action>
     <xf:action event="xforms-submit-done" observer="fr-get-instance-from-service">
         <xf:insert

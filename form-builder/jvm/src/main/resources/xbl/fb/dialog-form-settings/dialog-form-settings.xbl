@@ -85,6 +85,10 @@
                     value="xxf:split(event('hints')) = 'minimal'"/>
 
                 <xf:setvalue
+                    ref="$i/data-migration"
+                    value="(event('data-migration')[. = ('true', 'false')], 'default')[1]"/>
+
+                <xf:setvalue
                     ref="$i/analysis-calculate"
                     value="(event('analysis-calculate')[. = ('true', 'false')], 'default')[1]"/>
 
@@ -157,6 +161,7 @@
                     <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
                     <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
+                    <xf:property name="data-migration"                value="$i/data-migration/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
 
                     <xf:property
@@ -213,6 +218,7 @@
                         <hints/>
                         <hints-placeholders/>
                         <mode/>
+                        <data-migration/>
                         <analysis-calculate/>
                     </instance>
                 </xf:instance>
@@ -541,6 +547,18 @@
                                                     value="false()"
                                                 />
                                             </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="data-migration" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/data-migration/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/data-migration/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>

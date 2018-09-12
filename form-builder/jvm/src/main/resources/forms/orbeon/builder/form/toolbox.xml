@@ -57,6 +57,7 @@
                             <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
+                            <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
                             <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
                             <xf:property name="email"                         value="bind('email-bind')"/>
                         </xxf:show>

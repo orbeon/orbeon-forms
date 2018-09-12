@@ -370,6 +370,10 @@
             <placeholders>
                 <label>Use Placeholder for Text Fields and Text Areas</label>
             </placeholders>
+            <data-migration>
+                <label>Simple Data Migration</label>
+                <hint>Automatically add/remove missing elements in data</hint>
+            </data-migration>
             <analysis-calculate>
                 <label>Automatic Calculations Dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -1499,6 +1503,10 @@
             <placeholders>
                 <label>Placer en ligne dans les champs et zones de texte</label>
             </placeholders>
+            <data-migration>
+                <label>Migration simple des données</label>
+                <hint>Ajoute ou supprime automatiquement les éléments manquants dans les données</hint>
+            </data-migration>
             <analysis-calculate>
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
@@ -2630,6 +2638,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -3789,6 +3801,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -4948,6 +4964,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -6099,6 +6119,10 @@
             <placeholders>
                 <label>Platzhalter für Textfelder und mehrzeilige Textfelder benutzen</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -7253,6 +7277,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -8404,6 +8432,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -9556,6 +9588,10 @@
             <placeholders>
                 <label>Gebruik placeholder voor tekstvelden en 'text areas'</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
                 <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
@@ -10687,6 +10723,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -11845,6 +11885,10 @@
             <placeholders>
                 <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
+            <data-migration>
+                <label todo="true">[Simple Data Migration]</label>
+                <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+            </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>

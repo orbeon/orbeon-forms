@@ -9433,13 +9433,13 @@
         </help-icon>
         <!-- Common -->
         <add>
-            <label>Voeg toe</label>
+            <label>Toevoegen</label>
         </add>
         <remove>
-            <label>Verwijder</label>
+            <label>Verwijderen</label>
         </remove>
         <edit>
-            <label>Wijzig</label>
+            <label>Bewerken</label>
         </edit>
         <classes>
             <label>Aangepaste CSS classes</label>
@@ -9451,19 +9451,19 @@
         </default-always-never>
         <!-- Dialogs -->
         <continue>
-            <label>Ga door</label>
+            <label>Doorgaan</label>
         </continue>
         <apply>
-            <label>Pas toe</label>
+            <label>Toepassen</label>
         </apply>
         <cancel>
-            <label>Annuleer</label>
+            <label>Annuleren</label>
         </cancel>
         <close>
-            <label>Sluit</label>
+            <label>Sluiten</label>
         </close>
         <delete>
-            <label>Verwijder</label>
+            <label>Verwijderen</label>
         </delete>
         <or>
             <label>of</label>
@@ -9549,12 +9549,12 @@
                 <label>Weergave van control-hints</label>
             </hints>
             <appearances>
-                <item id="0">Gebruk standaard</item>
+                <item id="0">Gebruik standaard</item>
                 <item id="1">Inline</item>
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Gebruik placeholder voor tekstvelden en tekst 'areas'</label>
+                <label>Gebruik placeholder voor tekstvelden en 'text areas'</label>
             </placeholders>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
@@ -9582,7 +9582,7 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label todo="true">[Encrypt data at rest]</label>
+                    <label todo="true">[Encrypt gegevens in rust]</label>
                     <value>fr-encrypt</value>
                 </item>
                 <item>
@@ -9893,21 +9893,21 @@
             <comment>Opmerking</comment>
         </dialog-publish>
         <dialog-add-language>
-            <label>Voeg taal toe</label>
+            <label>Taal toevoegen</label>
             <new-language>
                 <label>Voeg de volgende taal toe</label>
             </new-language>
             <common>Meest gangbare talen</common>
             <all>Andere talen</all>
             <add-language>
-                <label>Voeg taal toe</label>
+                <label>Taal toevoegen</label>
             </add-language>
             <remove-language>
-                <label>Verwijder taal</label>
+                <label>Taal verwijderen</label>
             </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
-            <label>XML Schema upload</label>
+            <label>XML Schema uploaden</label>
             <schema-type>
                 <label>Beschikbare schema typen</label>
                 <hint>De beschikbare simple types in het geüploade schema</hint>
@@ -9923,13 +9923,13 @@
                 <label>Verwijder bestaand XML Schema</label>
             </delete-schema>
             <change-schema>
-                <label>Wijzig XML Schema</label>
+                <label>XML Schema bewerken</label>
             </change-schema>
             <replace-schema>
-                <label>Vervang XML Schema</label>
+                <label>XML Schema vervangen</label>
             </replace-schema>
             <upload-schema>
-                <label>Koppel XML Schema</label>
+                <label>XML Schema koppelen</label>
             </upload-schema>
             <messages>
                 <no-simple-types>Uw schema lijkt geen simple types te bevatten. U zult geen typen kunnen selecteren uit dit schema voor validatie</no-simple-types>
@@ -9946,10 +9946,10 @@
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <label>Toon bron</label>
+            <label>Bron tonen</label>
         </dialog-view-source>
         <dialog-pdf>
-            <label>Koppel PDF templates</label>
+            <label>PDF templates koppelen</label>
             <pdf-upload>
                 <label>PDF-bestand</label>
             </pdf-upload>
@@ -9961,7 +9961,7 @@
             </attachment-language>
         </dialog-pdf>
         <dialog-itemsets>
-            <label>Wijzig keuze</label>
+            <label>Keuze bewerken</label>
             <resources-language>
                 <label>Resources taal</label>
             </resources-language>
@@ -9975,10 +9975,10 @@
                 <label>Hint</label>
             </hint-header>
             <clear-value>
-                <label>Wis waarde</label>
+                <label>Waarde wissen</label>
             </clear-value>
             <remove-all>
-                <label>Verwijder alles</label>
+                <label>Alles verwijderen</label>
             </remove-all>
         </dialog-itemsets>
         <dialog-http-services>
@@ -10096,16 +10096,16 @@
                 <hint>SQL query die placeholders kan bevatten voor parameters</hint>
             </query>
             <save>
-                <label>Bewaar</label>
+                <label>Bewaren</label>
             </save>
             <test>
-                <label>Test</label>
+                <label>Testen</label>
             </test>
         </dialog-database-services>
         <dialog-actions>
             <label>Acties-editor</label>
             <service-name>
-                <label>Action Name</label>
+                <label>Actie naam</label>
                 <hint>Kies een unieke naam voor deze actie</hint>
             </service-name>
             <observer-type>
@@ -10256,38 +10256,38 @@
             <delete>Verwijderen</delete>
         </dialog-permissions>
         <dialog-workflow>
-            <label todo="true">[Workflow and Permissions]</label>
+            <label todo="true">[Workflow en bevoegdheden]</label>
 
-            <operations todo="true">[Operations]</operations>
+            <operations todo="true">[Bewerkingen]</operations>
 
-            <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
+            <custom-operations todo="true">[Definieer aangepaste bewerkingen voor dit form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
-            <predefined-label todo="true">[Predefined]</predefined-label>
-            <custom-label todo="true">[Custom]</custom-label>
-            <available-to todo="true">[Available To]</available-to>
-            <availability-to-anyone todo="true">[Anyone]</availability-to-anyone>
-            <availability-to-no-one todo="true">[No One]</availability-to-no-one>
-            <availability-to-users> todo="true"U[sers matching the following rule]</availability-to-users>
-            <availability-to-users-before todo="true">[Users matching]</availability-to-users-before>
-            <availability-to-users-after todo="true">[of the following rules]</availability-to-users-after>
-            <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
-            <workflow-role> todo="true"W[orkflow Role]</workflow-role>
-            <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
-            <any todo="true">[Any]</any>
-            <all todo="true">[All]</all>
-            <actions todo="true">[Actions]</actions>
-            <no-action todo="true">[No Action]</no-action>
-            <change-stage-action todo="true">[Change Stage]</change-stage-action>
-            <run-process-action todo="true">[Run Process]</run-process-action>
-            <remove-operation todo="true">[Remove Operation]</remove-operation>
+            <predefined-label todo="true">[Voorgedefinieerd]</predefined-label>
+            <custom-label todo="true">[Aangepast]</custom-label>
+            <available-to todo="true">[Beschikbaar voor]</available-to>
+            <availability-to-anyone todo="true">[Iedereen]</availability-to-anyone>
+            <availability-to-no-one todo="true">[Niemand]</availability-to-no-one>
+            <availability-to-users> todo="true"[Gebruikers die aan de volgende regel voldoen]</availability-to-users>
+            <availability-to-users-before todo="true">[Gebruikers die]</availability-to-users-before>
+            <availability-to-users-after todo="true">[van de volgende regels]</availability-to-users-after>
+            <workflow-stage todo="true">[Workflow stadium]</workflow-stage>
+            <workflow-role> todo="true"[Workflow rol]</workflow-role>
+            <authentication-role todo="true">[Authenticatierol]</authentication-role>
+            <show-button> todo="true"[Toon knop op detailpagina]</show-button>
+            <any todo="true">[Iedereen]</any>
+            <all todo="true">[Alles]</all>
+            <actions todo="true">[Acties]</actions>
+            <no-action todo="true">[Geen actie]</no-action>
+            <change-stage-action todo="true">[Stadium bewerken]</change-stage-action>
+            <run-process-action todo="true">[Proces starten]</run-process-action>
+            <remove-operation todo="true">[Bewerking verwijderen]</remove-operation>
             <is todo="true">[is]</is>
-            <is-not todo="true">[is Not]</is-not>
+            <is-not todo="true">[is niet]</is-not>
 
-            <stages todo="true">[Stages]</stages>
+            <stages todo="true">[Stadia]</stages>
 
-            <stage-name todo="true">[Stage Name]</stage-name>
-            <default-stage todo="true">[Default]</default-stage>
+            <stage-name todo="true">[Stadium naam]</stage-name>
+            <default-stage todo="true">[Standaard]</default-stage>
 
         </dialog-workflow>
         <!-- Messages -->
@@ -10312,7 +10312,7 @@
             <untitled-section>Naamloze sectie</untitled-section>
             <items>
                 <item>
-                    <label>Eerst keuze</label>
+                    <label>Eerste keuze</label>
                     <value>1</value>
                     <hint/>
                 </item>

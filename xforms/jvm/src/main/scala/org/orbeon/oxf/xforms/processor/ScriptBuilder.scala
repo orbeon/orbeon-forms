@@ -170,7 +170,7 @@ object ScriptBuilder {
 
       sb append "var opsXFormsProperties = {"
 
-      for (((propertyName, propertyValue), index) ← clientProperties.zipWithIndex) {
+      for (((propertyName, propertyValue), index) ← clientProperties.toList.zipWithIndex) {
 
         if (index != 0)
           sb append ','

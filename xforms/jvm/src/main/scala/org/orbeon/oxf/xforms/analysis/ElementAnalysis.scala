@@ -447,7 +447,7 @@ object ElementAnalysis {
   /**
    * Return an iterator over all the element's ancestors.
    */
-  def ancestorIterator(start: ElementAnalysis) = new IteratorBase(start) {
+  def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
     def initialNext = start.parent
     def subsequentNext(e: ElementAnalysis) = e.parent
   }
@@ -455,7 +455,7 @@ object ElementAnalysis {
   /**
    * Iterator over the element and all its ancestors.
    */
-  def ancestorOrSelfIterator(start: ElementAnalysis) = new IteratorBase(start) {
+  def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
     def initialNext = Option(start)
     def subsequentNext(e: ElementAnalysis) = e.parent
   }
@@ -463,7 +463,7 @@ object ElementAnalysis {
   /**
    * Iterator over the element's preceding siblings.
    */
-  def precedingSiblingIterator(start: ElementAnalysis) = new IteratorBase(start) {
+  def precedingSiblingIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
     def initialNext = start.preceding
     def subsequentNext(e: ElementAnalysis) = e.preceding
   }
@@ -483,13 +483,13 @@ object ElementAnalysis {
   /**
    * Get the closest ancestor in the same scope.
    */
-  def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope) =
+  def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope): Option[ElementAnalysis] =
     ancestorIterator(start) find (_.scope == scope)
 
   /**
    * Return the first ancestor with a binding analysis that is in the same scope/model.
    */
-  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel) =
+  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel): Option[ElementAnalysis] =
     ancestorIterator(start) find (e ⇒ ScopeModel(e.scope, e.model) == scopeModel)
 
   /**

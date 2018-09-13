@@ -122,8 +122,8 @@ object FormRunnerMetadata {
 
     val sb = new StringBuilder
 
-    def processNext(it: List[ControlDetails], level: Int): Unit =
-      it match {
+    def processNext(controlDetails: List[ControlDetails], level: Int): Unit =
+      controlDetails match {
         case Nil ⇒
         case gridControl :: rest if gridControl.typ == "grid" && gridControl.repeated ⇒
 

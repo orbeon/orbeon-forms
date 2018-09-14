@@ -1566,14 +1566,20 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
             } else if (jControl.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
                 // No value
-            } else if (jControl.is('.xforms-type-time')) {
+            } else if (
+                jControl.is('.xforms-type-time') &&
+                ! ORBEON.xforms.XBL.isComponent(jControl)
+            ) {
                 // Time control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var inputField = control.getElementsByTagName("input")[0];
                     var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
-            } else if (jControl.is('.xforms-type-date')) {
+            } else if (
+                jControl.is('.xforms-type-date') &&
+                ! ORBEON.xforms.XBL.isComponent(jControl)
+            ) {
                 // Date control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
@@ -1586,7 +1592,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         inputField.value = displayDate;
                     }
                 }
-            } else if (jControl.is('.xforms-type-dateTime')) {
+            } else if (
+                jControl.is('.xforms-type-dateTime') &&
+                ! ORBEON.xforms.XBL.isComponent(jControl)
+            ) {
                 // Only update value if different from the one we have. This handle the case where the fields contain invalid
                 // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
                 // to separate into 2 values.

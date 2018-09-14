@@ -21,6 +21,7 @@ import org.scalajs.jquery.JQuery
 import scala.scalajs.js
 import DatePickerFacade._
 import org.orbeon.xforms.DocumentAPI
+import org.scalajs.dom
 
 object Date {
   XBL.declareCompanion("fr|date", new DateCompanion())
@@ -28,58 +29,80 @@ object Date {
 
 private class DateCompanion extends XBLCompanion {
 
-  def inputEl: JQuery = $(containerElem).find("input")
-  var datePicker: DatePicker = null
+  def inputEl    : JQuery     = $(containerElem).find("input")
+  def iOS        : Boolean    = $(dom.document.body).hasClass("xforms-ios")
+  var datePicker : DatePicker = null
 
   override def init(): Unit = {
+
     // Add `readonly` attribute on the input if the control is readonly
     val isReadonly = $(containerElem).is(".xforms-readonly")
     inputEl.prop("readonly", isReadonly)
-    val options = new DatePickerOptions
-    options.autoclose = true
-    options.enableOnReadonly = false
-    datePicker = inputEl.datepicker(options)
-    datePicker.onChangeDate(() ⇒ onChangeDate(datePicker))
+
+    if (iOS) {
+      // On iOS, use native date picker
+      inputEl.attr("type", "date")
+      inputEl.on("change", () ⇒ onChangeDate())
+    } else {
+      // Initialize bootstrap-datepicker
+      val options              = new DatePickerOptions
+      options.autoclose        = true
+      options.enableOnReadonly = false
+      datePicker = inputEl.datepicker(options)
+      datePicker.onChangeDate(() ⇒ onChangeDate())
+    }
   }
 
   override def xformsGetValue(): String = {
-    Option(datePicker.getDate) match {
-      case Some(date) ⇒ date.toISOString.substring(0, 10)
-      case None       ⇒ ""
+    if (iOS) {
+      inputEl.prop("value").asInstanceOf[String]
+    } else {
+      Option(datePicker.getDate) match {
+        case Some(date) ⇒ date.toISOString.substring(0, 10)
+        case None       ⇒ ""
+      }
     }
   }
 
   override def xformsUpdateValue(newValue: String): Unit = {
     if (xformsGetValue() != newValue) {
-      try {
-        val dateParts = newValue.splitTo[List]("-")
-        // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-        val jsDate = new js.Date(
-          year  = dateParts(0).toInt,
-          month = dateParts(1).toInt - 1,
-          date  = dateParts(2).toInt,
-          0, 0, 0, 0)
-        datePicker.setDate(jsDate)
-      } catch {
-        case _: Exception ⇒ // Ignore values we can't parse as dates
+      if (iOS) {
+        inputEl.prop("value", newValue)
+      } else {
+        try {
+          val dateParts = newValue.splitTo[List]("-")
+          // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
+          val jsDate = new js.Date(
+            year  = dateParts(0).toInt,
+            month = dateParts(1).toInt - 1,
+            date  = dateParts(2).toInt,
+            0, 0, 0, 0)
+          datePicker.setDate(jsDate)
+        } catch {
+          case _: Exception ⇒ // Ignore values we can't parse as dates
+        }
       }
     }
   }
 
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
-    inputEl.prop("readonly", readonly)
+    inputEl.prop("disabled", readonly)
 
   def setFormat(format: String): Unit = {
-    val date = datePicker.getDate
-    datePicker.options.format = format
-      .replaceAllLiterally("[D]", "d")
-      .replaceAllLiterally("[M]", "m")
-      .replaceAllLiterally("[Y]", "yyyy")
-    datePicker.setDate(date)
+    // On iOS, ignore the format as the native widget uses its own format
+    if (! iOS) {
+      val date = datePicker.getDate
+      datePicker.options.format = format
+        .replaceAllLiterally("[D]", "d")
+        .replaceAllLiterally("[M]", "m")
+        .replaceAllLiterally("[Y]", "yyyy")
+      datePicker.setDate(date)
+    }
   }
 
-  def onChangeDate(datePicker: DatePicker): Unit =
+  def onChangeDate(): Unit = {
     DocumentAPI.setValue(containerElem.id, xformsGetValue())
+  }
 }
 
 private object DatePickerFacade {

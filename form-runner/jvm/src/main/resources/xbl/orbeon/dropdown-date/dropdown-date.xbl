@@ -47,8 +47,7 @@
             <display-name lang="nl">Selectie datum</display-name>
             <display-name lang="pt">Lista de Opções para Data</display-name>
             <icon>
-                <small-icon>/ops/images/xforms/calendar.png</small-icon>
-                <large-icon>/ops/images/xforms/calendar.png</large-icon>
+                <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
             <templates>
                 <bind type="xf:date"/>

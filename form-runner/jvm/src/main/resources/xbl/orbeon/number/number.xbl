@@ -43,8 +43,7 @@
             <display-name lang="nl">Getal</display-name>
             <display-name lang="pt">Número</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/other/number123-16.png</small-icon>
-                <large-icon>/apps/fr/style/images/other/number123-16.png</large-icon>
+                <icon-class>fa fa-fw fa-superscript</icon-class>
             </icon>
             <templates>
                 <bind type="xf:decimal"/>

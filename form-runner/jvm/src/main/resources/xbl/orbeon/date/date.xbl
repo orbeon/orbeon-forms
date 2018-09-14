@@ -44,10 +44,7 @@
             <display-name lang="sv">Datum</display-name>
             <display-name lang="pt">Data</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
-                <!-- Need Font Awesome upgrade -->
-                <!--<icon-class>fa fa-fw fa-calendar-alt</icon-class>-->
+                <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
             <templates>
                 <bind type="xf:date"/>

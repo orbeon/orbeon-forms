@@ -29,10 +29,7 @@
             <display-name lang="sv">Tid</display-name>
             <display-name lang="pt">Hora</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/time.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
-                <!-- Need Font Awesome ugprade -->
-                <!--<icon-class>fa fa-fw fa-clock</icon-class>-->
+                <icon-class>fa fa-fw fa-clock-o</icon-class>
             </icon>type>
             <templates>
                 <bind type="xf:time"/>

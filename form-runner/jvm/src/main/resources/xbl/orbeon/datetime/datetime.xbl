@@ -37,8 +37,7 @@
             <display-name lang="sv">Datum och tid</display-name>
             <display-name lang="pt">Data e Hora</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/clock_link.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
+                <icon-class>fa fa-fw fa-calendar-o</icon-class>
             </icon>
             <templates>
                 <bind type="xf:dateTime"/>

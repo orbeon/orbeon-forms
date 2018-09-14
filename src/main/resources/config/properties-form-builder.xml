@@ -55,8 +55,8 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
         oxf:/xbl/orbeon/number/number.xbl
-        oxf:/forms/orbeon/builder/xbl/typed-email.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
+        oxf:/forms/orbeon/builder/xbl/typed-email.xbl
         oxf:/xbl/orbeon/us-phone/us-phone.xbl
         oxf:/xbl/orbeon/us-state/us-state.xbl
     </property>

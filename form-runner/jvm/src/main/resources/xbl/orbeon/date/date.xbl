@@ -50,13 +50,13 @@
                 <!--<icon-class>fa fa-fw fa-calendar-alt</icon-class>-->
             </icon>
             <templates>
-                <!--<bind type="xf:date"/>-->
+                <bind type="xf:date"/>
                 <view>
                     <fr:date id="" ref="" xmlns="">
-                        <xf:label ref=""/>
-                        <xf:hint ref=""/>
-                        <xf:help ref=""/>
-                        <xf:alert ref=""/>
+                        <xf:label  ref=""/>
+                        <xf:hint   ref=""/>
+                        <xf:help   ref=""/>
+                        <xf:alert  ref=""/>
                     </fr:date>
                 </view>
             </templates>

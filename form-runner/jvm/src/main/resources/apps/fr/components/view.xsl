@@ -774,7 +774,7 @@
                                     if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
                                         ()
                                     else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
-                                        'validate'
+                                        (('wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
                                     else
                                         xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.'))),
                                 $is-inner :=
@@ -847,7 +847,7 @@
                                     'xforms-trigger-appearance-xxforms-',
                                      if ($primary) then
                                         'primary'
-                                     else if ($inverse) then
+                                     else if ($inverse and position() = last()) then
                                         'inverse'
                                      else
                                         'default'

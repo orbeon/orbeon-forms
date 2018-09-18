@@ -108,7 +108,7 @@
                     "/>
                 <xh:input type="text" class="span2" placeholder="{$placeholder}"/>
                 <xh:span class="add-on">
-                    <xh:i class="icon-th"/>
+                    <xh:i class="fa fa-fw fa-calendar"/>
                 </xh:span>
             </xh:div>
         </xbl:template>

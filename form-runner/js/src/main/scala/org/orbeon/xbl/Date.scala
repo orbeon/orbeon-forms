@@ -48,7 +48,7 @@ private class DateCompanion extends XBLCompanion {
       val options              = new DatePickerOptions
       options.autoclose        = true
       options.enableOnReadonly = false
-      datePicker = inputEl.datepicker(options)
+      datePicker = inputEl.parent().datepicker(options)
       datePicker.onChangeDate(() ⇒ onChangeDate())
     }
   }

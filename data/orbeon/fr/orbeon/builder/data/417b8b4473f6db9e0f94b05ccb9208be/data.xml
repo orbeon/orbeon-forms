@@ -10,15 +10,16 @@
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         fr:data-format-version="4.0.0">
     <xh:head>
         <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <text-controls>
                         <htmlarea>&lt;div style="text-align: left;"&gt;
-&lt;p&gt;&lt;strong&gt;Giuseppe Fortunino Francesco Verdi&lt;/strong&gt;&amp;nbsp;(Italian:&amp;nbsp;&lt;a shape="rect" title="Help:IPA for Italian" href="https://en.wikipedia.org/wiki/Help:IPA_for_Italian"&gt;[d͡ʒuˈzɛppe ˈverdi]&lt;/a&gt;; 9 or 10 October 1813&amp;nbsp;– 27 January 1901) was an&amp;nbsp;&lt;a shape="rect" title="Italians" href="https://en.wikipedia.org/wiki/Italians"&gt;Italian&lt;/a&gt;&amp;nbsp;&lt;a shape="rect" title="Romantic music" href="https://en.wikipedia.org/wiki/Romantic_music"&gt;Romantic&lt;/a&gt;&amp;nbsp;composer primarily known for his operas. He is considered, together with&amp;nbsp;&lt;a shape="rect" title="Richard Wagner" href="https://en.wikipedia.org/wiki/Richard_Wagner"&gt;Richard Wagner&lt;/a&gt;, the preeminent opera composer of the nineteenth century.&amp;nbsp;Verdi dominated the Italian opera scene after the eras of&amp;nbsp;&lt;a shape="rect" title="Vincenzo Bellini" href="https://en.wikipedia.org/wiki/Vincenzo_Bellini"&gt;Bellini&lt;/a&gt;,&amp;nbsp;&lt;a shape="rect" title="Gaetano Donizetti" href="https://en.wikipedia.org/wiki/Gaetano_Donizetti"&gt;Donizetti&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a shape="rect" title="Gioachino Rossini" href="https://en.wikipedia.org/wiki/Gioachino_Rossini"&gt;Rossini&lt;/a&gt;. His works are frequently performed in opera houses throughout the world and, transcending the boundaries of the genre, some of his themes have long since taken root in popular culture, as "&lt;a shape="rect" title="La donna è mobile" href="https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile"&gt;La donna è mobile&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" class="mw-redirect" title="Rigoletto (opera)" href="https://en.wikipedia.org/wiki/Rigoletto_(opera)"&gt;Rigoletto&lt;/a&gt;&lt;/em&gt;, "&lt;a shape="rect" title="Libiamo ne' lieti calici" href="https://en.wikipedia.org/wiki/Libiamo_ne%27_lieti_calici"&gt;Libiamo ne' lieti calici&lt;/a&gt;" (The Drinking Song) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="La traviata" href="https://en.wikipedia.org/wiki/La_traviata"&gt;La traviata&lt;/a&gt;&lt;/em&gt;, "&lt;a shape="rect" title="Va, pensiero" href="https://en.wikipedia.org/wiki/Va,_pensiero"&gt;Va, pensiero&lt;/a&gt;" (The Chorus of the Hebrew Slaves) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Nabucco" href="https://en.wikipedia.org/wiki/Nabucco"&gt;Nabucco&lt;/a&gt;&lt;/em&gt;, the "Coro di zingari" (&lt;a shape="rect" title="Anvil Chorus" href="https://en.wikipedia.org/wiki/Anvil_Chorus"&gt;Anvil Chorus&lt;/a&gt;) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Il trovatore" href="https://en.wikipedia.org/wiki/Il_trovatore"&gt;Il trovatore&lt;/a&gt;&lt;/em&gt;&amp;nbsp;and the "&lt;a shape="rect" title="Triumphal March" href="https://en.wikipedia.org/wiki/Triumphal_March"&gt;Grand March&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Aida" href="https://en.wikipedia.org/wiki/Aida"&gt;Aida&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;Moved by the death of compatriot&amp;nbsp;&lt;a shape="rect" title="Alessandro Manzoni" href="https://en.wikipedia.org/wiki/Alessandro_Manzoni"&gt;Alessandro Manzoni&lt;/a&gt;, Verdi wrote&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Requiem (Verdi)" href="https://en.wikipedia.org/wiki/Requiem_(Verdi)"&gt;Messa da Requiem&lt;/a&gt;&lt;/em&gt;&amp;nbsp;in 1874 in Manzoni's honour, a work now regarded as a masterpiece of the&amp;nbsp;&lt;a shape="rect" title="Oratorio" href="https://en.wikipedia.org/wiki/Oratorio"&gt;oratorio&lt;/a&gt;&amp;nbsp;tradition and a testimony to his capacity outside the field of opera.&amp;nbsp;Visionary and politically engaged, he remains – alongside&amp;nbsp;&lt;a shape="rect" title="Giuseppe Garibaldi" href="https://en.wikipedia.org/wiki/Giuseppe_Garibaldi"&gt;Garibaldi&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a shape="rect" title="Camillo Benso, Count of Cavour" href="https://en.wikipedia.org/wiki/Camillo_Benso,_Count_of_Cavour"&gt;Cavour&lt;/a&gt;&amp;nbsp;– an emblematic figure of the reunification process of the&amp;nbsp;&lt;a shape="rect" class="mw-redirect" title="Italian peninsula" href="https://en.wikipedia.org/wiki/Italian_peninsula"&gt;Italian peninsula&lt;/a&gt;&amp;nbsp;(the&amp;nbsp;&lt;em&gt;&lt;a shape="rect" class="mw-redirect" title="Risorgimento" href="https://en.wikipedia.org/wiki/Risorgimento"&gt;Risorgimento&lt;/a&gt;&lt;/em&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Giuseppe Fortunino Francesco Verdi&lt;/strong&gt;&amp;nbsp;(Italian:&amp;nbsp;&lt;a title="Help:IPA for Italian" href="https://en.wikipedia.org/wiki/Help:IPA_for_Italian" shape="rect"&gt;[d͡ʒuˈzɛppe ˈverdi]&lt;/a&gt;; 9 or 10 October 1813&amp;nbsp;– 27 January 1901) was an&amp;nbsp;&lt;a title="Italians" href="https://en.wikipedia.org/wiki/Italians" shape="rect"&gt;Italian&lt;/a&gt;&amp;nbsp;&lt;a title="Romantic music" href="https://en.wikipedia.org/wiki/Romantic_music" shape="rect"&gt;Romantic&lt;/a&gt;&amp;nbsp;composer primarily known for his operas. He is considered, together with&amp;nbsp;&lt;a title="Richard Wagner" href="https://en.wikipedia.org/wiki/Richard_Wagner" shape="rect"&gt;Richard Wagner&lt;/a&gt;, the preeminent opera composer of the nineteenth century.&amp;nbsp;Verdi dominated the Italian opera scene after the eras of&amp;nbsp;&lt;a title="Vincenzo Bellini" href="https://en.wikipedia.org/wiki/Vincenzo_Bellini" shape="rect"&gt;Bellini&lt;/a&gt;,&amp;nbsp;&lt;a title="Gaetano Donizetti" href="https://en.wikipedia.org/wiki/Gaetano_Donizetti" shape="rect"&gt;Donizetti&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a title="Gioachino Rossini" href="https://en.wikipedia.org/wiki/Gioachino_Rossini" shape="rect"&gt;Rossini&lt;/a&gt;. His works are frequently performed in opera houses throughout the world and, transcending the boundaries of the genre, some of his themes have long since taken root in popular culture, as "&lt;a title="La donna è mobile" href="https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile" shape="rect"&gt;La donna è mobile&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a class="mw-redirect" title="Rigoletto (opera)" href="https://en.wikipedia.org/wiki/Rigoletto_(opera)" shape="rect"&gt;Rigoletto&lt;/a&gt;&lt;/em&gt;, "&lt;a title="Libiamo ne' lieti calici" href="https://en.wikipedia.org/wiki/Libiamo_ne%27_lieti_calici" shape="rect"&gt;Libiamo ne' lieti calici&lt;/a&gt;" (The Drinking Song) from&amp;nbsp;&lt;em&gt;&lt;a title="La traviata" href="https://en.wikipedia.org/wiki/La_traviata" shape="rect"&gt;La traviata&lt;/a&gt;&lt;/em&gt;, "&lt;a title="Va, pensiero" href="https://en.wikipedia.org/wiki/Va,_pensiero" shape="rect"&gt;Va, pensiero&lt;/a&gt;" (The Chorus of the Hebrew Slaves) from&amp;nbsp;&lt;em&gt;&lt;a title="Nabucco" href="https://en.wikipedia.org/wiki/Nabucco" shape="rect"&gt;Nabucco&lt;/a&gt;&lt;/em&gt;, the "Coro di zingari" (&lt;a title="Anvil Chorus" href="https://en.wikipedia.org/wiki/Anvil_Chorus" shape="rect"&gt;Anvil Chorus&lt;/a&gt;) from&amp;nbsp;&lt;em&gt;&lt;a title="Il trovatore" href="https://en.wikipedia.org/wiki/Il_trovatore" shape="rect"&gt;Il trovatore&lt;/a&gt;&lt;/em&gt;&amp;nbsp;and the "&lt;a title="Triumphal March" href="https://en.wikipedia.org/wiki/Triumphal_March" shape="rect"&gt;Grand March&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a title="Aida" href="https://en.wikipedia.org/wiki/Aida" shape="rect"&gt;Aida&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Moved by the death of compatriot&amp;nbsp;&lt;a title="Alessandro Manzoni" href="https://en.wikipedia.org/wiki/Alessandro_Manzoni" shape="rect"&gt;Alessandro Manzoni&lt;/a&gt;, Verdi wrote&amp;nbsp;&lt;em&gt;&lt;a title="Requiem (Verdi)" href="https://en.wikipedia.org/wiki/Requiem_(Verdi)" shape="rect"&gt;Messa da Requiem&lt;/a&gt;&lt;/em&gt;&amp;nbsp;in 1874 in Manzoni's honour, a work now regarded as a masterpiece of the&amp;nbsp;&lt;a title="Oratorio" href="https://en.wikipedia.org/wiki/Oratorio" shape="rect"&gt;oratorio&lt;/a&gt;&amp;nbsp;tradition and a testimony to his capacity outside the field of opera.&amp;nbsp;Visionary and politically engaged, he remains – alongside&amp;nbsp;&lt;a title="Giuseppe Garibaldi" href="https://en.wikipedia.org/wiki/Giuseppe_Garibaldi" shape="rect"&gt;Garibaldi&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a title="Camillo Benso, Count of Cavour" href="https://en.wikipedia.org/wiki/Camillo_Benso,_Count_of_Cavour" shape="rect"&gt;Cavour&lt;/a&gt;&amp;nbsp;– an emblematic figure of the reunification process of the&amp;nbsp;&lt;a class="mw-redirect" title="Italian peninsula" href="https://en.wikipedia.org/wiki/Italian_peninsula" shape="rect"&gt;Italian peninsula&lt;/a&gt;&amp;nbsp;(the&amp;nbsp;&lt;em&gt;&lt;a class="mw-redirect" title="Risorgimento" href="https://en.wikipedia.org/wiki/Risorgimento" shape="rect"&gt;Risorgimento&lt;/a&gt;&lt;/em&gt;).&lt;/p&gt;
 &lt;/div&gt;</htmlarea>
                         <input>Michelle</input>
                         <input-counter>This must not be "too long"!</input-counter>
@@ -50,19 +51,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <dynamic-data-dropdown itemset-empty="false">ca</dynamic-data-dropdown>
                         <checkboxes>cat bird</checkboxes>
                         <multiple-list>cat bird</multiple-list>
-
-
                         <radio-buttons>cat</radio-buttons>
                         <open-select1>Pistachio</open-select1>
-
-
-
                         <yesno-input>false</yesno-input>
                         <checkbox-input>false</checkbox-input>
-
-
                         <autocomplete label="United States">us</autocomplete>
-
                     </selection-controls>
                     <attachment-controls>
                         <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
@@ -112,21 +105,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xf:bind id="date-bind" ref="date" type="xf:date" name="date"/>
-                    <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
                     <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                     <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
+                    <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
-
-
-
-
-
                     <xf:bind id="autocomplete-bind" ref="autocomplete" name="autocomplete"/>
-
-
-
                     <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
                              name="checkbox-input"/>
@@ -298,8 +283,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <selection-controls>
                             <label>Selection Controls</label>
                         </selection-controls>
-
-
                         <radio-buttons>
                             <label>Radio Buttons</label>
                             <hint>Standard radio buttons</hint>
@@ -336,9 +319,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>strawberry</value>
                             </item>
                         </open-select1>
-
-
-
                         <yesno-input>
                             <label>Yes/No Answer</label>
                             <hint/>
@@ -347,8 +327,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Single Checkbox</label>
                             <hint>An input which captures "true" or "false"</hint>
                         </checkbox-input>
-
-
+                        <signature-controls>
+                            <label>Signature</label>
+                            <help/>
+                        </signature-controls>
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
@@ -419,7 +401,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Enter the name of a country</hint>
                             <code>Country code</code>
                         </autocomplete>
-
                     </resource>
                     <resource xml:lang="fr">
                         <dropdown>
@@ -532,8 +513,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <selection-controls>
                             <label>Contrôles de sélection</label>
                         </selection-controls>
-
-
                         <radio-buttons>
                             <label>Boutons radio</label>
                             <hint>Boutons radio standards</hint>
@@ -570,9 +549,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>strawberry</value>
                             </item>
                         </open-select1>
-
-
-
                         <yesno-input>
                             <label>Réponse oui/non</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
@@ -581,8 +557,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Case à cocher unique</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
                         </checkbox-input>
-
-
+                        <signature-controls>
+                            <label>Signature</label>
+                            <help/>
+                        </signature-controls>
                         <date>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
@@ -653,7 +631,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Entrez le nom d'un pays</hint>
                             <code>Code du pays</code>
                         </autocomplete>
-
                     </resource>
                 </resources>
             </xf:instance>
@@ -689,344 +666,320 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
     <xh:body>
         <fr:view>
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xf:label ref="$form-resources/text-controls/label"/>
-                    <fr:grid columns="3">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input bind="input-bind" id="input-control">
-                                    <xf:label ref="$form-resources/input/label"/>
-                                    <xf:hint ref="$form-resources/input/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input id="input-counter-control" bind="input-counter-bind"
-                                          appearance="character-counter">
-                                    <xf:label ref="$form-resources/input-counter/label"/>
-                                    <xf:hint ref="$form-resources/input-counter/hint"/>
-                                    <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:textarea bind="textarea-bind" id="textarea-control">
-                                    <xf:label ref="$form-resources/textarea/label"/>
-                                    <xf:hint ref="$form-resources/textarea/hint"/>
-                                </xf:textarea>
-                            </xh:td>
-                            <xh:td>
-                                <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind"
-                                             appearance="character-counter">
-                                    <xf:label ref="$form-resources/textarea-counter/label"/>
-                                    <xf:hint ref="$form-resources/textarea-counter/hint"/>
-                                    <xf:alert ref="$form-resources/textarea-counter/alert"
-                                              validation="constraint-49-constraint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:textarea>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:output bind="output-bind" id="output-control">
-                                    <xf:label ref="$form-resources/output/label"/>
-                                </xf:output>
-                            </xh:td>
-                            <xh:td>
-                                <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
-                                    <xf:label ref="$form-resources/secret/label"/>
-                                    <xf:hint ref="$form-resources/secret/hint"/>
-                                </xf:secret>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="3" id="grid-1-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input bind="input-bind" id="input-control">
+                                <xf:label ref="$form-resources/input/label"/>
+                                <xf:hint ref="$form-resources/input/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="input-counter-control" bind="input-counter-bind"
+                                      appearance="character-counter">
+                                <xf:label ref="$form-resources/input-counter/label"/>
+                                <xf:hint ref="$form-resources/input-counter/hint"/>
+                                <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="6">
+                            <xf:textarea bind="textarea-bind" id="textarea-control">
+                                <xf:label ref="$form-resources/textarea/label"/>
+                                <xf:hint ref="$form-resources/textarea/hint"/>
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="6">
+                            <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind"
+                                         appearance="character-counter">
+                                <xf:label ref="$form-resources/textarea-counter/label"/>
+                                <xf:hint ref="$form-resources/textarea-counter/hint"/>
+                                <xf:alert ref="$form-resources/textarea-counter/alert"
+                                          validation="constraint-49-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="6">
+                            <xf:output bind="output-bind" id="output-control">
+                                <xf:label ref="$form-resources/output/label"/>
+                            </xf:output>
+                        </fr:c>
+                        <fr:c y="3" x="7" w="6">
+                            <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
+                                <xf:label ref="$form-resources/secret/label"/>
+                                <xf:hint ref="$form-resources/secret/hint"/>
+                            </xf:secret>
+                        </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1">
-                        <xh:tr>
-                            <xh:td>
-                                <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
-                                    <xf:label ref="$form-resources/htmlarea/label"/>
-                                    <xf:hint ref="$form-resources/htmlarea/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:tinymce>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="1" id="grid-2-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
+                                <xf:label ref="$form-resources/htmlarea/label"/>
+                                <xf:hint ref="$form-resources/htmlarea/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:tinymce>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="typed-controls-section" bind="typed-controls-bind">
                     <xf:label ref="$form-resources/typed-controls/label"/>
-                    <fr:grid>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input bind="email-bind" id="email-control">
-                                    <xf:label ref="$form-resources/email/label"/>
-                                    <xf:hint ref="$form-resources/email/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:us-phone bind="us-phone-bind" id="us-phone-control">
-                                    <xf:label ref="$form-resources/us-phone/label"/>
-                                    <xf:hint ref="$form-resources/us-phone/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:us-phone>
-                            </xh:td>
-                            <xh:td>
-                                <fr:number id="number-control" digits-after-decimal="0" bind="number-bind"
-                                           suffix="m/s">
-                                    <xf:label ref="$form-resources/number/label"/>
-                                    <xf:hint ref="$form-resources/number/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:number>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <fr:currency bind="currency-bind" id="currency-control">
-                                    <xf:label ref="$form-resources/currency/label"/>
-                                    <xf:hint ref="$form-resources/currency/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:currency>
-                            </xh:td>
-                            <xh:td>
-                                <fr:us-state bind="us-state-bind" id="us-state-control">
-                                    <xf:label ref="$form-resources/us-state/label"/>
-                                    <xf:hint ref="$form-resources/us-state/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:us-state>
-                            </xh:td>
-                            <xh:td/>
-                        </xh:tr>
+                    <fr:grid id="grid-3-grid">
+                        <fr:c y="1" x="1" w="4">
+                            <xf:input bind="email-bind" id="email-control">
+                                <xf:label ref="$form-resources/email/label"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
+                                <xf:label ref="$form-resources/us-phone/label"/>
+                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" suffix="m/s">
+                                <xf:label ref="$form-resources/number/label"/>
+                                <xf:hint ref="$form-resources/number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:number>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <fr:currency bind="currency-bind" id="currency-control">
+                                <xf:label ref="$form-resources/currency/label"/>
+                                <xf:hint ref="$form-resources/currency/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <fr:us-state bind="us-state-bind" id="us-state-control">
+                                <xf:label ref="$form-resources/us-state/label"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
                     <xf:label ref="$form-resources/date-time-controls/label"/>
-                    <fr:grid columns="3">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input bind="date-bind" id="date-control">
-                                    <xf:label ref="$form-resources/date/label"/>
-                                    <xf:hint ref="$form-resources/date/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input bind="time-bind" id="time-control">
-                                    <xf:label ref="$form-resources/time/label"/>
-                                    <xf:hint ref="$form-resources/time/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input bind="datetime-bind" id="datetime-control">
-                                    <xf:label ref="$form-resources/datetime/label"/>
-                                    <xf:hint ref="$form-resources/datetime/hint"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
-                                    <xf:label ref="$form-resources/dropdown-date/label"/>
-                                    <xf:hint ref="$form-resources/dropdown-date/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:dropdown-date>
-                            </xh:td>
-                            <xh:td>
-                                <fr:fields-date bind="fields-date-bind" id="fields-date-control">
-                                    <xf:label ref="$form-resources/fields-date/label"/>
-                                    <xf:hint ref="$form-resources/fields-date/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:fields-date>
-                            </xh:td>
-                            <xh:td/>
-                        </xh:tr>
+                    <fr:grid columns="3" id="grid-4-grid">
+                        <fr:c y="1" x="1" w="2">
+                            <fr:date bind="date-bind" id="date-control">
+                                <xf:label ref="$form-resources/date/label"/>
+                                <xf:hint ref="$form-resources/date/hint"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c y="1" x="3" w="2"/>
+                        <fr:c x="5" y="1" w="2" h="1">
+                            <xf:input bind="time-bind" id="time-control">
+                                <xf:label ref="$form-resources/time/label"/>
+                                <xf:hint ref="$form-resources/time/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="2" h="1"/>
+                        <fr:c y="1" x="9" w="4">
+                            <xf:input bind="datetime-bind" id="datetime-control">
+                                <xf:label ref="$form-resources/datetime/label"/>
+                                <xf:hint ref="$form-resources/datetime/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
+                                <xf:label ref="$form-resources/dropdown-date/label"/>
+                                <xf:hint ref="$form-resources/dropdown-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:dropdown-date>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <fr:fields-date bind="fields-date-bind" id="fields-date-control">
+                                <xf:label ref="$form-resources/fields-date/label"/>
+                                <xf:hint ref="$form-resources/fields-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:fields-date>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
                     <xf:label ref="$form-resources/selection-controls/label"/>
-                    <fr:grid columns="3">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em"
-                                            appearance="dropdown">
-                                    <xf:label ref="$form-resources/dropdown/label"/>
-                                    <xf:hint ref="$form-resources/dropdown/hint"/>
-                                    <xf:itemset ref="$form-resources/dropdown/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </xh:td>
-                            <xh:td>
-                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control"
-                                                      appearance="minimal"
-                                                      resource="/fr/service/custom/orbeon/controls/countries?all=true"
-                                                      bind="dynamic-data-dropdown-bind">
-                                    <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
-                                    <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="/*/country">
-                                        <xf:label ref="name"/>
-                                        <xf:value ref="us-code"/>
-                                    </xf:itemset>
-                                </fr:databound-select1>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
-                                    <xf:label ref="$form-resources/checkboxes/label"/>
-                                    <xf:hint ref="$form-resources/checkboxes/hint"/>
-                                    <xf:itemset ref="$form-resources/checkboxes/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select>
-
-                            </xh:td>
-                            <xh:td>
-                                <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
-                                    <xf:label ref="$form-resources/multiple-list/label"/>
-                                    <xf:hint ref="$form-resources/multiple-list/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="$form-resources/multiple-list/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select>
-
-                            </xh:td>
-
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
-                                    <xf:label ref="$form-resources/radio-buttons/label"/>
-                                    <xf:hint ref="$form-resources/radio-buttons/hint"/>
-                                    <xf:itemset ref="$form-resources/radio-buttons/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-
-                            </xh:td>
-                            <xh:td>
-                                <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control"
-                                                 bind="open-select1-bind">
-                                    <xf:label ref="$form-resources/open-select1/label"/>
-                                    <xf:hint ref="$form-resources/open-select1/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="$form-resources/open-select1/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </fr:open-select1>
-
-                            </xh:td>
-
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
-                                    <xf:label ref="$form-resources/yesno-input/label"/>
-                                    <xf:hint ref="$form-resources/yesno-input/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:yesno-input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:checkbox-input bind="checkbox-input-bind" id="checkbox-input-control">
-                                    <xf:label ref="$form-resources/checkbox-input/label"/>
-                                    <xf:hint ref="$form-resources/checkbox-input/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:checkbox-input>
-                            </xh:td>
-
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control"
-                                                 dynamic-itemset="true"
-                                                 max-results-displayed="10">
-                                    <xf:label ref="$form-resources/autocomplete/label"/>
-                                    <xf:hint ref="$form-resources/autocomplete/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="instance('autocomplete-itemset-instance')/country">
-                                        <xf:label ref="name"/>
-                                        <xf:value ref="us-code"/>
-                                    </xf:itemset>
-                                    <xf:action event="fr-search-changed">
-                                        <xf:var name="search-value" value="event('fr-search-value')"/>
-                                        <xf:setvalue ref="instance('autocomplete-search-instance')/country-name"
-                                                     value="$search-value"/>
-                                        <xf:send submission="autocomplete-submission"/>
-                                    </xf:action>
-                                </fr:autocomplete>
-                            </xh:td>
-                            <xh:td>
-
-                            </xh:td>
-
-                        </xh:tr>
+                    <fr:grid columns="3" id="grid-5-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em"
+                                        appearance="dropdown">
+                                <xf:label ref="$form-resources/dropdown/label"/>
+                                <xf:hint ref="$form-resources/dropdown/hint"/>
+                                <xf:itemset ref="$form-resources/dropdown/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control"
+                                                  appearance="minimal"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="dynamic-data-dropdown-bind">
+                                <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
+                                <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="/*/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="6">
+                            <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
+                                <xf:label ref="$form-resources/checkboxes/label"/>
+                                <xf:hint ref="$form-resources/checkboxes/hint"/>
+                                <xf:itemset ref="$form-resources/checkboxes/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="6">
+                            <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
+                                <xf:label ref="$form-resources/multiple-list/label"/>
+                                <xf:hint ref="$form-resources/multiple-list/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/multiple-list/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="6">
+                            <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
+                                <xf:label ref="$form-resources/radio-buttons/label"/>
+                                <xf:hint ref="$form-resources/radio-buttons/hint"/>
+                                <xf:itemset ref="$form-resources/radio-buttons/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c y="3" x="7" w="6">
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control"
+                                             bind="open-select1-bind">
+                                <xf:label ref="$form-resources/open-select1/label"/>
+                                <xf:hint ref="$form-resources/open-select1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/open-select1/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </fr:c>
+                        <fr:c y="4" x="1" w="6">
+                            <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
+                                <xf:label ref="$form-resources/yesno-input/label"/>
+                                <xf:hint ref="$form-resources/yesno-input/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c y="4" x="7" w="6">
+                            <fr:checkbox-input bind="checkbox-input-bind" id="checkbox-input-control">
+                                <xf:label ref="$form-resources/checkbox-input/label"/>
+                                <xf:hint ref="$form-resources/checkbox-input/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:checkbox-input>
+                        </fr:c>
+                        <fr:c y="5" x="1" w="6">
+                            <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control"
+                                             dynamic-itemset="true"
+                                             max-results-displayed="10">
+                                <xf:label ref="$form-resources/autocomplete/label"/>
+                                <xf:hint ref="$form-resources/autocomplete/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="instance('autocomplete-itemset-instance')/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                                <xf:action event="fr-search-changed">
+                                    <xf:var name="search-value" value="event('fr-search-value')"/>
+                                    <xf:setvalue ref="instance('autocomplete-search-instance')/country-name"
+                                                 value="$search-value"/>
+                                    <xf:send submission="autocomplete-submission"/>
+                                </xf:action>
+                            </fr:autocomplete>
+                        </fr:c>
+                        <fr:c y="5" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="signature-controls-control" bind="signature-controls-bind">
+                    <xf:label ref="$form-resources/signature-controls/label"/>
+                    <fr:grid id="grid-6-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                      id="handwritten-signature-control"
+                                                      bind="handwritten-signature-bind">
+                                <xf:label ref="$form-resources/handwritten-signature/label"/>
+                                <xf:hint ref="$form-resources/handwritten-signature/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:handwritten-signature>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
                     <xf:label ref="$form-resources/attachment-controls/label"/>
-                    <fr:grid>
-                        <xh:tr>
-                            <xh:td>
-                                <fr:image bind="static-image-bind" id="static-image-control">
-                                    <xf:label ref="$form-resources/static-image/label"/>
-                                </fr:image>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid id="grid-7-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <fr:image bind="static-image-bind" id="static-image-control">
+                                <xf:label ref="$form-resources/static-image/label"/>
+                            </fr:image>
+                        </fr:c>
                     </fr:grid>
                     <fr:grid id="image-attachments-control" bind="image-attachments-bind" repeat="content"
                              min="1"
                              template="instance('image-attachments-template')"
                              apply-defaults="true"
                              fb:initial-iterations="first">
-                        <xh:tr>
-                            <xh:td>
-                                <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                     id="image-attachment-control"
-                                                     bind="image-attachment-bind"
-                                                     class="fr-attachment">
-                                    <xf:label ref="$form-resources/image-attachment/label"/>
-                                    <xf:hint ref="$form-resources/image-attachment/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:image-attachment>
-                            </xh:td>
-                            <xh:td>
-                                <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
-                                    <xf:label ref="$form-resources/file-attachment/label"/>
-                                    <xf:hint ref="$form-resources/file-attachment/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:attachment>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="6">
+                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                 id="image-attachment-control"
+                                                 bind="image-attachment-bind"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/image-attachment/label"/>
+                                <xf:hint ref="$form-resources/image-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
+                                <xf:label ref="$form-resources/file-attachment/label"/>
+                                <xf:hint ref="$form-resources/file-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="buttons-section" bind="buttons-bind">
                     <xf:label ref="$form-resources/buttons/label"/>
-                    <fr:grid columns="2">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:trigger bind="standard-button-bind" id="standard-button-control">
-                                    <xf:label ref="$form-resources/standard-button/label"/>
-                                    <xf:hint ref="$form-resources/standard-button/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:trigger>
-                            </xh:td>
-                            <xh:td>
-                                <xf:trigger appearance="minimal" bind="link-button-bind" id="link-button-control">
-                                    <xf:label ref="$form-resources/link-button/label"/>
-                                    <xf:hint ref="$form-resources/link-button/hint"/>
-                                </xf:trigger>
-                            </xh:td>
-                            <xh:td/>
-                            <xh:td/>
-                        </xh:tr>
+                    <fr:grid columns="2" id="grid-8-grid">
+                        <fr:c y="1" x="1" w="3">
+                            <xf:trigger bind="standard-button-bind" id="standard-button-control">
+                                <xf:label ref="$form-resources/standard-button/label"/>
+                                <xf:hint ref="$form-resources/standard-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c y="1" x="4" w="3">
+                            <xf:trigger appearance="minimal" bind="link-button-bind" id="link-button-control">
+                                <xf:label ref="$form-resources/link-button/label"/>
+                                <xf:hint ref="$form-resources/link-button/hint"/>
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="3"/>
+                        <fr:c y="1" x="10" w="3"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="us-address-control" bind="us-address-bind">

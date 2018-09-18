@@ -75,21 +75,15 @@
                              type="xf:boolean"/>
                     <xf:bind id="last-name-bind" ref="last-name" name="last-name" required="true()"
                              xxf:whitespace="trim"
-                             type="dmv:last-name">
-
-                    </xf:bind>
+                             type="dmv:last-name"/>
                     <xf:bind id="first-name-bind" ref="first-name" name="first-name" required="true()"
                              xxf:whitespace="trim"
-                             type="dmv:first-name">
-
-                    </xf:bind>
+                             type="dmv:first-name"/>
                     <xf:bind id="driver-license-number-bind" ref="driver-license-number"
                              name="driver-license-number"
                              required="true()"
                              xxf:whitespace="trim"
-                             type="dmv:driver-license-number">
-
-                    </xf:bind>
+                             type="dmv:driver-license-number"/>
                     <xf:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial"
                              xxf:whitespace="trim"/>
                 </xf:bind>
@@ -112,10 +106,7 @@
                     <xf:bind id="residence-street-number-bind" ref="residence-street-number"
                              name="residence-street-number"
                              type="dmv:street-number"
-                             xxf:whitespace="trim">
-
-
-                    </xf:bind>
+                             xxf:whitespace="trim"/>
                     <xf:bind id="residence-street-name-2-bind" ref="residence-street-name-2"
                              name="residence-street-name-2"
                              type="dmv:street-name-2"
@@ -232,6 +223,8 @@
                     <form-name>dmv-14</form-name>
                     <title xml:lang="en">Notice of Change of Address</title>
                     <description xml:lang="en">Use this form to notify the Department of Motor Vehicles of a change of residence or mailing address for your vehicle, vessel, driver license, or identification card records. You must report a change of address to DMV within 10 days of the change. You can also use this form to report a voter change of address, if you are already a registered voter and you still reside in the same county. You will not be issued new documents.</description>
+                    <logo mediatype="" filename="" size=""/>
+                    <migration version="4.8.0">[{ "path": "vehicles/vehicle", "iteration-name": "vehicle-iteration" }]</migration>
                     <wizard>true</wizard>
                     <wizard-mode>free</wizard-mode>
                 </metadata>
@@ -239,7 +232,7 @@
             <xf:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
-                    <pdf mediatype="application/pdf" filename="dmv14.pdf" size="81260">/fr/service/persistence/crud/orbeon/dmv-14/form/bcb79e84010df5a6cf8eb7315b2067d193818164.bin</pdf>
+                    <pdf mediatype="application/pdf" filename="dmv14.pdf" size="81260">/fr/service/persistence/crud/orbeon/dmv-14/form/99450e3daef3872b58a965d90333ec2f62f77e40.bin</pdf>
                 </attachments>
             </xf:instance>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
@@ -331,8 +324,6 @@
                         <residence-street-number>
                             <label>Street Number</label>
                             <hint/>
-
-
                         </residence-street-number>
                         <residence-street-name-1>
                             <label>Street Name 1</label>
@@ -368,12 +359,10 @@
                         <last-name>
                             <label>Last Name</label>
                             <hint/>
-
                         </last-name>
                         <first-name>
                             <label>First Name</label>
                             <hint/>
-
                         </first-name>
                         <initial>
                             <label>Initial</label>
@@ -382,7 +371,6 @@
                         <driver-license-number>
                             <label>Driver License / Id Card No.</label>
                             <hint/>
-
                         </driver-license-number>
                         <birth-date>
                             <label>Birth Date</label>
@@ -430,7 +418,6 @@
             <xs:schema targetNamespace="http://orbeon.org/oxf/examples/dmv"
                        elementFormDefault="qualified"
                        attributeFormDefault="unqualified">
-
                 <xs:simpleType name="first-name">
                     <xs:restriction base="xs:string">
                         <xs:maxLength value="9"/>
@@ -566,8 +553,8 @@
     <xh:body>
         <fr:view>
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                      xmlns:ev="http://www.w3.org/2001/xml-events">
                 <fr:section id="personal-information-section" bind="personal-information-bind">
                     <xf:label ref="$form-resources/personal-information/label"/>
@@ -577,8 +564,6 @@
                                 <xf:label ref="$form-resources/last-name/label"/>
                                 <xf:hint ref="$form-resources/last-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
@@ -586,8 +571,6 @@
                                 <xf:label ref="$form-resources/first-name/label"/>
                                 <xf:hint ref="$form-resources/first-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="9" w="1">
@@ -597,26 +580,25 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
-                        <fr:c x="10" y="1" w="2" h="1"/>
-                        <fr:c x="12" y="1" w="1" h="1"/>
+                        <fr:c x="10" y="1" w="3" h="1"/>
+
                         <fr:c y="2" x="1" w="4">
                             <xf:input id="driver-license-number-control" bind="driver-license-number-bind"
                                       class="fr-summary fr-search">
                                 <xf:label ref="$form-resources/driver-license-number/label"/>
                                 <xf:hint ref="$form-resources/driver-license-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
-                        <fr:c y="2" x="5" w="4">
-                            <xf:input id="birth-date-control" bind="birth-date-bind" class="fr-summary fr-search">
+                        <fr:c y="2" x="5" w="2">
+                            <fr:date id="birth-date-control" bind="birth-date-bind" class="fr-summary fr-search">
                                 <xf:label ref="$form-resources/birth-date/label"/>
                                 <xf:hint ref="$form-resources/birth-date/hint"/>
                                 <xf:alert ref="$form-resources/birth-date/alert" validation="validation-6-validation"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
+                            </fr:date>
                         </fr:c>
+                        <fr:c x="7" y="2" w="2" h="1"/>
                         <fr:c y="2" x="9" w="4">
                             <fr:checkbox-input id="voter-address-change-control" bind="voter-address-change-bind">
                                 <xf:label ref="$form-resources/voter-address-change/label"/>
@@ -634,9 +616,6 @@
                                 <xf:label ref="$form-resources/residence-street-number/label"/>
                                 <xf:hint ref="$form-resources/residence-street-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-
                             </xf:input>
                         </fr:c>
                         <fr:c x="3" y="1" w="1" h="1"/>

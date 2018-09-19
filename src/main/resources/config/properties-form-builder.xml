@@ -64,7 +64,7 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
         oxf:/xbl/orbeon/date/date.xbl
-        oxf:/forms/orbeon/builder/xbl/date-time-time.xbl
+        oxf:/xbl/orbeon/time/time.xbl
         oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
         oxf:/xbl/orbeon/fields-date/fields-date.xbl

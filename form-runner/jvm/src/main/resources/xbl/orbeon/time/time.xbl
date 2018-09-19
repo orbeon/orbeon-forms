@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2018 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,12 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding id="fb-input-time" element="xf|input:xxf-type('xs:time')">
+    <xbl:binding
+        id="fr-time"
+        element="fr|time"
+        xxbl:mode="lhha binding value">
+
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Time</display-name>
             <display-name lang="es">Hora</display-name>
@@ -30,19 +37,32 @@
             <display-name lang="pt">Hora</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-clock-o</icon-class>
-            </icon>type>
+            </icon>
             <templates>
                 <bind type="xf:time"/>
                 <view>
-                    <xf:input id="" ref="" xmlns="">
+                    <fr:time id="" ref="" xmlns="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>
-                    </xf:input>
+                    </fr:time>
                 </view>
             </templates>
         </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/time/time.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xh:div class="input-append date">
+                <xf:input ref="xxf:binding('fr-time')"/>
+                <xh:span class="add-on">
+                    <xh:i class="fa fa-fw fa-clock-o"/>
+                </xh:span>
+            </xh:div>
+        </xbl:template>
     </xbl:binding>
 
 </xbl:xbl>

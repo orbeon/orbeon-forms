@@ -25,6 +25,9 @@
                         <ssn/>
                         <ein/>
                     </tin>
+                    <certification>
+                        <signature/>
+                    </certification>
                     <hidden>
                         <current-date/>
                     </hidden>
@@ -55,6 +58,10 @@
                 <xf:bind name="hidden" id="hidden-bind" ref="hidden" relevant="$fr-mode = 'pdf'">
                     <xf:bind name="current-date" id="current-date-bind" ref="current-date" calculate="current-date()" type="xf:date"/>
                 </xf:bind>
+                <xf:bind id="certification-bind" ref="certification" name="certification" relevant="fr:is-pe()">
+                    <xf:bind id="signature-bind" ref="signature" name="signature" type="xf:anyURI"/>
+
+                </xf:bind>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
@@ -67,12 +74,23 @@
             <xf:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
-                    <pdf mediatype="application/pdf" filename="fw9-orbeon.pdf" size="183843">/fr/service/persistence/crud/orbeon/w9/form/831113e3ef799f2c9f57ee0b10f789a8951360ba.bin</pdf>
+                    <pdf mediatype="application/pdf" filename="fw9-orbeon.pdf" size="189922">/fr/service/persistence/crud/orbeon/w9/form/831113e3ef799f2c9f57ee0b10f789a8951360ba.bin</pdf>
                 </attachments>
             </xf:instance>
             <xf:instance id="fr-form-resources" xxf:readonly="false">
                 <resources>
-                    <resource xml:lang="en"><ssn-or-ein><label>SSN/EIN</label><hint/><help/><alert/><item>
+                    <resource xml:lang="en">
+                        <signature>
+                            <label>Signature</label>
+                            <hint/>
+                        </signature>
+
+                        <ssn-or-ein>
+                            <label>SSN/EIN</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                            <item>
                                 <label>SSN</label>
                                 <value>ssn</value>
                             </item><item>
@@ -213,6 +231,10 @@
                             <label>Taxpayer Identification Number (TIN)</label>
                             <help/>
                         </tin>
+                        <certification>
+                            <label>Certifications</label>
+                            <help/>
+                        </certification>
                         <hidden>
                             <label>Hidden</label>
                             <help/>
@@ -379,7 +401,24 @@
                                 </xf:input></xh:td>
 
                         </xh:tr>
-
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="certification-control" bind="certification-bind">
+                    <xf:label ref="$form-resources/certification/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                          id="signature-control"
+                                                          bind="signature-bind">
+                                    <xf:label ref="$form-resources/signature/label"/>
+                                    <xf:hint ref="$form-resources/signature/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:handwritten-signature>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="hidden-control" bind="hidden-bind">

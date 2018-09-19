@@ -3244,17 +3244,17 @@
         <common>
             <formats>
                 <within-day>[h]:[m01] [P,*-2]</within-day>
-                <day-this-year>[MNn,*-3] [D]</day-this-year>
+                <day-this-year>[D] [MNn,*-3]</day-this-year>
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Maken]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [Tonen]</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; [Goedkeuren]</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; [Weigeren]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
+            <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
@@ -3575,13 +3575,13 @@
                 <form-identification>Form-identificatie</form-identification>
                 <last-modified>Bewerkt</last-modified>
                 <reindexing-confirmation>Bevestigen herindexeren</reindexing-confirmation>
-                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <reencrypt-confirmation todo="true">[Bevestigen her-encryptie]</reencrypt-confirmation>
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
                 <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
                 <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?</reindexing-confirmation>
-                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <reencrypt-confirmation todo="true">[We adviseren u het vernieuwen van de encryptie te doen als het systeem offline is. Weet u zeker dat u door wilt gaan met her-encryptie?]</reencrypt-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>
@@ -3595,9 +3595,9 @@
                 <reindexing-provider>Herindexeren {0} ({1,number}/{2,number})</reindexing-provider>
                 <reindexing-stopping>Herindexeren wordt gestopt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
                 <reindexing-finished>Herindexeren is gestopt</reindexing-finished>
-                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
-                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
-                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+                <reencrypt-state todo="true">[Her-encryptie-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Her-encryptie gestart]</reencrypt-started>
+                <reencrypt-finished todo="true">[Her-encryptie voltooid]</reencrypt-finished>
             </labels>
         </home>
     </resource>

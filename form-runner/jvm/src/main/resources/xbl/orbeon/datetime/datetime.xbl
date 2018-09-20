@@ -11,7 +11,8 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -51,6 +52,10 @@
                 </view>
             </templates>
         </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/datetime/datetime.css"/>
+        </xbl:resources>
 
         <xbl:implementation>
 
@@ -144,8 +149,10 @@
                                       translate($local-time/string(), 'T', ''))"/>
             </xf:action>
 
-            <xf:input ref="$local-date[not($view)]" id="date" xxf:title="{xxf:r('date')}"/>
-            <xf:input ref="$local-time[not($view)]" id="time" xxf:title="{xxf:r('time')}"/>
+            <xh:div class="fr-datetime-fields">
+                <fr:date ref="$local-date[not($view)]" id="date" xxf:title="{xxf:r('date')}"/>
+                <fr:time ref="$local-time[not($view)]" id="time" xxf:title="{xxf:r('time')}"/>
+            </xh:div>
             <xf:input ref="$binding[$view]"/>
         </xbl:template>
 

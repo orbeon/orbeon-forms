@@ -13,20 +13,32 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import org.junit.Test
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceManagerTestBase, XFormsSupport}
+import org.scalatest.FunSpecLike
 
-class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class XFormsResourceServerTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike
+     with XFormsSupport {
 
-  @Test def proxyURI(): Unit = {
+  describe("The `proxyURI` function") {
 
     implicit val indentedLogger = ResourceManagerTestBase.newIndentedLogger
 
-    assert("/xforms-server/dynamic/04fcb2850925c9064012678737bb76216020facf" ===
-      XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+    it("must work for an absolute path") {
+      withTestExternalContext { _ ⇒
+        assert("/xforms-server/dynamic/04fcb2850925c9064012678737bb76216020facf" ===
+          XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+      }
+    }
 
-    assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
-      XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+    it("must work for an absolute URL") {
+      withTestExternalContext { _ ⇒
+        assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
+          XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+      }
+    }
+
   }
 }

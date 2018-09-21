@@ -21,6 +21,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
     xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"
+    xmlns:simple-migration="java:org.orbeon.oxf.fr.SimpleDataMigration"
     xmlns:d="DAV:">
 
     <xf:var name="parameters"           value="xxf:instance('fr-parameters-instance')"/>
@@ -162,7 +163,7 @@
                                 $form-data
                             )[1]/root()/*,
                             $simply-migrated :=
-                                migration:dataMaybeWithSimpleMigration(
+                                simple-migration:dataMaybeWithSimpleMigration(
                                     xxf:absolute-id('fr-form-model'),
                                     instance('fr-initial-instance'),
                                     $format-migrated
@@ -720,7 +721,7 @@
                             xxf:instance('fr-form-metadata')/root()
                         )/root()/*,
                     $simply-migrated :=
-                        migration:dataMaybeWithSimpleMigration(
+                        simple-migration:dataMaybeWithSimpleMigration(
                             xxf:absolute-id('fr-form-model'),
                             instance('fr-initial-instance'),
                             $format-migrated

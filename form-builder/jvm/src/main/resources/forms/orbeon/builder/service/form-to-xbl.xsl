@@ -301,7 +301,7 @@
                                         instance('fr-form-template'),
                                         instance()
                                     )"
-                                xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"/>
+                                xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"/>
 
                             <xf:action if="exists($simply-migrated)">
                                 <xf:delete ref="instance()/*"/>

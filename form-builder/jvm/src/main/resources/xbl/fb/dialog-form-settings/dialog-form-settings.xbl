@@ -86,7 +86,7 @@
 
                 <xf:setvalue
                     ref="$i/data-migration"
-                    value="(event('data-migration')[. = ('true', 'false')], 'default')[1]"/>
+                    value="(event('data-migration')[. = ('enabled', 'disabled', 'error')], 'default')[1]"/>
 
                 <xf:setvalue
                     ref="$i/analysis-calculate"
@@ -554,9 +554,18 @@
                                             <xf:select1 ref="data-migration" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/data-migration/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/data-migration/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/data-migration/item">
                                                     <xf:label ref="."/>
-                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                    <xf:value
+                                                        ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else if (@id = 1) then
+                                                                'enabled'
+                                                            else if (@id = 1) then
+                                                                'disabled'
+                                                            else
+                                                                'error'"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>

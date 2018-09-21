@@ -228,6 +228,11 @@ trait FormRunnerBaseOps {
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
 
+  def metadataElemValueOpt(name: String): Option[String] =
+    metadataInstance       map
+    (_.rootElement)        flatMap
+    (_.elemValueOpt(name))
+
   def formTitleFromMetadata: Option[String] = {
 
     val metadataElem = metadataInstance map (_.rootElement) toList

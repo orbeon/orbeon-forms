@@ -25,7 +25,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.scalatest.FunSpecLike
 
-class DataMigrationTest
+class SimpleDataMigrationTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with FunSpecLike

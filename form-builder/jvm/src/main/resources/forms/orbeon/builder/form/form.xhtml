@@ -368,7 +368,7 @@
                                         <xf:delete
                                             bind="data-migration-bind"/>
                                         <xf:insert
-                                            if="event('data-migration') = ('true', 'false')"
+                                            if="event('data-migration') = ('enabled', 'disabled', 'error')"
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('data-migration', event('data-migration'))"/>

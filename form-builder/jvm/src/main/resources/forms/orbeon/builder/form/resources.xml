@@ -373,6 +373,10 @@
             <data-migration>
                 <label>Simple Data Migration</label>
                 <hint>Automatically add/remove missing elements in data</hint>
+                <item id="0">Use default</item>
+                <item id="1">Enabled</item>
+                <item id="2">Disabled</item>
+                <item id="3">Raise an error</item>
             </data-migration>
             <analysis-calculate>
                 <label>Automatic Calculations Dependencies</label>
@@ -1506,6 +1510,10 @@
             <data-migration>
                 <label>Migration simple des données</label>
                 <hint>Ajoute ou supprime automatiquement les éléments manquants dans les données</hint>
+                <item id="0">Utiliser le défaut</item>
+                <item id="1">Activée</item>
+                <item id="2">Désactivée</item>
+                <item id="3">Produit une erreur</item>
             </data-migration>
             <analysis-calculate>
                 <label>Dépendances automatiques des formules de calculs</label>
@@ -2641,6 +2649,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -3804,6 +3816,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -4967,6 +4983,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -6122,6 +6142,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -7280,6 +7304,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -8435,6 +8463,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -9591,6 +9623,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
@@ -10726,6 +10762,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
@@ -11888,6 +11928,10 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Enabled]</item>
+                <item id="2" todo="true">[Disabled]</item>
+                <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>

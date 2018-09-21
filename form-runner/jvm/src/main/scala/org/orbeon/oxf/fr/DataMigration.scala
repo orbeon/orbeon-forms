@@ -13,28 +13,19 @@
  */
 package org.orbeon.oxf.fr
 
-import com.typesafe.scalalogging.Logger
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
-import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{DocumentInfo, Name10Checker, NodeInfo, VirtualNode}
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
-
-import scala.collection.JavaConverters._
 
 object DataMigration {
 
@@ -236,165 +227,12 @@ object DataMigration {
     mutableData
   }
 
-  // Attempt to fill/remove holes in an instance given:
-  //
-  // - the enclosing model
-  // - the main template instance
-  // - the data to update
-  //
-  // The function returns the root element of the updated data if there was any update, or the
-  // empty sequence if there was no data to update.
-  //
-  //@XPathFunction
-  def dataMaybeWithSimpleMigration(
-    enclosingModelAbsoluteId : String,
-    templateInstanceRootElem : NodeInfo,
-    dataToMigrateRootElem    : NodeInfo
-  ): Option[NodeInfo] =
-    try {
-
-      require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
-      require(templateInstanceRootElem.isElement)
-      require(dataToMigrateRootElem.isElement)
-
-      if (! isSimpleMigrationEnabled)
-        return None
-
-      val dataToMigrateRootElemMutable = TransformerUtils.extractAsMutableDocument(dataToMigrateRootElem).rootElement
-
-      val doc = inScopeContainingDocument
-
-      val enclosingModel =
-        doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
-          (_.cast[XFormsModel])                                                                 getOrElse
-          (throw new IllegalStateException)
-
-      val templateIterationNamesToRootElems =
-        (
-          for {
-            instance   ← enclosingModel.getInstances.iterator.asScala
-            instanceId = instance.getId
-            if FormRunner.isTemplateId(instanceId)
-          } yield
-            instance.rootElement.localname → instance.rootElement
-        ).toMap
-
-      // How this works:
-      //
-      // - the source of truth is the bind tree
-      // - we iterate binds from root to leaf
-      // - repeated elements are identified by the existence of a template instance, so
-      //   we don't need to look at the static tree of controls
-      // - element templates are searched first in the form instance and then, as we enter
-      //   repeats, the relevant template instances
-      // - We use the bind hierarchy to look for templates, instead of just searching for the first
-      //   matching element, because the top-level instance can contain data from section templates,
-      //   and those are not guaranteed to be unique. Se we could find an element template coming
-      //   from section template data, which would be the wrong element template. By following binds,
-      //   and taking paths from them, we avoid finding incorrect element templates in section template
-      //   data.
-      // - NOTE: We never need to identity a template for a repeat iteration, because  repeat
-      //   iterations are optional!
-
-      def findElementTemplate(templateRootElem: NodeInfo, path: List[String]): Option[NodeInfo] =
-        path.foldRight(Option(templateRootElem)) {
-          case (_, None)          ⇒ None
-          case (name, Some(node)) ⇒ node firstChildOpt name
-        }
-
-      var insertions = 0
-      var deletions  = 0
-
-      def ensureLevel(
-        parents          : List[NodeInfo],
-        binds            : Seq[StaticBind],
-        templateRootElem : NodeInfo,
-        path             : List[String]
-      ): Unit = {
-
-        val allBindNames = binds flatMap (_.nameOpt) toSet
-
-        binds foreach { bind ⇒
-
-          val allNewOrExistingChildrenElems =
-            bind.nameOpt.toList flatMap { name ⇒
-              parents flatMap { parent ⇒
-
-                // Remove extra elements
-                (parent / * filter (e ⇒ ! allBindNames(e.localname)) toList) foreach { e ⇒
-                  logger.debug(s"removing element `${e.localname}` from `${parent.localname}`")
-                  deletions += 1
-                  delete(e)
-                }
-
-                // Add missing elements
-                parent / name toList match {
-                  case Seq() ⇒
-                    logger.debug(s"inserting element `$name` into `${parent.localname}`")
-                    insertions += 1
-                    insert(
-                      into   = parent,
-                      after  = parent / *,
-                      origin = findElementTemplate(templateRootElem, name :: path).toList
-                    )
-                  case existing ⇒
-                    existing
-                }
-              }
-            }
-
-          val newTemplateRootElem =
-            bind.nameOpt flatMap templateIterationNamesToRootElems.get
-
-          ensureLevel(
-            parents          = allNewOrExistingChildrenElems,
-            binds            = bind.children,
-            templateRootElem = newTemplateRootElem getOrElse templateRootElem,
-            path             = if (newTemplateRootElem.isDefined) Nil else bind.nameOpt.toList ::: path
-          )
-        }
-      }
-
-      // The root bind has id `fr-form-binds` at the top-level as well as within section templates
-      enclosingModel.staticModel.bindsById.get(Names.FormBinds) foreach { bind ⇒
-        ensureLevel(
-          parents          = List(dataToMigrateRootElemMutable),
-          binds            = bind.children,
-          templateRootElem = templateInstanceRootElem,
-          Nil
-        )
-      }
-
-      insertions > 0 || deletions > 0 option {
-        logger.debug(s"inserted $insertions element(s) and deleted $deletions element(s)")
-        dataToMigrateRootElemMutable
-      }
-    } catch {
-      case t: Throwable ⇒
-        logger.error(OrbeonFormatter.format(t))
-        throw t
-    }
-
   private object Private {
-
-    val logger = Logger("org.orbeon.fr.data-migration")
 
     // NOTE: The format of the path can be like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
     // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
     // the migration data.
     val TrimPathElementRE = """\s*\(?([^)^/]+)\)?\s*""".r
-
-    val DataMigrationFeatureName = "data-migration"
-
-    def isSimpleMigrationEnabled: Boolean = {
-
-      implicit val formRunnerParams = FormRunnerParams()
-
-      ! isDesignTime && (
-        (metadataInstance map (_.rootElement) flatMap (_.elemValueOpt(DataMigrationFeatureName))) map (_ == "true") getOrElse
-          booleanFormRunnerProperty(s"oxf.fr.detail.$DataMigrationFeatureName")
-        )
-    }
 
     def partitionNodes(
       mutableData : NodeInfo,
@@ -407,7 +245,8 @@ object DataMigration {
             (path.init map (_.value) mkString "/", path.last.value)
 
           // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
-          val parentNodes = scaxon.XPath.eval(mutableData.rootElement, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
+          val parentNodes =
+            scaxon.XPath.eval(mutableData.rootElement, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
             case node: NodeInfo ⇒ node
           }
 

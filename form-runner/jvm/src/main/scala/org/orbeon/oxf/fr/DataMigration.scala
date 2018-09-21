@@ -296,10 +296,10 @@ object DataMigration {
       // - NOTE: We never need to identity a template for a repeat iteration, because  repeat
       //   iterations are optional!
 
-      def findElementTemplate(templateRootElem: NodeInfo, path: List[String], name: String): Option[NodeInfo] =
-        (name :: path).foldRight(Option(templateRootElem)) {
+      def findElementTemplate(templateRootElem: NodeInfo, path: List[String]): Option[NodeInfo] =
+        path.foldRight(Option(templateRootElem)) {
           case (_, None)          ⇒ None
-          case (name, Some(node)) ⇒ node / name headOption
+          case (name, Some(node)) ⇒ node firstChildOpt name
         }
 
       var insertions = 0
@@ -335,7 +335,7 @@ object DataMigration {
                     insert(
                       into   = parent,
                       after  = parent / *,
-                      origin = findElementTemplate(templateRootElem, path, name).toList
+                      origin = findElementTemplate(templateRootElem, name :: path).toList
                     )
                   case existing ⇒
                     existing

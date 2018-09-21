@@ -72,6 +72,7 @@ object XFormsSetindexAction {
     val indentedLogger = interpreter.indentedLogger
 
     // "This XForms Action begins by invoking the deferred update behavior."
+    // See also `synchronizeAndRefreshIfNeeded`
     if (interpreter.isDeferredUpdates(actionElement))
       interpreter.containingDocument.synchronizeAndRefresh()
 

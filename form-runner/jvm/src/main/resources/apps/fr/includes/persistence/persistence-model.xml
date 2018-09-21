@@ -76,7 +76,9 @@
             (fr:is-pe() or frf:sendError(404))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
-    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+    <xf:action
+        event="xforms-model-construct-done"
+        if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -174,7 +176,9 @@
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
-                <xf:setvalue if="$mode = 'edit'" ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
+                <xf:setvalue
+                    if="$mode = 'edit'"
+                    ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
             </xf:action>
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs

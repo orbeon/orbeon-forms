@@ -286,7 +286,7 @@
                         <xf:action if="$is-empty">
                             <xf:insert
                                 context="instance()"
-                                origin="instance('fr-form-template')/*"/>>
+                                origin="instance('fr-form-template')/*"/>
                             <!-- RRR with defaults -->
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>

@@ -179,8 +179,13 @@
                              but seems fine to keep this permanently). See #1509. -->
                         <xsl:if test="$appearance = 'full' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
-                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1" id="fr-repeater-add">
-                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>
+                                <xf:trigger
+                                    appearance="minimal"
+                                    ref="$repeat-context[$can-add]"
+                                    tabindex="-1"
+                                    id="fr-repeater-add"
+                                    xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
+                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/></xf:label>
                                 </xf:trigger>
                             </xf:group>
                         </xsl:if>

@@ -15,15 +15,26 @@
 .orbeon {
     .xbl-fr-repeater {
 
+        .fr-repeat-container {
+            display: block;
+            width: 100%;
+        }
+
         .fr-repeat-iteration {
+            display: flex;
             border-bottom: 5px solid #dddddd;
-            padding-bottom: 5px; // https://github.com/orbeon/orbeon-forms/issues/3745
+            margin-bottom: 5px; // https://github.com/orbeon/orbeon-forms/issues/3745
         }
 
         .fr-repeat-menu {
             width: 22px;
-            float:left;
-            padding: 5px 4px 0 0;
+            padding: 2px 2px 0 2px;
+            background-color: #ddd;
+        }
+
+        .fr-repeat-content {
+            padding-left: 5px;
+            padding-bottom: 4px;
         }
 
         .xforms-repeat-selected-item-1,
@@ -34,20 +45,28 @@
             }
         }
 
-        // If there a menu, increase the padding
-        .fr-repeat-content {
-            padding-left: 26px;
-        }
+        &.xforms-repeater-appearance-minimal {
 
-        // If there is no menu, don't increase the padding
-        &.xforms-repeater-appearance-minimal .fr-repeat-content {
-            padding-left: 16px;
+            .fr-repeat-container {
+                display: block;
+                width: 100%;
+            }
+
+            .fr-repeat-iteration {
+                &> .fr-repeat-content {
+                    padding-left: 0;
+                }
+
+                &> .fr-section-right-column {
+                }
+            }
         }
 
         .fr-repeater-top-buttons {
 
             display: block;
             margin-bottom: 4px; // looks nicer in Form Builder
+            border-bottom: 4px solid #ddd;
 
             .xforms-trigger i {
                 margin-left: 4px;

@@ -99,22 +99,22 @@
                 <move-up>Move Up</move-up>
                 <move-down>Move Down</move-down>
                 <remove>
-                    <label>Remove</label>
+                    <label>Remove Line</label>
                     <hint>Remove Line from the Repeated Grid</hint>
                 </remove>
                 <add-another>
-                    <label>Add Another</label>
+                    <label>Add Another Line</label>
                     <hint>Add Another Line to the Repeated Grid</hint>
                 </add-another>
             </grid>
             <section>
                 <remove>
-                    <label>Remove</label>
-                    <hint>Remove Iteration from the Repeated Section</hint>
+                    <label>Remove Repetition</label>
+                    <hint>Remove Repetition from the Repeated Section</hint>
                 </remove>
                 <add-another>
-                    <label>Add Another</label>
-                    <hint>Add Another Iteration to the Repeated Section</hint>
+                    <label>Add Another Repetition</label>
+                    <hint>Add Another Repetition to the Repeated Section</hint>
                 </add-another>
             </section>
             <date-time>
@@ -471,12 +471,12 @@
             </grid>
             <section>
                 <remove>
-                    <label>Remove</label>
-                    <hint>Remove Iteration from the Repeated Section</hint>
+                    <label>Supprimer la répétition</label>
+                    <hint>Supprimer la répétition de section</hint>
                 </remove>
                 <add-another>
-                    <label>Add Another</label>
-                    <hint>Add Another Iteration to the Repeated Section</hint>
+                    <label>Ajouter une répétition</label>
+                    <hint>Ajouter une nouvelle répétition de section</hint>
                 </add-another>
             </section>
             <date-time>

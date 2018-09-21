@@ -259,7 +259,7 @@
             <label>Custom CSS classes</label>
         </classes>
         <default-always-never>
-            <item id="0">Use default</item>
+            <item id="0">Use property</item>
             <item id="1">Always</item>
             <item id="2">Never</item>
         </default-always-never>
@@ -327,7 +327,7 @@
             <wizard-mode>
                 <label>Wizard Navigation Validation Mode</label>
                 <hint>How wizard navigation behaves when data is not valid</hint>
-                <item id="0">Use default</item>
+                <item id="0">Use property</item>
                 <item id="1">Free</item>
                 <item id="2">Lax</item>
                 <item id="3">Strict</item>
@@ -339,7 +339,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show subsections for the active section only</item>
                 <item id="2">Show subsections for all sections</item>
                 <item id="3">Don't show subsections</item>
@@ -363,7 +363,7 @@
                 <label>Appearance of Control Hints</label>
             </hints>
             <appearances>
-                <item id="0">Use default</item>
+                <item id="0">Use property</item>
                 <item id="1">Inline</item>
                 <item id="2">Tooltip</item>
             </appearances>
@@ -373,7 +373,7 @@
             <data-migration>
                 <label>Simple Data Migration</label>
                 <hint>Automatically add/remove missing elements in data</hint>
-                <item id="0">Use default</item>
+                <item id="0">Use property</item>
                 <item id="1">Enabled</item>
                 <item id="2">Disabled</item>
                 <item id="3">Raise an error</item>
@@ -396,11 +396,11 @@
             <options>
                 <label>Options</label>
                 <item>
-                    <label>Show in Summary</label>
+                    <label>Show on Summary page</label>
                     <value>fr-summary</value>
                 </item>
                 <item>
-                    <label>Show in Search</label>
+                    <label>Show in search</label>
                     <value>fr-search</value>
                 </item>
                 <item>
@@ -408,31 +408,31 @@
                     <value>fr-encrypt</value>
                 </item>
                 <item>
-                    <label>Email Recipient</label>
+                    <label>Email recipient</label>
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
-                    <label>Email Carbon Copy Recipient</label>
+                    <label>Email carbon copy recipient</label>
                     <value>fr-email-cc</value>
                 </item>
                 <item>
-                    <label>Email Bind Carbon Copy Recipient</label>
+                    <label>Email blind carbon copy recipient</label>
                     <value>fr-email-bcc</value>
                 </item>
                 <item>
-                    <label>Email Sender</label>
+                    <label>Email sender</label>
                     <value>fr-email-sender</value>
                 </item>
                 <item>
-                    <label>Include as Email Attachment</label>
+                    <label>Include as email attachment</label>
                     <value>fr-email-attachment</value>
                 </item>
                 <item>
-                    <label>Exclude from Email Body</label>
+                    <label>Exclude from email body</label>
                     <value>fr-exclude-from-email-body</value>
                 </item>
                 <item>
-                    <label>Show in Email Subject (Deprecated)</label>
+                    <label>Show in email subject (Deprecated)</label>
                     <value>fr-email-subject</value>
                 </item>
             </options>
@@ -2535,7 +2535,7 @@
             <label todo="true">[Custom CSS classes]</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -2603,7 +2603,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -2615,7 +2615,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -2639,7 +2639,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -2649,7 +2649,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -3702,7 +3702,7 @@
             <label todo="true">[Custom CSS classes]</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -3770,7 +3770,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -3782,7 +3782,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -3806,7 +3806,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -3816,7 +3816,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -4869,7 +4869,7 @@
             <label>Classi CSS personalizzati</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -4937,7 +4937,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -4949,7 +4949,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -4973,7 +4973,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -4983,7 +4983,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -6108,7 +6108,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -6142,7 +6142,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -7190,7 +7190,7 @@
             <label>Mukautetut CSS luokat</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -7258,7 +7258,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -7270,7 +7270,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -7294,7 +7294,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -7304,7 +7304,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -8349,7 +8349,7 @@
             <label>Classes CSS customizadas</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -8417,7 +8417,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -8429,7 +8429,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -8453,7 +8453,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -8463,7 +8463,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -9623,7 +9623,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -10648,7 +10648,7 @@
             <label>Classes CSS Personalizadas</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -10716,7 +10716,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -10728,7 +10728,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -10752,7 +10752,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -10762,7 +10762,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
@@ -11814,7 +11814,7 @@
             <label>Anpassade CSS-klasser</label>
         </classes>
         <default-always-never>
-            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
             <item todo="true" id="2">[Never]</item>
         </default-always-never>
@@ -11882,7 +11882,7 @@
             <wizard-mode>
                 <label todo="true">[Wizard Navigation Validation Mode]</label>
                 <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Free]</item>
                 <item todo="true" id="2">[Lax]</item>
                 <item todo="true" id="3">[Strict]</item>
@@ -11894,7 +11894,7 @@
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>
                 <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use Default</item>
+                <item id="0">Use property</item>
                 <item id="1">Show Subsections for the Active Section Only</item>
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
@@ -11918,7 +11918,7 @@
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
-                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
@@ -11928,7 +11928,7 @@
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
                 <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-                <item id="0" todo="true">[Use default]</item>
+                <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Enabled]</item>
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>

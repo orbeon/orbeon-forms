@@ -31,7 +31,6 @@
             &.fr-section-title {
                 #gradient > .vertical(@grayLighter, @grayLighter);
                 margin: 0;
-                text-align: left;
                 font-weight: normal;
                 padding: 0;
                 color: @frHeaderColor;
@@ -92,7 +91,8 @@
                 }
 
                 &.fr-section-open, &.fr-section-closed {
-                    padding-left: @frSectionTitleLeftPadding;
+                    padding-left  : @frSectionTitleLeftPadding;
+                    padding-right : @frSectionTitleLeftPadding; // Same logic, for RTL
                     background-repeat: no-repeat;
                     background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
                                                                                                              // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close

@@ -44,12 +44,12 @@ class SimpleDataMigrationTest
                 <s2field1/>
                 <grid-2>
                     <grid-2-iteration>
-                        <s2number/>
                         <s2attachment filename="" mediatype="" size=""/>
+                        <s2number/>
                     </grid-2-iteration>
                     <grid-2-iteration>
-                        <s2number/>
                         <s2attachment filename="" mediatype="" size=""/>
+                        <s2number/>
                     </grid-2-iteration>
                 </grid-2>
             </section-1-iteration>
@@ -57,22 +57,23 @@ class SimpleDataMigrationTest
                 <s2field1/>
                 <grid-2>
                     <grid-2-iteration>
-                        <s2number/>
                         <s2attachment filename="" mediatype="" size=""/>
+                        <s2number/>
                     </grid-2-iteration>
                     <grid-2-iteration>
-                        <s2number/>
                         <s2attachment filename="" mediatype="" size=""/>
+                        <s2number/>
                     </grid-2-iteration>
                     <grid-2-iteration>
-                        <s2number/>
                         <s2attachment filename="" mediatype="" size=""/>
+                        <s2number/>
                     </grid-2-iteration>
                 </grid-2>
             </section-1-iteration>
         </section-1>
         <section-4>
             <st1field1/>
+            <st1image1 filename="" mediatype="" size=""/>
             <st1num1/>
             <st1grid2>
                 <st1grid2-iteration>
@@ -80,10 +81,10 @@ class SimpleDataMigrationTest
                     <st1currency1/>
                 </st1grid2-iteration>
             </st1grid2>
-            <st1image1 filename="" mediatype="" size=""/>
         </section-4>
         <section-3>
             <st1field1/>
+            <st1image1 filename="" mediatype="" size=""/>
             <st1num1/>
             <st1grid2>
                 <st1grid2-iteration>
@@ -91,7 +92,6 @@ class SimpleDataMigrationTest
                     <st1currency1/>
                 </st1grid2-iteration>
             </st1grid2>
-            <st1image1 filename="" mediatype="" size=""/>
         </section-3>
         <section-5>
           <!-- This needs to be the correct template. -->

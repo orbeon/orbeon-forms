@@ -110,8 +110,8 @@ object SimpleDataMigration {
     sealed trait DataMigrationOp
 
     object DataMigrationOp {
-      case class Insert(parentElem: NodeInfo, template: Option[NodeInfo]) extends DataMigrationOp
-      case class Delete(elem: NodeInfo)                                   extends DataMigrationOp
+      case class Insert(parentElem: NodeInfo, after: Option[String], template: Option[NodeInfo]) extends DataMigrationOp
+      case class Delete(elem: NodeInfo)                                                          extends DataMigrationOp
     }
 
     def getConfiguredDataMigrationBehavior: DataMigrationBehavior = {
@@ -173,6 +173,8 @@ object SimpleDataMigration {
           case (name, Some(node)) ⇒ node firstChildOpt name
         }
 
+      // NOTE: We work with `List`, which is probably the most optimal thing. Tried with `Iterator` but
+      // it is messy and harder to get right.
       def processLevel(
         parents          : List[NodeInfo],
         binds            : Seq[StaticBind],
@@ -182,35 +184,56 @@ object SimpleDataMigration {
 
         val allBindNames = binds flatMap (_.nameOpt) toSet
 
-        binds.toList flatMap { bind ⇒
-          bind.nameOpt.toList flatMap { bindName ⇒
-            parents flatMap { parent ⇒
+        def iterateBinds(find: (Option[StaticBind], StaticBind, String) ⇒ List[DataMigrationOp]): List[DataMigrationOp] = {
 
-              val deleteOps =
-                parent / * filter (e ⇒ ! allBindNames(e.localname)) map DataMigrationOp.Delete
+          var result: List[DataMigrationOp] = Nil
 
-              val nestedOps =
-                parent / bindName toList match {
-                  case Nil ⇒
-                    List(DataMigrationOp.Insert(parent, findElementTemplate(templateRootElem, bindName :: path)))
-                  case nodes ⇒
-
-                    // Recurse
-                    val newTemplateRootElem =
-                      templateIterationNamesToRootElems.get(bindName)
-
-                    processLevel(
-                      parents          = nodes,
-                      binds            = bind.children,
-                      templateRootElem = newTemplateRootElem getOrElse templateRootElem,
-                      path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
-                    )
-                }
-
-              deleteOps ++: nestedOps
+          binds.scanLeft(None: Option[StaticBind]) { case (prevBindOpt, bind) ⇒
+            bind.nameOpt foreach { bindName ⇒
+              result = find(prevBindOpt, bind, bindName) ::: result
             }
+            Some(bind)
           }
+
+          result
         }
+
+        def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[DataMigrationOp] =
+          parents flatMap { parent ⇒
+
+            val deleteOps =
+              parent / * filter (e ⇒ ! allBindNames(e.localname)) map { e ⇒
+                DataMigrationOp.Delete(e)
+              }
+
+            val nestedOps =
+              parent / bindName toList match {
+                case Nil ⇒
+                  List(
+                    DataMigrationOp.Insert(
+                      parentElem = parent,
+                      after      = prevBindOpt flatMap (_.nameOpt),
+                      template   = findElementTemplate(templateRootElem, bindName :: path)
+                    )
+                  )
+                case nodes ⇒
+
+                  // Recurse
+                  val newTemplateRootElem =
+                    templateIterationNamesToRootElems.get(bindName)
+
+                  processLevel(
+                    parents          = nodes,
+                    binds            = bind.children,
+                    templateRootElem = newTemplateRootElem getOrElse templateRootElem,
+                    path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
+                  )
+              }
+
+            deleteOps ++: nestedOps
+          }
+
+        iterateBinds(findOps)
       }
 
       // The root bind has id `fr-form-binds` at the top-level as well as within section templates
@@ -224,26 +247,26 @@ object SimpleDataMigration {
       }
     }
 
-    def performMigrationOps(ops: List[DataMigrationOp]): Unit = {
-
+    def performMigrationOps(ops: List[DataMigrationOp]): Unit =
       ops foreach {
         case DataMigrationOp.Delete(elem) ⇒
+
           logger.debug(s"removing element `${elem.localname}` from `${elem.getParent.localname}`")
           delete(elem)
-        case DataMigrationOp.Insert(parentElem, Some(template)) ⇒
 
-          logger.debug(s"inserting element `${template.localname}` into `${parentElem.localname}`")
+        case DataMigrationOp.Insert(parentElem, after, Some(template)) ⇒
+
+          logger.debug(s"inserting element `${template.localname}` into `${parentElem.localname}` after `$after`")
 
           insert(
             into   = parentElem,
-            after  = parentElem / *,
+            after  = after.toList flatMap (parentElem / _),
             origin = template.toList
           )
 
-        case DataMigrationOp.Insert(_, None) ⇒
+        case DataMigrationOp.Insert(_, _, None) ⇒
+
           // Template for the element was not found. Error?
       }
-
-    }
   }
 }

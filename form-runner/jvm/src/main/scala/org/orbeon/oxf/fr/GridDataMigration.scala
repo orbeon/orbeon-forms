@@ -27,7 +27,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 
-object DataMigration {
+object GridDataMigration {
 
   import Private._
 
@@ -122,10 +122,10 @@ object DataMigration {
 
   //@XPathFunction
   def dataMaybeMigratedFromDatabaseFormat(
-    app           : String,
-    form          : String,
-    data          : DocumentInfo,
-    metadata: Option[DocumentInfo]
+    app       : String,
+    form      : String,
+    data      : DocumentInfo,
+    metadata  : Option[DocumentInfo]
   ): DocumentInfo = {
 
     val srcDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)

@@ -245,7 +245,7 @@
                     </xsl:variable>
                     <xsl:copy-of
                         select="migration:migrateDataTo($instance, $migration)/*"
-                        xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"/>
+                        xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- Leave inline instance unchanged -->

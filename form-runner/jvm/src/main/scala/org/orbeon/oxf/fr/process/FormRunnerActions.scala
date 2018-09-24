@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
-import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{GridDataMigration, DataStatus, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
@@ -134,7 +134,7 @@ trait FormRunnerActions {
       val modeElement = parametersInstance.get.rootElement / "mode"
       val isNew       = modeElement.stringValue == "new"
 
-      import DataMigration._
+      import GridDataMigration._
 
       val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
 

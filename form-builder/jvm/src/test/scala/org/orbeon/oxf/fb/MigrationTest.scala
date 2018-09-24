@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.DataMigration
-import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
+import org.orbeon.oxf.fr.GridDataMigration
+import org.orbeon.oxf.fr.GridDataMigration.{Migration, PathElem}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -93,7 +93,7 @@ class MigrationTest
 
     it("must decode with or without parentheses") {
       for (migrations ← List(MigrationJSONWithParens, MigrationJSON))
-        assert(expected === DataMigration.decodeMigrationsFromJSON(migrations))
+        assert(expected === GridDataMigration.decodeMigrationsFromJSON(migrations))
     }
   }
 
@@ -368,7 +368,7 @@ class MigrationTest
       it(s"must pass $desc") {
         assertXMLDocumentsIgnoreNamespacesInScope(
           to.root,
-          DataMigration.migrateDataTo(from.root, MigrationJSON)
+          GridDataMigration.migrateDataTo(from.root, MigrationJSON)
         )
       }
     }
@@ -384,7 +384,7 @@ class MigrationTest
       it(s"must pass $desc") {
         assertXMLDocumentsIgnoreNamespacesInScope(
           from.root,
-          DataMigration.migrateDataFrom(to.root, MigrationJSON, pruneMetadata = false)
+          GridDataMigration.migrateDataFrom(to.root, MigrationJSON, pruneMetadata = false)
         )
       }
     }
@@ -400,7 +400,7 @@ class MigrationTest
       it(s"must pass $desc") {
         assertXMLDocumentsIgnoreNamespacesInScope(
           from.root,
-          DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON, pruneMetadata = false)
+          GridDataMigration.migrateDataFrom(GridDataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON, pruneMetadata = false)
         )
       }
     }

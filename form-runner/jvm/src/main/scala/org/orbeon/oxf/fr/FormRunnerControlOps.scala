@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.DataMigration.PathElem
+import org.orbeon.oxf.fr.GridDataMigration.PathElem
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
@@ -249,7 +249,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // Also, specific case for Form Builder: drop language predicate, as we want to index/return values
     // for all languages. So far, this is handled as a special case, as this is not something that happens
     // in other forms.
-    def buildBindPath(bind: NodeInfo): List[DataMigration.PathElem] =
+    def buildBindPath(bind: NodeInfo): List[GridDataMigration.PathElem] =
       (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef ⇒
         PathElem(
           if (bindRef.endsWith(FBLangPredicate))

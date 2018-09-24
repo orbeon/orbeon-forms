@@ -20,7 +20,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-    xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"
+    xmlns:grid-migration="java:org.orbeon.oxf.fr.GridDataMigration"
     xmlns:simple-migration="java:org.orbeon.oxf.fr.SimpleDataMigration"
     xmlns:d="DAV:">
 
@@ -157,7 +157,7 @@
                         let $format-migrated :=
                             (
                                 if (not(xxf:get-request-parameter('data-format-version') = 'edge')) then
-                                    migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
+                                    grid-migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
                                 else
                                     (),
                                 $form-data
@@ -714,7 +714,7 @@
             origin="
                 let
                     $format-migrated :=
-                        migration:dataMaybeMigratedFromDatabaseFormat(
+                        grid-migration:dataMaybeMigratedFromDatabaseFormat(
                             $app,
                             $form,
                             root(),
@@ -736,7 +736,7 @@
     <xf:action event="xforms-submit-done" observer="fr-get-instance-from-service">
         <xf:insert
             context="xxf:instance('fr-form-instance')/root()"
-            origin="migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>
+            origin="grid-migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>
     </xf:action>
 
     <!-- Initial instance (to support clear) -->

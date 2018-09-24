@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{DataMigration, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{GridDataMigration, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
@@ -66,8 +66,8 @@ trait FormDefinition {
     val migrationPaths =
       if (mustMigratePathsTo40Format)
         FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
-          DataMigration.migrationMapFromMetadata           flatMap
-          DataMigration.decodeMigrationsFromJSON
+          GridDataMigration.migrationMapFromMetadata           flatMap
+          GridDataMigration.decodeMigrationsFromJSON
       else
         Nil
 

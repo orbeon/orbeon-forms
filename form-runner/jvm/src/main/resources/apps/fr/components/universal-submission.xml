@@ -15,7 +15,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"
+    xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"
     xmlns:metadata="java:org.orbeon.oxf.fr.FormRunnerMetadata">
 
     <!-- ==== Form Runner send submissions ========================================================================= -->

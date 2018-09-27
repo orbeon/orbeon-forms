@@ -16,10 +16,10 @@ package org.orbeon.oxf.fr.library
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -37,7 +37,6 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 

@@ -1,5 +1,5 @@
 addSbtPlugin     ("com.orrsella"        % "sbt-sound"            % "1.0.4")
-addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"          % "0.6.21")
+addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"          % "0.6.25")
 addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"        % "0.6.1")
 addSbtPlugin     ("com.typesafe.sbt"    % "sbt-coffeescript"     % "1.0.0")
 addSbtPlugin     ("com.typesafe.sbt"    % "sbt-less"             % "1.1.0")

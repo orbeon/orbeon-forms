@@ -182,7 +182,10 @@
             </xh:div>
         </xf:group>
 
-        <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
+        <!--
+            Form content. Set context on form instance and define this group as `#fr-form-group` as observers will refer to it.
+            NOTE: Use `fr-view-component` whenever possible instead since Orbeon Forms 2017.1.
+        -->
         <xf:group
             id="fr-form-group"
             class="{
@@ -550,7 +553,7 @@
         <!-- Listen for upload events -->
         <xf:action
             ev:event="xxforms-upload-error"
-            ev:observer="fr-form-group"
+            ev:observer="fr-view-component"
             ev:defaultAction="cancel"
             xxf:phantom="true">
             <xf:action type="xpath">
@@ -599,7 +602,7 @@
 
         <xf:action
             ev:event="xxforms-upload-done"
-            ev:observer="fr-form-group"
+            ev:observer="fr-view-component"
             ev:defaultAction="cancel"
             xxf:phantom="true"
             type="xpath">
@@ -620,7 +623,7 @@
             <fr:row>
                 <fr:error-summary
                     id="error-summary-control-{$position}"
-                    observer="fr-form-group fr-captcha-group"
+                    observer="fr-view-component fr-captcha-group"
                     model="fr-error-summary-model"
                     alerts-count-ref="counts/@alert"
                     errors-count-ref="counts/@error"

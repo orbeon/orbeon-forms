@@ -23,6 +23,7 @@ import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 import org.scalajs.jquery.JQuery
 
 import scala.collection.mutable
@@ -270,14 +271,17 @@ object GridWallDnD {
       val drake = Dragula(
         js.Array(),
         new DragulaOptions {
-          override def isContainer(el: html.Element): Boolean = {
+          def isContainer(el: html.Element): Boolean =
             el.classList.contains(WallContainerClass)
-          }
-          override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
+
+          def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean =
             handle.classList.contains(WallHandleClass)
-          }
-          override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
+
+          def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
             target.classList.contains(WallContainerClass)
+
+          def invalid(el: Element, handle: Element) = false
+          def copy   (el: Element, source: Element) = false
         }
       )
 

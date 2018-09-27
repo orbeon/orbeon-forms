@@ -22,6 +22,7 @@ import org.scalajs.dom.html.Element
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 
 object Tabbable {
 
@@ -56,10 +57,12 @@ object Tabbable {
               js.Array(firstRepeatContainer),
               new DragulaOptions {
 
-                // Only elements in drake.containers will be taken into account
-                override def isContainer(el: Element): Boolean = false
+                override val mirrorContainer: UndefOr[Element] = firstRepeatContainer
 
-                override def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean = {
+                // Only elements in drake.containers will be taken into account
+                def isContainer(el: Element): Boolean = false
+
+                def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean = {
                   val jEl = $(el)
                   (
                       jEl.prev().is(IsRepeatDelimiterSelector) ||
@@ -68,12 +71,12 @@ object Tabbable {
                       jEl.is(IsDndMovesSelector)
                 }
 
-                override def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean =
+                def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean =
                   sibling != null && $(sibling).is(IsNotGuSelector)
 
-                // Don"t prevent any drags from initiating by default
-                override def invalid(el: Element, handle: Element) = false
-                override def mirrorContainer                       = firstRepeatContainer
+                // Don't prevent any drags from initiating by default
+                def invalid(el: Element, handle: Element) = false
+                def copy   (el: Element, source: Element) = false
               }
             )
 

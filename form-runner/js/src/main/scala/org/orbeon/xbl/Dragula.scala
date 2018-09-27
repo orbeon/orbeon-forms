@@ -14,10 +14,12 @@
 package org.orbeon.xbl
 
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.annotation.ScalaJSDefined
 
 // Simple facade for Dragula. See https://github.com/bevacqua/dragula.
 object Dragula {
@@ -25,27 +27,29 @@ object Dragula {
     g.dragula(initialContainers, options).asInstanceOf[Drake]
 }
 
-// TODO: Consider moving to trait with `js.UndefOr[Boolean] = js.undefined`, `val`s, see:
-// https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
-abstract class DragulaOptions extends js.Object {
-  def isContainer (el: Element)                                                     = false
-  def moves       (el: Element, source: Element, handle: Element, sibling: Element) = true
-  def accepts     (el: Element, target: Element, source: Element, sibling: Element) = true
-  def invalid     (el: Element, handle: Element)                                    = false
-  def copy        (el: Element, source: Element)                                    = false
-  def direction                                                                     = "vertical"
-  def copySortSource                                                                = false
-  def revertOnSpill                                                                 = false
-  def removeOnSpill                                                                 = false
-  def mirrorContainer                                                               = dom.document.body
-  def ignoreInputTextSelection                                                      = true
+// See: https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
+@ScalaJSDefined
+trait DragulaOptions extends js.Object {
+
+  val direction                : js.UndefOr[String]       = js.undefined // "vertical"
+  val copySortSource           : js.UndefOr[Boolean]      = js.undefined // false
+  val revertOnSpill            : js.UndefOr[Boolean]      = js.undefined // false
+  val removeOnSpill            : js.UndefOr[Boolean]      = js.undefined // false
+  val mirrorContainer          : js.UndefOr[html.Element] = js.undefined // dom.document.body
+  val ignoreInputTextSelection : js.UndefOr[Boolean]      = js.undefined // true
+
+  def isContainer (el: Element)                                                    : Boolean // false
+  def moves       (el: Element, source: Element, handle: Element, sibling: Element): Boolean // true
+  def accepts     (el: Element, target: Element, source: Element, sibling: Element): Boolean // true
+  def invalid     (el: Element, handle: Element)                                   : Boolean // false
+  def copy        (el: Element, source: Element)                                   : Boolean // false
 }
 
 @js.native
 trait Drake extends js.Any {
-  def on(eventName: String, callback: js.Function): Unit                            = js.native
-  def destroy(): Unit                                                               = js.native
-  val dragging: Boolean                                                             = js.native
+  def on(eventName: String, callback: js.Function): Unit = js.native
+  def destroy(): Unit                                    = js.native
+  val dragging: Boolean                                  = js.native
 }
 
 object Drake {

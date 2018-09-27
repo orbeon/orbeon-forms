@@ -20,6 +20,7 @@ import org.orbeon.xforms.$
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 
 // Companion for `fr:dnd-repeat`
 object DndRepeat {
@@ -54,11 +55,15 @@ object DndRepeat {
             js.Array(),
             new DragulaOptions {
 
-              override def mirrorContainer                                                        = containerElem
-              override def isContainer(el: Element)                                               = el eq containerElem
-              override def moves(el: Element, source: Element, handle: Element, sibling: Element) = $(el).is(IsDndMovesSelector)
+              override val mirrorContainer: UndefOr[Element] = containerElem
 
-              override def accepts(el: Element, target: Element, source: Element, sibling: Element) = {
+              def isContainer(el: Element): Boolean =
+                el eq containerElem
+
+              def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean =
+                $(el).is(IsDndMovesSelector)
+
+              def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean = {
 
                 val jSibling = $(sibling)
 
@@ -70,6 +75,9 @@ object DndRepeat {
                   )                              &&
                   ! dragState.exists(_.excludedTargets.exists(_ eq sibling))
               }
+
+              def invalid(el: Element, handle: Element) = false
+              def copy   (el: Element, source: Element) = false
             }
           )
 

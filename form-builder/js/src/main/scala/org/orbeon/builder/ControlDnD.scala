@@ -18,6 +18,7 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
+import org.scalajs.dom.html.Element
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
@@ -46,26 +47,30 @@ private object ControlDnD {
     val drake = Dragula(
       js.Array(),
       new DragulaOptions {
-        override def isContainer(el: html.Element): Boolean = {
+
+        // Create the mirror inside the first container, so the proper CSS applies to the mirror
+        override val mirrorContainer: js.UndefOr[html.Element] =
+          $(".fb-body .fr-grid-td").get(0).asInstanceOf[html.Element]
+
+        def isContainer(el: html.Element): Boolean =
           el.classList.contains("fr-grid-td")
-        }
-        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean = {
+
+        def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean =
           handle.classList.contains("fb-control-handle")
-        }
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean = {
-          // Can only drop into an empty cell
+
+        // Can only drop into an empty cell
+        def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
           $(target)
             .find("> :not(.gu-mirror, .gu-transit, .fb-control-editor-left)")
             .length == 0
-        }
-        override def mirrorContainer: html.Element =
-          // Create the mirror inside the first container, so the proper CSS applies to the mirror
-          $(".fb-body .fr-grid-td").get(0).asInstanceOf[html.Element]
-        override def copy(el: html.Element, source: html.Element): Boolean = {
+
+        def copy(el: html.Element, source: html.Element): Boolean = {
           val cursorClass = if (shiftPressed) CopyClass else MoveClass
           $(el).addClass(cursorClass)
           shiftPressed
         }
+
+        def invalid(el: Element, handle: Element) = false
       }
     )
 

@@ -195,9 +195,10 @@
             }"
             model="fr-form-model"
             ref="
-                if ($show-form-data)
-                then instance('fr-form-instance')
-                else ()"
+                if ($show-form-data) then
+                    instance('fr-form-instance')
+                else
+                    ()"
             xxf:validation-mode="{$validation-mode}"
         >
             <xsl:if test="$is-full-update">
@@ -606,7 +607,12 @@
             ev:defaultAction="cancel"
             xxf:phantom="true"
             type="xpath">
-            frf:successMessage(xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
+            frf:successMessage(
+                xxf:r(
+                    concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')),
+                    'fr-fr-resources'
+                )
+            )
         </xf:action>
 
     </xsl:template>

@@ -278,15 +278,17 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       setvalue(controlElement /@ attName, makeInstanceExpression(templateId(newName)))
 
     // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
+    // NOTE: We used to handle an empty `ref`. Why? We should never have that. If we do want to handle that,
+    // do it in `annotate.xpl`.
     for {
-      resourcePointer ← controlElement child *
-      resourceName    = resourcePointer.localname
-      if resourcesNames(resourceName)                             // We have a resource for this sub-element
-      ref             ← resourcePointer.att("ref").headOption
-      refVal          = ref.stringValue
-      if refVal.isEmpty || refVal.startsWith("$form-resources")   // Don't overwrite ref pointing somewhere else
+      resourcePointer       ← controlElement child *
+      resourceName          = resourcePointer.localname
+      if resourcesNames(resourceName) // We have a resource for this sub-element
+      ref                   ← resourcePointer.att("ref").headOption
+      (_, explicitIndexOpt) ← FormBuilder.findNameAndZeroBasedIndexFromAlertRef(ref.stringValue)
+      predicateString       = explicitIndexOpt map (i ⇒ s"[${i + 1}]") getOrElse ""
     } locally {
-      setvalue(ref.toSeq, s"$$form-resources/$newName/$resourceName")
+      setvalue(List(ref), s"$$form-resources/$newName/$resourceName$predicateString")
     }
 
     // If using a static itemset editor, set `xf:itemset/@ref` value

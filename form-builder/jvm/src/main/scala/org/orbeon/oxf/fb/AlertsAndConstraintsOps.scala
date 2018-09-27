@@ -42,8 +42,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  private val OldAlertRefMatcher = """\$form-resources/([^/]+)/alert(\[(\d+)\])?""".r
-  private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.alert(\.(\d+))?'\)""".r
+  private val OldAlertRefMatcher = """\$form-resources/([^/]+)/alert(?:\[(\d+)\])?""".r
+  private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.alert(?:\.(\d+))?'\)""".r
 
   val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
@@ -557,6 +557,24 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
+  def isGlobalAlertRef(refAtt: String): Boolean =
+    refAtt == OldStandardAlertRef
+
+  // - If the attribute matches a non-global alert path, return `Some`, otherwise `None`.
+  // - If there is an explicit index such as as `[1]`, then return `Some` index, otherwise `None.
+  // - The index, if any, is 0-based.
+  def findNameAndZeroBasedIndexFromAlertRef(refAtt: String): Option[(String, Option[Int])] = {
+
+    def normalizeIndex(index: String) =
+      Option(index) map (_.toInt - 1)
+
+    refAtt match {
+      case OldAlertRefMatcher(controlName, index) ⇒ Some(controlName → normalizeIndex(index))
+      case NewAlertRefMatcher(controlName, index) ⇒ Some(controlName → normalizeIndex(index))
+      case _                                      ⇒ None
+    }
+  }
+
   object AlertDetails {
 
     // Return supported alert details for the control
@@ -576,21 +594,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
         val validationAtt = attValueOrNone(VALIDATION_QNAME)
         val levelAtt      = attValueOrNone(LEVEL_QNAME)
-        val refAtt        = attValueOrNone(REF_QNAME)
+        val refAttOpt     = attValueOrNone(REF_QNAME)
 
-        val isGlobal = refAtt contains OldStandardAlertRef
-
-        // Try to find the alert index from xf:alert/@ref
-        val alertIndexOpt =
-          if (isGlobal)
-            None
-          else
-            refAtt collect {
-              case OldAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
-              case NewAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
-            } map {
-              _  map (_.toInt - 1) getOrElse 0
-            }
+        val alertIndexOpt = refAttOpt match {
+          case Some(refAtt) ⇒ findNameAndZeroBasedIndexFromAlertRef(refAtt) flatMap (_._2) orElse Some(0)
+          case None         ⇒ throw new IllegalArgumentException(s"missing `${REF_QNAME.qualifiedName}` attribute")
+        }
 
         // Try to find an existing resource for the given index if present, otherwise assume a blank value for
         // the language
@@ -606,7 +615,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         def hasSingleValidation = forValidations.size == 1 && forLevels.isEmpty
         def canHandle           = (isDefault || hasSingleValidation) && alertsByLang.nonEmpty
 
-        canHandle option AlertDetails(forValidations.headOption, alertsByLang, isGlobal)
+        canHandle option AlertDetails(forValidations.headOption, alertsByLang, refAttOpt exists isGlobalAlertRef)
       }
 
       controlElem child "alert" flatMap alertFromElement toList

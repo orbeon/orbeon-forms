@@ -15,8 +15,8 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms
-import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
 import org.orbeon.xforms.$
+import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
@@ -57,13 +57,13 @@ object DndRepeat {
 
               override val mirrorContainer: UndefOr[Element] = containerElem
 
-              def isContainer(el: Element): Boolean =
+              override def isContainer(el: Element) =
                 el eq containerElem
 
-              def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean =
+              override def moves(el: Element, source: Element, handle: Element, sibling: Element) =
                 $(el).is(IsDndMovesSelector)
 
-              def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean = {
+              override def accepts(el: Element, target: Element, source: Element, sibling: Element) = {
 
                 val jSibling = $(sibling)
 
@@ -75,9 +75,6 @@ object DndRepeat {
                   )                              &&
                   ! dragState.exists(_.excludedTargets.exists(_ eq sibling))
               }
-
-              def invalid(el: Element, handle: Element) = false
-              def copy   (el: Element, source: Element) = false
             }
           )
 

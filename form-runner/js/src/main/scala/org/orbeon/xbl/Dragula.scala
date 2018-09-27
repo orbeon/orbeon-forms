@@ -26,7 +26,7 @@ object Dragula {
 }
 
 // See: https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
-trait DragulaOptions extends js.Object {
+abstract class DragulaOptions extends js.Object {
 
   val direction                : js.UndefOr[String]       = js.undefined // "vertical"
   val copySortSource           : js.UndefOr[Boolean]      = js.undefined // false
@@ -35,11 +35,11 @@ trait DragulaOptions extends js.Object {
   val mirrorContainer          : js.UndefOr[html.Element] = js.undefined // dom.document.body
   val ignoreInputTextSelection : js.UndefOr[Boolean]      = js.undefined // true
 
-  def isContainer (el: Element)                                                    : Boolean // false
-  def moves       (el: Element, source: Element, handle: Element, sibling: Element): Boolean // true
-  def accepts     (el: Element, target: Element, source: Element, sibling: Element): Boolean // true
-  def invalid     (el: Element, handle: Element)                                   : Boolean // false
-  def copy        (el: Element, source: Element)                                   : Boolean // false
+  def isContainer (el: Element)                                                    : js.UndefOr[Boolean] = js.undefined // false
+  def moves       (el: Element, source: Element, handle: Element, sibling: Element): js.UndefOr[Boolean] = js.undefined // true
+  def accepts     (el: Element, target: Element, source: Element, sibling: Element): js.UndefOr[Boolean] = js.undefined // true
+  def invalid     (el: Element, handle: Element)                                   : js.UndefOr[Boolean] = js.undefined // false
+  def copy        (el: Element, source: Element)                                   : js.UndefOr[Boolean] = js.undefined // false
 }
 
 @js.native

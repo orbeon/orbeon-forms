@@ -19,12 +19,12 @@ import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html.Element
-import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 
 private object ControlDnD {
 
@@ -49,28 +49,26 @@ private object ControlDnD {
       new DragulaOptions {
 
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
-        override val mirrorContainer: js.UndefOr[html.Element] =
+        override val mirrorContainer: UndefOr[Element] =
           $(".fb-body .fr-grid-td").get(0).asInstanceOf[html.Element]
 
-        def isContainer(el: html.Element): Boolean =
+        override def isContainer(el: html.Element) =
           el.classList.contains("fr-grid-td")
 
-        def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean =
+        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
           handle.classList.contains("fb-control-handle")
 
         // Can only drop into an empty cell
-        def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean =
+        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
           $(target)
             .find("> :not(.gu-mirror, .gu-transit, .fb-control-editor-left)")
             .length == 0
 
-        def copy(el: html.Element, source: html.Element): Boolean = {
+        override def copy(el: html.Element, source: html.Element) = {
           val cursorClass = if (shiftPressed) CopyClass else MoveClass
           $(el).addClass(cursorClass)
           shiftPressed
         }
-
-        def invalid(el: Element, handle: Element) = false
       }
     )
 

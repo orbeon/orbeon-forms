@@ -60,9 +60,9 @@ object Tabbable {
                 override val mirrorContainer: UndefOr[Element] = firstRepeatContainer
 
                 // Only elements in drake.containers will be taken into account
-                def isContainer(el: Element): Boolean = false
+                override def isContainer(el: Element) = false
 
-                def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean = {
+                override def moves(el: Element, source: Element, handle: Element, sibling: Element) = {
                   val jEl = $(el)
                   (
                       jEl.prev().is(IsRepeatDelimiterSelector) ||
@@ -71,12 +71,8 @@ object Tabbable {
                       jEl.is(IsDndMovesSelector)
                 }
 
-                def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean =
+                override def accepts(el: Element, target: Element, source: Element, sibling: Element) =
                   sibling != null && $(sibling).is(IsNotGuSelector)
-
-                // Don't prevent any drags from initiating by default
-                def invalid(el: Element, handle: Element) = false
-                def copy   (el: Element, source: Element) = false
               }
             )
 

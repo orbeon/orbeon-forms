@@ -376,8 +376,11 @@
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/actions/label"/>
                         <!-- Repeat over existing bindings -->
-                        <xf:repeat ref="$model/fb:action[ends-with(@id, '-binding')]">
-                            <xh:div class="fb-tool">
+                        <xf:var name="actions" value="$model/fb:action[ends-with(@id, '-binding')]"/>
+                        <xf:var name="moves"   value="count($actions) gt 1"/>
+                        <fr:dnd-repeat ref="$actions">
+                            <xh:div class="{'fb-tool', 'xforms-dnd-item', 'xforms-dnd-moves'[$moves]}">
+                                <xh:i class="fa fa-fw fa-bars fb-action-service-grab"/>
                                 <xf:var name="current-action" value="."/>
                                 <xf:var name="binding-name" value="substring-before(@id, '-binding')"/>
                                 <xf:trigger>
@@ -387,9 +390,9 @@
                                     </xxf:show>
                                 </xf:trigger>
                             </xh:div>
-                        </xf:repeat>
+                        </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger id="fb-add-action">
+                            <xf:trigger class="fb-add-action-button">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>
@@ -406,8 +409,11 @@
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/http-services/label"/>
                         <!-- Repeat over existing services -->
-                        <xf:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-service')]">
-                            <xh:div class="fb-tool">
+                        <xf:var name="services" value="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-service')]"/>
+                        <xf:var name="moves"    value="count($services) gt 1"/>
+                        <fr:dnd-repeat ref="$services">
+                            <xh:div class="{'fb-tool', 'xforms-dnd-item', 'xforms-dnd-moves'[$moves]}">
+                                <xh:i class="fa fa-fw fa-bars fb-action-service-grab"/>
                                 <xf:var name="current-submission" value="."/>
                                 <xf:var name="submission-name" value="substring-before(@id, '-submission')"/>
                                 <xf:trigger>
@@ -418,9 +424,9 @@
                                     </xf:dispatch>
                                 </xf:trigger>
                             </xh:div>
-                        </xf:repeat>
+                        </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger id="fb-add-service">
+                            <xf:trigger class="fb-add-http-service-button">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>
@@ -439,20 +445,23 @@
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/database-services/label"/>
                         <!-- Repeat over existing services -->
-                            <xf:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-database-service')]">
-                                <xh:div class="fb-tool">
-                                    <xf:var name="current-submission" value="."/>
-                                    <xf:var name="submission-name" value="substring-before(@id, '-submission')"/>
-                                    <xf:trigger>
-                                        <xf:label value="$submission-name"/>
-                                        <xxf:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
-                                            <xf:property name="submission-name" value="$submission-name"/>
-                                        </xxf:show>
-                                    </xf:trigger>
-                                </xh:div>
-                        </xf:repeat>
+                        <xf:var name="services" value="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-database-service')]"/>
+                        <xf:var name="moves"    value="count($services) gt 1"/>
+                        <fr:dnd-repeat ref="$services">
+                            <xh:div class="{'fb-tool', 'xforms-dnd-item', 'xforms-dnd-moves'[$moves]}">
+                                <xh:i class="fa fa-fw fa-bars fb-action-service-grab"/>
+                                <xf:var name="current-submission" value="."/>
+                                <xf:var name="submission-name" value="substring-before(@id, '-submission')"/>
+                                <xf:trigger>
+                                    <xf:label value="$submission-name"/>
+                                    <xxf:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
+                                        <xf:property name="submission-name" value="$submission-name"/>
+                                    </xxf:show>
+                                </xf:trigger>
+                            </xh:div>
+                        </fr:dnd-repeat>
                         <xh:div class="fb-tool">
-                            <xf:trigger>
+                            <xf:trigger class="fb-add-service-database-button">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-plus-circle"/>
                                     <xf:output value="$form-resources/add/label"/>

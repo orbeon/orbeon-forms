@@ -407,6 +407,46 @@ div.orbeon.orbeon-portlet-div {
                             margin-right: 4px;
                         }
                     }
+
+                    .fb-add-action-button, .fb-add-http-service-button, .fb-add-service-database-button {
+                        display: block;
+                        //border-top: 1px solid #e5e5e5;
+                        button {
+                            padding-left: 0;
+                        }
+                    }
+
+                    &.xforms-dnd-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        i.fa {
+                            margin-left: 0;
+                        }
+
+                        &> .xforms-trigger {
+                            flex-grow: 1;
+                            display: inline-block;
+                        }
+
+                        .fb-action-service-grab {
+                            display: inline-block;
+                            .opacity(10);
+                            flex-grow: 0;
+                            margin: 0;
+                        }
+
+                        &.xforms-dnd-moves .fb-action-service-grab {
+                            cursor: move;
+                            .opacity(50);
+                        }
+
+                        &:hover {
+                            border-radius: 4px;
+                            #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
+                        }
+                    }
                 }
 
                 // Services and actions
@@ -664,18 +704,17 @@ div.orbeon.orbeon-portlet-div {
                     }
                 }
 
-                .fb-action-options,
-                .fb-action-buttons {
+                .fb-action-options, .fb-action-buttons {
                     display: table-cell;
                     padding-bottom: 5px;
                 }
 
                 .fb-action-grab {
-                    display: none;
+                    display: inline-block;
+                    .opacity(10);
                 }
 
                 &.xforms-dnd-moves .fb-action-grab {
-                    display: inline-block;
                     cursor: move;
                     .opacity(50);
                 }

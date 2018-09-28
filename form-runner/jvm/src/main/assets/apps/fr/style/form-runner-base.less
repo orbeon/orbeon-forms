@@ -219,21 +219,19 @@
     .xbl-component {
         .input-prepend, .input-append {
 
-            display: -ms-flexbox;
-            display: flex; // for IE10
+            display: flex;
+            display: -ms-flexbox; // for IE10
 
-            .add-on {
-                -ms-flex: 0 auto; // for IE10
-                flex-grow: 0;
+            > .add-on {
                 .xforms-output-output {
                     white-space: nowrap;
                 }
             }
 
-            .xforms-input-input, .xforms-input-input[type="text"] { // to override strong existing rule
-                -ms-flex: 1 auto; // for IE10
+            > :not(.add-on) {
                 flex-grow: 1;
-                width: 100%;
+                -ms-flex: 1; // for IE10
+                min-width: 0; // For the input to get smaller than its "implied width"
             }
         }
     }

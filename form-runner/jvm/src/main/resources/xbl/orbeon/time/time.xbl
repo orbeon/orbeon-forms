@@ -56,7 +56,7 @@
         </xbl:resources>
 
         <xbl:template>
-            <xh:div class="input-append date">
+            <xh:div class="input-append">
                 <xf:input ref="xxf:binding('fr-time')"/>
                 <xh:span class="add-on">
                     <xh:i class="fa fa-fw fa-clock-o"/>

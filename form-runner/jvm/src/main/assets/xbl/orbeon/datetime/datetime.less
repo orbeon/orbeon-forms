@@ -1,6 +1,14 @@
 .xbl-fr-datetime {
     .fr-datetime-fields {
+
         display: flex;
+        display: -ms-flexbox; // for IE10
+
+        .xbl-fr-date, .xbl-fr-time {
+            flex-grow: 1;
+            -ms-flex: 1; // for IE10
+        }
+
         .xbl-fr-date { padding-right : 2px }
         .xbl-fr-time { padding-left  : 2px }
     }

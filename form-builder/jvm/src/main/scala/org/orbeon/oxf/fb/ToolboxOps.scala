@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -226,7 +227,7 @@ object ToolboxOps {
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-          <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
+          <xf:label ref={FormBuilder.buildResourcePointer(newSectionName, LHHA.Label.entryName, None)}/>{
           if (withGrid)
             <fr:grid edit-ref="" id={nextId("grid")}>
               <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>

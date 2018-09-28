@@ -561,19 +561,27 @@ trait AlertsAndConstraintsOps extends ControlOps {
     refAtt == OldStandardAlertRef
 
   // - If the attribute matches a non-global alert path, return `Some`, otherwise `None`.
-  // - If there is an explicit index such as as `[1]`, then return `Some` index, otherwise `None.
+  // - If there is an explicit index such as as `[1]`, then return a nested `Some` index, otherwise `None.
   // - The index, if any, is 0-based.
-  def findNameAndZeroBasedIndexFromAlertRef(refAtt: String): Option[(String, Option[Int])] = {
+  def findZeroBasedIndexFromAlertRef(refAtt: String): Option[Option[Int]] = {
 
     def normalizeIndex(index: String) =
       Option(index) map (_.toInt - 1)
 
     refAtt match {
-      case OldAlertRefMatcher(controlName, index) ⇒ Some(controlName → normalizeIndex(index))
-      case NewAlertRefMatcher(controlName, index) ⇒ Some(controlName → normalizeIndex(index))
+      case OldAlertRefMatcher(controlName, index) ⇒ Some(normalizeIndex(index))
+      case NewAlertRefMatcher(controlName, index) ⇒ Some(normalizeIndex(index))
       case _                                      ⇒ None
     }
   }
+
+  // Same as `findZeroBasedIndexFromAlertRef` but handle case of a blank value which returns `Some(None)`.
+  def findZeroBasedIndexFromAlertRefHandleBlankRef(refAtt: String): Option[Option[Int]] =
+    findZeroBasedIndexFromAlertRef(refAtt) orElse (refAtt.isBlank option None)
+
+  // NOTE: The index is 0-based.
+  def buildResourcePointer(controlName: String, lhhaName: String, indexOpt: Option[Int]) =
+    s"$$form-resources/$controlName/$lhhaName${indexOpt map (i ⇒ s"[${i + 1}]") getOrElse ""}"
 
   object AlertDetails {
 
@@ -597,7 +605,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val refAttOpt     = attValueOrNone(REF_QNAME)
 
         val alertIndexOpt = refAttOpt match {
-          case Some(refAtt) ⇒ findNameAndZeroBasedIndexFromAlertRef(refAtt) flatMap (_._2) orElse Some(0)
+          case Some(refAtt) ⇒ findZeroBasedIndexFromAlertRef(refAtt).flatten orElse Some(0)
           case None         ⇒ throw new IllegalArgumentException(s"missing `${REF_QNAME.qualifiedName}` attribute")
         }
 

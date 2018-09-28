@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om.NodeInfo
@@ -277,24 +278,23 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     for (attName ← List("template", "origin"))
       setvalue(controlElement /@ attName, makeInstanceExpression(templateId(newName)))
 
-    // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
-    // NOTE: We used to handle an empty `ref`. Why? We should never have that. If we do want to handle that,
-    // do it in `annotate.xpl`.
+    // Set `xf:label`, `xf:hint`, `xf:help` and `xf:alert` `@ref` if present.
+    // NOTE: Just after an insert, for example of `fr:explanation`, we have `<fr:text ref=""/>`, so we must handle
+    // the case where the `ref` is blank.
     for {
-      resourcePointer       ← controlElement child *
-      resourceName          = resourcePointer.localname
+      resourcePointer  ← controlElement child *
+      resourceName     = resourcePointer.localname
       if resourcesNames(resourceName) // We have a resource for this sub-element
-      ref                   ← resourcePointer.att("ref").headOption
-      (_, explicitIndexOpt) ← FormBuilder.findNameAndZeroBasedIndexFromAlertRef(ref.stringValue)
-      predicateString       = explicitIndexOpt map (i ⇒ s"[${i + 1}]") getOrElse ""
+      ref              ← resourcePointer.att("ref").headOption
+      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue)
     } locally {
-      setvalue(List(ref), s"$$form-resources/$newName/$resourceName$predicateString")
+      setvalue(List(ref), FormBuilder.buildResourcePointer(newName, resourceName, explicitIndexOpt))
     }
 
     // If using a static itemset editor, set `xf:itemset/@ref` value
     // TODO: Does this work if the itemset points to the data?
     if (hasEditor(controlElement, "static-itemset"))
-      setvalue(controlElement / "*:itemset" /@ "ref", s"$$form-resources/$newName/item")
+      setvalue(controlElement / "*:itemset" /@ "ref", FormBuilder.buildResourcePointer(newName, "item", None))
   }
 
   // Rename a bind
@@ -637,18 +637,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           List(
             elementInfo(
               lhhaQName,
-              attributeInfo("ref", s"$$form-resources/$controlName/$lhhaName") +: params
+              attributeInfo("ref", FormBuilder.buildResourcePointer(controlName, lhhaName, None)) +: params
             )
           )
         } else {
 
-          def newTemplate(index: Int) =
+          def newTemplate(zeroBasedIndex: Int) =
             elementInfo(
               lhhaQName,
-              attributeInfo("ref", s"$$form-resources/$controlName/$lhhaName[$index]") +: params
+              attributeInfo("ref", FormBuilder.buildResourcePointer(controlName, lhhaName, Some(zeroBasedIndex))) +: params
             )
 
-          1 to count map newTemplate
+          0 until count map newTemplate
         }
 
       insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)

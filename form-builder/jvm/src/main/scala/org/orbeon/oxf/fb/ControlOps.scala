@@ -286,7 +286,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       resourceName     = resourcePointer.localname
       if resourcesNames(resourceName) // We have a resource for this sub-element
       ref              ← resourcePointer.att("ref").headOption
-      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue)
+      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue, resourceName)
     } locally {
       setvalue(List(ref), FormBuilder.buildResourcePointer(newName, resourceName, explicitIndexOpt))
     }

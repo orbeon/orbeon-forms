@@ -42,8 +42,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  private val OldAlertRefMatcher = """\$form-resources/([^/]+)/alert(?:\[(\d+)\])?""".r
-  private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.alert(?:\.(\d+))?'\)""".r
+  private val OldAlertRefMatcher = """\$form-resources/([^/]+)/(\w+)(?:\[(\d+)\])?""".r
+  private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.(\w+)(?:\.(\d+))?'\)""".r
 
   val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
@@ -563,21 +563,21 @@ trait AlertsAndConstraintsOps extends ControlOps {
   // - If the attribute matches a non-global alert path, return `Some`, otherwise `None`.
   // - If there is an explicit index such as as `[1]`, then return a nested `Some` index, otherwise `None.
   // - The index, if any, is 0-based.
-  def findZeroBasedIndexFromAlertRef(refAtt: String): Option[Option[Int]] = {
+  def findZeroBasedIndexFromAlertRef(refAtt: String, resourceName: String): Option[Option[Int]] = {
 
     def normalizeIndex(index: String) =
       Option(index) map (_.toInt - 1)
 
     refAtt match {
-      case OldAlertRefMatcher(controlName, index) ⇒ Some(normalizeIndex(index))
-      case NewAlertRefMatcher(controlName, index) ⇒ Some(normalizeIndex(index))
-      case _                                      ⇒ None
+      case OldAlertRefMatcher(_, `resourceName`, index) ⇒ Some(normalizeIndex(index))
+      case NewAlertRefMatcher(_, `resourceName`, index) ⇒ Some(normalizeIndex(index))
+      case _                                            ⇒ None
     }
   }
 
   // Same as `findZeroBasedIndexFromAlertRef` but handle case of a blank value which returns `Some(None)`.
-  def findZeroBasedIndexFromAlertRefHandleBlankRef(refAtt: String): Option[Option[Int]] =
-    findZeroBasedIndexFromAlertRef(refAtt) orElse (refAtt.isBlank option None)
+  def findZeroBasedIndexFromAlertRefHandleBlankRef(refAtt: String, resourceName: String): Option[Option[Int]] =
+    findZeroBasedIndexFromAlertRef(refAtt, resourceName) orElse (refAtt.isBlank option None)
 
   // NOTE: The index is 0-based.
   def buildResourcePointer(controlName: String, lhhaName: String, indexOpt: Option[Int]) =
@@ -605,7 +605,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val refAttOpt     = attValueOrNone(REF_QNAME)
 
         val alertIndexOpt = refAttOpt match {
-          case Some(refAtt) ⇒ findZeroBasedIndexFromAlertRef(refAtt).flatten orElse Some(0)
+          case Some(refAtt) ⇒ findZeroBasedIndexFromAlertRef(refAtt, LHHA.Alert.entryName).flatten orElse Some(0)
           case None         ⇒ throw new IllegalArgumentException(s"missing `${REF_QNAME.qualifiedName}` attribute")
         }
 

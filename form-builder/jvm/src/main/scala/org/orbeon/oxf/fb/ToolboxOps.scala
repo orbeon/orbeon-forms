@@ -1016,7 +1016,7 @@ object ToolboxOps {
         case None ⇒ ensureEmptyCell()
       }
 
-     insertCellElemOpt map { insertCellElem ⇒
+    insertCellElemOpt map { insertCellElem ⇒
 
       implicit val ctx = FormBuilderDocContext()
 

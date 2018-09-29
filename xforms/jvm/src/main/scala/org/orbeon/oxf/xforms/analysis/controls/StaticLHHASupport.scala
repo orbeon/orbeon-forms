@@ -39,7 +39,7 @@ object LHHA extends Enum[LHHA] {
   val size = values.size
 
   val QNameForValue = values map (value ⇒ value → QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
-  val QNamesSet      = QNameForValue.values.to[Set]
+  val QNamesSet     = QNameForValue.values.to[Set]
 
   // By default all controls support HTML LHHA
   val DefaultLHHAHTMLSupport = values.toSet

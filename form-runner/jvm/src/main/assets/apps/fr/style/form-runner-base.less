@@ -220,7 +220,6 @@
         .input-prepend, .input-append {
 
             display: flex;
-            display: -ms-flexbox; // for IE10
 
             > .add-on {
                 .xforms-output-output {
@@ -230,7 +229,6 @@
 
             > :not(.add-on) {
                 flex-grow: 1;
-                -ms-flex: 1; // for IE10
                 min-width: 0; // For the input to get smaller than its "implied width"
             }
         }

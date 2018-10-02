@@ -69,17 +69,21 @@ private class DateCompanion extends XBLCompanion {
       if (iOS) {
         inputEl.prop("value", newValue)
       } else {
-        try {
-          val dateParts = newValue.splitTo[List]("-")
-          // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-          val jsDate = new js.Date(
-            year  = dateParts(0).toInt,
-            month = dateParts(1).toInt - 1,
-            date  = dateParts(2).toInt,
-            0, 0, 0, 0)
-          datePicker.setDate(jsDate)
-        } catch {
-          case _: Exception ⇒ // Ignore values we can't parse as dates
+        if (newValue.isBlank) {
+          datePicker.clearDates()
+        } else {
+          try {
+            val dateParts = newValue.splitTo[List]("-")
+            // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
+            val jsDate = new js.Date(
+              year  = dateParts(0).toInt,
+              month = dateParts(1).toInt - 1,
+              date  = dateParts(2).toInt,
+              0, 0, 0, 0)
+            datePicker.setDate(jsDate)
+          } catch {
+            case _: Exception ⇒ // Ignore values we can't parse as dates
+          }
         }
       }
     }
@@ -100,9 +104,8 @@ private class DateCompanion extends XBLCompanion {
     }
   }
 
-  def onChangeDate(): Unit = {
+  def onChangeDate(): Unit =
     DocumentAPI.setValue(containerElem.id, xformsGetValue())
-  }
 }
 
 private object DatePickerFacade {
@@ -131,6 +134,7 @@ private object DatePickerFacade {
     def onChangeDate(f: js.Function0[Unit]): Unit = datePicker.on("changeDate", f)
     def getDate: js.Date = datePicker.datepicker("getDate").asInstanceOf[js.Date]
     def setDate(date: js.Date): Unit = datePicker.datepicker("setDate", date)
+    def clearDates(): Unit = datePicker.datepicker("clearDates", Nil)
     def options: DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
   }
 }

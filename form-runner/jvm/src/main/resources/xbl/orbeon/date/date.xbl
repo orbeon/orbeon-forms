@@ -64,7 +64,7 @@
         </xbl:resources>
 
         <xbl:handlers>
-            <xbl:handler event="xxforms-visible">
+            <xbl:handler event="xxforms-visible xxforms-iteration-moved">
                 <xf:action type="javascript">
                     <xf:param name="format" value="xxf:property('oxf.xforms.format.input.date')"/>
                     <xf:body>ORBEON.xforms.XBL.instanceForControl(this).setFormat(format)</xf:body>

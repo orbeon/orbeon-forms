@@ -1872,9 +1872,9 @@
 					p = parts[i].slice(0, m.length);
 				return m.toLowerCase() === p.toLowerCase();
 			}
-			if (parts.length === fparts.length){
+			if (parts.length <= fparts.length){
 				var cnt;
-				for (i=0, cnt = fparts.length; i < cnt; i++){
+				for (i=0, cnt = parts.length; i < cnt; i++){
 					val = parseInt(parts[i], 10);
 					part = fparts[i];
 					if (isNaN(val)){

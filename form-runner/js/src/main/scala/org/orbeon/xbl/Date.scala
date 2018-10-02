@@ -48,6 +48,7 @@ private class DateCompanion extends XBLCompanion {
       val options              = new DatePickerOptions
       options.autoclose        = true
       options.enableOnReadonly = false
+      options.assumeNearbyYear = true
       datePicker = inputEl.parent().datepicker(options)
       datePicker.onChangeDate(() ⇒ onChangeDate())
     }
@@ -128,6 +129,7 @@ private object DatePickerFacade {
     var format           : String  = "mm/dd/yyyy"
     var autoclose        : Boolean = false
     var enableOnReadonly : Boolean = true
+    var assumeNearbyYear : Boolean = false
   }
 
   implicit class DatePickerOps(val datePicker: DatePicker) extends AnyVal {
@@ -138,4 +140,3 @@ private object DatePickerFacade {
     def options: DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
   }
 }
-

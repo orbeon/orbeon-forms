@@ -25,7 +25,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js"/>
 
     <xbl:binding
         id="fr-date"

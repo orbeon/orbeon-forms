@@ -47,6 +47,15 @@
       <module name="formRunnerJVM" target="1.6" />
       <module name="formRunnerProxyPortlet" target="1.6" />
       <module name="fullPortlet" target="1.6" />
+      <module name="js-orbeon-common" target="1.6" />
+      <module name="js-orbeon-form-builder" target="1.6" />
+      <module name="js-orbeon-form-runner" target="1.6" />
+      <module name="js-orbeon-war" target="1.6" />
+      <module name="jvm-orbeon-common" target="1.6" />
+      <module name="jvm-orbeon-form-builder" target="1.6" />
+      <module name="jvm-orbeon-form-runner" target="1.6" />
+      <module name="jvm-orbeon-war" target="1.6" />
+      <module name="jvm-orbeon-xforms" target="1.6" />
       <module name="nodeFacades" target="1.6" />
       <module name="orbeonWar" target="1.6" />
       <module name="orbeonWarJS" target="1.6" />

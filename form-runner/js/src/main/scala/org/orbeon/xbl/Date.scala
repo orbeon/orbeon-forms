@@ -95,12 +95,12 @@ private class DateCompanion extends XBLCompanion {
   def setFormat(format: String): Unit = {
     // On iOS, ignore the format as the native widget uses its own format
     if (! iOS) {
-      val date = datePicker.getDate
+      val jsDate = datePicker.getDate
       datePicker.options.format = format
         .replaceAllLiterally("[D]", "d")
         .replaceAllLiterally("[M]", "m")
         .replaceAllLiterally("[Y]", "yyyy")
-      datePicker.setDate(date)
+      datePicker.setDate(jsDate)
     }
   }
 

@@ -51,18 +51,18 @@ object StringUtils {
      *
      * This implementation can return any collection type for which there is a builder:
      *
-     * split[List]("a b")
-     * split[Array]("a b")
-     * split[Set]("a b")
-     * split[LinkedHashSet]("a b")
-     * split("a b")
+     * splitTo[List]("a b")
+     * splitTo[Array]("a b")
+     * splitTo[Set]("a b")
+     * splitTo[LinkedHashSet]("a b")
+     * splitTo("a b")
      *
      * Or:
      *
-     * val result: List[String]          = split("a b")(breakOut)
-     * val result: Array[String]         = split("a b")(breakOut)
-     * val result: Set[String]           = split("a b")(breakOut)
-     * val result: LinkedHashSet[String] = split("a b")(breakOut)
+     * val result: List[String]          = splitTo("a b")(breakOut)
+     * val result: Array[String]         = splitTo("a b")(breakOut)
+     * val result: Set[String]           = splitTo("a b")(breakOut)
+     * val result: LinkedHashSet[String] = splitTo("a b")(breakOut)
      */
     def splitTo[T[_]](sep: String = null, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
 

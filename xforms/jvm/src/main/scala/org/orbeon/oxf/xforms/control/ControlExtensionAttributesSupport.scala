@@ -27,7 +27,7 @@ trait ControlExtensionAttributesSupport {
   // Optional extension attributes supported by the control
   private[ControlExtensionAttributesSupport] var _extensionAttributes: Option[Map[QName, String]] = None
 
-  final def evaluatedExtensionAttributes =
+  final def evaluatedExtensionAttributes: Map[QName, String] =
     _extensionAttributes getOrElse {
 
       val result =
@@ -48,14 +48,14 @@ trait ControlExtensionAttributesSupport {
   final def evaluateNonRelevantExtensionAttribute(): Unit =
     _extensionAttributes = None
 
-  final def markExtensionAttributesDirty() =
+  final def markExtensionAttributesDirty(): Unit =
     _extensionAttributes = None
 
-  final def compareExtensionAttributes(other: XFormsControl) =
+  final def compareExtensionAttributes(other: XFormsControl): Boolean =
     evaluatedExtensionAttributes == other.evaluatedExtensionAttributes
 
   // NOTE: Overridden by some tests
-  def extensionAttributeValue(attributeName: QName) =
+  def extensionAttributeValue(attributeName: QName): Option[String] =
     evaluatedExtensionAttributes.get(attributeName)
 
   // Add all non-null values to the given list of attributes, filtering by namespace URI

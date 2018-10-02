@@ -13,8 +13,10 @@
   */
 package org.orbeon
 
+import org.scalajs.jquery.JQueryStatic
+
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 package object xforms {
-  val $ = g.ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
+  val $: JQueryStatic = g.ORBEON.jQuery.asInstanceOf[JQueryStatic]
 }

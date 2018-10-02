@@ -14,16 +14,10 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js"/>

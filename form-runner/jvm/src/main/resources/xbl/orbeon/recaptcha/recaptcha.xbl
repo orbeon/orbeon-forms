@@ -103,10 +103,6 @@
                             </xf:action>
                         </xf:action>
 
-                        <!-- Configuration -->
-                        <xsl:copy-of select="xxbl:parameter(., 'public-key')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
-
                         <!-- Provides access the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
                         <xf:input ref="response"  class="xbl-fr-recaptcha-response xforms-hidden"/>

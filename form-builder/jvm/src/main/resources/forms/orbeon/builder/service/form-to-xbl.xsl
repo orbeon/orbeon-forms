@@ -107,7 +107,6 @@
                 <display-name lang="it"><xsl:value-of select="fr:title('it', 'Templates della sezione')"/></display-name>
                 <icon>
                     <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
-                    <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
                 </icon>
             </metadata>
 

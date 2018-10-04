@@ -51,7 +51,6 @@
             <form-settings show="false"/>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/autocomplete.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
             </icon>
             <templates>
                 <instance label=""/>

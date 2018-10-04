@@ -41,7 +41,6 @@
             <display-name lang="pt">Anexar imagem</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/picture.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/picture.png</large-icon>
                 <!--<icon-class>fa fa-fw fa-file-image</icon-class>-->
             </icon>
             <templates>

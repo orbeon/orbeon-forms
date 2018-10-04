@@ -31,7 +31,6 @@
             <toolbox show="false"/>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
             <templates>
                 <bind type="xf:boolean"/>

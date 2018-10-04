@@ -44,7 +44,6 @@
             <display-name lang="pt">Inserir no local</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
             <template>
                  <fr:inplace-input>

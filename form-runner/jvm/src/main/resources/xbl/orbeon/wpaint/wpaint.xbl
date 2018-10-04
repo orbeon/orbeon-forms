@@ -49,7 +49,6 @@
             <fb:display-name lang="pt">Anotação da imagem</fb:display-name>
             <fb:icon>
                 <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
-                <fb:large-icon>/apps/fr/style/images/silk/paintbrush.png</fb:large-icon>
             </fb:icon>
             <fb:templates>
                 <fb:view>

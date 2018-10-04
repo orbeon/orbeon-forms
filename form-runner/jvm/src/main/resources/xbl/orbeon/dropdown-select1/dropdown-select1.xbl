@@ -40,7 +40,6 @@
             <display-name lang="sv">Rullgardinsmeny</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
             <editors static-itemset="true"/>
             <templates>

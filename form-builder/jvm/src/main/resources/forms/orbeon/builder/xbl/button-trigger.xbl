@@ -28,7 +28,6 @@
             <display-name lang="pt">Botão</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
             </icon>
             <template>
                 <xf:trigger id="" xmlns="">

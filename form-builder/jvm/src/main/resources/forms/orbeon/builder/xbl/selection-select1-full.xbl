@@ -28,7 +28,6 @@
             <display-name lang="pt">Botões de Opção</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
             </icon>
             <editors static-itemset="true" item-hint="true"/>
             <templates>

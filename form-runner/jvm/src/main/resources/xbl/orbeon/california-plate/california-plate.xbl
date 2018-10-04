@@ -39,7 +39,6 @@
             <display-name lang="pt">Matrícula da Califórnia</display-name>
             <icon>
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
-                <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>
             <templates>
                 <view>

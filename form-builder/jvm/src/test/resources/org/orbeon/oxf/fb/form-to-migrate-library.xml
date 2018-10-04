@@ -14,7 +14,6 @@
             <display-name lang="it">Templates della sezione</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
         </metadata>
         <xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component">
@@ -23,13 +22,11 @@
                 <description lang="en"/>
                 <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                    <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
                 <display-name lang="fr">Adresse US</display-name>
                 <description lang="fr"/>
                 <icon lang="fr">
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                    <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
                 <templates>
                     <view>
@@ -310,7 +307,6 @@
             <display-name lang="it">Templates della sezione</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
         </metadata>
         <xbl:binding id="migration-section-1-component" element="component|section-1" class="fr-section-component">
@@ -319,7 +315,6 @@
                 <description lang="en"/>
                 <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                    <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
                 <templates>
                     <view>
@@ -476,7 +471,6 @@
                 <description lang="en"/>
                 <icon>
                     <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
-                    <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
                 </icon>
                 <templates>
                     <view>

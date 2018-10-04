@@ -42,7 +42,6 @@
             <display-name lang="pt">Diálogo Selecção Simples</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <editors static-itemset="true"/>
             <template>

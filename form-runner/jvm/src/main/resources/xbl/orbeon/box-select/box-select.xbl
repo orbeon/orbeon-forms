@@ -46,7 +46,6 @@
             <display-name lang="pt">Lista de Caixas de Verificação</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
             <editors static-itemset="true"/>
             <template>

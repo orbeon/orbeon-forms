@@ -44,7 +44,6 @@
             <form-settings show="false"/>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
             <datatype>xf:string</datatype>
             <editors static-itemset="false"/>

@@ -45,7 +45,6 @@
             <display-name lang="pt" todo="true">[Tree Selector]</display-name>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
-                <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
             </icon>
             <editors static-itemset="true" item-hint="true"/>
             <templates>

@@ -43,7 +43,6 @@
             <display-name lang="pt">Mapa</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>
             <templates>
                 <view>

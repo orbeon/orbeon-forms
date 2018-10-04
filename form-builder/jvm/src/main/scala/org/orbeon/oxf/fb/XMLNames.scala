@@ -33,6 +33,7 @@ object XMLNames {
   val FBEditorsTest     : Test  = FB → "editors"
   val FBDisplayNameTest : Test  = FB → "display-name"
   val FBIconTest        : Test  = FB → "icon"
+  val FBIconClassTest   : Test  = FB → "icon-class"
   val FBSmallIconTest   : Test  = FB → "small-icon"
 
   val InitialIterations : QName = QName("initial-iterations", FBPrefix, FB)

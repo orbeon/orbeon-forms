@@ -730,11 +730,18 @@
                                                     <xf:select1 ref="$i/appearances/@selection[$multi]" appearance="full">
                                                         <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                                         <xf:itemset ref="$i/appearances/appearance">
-                                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
-                                                            <xf:label xml:space="preserve">
-                                                                <xh:img src="{{icon}}" alt="" width="16" height="16"/>
-                                                                <xf:output value="label"/>
-                                                            </xf:label>
+                                                            <xf:label
+                                                                mediatype="text/html"
+                                                                value="
+                                                                    concat(
+                                                                        if (exists(icon-path)) then
+                                                                            concat('&lt;img src=&quot;', icon-path[1], '&quot; alt=&quot;&quot;/>')
+                                                                        else
+                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;/>'),
+                                                                        ' ',
+                                                                        label
+                                                                    )
+                                                            "/>
                                                             <xf:value ref="value"/>
                                                         </xf:itemset>
                                                     </xf:select1>
@@ -742,11 +749,18 @@
                                                     <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
                                                         <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                                         <xf:itemset ref="$i/appearances/appearance[xxf:non-blank(value)]">
-                                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
-                                                            <xf:label xml:space="preserve">
-                                                                <xh:img src="{{icon}}" alt="" width="16" height="16"/>
-                                                                <xf:output value="label"/>
-                                                            </xf:label>
+                                                            <xf:label
+                                                                mediatype="text/html"
+                                                                value="
+                                                                    concat(
+                                                                        if (exists(icon-path)) then
+                                                                            concat('&lt;img src=&quot;', icon-path[1], '&quot; alt=&quot;&quot;/>')
+                                                                        else
+                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;/>'),
+                                                                        ' ',
+                                                                        label
+                                                                    )
+                                                            "/>
                                                             <xf:value ref="value"/>
                                                         </xf:itemset>
                                                     </xf:select>

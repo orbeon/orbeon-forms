@@ -81,7 +81,7 @@ trait BindingOps {
 
     val appearancesXML =
       for {
-        (valueOpt, label, icon) ← possibleAppearancesWithLabel(
+        (valueOpt, label, iconPathOpt, iconClasses) ← possibleAppearancesWithLabel(
             elemName,
             builtinType,
             lang,
@@ -91,7 +91,12 @@ trait BindingOps {
         <appearance current={appearanceMatches(valueOpt).toString}>
           <label>{label}</label>
           <value>{valueOpt.getOrElse("")}</value>
-          <icon>{icon}</icon>
+          {
+            iconPathOpt.toList map { iconPath ⇒
+              <icon-path>{iconPath}</icon-path>
+            }
+          }
+          <icon-class>{iconClasses}</icon-class>
         </appearance>
 
     appearancesXML map elemToNodeInfo toArray
@@ -107,7 +112,7 @@ trait BindingOps {
     datatype : QName,
     lang     : String,
     bindings : Seq[NodeInfo]
-  ): Seq[(Option[String], String, String)] = {
+  ): Seq[(Option[String], String, Option[String], String)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]) =
       bindingOpt.to[List] flatMap bindingMetadata headOption
@@ -126,16 +131,15 @@ trait BindingOps {
           fromLang orElse fromFirst map (_.stringValue) flatMap trimAllToOpt
         }
 
-        val displayNames = metadata / FBDisplayNameTest
-        val icons        = metadata / FBIconTest / FBSmallIconTest
+        // See also toolbox.xml which duplicates some of this logic
+        val displayNameOpt = findMetadata(metadata / FBDisplayNameTest)
+        val iconClasses    = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
+        val iconPathOpt    = findMetadata(metadata / FBIconTest / FBSmallIconTest)
 
-        val displayNameOpt = findMetadata(displayNames)
-        val icon           = findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png"
-
-        (appearanceOpt, displayNameOpt, icon)
+        (appearanceOpt, displayNameOpt, iconPathOpt, iconClasses)
     } collect {
-      case (appearanceOpt, Some(displayName), icon) ⇒
-        (appearanceOpt, displayName, icon)
+      case (appearanceOpt, Some(displayName), iconPathOpt, iconClasses) ⇒
+        (appearanceOpt, displayName, iconPathOpt, iconClasses)
     }
   }
 

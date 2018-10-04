@@ -176,9 +176,9 @@ trait InstanceMetadata {
         None → None
     }
 
-  // Don't allow a blank src attribute
-  if (useExternalContent && instanceSource.contains(""))
-    throw new ValidationException("xf:instance must not specify a blank URL", extendedLocationData)
+  // Don't allow a blank `src` attribute
+  if (useExternalContent && instanceSource.exists(_.isBlank))
+    throw new ValidationException("`xf:instance` must not specify a blank URL", extendedLocationData)
 }
 
 object Instance {

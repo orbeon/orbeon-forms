@@ -61,7 +61,7 @@ class Instance(
   // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
   // instances of a given form. This is useful in particular for component i18n resource instances.
-  def inlineContent = {
+  def inlineContent: DocumentInfo = {
 
     // An instance within xf:implementation has a ComponentControl grandparent
     def componentForConstantInstances =

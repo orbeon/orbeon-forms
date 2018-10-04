@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om.DocumentInfo
 
 import scala.collection.JavaConverters._
 
@@ -102,7 +103,7 @@ case class AbstractBinding(
 
   // Constant instance DocumentInfo by model and instance index
   // We use the indexes because at this time, no id annotation has taken place yet
-  val constantInstances = (
+  val constantInstances: Map[(Int, Int), DocumentInfo] = (
     for {
       (m, mi) ← modelElements.zipWithIndex
       (i, ii) ← Dom4j.elements(m, XFORMS_INSTANCE_QNAME).zipWithIndex

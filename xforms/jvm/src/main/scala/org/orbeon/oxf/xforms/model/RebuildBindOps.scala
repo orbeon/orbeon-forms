@@ -86,7 +86,7 @@ trait RebuildBindOps {
   // object. Otherwise, the IDREF resolution produced a null search result."
   def resolveBind(bindId: String, contextItemOpt: Option[Item]): Option[RuntimeBind] =
     singleNodeContextBinds.get(bindId) match {
-      case some @ Some(singleNodeContextBind) ⇒
+      case some @ Some(_) ⇒
         // This bind has a single-node context (incl. top-level bind), so ignore context item and just return
         // the bind nodeset
         some

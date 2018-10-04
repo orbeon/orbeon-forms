@@ -13,18 +13,15 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.{DependsOnContextItem, NamespaceMapping, ShareableXPathStaticContext}
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
-import scala.util.Try
 
 trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 
@@ -76,47 +73,6 @@ trait LongValidationFunction   extends ValidationFunction[Long] {
 
 trait StringValidationFunction extends ValidationFunction[String] {
   def argumentOpt(implicit xpathContext: XPathContext): Option[String] = stringArgumentOpt(0)
-}
-
-
-// NOTE: This should probably be scope in the Form Builder module.
-object ValidationFunction {
-
-  def analyzeKnownConstraint(
-    xpathString      : String,
-    namespaceMapping : NamespaceMapping,
-    functionLibrary  : FunctionLibrary
-  )(implicit
-    logger          : IndentedLogger
-  ): Option[(String, Option[String])] = {
-
-    def tryCompile =
-      Try(
-        XPath.compileExpressionMinimal(
-          staticContext = new ShareableXPathStaticContext(
-            XPath.GlobalConfiguration,
-            namespaceMapping,
-            functionLibrary
-          ),
-          xpathString   = xpathString
-        )
-      )
-
-    def analyze(expr: Expression) =
-      expr match {
-        case e: ValidationFunction[_] ⇒
-          e.arguments.headOption match {
-            case Some(l: Literal) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
-            case None             ⇒ Some(e.propertyName → None)
-            case other            ⇒ None
-          }
-        case other ⇒
-          None
-      }
-
-    tryCompile.toOption flatMap analyze
-  }
-
 }
 
 class MaxLengthValidation extends LongValidationFunction {

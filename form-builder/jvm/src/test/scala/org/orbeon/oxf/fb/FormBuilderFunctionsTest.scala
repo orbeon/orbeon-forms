@@ -384,8 +384,8 @@ class FormBuilderFunctionsTest
 
   describe("Analyze known constraint") {
 
+    import CommonConstraint.analyzeKnownConstraint
     import org.orbeon.oxf.xforms.XFormsConstants._
-    import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction.analyzeKnownConstraint
 
     val Library = XFormsFunctionLibrary
 

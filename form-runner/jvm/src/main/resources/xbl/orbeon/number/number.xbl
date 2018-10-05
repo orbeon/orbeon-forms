@@ -70,12 +70,12 @@
                         NumberSupport:getStorageValueJava(
                             event('value'),
                             xxf:binding('fr-number'),
-                            xxf:component-param-value('decimal-separator'),
-                            xxf:component-param-value('grouping-separator'),
-                            xxf:component-param-value('prefix'),
-                            xxf:component-param-value('digits-after-decimal'),
-                            string(xxf:component-param-value('round-when-formatting')) = 'true',
-                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                            fr:component-param-value('decimal-separator'),
+                            fr:component-param-value('grouping-separator'),
+                            fr:component-param-value('prefix'),
+                            fr:component-param-value('digits-after-decimal'),
+                            string(fr:component-param-value('round-when-formatting')) = 'true',
+                            string(fr:component-param-value('round-when-storing'))    = 'true'
                         )"/>
             </xbl:handler>
 
@@ -89,18 +89,18 @@
                     value="
                         NumberSupport:getDisplayAndEditValueJava(
                             xxf:binding('fr-number'),
-                            xxf:component-param-value('decimal-separator'),
-                            xxf:component-param-value('grouping-separator'),
-                            xxf:component-param-value('prefix'),
-                            xxf:component-param-value('digits-after-decimal'),
-                            string(xxf:component-param-value('round-when-formatting')) = 'true',
-                            string(xxf:component-param-value('round-when-storing'))    = 'true'
+                            fr:component-param-value('decimal-separator'),
+                            fr:component-param-value('grouping-separator'),
+                            fr:component-param-value('prefix'),
+                            fr:component-param-value('digits-after-decimal'),
+                            string(fr:component-param-value('round-when-formatting')) = 'true',
+                            string(fr:component-param-value('round-when-storing'))    = 'true'
                         )"/>
 
                 <xf:action type="javascript">
                     <xf:param name="displayValue"     value="$display-and-edit-values[1]"/>
                     <xf:param name="editValue"        value="$display-and-edit-values[2]"/>
-                    <xf:param name="decimalSeparator" value="xxf:component-param-value('decimal-separator')"/>
+                    <xf:param name="decimalSeparator" value="fr:component-param-value('decimal-separator')"/>
                     <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
                 </xf:action>
 
@@ -126,8 +126,8 @@
             <xf:group ref="$binding[not($view)]">
 
 
-                <xf:var name="prefix" value="xxf:component-param-value('prefix')"/>
-                <xf:var name="suffix" value="xxf:component-param-value('suffix')"/>
+                <xf:var name="prefix" value="fr:component-param-value('prefix')"/>
+                <xf:var name="suffix" value="fr:component-param-value('suffix')"/>
 
                 <!-- See also https://github.com/orbeon/orbeon-forms/issues/2495 -->
 
@@ -186,17 +186,17 @@
                 xxf:format="
                     string-join(
                         (
-                            xxf:component-param-value('prefix'),
+                            fr:component-param-value('prefix'),
                             NumberSupport:getDisplayAndEditValueJava(
                                 xxf:binding('fr-number'),
-                                xxf:component-param-value('decimal-separator'),
-                                xxf:component-param-value('grouping-separator'),
-                                xxf:component-param-value('prefix'),
-                                xxf:component-param-value('digits-after-decimal'),
-                                string(xxf:component-param-value('round-when-formatting')) = 'true',
-                                string(xxf:component-param-value('round-when-storing'))    = 'true'
+                                fr:component-param-value('decimal-separator'),
+                                fr:component-param-value('grouping-separator'),
+                                fr:component-param-value('prefix'),
+                                fr:component-param-value('digits-after-decimal'),
+                                string(fr:component-param-value('round-when-formatting')) = 'true',
+                                string(fr:component-param-value('round-when-storing'))    = 'true'
                             )[1],
-                            xxf:component-param-value('suffix')
+                            fr:component-param-value('suffix')
                         ),
                         ' '
                     )"/>

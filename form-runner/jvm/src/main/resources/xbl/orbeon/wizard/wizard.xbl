@@ -141,7 +141,7 @@
 
                 <xf:var name="local" value="instance('local')"/>
 
-                <xf:bind ref="validate"                       xxf:default="Wizard:normalizeWizardMode(xxf:component-param-value('validate'))"/>
+                <xf:bind ref="validate"                       xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
                 <xf:bind ref="separate-toc" type="xs:boolean" xxf:default="Wizard:isWizardSeparateToc()"/>
                 <xf:bind ref="show-toc"     type="xs:boolean" xxf:default="true()"/>
                 <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(Wizard:isWizardSeparateToc())"/>

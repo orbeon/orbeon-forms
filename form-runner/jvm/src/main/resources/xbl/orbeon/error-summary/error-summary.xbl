@@ -113,7 +113,7 @@
                     <xf:bind ref="default-page-size | current-page-size" type="xs:integer"
                              xxf:default="
                                 (
-                                    xxf:component-param-value('page-size'),
+                                    fr:component-param-value('page-size'),
                                     .
                                 )[. castable as xs:integer][1]"/>
                 </xf:bind>

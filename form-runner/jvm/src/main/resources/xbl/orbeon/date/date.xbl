@@ -59,10 +59,6 @@
             </templates>
         </metadata>
 
-        <xbl:resources>
-            <xbl:style src="/xbl/orbeon/date/date.css"/>
-        </xbl:resources>
-
         <xbl:handlers>
             <xbl:handler event="xxforms-visible xxforms-iteration-moved">
                 <xf:action type="javascript">
@@ -70,10 +66,16 @@
                     <xf:body>ORBEON.xforms.XBL.instanceForControl(this).setFormat(format)</xf:body>
                 </xf:action>
             </xbl:handler>
+            <xbl:handler event="xxforms-visible xxforms-iteration-moved fr-date-dates-disabled-changed">
+                <xf:action type="javascript">
+                    <xf:param name="datesDisabled" value="xxf:instance('fr-form-instance')//excluded"/>
+                    <xf:body>ORBEON.xforms.XBL.instanceForControl(this).setDatesDisabled(datesDisabled)</xf:body>
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:resources>
-            <!--<xbl:style src="/xbl/orbeon/date/date.css"/>-->
+            <xbl:style src="/xbl/orbeon/date/date.css"/>
             <xbl:style src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css"/>
         </xbl:resources>
 
@@ -90,6 +92,11 @@
         </xbl:implementation>
 
         <xbl:template>
+            <xf:var name="dates-disabled" value="xxf:instance('fr-form-instance')//excluded/string()">
+                <xf:action event="xforms-value-changed">
+                    <xf:dispatch name="fr-date-dates-disabled-changed" targetid="fr-date"/>
+                </xf:action>
+            </xf:var>
             <xh:div class="input-append date">
                 <xf:var
                     name="placeholder"

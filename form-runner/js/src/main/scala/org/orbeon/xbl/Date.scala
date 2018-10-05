@@ -105,6 +105,14 @@ private class DateCompanion extends XBLCompanion {
     }
   }
 
+  def setDatesDisabled(datesDisabled: String): Unit = {
+    datePicker.options.datesDisabled =
+      datesDisabled
+        .splitTo[js.Array]()
+        .map(new js.Date(_))
+    datePicker.update()
+  }
+
   def onChangeDate(): Unit =
     DocumentAPI.setValue(containerElem.id, xformsGetValue())
 }
@@ -126,17 +134,19 @@ private object DatePickerFacade {
   }
 
   class DatePickerOptions extends js.Object {
-    var format           : String  = "mm/dd/yyyy"
-    var autoclose        : Boolean = false
-    var enableOnReadonly : Boolean = true
-    var assumeNearbyYear : Boolean = false
+    var format           : String            = "mm/dd/yyyy"
+    var autoclose        : Boolean           = false
+    var enableOnReadonly : Boolean           = true
+    var assumeNearbyYear : Boolean           = false
+    var datesDisabled    : js.Array[js.Date] = null
   }
 
   implicit class DatePickerOps(val datePicker: DatePicker) extends AnyVal {
-    def onChangeDate(f: js.Function0[Unit]): Unit = datePicker.on("changeDate", f)
-    def getDate: js.Date = datePicker.datepicker("getDate").asInstanceOf[js.Date]
-    def setDate(date: js.Date): Unit = datePicker.datepicker("setDate", date)
-    def clearDates(): Unit = datePicker.datepicker("clearDates", Nil)
-    def options: DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
+    def onChangeDate(f: js.Function0[Unit]) : Unit              = datePicker.on("changeDate", f)
+    def getDate                             : js.Date           = datePicker.datepicker("getDate").asInstanceOf[js.Date]
+    def setDate(date: js.Date)              : Unit              = datePicker.datepicker("setDate", date)
+    def clearDates()                        : Unit              = datePicker.datepicker("clearDates", Nil)
+    def update()                            : Unit              = datePicker.datepicker("update")
+    def options                             : DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
   }
 }

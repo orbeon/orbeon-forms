@@ -22,8 +22,6 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xbl:script src="/xbl/orbeon/repeater/repeater.js"/>
-
     <xbl:binding
         id="fr-repeater-binding"
         element="fr|repeater"
@@ -176,7 +174,7 @@
                                 <xf:action
                                     event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
                                     target="#observer"
-                                    if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-repeat-iteration', 'class'))">
+                                    if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-repeater-repeat-iteration', 'class'))">
 
                                     <!-- Make sure we have stable references -->
                                     <xf:var name="context"  value="$repeat-context"/>
@@ -330,14 +328,14 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
 
-                                <xh:div id="fr-repeat-iteration">
-                                    <xsl:attribute name="class" select="@class, 'fr-repeat-iteration', '{$can-classes}'"/>
+                                <xh:div id="fr-repeater-repeat-iteration">
+                                    <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                         <!-- Scope var in outer scope so content can handle remove availability -->
                                         <xf:var name="fr-repeater-can-remove">
                                             <xxf:value
                                                 xxbl:scope="inner"
-                                                value="'can-remove' = xxf:split(xxf:avt-value('fr-repeat-iteration', 'class'))"/>
+                                                value="'can-remove' = xxf:split(xxf:avt-value('fr-repeater-repeat-iteration', 'class'))"/>
                                         </xf:var>
                                         <!-- Content of the repeat iteration -->
                                         <xsl:apply-templates select="*"/>

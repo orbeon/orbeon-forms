@@ -28,6 +28,7 @@ object FormRunnerApp extends App {
     xbl.WPaint
     xbl.HrefButton
     xbl.Grid
+    xbl.Repeater
     xbl.Date
     FormRunnerPrivateAPI
   }

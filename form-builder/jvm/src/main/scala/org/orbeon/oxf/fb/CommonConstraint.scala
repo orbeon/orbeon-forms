@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
 import org.orbeon.saxon.expr.{Expression, Literal}
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.value._
 
 import scala.util.Try
 
@@ -44,15 +45,31 @@ object CommonConstraint {
         )
       )
 
+    def findArgument(xpathString: String): String = {
+      val start = xpathString.indexOf("(")
+      val end   = xpathString.lastIndexOf(")")
+      xpathString.substring(start + 1, end)
+    }
+
+    // NOTE: In the future, we could handle more types of literals, possibly all of the `AtomicValue` literals. In this case,
+    // we should return the type of the literal, and a correctly-serialized string value of the string. We will also have to
+    // support extracting a sequence of items, in particular a sequence of `xs:date`.
+    def isSupportedLiteral(l: Literal): Boolean =
+      l.getValue match {
+        case _: StringValue | _: IntegerValue | _: DecimalValue | _: BooleanValue ⇒ true
+        case _ ⇒ false
+      }
+
     def analyze(expr: Expression) =
       expr match {
         case e: ValidationFunction[_] ⇒
           e.arguments.headOption match {
-            case Some(l: Literal) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
-            case None             ⇒ Some(e.propertyName → None)
-            case other            ⇒ None
+            case Some(l: Literal) if isSupportedLiteral(l) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
+            case Some(_)                                   ⇒ Some(e.propertyName → Some(findArgument(xpathString)))
+            case None                                      ⇒ Some(e.propertyName → None)
+            case _                                         ⇒ None
           }
-        case other ⇒
+        case _ ⇒
           None
       }
 

@@ -13,19 +13,20 @@
  */
 package org.orbeon.oxf.util
 
-import org.joda.time.DateTimeZone
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.value.{CalendarValue, DateValue, DateTimeValue}
-import org.orbeon.saxon.`type`.ValidationFailure
-import java.util.{Properties, Locale}
+import java.util.{Locale, Properties}
+
 import javax.xml.transform.Result
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat, ISODateTimeFormat}
+import org.joda.time.DateTimeZone
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
+import org.orbeon.saxon.`type`.ValidationFailure
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.value.{CalendarValue, DateTimeValue, DateValue}
 
 import scala.util.Try
 
 object DateUtils {
 
-  // ISO 8601 xs:dateTime formats with timezone, which we should always use when serializing a date
+  // ISO 8601 `xs:dateTime` formats with timezone, which we should always use when serializing a date
   // From the doc: "DateTimeFormat is thread-safe and immutable, and the formatters it returns are as well."
   val DateTime   = ISODateTimeFormat.dateTime.withZoneUTC
 
@@ -48,11 +49,12 @@ object DateUtils {
 
   // Epoch dateTime/date
   private val EpochDateTime = new DateTimeValue(1970, 1, 1, 0, 0, 0, 0, 0)
-  private val EpochDate = new DateValue(1970, 1, 1, 0)
+  private val EpochDate     = new DateValue(1970, 1, 1, 0) // CalendarValue.NO_TIMEZONE
 
   // Default timezone offset in minutes
-  // This is obtained once at the time the current object initializes
-  val DefaultOffsetMinutes = {
+  // This is obtained once at the time the current object initializes. This searches `user.timezone`, the JDK timezone,
+  // and then UTC in order. This is ony used for setting an absolute point in time before subtracting.
+  val DefaultOffsetMinutes: Int = {
     val currentInstant = System.currentTimeMillis
     DateTimeZone.getDefault.getOffset(currentInstant) / 1000 / 60
   }
@@ -63,7 +65,15 @@ object DateUtils {
   // - Format for a date:     [-]yyyy-mm-dd[([+|-]hh:mm | Z)]
   //
   // Throws IllegalArgumentException if the date format is incorrect.
-  def parseISODateOrDateTime(date: String): Long = {
+  //
+  // If the date or dateTime doesn't have a timezone, then xxx.
+  //
+  def parseISODateOrDateTime(date: String): Long =
+    tryParseISODateOrDateTime(date, TimeZone.Default) getOrElse (throw new IllegalArgumentException)
+
+  def tryParseISODateOrDateTime(date: String, defaultTimeZone: TimeZone): Option[Long] = {
+
+    // FIXME: what if the value has an optional `-` sign in front?
     val valueOrFailure =
       if (date.length >= 11 && date.charAt(10) == 'T')
         DateTimeValue.makeDateTimeValue(date)
@@ -72,11 +82,20 @@ object DateUtils {
 
     valueOrFailure match {
       case value: CalendarValue ⇒
-        value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, TZXPathContext).getLengthInMilliseconds
-      case failure: ValidationFailure ⇒
-        throw new IllegalArgumentException(failure.getMessage)
+        // FIXME: Could we not just use: `value.getCalendar.getTimeInMillis`
+        Some(value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, defaultTimeZone).getLengthInMilliseconds)
+      case _: ValidationFailure ⇒ None
     }
   }
+
+  // Parse an ISO date and return the number of milliseconds from the epoch.
+  def tryParseISODate(date: String, defaultTimeZone: TimeZone): Option[Long] =
+    DateValue.makeDateValue(date) match {
+      case value: DateValue     ⇒
+        value.getCalendar.getTimeInMillis
+        Some(value.subtract(EpochDate, defaultTimeZone).getLengthInMilliseconds)
+      case _: ValidationFailure ⇒ None
+    }
 
   // Parse an RFC 1123 dateTime
   // NOTE: This is a bit ugly and repetitive, but it is clear and works fine!
@@ -91,60 +110,69 @@ object DateUtils {
         }
     }
 
-  def tryParseRFC1123(date: String) = Try(parseRFC1123(date)).toOption
+  def tryParseRFC1123(date: String): Option[Long] = Try(parseRFC1123(date)).toOption
+
+  object TimeZone {
+
+    object Default extends TimeZone {
+      def getImplicitTimezone: Int = DateUtils.DefaultOffsetMinutes
+    }
+
+    object UTC extends TimeZone {
+      def getImplicitTimezone: Int = 0
+    }
+  }
+
+  sealed trait TimeZone extends XPathContext {
+
+    import org.orbeon.saxon.`type`.SchemaType
+    import org.orbeon.saxon.event.SequenceReceiver
+    import org.orbeon.saxon.expr.XPathContext
+    import org.orbeon.saxon.instruct.LocalParam
+    import org.orbeon.saxon.om.{SequenceIterator, StructuredQName, ValueRepresentation}
+    import org.orbeon.saxon.trace.InstructionInfo
+
+    def getImplicitTimezone: Int
+
+    // None of these methods are called by Saxon upon `subtract()`
+    def newContext() = Illegal
+    def newCleanContext() = Illegal
+    def newMinorContext() = Illegal
+    def getLocalParameters = Illegal
+    def getTunnelParameters = Illegal
+    def setOrigin(expr: InstructionInfo) = Illegal
+    def setOriginatingConstructType(loc: Int) = Illegal
+    def getOrigin = Illegal
+    def getOriginatingConstructType = Illegal
+    def getController = Illegal
+    def getConfiguration = Illegal
+    def getNamePool = Illegal
+    def setCaller(caller: XPathContext) = Illegal
+    def getCaller = Illegal
+    def setCurrentIterator(iter: SequenceIterator) = Illegal
+    def getCurrentIterator = Illegal
+    def getContextPosition = Illegal
+    def getContextItem = Illegal
+    def getLast = Illegal
+    def isAtLast = Illegal
+    def getCollation(name: String) = Illegal
+    def getDefaultCollation = Illegal
+    def useLocalParameter(qName: StructuredQName, binding: LocalParam, isTunnel: Boolean) = Illegal
+    def getStackFrame = Illegal
+    def evaluateLocalVariable(slotnumber: Int) = Illegal
+    def setLocalVariable(slotnumber: Int, value: ValueRepresentation) = Illegal
+    def changeOutputDestination(props: Properties, result: Result, isFinal: Boolean, hostLanguage: Int, validation: Int, schemaType: SchemaType) = Illegal
+    def setTemporaryReceiver(out: SequenceReceiver) = Illegal
+    def setReceiver(receiver: SequenceReceiver) = Illegal
+    def getReceiver = Illegal
+    def getCurrentMode = Illegal
+    def getCurrentTemplateRule = Illegal
+    def getCurrentGroupIterator = Illegal
+    def getCurrentRegexIterator = Illegal
+    def getCurrentDateTime = Illegal
+    def iterateStackFrames() = Illegal
+
+    private def Illegal = throw new IllegalStateException
+  }
 }
 
-// Mock XPathContext
-// We tried using Mockito, but then that's yet another runtime dependency
-object TZXPathContext extends XPathContext {
-
-  import org.orbeon.saxon.expr.XPathContext
-  import org.orbeon.saxon.event.SequenceReceiver
-  import org.orbeon.saxon.`type`.SchemaType
-  import org.orbeon.saxon.trace.InstructionInfo
-  import org.orbeon.saxon.instruct.LocalParam
-  import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, SequenceIterator}
-
-  // Return the default timezone offset
-  def getImplicitTimezone = DateUtils.DefaultOffsetMinutes
-
-  // None of these methods are called by Saxon upon subtract()
-  def newContext() = Illegal
-  def newCleanContext() = Illegal
-  def newMinorContext() = Illegal
-  def getLocalParameters = Illegal
-  def getTunnelParameters = Illegal
-  def setOrigin(expr: InstructionInfo) = Illegal
-  def setOriginatingConstructType(loc: Int) = Illegal
-  def getOrigin = Illegal
-  def getOriginatingConstructType = Illegal
-  def getController = Illegal
-  def getConfiguration = Illegal
-  def getNamePool = Illegal
-  def setCaller(caller: XPathContext) = Illegal
-  def getCaller = Illegal
-  def setCurrentIterator(iter: SequenceIterator) = Illegal
-  def getCurrentIterator = Illegal
-  def getContextPosition = Illegal
-  def getContextItem = Illegal
-  def getLast = Illegal
-  def isAtLast = Illegal
-  def getCollation(name: String) = Illegal
-  def getDefaultCollation = Illegal
-  def useLocalParameter(qName: StructuredQName, binding: LocalParam, isTunnel: Boolean) = Illegal
-  def getStackFrame = Illegal
-  def evaluateLocalVariable(slotnumber: Int) = Illegal
-  def setLocalVariable(slotnumber: Int, value: ValueRepresentation) = Illegal
-  def changeOutputDestination(props: Properties, result: Result, isFinal: Boolean, hostLanguage: Int, validation: Int, schemaType: SchemaType) = Illegal
-  def setTemporaryReceiver(out: SequenceReceiver) = Illegal
-  def setReceiver(receiver: SequenceReceiver) = Illegal
-  def getReceiver = Illegal
-  def getCurrentMode = Illegal
-  def getCurrentTemplateRule = Illegal
-  def getCurrentGroupIterator = Illegal
-  def getCurrentRegexIterator = Illegal
-  def getCurrentDateTime = Illegal
-  def iterateStackFrames() = Illegal
-
-  private def Illegal = throw new IllegalStateException
-}

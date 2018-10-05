@@ -300,5 +300,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Fun("get-request-parameter", classOf[GetRequestParameterTryXFormsDocument], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("excluded-dates", classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(DATE, ALLOWS_ZERO_OR_MORE)
+    )
   }
 }

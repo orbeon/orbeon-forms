@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.{DependsOnContextItem, NamespaceMapping, ShareableXPathStaticContext}
+import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
@@ -30,6 +31,9 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
   def argumentOpt(implicit xpathContext: XPathContext): Option[T]
   def evaluate(value: String, constraintOpt: Option[T]): Boolean
 
+  def toMipValue(constraintOpt: Option[T]): Option[String] =
+    constraintOpt map (_.toString) orElse Some("true") // XXX check why "true"?
+
   override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
 
     implicit val ctx = xpathContext
@@ -37,13 +41,11 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
     val valueOpt      = Option(xpathContext.getContextItem) map (_.getStringValue)
     val constraintOpt = argumentOpt
 
-    val propertyStringOpt = constraintOpt map (_.toString) orElse Some("true")
-
-    setProperty(propertyName, propertyStringOpt)
+    setProperty(propertyName, toMipValue(constraintOpt))
 
     valueOpt match {
-      case Some(item) ⇒ evaluate(item, constraintOpt)
-      case None       ⇒ true
+      case Some(itemValue) ⇒ evaluate(itemValue, constraintOpt)
+      case None            ⇒ true
     }
   }
 
@@ -73,6 +75,27 @@ trait LongValidationFunction extends ValidationFunction[Long] {
 
 trait StringValidationFunction extends ValidationFunction[String] {
   def argumentOpt(implicit xpathContext: XPathContext): Option[String] = stringArgumentOpt(0)
+}
+
+trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
+
+   // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
+  override def toMipValue(constraintOpt: Option[Seq[DateValue]]): Option[String] =
+    constraintOpt map { dates ⇒
+      dates map (d ⇒ DateUtils.DateNoZone.print(d.getCalendar.getTimeInMillis)) mkString " "
+    }
+
+  def argumentOpt(implicit xpathContext: XPathContext): Option[Seq[DateValue]] =
+    itemsArgumentOpt(0) map { itemsIt ⇒
+
+      val datesIt =
+        asScalaIterator(itemsIt) flatMap {
+          case v: DateValue  ⇒ Some(v)
+          case _             ⇒ None
+        }
+
+      datesIt.toList
+    }
 }
 
 class MaxLengthValidation extends LongValidationFunction {
@@ -222,4 +245,23 @@ class UploadMediatypesValidation extends StringValidationFunction {
     case None             ⇒ true
   }
 
+}
+
+// Passes if:
+//
+// - the current value is a date
+// - AND that date is NOT part of the list of excluded dates
+//
+// We use timestamps/instants to do the comparison, assuming that the function is passed `Date` objects
+// which reflect actual date values.
+//
+class ExcludedDatesValidation extends DateSeqValidationFunction {
+
+  val propertyName = "excluded-dates"
+
+  def evaluate(value: String, constraintOpt: Option[Seq[DateValue]]): Boolean =
+    DateUtils.tryParseISODate(value, DateUtils.TimeZone.UTC) exists { dateInstant ⇒
+       // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
+      ! (constraintOpt.iterator.flatten exists (_.getCalendar.getTimeInMillis == dateInstant))
+    }
 }

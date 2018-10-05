@@ -384,6 +384,7 @@ class FormBuilderFunctionsTest
 
     import CommonConstraint.analyzeKnownConstraint
     import org.orbeon.oxf.xforms.XFormsConstants._
+    import org.orbeon.oxf.xml.XMLConstants._
 
     val Library = XFormsFunctionLibrary
 
@@ -393,26 +394,33 @@ class FormBuilderFunctionsTest
           XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
           XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
           XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
-          XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI
+          XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
+          XSD_PREFIX           → XSD_URI
         )
       )
 
     val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
-    it("must pass all common constraints") {
-      assert(Some("max-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:max-length(5)",                                   Mapping, Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length(5)",                                   Mapping, Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("xxf:min-length('5')",                                 Mapping, Library)(Logger))
-      assert(Some("min-length"        → Some("5"))                          === analyzeKnownConstraint("(xxf:min-length(5))",                                 Mapping, Library)(Logger))
-      assert(Some("non-negative"      → None)                               === analyzeKnownConstraint("(xxf:non-negative())",                                Mapping, Library)(Logger))
-      assert(Some("negative"          → None)                               === analyzeKnownConstraint("(xxf:negative())",                                    Mapping, Library)(Logger))
-      assert(Some("non-positive"      → None)                               === analyzeKnownConstraint("(xxf:non-positive())",                                Mapping, Library)(Logger))
-      assert(Some("positive"          → None)                               === analyzeKnownConstraint("(xxf:positive())",                                    Mapping, Library)(Logger))
-      assert(Some("upload-max-size"   → Some("3221225472"))                 === analyzeKnownConstraint("xxf:upload-max-size(3221225472)",                     Mapping, Library)(Logger))
-      assert(Some("upload-mediatypes" → Some("image/jpeg application/pdf")) === analyzeKnownConstraint("xxf:upload-mediatypes('image/jpeg application/pdf')", Mapping, Library)(Logger))
-      assert(None                                                           === analyzeKnownConstraint("xxf:min-length(foo)",                                 Mapping, Library)(Logger))
-      assert(None                                                           === analyzeKnownConstraint("xxf:foobar(5)",                                       Mapping, Library)(Logger))
-    }
+    val data = List(
+      (Some("max-length"        → Some("5"))                                             , "xxf:max-length(5)"),
+      (Some("min-length"        → Some("5"))                                             , "xxf:min-length(5)"),
+      (Some("min-length"        → Some("5"))                                             , "xxf:min-length('5')"),
+      (Some("min-length"        → Some("5"))                                             , "(xxf:min-length(5))"),
+      (Some("non-negative"      → None)                                                  , "(xxf:non-negative())"),
+      (Some("negative"          → None)                                                  , "(xxf:negative())"),
+      (Some("non-positive"      → None)                                                  , "(xxf:non-positive())"),
+      (Some("positive"          → None)                                                  , "(xxf:positive())"),
+      (Some("upload-max-size"   → Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
+      (Some("upload-mediatypes" → Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
+      (Some("min-length"        → Some("foo"))                                           , "xxf:min-length(foo)"),
+      (Some("excluded-dates"    → Some("(xs:date('2018-11-29'), xs:date('2018-12-02'))")), "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
+      (None                                                                              , "xxf:foobar(5)")
+    )
+
+    for ((expected, expr) ← data)
+      it(s"must pass checking `$expr`") {
+        assert(expected === analyzeKnownConstraint(expr, Mapping, Library)(Logger))
+      }
   }
 
   def assertDataHolder(holderName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {

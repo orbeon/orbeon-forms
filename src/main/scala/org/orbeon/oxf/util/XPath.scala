@@ -404,7 +404,7 @@ object XPath {
     functionLibrary  : FunctionLibrary,
     locationData     : LocationData)(implicit
     logger           : IndentedLogger
-  ) =
+  ): Boolean =
     isNotBlank(xpathString) &&
     Try(
       compileExpressionMinimal(

@@ -60,8 +60,8 @@
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
 
-                <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/relevant"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant'), 'true()' )[1]"/>
+                <xf:setvalue ref="$i/readonly"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly'), 'false()')[1]"/>
 
                 <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
@@ -474,20 +474,18 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <!-- Relevant -->
-                                        <xf:textarea ref="relevant" incremental="true">
+                                        <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-details/visibility/label"/>
                                             <xf:alert ref="$resources/dialog-container-details/visibility/alert"/>
-                                            <xf:hint  ref="$resources/dialog-container-details/visibility/hint"/>
-                                        </xf:textarea>
+                                            <xf:hint  ref="$resources/dialog-container-details/visibility/hint" appearance="minimal"/>
+                                        </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <!-- Readonly -->
-                                        <xf:textarea ref="readonly" incremental="true">
+                                        <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-details/readonly/label"/>
                                             <xf:alert ref="$resources/dialog-container-details/readonly/alert"/>
-                                            <xf:hint  ref="$resources/dialog-container-details/readonly/hint"/>
-                                        </xf:textarea>
+                                            <xf:hint  ref="$resources/dialog-container-details/readonly/hint" appearance="minimal"/>
+                                        </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

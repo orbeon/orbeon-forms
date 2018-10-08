@@ -415,6 +415,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         valueNamespaceMappingScopeIfNeeded(bind, value).isDefined &&
         Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(value))
 
+      def isRelevantTrue(value: String) =
+        mipName == Model.Relevant.name && value == "true()"
+
+      def isReadonlyFalse(value: String) =
+        mipName == Model.Readonly.name && value == "false()"
+
       def isRequiredFalse(value: String) =
         mipName == Model.Required.name && value == "false()"
 
@@ -422,7 +428,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         mipName == Model.Whitespace.name && value == Whitespace.Preserve.name
 
       def mustRemoveAttribute(value: String) =
-        isTypeString(value) || isRequiredFalse(value) || isWhitespacePreserve(value)
+        isTypeString(value)      ||
+          isRelevantTrue(value)  ||
+          isReadonlyFalse(value) ||
+          isRequiredFalse(value) ||
+          isWhitespacePreserve(value)
 
       mipValue.trimAllToOpt match {
         case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒

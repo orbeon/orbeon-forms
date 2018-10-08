@@ -155,8 +155,8 @@
                     value="'true()'"/>
 
                 <!-- Read MIPs -->
-                <xf:setvalue ref="$i/relevant"   value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"   value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/relevant"   value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant'), 'true()' )[1]"/>
+                <xf:setvalue ref="$i/readonly"   value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly'), 'false()')[1]"/>
                 <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'calculate')"/>
                 <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'default')"/>
                 <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'whitespace')"/>
@@ -849,38 +849,7 @@
 
                                             <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
                                             <xf:group ref=".[$validation-type = 'required']/required">
-                                                <xf:var name="required"      value="."/>
-                                                <xf:var name="true-or-false" value="$required = ('true()', 'false()')"/>
-                                                <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
-
-                                                <xf:select1 ref="$required" appearance="full xxf:horizontal">
-                                                    <!--  Place "No" first as that is the default -->
-                                                    <xf:itemset ref="$items[@id = 1], $items[@id = (0, 2)]">
-                                                        <xf:label ref="."/>
-                                                        <!-- Tricky bits: map @id to XPath and handle case where we switch from
-                                                             true() or false() to XPath -->
-                                                        <xf:value ref="if (@id = 0)
-                                                                       then 'true()'
-                                                                       else if (@id = 1)
-                                                                       then 'false()'
-                                                                       else string($required[not($true-or-false)])"/>
-                                                    </xf:itemset>
-                                                </xf:select1>
-                                                <xf:input
-                                                    id="required-xpath"
-                                                    ref="$required[not($true-or-false)]"
-                                                    class="fb-control-settings-required-formula">
-
-                                                    <xf:label ref="$resources/dialog-control-details/formula/label" appearance="minimal"/>
-                                                    <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
-
-                                                    <!-- When the control appears and its value is empty, it means that the
-                                                         user just chose the "Formula" option. -->
-                                                    <xf:setfocus
-                                                        event="xforms-enabled"
-                                                        if="xxf:is-blank()"
-                                                        control="required-xpath"/>
-                                                </xf:input>
+                                                <fb:boolean-or-formula ref="." resources-ref="$resources"/>
                                             </xf:group>
 
                                             <!-- Built-in type -->
@@ -1021,18 +990,18 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:textarea ref="relevant">
+                                        <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-control-details/visibility/label"/>
                                             <xf:alert ref="$resources/dialog-control-details/visibility/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-details/visibility/hint" appearance="minimal"/>
-                                        </xf:textarea>
+                                        </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:textarea ref="readonly">
+                                        <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-control-details/readonly/label"/>
                                             <xf:alert ref="$resources/dialog-control-details/readonly/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-details/readonly/hint" appearance="minimal"/>
-                                        </xf:textarea>
+                                        </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

@@ -314,6 +314,7 @@
                         <fr:language-selector/>
                         <fr:status-icons/>
                         <fr:goto-content/>
+                        <fr:user-nav/>
                     </xsl:variable>
 
                     <xsl:apply-templates select="$default-objects"/>
@@ -498,6 +499,44 @@
                     <xf:output model="fr-form-model" value="$fr-resources/summary/labels/goto-content"/>
                 </xh:a>
             </xf:group>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:user-nav">
+        <xf:group class="fr-user-nav" ref=".[xxf:property('oxf.fr.authentication.user-menu.enable')]">
+            <xh:ul class="nav">
+                <xh:li class="dropdown">
+                    <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <xh:i class="fa fa-user"/>
+                    </xh:a>
+                    <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
+                        <xf:var name="signed-in"     value="exists(xxf:username())"/>
+                        <xf:var name="for-signed-in" value="if (    $signed-in ) then '' else 'xforms-hidden'"/>
+                        <xf:var name="for-anonymous" value="if (not($signed-in)) then '' else 'xforms-hidden'"/>
+                        <xh:li role="presentation" class="disabled {{$for-signed-in}}">
+                            <xh:a role="menuitem" href="#">
+                                Signed in as <xh:b><xf:output value="xxf:username()"/></xh:b>
+                            </xh:a>
+                        </xh:li>
+                        <xh:li role="presentation" class="divider {{$for-signed-in}}"/>
+                        <xh:li role="presentation" class="{{$for-signed-in}}">
+                            <xf:trigger role="menuitem" appearance="minimal">
+                                <xf:label>Sign out</xf:label>
+                            </xf:trigger>
+                        </xh:li>
+                        <xh:li role="presentation" class="{{$for-anonymous}}">
+                            <xh:a role="menuitem" href="{{xxf:property('oxf.fr.authentication.user-menu.uri.signin')}}">
+                                Sign in
+                            </xh:a>
+                        </xh:li>
+                        <xh:li role="presentation" class="{{$for-anonymous}}">
+                            <xh:a role="menuitem" href="{{xxf:property('oxf.fr.authentication.user-menu.uri.signup')}}">
+                                Sign up
+                            </xh:a>
+                        </xh:li>
+                    </xh:ul>
+                </xh:li>
+            </xh:ul>
         </xf:group>
     </xsl:template>
 

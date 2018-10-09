@@ -324,6 +324,7 @@
     <xsd:attributeGroup name="UI.Common.Attrs">
         <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
         <xsd:attribute name="style" type="xsd:string" use="optional"/>
+        <xsd:attribute name="role" type="xsd:string" use="optional"/>
         <xsd:attribute name="navindex" type="xsd:string" use="optional"/>
         <xsd:attribute name="accesskey" type="xsd:string" use="optional"/>
     </xsd:attributeGroup>

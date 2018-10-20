@@ -506,7 +506,7 @@
 
     <xsl:template match="fr:user-nav">
         <xf:group class="fr-user-nav" ref=".[xxf:property('oxf.fr.authentication.user-menu.enable')]">
-            <xh:ul class="nav">
+            <xh:ul class="nav pull-right">
                 <xh:li class="dropdown">
                     <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <xh:i class="fa fa-user"/>

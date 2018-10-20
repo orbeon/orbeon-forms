@@ -307,13 +307,13 @@
             <xh:div class="navbar-inner">
                 <xh:div class="container">
                     <xsl:variable name="default-objects" as="element()+">
+                        <fr:goto-content/>
                         <!-- These are typically to the left -->
                         <fr:logo/>
                         <fr:title/>
                         <!-- These are typically to the right -->
                         <fr:language-selector/>
                         <fr:status-icons/>
-                        <fr:goto-content/>
                         <fr:user-nav/>
                     </xsl:variable>
 
@@ -455,8 +455,10 @@
     </xsl:template>
 
     <xsl:template match="fr:logo">
-        <xsl:if test="not($hide-logo) and normalize-space($default-logo-uri)">
-            <xh:img src="{$default-logo-uri}" alt=""/>
+        <xsl:if test="not($hide-logo) and exists($default-logo-uri)">
+            <xh:div>
+                <xh:img src="{$default-logo-uri}" alt=""/>
+            </xh:div>
         </xsl:if>
     </xsl:template>
 

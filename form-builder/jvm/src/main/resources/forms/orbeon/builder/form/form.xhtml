@@ -49,7 +49,9 @@
         <xh:div class="fb-navbar navbar navbar-fixed-top">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
-                    <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt=""/>
+                    <xh:span>
+                        <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt=""/>
+                    </xh:span>
                     <xh:h1 class="brand">Form Builder</xh:h1>
                     <xh:ul class="nav pull-right">
                         <xh:li>
@@ -122,9 +124,26 @@
                             </xf:group>
                             <fr:title ref="bind('title-bind')"/>
 
+                            <!-- Language selector -->
+                            <xh:div class="fr-language-choice">
+                                <xf:select1 id="fb-resources-language-select" ref="$fb-lang" appearance="bootstrap">
+                                    <xf:itemset ref="$resources/resource">
+                                        <xf:label value="xxf:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
+                                        <xf:value ref="@xml:lang"/>
+                                    </xf:itemset>
+
+                                    <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                                    <xf:action ev:event="xforms-value-changed" model="fr-form-model">
+                                        <xf:rebuild/>
+                                        <xf:recalculate/>
+                                        <xf:refresh/>
+                                    </xf:action>
+
+                                </xf:select1>
+                            </xh:div>
+
                             <!-- Add/remove language -->
-                            <!--suppress XmlUnusedNamespaceDeclaration -->
-                            <xf:group class="fb-language-triggers pull-right" ref=".[fr:is-pe()]">
+                            <xf:group class="fb-language-triggers" ref=".[fr:is-pe()]">
                                 <xf:trigger appearance="minimal" id="fb-add-language">
                                     <xf:label><xh:i class="fa fa-plus-circle" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
@@ -155,24 +174,6 @@
                                     </xf:action>
                                 </xf:trigger>
                             </xf:group>
-
-                            <!-- Language selector -->
-                            <xh:div class="fr-language-choice">
-                                <xf:select1 id="fb-resources-language-select" ref="$fb-lang" appearance="bootstrap">
-                                    <xf:itemset ref="$resources/resource">
-                                        <xf:label value="xxf:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
-                                        <xf:value ref="@xml:lang"/>
-                                    </xf:itemset>
-
-                                    <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
-                                    <xf:action ev:event="xforms-value-changed" model="fr-form-model">
-                                        <xf:rebuild/>
-                                        <xf:recalculate/>
-                                        <xf:refresh/>
-                                    </xf:action>
-
-                                </xf:select1>
-                            </xh:div>
                         </xh:div>
                     </xh:div>
                 </xh:div>

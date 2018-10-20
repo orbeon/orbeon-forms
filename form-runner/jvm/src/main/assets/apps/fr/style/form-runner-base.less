@@ -23,9 +23,15 @@
     -webkit-text-size-adjust: 100%; // Prevent font scaling in landscape while allowing user zoom
 
     .navbar .navbar-inner .container {
+
+        display: flex;
+
+        .fr-language-choice {
+            margin-left: auto; // So this and what follows aligned to the left
+        }
+
         .fr-status-icons {
             display: block;
-            float: right;
             i { margin-left: 5px; }
         }
 

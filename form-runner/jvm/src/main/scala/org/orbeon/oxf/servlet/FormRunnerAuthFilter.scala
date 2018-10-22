@@ -69,6 +69,17 @@ object FormRunnerAuthFilter {
       val headersToPrepend = authHeaders
     }
 
-    new HttpServletRequestWrapper(servletRequest) with CustomHeaders
+    def headersAsString(r: HttpServletRequest) = {
+      r.getHeaderNames.asScala flatMap { name ⇒
+        r.getHeaders(name).asScala map { value ⇒
+          s"$name: $value"
+        }
+      } mkString "\n"
+    }
+
+    Logger.debug("incoming headers:\n" + headersAsString(servletRequest))
+    val amendedHeaders = new HttpServletRequestWrapper(servletRequest) with CustomHeaders
+    Logger.debug("amended headers:\n" + headersAsString(amendedHeaders))
+    amendedHeaders
   }
 }

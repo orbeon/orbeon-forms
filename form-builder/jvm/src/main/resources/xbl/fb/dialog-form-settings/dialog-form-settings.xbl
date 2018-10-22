@@ -285,6 +285,10 @@
                 <xf:bind
                     ref="mode"
                     constraint=". = ('new', 'edit', 'save-as')"/>
+                <xf:bind
+                    ref="data-migration"
+                    relevant="fr:is-pe()"/>
+                
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

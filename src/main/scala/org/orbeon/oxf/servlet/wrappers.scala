@@ -15,9 +15,9 @@ package org.orbeon.oxf.servlet
 
 import java.io._
 import java.{util ⇒ ju}
+
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
-
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
@@ -90,12 +90,12 @@ trait RequestRemoveHeaders extends HttpServletRequestWrapper {
 
   def headersToRemove: String ⇒ Boolean
 
-  override def getHeaderNames = (super.getHeaderNames.asScala filterNot headersToRemove).asJavaEnumeration
+  override def getHeaderNames             : ju.Enumeration[String] = (super.getHeaderNames.asScala filterNot headersToRemove).asJavaEnumeration
 
-  override def getHeader(name: String)     = if (headersToRemove(name)) null else super.getHeader(name)
-  override def getHeaders(name: String)    = if (headersToRemove(name)) null else super.getHeaders(name)
-  override def getDateHeader(name: String) = if (headersToRemove(name)) -1   else super.getDateHeader(name)
-  override def getIntHeader(name: String)  = if (headersToRemove(name)) -1   else super.getIntHeader(name)
+  override def getHeader    (name: String): String                 = if (headersToRemove(name)) null else super.getHeader(name)
+  override def getHeaders   (name: String): ju.Enumeration[String] = if (headersToRemove(name)) null else super.getHeaders(name)
+  override def getDateHeader(name: String): Long                   = if (headersToRemove(name)) -1   else super.getDateHeader(name)
+  override def getIntHeader (name: String): Int                    = if (headersToRemove(name)) -1   else super.getIntHeader(name)
 }
 
 trait RequestEmptyBody extends HttpServletRequestWrapper {

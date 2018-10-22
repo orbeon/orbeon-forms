@@ -164,7 +164,7 @@ object SimpleDataMigration {
       //   from section template data, which would be the wrong element template. By following binds,
       //   and taking paths from them, we avoid finding incorrect element templates in section template
       //   data.
-      // - NOTE: We never need to identity a template for a repeat iteration, because  repeat
+      // - NOTE: We never need to identify a template for a repeat iteration, because repeat
       //   iterations are optional!
 
       def findElementTemplate(templateRootElem: NodeInfo, path: List[String]): Option[NodeInfo] =

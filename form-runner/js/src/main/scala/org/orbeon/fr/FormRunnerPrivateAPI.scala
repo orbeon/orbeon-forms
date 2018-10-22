@@ -27,8 +27,10 @@ object FormRunnerPrivateAPI {
   private val ListenerSuffix = ".orbeon-beforeunload"
   private val ListenerEvents = s"beforeunload$ListenerSuffix"
 
-  def setDataStatus(safe: Boolean): Unit = {
-    // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
+  // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
+  private val Message = "You may lose some unsaved changes."
+
+  def setDataStatus(safe: Boolean): Unit =
     if (safe)
       $(global).off(
         ListenerEvents
@@ -36,8 +38,6 @@ object FormRunnerPrivateAPI {
     else
       $(global).on(
         ListenerEvents,
-        ((_: JQueryEventObject) ⇒ "You may lose some unsaved changes."): js.Function
+        ((_: JQueryEventObject) ⇒ Message): js.Function
       )
-  }
-
 }

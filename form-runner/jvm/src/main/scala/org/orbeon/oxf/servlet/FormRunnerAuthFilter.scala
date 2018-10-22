@@ -13,29 +13,29 @@
  */
 package org.orbeon.oxf.servlet
 
+import com.typesafe.scalalogging.Logger
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.util.StringUtils._
-import org.slf4j.LoggerFactory
 
 class FormRunnerAuthFilter extends Filter {
 
-  import FormRunnerAuthFilter.Logger._
+  import FormRunnerAuthFilter._
 
   private case class FilterSettings(contentSecurityPolicy: Option[String])
 
   private var settingsOpt: Option[FilterSettings] = None
 
   def init(filterConfig: FilterConfig): Unit = {
-    info("initializing")
+    logger.info("initializing")
     val settings = FilterSettings(Option(filterConfig.getInitParameter("content-security-policy")) flatMap (_.trimAllToOpt))
-    info(s"configuring: $settings")
+    logger.info(s"configuring: $settings")
     settingsOpt = Some(settings)
   }
 
   def destroy(): Unit = {
-    info(s"destroying")
+    logger.info(s"destroying")
     settingsOpt = None
   }
 
@@ -46,7 +46,7 @@ class FormRunnerAuthFilter extends Filter {
       res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
     }
 
-    chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+    chain.doFilter(amendRequest(req.asInstanceOf[HttpServletRequest]), res)
   }
 }
 
@@ -54,7 +54,7 @@ object FormRunnerAuthFilter {
 
   import scala.collection.JavaConverters._
 
-  val Logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
+  private val logger = Logger("org.orbeon.filter.form-runner-auth")
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
@@ -77,9 +77,9 @@ object FormRunnerAuthFilter {
       } mkString "\n"
     }
 
-    Logger.debug("incoming headers:\n" + headersAsString(servletRequest))
+    logger.debug("incoming headers:\n" + headersAsString(servletRequest))
     val amendedHeaders = new HttpServletRequestWrapper(servletRequest) with CustomHeaders
-    Logger.debug("amended headers:\n" + headersAsString(amendedHeaders))
+    logger.debug("amended headers:\n" + headersAsString(amendedHeaders))
     amendedHeaders
   }
 }

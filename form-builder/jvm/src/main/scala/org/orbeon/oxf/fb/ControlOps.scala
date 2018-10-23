@@ -16,10 +16,10 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.UndoAction._
-import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
@@ -32,7 +32,6 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om.NodeInfo
@@ -309,7 +308,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     findBindByName(ctx.formDefinitionRootElem, oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
-  private def ensureDataHolder(rootElem: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
+  private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
     @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() ⇒ NodeInfo, Option[String])]): Seq[NodeInfo] =
       if (names.hasNext) {
@@ -331,14 +330,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
               case existing ⇒
                 // At least one holder exists (can be more than one for repeats)
                 existing
-
             }
 
         ensure(children.flatten, names)
       } else
         parents
 
-    ensure(Seq(rootElem), holders.toIterator)
+    ensure(List(rootElem), holders.toIterator)
   }
 
   // Insert data and resource holders for all languages
@@ -364,15 +362,26 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx                  : FormBuilderDocContext
   ): Unit = {
 
-    val containerNames = findContainerNamesForModel(controlElement)
-
-    // Insert hierarchy of data holders
-    // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous
-    // names. In practice, the ancestor holders should already exist.
-    dataHolders foreach { dataHolder ⇒
-      ensureDataHolder(
+    // First we ensure all the containers
+    val containers =
+      ensureContainers(
         ctx.dataRootElem,
-        (containerNames map (name ⇒ (() ⇒ elementInfo(name), None))) :+ (() ⇒ dataHolder, precedingControlName)
+        (findContainerNamesForModel(controlElement) map (name ⇒ (() ⇒ elementInfo(name), None)))
+      )
+
+    // Then we create the holders within the containers
+    // The idea is that we try to fill with the provided holders. If we don't have enough holders
+    // provided, then we use the first holder. This also handles the case where we have only one
+    // template holder, of course.
+    // See https://github.com/orbeon/orbeon-forms/issues/3781
+    val holdersIt =
+      dataHolders.iterator ++ Iterator.continually(dataHolders.head)
+
+    containers foreach { container ⇒
+      insert(
+        into   = container,
+        after  = container / * filter (_.name == precedingControlName.getOrElse("")),
+        origin = holdersIt.next()
       )
     }
 

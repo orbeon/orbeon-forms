@@ -420,12 +420,9 @@ object ToolboxOps {
                   FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
               )
 
-          // LATER: handle repetitions, for now keep only the first data holder
-          val firstHolderOpt = holders flatMap (_.headOption)
-
           XcvEntry.values map {
             case e @ XcvEntry.Control   ⇒ e → List(control)
-            case e @ XcvEntry.Holder    ⇒ e → firstHolderOpt.toList
+            case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
             case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
             case e @ XcvEntry.Bind      ⇒ e → bindAsList
           }
@@ -1023,7 +1020,7 @@ object ToolboxOps {
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
-      def dataHolders = xcvElem / XcvEntry.Holder.entryName / * take 1
+      def dataHolders = xcvElem / XcvEntry.Holder.entryName / *
       def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
 
       val name = {

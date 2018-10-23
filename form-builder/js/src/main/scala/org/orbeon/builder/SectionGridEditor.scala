@@ -149,12 +149,12 @@ object SectionGridEditor {
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
-            case SectionDelete        ⇒ client.sectionDelete       (sectionGridId).call()
+            case SectionDelete        ⇒ client.containerDelete     (sectionGridId).call()
             case SectionMoveUp        ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
             case SectionMoveDown      ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
             case SectionMoveRight     ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
             case SectionMoveLeft      ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
-            case GridDelete           ⇒ client.gridDelete          (sectionGridId).call()
+            case GridDelete           ⇒ client.containerDelete     (sectionGridId).call()
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
             case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()

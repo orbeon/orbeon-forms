@@ -14,8 +14,8 @@
 package org.orbeon.builder.rpc
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
-import org.orbeon.oxf.fb.UndoAction.{ControlSettings, MoveWall}
-import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, ToolboxOps, Undo}
+import org.orbeon.oxf.fb.UndoAction.ControlSettings
+import org.orbeon.oxf.fb._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
@@ -142,11 +142,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     FormBuilder.split(resolveId(cellId).get, Direction.Up, None) foreach Undo.pushUserUndoAction
   }
 
-  def sectionDelete(sectionId: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteSectionByIdIfPossible(sectionId) foreach Undo.pushUserUndoAction
-  }
-
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
     XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / "label", label)
@@ -170,9 +165,17 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       Undo.pushUserUndoAction
   }
 
-  def gridDelete(gridId: String): Unit = {
+  def containerDelete(containerId: String): Unit = {
+
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.deleteGridByIdIfPossible(gridId) foreach Undo.pushUserUndoAction
+
+    val undoAction =
+      if (FormRunner.IsGrid(FormBuilder.containerById(containerId)))
+        FormBuilder.deleteGridByIdIfPossible(containerId)
+      else
+        FormBuilder.deleteSectionByIdIfPossible(containerId)
+
+    undoAction foreach Undo.pushUserUndoAction
   }
 
   def containerCopy(containerId: String): Unit = {
@@ -190,11 +193,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       FormRunner.IsSection(containerElem) && FormBuilder.canDeleteSection(containerElem)) {
 
       containerCopy(containerId)
-
-      if (FormRunner.IsGrid(FormBuilder.containerById(containerId)))
-        FormBuilder.deleteGridByIdIfPossible(containerId)
-      else
-        FormBuilder.deleteSectionByIdIfPossible(containerId)
+      containerDelete(containerId)
     }
   }
 

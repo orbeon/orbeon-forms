@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.GridDataMigration.PathElem
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
@@ -48,8 +49,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     classNamesList exists controlClasses.contains
   }
 
-  val LHHAInOrder = Seq("label", "hint", "help", "alert")
-  val LHHANames: Set[String] = LHHAInOrder.to[Set]
+  val LHHAInOrder = LHHA.values map (_.entryName) toList
 
   // Get the control name based on the control, bind, grid, section or template id
   //@XPathFunction

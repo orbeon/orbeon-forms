@@ -27,6 +27,7 @@ object LHHA extends Enum[LHHA] {
 
   val values = findValues
 
+  // NOTE: Order as "LHHA" is important to some callers so don't change it!
   case object Label extends LHHA
   case object Help  extends LHHA
   case object Hint  extends LHHA

@@ -788,8 +788,6 @@ object ToolboxOps {
       Undo.pushUserUndoAction
   }
 
-  private val ControlResourceNames = Set.empty ++ LHHAInOrder + "itemset"
-
   def pasteSectionGridFromXcv(
     xcvElem        : NodeInfo,
     prefix         : String,
@@ -1103,7 +1101,8 @@ object ToolboxOps {
 
   private object Private {
 
-    val LHHAResourceNamesToInsert = LHHANames - "alert"
+    val ControlResourceNames      = (LHHA.values map (_.entryName)).to[Set] + "itemset"
+    val LHHAResourceNamesToInsert = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =

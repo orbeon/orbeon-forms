@@ -34,7 +34,7 @@ class SerializationTest
              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
           <xh:head>
-            <xf:model>
+            <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
               <xf:instance id="instance">
                 <value/>
               </xf:instance>
@@ -75,7 +75,7 @@ class SerializationTest
              xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
              xmlns:xbl="http://www.w3.org/ns/xbl">
           <xh:head>
-            <xf:model>
+            <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
               <xf:instance id="instance">
                 <value/>
               </xf:instance>

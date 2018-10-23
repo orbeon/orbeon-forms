@@ -33,9 +33,10 @@ class ErrorSummaryTest
         val doc = this setupDocument
           <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <xh:head>
-              <xf:model>
+              <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                 <xf:instance>
                   <invalid/>
                 </xf:instance>

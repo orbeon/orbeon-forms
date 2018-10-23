@@ -68,7 +68,7 @@
                     <p:input name="document">
                         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                             <xh:head>
-                                <xf:model id="model" xxf:inline-resources="true">
+                                <xf:model id="model" xxf:inline-resources="true" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                                     <xf:instance id="instance">
                                         <form/>
                                     </xf:instance>
@@ -185,7 +185,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model">
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                         <xf:instance id="instance">
                             <form>
                                 <text/>
@@ -569,7 +569,7 @@
         <input name="document">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
-                    <xf:model id="model">
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                         <xf:instance id="instance">
                             <instance>
                                 <first-name/>
@@ -732,7 +732,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model">
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                         <xf:instance id="instance">
                             <instance>
                                 <currency>12.34</currency>
@@ -785,7 +785,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model">
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
                         <xf:instance id="instance">
                             <number/>
                         </xf:instance>

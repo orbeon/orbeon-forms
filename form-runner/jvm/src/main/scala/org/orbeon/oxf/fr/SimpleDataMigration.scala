@@ -177,7 +177,7 @@ object SimpleDataMigration {
       // it is messy and harder to get right.
       def processLevel(
         parents          : List[NodeInfo],
-        binds            : Seq[StaticBind],
+        binds            : List[StaticBind], // use `List` to ensure eager evaluation
         templateRootElem : NodeInfo,
         path             : List[String]
       ): List[DataMigrationOp] = {
@@ -224,7 +224,7 @@ object SimpleDataMigration {
 
                   processLevel(
                     parents          = nodes,
-                    binds            = bind.children,
+                    binds            = bind.children.to[List],
                     templateRootElem = newTemplateRootElem getOrElse templateRootElem,
                     path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
                   )
@@ -240,7 +240,7 @@ object SimpleDataMigration {
       enclosingModel.staticModel.bindsById.get(Names.FormBinds).toList flatMap { bind ⇒
         processLevel(
           parents          = List(dataToMigrateRootElem),
-          binds            = bind.children,
+          binds            = bind.children.to[List],
           templateRootElem = templateInstanceRootElem,
           Nil
         )

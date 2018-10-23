@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -401,7 +402,7 @@ object ToolboxOps {
         predicate      = _ ⇒ true
       ).headOption
 
-    val xcvContent =
+    val (xcvContent, isNonRepeatedGrid) =
       controlDetailsOpt match {
         case Some(ControlBindPathHoldersResources(control, bind, _, holders, _)) ⇒
           // The control has a name and a bind
@@ -420,12 +421,15 @@ object ToolboxOps {
                   FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
               )
 
-          XcvEntry.values map {
-            case e @ XcvEntry.Control   ⇒ e → List(control)
-            case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
-            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
-            case e @ XcvEntry.Bind      ⇒ e → bindAsList
-          }
+          (
+            XcvEntry.values map {
+              case e @ XcvEntry.Control   ⇒ e → List(control)
+              case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
+              case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
+              case e @ XcvEntry.Bind      ⇒ e → bindAsList
+            },
+            false
+          )
 
         case None ⇒
           // Non-repeated grids don't have a name or a bind.
@@ -446,15 +450,27 @@ object ToolboxOps {
               )
           }
 
-          XcvEntry.values map {
-            case e @ XcvEntry.Control   ⇒ e → List(controlOrContainerElem)
-            case e @ XcvEntry.Holder    ⇒ e → (nestedControlDetails flatMap (_.holders flatMap (_.headOption)))
-            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang.toList
-            case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
-          }
+          // See https://github.com/orbeon/orbeon-forms/issues/3781
+          val dataHoldersWithDummyContainer =
+            nestedControlDetails map (d ⇒ elementInfo("dummy", d.holders.toList.flatten))
+
+          (
+            XcvEntry.values map {
+              case e @ XcvEntry.Control   ⇒ e → List(controlOrContainerElem)
+              case e @ XcvEntry.Holder    ⇒ e → dataHoldersWithDummyContainer
+              case e @ XcvEntry.Resources ⇒ e → resourcesWithLang.toList
+              case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
+            },
+            true
+          )
       }
 
-    val result = elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+    val result =
+      elementInfo(
+        "xcv",
+        attributeInfo(IsNonRepeatedGridName, isNonRepeatedGrid.toString) +:
+          (xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+      )
 
     // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
     // we just re-annotate at that time
@@ -800,6 +816,7 @@ object ToolboxOps {
     require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
+    val isNonRepeatedGrid    = xcvElem attValueOpt IsNonRepeatedGridName contains true.toString
 
     // Rename control names if needed
     locally {
@@ -824,7 +841,13 @@ object ToolboxOps {
         }
 
         // Rename holders
-        (xcvElem / XcvEntry.Holder.entryName / *).iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem ⇒
+        val holders =
+          if (isNonRepeatedGrid)
+            xcvElem / XcvEntry.Holder.entryName / * / *
+          else
+            xcvElem / XcvEntry.Holder.entryName / *
+
+        holders.iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem ⇒
 
           val oldName = holderElem.localname
 
@@ -947,12 +970,32 @@ object ToolboxOps {
         lang → (resourceElem / *)
 
     // Insert holders
-    insertHolders(
-      controlElement       = newContainerElem, // in order to find containers
-      dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
-      resourceHolders      = resourceHolders,
-      precedingControlName = precedingContainerNameOpt
-    )
+    if (isNonRepeatedGrid) {
+
+      val dummyHolders = xcvElem / XcvEntry.Holder.entryName / *
+
+      // Insert the holders for each nested control in turn.
+      /// NOTE: Use `to[List]` to ensure eager evaluation.
+      dummyHolders.to[List].scanLeft(precedingContainerNameOpt) { case (precedingControlNameOpt, dummyHolder) ⇒
+
+        insertHolders(
+          controlElement       = newContainerElem, // in order to find containers
+          dataHolders          = dummyHolder / *,
+          resourceHolders      = resourceHolders,
+          precedingControlName = precedingControlNameOpt
+        )
+
+        Some(dummyHolder.localname)
+      }
+    } else {
+      insertHolders(
+        controlElement       = newContainerElem, // in order to find containers
+        dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
+        resourceHolders      = resourceHolders,
+        precedingControlName = precedingContainerNameOpt
+      )
+    }
+
     val xcvBinds = xcvElem / XcvEntry.Bind.entryName / *
 
     if (newContainerElem.hasAtt("bind")) {
@@ -1103,6 +1146,8 @@ object ToolboxOps {
 
     val ControlResourceNames      = (LHHA.values map (_.entryName)).to[Set] + "itemset"
     val LHHAResourceNamesToInsert = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
+
+    val IsNonRepeatedGridName = "is-non-repeated-grid"
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =

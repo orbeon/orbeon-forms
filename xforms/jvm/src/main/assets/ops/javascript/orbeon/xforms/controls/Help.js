@@ -33,8 +33,15 @@
         controlEl = $(controlEl);
         var labelText           = Controls.getLabelMessage(controlEl[0]);
         var helpText            = Controls.getHelpMessage (controlEl[0]);
+        var declaredContainer   = controlEl.is('.xforms-help-popover-control') ?
+                                  controlEl :
+                                  controlEl.find('.xforms-help-popover-control');
         var formElContainer     = Dom.commonAncestor(controlEl.find(':input:visible'));
-        var el                  = formElContainer.is('*') ? formElContainer : controlEl; // [1]
+        var el                  = declaredContainer.is('*') ?
+                                  declaredContainer :
+                                  formElContainer.is('*') ?
+                                  formElContainer :
+                                  controlEl; // [1]
         var elPos               = Controls.getPosition(el);
         var placement           = Controls.getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');

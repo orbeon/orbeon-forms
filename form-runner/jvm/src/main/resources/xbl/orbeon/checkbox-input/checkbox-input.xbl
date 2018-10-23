@@ -55,9 +55,20 @@
             </templates>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/checkbox-input/checkbox-input.css"/>
+        </xbl:resources>
+
         <xbl:template>
-            <xf:select appearance="full" ref="xxf:binding('fr-checkbox-input-binding')" xbl:attr="xxf:encrypt-item-values">
-                <xf:hint mediatype="text/html" value="xxf:hint('fr-checkbox-input-binding')"/>
+            <xf:select
+                appearance="full"
+                ref="xxf:binding('fr-checkbox-input-binding')"
+                xbl:attr="xxf:encrypt-item-values"
+                class="xforms-help-popover-control"
+            >
+                <xf:hint  mediatype="text/html" value="xxf:hint ('fr-checkbox-input-binding')"/>
+                <xf:help  mediatype="text/html" value="xxf:help ('fr-checkbox-input-binding')"/>
+                <xf:alert mediatype="text/html" value="xxf:alert('fr-checkbox-input-binding')"/>
                 <xf:item>
                     <xf:label mediatype="text/html" value="xxf:label('fr-checkbox-input-binding')"/>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>
@@ -71,7 +82,6 @@
                     ref="."
                     xbl:attr="xbl:text=deselected-value">false</xf:setvalue>
             </xf:select>
-
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

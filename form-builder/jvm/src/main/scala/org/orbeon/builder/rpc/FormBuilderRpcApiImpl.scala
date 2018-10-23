@@ -18,6 +18,7 @@ import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -25,7 +26,7 @@ import org.orbeon.xforms.XFormsId
 object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   private val EditorIdPrefix   = "fb-lhh-editor-for-"
-  private val EditorIdPrefixes = List("label", "hint") map (EditorIdPrefix + _ + '-')
+  private val EditorIdPrefixes = List(LHHA.Label.entryName, LHHA.Hint.entryName) map (EditorIdPrefix + _ + '-')
 
 
   def unsupportedBrowser(browserName: String, browserVersion: Double): Unit = {
@@ -34,7 +35,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     val rootElem = ctx.userAgentInstance.toList map (_.rootElement)
 
     XFormsAPI.setvalue(rootElem child "browser-name",         s"$browserName $browserVersion")
-    XFormsAPI.setvalue(rootElem child "is-supported-browser", "false")
+    XFormsAPI.setvalue(rootElem child "is-supported-browser", false.toString)
   }
 
   def controlUpdateLabelOrHintOrText(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
@@ -144,7 +145,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / "label", label)
+    XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / LHHA.Label.entryName, label)
   }
 
   def containerEditDetails(containerId: String): Unit =

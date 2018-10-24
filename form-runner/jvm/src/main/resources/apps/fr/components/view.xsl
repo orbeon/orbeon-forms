@@ -332,7 +332,10 @@
                 model="fr-persistence-model"
                 ref="instance('fr-persistence-instance')/data-safe"
                 value="data(.)">
-                <xf:action type="javascript" event="xforms-enabled xforms-value-changed">
+                <xf:action
+                    type="javascript"
+                    event="xforms-enabled xforms-value-changed"
+                    if="xxf:property(string-join(('oxf.fr.detail.warn-when-data-unsafe', fr:app-name(), fr:form-name()), '.'))">
                     <xf:param name="safe" value="."/>
                     <xf:body>ORBEON.fr.private.API.setDataStatus(safe == "true")</xf:body>
                 </xf:action>

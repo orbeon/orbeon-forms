@@ -61,7 +61,7 @@
                 <!-- When the control appears and its value is empty, it means that the
                      user just chose the "Formula" option. -->
                 <xf:setfocus
-                    event="xforms-enabled"
+                    event="xforms-readwrite"
                     if="xxf:is-blank()"
                     control="xpath-textarea"/>
             </xf:textarea>

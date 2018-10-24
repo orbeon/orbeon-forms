@@ -302,7 +302,7 @@
         <xf:group
                 xxf:element="div"
                 model="fr-form-model"
-                ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', $fr-app, $fr-form), '.')))]"
+                ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
                 class="navbar navbar-inverse">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
@@ -722,7 +722,7 @@
         <xf:group
                 xxf:element="div"
                 model="fr-form-model"
-                ref=".[$fr-mode = 'view' and xxf:property(string-join(('oxf.fr.detail.view.show-explanation', $fr-app, $fr-form), '.')) = true()]"
+                ref=".[$fr-mode = 'view' and xxf:property(string-join(('oxf.fr.detail.view.show-explanation', fr:app-name(), fr:form-name()), '.')) = true()]"
                 class="fr-explanation">
             <xf:output value="$fr-resources/detail/view/explanation"/>
         </xf:group>
@@ -826,7 +826,7 @@
                                     else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
                                         (('wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
                                     else
-                                        xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.'))),
+                                        xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
                                 $is-inner :=
                                     starts-with($buttons-property-override, 'oxf.fr.detail.buttons.inner')
                             return
@@ -835,14 +835,14 @@
                                     let $visible-expression :=
                                             xxf:property(
                                                 string-join(
-                                                    ('oxf.fr.detail.button', $button-name, 'visible', $fr-app, $fr-form),
+                                                    ('oxf.fr.detail.button', $button-name, 'visible', fr:app-name(), fr:form-name()),
                                                     '.'
                                                 )
                                             ),
                                         $enabled-expression :=
                                             xxf:property(
                                                 string-join(
-                                                    ('oxf.fr.detail.button', $button-name, 'enabled', $fr-app, $fr-form),
+                                                    ('oxf.fr.detail.button', $button-name, 'enabled', fr:app-name(), fr:form-name()),
                                                     '.'
                                                 )
                                             ),

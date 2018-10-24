@@ -979,7 +979,7 @@ object ToolboxOps {
           precedingControlName = precedingControlNameOpt
         )
 
-        Some(dummyHolder.localname)
+        (dummyHolder / * headOption) map (_.localname)
       }
     } else {
       insertHolders(

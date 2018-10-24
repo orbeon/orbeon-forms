@@ -148,7 +148,7 @@ class ClipboardTest
 
       val RepeatedControl1 = "control-111"
       val RepeatedControl2 = "control-121"
-      val SingleControl1   = "control-21"
+      val SingleControl    = "control-21"
 
       withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx ⇒
 
@@ -176,6 +176,7 @@ class ClipboardTest
         def assertCutPasteSingleToRepeat(sourceControlName: String, newControlName: String, expected: String): Unit = {
 
           assert(List(expected) == findValues(sourceControlName))
+
           ToolboxOps.copyToClipboard(findControlByName(doc, sourceControlName).get.parentUnsafe)
 
           FormBuilder.selectCell(findControlByName(doc, RepeatedControl1).get.parentUnsafe)
@@ -184,20 +185,53 @@ class ClipboardTest
           assert(List(expected, expected) == findValues(newControlName))
         }
 
-        assertCutPasteSingleToRepeat(SingleControl1, Control3, "value21")
+        assertCutPasteSingleToRepeat(SingleControl, Control3, "value21")
 
         def assertCutPasteRepeatToSingle(sourceControlName: String, newControlName: String, expected: List[String]): Unit = {
 
           assert(expected == findValues(sourceControlName))
           ToolboxOps.copyToClipboard(findControlByName(doc, sourceControlName).get.parentUnsafe)
 
-          FormBuilder.selectCell(findControlByName(doc, SingleControl1).get.parentUnsafe)
+          FormBuilder.selectCell(findControlByName(doc, SingleControl).get.parentUnsafe)
           ToolboxOps.pasteFromClipboard()
           assert(expected           == findValues(sourceControlName))
           assert(List(expected.head) == findValues(newControlName))
         }
 
         assertCutPasteRepeatToSingle(RepeatedControl1, Control4, List("value111⊙1", "value111⊙2"))
+      }
+    }
+
+    it("must cut and paste nested grid (#3781)") {
+
+      val RepeatedControl111   = "control-111"
+      val RepeatedControl112   = "control-112"
+      val RepeatedControl121   = "control-121"
+      val RepeatedControl122   = "control-122"
+
+      val NestedGridId         = "grid-1-grid"
+      val NestedRepeatedGridId = "grid12-grid"
+
+      withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx ⇒
+
+        val doc = ctx.formDefinitionRootElem
+
+        def findValues(controlName: String) =
+          ctx.dataInstanceElem descendant controlName map (_.stringValue)
+
+        def assertContainerCutPaste(gridId: String, controlNames: List[String], expected: List[String]): Unit = {
+
+          assert(expected == (controlNames flatMap findValues))
+
+          FormBuilderRpcApiImpl.containerCut(gridId)
+          assert(Nil == (controlNames flatMap findValues))
+
+          ToolboxOps.pasteFromClipboard()
+          assert(expected == (controlNames flatMap findValues))
+        }
+
+        assertContainerCutPaste(NestedGridId,         List(RepeatedControl111, RepeatedControl112), List("value111⊙1", "value111⊙2", "value112⊙1", "value112⊙2"))
+        assertContainerCutPaste(NestedRepeatedGridId, List(RepeatedControl121, RepeatedControl122), List("value121⊙1", "value121⊙2", "value122⊙1", "value122⊙2"))
       }
     }
 

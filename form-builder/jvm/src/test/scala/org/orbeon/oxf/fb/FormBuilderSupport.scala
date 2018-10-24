@@ -80,13 +80,8 @@ trait FormBuilderSupport extends XFormsSupport {
             <xf:var name="selected-cell" value="$variables/selected-cell"/>
 
             <xf:instance id="fb-xcv-instance">
-              <xcv>
-                  <cut-trigger/>
-                  <copy-trigger/>
-                  <paste-trigger/>
-              </xcv>
+              <xcv/>
             </xf:instance>
-            <xf:var name="xcv" value="instance('fb-xcv-instance')"/>
 
             <xf:instance id="fb-undo-instance">
                 <undo>

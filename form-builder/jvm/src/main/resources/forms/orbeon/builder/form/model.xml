@@ -754,17 +754,17 @@
 
     <!-- Cut/copy/paste instance -->
     <xf:instance id="fb-xcv-instance" xxf:index="id">
+        <xcv/>
+    </xf:instance>
+
+    <xf:instance id="fb-xcv-triggers-instance" xxf:index="id">
         <xcv>
-            <control/>
-            <holder/>
-            <resources/>
-            <bind/>
             <cut-trigger/>
             <copy-trigger/>
             <paste-trigger/>
         </xcv>
     </xf:instance>
-    <xf:var name="xcv" value="instance('fb-xcv-instance')"/>
+    <xf:var name="xcv" value="instance('fb-xcv-triggers-instance')"/>
 
     <xf:bind ref="$xcv">
         <xf:bind ref="cut-trigger"   readonly="not(exists($current-td/*))"/>

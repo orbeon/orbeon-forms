@@ -510,19 +510,13 @@ object ToolboxOps {
 
     (xcvElem / XcvEntry.Control.entryName / * nonEmpty) option {
       val clone = elementInfo("xcv", Nil)
-      insert(into = clone, origin = xcvElem / *)
+      insert(into = clone, origin = (xcvElem /@ @*) ++ (xcvElem / *))
       clone
     }
   }
 
-  def clearClipboard()(implicit ctx: FormBuilderDocContext): Unit =
-    XcvEntry.values
-      .map(_.entryName)
-      .foreach(entryName ⇒ delete(ctx.clipboardXcvRootElem / entryName))
-
   def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
-    clearClipboard()
-    insert(into = ctx.clipboardXcvRootElem, origin = xcv / *)
+    insert(into = ctx.clipboardXcvRootElem.root, origin = xcv)
   }
 
   def dndControl(

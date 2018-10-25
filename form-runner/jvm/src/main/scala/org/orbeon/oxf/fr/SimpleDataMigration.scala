@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import com.typesafe.scalalogging.Logger
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.FormRunner.{formRunnerProperty, _}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -136,6 +137,7 @@ object SimpleDataMigration {
     val logger = Logger("org.orbeon.fr.data-migration")
 
     val DataMigrationFeatureName  = "data-migration"
+    val DataMigrationPropertyName = s"oxf.fr.detail.$DataMigrationFeatureName"
 
     import enumeratum._
 
@@ -161,13 +163,25 @@ object SimpleDataMigration {
 
       implicit val formRunnerParams = FormRunnerParams()
 
-      if (FormRunner.isDesignTime)
-        DataMigrationBehavior.Disabled
+      val behavior =
+        if (FormRunner.isDesignTime)
+          DataMigrationBehavior.Disabled
+        else
+          FormRunner.metadataElemValueOpt(DataMigrationFeatureName) orElse
+          formRunnerProperty(DataMigrationPropertyName)             flatMap
+          DataMigrationBehavior.withNameOption                      getOrElse
+          DataMigrationBehavior.Disabled
+
+      def isFeatureEnabled =
+        Version.instance.isPEFeatureEnabled(
+          featureRequested = true,
+          "Form Runner simple data migration"
+        )
+
+      if (behavior == DataMigrationBehavior.Enabled && ! isFeatureEnabled)
+        DataMigrationBehavior.Error
       else
-        FormRunner.metadataElemValueOpt(DataMigrationFeatureName)      orElse
-        formRunnerProperty(s"oxf.fr.detail.$DataMigrationFeatureName") flatMap
-        DataMigrationBehavior.withNameOption                           getOrElse
-        DataMigrationBehavior.Disabled
+        behavior
     }
 
     def findEnclosingModel(enclosingModelAbsoluteId: String)(implicit doc: XFormsContainingDocument): XFormsModel =

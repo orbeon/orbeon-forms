@@ -21,10 +21,12 @@ import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
 
-// Analyze a tree of binds to determine expressions dependencies based on references to MIP variables, that is to binds
-// which have a `name` attribute. The result is an evaluation order which satisfies the dependencies.
+// Analyze a tree of binds to determine expressions dependencies based on references to MIP variables,
+// that is to binds which have a `name` attribute. The result is an evaluation order which satisfies
+// the dependencies.
 //
 // See also: https://github.com/orbeon/orbeon-forms/issues/2186
+//
 object DependencyAnalyzer {
 
   val Logger = LoggerFactory.getLogger("org.orbeon.xforms.analysis.calculate")
@@ -60,7 +62,7 @@ object DependencyAnalyzer {
   //
   // Return an evaluation order or a `ValidationException` if there is a cycle.
   //
-  // NOTE: If a variable reference is not found, this behaves as if the variabel reference was missing.
+  // NOTE: If a variable reference is not found, this behaves as if the variable reference was missing.
   //
   def determineEvaluationOrder(
     tree : BindTree,

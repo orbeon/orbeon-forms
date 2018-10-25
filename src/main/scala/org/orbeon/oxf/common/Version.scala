@@ -26,7 +26,7 @@ abstract class Version {
 
   import Version._
 
-  def requirePEFeature(featureName: String)
+  def requirePEFeature(featureName: String): Unit
   def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
 
   override def toString = VersionString

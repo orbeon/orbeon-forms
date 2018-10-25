@@ -208,15 +208,16 @@
                                 </xsl:otherwise>
                             </xsl:choose>
 
+                            <!-- NOTE: We can't use `fr:component-param-value()` because that returns an `xs:string`. We should have
+                                 another function able to handle non-AVT attributes which return arbitrary sequences. -->
                             <xsl:if test="not($readonly)">
-                                <xf:var name="repeat-template">
+                                <xf:var name="repeat-template" as="element(*)">
                                     <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                     <xxf:value value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
                                 </xf:var>
                             </xsl:if>
-                            <xf:var name="repeat-index">
-                                <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
-                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
+                            <xf:var name="repeat-index" as="xs:integer">
+                                <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection [REALLY?] -->
                                 <xxf:value value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
                             <!-- NOTE: We need a better way to get the Form Runner mode. -->
@@ -224,23 +225,24 @@
                                 name="view-mode"
                                 value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>
 
-                            <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
-                            <xf:var name="min">
-                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
-                                <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
-                            </xf:var>
+                            <!-- NOTE: `min="foo"` is taken as no minimum. Dubious but has been like this for a long time. -->
+                            <xf:var name="min"    as="xs:integer"  value="(xs:integer(fr:component-param-value('min')   [. castable as xs:integer])[. ge 0], 0)[1]"/>
+                            <xf:var name="freeze" as="xs:integer"  value="(xs:integer(fr:component-param-value('freeze')[. castable as xs:integer])[. ge 0], 0)[1]"/>
 
-                            <xf:var name="max-avt" xxbl:scope="outer"><xsl:value-of select="($root/@max, $root/@maxOccurs, 'none')[1]"/></xf:var>
-                            <xf:var name="max">
-                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
-                                <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
-                            </xf:var>
-
-                            <xf:var name="freeze-avt" xxbl:scope="outer"><xsl:value-of select="$root/@freeze"/></xf:var>
-                            <xf:var name="freeze">
-                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
-                                <xxf:value value="(xs:integer($repeat-context-outer/xxf:evaluate-avt($freeze-avt)[. castable as xs:integer]), 0)[1]" xxbl:scope="outer"/>
-                            </xf:var>
+                            <xf:var
+                                name="max"
+                                as="xs:integer?"
+                                value="
+                                    let $s := fr:component-param-value('max'),
+                                        $i := xs:integer($s[. castable as xs:integer])
+                                    return
+                                        if ($s = 'none') then
+                                            ()
+                                        else if (exists($s) and empty($i)) then
+                                            0
+                                        else
+                                            $i
+                            "/>
 
                             <xf:action event="DOMActivate" observer="fr-grid-add fr-grid-add-bottom">
                                 <xsl:choose>
@@ -289,11 +291,7 @@
 
                             <xf:var
                                 name="can-add"
-                                value="
-                                    $max = ('none', 'unbounded') or (
-                                        $max castable as xs:integer and
-                                        count($repeat-sequence) lt xs:integer($max)
-                                    )"
+                                value="empty($max) or count($repeat-sequence) lt $max"
                             />
                         </xsl:if><!-- $is-repeat -->
 
@@ -749,9 +747,8 @@
                                                         name="can-remove"
                                                         value="
                                                             $remove-constraint and
-                                                            not($frozen) and
-                                                            $min castable as xs:integer and
-                                                            count($repeat-sequence) gt xs:integer($min)"
+                                                            not($frozen)       and
+                                                            count($repeat-sequence) gt $min"
                                                     />
 
                                                     <xf:var
@@ -931,9 +928,7 @@
                                     <!-- TODO LATER: not($frozen) -->
                                     <xf:var
                                         name="can-remove"
-                                        value="
-                                            $min castable as xs:integer and
-                                            count($repeat-sequence) gt xs:integer($min)"
+                                        value="count($repeat-sequence) gt $min"
                                     />
 
                                     <!-- Show only if can remove -->

@@ -291,7 +291,7 @@ trait GridOps extends ContainerOps {
     case v                 ⇒ v
   }
 
-  private val NoMaximum = Set("none", "unbounded")
+  private val NoMaximum = Set("none")
 
   // NOTE: Value can be a simple AVT
   def getNormalizedMax(doc: NodeInfo, gridName: String): Option[String] =

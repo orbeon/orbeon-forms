@@ -180,7 +180,7 @@
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
                                 <xf:trigger
                                     appearance="minimal"
-                                    ref="$repeat-context[$can-add]"
+                                    ref="if ($can-add) then $repeat-context else ''"
                                     tabindex="-1"
                                     id="fr-repeater-add"
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">

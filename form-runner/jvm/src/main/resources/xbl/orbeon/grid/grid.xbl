@@ -465,6 +465,8 @@
                                                         <xsl:copy>
                                                             <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
                                                             <xsl:attribute name="for" select="$control/@id"/>
+                                                            <!-- Copy classes both from the control and the LHH, to enable custom styling by form authors -->
+                                                            <xsl:variable name="source-class" select="$control/@class, @class"/>
 
                                                             <xsl:choose>
                                                                 <xsl:when test="$can-support-required-class and local-name() = 'label'">
@@ -472,10 +474,10 @@
                                                                          AND is required. -->
                                                                     <xsl:attribute
                                                                         name="class"
-                                                                        select="@class, '{''xforms-required''[xxf:required($control-bindings-or-empty[1])]}'"/>
+                                                                        select="$source-class, '{''xforms-required''[xxf:required($control-bindings-or-empty[1])]}'"/>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
-                                                                    <xsl:copy-of select="@class"/>
+                                                                    <xsl:copy-of select="$source-class"/>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
 

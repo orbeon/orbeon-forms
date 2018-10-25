@@ -38,9 +38,8 @@ object XXFormsComponentParam {
     paramSuffix : List[String]
   ): Option[AtomicValue] = {
 
-    val prefixedId = XFormsId.getPrefixedId(XFormsFunction.context.sourceEffectiveId)
-    val containerForSourceScope =
-      XFormsFunction.context.container.findScopeRoot(prefixedId)
+    val prefixedId              = XFormsId.getPrefixedId(XFormsFunction.context.sourceEffectiveId)
+    val containerForSourceScope = XFormsFunction.context.container.findScopeRoot(prefixedId)
 
     containerForSourceScope.associatedControlOpt collect
       { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒

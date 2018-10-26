@@ -152,31 +152,6 @@
                     </xsl:element>
                 </xsl:template>
 
-                <!-- Hide grid rows without visible controls -->
-                <!-- See https://github.com/orbeon/orbeon-forms/issues/2135 -->
-                <xsl:template
-                    match="
-                        *:table[
-                            p:has-class('fr-grid')
-                        ]/
-                        *:tbody/
-                        *:tr[
-                            empty(
-                                *:td/*[
-                                    (p:has-class('xforms-control') or p:has-class('xbl-component')) and
-                                    not(p:has-class('xforms-disabled'))
-                                ]
-                            )
-                        ]"
-                    mode="in-grid">
-
-                    <xsl:element name="{local-name()}">
-                        <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:attribute name="class" select="'xforms-hidden'"/>
-                        <xsl:apply-templates select="node()" mode="#current"/>
-                    </xsl:element>
-                </xsl:template>
-
                  <!-- These are unneeded and can make iText choke (values too long) -->
                  <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
 

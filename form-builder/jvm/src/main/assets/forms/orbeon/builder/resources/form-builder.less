@@ -1159,10 +1159,13 @@ div.orbeon.orbeon-portlet-div {
             margin-left: 15px;
             margin-right: 15px;
             img, .brand { vertical-align: middle }                          // Logo and title vertically centered
-            img { padding: 0 0 0 10px }                                         // Space to the left of the logo
+            img { padding: 0 0 0 10px }                                     // Space to the left of the logo
             .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
                 float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
                 margin: 0; padding: 0; display: inline;                     // Override h1 styles
+            }
+            .nav {
+                margin-left: auto;                                          // Show at the end of the line in `flex` layout
             }
         }
     }

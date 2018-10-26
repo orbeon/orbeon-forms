@@ -689,26 +689,6 @@
             <include name="**/*.wsdl"/>
         </fixcrlf>
         <zip zipfile="build/distrib/${versioned-name}.zip" basedir="build/temp/distrib"/>
-        <!-- Fix EOL for Unix platform -->
-        <fixcrlf srcDir="build/temp/distrib" eol="lf">
-            <include name="**/*.txt"/>
-            <include name="**/*.xml"/>
-            <include name="**/*.xsl"/>
-            <include name="**/*.xpl"/>
-            <include name="**/*.jsp"/>
-            <include name="**/*.jspx"/>
-            <include name="**/*.html"/>
-            <include name="**/*.htm"/>
-            <include name="**/*.js"/>
-            <include name="**/*.css"/>
-            <include name="**/*.java"/>
-            <include name="**/*.properties"/>
-            <include name="**/*.rng"/>
-            <include name="**/*.xsd"/>
-            <include name="**/*.xhtml"/>
-            <include name="**/*.wsdl"/>
-        </fixcrlf>
-        <tar tarfile="build/distrib/${versioned-name}.tgz" compression="gzip" basedir="build/temp/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
 

@@ -14,17 +14,16 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.GridDataMigration.PathElem
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.GridDataMigration.PathElem
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
-
-import scala.collection.JavaConverters._
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -222,7 +221,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     for {
       control                              ← controlElems
       if predicate(control)
-      bindId                               ← control.attValueOpt("bind").toList
+      bindId                               ← control.attValueOpt(XFormsConstants.BIND_QNAME).toList
       controlName                          ← controlNameFromIdOpt(bindId).toList
       BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
       resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)

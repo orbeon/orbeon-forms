@@ -28,6 +28,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -145,7 +146,7 @@ object ToolboxOps {
 
           // Make sure there is a @bind instead of a @ref on the control
           delete(newControlElem /@ "ref")
-          ensureAttribute(newControlElem, "bind", bind.id)
+          ensureAttribute(newControlElem, XFormsConstants.BIND_QNAME.name, bind.id)
 
           // Set bind attributes if any
           insert(into = bind, origin = findBindAttributesTemplate(binding))
@@ -992,7 +993,7 @@ object ToolboxOps {
 
     val xcvBinds = xcvElem / XcvEntry.Bind.entryName / *
 
-    if (newContainerElem.hasAtt("bind")) {
+    if (newContainerElem.hasAtt(XFormsConstants.BIND_QNAME.name)) {
       // Insert the bind element for the container and descendants
       val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
       insert(after = tmpBind, origin = xcvBinds)

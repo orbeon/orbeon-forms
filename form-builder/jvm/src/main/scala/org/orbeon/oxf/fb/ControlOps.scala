@@ -77,7 +77,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def fromPrecedingNamesInGrid = precedingCellsInGrid flatMap (_ firstChildOpt * flatMap getControlNameOpt) headOption
 
     def fromPrecedingGrids =
-      if (grid.hasAtt("bind"))
+      if (grid.hasAtt(BIND_QNAME))
         None
       else
         precedingBoundControlNameInSectionForGrid(grid, includeSelf = false)
@@ -91,8 +91,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // with a name (there might not be one).
     val boundControls =
       precedingSiblingOrSelfContainers(gridElem, includeSelf) flatMap {
-        case grid if ! grid.hasAtt("bind") ⇒ grid descendant CellTest child * filter hasName lastOption
-        case boundSectionOrGrid            ⇒ Some(boundSectionOrGrid)
+        case grid if ! grid.hasAtt(BIND_QNAME) ⇒ grid descendant CellTest child * filter hasName lastOption
+        case boundSectionOrGrid                ⇒ Some(boundSectionOrGrid)
       }
 
     // Take the first result
@@ -270,8 +270,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Set @id in any case, @ref value if present, @bind value if present
     ensureAttribute(controlElement, "id", newControlId)
-    if (! IsGrid(controlElement) || controlElement.hasAtt("bind"))
-      ensureAttribute(controlElement, "bind", bindId(newName))
+    if (! IsGrid(controlElement) || controlElement.hasAtt(BIND_QNAME))
+      ensureAttribute(controlElement, BIND_QNAME.name, bindId(newName))
 
     // Make the control point to its template if @template (or legacy @origin) is present
     for (attName ← List("template", "origin"))

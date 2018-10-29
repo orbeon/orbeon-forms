@@ -155,6 +155,7 @@ object SimplePath {
     def id = attValue("id")
     def hasId = att("id").nonEmpty && attValue("id").trimAllToEmpty != ""
     def hasAtt(attName: String) = att(attName).nonEmpty
+    def hasAtt(attName: QName) = att(attName).nonEmpty
 
     def attValueOpt(attName: String) = /@(attName) match {
       case Seq() ⇒ None

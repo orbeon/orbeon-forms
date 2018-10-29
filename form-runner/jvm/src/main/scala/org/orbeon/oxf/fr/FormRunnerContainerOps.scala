@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
@@ -131,7 +132,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     for {
       control       ← findControlByName(inDoc, controlName)
       if controlRequiresNestedIterationElement(control)
-      bind          ← control attValueOpt "bind" flatMap (findInBindsTryIndex(inDoc, _))
+      bind          ← control attValueOpt XFormsConstants.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
       iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)

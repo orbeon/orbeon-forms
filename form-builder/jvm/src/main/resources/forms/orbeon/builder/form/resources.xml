@@ -393,6 +393,9 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "first-name"</hint>
             </control-name>
+            <pdf-field-name>
+                <label>Name of the PDF field</label>
+            </pdf-field-name>
             <options>
                 <label>Options</label>
                 <item>
@@ -1530,6 +1533,9 @@
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint>E.g.: "nom-de-famille"</hint>
             </control-name>
+            <pdf-field-name>
+                <label>Nom du champ PDF</label>
+            </pdf-field-name>
             <options>
                 <label>Options</label>
                 <item>
@@ -2669,6 +2675,9 @@
                 <alert>Navnet er galt eller allerede i bruk.</alert>
                 <hint>F.eks.: «fornavn»</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -3836,6 +3845,9 @@
                 <alert>Название уже используется или некорректно</alert>
                 <hint>Например: "first-name"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -5003,6 +5015,9 @@
                 <alert>Il nome é già in uso o non é valido</alert>
                 <hint>Ad esempio: "primo nome"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Opzioni</label>
                 <item>
@@ -6162,6 +6177,9 @@
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>z.B.: "Vorname"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Optionen</label>
                 <item>
@@ -7324,6 +7342,9 @@
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "etunimi"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Asetukset</label>
                 <item>
@@ -8483,6 +8504,9 @@
                 <alert>Nombre en uso o incorrecto</alert>
                 <hint>Ej.: "primer-nombre"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Página de Resumen</label>
                 <item>
@@ -9643,6 +9667,9 @@
                 <alert>Naam wordt al gebruikt of is ongeldig</alert>
                 <hint>Bijv.: "voornaam"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Opties</label>
                 <item>
@@ -10782,6 +10809,9 @@
                 <alert>O nome está incorrecto ou já existe um outro controlo com o mesmo nome</alert>
                 <hint>Ex.: "primeiro-nome"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Opções</label>
                 <item>
@@ -11948,6 +11978,9 @@
                 <alert>Namnet används redan eller innehåller otillåtna tecken</alert>
                 <hint>Exempel: "efternamn"</hint>
             </control-name>
+            <pdf-field-name>
+                <label todo="true">[Name of the PDF field]</label>
+            </pdf-field-name>
             <options>
                 <label>Val</label>
                 <item>

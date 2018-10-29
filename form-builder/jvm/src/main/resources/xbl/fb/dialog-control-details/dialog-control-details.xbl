@@ -666,6 +666,13 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
+                                                <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
+                                                    <xf:label ref="$resources/dialog-control-details/pdf-field-name/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
 
                                                 <xf:var
                                                     name="is-attachment"

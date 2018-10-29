@@ -85,7 +85,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   // Don't return non-repeated `fr:grid` until an enclosing element is needed. See:
   // - https://github.com/orbeon/orbeon-forms/issues/2173
   // - https://github.com/orbeon/orbeon-forms/issues/1947
-  def findContainerNamesForModel(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
+  def findContainerNamesForModel(
+    descendant               : NodeInfo,
+    includeSelf              : Boolean = false,
+    includeIterationElements : Boolean = true
+  ): Seq[String] = {
 
     val namesWithContainers =
       for {
@@ -93,14 +97,16 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
         name      ← getControlNameOpt(container)
         if ! (IsGrid(container) && ! isRepeat(container))
       } yield
-        name → container
+        name
 
-    // Repeated sections add an intermediary iteration element
+    // Repeated sections and grids add an intermediary iteration element
     val namesFromLeaf =
-      namesWithContainers flatMap {
-        case (name, _) ⇒
+      if (includeIterationElements)
+        namesWithContainers flatMap { name ⇒
           findRepeatIterationName(descendant, name).toList ::: name :: Nil
-      }
+        }
+      else
+        namesWithContainers
 
     namesFromLeaf.reverse
   }

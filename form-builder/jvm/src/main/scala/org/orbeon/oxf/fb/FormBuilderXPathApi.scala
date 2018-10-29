@@ -33,6 +33,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 object FormBuilderXPathApi {
 
@@ -507,6 +508,27 @@ object FormBuilderXPathApi {
           )
         )
     }
+
+  //@XPathFunction
+  def findPdfFieldName(controlName: String, currentControlName: String): Option[String] = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) map { controlElem ⇒
+
+      val containerNames =
+        FormRunner.findContainerNamesForModel(
+          controlElem,
+          includeSelf              = false,
+          includeIterationElements = false
+        )
+
+      val suffix =
+        XFormsId.getEffectiveIdSuffix(buildControlEffectiveId(controlElem)).trimAllToOpt.toList
+
+      containerNames ++: (currentControlName :: suffix) mkString FormRunner.PdfFieldSeparator
+    }
+  }
 
   //@XPathFunction
   def namesToRenameForMergingSectionTemplate(

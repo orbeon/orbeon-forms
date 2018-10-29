@@ -26,6 +26,8 @@ import scala.collection.JavaConverters._
 
 trait FormRunnerPDF {
 
+  val PdfFieldSeparator = "$"
+
   // Return mappings (formatName → expression) for all PDF formats in the properties
   //@XPathFunction
   def getPDFFormats: ju.Map[String, String] = {
@@ -86,7 +88,7 @@ trait FormRunnerPDF {
 
     // This only makes sense if we are passed a control with a name
     findControlName(control) map { controlName ⇒
-      ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString "$"
+      ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString PdfFieldSeparator
      } orNull
   }
 

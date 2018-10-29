@@ -40,7 +40,9 @@
                 'xforms-group',
                 'xforms-case',
                 'xforms-switch',
-                'xforms-repeat'
+                'xforms-repeat',
+                'xbl-fr-grid',
+                'xbl-fr-section'
             "
         as="xs:string*"/>
 

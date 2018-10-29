@@ -239,7 +239,7 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.fr-number">
-        .//*[tokenize(@class, '\s+') = 'xbl-fr-number-xforms-input']/input/@value/string()
+        .//*[tokenize(@class, '\s+') = 'xforms-input']/input/@value/string()
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.fr-autocomplete">

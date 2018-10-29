@@ -31,13 +31,13 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest    effectiveBooleanValue
   val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest effectiveBooleanValue
 
-  def isRepeatable(node: NodeInfo) =
+  def isRepeatable(node: NodeInfo): Boolean =
     IsGrid(node) || IsSection(node)
 
-  def isContentRepeat(node: NodeInfo) =
+  def isContentRepeat(node: NodeInfo): Boolean =
     isRepeatable(node) && node.attValue("repeat") == RepeatContentToken
 
-  def isLegacyRepeat(node: NodeInfo) =
+  def isLegacyRepeat(node: NodeInfo): Boolean =
     ! isContentRepeat(node) &&
     isRepeatable(node)      && (
       node.attValue("repeat") == LegacyRepeatContentToken ||
@@ -48,17 +48,17 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     )
 
   //@XPathFunction
-  def isRepeat(node: NodeInfo) =
+  def isRepeat(node: NodeInfo): Boolean =
     isContentRepeat(node) || isLegacyRepeat(node)
 
   // Non-repeated grid doesn't (yet) have container settings
-  def hasContainerSettings(node: NodeInfo) =
+  def hasContainerSettings(node: NodeInfo): Boolean =
     IsSection(node) || isRepeat(node)
 
   val IsContainer: NodeInfo ⇒ Boolean =
     node ⇒ (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
 
-  def controlRequiresNestedIterationElement(node: NodeInfo) =
+  def controlRequiresNestedIterationElement(node: NodeInfo): Boolean =
     isRepeat(node)
 
   // Find the binding's first URI qualified name
@@ -72,7 +72,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   // Get the name for a section or grid element or null (the empty sequence)
   //@XPathFunction
-  def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
+  def getContainerNameOrEmpty(elem: NodeInfo): String = getControlNameOpt(elem).orNull
 
   def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): List[NodeInfo] =
       (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
@@ -120,18 +120,18 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     container / * filter IsGrid
 
   // Find all ancestor repeats from leaf to root
-  def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+  def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter isRepeat
 
-  def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+  def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[String] =
     findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 
   // Find all ancestor sections from leaf to root
-  def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+  def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsSection
 
   //@XPathFunction
-  def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
+  def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String): String =
     findRepeatIterationName(inDoc, controlName) getOrElse ""
 
   def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =

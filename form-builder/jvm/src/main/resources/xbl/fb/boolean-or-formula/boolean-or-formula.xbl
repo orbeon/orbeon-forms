@@ -35,11 +35,10 @@
             <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
 
             <xf:select1 ref="$binding" appearance="full xxf:horizontal">
-                <!--  Place "No" first as that is the default -->
-                <xf:itemset ref="$items[@id = 1], $items[@id = (0, 2)]">
+                <xf:itemset ref="$items[@id = (0, 1, 2)]">
                     <xf:label ref="."/>
                     <!-- Tricky bits: map @id to XPath and handle case where we switch from
-                         true() or false() to XPath -->
+                         `true()` or `false()` to XPath -->
                     <xf:value
                         ref="
                             if (@id = 0) then

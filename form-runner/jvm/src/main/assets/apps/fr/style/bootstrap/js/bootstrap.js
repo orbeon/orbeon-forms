@@ -758,7 +758,7 @@
       selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
-    $parent = selector && $(selector)
+    $parent = selector && selector != "#" && $(selector)
 
     if (!$parent || !$parent.length) $parent = $this.parent()
 

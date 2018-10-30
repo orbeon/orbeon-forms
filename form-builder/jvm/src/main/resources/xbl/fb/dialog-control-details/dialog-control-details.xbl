@@ -666,9 +666,6 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-                                                <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
-                                                    <xf:label ref="$resources/dialog-control-details/pdf-field-name/label"/>
-                                                </xf:output>
 
                                                 <xf:var
                                                     name="items-to-show"
@@ -719,14 +716,6 @@
                                                 </xf:select>
                                             </xh:td>
                                         </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <!-- Custom classes -->
-                                                <xf:input ref="$i/custom-classes">
-                                                    <xf:label ref="$resources/classes/label"/>
-                                                </xf:input>
-                                            </xh:td>
-                                        </xh:tr>
                                     </fr:grid>
                                 </xh:div>
                                 <xh:div class="fb-base-tab-right">
@@ -742,10 +731,25 @@
                                         name="multi"
                                         value="not($toggle) and count($i/appearances/appearance) gt 1"/>
 
-                                    <xf:group ref=".[$multi or $toggle]">
-                                        <fr:grid>
-                                            <xh:tr>
-                                                <xh:td>
+                                    <fr:grid>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
+                                                    <xf:label ref="$resources/dialog-control-details/pdf-field-name/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <!-- Custom classes -->
+                                                <xf:input ref="$i/custom-classes">
+                                                    <xf:label ref="$resources/classes/label"/>
+                                                </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:group ref=".[$multi or $toggle]">
                                                     <!-- Propose a choice between multiple items -->
                                                     <xf:select1 ref="$i/appearances/@selection[$multi]" appearance="full">
                                                         <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
@@ -784,10 +788,10 @@
                                                             <xf:value ref="value"/>
                                                         </xf:itemset>
                                                     </xf:select>
-                                                </xh:td>
-                                            </xh:tr>
-                                        </fr:grid>
-                                    </xf:group>
+                                                </xf:group>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </fr:grid>
                                     <!-- Properties specific to this control defined in the XBL metadata -->
                                     <xxf:dynamic ref="instance('dynamic')[exists(//xf:instance/*)]" id="custom-properties"/>
                                 </xh:div>

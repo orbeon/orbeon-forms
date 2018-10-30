@@ -8538,13 +8538,13 @@
                     <label>Mostrar en Búsquedas</label>
                     <value>fr-search</value>
                 </item>
-            </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Es receptor del Emails</label>
                     <value>fr-email-recipient</value>

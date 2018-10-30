@@ -47,7 +47,7 @@
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
-                <xf:var name="standard-classes"             value="$resources/dialog-control-details/options/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
+                <xf:var name="standard-classes"             value="$resources/dialog-control-details/(options | email-options)/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
                 <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
 
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>

@@ -410,6 +410,9 @@
                     <label>Encrypt data at rest</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label>Email Options</label>
                 <item>
                     <label>Email recipient</label>
                     <value>fr-email-recipient</value>
@@ -438,7 +441,7 @@
                     <label>Show in email subject (Deprecated)</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -1550,6 +1553,9 @@
                     <label>Crypter les données au repos</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label>Options email</label>
                 <item>
                     <label>Destinataire email</label>
                     <value>fr-email-recipient</value>
@@ -1578,7 +1584,7 @@
                     <label>Inclure dans le sujet d'email (déprécié)</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -2692,6 +2698,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Epostmottaker</label>
                     <value>fr-email-recipient</value>
@@ -2720,7 +2729,7 @@
                     <label todo="true">Vis i epostemne</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -3862,6 +3871,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Адрес получателя почты</label>
                     <value>fr-email-recipient</value>
@@ -3890,7 +3902,7 @@
                     <label todo="true">Показывать в теме письма</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -5032,6 +5044,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Destinatario email</label>
                     <value>fr-email-recipient</value>
@@ -5060,7 +5075,7 @@
                     <label todo="true">Mostra in oggetto</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -6194,6 +6209,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>E-Mail-Empfänger</label>
                     <value>fr-email-recipient</value>
@@ -6222,7 +6240,7 @@
                     <label todo="true">In E-Mail-Betreff anzeigen</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -7359,6 +7377,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Sähköpostin vastaanottaja</label>
                     <value>fr-email-recipient</value>
@@ -7387,7 +7408,7 @@
                     <label todo="true">Näytä sähköpostin aiheena</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -8517,6 +8538,9 @@
                     <label>Mostrar en Búsquedas</label>
                     <value>fr-search</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
@@ -8549,7 +8573,7 @@
                     <label todo="true">Mostrar en Asunto del Mail</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -9684,6 +9708,9 @@
                     <label>Encrypt gegevens in rust</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>E-mail ontvanger</label>
                     <value>fr-email-recipient</value>
@@ -9712,7 +9739,7 @@
                     <label>Toon in e-mail onderwerp (deprecated)</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -10826,6 +10853,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Receptor do Email</label>
                     <value>fr-email-recipient</value>
@@ -10854,7 +10884,7 @@
                     <label todo="true">Mostrar no assunto do email</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -11995,6 +12025,9 @@
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
+            </options>
+            <email-options>
+                <label todo="true">[Email Options]</label>
                 <item>
                     <label>Mottagare av mejl</label>
                     <value>fr-email-recipient</value>
@@ -12023,7 +12056,7 @@
                     <label todo="true">Visa i ärenderaden för mejl</label>
                     <value>fr-email-subject</value>
                 </item>
-            </options>
+            </email-options>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>

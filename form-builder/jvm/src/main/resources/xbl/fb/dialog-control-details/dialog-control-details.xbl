@@ -669,6 +669,22 @@
                                                 <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
                                                     <xf:label ref="$resources/dialog-control-details/pdf-field-name/label"/>
                                                 </xf:output>
+
+                                                <xf:var
+                                                    name="items-to-show"
+                                                    value="
+                                                        $resources/dialog-control-details/options/item[
+                                                            fr:is-pe() or value != 'fr-encrypt'
+                                                        ]
+                                                    "/>
+
+                                                <xf:select ref="$i/standard-classes" appearance="full">
+                                                    <xf:label ref="$resources/dialog-control-details/options/label"/>
+                                                    <xf:itemset ref="$items-to-show[not(contains(value, 'email'))]">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                </xf:select>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>
@@ -683,23 +699,20 @@
                                                     value="xxf:split($i/standard-classes) = 'fr-static-attachment'"/>
 
                                                 <xf:var
-                                                    name="items-to-show"
+                                                    name="email-items-to-show"
                                                     value="
-                                                        $resources/dialog-control-details/options/item[
+                                                        $resources/dialog-control-details/email-options/item[
                                                             (
                                                                 $is-attachment or value != 'fr-email-attachment'
                                                             ) and not(
                                                                 ($is-attachment or $is-static-attachment) and value = ('fr-email-recipient', 'fr-email-subject')
-                                                            ) and (
-                                                                fr:is-pe() or value != 'fr-encrypt'
                                                             )
                                                         ]
                                                     "/>
 
-                                                <!-- Options (predefined classes) -->
                                                 <xf:select ref="$i/standard-classes" appearance="full">
-                                                    <xf:label ref="$resources/dialog-control-details/options/label"/>
-                                                    <xf:itemset ref="$items-to-show">
+                                                    <xf:label ref="$resources/dialog-control-details/email-options/label"/>
+                                                    <xf:itemset ref="$email-items-to-show[contains(value, 'email')]">
                                                         <xf:label ref="label"/>
                                                         <xf:value ref="value"/>
                                                     </xf:itemset>

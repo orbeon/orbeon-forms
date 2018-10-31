@@ -22,7 +22,7 @@ object FormBuilderApp {
   def main(args: Array[String]): Unit = {
 
     def initializeOnDomReady(): Unit = {
-      FormRunnerApp.main(Array.empty)
+      FormRunnerApp.initializeOnDomReady()
       StaticUpload
       DialogItemset
       ControlDnD

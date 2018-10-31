@@ -19,21 +19,20 @@ import org.orbeon.xforms.$
 // Scala.js starting point for Form Runner
 object FormRunnerApp {
 
+  def initializeOnDomReady(): Unit = {
+    xforms.XFormsApp.initializeOnDomReady()
+    xbl.DndRepeat
+    xbl.Tabbable
+    xbl.Number
+    xbl.TreeSelect1
+    xbl.WPaint
+    xbl.HrefButton
+    xbl.Grid
+    xbl.Date
+    FormRunnerPrivateAPI
+  }
+
   def main(args: Array[String]): Unit = {
-
-    def initializeOnDomReady(): Unit = {
-      xbl.DndRepeat
-      xbl.Tabbable
-      xbl.Number
-      xbl.TreeSelect1
-      xbl.WPaint
-      xbl.HrefButton
-      xbl.Grid
-      xbl.Date
-      FormRunnerPrivateAPI
-      xforms.XFormsApp.main(Array.empty)
-    }
-
     $(initializeOnDomReady _)
   }
 }

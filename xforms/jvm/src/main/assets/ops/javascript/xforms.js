@@ -3986,38 +3986,14 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
     // Run xformsPageLoaded when the browser has finished loading the page
     // In case this script is loaded twice, we still want to run the initialization only once
     if (! ORBEON.xforms.Globals.pageLoadedRegistered) {
-
-        // See if we the form is inside a <div class="dijitContentPane">. If it is, this means that the form has been
-        // included into the <div> by Dojo. When that happens, using YAHOO.util.Event.onDOMReady() works with IE but not
-        // Firefox. So the user is responsible from calling ORBEON.xforms.Init.document() (see the Wiki:
-        // http://tinyurl.com/cufx4f). But because YAHOO.util.Event.onDOMReady() does work on IE, that causes
-        // ORBEON.xforms.Init.document() to be called twice which causes problems. So here we look for a
-        // <div class="dijitContentPane"> and if we can find one, we don't call YAHOO.util.Event.onDOMReady().
-        var foundDojoContentPane = false;
-        for (var i = 0; i < document.forms.length; i++) {
-            var form = document.forms[i];
-            if (form.className.indexOf("xforms-form") != -1) {
-                // Found Orbeon Forms <form> element
-                var currentElement = form.parentNode;
-                while (currentElement != null) {
-                    if (currentElement.className == "dijitContentPane") {
-                        foundDojoContentPane = true;
-                        break;
-                    }
-                    currentElement = currentElement.parentNode;
-                }
-            }
-        }
-        if (! foundDojoContentPane) {
-            ORBEON.xforms.Globals.pageLoadedRegistered = true;
-            YAHOO.util.Event.throwErrors = true;
-            if (_.isUndefined(window.Liferay))
-                YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
-            else
-                Liferay.on("allPortletsReady", ORBEON.xforms.Init.document);
-            ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
-            ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
-        }
+        ORBEON.xforms.Globals.pageLoadedRegistered = true;
+        YAHOO.util.Event.throwErrors = true;
+        if (_.isUndefined(window.Liferay))
+            YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
+        else
+            Liferay.on("allPortletsReady", ORBEON.xforms.Init.document);
+        ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
+        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     }
     ORBEON.onJavaScriptLoaded.fire();
 

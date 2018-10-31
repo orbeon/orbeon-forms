@@ -36,9 +36,8 @@ html.fr-accordion-lnf-js dt.a-m-t{
 .fr-accordion-lnf dd.a-m-d { margin: 0; padding: 0 }
 
 html.accordion-menu-js dd.a-m-d {
-    top: -10000px;
-    left: -10000px;
-    position: absolute;
+    // See https://github.com/orbeon/orbeon-forms/issues/3621
+    display: none;
 }
 html.accordion-menu-js dd.a-m-d-expand {
     position: static;

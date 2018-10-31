@@ -43,8 +43,14 @@ object Page {
     }
 
   // Return the language for the page, defaulting to English if none is set on html/@lang.
-  def getLang(): String =
-    ($(g.document.documentElement).attr("lang") getOrElse "en").substring(0, 2)
+  // See also https://github.com/orbeon/orbeon-forms/issues/3787
+  def getLang(): String = {
+
+    def fromRootElem = $(g.document.documentElement).attr("lang")
+    def fromOther    = $("[lang]").attr("lang")
+
+    (fromRootElem orElse fromOther getOrElse "en").substring(0, 2)
+  }
 
   // Create or return a control object corresponding to the provided container. Each control is inside a given
   // form, so getControl() could be a method of a form, but since we can given a container or control id determine

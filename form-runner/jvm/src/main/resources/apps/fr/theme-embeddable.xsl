@@ -24,10 +24,12 @@
 
     <xsl:template match="/">
         <xh:div>
-            <!-- Copy xforms-[dis|en]able-hint-as-tooltip and xforms-[dis|en]able-alert-as-tooltip from the body to the div -->
+            <!-- Copy `id` and `lang` from the root element, see https://github.com/orbeon/orbeon-forms/issues/3787. -->
+            <xsl:copy-of select="/*/(@id | @lang)"/>
+            <!-- Copy `xforms-[dis|en]able-hint-as-tooltip` and `xforms-[dis|en]able-alert-as-tooltip` from the body to the div -->
             <!-- NOTE: Since Orbeon Forms 2016.2, the XForms engine places the hint classes on the `<xh:form>` element. -->
-            <xsl:variable name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
-            <xsl:attribute name="class" select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
+            <xsl:variable  name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
+            <xsl:attribute name="class"           select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Handle head elements except scripts -->
             <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link | xh:style)">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">

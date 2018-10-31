@@ -42,14 +42,14 @@ object Page {
         newForm
     }
 
-  // Return the language for the page, defaulting to English if none is set on html/@lang.
+  // Return the language for the page, defaulting to English if none is found
   // See also https://github.com/orbeon/orbeon-forms/issues/3787
   def getLang(): String = {
 
-    def fromRootElem = $(g.document.documentElement).attr("lang")
-    def fromOther    = $("[lang]").attr("lang")
+    def fromRootElem      = $(g.document.documentElement).attr("lang")
+    def fromEmbeddingElem = $(".orbeon-portlet-div[lang]").attr("lang")
 
-    (fromRootElem orElse fromOther getOrElse "en").substring(0, 2)
+    (fromRootElem orElse fromEmbeddingElem getOrElse "en").substring(0, 2)
   }
 
   // Create or return a control object corresponding to the provided container. Each control is inside a given

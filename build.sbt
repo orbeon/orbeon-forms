@@ -129,7 +129,10 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File, pathPrefix: 
 
   IO.createDirectory(targetDir)
 
-  for ((sourceFile, newPath) ← scalaJsFiles(sourceFile, pathPrefix)) {
+  for {
+    (sourceFile, newPath) ← scalaJsFiles(sourceFile, pathPrefix)
+    if sourceFile.exists()
+  } locally {
     val targetFile = targetDir / newPath
     println(s"Copying Scala.js file ${sourceFile.name} to ${targetFile.absolutePath}.")
     IO.copyFile(
@@ -297,6 +300,7 @@ lazy val commonSettings = Seq(
 lazy val commonScalaJsSettings = Seq(
 
   skip in packageJSDependencies  := false,
+  scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
 
   scalaJSUseMainModuleInitializer in Compile := true,
   scalaJSUseMainModuleInitializer in Test    := false,

@@ -3,7 +3,7 @@ import org.orbeon.sbt.OrbeonSupport
 import org.orbeon.sbt.OrbeonSupport._
 import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
-//import sbtcross.{crossProject, CrossType} // until Scala.js 1.0.0 is released
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 val DefaultOrbeonFormsVersion     = "2017.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
@@ -349,7 +349,7 @@ lazy val assetsSettings = Seq(
   }
 )
 
-lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
+lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-common",
@@ -422,7 +422,7 @@ lazy val portletSupport = (project in file("portlet-support"))
     name := "orbeon-portlet-support"
   )
 
-lazy val formRunner = (crossProject.crossType(CrossType.Full) in file("form-runner"))
+lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-form-runner"
@@ -493,7 +493,7 @@ lazy val formRunnerJS = formRunner.js
     )
   )
 
-lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-builder"))
+lazy val formBuilder = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-builder"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-form-builder"
@@ -549,7 +549,7 @@ lazy val formBuilderJS: Project = formBuilder.js
     )
   )
 
-lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
+lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-xforms",
@@ -662,7 +662,7 @@ lazy val core = (project in file("src"))
     libraryDependencies                ++= CoreLibraryDependencies
   )
 
-lazy val orbeonWar = (crossProject.crossType(CrossType.Dummy) in file("orbeon-war"))
+lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
   .settings(
     name := "orbeon-war",
     exportJars := false

@@ -366,7 +366,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val containers =
       ensureContainers(
         ctx.dataRootElem,
-        (findContainerNamesForModel(controlElement) map (name ⇒ (() ⇒ elementInfo(name), None)))
+        findContainerNamesForModel(controlElement) map (name ⇒ (() ⇒ elementInfo(name), None))
       )
 
     // Then we create the holders within the containers

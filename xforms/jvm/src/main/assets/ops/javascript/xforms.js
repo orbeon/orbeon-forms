@@ -3465,7 +3465,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 debugDiv: null,                      // Points to the div when debug messages are displayed
                 debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
                 lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
-                pageLoadedRegistered: true,          // If the page loaded listener has been registered already, to avoid running it more than once
                 sliderYui: {},                       // Maps slider id to the YUI object for that slider
                 isReloading: false,                  // Whether the form is being reloaded from the server
                 lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
@@ -3983,18 +3982,9 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         ORBEON.xforms.ServerValueStore.purgeExpired();
     });
 
-    // Run xformsPageLoaded when the browser has finished loading the page
-    // In case this script is loaded twice, we still want to run the initialization only once
-    if (! ORBEON.xforms.Globals.pageLoadedRegistered) {
-        ORBEON.xforms.Globals.pageLoadedRegistered = true;
-        YAHOO.util.Event.throwErrors = true;
-        if (_.isUndefined(window.Liferay))
-            YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
-        else
-            Liferay.on("allPortletsReady", ORBEON.xforms.Init.document);
-        ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
-        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
-    }
+    YAHOO.util.Event.throwErrors = true;
+    ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
+    ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     ORBEON.onJavaScriptLoaded.fire();
 
 })();

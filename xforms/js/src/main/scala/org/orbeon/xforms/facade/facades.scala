@@ -14,6 +14,7 @@
 package org.orbeon.xforms.facade
 
 import org.orbeon.xforms.{DocumentAPI, YUICustomEvent}
+import org.scalajs.dom
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
 import org.scalajs.jquery.JQueryCallback
@@ -48,6 +49,15 @@ trait DocumentTrait extends js.Object {
 @js.native
 @JSGlobal("ORBEON.xforms.Document")
 object Document extends DocumentTrait
+
+@js.native
+trait InitTrait extends js.Object {
+  def document(): Unit = js.native
+}
+
+@js.native
+@JSGlobal("ORBEON.xforms.Init")
+object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {

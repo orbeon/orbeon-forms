@@ -14,29 +14,23 @@
 package org.orbeon.builder
 
 import org.orbeon.fr._
-import org.orbeon.xforms.$
+import org.orbeon.xforms.App
 
 // Scala.js starting point for Form Builder
-object FormBuilderApp {
+object FormBuilderApp extends App {
 
-  def main(args: Array[String]): Unit = {
-
-    def initializeOnDomReady(): Unit = {
-      FormRunnerApp.initializeOnDomReady()
-      StaticUpload
-      DialogItemset
-      ControlDnD
-      BlockCache
-      SectionGridEditor
-      RowEditor
-      LabelEditor
-      ControlEditor
-      ControlLabelHintTextEditor
-      GridWallDnD
-
-      BrowserCheck.checkSupportedBrowser()
-    }
-
-    $(initializeOnDomReady _)
+  def load(): Unit = {
+    FormRunnerApp.load()
+    StaticUpload
+    DialogItemset
+    ControlDnD
+    BlockCache
+    SectionGridEditor
+    RowEditor
+    LabelEditor
+    ControlEditor
+    ControlLabelHintTextEditor
+    GridWallDnD
+    BrowserCheck.checkSupportedBrowser()
   }
 }

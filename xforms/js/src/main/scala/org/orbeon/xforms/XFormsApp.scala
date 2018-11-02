@@ -14,13 +14,9 @@
 package org.orbeon.xforms
 
 // Scala.js starting point for XForms
-object XFormsApp {
+object XFormsApp extends App {
 
-  def initializeOnDomReady(): Unit = {
+  def load(): Unit = {
     Upload
-  }
-
-  def main(args: Array[String]): Unit = {
-    $(initializeOnDomReady _)
   }
 }

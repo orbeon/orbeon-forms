@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Orbeon, Inc.
+ * Copyright (C) 2018 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,24 +11,30 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.fr
+package org.orbeon.xforms
 
-import org.orbeon.xbl
-import org.orbeon.xforms.{App, XFormsApp}
+import org.orbeon.xforms.facade.Init
+import org.scalajs.dom
+import org.orbeon.liferay._
 
-// Scala.js starting point for Form Runner
-object FormRunnerApp extends App {
 
-  def load(): Unit = {
-    XFormsApp.load()
-    xbl.DndRepeat
-    xbl.Tabbable
-    xbl.Number
-    xbl.TreeSelect1
-    xbl.WPaint
-    xbl.HrefButton
-    xbl.Grid
-    xbl.Date
-    FormRunnerPrivateAPI
+trait App {
+
+  def load(): Unit
+
+  def main(args: Array[String]): Unit = {
+
+    def loadAndInit(): Unit = {
+      load()
+      Init.document()
+    }
+
+    $(() ⇒ {
+      dom.window.Liferay.toOption match {
+        case None          ⇒ $(loadAndInit _)
+        case Some(liferay) ⇒ liferay.on("allPortletsReady", loadAndInit _)
+      }
+    })
   }
+
 }

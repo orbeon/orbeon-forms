@@ -32,6 +32,6 @@ class ConcreteAttribute(qname: QName, var value: String)
   def getNamespacePrefix = getQName.namespace.prefix
   def getNamespaceURI    = getQName.namespace.uri
 
-  override def getName   = getQName.name
+  override def getName   = getQName.localName
   def getQualifiedName   = getQName.qualifiedName
 }

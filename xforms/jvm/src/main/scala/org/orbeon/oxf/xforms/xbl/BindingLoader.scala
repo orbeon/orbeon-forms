@@ -63,7 +63,7 @@ trait BindingLoader extends Logging {
 
         def pathsForQNames(qNames: Set[QName]) =
           qNames flatMap { qName ⇒
-            findBindingPathByNameUseMappings(urlMappings, qName.namespace.uri, qName.name)
+            findBindingPathByNameUseMappings(urlMappings, qName.namespace.uri, qName.localName)
           } partition (_._2) match {
             case (found, notFound) ⇒ (found map (_._1), notFound map (_._1))
           }

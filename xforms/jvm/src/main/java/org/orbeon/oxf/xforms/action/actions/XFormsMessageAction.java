@@ -65,7 +65,7 @@ public class XFormsMessageAction extends XFormsAction {
                 if (tempLevelAttribute == null) {
                     // "The default is "modal" if the attribute is not specified."
                     levelQName = XFormsConstants.XFORMS_MODAL_LEVEL_QNAME;
-                    levelAttribute = levelQName.name();
+                    levelAttribute = levelQName.localName();
                 } else {
                     levelAttribute = tempLevelAttribute;
                     levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, XFormsConstants.LEVEL_QNAME);
@@ -110,7 +110,7 @@ public class XFormsMessageAction extends XFormsAction {
                 if (levelQName.namespace().prefix().equals("")) {
                     level = levelAttribute;
                 } else {
-                    level = "{" + levelQName.namespace().uri() + "}" + levelQName.name();
+                    level = "{" + levelQName.namespace().uri() + "}" + levelQName.localName();
                 }
 
                 // Store message for sending to client

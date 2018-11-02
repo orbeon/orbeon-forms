@@ -43,7 +43,7 @@ class XXFormsType extends XXFormsMIPFunction {
             new QNameValue(
               "",
               typeQName.namespace.uri,
-              typeQName.name,
+              typeQName.localName,
               null
             )
           case _ ⇒

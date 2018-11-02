@@ -77,7 +77,7 @@ object XXFormsComponentParam {
 
     def propertyName =
       abstractBinding.directName map { qName ⇒
-        List("oxf.xforms.xbl", qName.namespace.prefix, qName.name, paramName) ++ paramSuffix mkString "."
+        List("oxf.xforms.xbl", qName.namespace.prefix, qName.localName, paramName) ++ paramSuffix mkString "."
       }
 
     // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is

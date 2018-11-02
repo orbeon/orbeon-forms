@@ -102,7 +102,7 @@ abstract class XFormsAnnotatorBase(
         isXBL                      = uri == XBL_NAMESPACE_URI,
         isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms,
         isXHTML                    = uri == XHTML_NAMESPACE_URI,
-        isFullUpdate               = atts.getValue(XXFORMS_UPDATE_QNAME.namespace.uri, XXFORMS_UPDATE_QNAME.name) == XFORMS_FULL_UPDATE
+        isFullUpdate               = atts.getValue(XXFORMS_UPDATE_QNAME.namespace.uri, XXFORMS_UPDATE_QNAME.localName) == XFORMS_FULL_UPDATE
       )
     }
   }

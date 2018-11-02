@@ -201,7 +201,7 @@ private object FormRunnerPersistenceProxy {
           new ElementFilterXMLReceiver(
             xmlReceiver = receiver,
             filter      = (_, _, _, atts) ⇒
-              atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.name) != "false"
+              atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
           ),
           XMLParsing.ParserConfiguration.PLAIN,
           true

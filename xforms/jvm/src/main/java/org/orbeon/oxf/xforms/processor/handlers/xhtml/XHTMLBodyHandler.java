@@ -23,10 +23,8 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
-import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
@@ -310,7 +308,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.name());
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.localName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName().equals(appearanceAttributeValue);
             }
         });
@@ -330,7 +328,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.name());
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.localName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName().equals(appearanceAttributeValue);
             }
         });

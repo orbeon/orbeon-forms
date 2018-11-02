@@ -163,7 +163,7 @@ trait ValidationBindOps extends Logging {
       val typeQName = staticBind.dataType.get
 
       val typeNamespaceURI = typeQName.namespace.uri
-      val typeLocalname    = typeQName.name
+      val typeLocalname    = typeQName.localName
 
       // Get value to validate if not already computed above
 

@@ -83,13 +83,13 @@ object QName {
 // Also, we don't like that this stores the qualified name. Storing `prefix: Option[String]`
 // would be better.
 //
-class QName private (val name: String, val namespace: Namespace, val qualifiedName: String) {
+class QName private (val localName: String, val namespace: Namespace, val qualifiedName: String) {
 
   private var _hashCode: Int = _
 
   override def hashCode(): Int = {
     if (_hashCode == 0) {
-      _hashCode = name.hashCode ^ namespace.uri.hashCode
+      _hashCode = localName.hashCode ^ namespace.uri.hashCode
       if (_hashCode == 0) {
         _hashCode = 0xbabe
       }
@@ -100,10 +100,10 @@ class QName private (val name: String, val namespace: Namespace, val qualifiedNa
   override def equals(other: Any): Boolean =
     other match {
       case anyRef: AnyRef if this eq anyRef ⇒ true
-      case that: QName if hashCode == that.hashCode && name == that.name && namespace.uri == that.namespace.uri ⇒ true
+      case that: QName if hashCode == that.hashCode && localName == that.localName && namespace.uri == that.namespace.uri ⇒ true
       case _ ⇒ false
     }
 
   override def toString =
-    if (namespace.uri == "") name else s"Q{$namespace.uri}$qualifiedName"
+    if (namespace.uri == "") localName else s"Q{$namespace.uri}$qualifiedName"
 }

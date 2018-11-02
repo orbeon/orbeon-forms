@@ -112,11 +112,11 @@ public class XFormsConstants {
     public static final QName XFORMS_GROUP_QNAME = QName.apply("group", XFORMS_NAMESPACE);
     public static final QName XFORMS_REPEAT_QNAME = QName.apply("repeat", XFORMS_NAMESPACE);
     public static final QName XFORMS_REPEAT_ITERATION_QNAME = QName.apply("repeat-iteration", XFORMS_NAMESPACE); // NOTE: Supposed to be xxf:repeat-iteration
-    public static final String REPEAT_NAME = XFORMS_REPEAT_QNAME.name();
+    public static final String REPEAT_NAME = XFORMS_REPEAT_QNAME.localName();
     public static final QName XFORMS_SWITCH_QNAME = QName.apply("switch", XFORMS_NAMESPACE);
     public static final QName XFORMS_CASE_QNAME = QName.apply("case", XFORMS_NAMESPACE);
     public static final QName XXFORMS_DIALOG_QNAME = QName.apply("dialog", XXFORMS_NAMESPACE);
-    public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.name();
+    public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.localName();
     public static final QName XXFORMS_DYNAMIC_QNAME = QName.apply("dynamic", XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_INPUT_QNAME = QName.apply("input", XFORMS_NAMESPACE);
@@ -124,7 +124,7 @@ public class XFormsConstants {
     public static final QName XFORMS_TEXTAREA_QNAME = QName.apply("textarea", XFORMS_NAMESPACE);
     public static final QName XFORMS_OUTPUT_QNAME = QName.apply("output", XFORMS_NAMESPACE);
     public static final QName XFORMS_UPLOAD_QNAME = QName.apply("upload", XFORMS_NAMESPACE);
-    public static final String UPLOAD_NAME = XFORMS_UPLOAD_QNAME.name();
+    public static final String UPLOAD_NAME = XFORMS_UPLOAD_QNAME.localName();
     public static final QName XFORMS_RANGE_QNAME = QName.apply("range", XFORMS_NAMESPACE);
     public static final QName XFORMS_SELECT_QNAME = QName.apply("select", XFORMS_NAMESPACE);
     public static final QName XFORMS_SELECT1_QNAME = QName.apply("select1", XFORMS_NAMESPACE);

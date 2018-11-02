@@ -75,8 +75,8 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
         // Output attribute
         final QName attributeQName = getQName(getDocumentLocator(), attributeName, getInterpreterContext().getPrefixesMap());
-        getInterpreterContext().getOutput().startPrefixMapping(attributeQName.name(), attributeQName.namespace().uri());// NOTE: we may have to check that the mapping does not exist yet
-        getInterpreterContext().getOutput().addAttribute(attributeQName.namespace().uri(), attributeQName.name(), attributeName, contentString);
+        getInterpreterContext().getOutput().startPrefixMapping(attributeQName.localName(), attributeQName.namespace().uri());// NOTE: we may have to check that the mapping does not exist yet
+        getInterpreterContext().getOutput().addAttribute(attributeQName.namespace().uri(), attributeQName.localName(), attributeName, contentString);
 
         // Clear state
         savedOutput = null;

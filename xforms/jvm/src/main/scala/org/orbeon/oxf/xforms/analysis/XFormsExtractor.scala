@@ -180,7 +180,7 @@ class XFormsExtractor(
         if (isTopLevel) {
           // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
           element(
-            localName = XFormsExtractor.LastIdQName.name,
+            localName = XFormsExtractor.LastIdQName.localName,
             atts      = List("id" → metadata.idGenerator.nextSequenceNumber.toString)
           )
 
@@ -260,7 +260,7 @@ class XFormsExtractor(
 
       // xxbl:scope
       val newScope =
-        Option(attributes.getValue(XXBL_SCOPE_QNAME.namespace.uri, XXBL_SCOPE_QNAME.name)) match {
+        Option(attributes.getValue(XXBL_SCOPE_QNAME.namespace.uri, XXBL_SCOPE_QNAME.localName)) match {
           case Some(xblScopeAttribute) ⇒ XXBLScope.valueOf(xblScopeAttribute)
           case None                    ⇒ parentElementDetails.scope
         }

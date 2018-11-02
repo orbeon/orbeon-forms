@@ -66,7 +66,7 @@ trait ControlExtensionAttributesSupport {
       (name, value) ← evaluatedExtensionAttributes
       if value ne null
       if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
-      localName = name.name
+      localName = name.localName
     } locally {
       attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
     }
@@ -84,7 +84,7 @@ trait ControlExtensionAttributesSupport {
         previousControlOpt,
         this,
         effectiveId,
-        name.name,
+        name.localName,
         _.extensionAttributeValue(name).orNull
       )(ch, containingDocument)
     }

@@ -38,7 +38,7 @@ object SimplePath {
   // Passing a string as test means to test on the local name of an element or attribute
   implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
-  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.namespace.uri, attName.name))
+  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.namespace.uri, attName.localName))
   implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
   implicit def uriQualifiedNameToTest(name: URIQualifiedName): Test = new NodeQNameTest(name.uri → name.localName)
 
@@ -128,7 +128,7 @@ object SimplePath {
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
     def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-    def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.name), Some(Type.ATTRIBUTE)))
+    def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.localName), Some(Type.ATTRIBUTE)))
     def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
     def /@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 

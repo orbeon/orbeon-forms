@@ -167,7 +167,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     xmlns:xf={XF}
                     xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
-                List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.name): NodeInfo)
+                List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.localName): NodeInfo)
               case None ⇒
                 Nil
             }
@@ -333,7 +333,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val datatypeQName = datatype.fold(_._1, identity)
 
     def level       = ErrorLevel
-    def stringValue = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.name)
+    def stringValue = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.localName)
 
     // Rename control element if needed when the datatype changes
     def renameControlIfNeeded(
@@ -365,7 +365,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val builtinTypeString = datatype match {
-        case Left((name, _)) ⇒ name.name
+        case Left((name, _)) ⇒ name.localName
         case _               ⇒ ""
       }
 

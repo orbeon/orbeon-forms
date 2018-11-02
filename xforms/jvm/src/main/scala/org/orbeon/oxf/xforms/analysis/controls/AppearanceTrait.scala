@@ -58,7 +58,7 @@ object AppearanceTrait {
         sb.append("-")
       }
     }
-    sb.append(appearance.name)
+    sb.append(appearance.localName)
     sb
   }
 }

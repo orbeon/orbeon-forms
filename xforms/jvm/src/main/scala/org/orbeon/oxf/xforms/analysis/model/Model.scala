@@ -372,11 +372,11 @@ object Model {
 
   // NOTE: If changed, QName returned has an empty prefix.
   def getVariationTypeOrKeep(datatype: QName) =
-    if (XFormsVariationTypeNames(datatype.name))
+    if (XFormsVariationTypeNames(datatype.localName))
       if (datatype.namespace.uri == XFORMS_NAMESPACE_URI)
-        QName(datatype.name, "", XSD_URI)
+        QName(datatype.localName, "", XSD_URI)
       else if (datatype.namespace.uri == XSD_URI)
-        QName(datatype.name, "", XFORMS_NAMESPACE_URI)
+        QName(datatype.localName, "", XFORMS_NAMESPACE_URI)
       else
         datatype
     else

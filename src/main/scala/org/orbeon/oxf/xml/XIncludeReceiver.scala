@@ -140,8 +140,8 @@ class XIncludeReceiver(
 
       // Whether to create/update xml:base attribute or not
       val generateXMLBase = {
-        val disableXMLBase = attributes.getValue(XXIncludeOmitXmlBaseQName.namespace.uri, XXIncludeOmitXmlBaseQName.name)
-        val fixupXMLBase = attributes.getValue(XIncludeFixupXMLBaseQName.namespace.uri, XIncludeFixupXMLBaseQName.name)
+        val disableXMLBase = attributes.getValue(XXIncludeOmitXmlBaseQName.namespace.uri, XXIncludeOmitXmlBaseQName.localName)
+        val fixupXMLBase = attributes.getValue(XIncludeFixupXMLBaseQName.namespace.uri, XIncludeFixupXMLBaseQName.localName)
         ! (disableXMLBase == "true" || fixupXMLBase == "false")
       }
 

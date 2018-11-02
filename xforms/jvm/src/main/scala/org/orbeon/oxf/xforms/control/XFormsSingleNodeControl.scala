@@ -246,12 +246,12 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   def getBuiltinTypeNameOpt =
     Option(valueType) filter
     (valueType ⇒ Set(XSD_URI, XFORMS_NAMESPACE_URI)(valueType.namespace.uri)) map
-    (_.name)
+    (_.localName)
 
   def getBuiltinTypeName = getBuiltinTypeNameOpt.orNull
 
   // Convenience method to return the local name of the XML Schema type.
-  def getTypeLocalNameOpt = Option(valueType) map (_.name)
+  def getTypeLocalNameOpt = Option(valueType) map (_.localName)
 
   def getBuiltinOrCustomTypeCSSClassOpt =
     (getBuiltinTypeNameOpt map ("xforms-type-" +)) orElse (getTypeLocalNameOpt map ("xforms-type-custom-" +))

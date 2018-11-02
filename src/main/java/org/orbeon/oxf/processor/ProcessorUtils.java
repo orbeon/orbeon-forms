@@ -59,7 +59,7 @@ public class ProcessorUtils {
         ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
         if (processorFactory == null)
             throw new OXFException("Cannot find processor factory with name '"
-                    + processorName.namespace().prefix() + ":" + processorName.name() + "'");
+                    + processorName.namespace().prefix() + ":" + processorName.localName() + "'");
 
         Processor processor = processorFactory.createInstance();
 

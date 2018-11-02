@@ -280,5 +280,5 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def getUploadControls          = _controlIndex.controlsOfName(UPLOAD_NAME).asInstanceOf[Iterable[XFormsUploadControl]]
   def getRepeatControls          = _controlIndex.controlsOfName(REPEAT_NAME).asInstanceOf[Iterable[XFormsRepeatControl]]
   def getDialogControls          = _controlIndex.controlsOfName(XXFORMS_DIALOG_NAME).asInstanceOf[Iterable[XXFormsDialogControl]]
-  def getSelectFullControlsAsMap = _controlIndex.controlsOfNameAsMap(XFORMS_SELECT_QNAME.name)
+  def getSelectFullControlsAsMap = _controlIndex.controlsOfNameAsMap(XFORMS_SELECT_QNAME.localName)
 }

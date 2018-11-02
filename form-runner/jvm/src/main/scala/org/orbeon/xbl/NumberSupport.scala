@@ -145,7 +145,7 @@ trait NumberSupport[Binding] {
     }
 
     def fractionDigitsIfInteger(binding: Binding): Option[Int] =
-      (getDatatypeOpt(binding) exists (_.name == "integer")) option 0
+      (getDatatypeOpt(binding) exists (_.localName == "integer")) option 0
 
     def propertyFractionDigitsOpt(binding: Binding)(implicit params: NumberConfig): Option[Int] =
       fractionDigitsIfInteger(binding) orElse params.digitsAfterDecimal

@@ -207,14 +207,14 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Append the new xxf:separator appearance
                     final String existingAppearance = attributes.getValue("appearance");
                     // See: https://github.com/orbeon/orbeon-forms/issues/418
-                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.name(),
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.localName(),
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName());
                     stackElement.startElement(uri, localname, qName, attributes);
                 } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                     // Add separator appearance
                     if (doesClosestXHTMLRequireSeparatorAppearance()) {
                         final String existingAppearance = attributes.getValue("appearance");
-                        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.name(),
+                        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.localName(),
                                 (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.qualifiedName());
                     }
 

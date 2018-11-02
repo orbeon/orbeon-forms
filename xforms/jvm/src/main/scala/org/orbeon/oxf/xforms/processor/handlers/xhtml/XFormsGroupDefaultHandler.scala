@@ -32,7 +32,7 @@ class XFormsGroupDefaultHandler(
   override def getContainingElementName =
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
-        control.elementQName.name
+        control.elementQName.localName
       case _ ⇒
         super.getContainingElementName
     }

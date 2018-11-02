@@ -89,5 +89,5 @@ object XFormsActions {
 
   // Whether the element is xf:action
   def isDispatchAction(qName: QName) =
-    qName.namespace.uri == XFORMS_NAMESPACE_URI && qName.name == "dispatch"
+    qName.namespace.uri == XFORMS_NAMESPACE_URI && qName.localName == "dispatch"
 }

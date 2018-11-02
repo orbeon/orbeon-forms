@@ -268,7 +268,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Set @id in any case, @ref value if present, @bind value if present
     ensureAttribute(controlElement, "id", newControlId)
     if (! IsGrid(controlElement) || controlElement.hasAtt(BIND_QNAME))
-      ensureAttribute(controlElement, BIND_QNAME.name, bindId(newName))
+      ensureAttribute(controlElement, BIND_QNAME.localName, bindId(newName))
 
     // Make the control point to its template if @template (or legacy @origin) is present
     for (attName ← List("template", "origin"))

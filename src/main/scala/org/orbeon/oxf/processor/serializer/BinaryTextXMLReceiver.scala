@@ -102,7 +102,7 @@ class BinaryTextXMLReceiver(
 
       // Get xsi:type attribute and determine whether the input is binary or text
 
-      val xsiType = Option(attributes.getValue(XSI_TYPE_QNAME.namespace.uri, XSI_TYPE_QNAME.name)) getOrElse
+      val xsiType = Option(attributes.getValue(XSI_TYPE_QNAME.namespace.uri, XSI_TYPE_QNAME.localName)) getOrElse
         (throw new OXFException("Root element must contain an xsi:type attribute"))
 
       val (typePrefix, typeLocalName) = parseQName(xsiType)

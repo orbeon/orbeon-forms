@@ -138,7 +138,7 @@ class ConcreteElement(var qname: QName)
      result + " userData: " + getData
   }
 
-  override def getName   : String    = getQName.name
+  override def getName   : String    = getQName.localName
 
   def getNamespace       : Namespace = getQName.namespace
   def getNamespacePrefix : String    = getQName.namespace.prefix

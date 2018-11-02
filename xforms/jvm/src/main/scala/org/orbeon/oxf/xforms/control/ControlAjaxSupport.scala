@@ -107,7 +107,7 @@ trait ControlAjaxSupport {
       attributeValue = value2 getOrElse ""
     } yield
       // NOTE: For now we use the local name; may want to use a full name?
-      added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.name, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
+      added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.localName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 
     added
   }

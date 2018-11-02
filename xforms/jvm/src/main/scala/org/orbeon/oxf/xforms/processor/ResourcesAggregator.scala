@@ -98,7 +98,7 @@ class ResourcesAggregator extends ProcessorImpl {
               } else if (level == 3 && inHead) {
 
                 implicit def attributesToSAXAttribute(attributes: Attributes) = new {
-                  def getValue(qName: QName) = attributes.getValue(qName.namespace.uri, qName.name)
+                  def getValue(qName: QName) = attributes.getValue(qName.namespace.uri, qName.localName)
                 }
 
                 lazy val href = attributes.getValue("href")

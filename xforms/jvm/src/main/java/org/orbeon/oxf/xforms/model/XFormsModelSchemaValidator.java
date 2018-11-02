@@ -312,7 +312,7 @@ public class XFormsModelSchemaValidator {
         if (xsiType != null) {
             // Honor xsi:type
             elementURI = xsiType.namespace().uri();
-            elementName = xsiType.name();
+            elementName = xsiType.localName();
         } else {
             // Use element name
             elementURI = element.getNamespaceURI();

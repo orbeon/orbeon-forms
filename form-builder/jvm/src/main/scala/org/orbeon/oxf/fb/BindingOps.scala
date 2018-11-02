@@ -186,8 +186,8 @@ trait BindingOps {
     allAttributes collect {
       case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
         // Some attributes must be prefixed before being inserted into the edited form
-        QName(qname.name, "fb", XMLNames.FB) → value
-      case (elem, qname, value) if !(qname.name == "type" && elem.resolveQName(value).name == "string") ⇒
+        QName(qname.localName, "fb", XMLNames.FB) → value
+      case (elem, qname, value) if !(qname.localName == "type" && elem.resolveQName(value).localName == "string") ⇒
         // Exclude `type="*:string"`
         qname → value
     } map {

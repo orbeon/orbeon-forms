@@ -307,7 +307,7 @@ object LHHAAnalysis {
                 elementAnalysis.part.staticState.staticStringProperty(
                   if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
                 )
-              )(XFORMS_MINIMAL_APPEARANCE_QNAME.name)
+              )(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
           )
           case None ⇒
             false

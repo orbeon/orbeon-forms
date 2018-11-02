@@ -443,23 +443,37 @@ object ToolboxOps {
             predicate      = _ ⇒ true
           )
 
-          val resourcesWithLang = nestedControlDetails flatMap (_.resources) groupBy (_._1) map {
-            case (lang, langsAndElems) ⇒
-              elementInfo(
-                "resource",
-                attributeInfo(XMLLangQName, lang) ++ (langsAndElems map (_._2))
-              )
+          val resourcesWithLangWithContainer = nestedControlDetails map { d ⇒
+
+            val resourceElems =
+              d.resources groupBy (_._1) map {
+                case (lang, langsAndElems) ⇒
+                  elementInfo(
+                    "resource",
+                    attributeInfo(XMLLangQName, lang) ++ (langsAndElems map (_._2))
+                  )
+              }
+
+            elementInfo(
+              getControlName(d.control),
+              resourceElems.toList
+            )
           }
 
           // See https://github.com/orbeon/orbeon-forms/issues/3781
-          val dataHoldersWithDummyContainer =
-            nestedControlDetails map (d ⇒ elementInfo("dummy", d.holders.toList.flatten))
+          val dataHoldersWithContainer =
+            nestedControlDetails map { d ⇒
+              elementInfo(
+                getControlName(d.control),
+                d.holders.toList.flatten
+              )
+            }
 
           (
             XcvEntry.values map {
               case e @ XcvEntry.Control   ⇒ e → List(controlOrContainerElem)
-              case e @ XcvEntry.Holder    ⇒ e → dataHoldersWithDummyContainer
-              case e @ XcvEntry.Resources ⇒ e → resourcesWithLang.toList
+              case e @ XcvEntry.Holder    ⇒ e → dataHoldersWithContainer
+              case e @ XcvEntry.Resources ⇒ e → resourcesWithLangWithContainer
               case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
             },
             true
@@ -811,7 +825,6 @@ object ToolboxOps {
     require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
-    val resources            = xcvElem / XcvEntry.Resources.entryName / "resource"
     val isNonRepeatedGrid    = xcvElem attValueOpt IsNonRepeatedGridName contains true.toString
 
     // Rename control names if needed
@@ -861,7 +874,13 @@ object ToolboxOps {
         }
 
         // Rename resources
-        resources / * foreach { holderElem ⇒
+        val resourceHolderContainers =
+          if (isNonRepeatedGrid)
+            xcvElem / XcvEntry.Resources.entryName / * / "resource"
+          else
+            xcvElem / XcvEntry.Resources.entryName / "resource"
+
+        resourceHolderContainers / * foreach { holderElem ⇒
 
           val oldName = holderElem.localname
 
@@ -869,6 +888,14 @@ object ToolboxOps {
             rename(holderElem, newName)
           }
         }
+
+        // Rename container elements if needed
+        if (isNonRepeatedGrid)
+          (xcvElem / XcvEntry.Resources.entryName / *) ++ (xcvElem / XcvEntry.Holder.entryName / *) foreach { elem ⇒
+            oldToNewNames.get(elem.localname) foreach { newName ⇒
+              rename(elem, newName)
+            }
+          }
 
         // Rename binds
         (xcvElem / XcvEntry.Bind.entryName / *).iterator flatMap iterateSelfAndDescendantBindsReversed foreach { bindElem ⇒
@@ -956,9 +983,9 @@ object ToolboxOps {
     val newContainerElem =
       insert(into = intoContainerElem, after = afterElemOpt.toList, origin = containerControlElem).head
 
-    val resourceHolders =
+    def resourceHolders(resourceElems: Seq[NodeInfo]): Seq[(String, Seq[NodeInfo])] =
       for {
-        resourceElem ← resources
+        resourceElem ← resourceElems
         lang = resourceElem attValue "*:lang"
       } yield
         lang → (resourceElem / *)
@@ -966,26 +993,29 @@ object ToolboxOps {
     // Insert holders
     if (isNonRepeatedGrid) {
 
-      val dummyHolders = xcvElem / XcvEntry.Holder.entryName / *
+      val holderContainers   = xcvElem / XcvEntry.Holder.entryName / *
+      val resources          = xcvElem / XcvEntry.Resources.entryName
 
       // Insert the holders for each nested control in turn.
       /// NOTE: Use `to[List]` to ensure eager evaluation.
-      dummyHolders.to[List].scanLeft(precedingContainerNameOpt) { case (precedingControlNameOpt, dummyHolder) ⇒
+      holderContainers.to[List].scanLeft(precedingContainerNameOpt) { case (precedingControlNameOpt, container) ⇒
+
+        val controlName = container.localname
 
         insertHolders(
           controlElement       = newContainerElem, // in order to find containers
-          dataHolders          = dummyHolder / *,
-          resourceHolders      = resourceHolders,
+          dataHolders          = container / *,
+          resourceHolders      = resourceHolders(resources / controlName / *),
           precedingControlName = precedingControlNameOpt
         )
 
-        (dummyHolder / * headOption) map (_.localname)
+        (container / * headOption) map (_.localname)
       }
     } else {
       insertHolders(
         controlElement       = newContainerElem, // in order to find containers
         dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
-        resourceHolders      = resourceHolders,
+        resourceHolders      = resourceHolders(xcvElem / XcvEntry.Resources.entryName / "resource"),
         precedingControlName = precedingContainerNameOpt
       )
     }

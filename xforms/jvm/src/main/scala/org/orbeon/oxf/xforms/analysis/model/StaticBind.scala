@@ -4,6 +4,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
@@ -34,7 +35,7 @@ class StaticBind(
 
   staticBind ⇒
 
-  def parentBind = parent match {
+  def parentBind: Option[StaticBind] = parent match {
     case parentBind: StaticBind ⇒ Some(parentBind)
     case _                      ⇒ None
   }
@@ -66,7 +67,7 @@ class StaticBind(
   ) extends MIP {
 
     // Compile the expression right away
-    val compiledExpression = {
+    val compiledExpression: XPath.CompiledExpression = {
 
       val booleanOrStringExpression =
         if (BooleanXPathMIPNames(name))
@@ -187,7 +188,7 @@ class StaticBind(
   }
 
   // Built-in XPath MIPs
-  val mipNameToXPathMIP = {
+  val mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
 
     def fromAttribute(name: QName) =
       for (value ← Option(element.attributeValue(name)).toList)
@@ -223,7 +224,7 @@ class StaticBind(
   }
 
   // Custom XPath MIPs
-  val customMIPNameToXPathMIP = { // Q: Why String → List[XPathMIP] and not String → XPathMIP?
+  val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String → List[XPathMIP] and not String → XPathMIP?
 
     def attributeCustomMIP =
       for {
@@ -259,7 +260,7 @@ class StaticBind(
   private val allMIPNameToXPathMIP = customMIPNameToXPathMIP ++ mipNameToXPathMIP
 
   // All constraint XPath MIPs grouped by level
-  val constraintsByLevel = {
+  val constraintsByLevel: Map[ValidationLevel, List[XPathMIP]] = {
     val levelWithMIP =
       for {
         mips ← allMIPNameToXPathMIP.get(Constraint.name).toList
@@ -275,7 +276,7 @@ class StaticBind(
   val hasCustomMIPs            = customMIPNameToXPathMIP.nonEmpty
   val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
 
-  def iterateNestedIds =
+  def iterateNestedIds: Iterator[String] =
     for {
       elem ← Dom4j.elements(element).iterator
       id   ← Option(XFormsUtils.getElementId(elem))
@@ -284,7 +285,7 @@ class StaticBind(
 
   // Create children binds
   private var _children: Seq[StaticBind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now
-  def children  = _children
+  def children: Seq[StaticBind] = _children
 
   // Globally remember if we have seen these categories of binds
   bindTree.hasDefaultValueBind      ||= getXPathMIPs(Default.name).nonEmpty
@@ -317,11 +318,11 @@ class StaticBind(
   }
 
   // Used by PathMapXPathDependencies
-  def getXPathMIPs(mipName: String) = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
+  def getXPathMIPs(mipName: String): List[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
 
   // TODO: Support multiple relevant, readonly, and required MIPs.
-  def firstXPathMIP(mip: Model.XPathMIP) = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
-  def hasXPathMIP(mip: Model.XPathMIP)   = firstXPathMIP(mip).isDefined
+  def firstXPathMIP(mip: Model.XPathMIP): Option[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
+  def hasXPathMIP  (mip: Model.XPathMIP): Boolean          = firstXPathMIP(mip).isDefined
 
   // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
   override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt orElse nonPreserveWhitespaceMIPOpt match {

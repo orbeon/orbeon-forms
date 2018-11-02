@@ -53,6 +53,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
+  private val PossibleResourcePointerNames: Set[String] = (LHHA.values map (_.entryName)).to[Set] + "itemset" + "text"
 
   private val TopLevelBindTemplate: NodeInfo =
     <xf:bind
@@ -246,24 +247,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     findControlByName(ctx.formDefinitionRootElem, oldName) foreach
-      (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
-
-  def resourceNamesInUseForControl(controlName: String)(implicit ctx: FormBuilderDocContext): Set[String] =
-    resourceNamesInUseForControl(List(currentResources), controlName)
-
-  def resourceNamesInUseForControl(resources: Seq[NodeInfo], controlName: String)(implicit ctx: FormBuilderDocContext): Set[String] =
-    (
-      resources child controlName child * map (_.localname) map {
-        case "item" ⇒ "itemset"
-        case other  ⇒ other
-      }
-    ).to[Set]
+      (renameControlByElement(_, newName))
 
   // Rename the control (but NOT its holders, binds, etc.)
   def renameControlByElement(
     controlElement : NodeInfo,
-    newName        : String,
-    resourcesNames : Set[String])(implicit
+    newName        : String)(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 
@@ -289,13 +278,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // NOTE: Just after an insert, for example of `fr:explanation`, we have `<fr:text ref=""/>`, so we must handle
     // the case where the `ref` is blank.
     for {
-      resourcePointer  ← controlElement child *
-      resourceName     = resourcePointer.localname
-      if resourcesNames(resourceName) // We have a resource for this sub-element
-      ref              ← resourcePointer.att("ref").headOption
-      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue, resourceName)
+      childElem        ← controlElement child *
+      childName        = childElem.localname
+      if PossibleResourcePointerNames(childName)
+      ref              ← childElem.att("ref").headOption
+      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue, childName)
     } locally {
-      setvalue(List(ref), FormBuilder.buildResourcePointer(newName, resourceName, explicitIndexOpt))
+      setvalue(List(ref), FormBuilder.buildResourcePointer(newName, childName, explicitIndexOpt))
     }
 
     // If using a static itemset editor, set `xf:itemset/@ref` value

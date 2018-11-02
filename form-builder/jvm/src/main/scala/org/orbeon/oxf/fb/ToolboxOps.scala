@@ -139,7 +139,7 @@ object ToolboxOps {
 
           // Adjust bindings on newly inserted control, done after the control is added as
           // renameControlByElement() expects resources to be present
-          renameControlByElement(newControlElem, newControlName, resourceNamesInUseForControl(newControlName))
+          renameControlByElement(newControlElem, newControlName)
 
           // Insert the bind element
           val bind = ensureBinds(findContainerNamesForModel(gridTd) :+ newControlName)
@@ -832,7 +832,7 @@ object ToolboxOps {
           val oldName = controlNameFromId(controlElem.id)
 
           oldToNewNames.get(oldName) foreach { newName ⇒
-            renameControlByElement(controlElem, newName, resourceNamesInUseForControl(resources, oldName))
+            renameControlByElement(controlElem, newName)
           }
         }
 
@@ -1067,7 +1067,7 @@ object ToolboxOps {
           val newName = controlNameFromId(nextId(XcvEntry.Control.entryName))
 
           // Rename everything
-          renameControlByElement(controlElem, newName, resources / * map (_.localname) toSet)
+          renameControlByElement(controlElem, newName)
 
           dataHolders ++ resources foreach
             (rename(_, newName))

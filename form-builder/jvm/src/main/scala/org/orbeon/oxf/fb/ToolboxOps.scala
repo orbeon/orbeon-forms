@@ -1138,7 +1138,8 @@ object ToolboxOps {
 
   private object Private {
 
-    val LHHAResourceNamesToInsert = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
+    // This is for `insertNewControl`
+    val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
 
     val IsNonRepeatedGridName = "is-non-repeated-grid"
 

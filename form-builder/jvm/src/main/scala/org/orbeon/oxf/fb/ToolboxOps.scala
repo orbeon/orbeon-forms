@@ -811,6 +811,7 @@ object ToolboxOps {
     require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
+    val resources            = xcvElem / XcvEntry.Resources.entryName / "resource"
     val isNonRepeatedGrid    = xcvElem attValueOpt IsNonRepeatedGridName contains true.toString
 
     // Rename control names if needed
@@ -831,7 +832,7 @@ object ToolboxOps {
           val oldName = controlNameFromId(controlElem.id)
 
           oldToNewNames.get(oldName) foreach { newName ⇒
-            renameControlByElement(controlElem, newName, ControlResourceNames)
+            renameControlByElement(controlElem, newName, resourceNamesInUseForControl(resources, oldName))
           }
         }
 
@@ -860,9 +861,7 @@ object ToolboxOps {
         }
 
         // Rename resources
-        val resourceHolders = xcvElem / XcvEntry.Resources.entryName / "resource" / *
-
-        resourceHolders foreach { holderElem ⇒
+        resources / * foreach { holderElem ⇒
 
           val oldName = holderElem.localname
 
@@ -959,7 +958,7 @@ object ToolboxOps {
 
     val resourceHolders =
       for {
-        resourceElem ← xcvElem / XcvEntry.Resources.entryName / "resource"
+        resourceElem ← resources
         lang = resourceElem attValue "*:lang"
       } yield
         lang → (resourceElem / *)
@@ -1139,7 +1138,6 @@ object ToolboxOps {
 
   private object Private {
 
-    val ControlResourceNames      = (LHHA.values map (_.entryName)).to[Set] + "itemset"
     val LHHAResourceNamesToInsert = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
 
     val IsNonRepeatedGridName = "is-non-repeated-grid"

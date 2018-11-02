@@ -249,7 +249,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
 
   def resourceNamesInUseForControl(controlName: String)(implicit ctx: FormBuilderDocContext): Set[String] =
-    currentResources.child(controlName).child(*).map(_.localname).to[Set]
+    resourceNamesInUseForControl(List(currentResources), controlName)
+
+  def resourceNamesInUseForControl(resources: Seq[NodeInfo], controlName: String)(implicit ctx: FormBuilderDocContext): Set[String] =
+    (
+      resources child controlName child * map (_.localname) map {
+        case "item" ⇒ "itemset"
+        case other  ⇒ other
+      }
+    ).to[Set]
 
   // Rename the control (but NOT its holders, binds, etc.)
   def renameControlByElement(

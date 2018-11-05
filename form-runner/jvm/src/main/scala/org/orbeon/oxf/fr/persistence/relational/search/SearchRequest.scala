@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.util.NetUtils
@@ -26,10 +26,9 @@ trait SearchRequest {
 
   val SearchPath = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
 
-
   def httpRequest = NetUtils.getExternalContext.getRequest
 
-  def parseRequest(searchDocument: DocumentInfo): Request = {
+  def parseRequest(searchDocument: DocumentInfo, version: Version): Request = {
 
     if (Logger.isDebugEnabled)
       Logger.logDebug("search request", TransformerUtils.tinyTreeToString(searchDocument))
@@ -47,6 +46,7 @@ trait SearchRequest {
           provider       = Provider.providerFromPathToken(provider),
           app            = app,
           form           = form,
+          version        = version,
           username       = username,
           group          = group,
           pageSize       = searchElement.firstChildOpt("page-size")  .get.stringValue.toInt,

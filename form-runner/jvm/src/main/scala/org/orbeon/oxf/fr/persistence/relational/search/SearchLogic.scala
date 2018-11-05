@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 
 trait SearchLogic extends SearchRequest {
 
@@ -78,8 +79,10 @@ trait SearchLogic extends SearchRequest {
     else
       RelationalUtils.withConnection { connection ⇒
 
+        val version = requestedFormVersion(connection, request)
+
         val commonParts = List(
-          commonPart         (request),
+          commonPart         (request, version),
           draftsPart         (request),
           permissionsPart    (permissions),
           columnFilterPart   (request),

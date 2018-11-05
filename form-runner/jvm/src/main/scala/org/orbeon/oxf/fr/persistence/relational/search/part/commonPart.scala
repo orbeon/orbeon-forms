@@ -20,8 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 
 object commonPart  {
 
-  def apply(request: Request) =
-
+  def apply(request: Request, versionNumber: Int) =
     StatementPart(
       sql = {
 
@@ -57,12 +56,15 @@ object commonPart  {
             |           $mySqlRowNumTable
             |           $columnFilterTables
             |           $freeTextTable
-            |     WHERE c.app     = ?         AND
-            |           c.form    = ?
+            |     WHERE c.app          = ?    AND
+            |           c.form         = ?    AND
+            |           c.form_version = ?
             |""".stripMargin
       },
       setters = List(
         _.setString(_, request.app),
-        _.setString(_, request.form)
+        _.setString(_, request.form),
+        _.setInt   (_, versionNumber)
       )
-    )}
+    )
+}

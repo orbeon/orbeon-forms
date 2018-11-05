@@ -15,14 +15,15 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array ⇒ _, _}
+
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
-
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}

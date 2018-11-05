@@ -24,13 +24,13 @@ case class Request(
   provider : Provider,
   app      : String,
   form     : String,
-  filename : Option[String],
   version  : Version,
+  filename : Option[String],
   dataPart : Option[DataPart]
-) {
-  def forForm       = dataPart.isEmpty
-  def forData       = dataPart.isDefined
-  def forAttachment = filename.isDefined
+) extends RequestCommon {
+  def forForm       : Boolean = dataPart.isEmpty
+  def forData       : Boolean = dataPart.isDefined
+  def forAttachment : Boolean = filename.isDefined
 }
 
 trait RequestResponse {
@@ -63,11 +63,11 @@ trait RequestResponse {
     httpRequest.getRequestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(Provider.providerFromPathToken(provider), app, form, file, version, None)
+        Request(Provider.Provider.providerFromPathToken(provider), app, form, version, file, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId)
-        Request(Provider.providerFromPathToken(provider), app, form, file, version, Some(dataPart))
+        Request(Provider.Provider.providerFromPathToken(provider), app, form, version, file, Some(dataPart))
     }
   }
 

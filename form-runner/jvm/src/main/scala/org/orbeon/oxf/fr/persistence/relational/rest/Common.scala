@@ -13,76 +13,13 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import java.sql.Connection
-
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
 
 trait Common extends RequestResponse with FormRunnerPersistence {
 
   implicit val Logger = RelationalUtils.Logger
-
-  /**
-    * Finds in the database what form version is used for an app/form and optional document id:
-    *
-    * 1. If only the app/form are provided, it returns the latest version of a published, non-deleted, form.
-    * We wouldn't want to return a version of a deleted published form, as running a GET for the latest
-    * form definition for an app/form, we would here return the version of a deleted form (and then 404 as we
-    * can't find that form in the database).
-    * 2. If the document id is provided, it returns the form version used for that document. We could return the
-    * form version for a deleted document, but decided against it for consistency with what we do when returning
-    * the form version for app/form. (A benefit of returning the version of a deleted data is that this could
-    * allow Form Runner to return a 510 to the browser. Without it, since Form Runner starts by reading the form
-    * definition, it will fail if that version isn't found. But this isn't a real benefit since right now the
-    * Page Flow Controller doesn't know how to return a 510.)
-    */
-  def formVersion(connection: Connection, app: String, form: String, docId: Option[String]): Option[Int] = {
-    val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
-    val versionSql =
-      s"""|SELECT max(t.form_version)
-          |FROM   $table t,
-          |       (
-          |           SELECT   max(last_modified_time) last_modified_time, app, form, form_version
-          |           FROM     $table
-          |           WHERE    app = ?
-          |                    AND form = ?
-          |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
-          |           GROUP BY app, form, form_version
-          |       ) m
-          |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
-          |       AND t.deleted = 'N'
-          |""".stripMargin
-    useAndClose(connection.prepareStatement(versionSql)) { ps ⇒
-      ps.setString(1, app)
-      ps.setString(2, form)
-      docId.foreach(ps.setString(3, _))
-      useAndClose(ps.executeQuery()) { rs ⇒
-        rs.next()
-        val version = rs.getInt(1)
-        if (rs.wasNull()) None else Some(version)
-      }
-    }
-  }
-
-  /**
-    * For every request, there is a corresponding specific form version number. In the request, that specific version
-    * can be specified, but the caller can also say that it wants the next version, the latest version, or the version
-    * of the form used to create a specific document. This function finds the specific form version corresponding to
-    * the request.
-    */
-  def requestedFormVersion(connection: Connection, req: Request): Int = {
-    def latest = formVersion(connection, req.app, req.form, None)
-    req.version match {
-      case Unspecified        ⇒ latest.getOrElse(1)
-      case Next               ⇒ latest.map(_ + 1).getOrElse(1)
-      case Specific(v)        ⇒ v
-      case ForDocument(docId) ⇒ formVersion(connection, req.app, req.form, Some(docId))
-        .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
-    }
-  }
 
   // List of columns that identify a row
   def idColumns(req: Request): List[String] =
@@ -96,7 +33,5 @@ trait Common extends RequestResponse with FormRunnerPersistence {
     ).flatten
 
   def idColumnsList(req: Request): String = idColumns(req).mkString(", ")
-
-  def joinColumns(cols: Seq[String], t1: String, t2: String) = cols.map(c ⇒ s"$t1.$c = $t2.$c").mkString(" AND ")
 
 }

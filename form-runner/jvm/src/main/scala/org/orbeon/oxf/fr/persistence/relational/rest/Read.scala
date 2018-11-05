@@ -26,6 +26,7 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 

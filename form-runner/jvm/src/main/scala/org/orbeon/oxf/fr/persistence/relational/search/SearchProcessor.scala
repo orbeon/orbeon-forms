@@ -13,6 +13,9 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersionLower
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
@@ -36,16 +39,22 @@ class SearchProcessor
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          // Read and parse input
+          val version =
+            Version(None, httpRequest.getFirstHeader(OrbeonFormDefinitionVersionLower)) match {
+              case v @ Unspecified       ⇒ v
+              case v @ Specific(_)       ⇒ v
+              case Next | ForDocument(_) ⇒ throw HttpStatusCodeException(StatusCode.BadRequest)
+            }
+
           val searchDocument = readInputAsTinyTree(
             pipelineContext,
             getInputByName(ProcessorImpl.INPUT_DATA),
             XPath.GlobalConfiguration
           )
-          val request = parseRequest(searchDocument)
+          val request = parseRequest(searchDocument, version)
 
-          // Generate and send output
           val (result, count) = doSearch(request)
+
           outputResult(request, result, count, xmlReceiver)
         }
       }

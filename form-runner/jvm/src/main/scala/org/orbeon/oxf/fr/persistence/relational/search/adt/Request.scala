@@ -13,32 +13,34 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RequestCommon, Version}
 
 case class Request(
-    provider       : Provider,
-    app            : String,
-    form           : String,
-    username       : Option[String],
-    group          : Option[String],
-    pageSize       : Int,
-    pageNumber     : Int,
-    columns        : List[Column],
-    drafts         : Drafts,
-    freeTextSearch : Option[String]
-  )
+  provider       : Provider,
+  app            : String,
+  form           : String,
+  version        : Version,
+  username       : Option[String],
+  group          : Option[String],
+  pageSize       : Int,
+  pageNumber     : Int,
+  columns        : List[Column],
+  drafts         : Drafts,
+  freeTextSearch : Option[String]
+) extends
+  RequestCommon
 
-  case class Column(
-    path           : String,
-    filterWith     : Option[String]
-  )
+case class Column(
+  path           : String,
+  filterWith     : Option[String]
+)
 
-  sealed trait                                                Drafts
-  case object ExcludeDrafts                           extends Drafts
-  case class  OnlyDrafts(whichDrafts: WhichDrafts)    extends Drafts
-  case object IncludeDrafts                           extends Drafts
+sealed trait                                                Drafts
+case object ExcludeDrafts                           extends Drafts
+case class  OnlyDrafts(whichDrafts: WhichDrafts)    extends Drafts
+case object IncludeDrafts                           extends Drafts
 
-  sealed trait                                                WhichDrafts
-  case object AllDrafts                               extends WhichDrafts
-  case object DraftsForNeverSavedDocs                 extends WhichDrafts
-  case class  DraftsForDocumentId(documentId: String) extends WhichDrafts
+sealed trait                                                WhichDrafts
+case object AllDrafts                               extends WhichDrafts
+case object DraftsForNeverSavedDocs                 extends WhichDrafts
+case class  DraftsForDocumentId(documentId: String) extends WhichDrafts

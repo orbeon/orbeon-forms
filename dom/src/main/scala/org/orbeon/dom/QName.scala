@@ -4,8 +4,8 @@ import java.{util ⇒ ju}
 
 object QName {
 
-  private var noNamespaceCache : ju.Map[String, QName]                    = ju.Collections.synchronizedMap(new ju.WeakHashMap[String, QName]())
-  private var namespaceCache   : ju.Map[Namespace, ju.Map[String, QName]] = ju.Collections.synchronizedMap(new ju.WeakHashMap[Namespace, ju.Map[String, QName]]())
+  private val noNamespaceCache: ju.Map[String, QName]                    = ju.Collections.synchronizedMap(new ju.WeakHashMap[String, QName]())
+  private val namespaceCache  : ju.Map[Namespace, ju.Map[String, QName]] = ju.Collections.synchronizedMap(new ju.WeakHashMap[Namespace, ju.Map[String, QName]]())
 
   // 2017-10-27: 84 usages
   def apply(name: String): QName = apply(name, Namespace.EmptyNamespace, name)

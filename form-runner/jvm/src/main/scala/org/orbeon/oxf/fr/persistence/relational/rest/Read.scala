@@ -41,9 +41,9 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         // For data, we don't need a version number, so accept we either accept no version being specified,
         // or if a form version if specified we'll later check that it matches the version number in the database.
         (req.forData && (req.version match {
-                case Unspecified ⇒ false
-                case Specific(_) ⇒ false
-                case           _ ⇒ true
+          case Unspecified ⇒ false
+          case Specific(_) ⇒ false
+          case           _ ⇒ true
         }))  ||
         // For form definition, everything is valid except Next
         (req.forForm && req.version == Next)

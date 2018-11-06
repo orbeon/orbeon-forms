@@ -20,7 +20,7 @@ import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
+import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._

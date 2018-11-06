@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
+import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils

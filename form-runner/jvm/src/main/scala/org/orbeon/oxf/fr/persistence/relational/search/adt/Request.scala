@@ -35,12 +35,18 @@ case class Column(
   filterWith     : Option[String]
 )
 
-sealed trait                                                Drafts
-case object ExcludeDrafts                           extends Drafts
-case class  OnlyDrafts(whichDrafts: WhichDrafts)    extends Drafts
-case object IncludeDrafts                           extends Drafts
+sealed trait Drafts
 
-sealed trait                                                WhichDrafts
-case object AllDrafts                               extends WhichDrafts
-case object DraftsForNeverSavedDocs                 extends WhichDrafts
-case class  DraftsForDocumentId(documentId: String) extends WhichDrafts
+object Drafts {
+  case object ExcludeDrafts                        extends Drafts
+  case class  OnlyDrafts(whichDrafts: WhichDrafts) extends Drafts
+  case object IncludeDrafts                        extends Drafts
+}
+
+sealed trait WhichDrafts
+
+object WhichDrafts {
+  case object AllDrafts                               extends WhichDrafts
+  case object DraftsForNeverSavedDocs                 extends WhichDrafts
+  case class  DraftsForDocumentId(documentId: String) extends WhichDrafts
+}

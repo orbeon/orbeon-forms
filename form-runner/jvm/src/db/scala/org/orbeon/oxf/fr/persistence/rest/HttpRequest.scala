@@ -147,7 +147,7 @@ private object HttpRequest {
       logger   : IndentedLogger
     ): Int = {
       val body = Some(XML(LockInfo.toDom4j(lockInfo)))
-      useAndClose(request(url, method, Unspecified, body, None, timeout))(_.httpResponse.statusCode)
+      useAndClose(request(url, method, Version.Unspecified, body, None, timeout))(_.httpResponse.statusCode)
     }
   }
 }

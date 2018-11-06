@@ -24,9 +24,9 @@ import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -411,11 +411,11 @@ trait CreateUpdateDelete
       val whatToReindex = req.dataPart match {
           case Some(dataPart) ⇒
             // Data: update index for this document id
-            Index.DataForDocumentId(dataPart.documentId)
+            Index.WhatToReindex.DataForDocumentId(dataPart.documentId)
           case None ⇒
             // Form definition: update index for this form version
             // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-            Index.DataForForm(req.app, req.form, versionSet)
+            Index.WhatToReindex.DataForForm(req.app, req.form, versionSet)
         }
       Index.reindex(req.provider, connection, whatToReindex)
 

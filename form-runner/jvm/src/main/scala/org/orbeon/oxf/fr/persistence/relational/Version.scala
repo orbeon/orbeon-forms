@@ -1,12 +1,13 @@
 package org.orbeon.oxf.fr.persistence.relational
 
-sealed trait  Version
-case   object Unspecified                     extends Version
-case   object Next                            extends Version
-case   class  Specific   (version: Int)       extends Version
-case   class  ForDocument(documentId: String) extends Version
+sealed trait Version
 
 object Version {
+
+  case object Unspecified                     extends Version
+  case object Next                            extends Version
+  case class  Specific   (version: Int)       extends Version
+  case class  ForDocument(documentId: String) extends Version
 
   val OrbeonForDocumentId              = "Orbeon-For-Document-Id"
   val OrbeonFormDefinitionVersion      = "Orbeon-Form-Definition-Version"

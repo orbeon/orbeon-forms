@@ -21,12 +21,12 @@ object Backend {
     providers     : List[String],
     indexProvider : String ⇒ Unit
   ): Unit = {
-    StatusStore.setStatus(Starting(providers))
+    StatusStore.setStatus(Status.Starting(providers))
     providers
       .zipWithIndex
       .foreach { case (provider, index) ⇒
-        if (StatusStore.getStatus != Stopping) {
-          StatusStore.setStatus(Indexing(
+        if (StatusStore.getStatus != Status.Stopping) {
+          StatusStore.setStatus(Status.Indexing(
             provider      = provider,
             providerCount = Count(index + 1, providers.length),
             documentCount = None
@@ -34,7 +34,7 @@ object Backend {
           indexProvider(provider)
         }
       }
-    StatusStore.setStatus(Stopped)
+    StatusStore.setStatus(Status.Stopped)
   }
 
   def setProviderDocumentTotal(total: Int): Unit =
@@ -43,8 +43,8 @@ object Backend {
   def setProviderDocumentNext(): Unit =
     setDocumentCount(c ⇒ c.copy(current = c.current + 1))
 
-  private def setIndexing(setter: Indexing ⇒ Option[Indexing]): Unit =
-    Some(StatusStore.getStatus).collect { case status: Indexing ⇒
+  private def setIndexing(setter: Status.Indexing ⇒ Option[Status.Indexing]): Unit =
+    Some(StatusStore.getStatus).collect { case status: Status.Indexing ⇒
       setter(status).foreach(StatusStore.setStatus)
     }
 

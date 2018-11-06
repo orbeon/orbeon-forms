@@ -14,15 +14,12 @@
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.util.NetUtils
-
-import scala.collection.JavaConverters._
 
 // Functions dealing with the session
 
 object StatusStore {
 
-  private var currentStatus: Status = Stopped
+  private var currentStatus: Status = Status.Stopped
 
   def getStatus: Status = currentStatus
 
@@ -34,10 +31,10 @@ object StatusStore {
       def logInfo  = liftLog(RelationalUtils.Logger.logInfo)
       def logDebug = liftLog(RelationalUtils.Logger.logDebug)
       status match {
-        case Stopped                         ⇒ logInfo("Stopped" )
-        case Starting(providers)             ⇒ logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
-        case Stopping                        ⇒ logInfo("Stopping")
-        case Indexing(provider, providerCount, maybeDocumentCount) ⇒
+        case Status.Stopped                         ⇒ logInfo("Stopped" )
+        case Status.Starting(providers)             ⇒ logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
+        case Status.Stopping                        ⇒ logInfo("Stopping")
+        case Status.Indexing(provider, providerCount, maybeDocumentCount) ⇒
           def providerInfo = s"$provider ${providerCount.current}/${providerCount.total}"
           maybeDocumentCount match {
             case None                        ⇒ logInfo (s"Indexing $providerInfo")

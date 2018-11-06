@@ -17,7 +17,7 @@ import java.sql.{Connection, PreparedStatement}
 
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
-import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, StatusStore, Stopping}
+import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
@@ -31,10 +31,15 @@ import scala.collection.JavaConverters._
 
 trait Reindex extends FormDefinition {
 
-  sealed trait                                                              WhatToReindex
-  case object  AllData                                              extends WhatToReindex
-  case class   DataForDocumentId(documentId: String)                extends WhatToReindex
-  case class   DataForForm(app: String, form: String, version: Int) extends WhatToReindex
+  sealed trait WhatToReindex
+
+  object WhatToReindex {
+    case object  AllData                                              extends WhatToReindex
+    case class   DataForDocumentId(documentId: String)                extends WhatToReindex
+    case class   DataForForm(app: String, form: String, version: Int) extends WhatToReindex
+  }
+
+  import WhatToReindex._
 
   // Reindexing is a 3 step process:
   //   1. Clean the index
@@ -184,7 +189,7 @@ trait Reindex extends FormDefinition {
         // Go through each data document
         // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
         var prevIndexedControls: Option[FormIndexedControls] = None
-        while (currentData.next() && StatusStore.getStatus != Stopping) {
+        while (currentData.next() && StatusStore.getStatus != Status.Stopping) {
 
           Backend.setProviderDocumentNext()
           val app = currentData.getString("app")

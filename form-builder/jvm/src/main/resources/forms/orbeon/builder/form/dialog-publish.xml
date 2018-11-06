@@ -278,7 +278,7 @@
                 origin="xf:element('dummy')"/>
         </xf:action>
 
-        <xf:instance id="fb-publish-instance">
+        <xf:instance id="fb-publish-instance" xxf:expose-xpath-types="true">
             <publish>
                 <app/>
                 <form/>
@@ -286,10 +286,10 @@
                 <published-attachments>-1</published-attachments> <!-- set by `fb-publish-submission` -->
                 <published-version>-1</published-version>         <!-- set by `fb-publish-submission` -->
 
-                <existing-version>-1</existing-version>
-                <existing-comment/>
+                <existing-version>-1</existing-version>           <!-- set by `fb-read-form-definition` -->
+                <existing-comment/>                               <!-- set by `fb-read-form-definition` -->
 
-                <latest-version>-1</latest-version>
+                <latest-version>-1</latest-version>               <!-- set on dialog open by `fb-read-form-metadata` -->
 
                 <available>true</available>
                 <selected-version>next</selected-version>
@@ -301,9 +301,9 @@
             ref="published-attachments | published-version | existing-version | latest-version"
             type="xs:integer"/>
 
-        <xf:var name="app"              value="instance()/app/string()"/>
-        <xf:var name="form"             value="instance()/form/string()"/>
-        <xf:var name="latest-version"   value="instance()/latest-version/data(.)"/>
+        <xf:var name="app"            value="instance()/app/string()"/>
+        <xf:var name="form"           value="instance()/form/string()"/>
+        <xf:var name="latest-version" value="instance()/latest-version/data(.)"/>
 
         <xf:var
             name="versioning-supported"

@@ -208,7 +208,7 @@
             <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
-                <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = 'full'">
+                <xsl:when test="$mode != 'import' and (not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = 'full')">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
 
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
@@ -234,7 +234,7 @@
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>
 
-                        <xsl:for-each select="$wizard-mode[1]">
+                        <xsl:for-each select="('strict'[$mode = 'import'], $wizard-mode)[1]">
                             <!--
                                 We'd prefer `mode` to match the term used in the documentation, or maybe
                                 `forward-validation-mode`. But `validate` is how the property was named.

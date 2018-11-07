@@ -16,8 +16,9 @@ package org.orbeon.xforms
 import org.orbeon.xforms.facade.Control
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.dom.raw.{Attr, MutationObserver, MutationRecord}
 
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.xforms.Page") // used by `xforms.js`, `AjaxServer.js`, `Calendar.coffee`
@@ -42,14 +43,39 @@ object Page {
         newForm
     }
 
+  private val LangAttr = "lang"
+
+  private def langElement: Option[dom.Element] = {
+
+    val langElements = Iterator(
+      () ⇒ dom.document.documentElement,
+      () ⇒ dom.document.querySelector(".orbeon-portlet-div[lang]")
+    )
+    langElements
+      .map(_.apply())
+      .find(_.hasAttribute(LangAttr))
+  }
+
   // Return the language for the page, defaulting to English if none is found
   // See also https://github.com/orbeon/orbeon-forms/issues/3787
   def getLang(): String = {
+    langElement
+      .map(_.getAttribute(LangAttr).substring(0, 2))
+      .getOrElse("en")
+  }
 
-    def fromRootElem      = $(g.document.documentElement).attr("lang")
-    def fromEmbeddingElem = $(".orbeon-portlet-div[lang]").attr("lang")
-
-    (fromRootElem orElse fromEmbeddingElem getOrElse "en").substring(0, 2)
+  def onLangChange(listener: String ⇒ Unit): Unit = {
+    langElement.foreach { element ⇒
+      val callback = (a: js.Array[MutationRecord], b: MutationObserver) ⇒
+        listener(getLang())
+      new MutationObserver(callback).observe(
+        target   = element,
+        options = dom.MutationObserverInit(
+          attributes      = true,
+          attributeFilter = js.Array("lang")
+        )
+      )
+    }
   }
 
   // Create or return a control object corresponding to the provided container. Each control is inside a given

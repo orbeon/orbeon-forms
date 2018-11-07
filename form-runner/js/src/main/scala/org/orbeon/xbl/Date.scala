@@ -14,13 +14,12 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.$
+import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.orbeon.xforms.facade.{Document, XBL, XBLCompanion}
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 import DatePickerFacade._
-import org.orbeon.xforms.DocumentAPI
 import org.scalajs.dom
 
 object Date {
@@ -49,8 +48,13 @@ private class DateCompanion extends XBLCompanion {
       options.autoclose        = true
       options.enableOnReadonly = false
       options.assumeNearbyYear = true
+      options.language         = Page.getLang()
       datePicker = inputEl.parent().datepicker(options)
       datePicker.onChangeDate(() ⇒ onChangeDate())
+      Page.onLangChange { newLang ⇒
+        datePicker.options.language = newLang
+        datePicker.update()
+      }
     }
   }
 
@@ -139,6 +143,7 @@ private object DatePickerFacade {
     var enableOnReadonly : Boolean           = true
     var assumeNearbyYear : Boolean           = false
     var datesDisabled    : js.Array[js.Date] = null
+    var language         : String            = "en"
   }
 
   implicit class DatePickerOps(val datePicker: DatePicker) extends AnyVal {

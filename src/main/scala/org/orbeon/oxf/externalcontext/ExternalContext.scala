@@ -92,11 +92,11 @@ object ExternalContext {
     def getNativeRequest: Any
 
     // TODO: return immutable.Map[String, List[AnyRef]] → what about AnyRef?
-    def parameters: collection.Map[String, Array[AnyRef]] = getParameterMap.asScala
-    def getFirstParamAsString(name: String)               = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
-    def getFirstHeader(name: String)                      = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
-    def sessionOpt: Option[Session]                       = Option(getSession(create = false))
-    lazy val contentLengthOpt: Option[Long]               = getFirstHeader(Headers.ContentLength) flatMap NumericUtils.parseLong filter (_ >= 0L)
+    def parameters: collection.Map[String, Array[AnyRef]]   = getParameterMap.asScala
+    def getFirstParamAsString(name: String): Option[String] = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
+    def getFirstHeader(name: String): Option[String]        = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
+    def sessionOpt: Option[Session]                         = Option(getSession(create = false))
+    lazy val contentLengthOpt: Option[Long]                 = getFirstHeader(Headers.ContentLength) flatMap NumericUtils.parseLong filter (_ >= 0L)
   }
 
   trait Rewriter extends URLRewriter {

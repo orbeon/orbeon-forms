@@ -56,6 +56,7 @@ object Page {
       .find(_.hasAttribute(LangAttr))
   }
 
+  // noinspection AccessorLikeMethodIsEmptyParen
   // Return the language for the page, defaulting to English if none is found
   // See also https://github.com/orbeon/orbeon-forms/issues/3787
   def getLang(): String = {

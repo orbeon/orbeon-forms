@@ -617,10 +617,10 @@
                                                                     )
                                                                 )
                                                             ], (: these toggle so remove them first :)
-                                                            'incomplete'        [map:get($map, 'has-incomplete-fields')],
-                                                            'invalid'           [map:get($map, 'has-error-fields')],
-                                                            'visible-incomplete'[map:get($map, 'has-visible-incomplete-fields')],
-                                                            'visible-invalid'   [map:get($map, 'has-visible-error-fields')]
+                                                            'incomplete'        [exists($map) and map:get($map, 'has-incomplete-fields')],
+                                                            'invalid'           [exists($map) and map:get($map, 'has-error-fields')],
+                                                            'visible-incomplete'[exists($map) and map:get($map, 'has-visible-incomplete-fields')],
+                                                            'visible-invalid'   [exists($map) and map:get($map, 'has-visible-error-fields')]
                                                         )
                                                     )"/>
 

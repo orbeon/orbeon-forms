@@ -27,6 +27,16 @@
 
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.sv.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pt.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.it.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.de.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.es.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fi.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.nl.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js"/>
 
     <xbl:binding
         id="fr-date"

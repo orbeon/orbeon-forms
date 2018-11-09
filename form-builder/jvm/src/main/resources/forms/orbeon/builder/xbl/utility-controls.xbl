@@ -14,16 +14,16 @@
 <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Output Controls</display-name>
-        <display-name lang="es">Controles de Salida</display-name>
-        <display-name lang="fi" todo="true">[Output Controls]</display-name>
-        <display-name lang="fr">Contrôles de sortie</display-name>
-        <display-name lang="ru" todo="true">[Output Controls]</display-name>
-        <display-name lang="de">Ausgabe-Steuerelemente</display-name>
-        <display-name lang="it" todo="true">[Output Controls]</display-name>
-        <display-name lang="nl" todo="true">[Output Controls]</display-name>
-        <display-name lang="sv">Enbart utmatning</display-name>
-        <display-name lang="pt" todo="true">[Output Controls]</display-name>
+        <display-name lang="en">Utility Controls</display-name>
+        <display-name lang="es" todo="true">[Utility Controls]</display-name>
+        <display-name lang="fi" todo="true">[Utility Controls]</display-name>
+        <display-name lang="fr">Contrôles utilitaires</display-name>
+        <display-name lang="ru" todo="true">[Utility Controls]</display-name>
+        <display-name lang="de" todo="true">[Utility Controls]</display-name>
+        <display-name lang="it" todo="true">[Utility Controls]</display-name>
+        <display-name lang="nl" todo="true">[Utility Controls]</display-name>
+        <display-name lang="sv" todo="true">[Utility Controls]</display-name>
+        <display-name lang="pt" todo="true">[Utility Controls]</display-name>
     </metadata>
 
 </xbl:xbl>

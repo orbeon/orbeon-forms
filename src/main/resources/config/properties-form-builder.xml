@@ -47,9 +47,10 @@
 
     <!-- Toolbox -->
     <property as="xs:string"  name="oxf.fb.toolbox.group.special.uri.*.*">
-        oxf:/forms/orbeon/builder/xbl/output-controls.xbl
+        oxf:/forms/orbeon/builder/xbl/utility-controls.xbl
         oxf:/xbl/orbeon/explanation/explanation.xbl
         oxf:/forms/orbeon/builder/xbl/text-output.xbl
+        oxf:/xbl/orbeon/hidden/hidden.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">

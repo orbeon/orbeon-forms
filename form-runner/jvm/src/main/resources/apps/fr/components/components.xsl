@@ -155,7 +155,7 @@
         as="xs:string"
         select="
             (
-                'wizard'[$fr-form-metadata/wizard = 'true'],
+                'wizard'[$fr-form-metadata/wizard = 'true' or $mode = 'import'],
                 p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[
                     normalize-space() and not($fr-form-metadata/wizard = 'false')
                 ],

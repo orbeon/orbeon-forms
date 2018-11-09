@@ -31,7 +31,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Delete</delete>
-            <import>&lt;i class="icon-upload"/&gt; Import</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Import</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; New</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicate</duplicate>
 
@@ -393,7 +393,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Supprimer</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importer</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importer</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nouveau</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliquer</duplicate>
 
@@ -759,7 +759,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Eliminar</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importar</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuevo</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 
@@ -1111,7 +1111,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Slett</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importer</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importer</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nytt skjema</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
@@ -1462,7 +1462,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Удалить</delete>
-            <import>&lt;i class="icon-upload"/&gt; Импорт</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Импорт</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Новая</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
 
@@ -1811,7 +1811,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importa</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importa</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuovo</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Copia</duplicate>
 
@@ -2173,7 +2173,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Löschen</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importieren</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importieren</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Neu</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopieren</duplicate>
 
@@ -2535,7 +2535,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; Näytä PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Poista</delete>
-            <import>&lt;i class="icon-upload"/&gt; Tuo</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Tuo</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Uusi</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopioi</duplicate>
 
@@ -2897,7 +2897,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Ta bort</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importera</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importera</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Skapa</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicera</duplicate>
 
@@ -3259,7 +3259,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Verwijderen</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importeren</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importeren</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nieuw</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliceren</duplicate>
 
@@ -3620,7 +3620,7 @@
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importar</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Novo</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
 

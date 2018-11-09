@@ -281,7 +281,7 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*">
         relinquish-lease
-        then navigate("/fr")
+        then navigate("/fr/")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
         pending-uploads

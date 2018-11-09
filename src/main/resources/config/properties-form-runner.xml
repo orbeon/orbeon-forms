@@ -271,7 +271,7 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
     <!-- Button processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='orbeon-home'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='form-runner-home'/>
     <property as="xs:string"  name="oxf.fr.detail.process.summary.*.*">
         relinquish-lease
         then navigate(uri = "/fr/{xxf:instance('fr-parameters-instance')/app}/{xxf:instance('fr-parameters-instance')/form}/summary")

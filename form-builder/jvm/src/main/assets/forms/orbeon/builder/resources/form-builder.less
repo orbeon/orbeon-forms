@@ -30,7 +30,7 @@ body.orbeon {
     top: 0;
     width: 100vw;
     height: 100vh;
-    .box-sizing(border-box);
+    box-sizing: border-box;
     background-color: @grayLight;
 }
 
@@ -62,7 +62,7 @@ div.orbeon.orbeon-portlet-div {
 
         .fb-main-inner {
             background-color: @wellBackground;
-            .box-sizing(border-box);
+            box-sizing: border-box;
             margin-bottom: 0;
             min-width: 980px;                                               // So we can include the standard 940px form width
             min-height: 100%;                                               // So the main area uses all the available space, not revealing a large portion of the background
@@ -261,13 +261,13 @@ div.orbeon.orbeon-portlet-div {
         top: 40px + @fbGutter;
         bottom: @fbBottomHeight + @fbGutter;
         width: @fbToolbarWidth;
-        .box-sizing(border-box);
+        box-sizing: border-box;
 
         .fb-toolbox-inside {
             width: 100%;
             height: 100%;
             padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
-            .box-sizing(border-box);
+            box-sizing: border-box;
             display: grid;
             grid-template-rows: auto 1fr;
 
@@ -895,7 +895,7 @@ div.orbeon.orbeon-portlet-div {
                 bottom: 0; left: 0; right: 0;       // At the bottom of the dialog body
                 line-height: @buttonsAreaHeight;
                 padding: 0 20px 0 0; margin: 0;     // Overrides default for .fr-dialog-buttons
-                .box-sizing(border-box);            // So top margin gets include in height
+                box-sizing: border-box;            // So top margin gets include in height
             }
         }
     }
@@ -910,7 +910,7 @@ div.orbeon.orbeon-portlet-div {
             }
             .fb-test-iframe {
                 height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
-                .box-sizing(border-box);            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
+                box-sizing: border-box;            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
                 border: none;                       // By default, iframes have a particularly ugly border
             }
         }
@@ -923,7 +923,7 @@ div.orbeon.orbeon-portlet-div {
     .fr-grid .xforms-label input, .fr-grid .xforms-hint input, .fb-label-editor input[type='text'] {
         height: @baseLineHeight;
         padding: 0;
-        .box-sizing(border-box);
+        box-sizing: border-box;
         .border-radius(0);
     }
 
@@ -1126,7 +1126,7 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;
         bottom: 0;
         width: 100%;
-        .box-sizing(border-box);
+        box-sizing: border-box;
         height: @fbBottomHeight;
         line-height: @fbBottomHeight;
         vertical-align: middle;

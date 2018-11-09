@@ -31,15 +31,31 @@
             <xf:var name="form" value="fr:form-name()"/>
 
             <xf:var
+                name="versioning-supported"
+                value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
+
+            <xf:var
                 name="allow-invalid-documents"
                 value="xxf:property(string-join(('oxf.fr.import.allow-invalid-documents', $app, $form), '.')) = true()"/>
 
-            <xf:action
-                event="xforms-model-construct-done"
-                if="not(fr:is-pe())"
-                type="xpath">
+            <xf:action event="xforms-model-construct-done">
 
-                frf:sendError(404)
+                <xf:action if="not(fr:is-pe())" type="xpath">
+                    frf:sendError(404)
+                </xf:action>
+
+                <xf:send submission="fb-read-form-metadata"/>
+
+                <xf:action if="empty(instance('fb-publish-form-metadata')/*)" type="xpath">
+                    frf:sendError(404)
+                </xf:action>
+
+                <xf:send
+                    if="exists(instance('fb-publish-form-metadata')/*) and not($versioning-supported)"
+                    submission="fr-import-search-submission">
+                    <xf:property name="form-version" value="1"/>
+                </xf:send>
+
             </xf:action>
 
             <xf:action event="xforms-ready" type="xpath">
@@ -87,7 +103,9 @@
                     <xf:bind
                         ref="selected-version"
                         type="xs:integer"
-                        required="true()"/>
+                        required="true()"
+                        xxf:default="if ($versioning-supported) then '' else 1"
+                    />
                     <xf:bind
                         ref="existing-comment"
                         readonly="true()"/>
@@ -358,24 +376,19 @@
             <!-- START: Shared with `dialog-publish.xml` -->
             <xf:instance id="fb-publish-instance" xxf:expose-xpath-types="true">
                 <publish>
-                    <existing-version>-1</existing-version>           <!-- set by `fb-read-form-definition` -->
-                    <latest-version>-1</latest-version>               <!-- set on dialog open by `fb-read-form-metadata` -->
+                    <latest-version>-1</latest-version> <!-- set on dialog open by `fb-read-form-metadata` -->
                 </publish>
             </xf:instance>
 
             <xf:bind ref="instance('fb-publish-instance')">
                 <xf:bind
-                    ref="existing-version | latest-version"
+                    ref="latest-version"
                     type="xs:integer"/>
             </xf:bind>
 
             <xf:var
                 name="latest-version"
                 value="instance('fb-publish-instance')/latest-version/data(.)"/>
-
-            <xf:var
-                name="versioning-supported"
-                value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
 
             <xf:instance id="fb-publish-form-metadata">
                 <dummy/>
@@ -419,17 +432,6 @@
                 </xf:header>
 
                 <xf:action event="xforms-submit-done">
-                    <!-- Persistence might not return a version header, in case versioning is not supported. In which case,
-                         return 1, the default version number. -->
-                    <xf:setvalue
-                        ref="instance('fb-publish-instance')/existing-version"
-                        value="
-                            for $version in xxf:trim(event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
-                            return
-                               if (xxf:non-blank($version)) then
-                                   $version
-                               else
-                                    1"/>
                     <xf:var
                         name="response-metadata"
                         value="frf:metadataInstanceRootOpt(event('response-body'))"/>
@@ -441,13 +443,6 @@
                         value="not($response-metadata/available = 'false')"/>
                 </xf:action>
 
-                <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">
-                    <!-- If no form definition exists yet, consider the current version is 0 -->
-                    <xf:setvalue
-                        ref="instance('fb-publish-instance')/existing-version"
-                        value="0"/>
-                </xf:action>
-
                 <xf:message
                     event="xforms-submit-error"
                     if="not(event('response-status-code') = (404, 410))">An error occurred while reading the form definition.</xf:message>
@@ -457,11 +452,6 @@
                     ref="instance('fr-form-instance')/version/existing-comment"/>
 
             </xf:submission>
-
-
-            <xf:send
-                event="xforms-model-construct-done"
-                submission="fb-read-form-metadata"/>
 
             <!-- END: Shared with `dialog-publish.xml` -->
 
@@ -566,19 +556,41 @@
 
                     <fr:grid>
                         <xh:tr>
-                            <xh:td colspan="2">
+                            <xh:td colspan="1">
                                 <xf:output value="$app">
                                     <xf:label>Application Name</xf:label>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td colspan="1">
                                 <xf:output value="$form">
                                     <xf:label>Form Name</xf:label>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td colspan="1">
                                 <xf:output value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label>Form Version</xf:label>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td colspan="3">
+                                <xf:output
+                                    class="alert alert-info"
+                                    ref=".[not($versioning-supported)]"
+                                    value="
+                                        if (instance('fr-import-search-response')/@search-total/string() castable as xs:integer) then
+                                            xxf:format-message(
+                                                'There {0,choice,1#is|1&lt;are} {0,number,integer}
+                                                 existing {0,choice,1#document|1&lt;documents} in the database for form
+                                                 {1}/{2}.',
+                                                (
+                                                    instance('fr-import-search-response')/@search-total/data(.),
+                                                    $app,
+                                                    $form
+                                                )
+                                            )
+                                        else
+                                            'N/A'">
                                 </xf:output>
                             </xh:td>
                         </xh:tr>

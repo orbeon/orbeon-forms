@@ -643,11 +643,10 @@
                     </fr:grid>
 
                     <!-- This is here so we can make the section invalid until validation has completed. -->
-                    <!-- TODO: Would need the `fr:hidden` control (https://github.com/orbeon/orbeon-forms/issues/2639). -->
-                    <xf:output ref="validating" class="xforms-hidden">
-                        <xf:label>validating</xf:label>
-                        <xf:alert>validating</xf:alert>
-                    </xf:output>
+                    <fr:hidden ref="validating" class="xforms-hidden">
+                        <xf:label>Validation</xf:label>
+                        <xf:alert>Please start the validation before proceeding to the import</xf:alert>
+                    </fr:hidden>
 
                     <fr:grid>
                         <xh:tr>

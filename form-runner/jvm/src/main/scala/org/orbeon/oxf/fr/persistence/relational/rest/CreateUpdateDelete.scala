@@ -32,6 +32,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
@@ -302,8 +303,7 @@ trait CreateUpdateDelete
   
   def change(req: Request, delete: Boolean): Unit = {
 
-    if (Logger.isDebugEnabled)
-      Logger.logDebug("CRUD", s"handling change request for delete = $delete and $req")
+    debug("CRUD: handling change request", List("delete" → delete.toString, "request" → req.toString))
 
     // Read before establishing a connection, so we don't use two simultaneous connections
     val formPermissions = {
@@ -311,8 +311,7 @@ trait CreateUpdateDelete
       PermissionsXML.parse(elOpt.orNull)
     }
 
-    if (Logger.isDebugEnabled)
-      Logger.logDebug("CRUD", s"form permissions $formPermissions")
+    debug("CRUD: form permissions", List("permissions" → formPermissions.toString))
 
     RelationalUtils.withConnection { connection ⇒
 
@@ -328,8 +327,8 @@ trait CreateUpdateDelete
           // Delete: no version can be specified
           req.forData && delete && ! (req.version == Unspecified)
 
-        if (badVersion && Logger.isDebugEnabled)
-          Logger.logDebug("CRUD", s"bad version, returning ${StatusCode.BadRequest}")
+        if (badVersion)
+          debug("CRUD: bad version", List("status code" → StatusCode.BadRequest.toString))
 
         if (badVersion)
           throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -368,8 +367,8 @@ trait CreateUpdateDelete
             true
           }
 
-        if (! authorized && Logger.isDebugEnabled)
-          Logger.logDebug("CRUD", s"not authorized, returning ${StatusCode.Forbidden}")
+        if (! authorized)
+          debug("CRUD: not authorized", List("status code" → StatusCode.Forbidden.toString))
 
         if (! authorized)
           throw HttpStatusCodeException(StatusCode.Forbidden)
@@ -400,8 +399,8 @@ trait CreateUpdateDelete
           (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
           (req.forData && isCreate && ! isSpecificVersion)
 
-        if (badVersion && Logger.isDebugEnabled)
-          Logger.logDebug("CRUD", s"bad version,  returning ${StatusCode.BadRequest}")
+        if (badVersion)
+          debug("CRUD: bad version", List("status code" → StatusCode.BadRequest.toString))
 
         if (badVersion)
           throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -411,8 +410,7 @@ trait CreateUpdateDelete
         // We can't delete a document that doesn't exist
         val nothingToDelete = delete && existing.isEmpty
 
-        if (Logger.isDebugEnabled)
-          Logger.logDebug("CRUD", s"nothing to delete, returning ${StatusCode.NotFound}")
+        debug("CRUD: nothing to delete", List("status code" → StatusCode.NotFound.toString))
 
         if (nothingToDelete)
           throw HttpStatusCodeException(StatusCode.NotFound)
@@ -422,8 +420,7 @@ trait CreateUpdateDelete
       checkVersionInitial()
       val existing = existingRow(connection, req)
 
-      if (Logger.isDebugEnabled)
-        Logger.logDebug("CRUD", s"existing = ${existing.isDefined}")
+      debug("CRUD: retrieved existing row", List("existing" → existing.isDefined.toString))
 
       checkAuthorized(existing)
       checkVersionWithExisting(existing)
@@ -432,15 +429,13 @@ trait CreateUpdateDelete
       // Update database
       val versionSet = store(connection, req, existing, delete)
 
-      if (Logger.isDebugEnabled)
-        Logger.logDebug("CRUD", s"database updated, before commit, version = $versionSet")
+      debug("CRUD: database updated, before commit", List("version" → versionSet.toString))
 
       // Commit before reindexing, as reindexing will read back the form definition, which can
       // cause a deadlock since we're still in the transaction writing the form definition
       useAndClose(connection.prepareStatement("COMMIT"))(_.execute())
 
-      if (Logger.isDebugEnabled)
-        Logger.logDebug("CRUD", s"after commit")
+      debug("CRUD: after commit")
 
       // Update index
       val whatToReindex = req.dataPart match {
@@ -454,8 +449,9 @@ trait CreateUpdateDelete
         }
       Index.reindex(req.provider, connection, whatToReindex)
 
-      if (Logger.isDebugEnabled)
-        Logger.logDebug("CRUD", s"after reindex")
+      withDebug("CRUD: reindexing", List("what" → whatToReindex.toString)) {
+        Index.reindex(req.provider, connection, whatToReindex)
+      }
 
       // Create flat view if needed
       if (
@@ -465,9 +461,7 @@ trait CreateUpdateDelete
         ! req.forAttachment                       &&
         ! delete                                  &&
         req.form != Names.LibraryFormName
-      ) locally {
-        if (Logger.isDebugEnabled)
-          Logger.logDebug("CRUD", s"creating flat view")
+      ) withDebug("CRUD: creating flat view") {
         FlatView.createFlatView(req, connection)
       }
 

@@ -13,11 +13,10 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.CoreUtils._
 
-trait Common extends RequestResponse with FormRunnerPersistence {
+trait Common {
 
   implicit val Logger = RelationalUtils.Logger
 

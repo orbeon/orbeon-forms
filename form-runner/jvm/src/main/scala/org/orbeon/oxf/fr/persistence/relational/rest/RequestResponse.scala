@@ -33,7 +33,7 @@ case class Request(
   def forAttachment : Boolean = filename.isDefined
 }
 
-trait RequestResponse {
+trait RequestResponse extends Common {
 
   def tableName(request: Request, master: Boolean = false): String =
     Seq(
@@ -60,7 +60,12 @@ trait RequestResponse {
     val version =
       Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
 
-    httpRequest.getRequestPath match {
+    val requestPath = httpRequest.getRequestPath
+
+    if (Logger.isDebugEnabled)
+      Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath, version = $version")
+
+    requestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
         Request(Provider.providerFromPathToken(provider), app, form, version, file, None)

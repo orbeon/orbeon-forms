@@ -28,6 +28,7 @@ class CRUD
 
   override def start(pipelineContext: PipelineContext): Unit =
     try {
+
       val req = request
 
       httpRequest.getMethod match {

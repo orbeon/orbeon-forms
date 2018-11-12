@@ -142,8 +142,8 @@ object RequestReader {
 
 trait CreateUpdateDelete
   extends RequestResponse
-    with Common
-  with CreateCols {
+     with Common
+     with CreateCols {
 
   private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
@@ -439,15 +439,14 @@ trait CreateUpdateDelete
 
       // Update index
       val whatToReindex = req.dataPart match {
-          case Some(dataPart) ⇒
-            // Data: update index for this document id
-            Index.WhatToReindex.DataForDocumentId(dataPart.documentId)
-          case None ⇒
-            // Form definition: update index for this form version
-            // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-            Index.WhatToReindex.DataForForm(req.app, req.form, versionSet)
-        }
-      Index.reindex(req.provider, connection, whatToReindex)
+        case Some(dataPart) ⇒
+          // Data: update index for this document id
+          Index.WhatToReindex.DataForDocumentId(dataPart.documentId)
+        case None ⇒
+          // Form definition: update index for this form version
+          // Re. the asInstanceOf, when updating a form, we must have a specific version specified
+          Index.WhatToReindex.DataForForm(req.app, req.form, versionSet)
+      }
 
       withDebug("CRUD: reindexing", List("what" → whatToReindex.toString)) {
         Index.reindex(req.provider, connection, whatToReindex)

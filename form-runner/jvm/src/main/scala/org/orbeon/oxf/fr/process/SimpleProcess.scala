@@ -55,15 +55,15 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   // during the second pass of a two-pass submission.
   override def beforeProcess() = Try {
 
-    val elems = getUrlsInstanceRootElem.toList child *
+    val childElems = findUrlsInstanceRootElem.toList child *
 
     // Remove resource and temporary file if any
-    elems map (_.stringValue) flatMap trimAllToOpt foreach { path ⇒
+    childElems map (_.stringValue) flatMap trimAllToOpt foreach { path ⇒
       XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
     }
 
     // Clear stored paths
-    delete(elems)
+    delete(childElems)
   }
 
   override def processError(t: Throwable) =

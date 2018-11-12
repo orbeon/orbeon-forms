@@ -269,7 +269,7 @@ trait FormRunnerActions {
         for {
           format    ← SupportedRenderFormats.to[List]
           (path, _) ← pdfOrTiffPathOpt(
-              urlsInstanceRootElem = getUrlsInstanceRootElem,
+              urlsInstanceRootElem = findUrlsInstanceRootElem.get,
               format               = format,
               pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
@@ -594,8 +594,8 @@ trait FormRunnerActions {
       }
     }
 
-  def getUrlsInstanceRootElem: NodeInfo =
-    urlsInstance map (_.rootElement) get
+  def findUrlsInstanceRootElem: Option[NodeInfo] =
+    urlsInstance map (_.rootElement)
 
   def findFrFormAttachmentsRootElemOpt: Option[NodeInfo] =
     formAttachmentsInstance map (_.rootElement)
@@ -608,7 +608,7 @@ trait FormRunnerActions {
       val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang))
 
       pdfOrTiffPathOpt(
-        urlsInstanceRootElem = getUrlsInstanceRootElem,
+        urlsInstanceRootElem = findUrlsInstanceRootElem.get,
         format               = format,
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
@@ -630,7 +630,7 @@ trait FormRunnerActions {
 
             val node =
               getOrCreatePdfTiffPathElemOpt(
-                urlsInstanceRootElem = getUrlsInstanceRootElem,
+                urlsInstanceRootElem = findUrlsInstanceRootElem.get,
                 format               = format,
                 pdfTemplateOpt       = pdfTemplateOpt,
                 defaultLang          = currentFormLang,

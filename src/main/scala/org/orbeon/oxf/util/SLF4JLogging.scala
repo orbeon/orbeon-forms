@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.util
 
-trait SLF4JLogging {
+object SLF4JLogging {
 
   def withDebug[T](
     message    : ⇒ String,
@@ -36,5 +36,3 @@ trait SLF4JLogging {
         logger.debug(s"end $message")
     }
 }
-
-object SLF4JLogging extends SLF4JLogging

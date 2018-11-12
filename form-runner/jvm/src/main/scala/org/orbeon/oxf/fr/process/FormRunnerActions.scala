@@ -271,7 +271,7 @@ trait FormRunnerActions {
           (path, _) ← pdfOrTiffPathOpt(
               urlsInstanceRootElem = findUrlsInstanceRootElem.get,
               format               = format,
-              pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang)),
+              pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
             )
         } yield
@@ -279,7 +279,7 @@ trait FormRunnerActions {
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
-        pdfTiffParams ::: createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+        pdfTiffParams ::: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
@@ -568,7 +568,7 @@ trait FormRunnerActions {
 
       recombineQuery(
         s"/fr/$app/$form/$format/$document",
-        ("fr-rendered-filename" → fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+        ("fr-rendered-filename" → fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
       tryChangeMode(
@@ -597,7 +597,7 @@ trait FormRunnerActions {
   def findUrlsInstanceRootElem: Option[NodeInfo] =
     urlsInstance map (_.rootElement)
 
-  def findFrFormAttachmentsRootElemOpt: Option[NodeInfo] =
+  def findFrFormAttachmentsRootElem: Option[NodeInfo] =
     formAttachmentsInstance map (_.rootElement)
 
   // Create if needed and return the element key name
@@ -605,7 +605,7 @@ trait FormRunnerActions {
     Try {
 
       val currentFormLang = FormRunner.currentLang
-      val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElemOpt, params, Some(currentFormLang))
+      val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElem, params, Some(currentFormLang))
 
       pdfOrTiffPathOpt(
         urlsInstanceRootElem = findUrlsInstanceRootElem.get,
@@ -621,7 +621,7 @@ trait FormRunnerActions {
           val path =
             recombineQuery(
               s"/fr/service/$app/$form/$format/$document",
-              createPdfOrTiffParams(findFrFormAttachmentsRootElemOpt, params, currentFormLang)
+              createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
             )
 
           def processSuccessResponse() = {

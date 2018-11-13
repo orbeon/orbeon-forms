@@ -103,32 +103,58 @@
         </xbl:implementation>
 
         <xbl:template>
-            <xf:var name="dates-disabled" value="xxf:instance('fr-form-instance')//excluded/string()">
-                <xf:action event="xforms-value-changed">
-                    <xf:dispatch name="fr-date-dates-disabled-changed" targetid="fr-date"/>
-                </xf:action>
-            </xf:var>
-            <xh:div class="input-append date">
-                <xf:var
-                    name="placeholder"
-                    value="
-                        let $format      := xxf:property('oxf.xforms.format.input.date'),
-                            $cleaned     := translate($format, '[]', ''),
-                            $duplicate   := replace(replace(replace($cleaned,
-                                            'M', 'MM'),
-                                            'D', 'DD'),
-                                            'Y', 'YYYY'),
-                            $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                            $format-lang := xxf:r('format'),
-                            $translated  := translate($duplicate, $format-en, $format-lang)
-                        return
-                            $translated
-                    "/>
-                <xh:input type="text" class="span2" placeholder="{$placeholder}"/>
-                <xh:span class="add-on">
-                    <xh:i class="fa fa-fw fa-calendar"/>
-                </xh:span>
-            </xh:div>
+
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-date')"/>
+            <xf:var
+                name="view"
+                value="
+                    property('xxf:readonly-appearance') = 'static' or
+                    fr:mode() = 'pdf'
+                "/>
+
+            <xf:group ref=".[not($view)]">
+                <xf:var name="dates-disabled" value="xxf:instance('fr-form-instance')//excluded/string()">
+                    <xf:action event="xforms-value-changed">
+                        <xf:dispatch name="fr-date-dates-disabled-changed" targetid="fr-date"/>
+                    </xf:action>
+                </xf:var>
+                <xh:div class="input-append date">
+                    <xf:var
+                        name="placeholder"
+                        value="
+                            let $format      := xxf:property('oxf.xforms.format.input.date'),
+                                $cleaned     := translate($format, '[]', ''),
+                                $duplicate   := replace(replace(replace($cleaned,
+                                                'M', 'MM'),
+                                                'D', 'DD'),
+                                                'Y', 'YYYY'),
+                                $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                                $format-lang := xxf:r('format'),
+                                $translated  := translate($duplicate, $format-en, $format-lang)
+                            return
+                                $translated
+                        "/>
+                    <xh:input type="text" class="span2" placeholder="{$placeholder}"/>
+                    <xh:span class="add-on">
+                        <xh:i class="fa fa-fw fa-calendar"/>
+                    </xh:span>
+                </xh:div>
+            </xf:group>
+
+            <!-- Static readonly mode -->
+            <xf:input
+                ref="$binding[$view]"
+                xxf:format="
+                    format-date(
+                        xs:date($binding),
+                        xxf:property('oxf.xforms.format.input.date'),
+                        fr:lang(),
+                        (), ()
+                    )
+                "/>
+
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

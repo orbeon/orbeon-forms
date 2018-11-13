@@ -242,6 +242,10 @@
         .//*[tokenize(@class, '\s+') = 'xforms-input']/input/@value/string()
     </property>
 
+    <property as="xs:string"  name="oxf.fr.pdf.format.fr-date">
+        .//*[tokenize(@class, '\s+') = 'xforms-input']/input/@value/string()
+    </property>
+
     <property as="xs:string"  name="oxf.fr.pdf.format.fr-autocomplete">
         .//*[tokenize(@class, '\s+') = 'fr-autocomplete-external-value']/input/@value/string()
     </property>
@@ -261,6 +265,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-wpaint.*"                       value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="fr-number"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="fr-number"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="fr-date"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-yesno-input.*"                  value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-autocomplete.*"                 value="fr-autocomplete"/>

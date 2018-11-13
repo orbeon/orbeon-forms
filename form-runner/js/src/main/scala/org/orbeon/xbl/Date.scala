@@ -28,7 +28,7 @@ object Date {
 
 private class DateCompanion extends XBLCompanion {
 
-  def inputEl    : JQuery     = $(containerElem).find("input")
+  def inputEl    : JQuery     = $(containerElem).find("input").first()
   def iOS        : Boolean    = $(dom.document.body).hasClass("xforms-ios")
   var datePicker : DatePicker = null
 

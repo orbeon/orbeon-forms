@@ -328,6 +328,24 @@
         </fr:dropdown-select1>
     </xsl:template>
 
+    <!-- Convert `xf:input` of type date to `fr:date` -->
+    <xsl:template
+        mode="within-body"
+        match="
+            xf:input[
+                exists(
+                    for $bind-id in @bind return
+                    $model//xf:bind[
+                        @id   = $bind-id and
+                        @type = ('xf:date', 'xs:date')
+                    ]
+                )
+            ]">
+        <fr:date>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+        </fr:date>
+    </xsl:template>
+
     <!-- Convert xf:output[@mediatype = 'image/*'] to fr:image -->
     <xsl:template match="xf:output[@mediatype = 'image/*']"
                   mode="within-body">

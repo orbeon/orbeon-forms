@@ -13,43 +13,45 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import collection.JavaConverters._
-import model.{Instance, Model}
+import java.{util ⇒ ju}
 
-import collection.mutable.{Buffer, LinkedHashMap}
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.util.CollectionUtils._
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {
 
   self: PartAnalysisImpl ⇒
 
-  private[PartModelAnalysis] val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
-  private[PartModelAnalysis] val modelsByPrefixedId = LinkedHashMap[String, Model]()
-  private[PartModelAnalysis] val modelByInstancePrefixedId = LinkedHashMap[String, Model]()
+  private[PartModelAnalysis] val modelsByScope             = mutable.LinkedHashMap[Scope, mutable.Buffer[Model]]()
+  private[PartModelAnalysis] val modelsByPrefixedId        = mutable.LinkedHashMap[String, Model]()
+  private[PartModelAnalysis] val modelByInstancePrefixedId = mutable.LinkedHashMap[String, Model]()
 
-  def getModel(prefixedId: String) =
+  def getModel(prefixedId: String): Model =
     modelsByPrefixedId.get(prefixedId).orNull
 
-  def getModelByInstancePrefixedId(prefixedId: String) =
+  def getModelByInstancePrefixedId(prefixedId: String): Model =
     modelByInstancePrefixedId.get(prefixedId).orNull
 
-  def getInstances(modelPrefixedId: String) =
+  def getInstances(modelPrefixedId: String): ju.List[Instance] =
     modelsByPrefixedId.get(modelPrefixedId).toSeq flatMap (_.instances.values) asJava
 
-  def defaultModel =
+  def defaultModel: Option[Model] =
     getDefaultModelForScope(startScope)
 
-  def getDefaultModelForScope(scope: Scope) =
+  def getDefaultModelForScope(scope: Scope): Option[Model] =
     modelsByScope.get(scope) flatMap (_.headOption)
 
-  def getModelByScopeAndBind(scope: Scope, bindStaticId: String) =
+  def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model =
     modelsByScope.get(scope) flatMap
       (_ find (_.bindsById.contains(bindStaticId))) orNull
 
-  def getModelsForScope(scope: Scope) =
+  def getModelsForScope(scope: Scope): Seq[Model] =
     modelsByScope.getOrElse(scope, Seq())
 
   def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance] =
@@ -71,8 +73,8 @@ trait PartModelAnalysis extends TransientState {
     prefixedIdIt.nextOption()
   }
 
-  protected def indexModel(model: Model, eventHandlers: Buffer[EventHandlerImpl]): Unit = {
-    val models = modelsByScope.getOrElseUpdate(model.scope, Buffer[Model]())
+  protected def indexModel(model: Model, eventHandlers: mutable.Buffer[EventHandlerImpl]): Unit = {
+    val models = modelsByScope.getOrElseUpdate(model.scope, mutable.Buffer[Model]())
     models += model
     modelsByPrefixedId += model.prefixedId → model
 
@@ -88,7 +90,7 @@ trait PartModelAnalysis extends TransientState {
       modelByInstancePrefixedId -= instance.prefixedId
   }
 
-  protected def analyzeModelsXPath() =
+  protected def analyzeModelsXPath(): Unit =
     for {
       models ← modelsByScope.valuesIterator
       model  ← models.iterator
@@ -96,7 +98,7 @@ trait PartModelAnalysis extends TransientState {
       model.analyzeXPath()
     }
 
-  override def freeTransientState() = {
+  override def freeTransientState(): Unit = {
     super.freeTransientState()
 
     for (model ← modelsByPrefixedId.values)

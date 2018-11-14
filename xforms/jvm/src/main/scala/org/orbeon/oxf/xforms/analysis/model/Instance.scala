@@ -151,7 +151,7 @@ trait InstanceMetadata {
   def isStrictValidation = validation == "strict"
   def isSchemaValidation = isLaxValidation || isStrictValidation
 
-  val credentialsOrNull = {
+  val credentialsOrNull: Credentials = {
     // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
     def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
     def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
@@ -161,7 +161,7 @@ trait InstanceMetadata {
     Option(username) map (Credentials(_, password, preemptiveAuth, domain)) orNull
   }
 
-  val excludeResultPrefixes = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))
+  val excludeResultPrefixes: Set[String] = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))
 
   // Inline root element if any
   private val root = Dom4j.elements(element) headOption
@@ -171,18 +171,18 @@ trait InstanceMetadata {
   def inlineContent: DocumentInfo
 
   // Extract the inline content into a new document (mutable or not)
-  protected def extractInlineContent =
+  protected def extractInlineContent: DocumentInfo =
     extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
 
   // Don't allow more than one child element
   if (Dom4j.elements(element).size > 1)
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
-  private def getAttributeEncode(qName: QName) =
+  private def getAttributeEncode(qName: QName): Option[String] =
     Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trimAllToEmpty, true))
 
-  private def src = getAttributeEncode(SRC_QNAME)
-  private def resource = getAttributeEncode(RESOURCE_QNAME)
+  private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
+  private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)
 
   // @src always wins, @resource always loses
   val useInlineContent = src.isEmpty && hasInlineContent

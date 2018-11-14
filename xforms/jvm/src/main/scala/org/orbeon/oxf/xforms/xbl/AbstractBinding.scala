@@ -89,14 +89,14 @@ case class AbstractBinding(
   def debugBindingName = bindingElement.getQualifiedName
 
   // CSS classes to put in the markup
-  val cssClasses =
+  val cssClasses: String =
     "xbl-component"                                           ::
     (cssName                  map ("xbl-" +) toList)          :::
     (modeFocus               list "xbl-focusable")            :::
     (modeJavaScriptLifecycle list "xbl-javascript-lifecycle") :::
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
-  val allowedExternalEvents =
+  val allowedExternalEvents: Set[String] =
     attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
     (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
     (if (modeExternalValue) List(XXFORMS_VALUE) else Nil)

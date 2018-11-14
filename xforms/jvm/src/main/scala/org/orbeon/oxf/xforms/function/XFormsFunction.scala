@@ -267,7 +267,7 @@ object XFormsFunction {
       case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
     }
 
-  def context =
+  def context: Context =
     XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
 
   // This ADT or something like it should be defined somewhere else

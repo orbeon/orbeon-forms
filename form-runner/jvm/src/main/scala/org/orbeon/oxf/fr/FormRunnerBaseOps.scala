@@ -30,6 +30,33 @@ import org.orbeon.scaxon.SimplePath._
 
 import scala.util.Try
 
+// The standard Form Runner parameters
+case class FormRunnerParams(
+  app         : String,
+  form        : String,
+  formVersion : Int,
+  document    : Option[String],
+  mode        : String
+)
+
+object FormRunnerParams {
+  def apply(): FormRunnerParams = {
+    val params = parametersInstance.get.rootElement
+
+    FormRunnerParams(
+      app         = params elemValue "app",
+      form        = params elemValue "form",
+      formVersion = Try(params elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
+      document    = params elemValue "document" trimAllToOpt,
+      mode        = params elemValue "mode"
+    )
+  }
+}
+
+case class AppForm(app: String, form: String) {
+  val toList = List(app, form)
+}
+
 trait FormRunnerBaseOps {
 
   val LanguageParam         = "fr-language"
@@ -284,23 +311,6 @@ trait FormRunnerBaseOps {
   def isReadonlyMode(implicit p: FormRunnerParams) = ReadonlyModes(p.mode)
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
-
-  // The standard Form Runner parameters
-  case class FormRunnerParams(app: String, form: String, formVersion: Int, document: Option[String], mode: String)
-
-  object FormRunnerParams {
-    def apply(): FormRunnerParams = {
-      val params = parametersInstance.get.rootElement
-
-      FormRunnerParams(
-        app         = params elemValue "app",
-        form        = params elemValue "form",
-        formVersion = Try(params elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
-        document    = params elemValue "document" trimAllToOpt,
-        mode        = params elemValue "mode"
-      )
-    }
-  }
 
   // Display a success message
   //@XPathFunction

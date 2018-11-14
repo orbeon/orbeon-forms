@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.analysis
 
 import collection.JavaConverters._
-import model.Model
-import collection.mutable.{LinkedHashMap, Buffer}
+import model.{Instance, Model}
+
+import collection.mutable.{Buffer, LinkedHashMap}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.CollectionUtils._
@@ -51,6 +52,12 @@ trait PartModelAnalysis extends TransientState {
   def getModelsForScope(scope: Scope) =
     modelsByScope.getOrElse(scope, Seq())
 
+  def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance] =
+    getModelsForScope(scope).iterator flatMap
+      (_.instances.iterator)          collectFirst
+      { case (`instanceStaticId`, instance) ⇒ instance }
+
+  // NOTE: This searches ancestor scopes as well.
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String] = {
 
     val prefixedIdIt =

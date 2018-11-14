@@ -164,7 +164,7 @@ object InstanceMirror {
           // This is a change to an instance
 
           container.findInstance(instanceId) match {
-            case Some(innerInstance) ⇒
+            case Some(innerInstance) if ! innerInstance.instance.readonly ⇒
               // Find destination path in instance
 
               // Find path rooted at wrapper
@@ -189,8 +189,8 @@ object InstanceMirror {
                 case newNode: VirtualNode ⇒ Some(innerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
-            case None ⇒
-              // May not be found if instance was just created
+            case _ ⇒
+              // May not be found if instance was just created or if the instance is readonly
               None
           }
       }

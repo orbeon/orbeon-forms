@@ -17,6 +17,7 @@ import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.XBLSupport
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.functions.FunctionLibrary
 
@@ -39,6 +40,7 @@ trait XFormsStaticState {
   def isCalculateDependencies                 : Boolean
 
   def functionLibrary                         : FunctionLibrary
+  def xblSupport                              : Option[XBLSupport]
   def sanitizeInput                           : String ⇒ String
   def isInlineResources                       : Boolean
   def assets                                  : XFormsAssets

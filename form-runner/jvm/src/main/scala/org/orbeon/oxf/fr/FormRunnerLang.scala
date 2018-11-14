@@ -33,10 +33,6 @@ trait FormRunnerLang {
   import Private._
   import FormRunner._
 
-  case class AppForm(app: String, form: String) {
-    val toList = List(app, form)
-  }
-
   // The client passes "*" or blank to indicate that there is no current app/form name
   def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
   def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)

@@ -18,10 +18,10 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
@@ -118,10 +118,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName = List(
-    "mode"                        → (() ⇒ FormRunner.FormRunnerParams().mode),
-    "app-name"                    → (() ⇒ FormRunner.FormRunnerParams().app),
-    "form-name"                   → (() ⇒ FormRunner.FormRunnerParams().form),
-    "document-id"                 → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
+    "mode"                        → (() ⇒ FormRunnerParams().mode),
+    "app-name"                    → (() ⇒ FormRunnerParams().app),
+    "form-name"                   → (() ⇒ FormRunnerParams().form),
+    "document-id"                 → (() ⇒ FormRunnerParams().document.orNull),
     "form-title"                  → (() ⇒ FormRunner.formTitleFromMetadata.orNull),
     "lang"                        → (() ⇒ FormRunner.currentLang),
     "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
@@ -148,7 +148,7 @@ private object FormRunnerFunctions {
   )
 
   val IntGettersByName = List(
-    "form-version"                → (() ⇒ FormRunner.FormRunnerParams().formVersion)
+    "form-version"                → (() ⇒ FormRunnerParams().formVersion)
   )
 
   val DateTimeGettersByName = List(
@@ -296,26 +296,45 @@ private object FormRunnerFunctions {
   }
 
   // For instance, `fr:component-param-value('decimal-separator')`
-  // returns the value of `oxf.xforms.xbl.fr.currency.decimal-separator.*.*`
+  //
+  // This searches bound element attributes, the `fr-form-metadata` instance, and properties.
+  //
+  // We search `fr-form-metadata` statically, since we know that it is readonly and inline.
+  //
   class FRComponentParam extends FunctionSupport with RuntimeDependentFunction {
 
-    override def evaluateItem(context: XPathContext): Item = {
+    override def evaluateItem(context: XPathContext): AtomicValue = {
 
       implicit val ctx  = context
-      val paramName     = QName(stringArgument(0))
 
-      def searchWithoutAppForm : Option[AtomicValue] = XXFormsComponentParam.evaluate(paramName, Nil)
-      def searchWithAppForm    : Option[AtomicValue] = {
-        FormRunner.parametersInstance.isDefined.flatOption {
-          val frParams      = FormRunner.FormRunnerParams()
-          val appNameSuffix = List(frParams.app, frParams.form)
-          XXFormsComponentParam.evaluate(paramName, appNameSuffix)
-        }
-      }
+      val paramName = QName(stringArgument(0))
 
-      searchWithAppForm
-        .orElse(searchWithoutAppForm)
-        .orNull
+      import XXFormsComponentParam._
+
+      findSourceComponent(XFormsFunction.context) flatMap { sourceComponent ⇒
+
+        val staticControl   = sourceComponent.staticControl
+        val concreteBinding = staticControl.bindingOrThrow
+
+        def fromAttributes: Option[StringValue] =
+          fromElemAlsoTryAvt(
+            concreteBinding.boundElementAtts.lift,
+            sourceComponent.evaluateAvt,
+            paramName
+          )
+
+        def fromMetadataAndProperties =
+          FRComponentParam.findConstantMetadataRootElem(staticControl.part) flatMap { constantMetadataRootElem ⇒
+            FRComponentParam.fromMetadataAndProperties(
+              constantMetadataRootElem = constantMetadataRootElem,
+              directNameOpt            = staticControl.abstractBinding.directName,
+              paramName                = paramName
+            )
+          }
+
+        fromAttributes orElse fromMetadataAndProperties
+
+      } orNull
     }
   }
 
@@ -331,5 +350,68 @@ private object FormRunnerFunctions {
           )
         )
       }
+  }
+}
+
+object FRComponentParam {
+
+  import org.orbeon.scaxon.SimplePath._
+
+  def findConstantMetadataRootElem(part: PartAnalysisImpl): Option[NodeInfo] =
+    for {
+      metadataInstance ← part.findInstanceInScope(part.startScope, Names.MetadataInstance)
+      constantContent  ← metadataInstance.constantContent
+    } yield
+      constantContent.rootElement
+
+  // Find in a hierarchical structure, such as:
+  //
+  // <metadata>
+  //   <xbl>
+  //     <fr:number>
+  //       <decimal-separator>'</decimal-separator>
+  //     </fr:number>
+  //   </xbl>
+  // </metadata>
+  //
+  def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: NodeInfo): Option[String] =
+    for {
+      directName    ← directNameOpt
+      xblElem       ← rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
+      componentElem ← xblElem.firstChildOpt(directName)
+      paramElem     ← componentElem.firstChildOpt(paramName)
+    } yield
+      paramElem.getStringValue
+
+  def fromMetadataAndProperties(
+    constantMetadataRootElem : NodeInfo,
+    directNameOpt            : Option[QName],
+    paramName                : QName
+  ): Option[AtomicValue] = {
+
+    // Instead of using `FormRunnerParams()`, we use the form definition metadata.
+    // This also allows support of the edited form in Form Builder.
+    def appFormFromMetadata =
+      for {
+        appName  ← constantMetadataRootElem elemValueOpt Names.AppName
+        formName ← constantMetadataRootElem elemValueOpt Names.FormName
+      } yield
+        AppForm(appName, formName)
+
+    def fromMetadataInstance: Option[StringValue] =
+      findHierarchicalElem(directNameOpt, paramName, constantMetadataRootElem) map
+        (new StringValue(_))
+
+    def fromPropertiesWithSuffix: Option[AtomicValue] =
+      appFormFromMetadata flatMap { appForm ⇒
+        XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt)
+      }
+
+    def fromPropertiesWithoutSuffix: Option[AtomicValue] =
+      XXFormsComponentParam.fromProperties(paramName, Nil, directNameOpt)
+
+    fromMetadataInstance       orElse
+      fromPropertiesWithSuffix orElse
+      fromPropertiesWithoutSuffix
   }
 }

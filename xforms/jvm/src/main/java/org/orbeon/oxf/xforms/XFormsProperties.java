@@ -30,6 +30,7 @@ public class XFormsProperties {
 
     // Document properties
     public static final String FUNCTION_LIBRARY_PROPERTY = "function-library";
+    public static final String XBL_SUPPORT_PROPERTY = "xbl-support";
 
     public static final String STATE_HANDLING_PROPERTY = "state-handling";
     public static final String STATE_HANDLING_SERVER_VALUE = "server";
@@ -230,6 +231,7 @@ public class XFormsProperties {
             ),
 
             new PropertyDefinition(FUNCTION_LIBRARY_PROPERTY                     , "",                             false),
+            new PropertyDefinition(XBL_SUPPORT_PROPERTY                          , "",                             false),
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT_PROPERTY    , "full",                         false),
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY   , "full",                         false),
             new PropertyDefinition(ORDER_PROPERTY                                , DEFAULT_ORDER_PROPERTY,         false),

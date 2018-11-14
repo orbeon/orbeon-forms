@@ -318,6 +318,8 @@ class XBLBindings(
 
           // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
           XBLTransformer.transform(
+            partAnalysis          = partAnalysis,
+            xblSupport            = partAnalysis.staticState.xblSupport,
             shadowTreeDocument    = shadowTreeDocument,
             boundElement          = boundElement,
             abstractBindingOpt    = Some(abstractBinding),

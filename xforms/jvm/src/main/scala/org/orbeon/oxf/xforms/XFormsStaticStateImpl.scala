@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLSupport}
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
@@ -39,6 +39,7 @@ import org.orbeon.saxon.sxpath.XPathExpression
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
+import scala.reflect.ClassTag
 import scala.util.Try
 
 class XFormsStaticStateImpl(
@@ -85,34 +86,43 @@ class XFormsStaticStateImpl(
     excludesProp.splitTo[List]().foldLeft(XFormsAssets.fromJSONProperty)(update)
   }
 
+  private def loadClass[T : ClassTag](propertyName: String): Option[T] =
+    staticStateDocument.nonDefaultProperties.get(propertyName) flatMap trimAllToOpt match {
+      case Some(className) ⇒
+
+        def tryFromScalaObject: Try[AnyRef] = Try {
+          Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
+        }
+
+        def fromJavaClass: AnyRef =
+          Class.forName(className).getDeclaredMethod("instance").invoke(null)
+
+        tryFromScalaObject getOrElse fromJavaClass match {
+          case instance: T ⇒ Some(instance)
+          case _ ⇒
+            throw new ClassCastException(
+              s"property `$propertyName` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
+            )
+        }
+      case None ⇒ None
+    }
+
   // This is a bit tricky because during analysis, XPath expression require the function library. This means this
   // property cannot use `nonDefaultPropertiesOnly` below, which collects all non-default properties and attempts to
   // evaluates AVT properties, which themselves require finding the default model, which is not yet ready! So we
   // use `staticStateDocument.nonDefaultProperties` instead.
   lazy val functionLibrary: FunctionLibrary =
-    staticStateDocument.nonDefaultProperties.get(FUNCTION_LIBRARY_PROPERTY) flatMap trimAllToOpt match {
-      case Some(functionLibraryClassName) ⇒
-
-        def tryFromScalaObject: Try[AnyRef] = Try {
-          Class.forName(functionLibraryClassName + "$").getDeclaredField("MODULE$").get(null)
-        }
-
-        def fromJavaClass: AnyRef =
-          Class.forName(functionLibraryClassName).getDeclaredMethod("instance").invoke(null)
-
-        tryFromScalaObject getOrElse fromJavaClass match {
-          case library: FunctionLibrary ⇒
-            new FunctionLibraryList                         |!>
-              (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
-              (_.addFunctionLibrary(library))
-          case _ ⇒
-            throw new ClassCastException(
-              s"property `$FUNCTION_LIBRARY_PROPERTY` does not refer to a FunctionLibrary with `$functionLibraryClassName`"
-            )
-        }
+    loadClass[FunctionLibrary](FUNCTION_LIBRARY_PROPERTY) match {
+      case Some(library) ⇒
+        new FunctionLibraryList                         |!>
+          (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+          (_.addFunctionLibrary(library))
       case None ⇒
         XFormsFunctionLibrary
     }
+
+  lazy val xblSupport: Option[XBLSupport] =
+    loadClass[XBLSupport](XBL_SUPPORT_PROPERTY)
 
   lazy val uploadMaxSize: MaximumSize =
     staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap

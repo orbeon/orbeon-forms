@@ -37,7 +37,8 @@
         select="count($body//*:td[exists(*)] | $body//*:c[exists(*)]) ge p:property('oxf.fb.section.close')"/>
 
     <!-- Temporarily mark read-only instances as read-write -->
-    <xsl:template match="xf:model/xf:instance/@xxf:readonly[. = 'true']" mode="within-model">
+    <!-- Except `fr-form-metadata`, see https://github.com/orbeon/orbeon-forms/issues/3822 -->
+    <xsl:template match="xf:model/xf:instance[not(@id = 'fr-form-metadata')]/@xxf:readonly[. = 'true']" mode="within-model">
         <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
     </xsl:template>
 

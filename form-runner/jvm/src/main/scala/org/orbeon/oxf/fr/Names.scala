@@ -35,5 +35,8 @@ object Names {
   val Item                = "item"
   val Value               = "value"
 
+  val AppName             = "application-name"
+  val FormName            = "form-name"
+
   val LibraryFormName     = "library"
 }

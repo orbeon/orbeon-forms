@@ -14,70 +14,78 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.xbl.AbstractBinding
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
-import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
+import shapeless.syntax.typeable._
 
 class XXFormsComponentParam extends XFormsFunction {
 
+  import XXFormsComponentParam._
+
   override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
+
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
-    XXFormsComponentParam.evaluate(paramName, Nil).orNull
-  }
-}
 
-object XXFormsComponentParam {
+    findSourceComponent(XFormsFunction.context) flatMap { sourceComponent ⇒
 
-  def evaluate(
-    paramName   : QName,
-    paramSuffix : List[String]
-  ): Option[AtomicValue] = {
-
-    val prefixedId              = XFormsId.getPrefixedId(XFormsFunction.context.sourceEffectiveId)
-    val containerForSourceScope = XFormsFunction.context.container.findScopeRoot(prefixedId)
-
-    containerForSourceScope.associatedControlOpt collect
-      { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒
-
-      val staticControl  =  c.staticControl
+      val staticControl   = sourceComponent.staticControl
       val concreteBinding = staticControl.bindingOrThrow
 
       // NOTE: In the future, we would like constant values to be available right away, and
       // AVTs to support dependencies. Those should probably be stored lazily at the control
       // level.
-      XXFormsComponentParam.evaluateUsePropertiesIfNeeded(
+      fromElemAlsoTryAvt(
         concreteBinding.boundElementAtts.lift,
-        c.evaluateAvt,
-        paramName,
-        paramSuffix,
-        staticControl.abstractBinding
-      )
-    }
+        sourceComponent.evaluateAvt,
+        paramName
+      ) orElse
+        fromProperties(
+          paramName,
+          Nil,
+          staticControl.abstractBinding.directName
+        )
+    } orNull
+  }
+}
+
+object XXFormsComponentParam {
+
+  val XblLocalName = XFormsConstants.XBL_XBL_QNAME.localName
+
+  def findSourceComponent(xformsFunctionContext: XFormsFunction.Context): Option[XFormsComponentControl] = {
+
+    val prefixedId              = XFormsId.getPrefixedId(xformsFunctionContext.sourceEffectiveId)
+    val containerForSourceScope = xformsFunctionContext.container.findScopeRoot(prefixedId)
+
+    containerForSourceScope.associatedControlOpt flatMap (_.cast[XFormsComponentControl])
   }
 
-  def evaluateUsePropertiesIfNeeded(
+  // NOTE: In the future, we would like constant values to be available right away, and
+  // AVTs to support dependencies. Those should probably be stored lazily at the control
+  // level.
+  def fromElemAlsoTryAvt(
     atts            : QName ⇒ Option[String],
     evaluateAvt     : String ⇒ String,
+    paramName       : QName
+  ): Option[StringValue] =
+    atts(paramName) map evaluateAvt map stringToStringValue
+
+  def fromProperties(
     paramName       : QName,
     paramSuffix     : List[String],
-    abstractBinding : AbstractBinding
+    directNameOpt   : Option[QName]
   ): Option[AtomicValue] = {
 
-    // NOTE: In the future, we would like constant values to be available right away, and
-    // AVTs to support dependencies. Those should probably be stored lazily at the control
-    // level.
-
-    def fromElemAlsoTryAvt =
-      atts(paramName) map evaluateAvt map stringToStringValue
-
-    def propertyName =
-      abstractBinding.directName map { qName ⇒
-        List("oxf.xforms.xbl", qName.namespace.prefix, qName.localName, paramName) ++ paramSuffix mkString "."
+    val propertyNameOpt =
+      findPropertyParts(directNameOpt, paramName) map { parts ⇒
+        "oxf" :: "xforms" :: parts ::: paramSuffix mkString "."
       }
 
     // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is
@@ -85,10 +93,12 @@ object XXFormsComponentParam {
     // such a way. So if the value is a blank string (which means the value is actually a blank `xs:string` or maybe
     // `xs:anyURI`), consider the property missing. We could revise this in the future to make a distinction between
     // a blank or empty string and a missing property.
-    def fromProperties =
-      propertyName flatMap Property.property filter (_.getStringValue.nonEmpty)
-
-    fromElemAlsoTryAvt orElse fromProperties
+    propertyNameOpt flatMap Property.property filter (_.getStringValue.nonBlank)
   }
 
+  // For example `xbl.fr.number.decimal-separator`
+  private def findPropertyParts(directNameOpt: Option[QName], paramName: QName): Option[List[String]] =
+    directNameOpt map { qName ⇒
+      XblLocalName :: qName.namespace.prefix :: qName.localName :: paramName.localName :: Nil
+    }
 }

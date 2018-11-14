@@ -21,9 +21,9 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
@@ -44,6 +44,8 @@ object XBLTransformer {
     * NOTE: This mutates shadowTreeDocument.
     */
   def transform(
+    partAnalysis          : PartAnalysisImpl,
+    xblSupport            : Option[XBLSupport],
     shadowTreeDocument    : Document,
     boundElement          : Element,
     abstractBindingOpt    : Option[AbstractBinding],
@@ -54,6 +56,7 @@ object XBLTransformer {
 
     val documentWrapper  = new DocumentWrapper(boundElement.getDocument, null, org.orbeon.oxf.util.XPath.GlobalConfiguration)
     val boundElementInfo = documentWrapper.wrap(boundElement)
+    val directNameOpt    = abstractBindingOpt flatMap (_.directName)
 
     def isNestedHandler(e: Element): Boolean =
       (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)
@@ -97,17 +100,6 @@ object XBLTransformer {
 
       val isXBLContent = currentElem.getQName == XBLContentQName
       var resultingNodes: ju.List[Node] = null
-
-      def evaluateParam(paramName: QName): Option[String] =
-        abstractBindingOpt flatMap { abstractBinding ⇒
-          XXFormsComponentParam.evaluateUsePropertiesIfNeeded(
-            boundElement.attributeValueOpt,
-            identity,
-            paramName,
-            Nil,
-            abstractBinding
-          ) map (_.getStringValue)
-        }
 
       val processChildren =
         if (isXBLContent) {
@@ -190,7 +182,11 @@ object XBLTransformer {
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", null)
           }
           true
-        } else if (currentElem.attributeValueOpt(XXBLUseIfAttrQName) exists (a ⇒ evaluateParam(QName.apply(a)).isEmpty)) {
+        } else if (currentElem.attributeValueOpt(XXBLUseIfAttrQName) exists (a ⇒ boundElement.attributeValueOpt(a).isEmpty)) {
+          // Skip this element
+          currentElem.detach()
+          false
+        } else if (xblSupport exists (! _.keepElement(partAnalysis, boundElement, directNameOpt, currentElem))) {
           // Skip this element
           currentElem.detach()
           false

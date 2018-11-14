@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
-import org.orbeon.oxf.fr.{DataStatus, Names}
+import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsUtils

@@ -18,6 +18,7 @@ import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.http.Credentials
 import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -28,6 +29,7 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
+import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
 
@@ -61,33 +63,53 @@ class Instance(
   // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
   // instances of a given form. This is useful in particular for component i18n resource instances.
-  def inlineContent: DocumentInfo = {
+  lazy val constantContent: Option[DocumentInfo] =
+    readonly && useInlineContent option {
 
-    // An instance within xf:implementation has a ComponentControl grandparent
-    def componentForConstantInstances =
-      if (readonly && useInlineContent)
-        parent.get.parent collect { case component: ComponentControl ⇒ component }
-      else
-        None
+      // An instance within `xf:implementation` has a `ComponentControl` grandparent
+      val componentOpt =
+        parent flatMap (_.parent) flatMap (_.cast[ComponentControl])
 
-    componentForConstantInstances map { component ⇒
+      componentOpt match {
+        case Some(component) ⇒
 
-      val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == "model")
-      val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == "instance")
+          val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == XFORMS_MODEL_QNAME.localName)
+          val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == XFORMS_INSTANCE_QNAME.localName)
 
-      debug("getting readonly inline instance from abstract binding", Seq(
-        "model id"       → parent.get.staticId,
-        "instance id"    → staticId,
-        "scope id"       → (component.bindingOpt map (_.innerScope.scopeId) orNull),
-        "binding name"   → component.abstractBinding.debugBindingName,
-        "model index"    → modelIndex.toString,
-        "instance index" → instanceIndex.toString))
+          debug(
+            "getting readonly inline instance from abstract binding",
+            List(
+              "model id"       → parent.get.staticId,
+              "instance id"    → staticId,
+              "scope id"       → (component.bindingOpt map (_.innerScope.scopeId) orNull),
+              "binding name"   → component.abstractBinding.debugBindingName,
+              "model index"    → modelIndex.toString,
+              "instance index" → instanceIndex.toString
+            )
+          )
 
-      // Delegate to AbstractBinding
-      component.abstractBinding.constantInstances((modelIndex, instanceIndex))
-    } getOrElse
-      extractInlineContent
-  }
+          component.abstractBinding.constantInstances((modelIndex, instanceIndex))
+        case None ⇒
+
+          debug(
+            "getting readonly inline instance from top-level",
+            List(
+              "model id"       → parent.get.staticId,
+              "instance id"    → staticId,
+              "scope id"       → scope.scopeId
+            )
+          )
+
+          new ThrowawayInstance(element).inlineContent
+      }
+    }
+
+  // Get constant inline content from `AbstractBinding` if possible, otherwise extract from element.
+  // Doing so allows for sharing of constant instances globally, among uses of an `AbstractBinding` and
+  // among multiple instances of a given form. This is useful in particular for component i18n resource
+  // instances, for example.
+  def inlineContent: DocumentInfo =
+    constantContent getOrElse extractInlineContent
 }
 
 // Used to gather instance metadata from AbstractBinding

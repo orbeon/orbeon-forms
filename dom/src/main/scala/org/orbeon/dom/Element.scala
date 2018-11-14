@@ -109,12 +109,14 @@ trait Element extends Branch {
    *         different namespaces then the first one is returned.
    */
   def attribute(name: String): Attribute
+  def attributeOpt(name: String): Option[Attribute] = Option(attribute(name))
 
   /**
    * @return the attribute for the given fully qualified name or null if it
    *         could not be found.
    */
   def attribute(qName: QName): Attribute
+  def attributeOpt(qName: QName): Option[Attribute] = Option(attribute(qName))
 
   /**
    * This returns the attribute value for the attribute with the given name
@@ -122,17 +124,7 @@ trait Element extends Branch {
    * string if the attribute value is empty.
    */
   def attributeValue(name: String): String
-
-  def attributeValueOpt(name: String): Option[String] =
-    Option(attributeValue(name))
-
-  /**
-   *
-   * This returns the attribute value for the attribute with the given name
-   * and any namespace or the default value if there is no such attribute
-   * value.
-   */
-  def attributeValue(name: String, defaultValue: String): String
+  def attributeValueOpt(name: String): Option[String] = Option(attributeValue(name))
 
   /**
    *
@@ -141,16 +133,7 @@ trait Element extends Branch {
    * if the attribute value is empty.
    */
   def attributeValue(qName: QName): String
-
-  def attributeValueOpt(qName: QName): Option[String] =
-    Option(attributeValue(qName))
-
-  /**
-   *
-   * This returns the attribute value for the attribute with the given fully
-   * qualified name or the default value if there is no such attribute value.
-   */
-  def attributeValue(qName: QName, defaultValue: String): String
+  def attributeValueOpt(qName: QName): Option[String] = Option(attributeValue(qName))
 
   def containsElement: Boolean
 
@@ -158,11 +141,13 @@ trait Element extends Branch {
    * Returns the first element for the given local name and any namespace.
    */
   def element(name: String): Element
+  def elementOpt(name: String): Option[Element] = Option(element(name))
 
   /**
    * Returns the first element for the given fully qualified name.
    */
   def element(qName: QName): Element
+  def elementOpt(name: QName): Option[Element] = Option(element(name))
 
   /**
    * Returns the elements contained in this element. If this element does not

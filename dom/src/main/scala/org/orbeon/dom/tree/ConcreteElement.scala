@@ -367,16 +367,6 @@ class ConcreteElement(var qname: QName)
     }
   }
 
-  def attributeValue(name: String, defaultValue: String): String = {
-    val answer = attributeValue(name)
-    if (answer ne null) answer else defaultValue
-  }
-
-  def attributeValue(qName: QName, defaultValue: String): String = {
-    val answer = attributeValue(qName)
-    if (answer ne null) answer else defaultValue
-  }
-
   def add(att: Attribute): Unit = {
     if (att.getParent ne null) {
       val message = "The Attribute already has an existing parent \"" + att.getParent.getQualifiedName + "\""

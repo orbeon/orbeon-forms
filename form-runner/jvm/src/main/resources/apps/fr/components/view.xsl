@@ -516,72 +516,72 @@
                     </xh:a>
                     <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
 
-                        <xf:var name="is-signed-in"  value="exists(xxf:username())"/>
+                        <xf:var name="is-logged-in"  value="exists(xxf:username())"/>
 
-                        <!-- Who is signed in -->
+                        <!-- Who is logged in -->
                         <xf:var
-                            name="signed-in-class"
+                            name="logged-in-class"
                             value="
-                                if ($is-signed-in)
+                                if ($is-logged-in)
                                 then ''
                                 else 'xforms-hidden'
                             "/>
-                        <xh:li role="presentation" class="disabled {{$signed-in-class}}">
+                        <xh:li role="presentation" class="disabled {{$logged-in-class}}">
                             <xh:a role="menuitem" href="#">
-                                Signed in as <xh:b><xf:output value="xxf:username()"/></xh:b>
+                                Logged in as <xh:b><xf:output value="xxf:username()"/></xh:b>
                             </xh:a>
                         </xh:li>
 
-                        <xh:li role="presentation" class="divider {{$signed-in-class}}"/>
+                        <xh:li role="presentation" class="divider {{$logged-in-class}}"/>
 
-                        <!-- Signout -->
+                        <!-- Logout -->
                         <xf:var
-                            name="signout-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.signout')"/>
+                            name="logout-url"
+                            value="xxf:property('oxf.fr.authentication.user-menu.uri.logout')"/>
                         <xf:var
-                            name="signout-class"
+                            name="logout-class"
                             value="
-                                if ($is-signed-in and $signout-url != '')
+                                if ($is-logged-in and $logout-url != '')
                                 then ''
                                 else 'xforms-hidden'
                             "/>
-                        <xh:li role="presentation" class="{{$signout-class}}">
-                            <xh:a role="menuitem" href="{{$signout-url}}">
-                                Sign out
+                        <xh:li role="presentation" class="{{$logout-class}}">
+                            <xh:a role="menuitem" href="{{$logout-url}}">
+                                Logout
                             </xh:a>
                         </xh:li>
 
-                        <!-- Signin -->
+                        <!-- Login -->
                         <xf:var
-                            name="signin-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.signin')"/>
+                            name="login-url"
+                            value="xxf:property('oxf.fr.authentication.user-menu.uri.login')"/>
                         <xf:var
-                            name="signin-class"
+                            name="login-class"
                             value="
-                                if (not($is-signed-in) and $signin-url != '')
+                                if (not($is-logged-in) and $login-url != '')
                                 then ''
                                 else 'xforms-hidden'
                             "/>
-                        <xh:li role="presentation" class="{{$signin-class}}">
-                            <xh:a role="menuitem" href="{{$signin-url}}">
-                                Sign in
+                        <xh:li role="presentation" class="{{$login-class}}">
+                            <xh:a role="menuitem" href="{{$login-url}}">
+                                Login
                             </xh:a>
                         </xh:li>
 
-                        <!-- Signup -->
+                        <!-- Register -->
                         <xf:var
-                            name="signup-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.signup')"/>
+                            name="register-url"
+                            value="xxf:property('oxf.fr.authentication.user-menu.uri.register')"/>
                         <xf:var
-                            name="signup-class"
+                            name="register-class"
                             value="
-                                if (not($is-signed-in) and $signup-url != '')
+                                if (not($is-logged-in) and $register-url != '')
                                 then ''
                                 else 'xforms-hidden'
                             "/>
-                        <xh:li role="presentation" class="{{$signup-class}}">
-                            <xh:a role="menuitem" href="{{$signup-url}}">
-                                Sign up
+                        <xh:li role="presentation" class="{{$register-class}}">
+                            <xh:a role="menuitem" href="{{$register-url}}">
+                                Register
                             </xh:a>
                         </xh:li>
 

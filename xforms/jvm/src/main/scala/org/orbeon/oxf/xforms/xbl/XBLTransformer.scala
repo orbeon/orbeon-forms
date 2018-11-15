@@ -196,10 +196,6 @@ object XBLTransformer {
           true
         }
 
-      if (processChildren) {
-
-      }
-
       // Handle attribute forwarding
       val xblAttr  = currentElem.attribute(XBLAttrQName)  // standard xbl:attr (custom syntax)
       val xxblAttr = currentElem.attribute(XXBLAttrQName) // extension xxbl:attr (XPath expression)
@@ -326,46 +322,6 @@ object XBLTransformer {
 
       processChildren
     })
-
-        // Prefix resulting xhtml:*/(@id |@for)
-
-        // NOTE: We could also do the prefixing in the handlers, when the page is output.
-        //
-        // - Benefit of prefixing here: done statically
-        // - Drawback of prefixing here: in the future if we try to reuse simple shadow trees this won't work
-
-//                    {
-//                        if (resultingNodes != null && resultingNodes.size() > 0) {
-//                            for (Iterator i = resultingNodes.iterator(); i.hasNext();) {
-//                                final Node node = (Node) i.next();
-//                                if (node instanceof Element) {
-//                                    Dom4jUtils.visitSubtree((Element) node, new Dom4jUtils.VisitorListener() {
-//                                        public void startElement(Element element) {
-//                                            if (XMLConstants.XHTML_NAMESPACE_URI.equals(element.getNamespaceURI())) {
-//                                                // Found XHTML element
-//
-//                                                // Update @id and @for if any
-//                                                final Attribute idAttribute = element.attribute("id");
-//                                                if (idAttribute != null) {
-//                                                    idAttribute.setValue(prefix + idAttribute.getValue());
-//                                                }
-//                                                final Attribute forAttribute = element.attribute("for");
-//                                                if (forAttribute != null) {
-//                                                    forAttribute.setValue(prefix + forAttribute.getValue());
-//                                                }
-//                                            }
-//                                        }
-//
-//                                        public void endElement(Element element) {
-//                                        }
-//
-//                                        public void text(Text text) {
-//                                        }
-//                                    });
-//                                }
-//                            }
-//                        }
-//                    }
     shadowTreeDocument
   }
 }

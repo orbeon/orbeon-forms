@@ -17,6 +17,8 @@ import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.FunSpec
 
+import scala.xml.Elem
+
 class XBLTransformerTest extends FunSpec with XMLSupport {
 
   describe("Conversion of CSS to XPath") {
@@ -42,35 +44,7 @@ class XBLTransformerTest extends FunSpec with XMLSupport {
       }
   }
 
-  describe("Issue #2519") {
-
-    val data = List(
-      (
-        "must copy attribute with simple syntax",
-        <bound bar="baz"/>,
-        <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
-        <root><elem bar="baz"/></root>
-      ),
-      (
-        "must copy attribute with `=` syntax",
-        <bound bar="baz"/>,
-        <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
-        <root><elem bar="baz"/></root>
-      ),
-      (
-        "must keep original attribute with simple syntax",
-        <bound/>,
-        <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
-        <root><elem bar="default"/></root>
-      ),
-      (
-        "must keep original attribute with `=` syntax",
-        <bound/>,
-        <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
-        <root><elem bar="default"/></root>
-      )
-    )
-
+  def assertTransforms(data: List[(String, Elem, Elem, Elem)]): Unit =
     for ((description, bound, shadow, expected) ← data)
       it(description) {
         assertXMLDocumentsIgnoreNamespacesInScope(
@@ -87,5 +61,60 @@ class XBLTransformerTest extends FunSpec with XMLSupport {
           )
         )
       }
+
+  describe("Issue #2519") {
+    assertTransforms(
+      List(
+        (
+          "must copy attribute with simple syntax",
+          <bound bar="baz"/>,
+          <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+          <root><elem bar="baz"/></root>
+        ),
+        (
+          "must copy attribute with `=` syntax",
+          <bound bar="baz"/>,
+          <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+          <root><elem bar="baz"/></root>
+        ),
+        (
+          "must keep original attribute with simple syntax",
+          <bound/>,
+          <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+          <root><elem bar="default"/></root>
+        ),
+        (
+          "must keep original attribute with `=` syntax",
+          <bound/>,
+          <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+          <root><elem bar="default"/></root>
+        )
+      )
+    )
+  }
+
+  describe("`xxbl:use-if-attr` attribute") {
+     assertTransforms(
+      List(
+        (
+          "keep with non-blank attribute",
+          <bound bar="baz"/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"><div id="keep"><span/></div><div id="keep-too" xxbl:use-if-attr="bar"><span/></div></root>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"><div id="keep"><span/></div><div id="keep-too" xxbl:use-if-attr="bar"><span/></div></root>
+        ),
+        (
+          "prune with blank attribute",
+          <bound bar=""/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"><div id="keep"><span/></div><div id="prune" xxbl:use-if-attr="bar"><span/></div></root>,
+          <root><div id="keep"><span/></div></root>
+        ),
+        (
+          "prune with missing attribute",
+          <bound/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"><div id="keep"><span/></div><div id="prune" xxbl:use-if-attr="bar"><span/></div></root>,
+          <root><div id="keep"><span/></div></root>
+        )
+      )
+    )
   }
 }

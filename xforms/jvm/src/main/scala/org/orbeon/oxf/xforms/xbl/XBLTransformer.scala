@@ -38,6 +38,20 @@ object XBLTransformer {
   val XXBLAttrQName      = QName("attr",       XXBL_NAMESPACE)
   val XXBLUseIfAttrQName = QName("use-if-attr", XXBL_NAMESPACE)
 
+  private object DefaultXblSupport extends XBLSupport {
+
+    def keepElement(
+      partAnalysis  : PartAnalysisImpl,
+      boundElement  : Element,
+      directNameOpt : Option[QName],
+      elem          : Element
+    ): Boolean =
+      elem.attributeValueOpt(XXBLUseIfAttrQName) match {
+        case Some(att) ⇒ boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
+        case None      ⇒ true
+      }
+  }
+
   /**
     * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
     *
@@ -182,7 +196,7 @@ object XBLTransformer {
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", null)
           }
           true
-        } else if (currentElem.attributeValueOpt(XXBLUseIfAttrQName) exists (a ⇒ boundElement.attributeValueOpt(a).isEmpty)) {
+        } else if (! DefaultXblSupport.keepElement(partAnalysis, boundElement, directNameOpt, currentElem)) {
           // Skip this element
           currentElem.detach()
           false

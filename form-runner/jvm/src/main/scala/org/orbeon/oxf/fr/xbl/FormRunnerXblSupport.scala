@@ -24,7 +24,7 @@ object FormRunnerXblSupport extends XBLSupport {
 
   private val XXBLUseIfParamQName = QName("use-if-param-non-blank", XMLNames.FRNamespace)
 
-  override def keepElement(
+  def keepElement(
     partAnalysis  : PartAnalysisImpl,
     boundElement  : Element,
     directNameOpt : Option[QName],

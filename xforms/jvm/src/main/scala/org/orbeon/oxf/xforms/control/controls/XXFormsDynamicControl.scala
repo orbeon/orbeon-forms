@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
@@ -226,9 +226,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
           instanceListener,
           changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
           changeListener(recordChanges(findBindChange,                 bindChanges)),
-          unknownChange)
+          unknownChange
         )
-      )
+      ))
     }
 
     InstanceMirror.addListener(outerInstance, outerListener)

@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.junit.Test
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpec
 
-class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
+class XBLTransformerTest extends FunSpec with XMLSupport {
 
-  @Test def testCSSToXPath(): Unit = {
+  describe("Conversion of CSS to XPath") {
 
     val data = List(
       "foo|a"                                     → "descendant-or-self::foo:a",
@@ -38,32 +37,55 @@ class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
     )
 
     for ((css, xpath) ← data)
-      assert(xpath === CSSParser.toXPath(css))
+      it(s"must convert `$css`") {
+        assert(xpath === CSSParser.toXPath(css))
+      }
   }
 
-  @Test def testIssue2519(): Unit = {
+  describe("Issue #2519") {
 
     val data = List(
-      (<bound bar="baz"/>, <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="baz"/></root>),
-      (<bound bar="baz"/>, <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="baz"/></root>),
-      (<bound/>          , <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="default"/></root>),
-      (<bound/>          , <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="default"/></root>)
+      (
+        "must copy attribute with simple syntax",
+        <bound bar="baz"/>,
+        <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+        <root><elem bar="baz"/></root>
+      ),
+      (
+        "must copy attribute with `=` syntax",
+        <bound bar="baz"/>,
+        <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+        <root><elem bar="baz"/></root>
+      ),
+      (
+        "must keep original attribute with simple syntax",
+        <bound/>,
+        <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+        <root><elem bar="default"/></root>
+      ),
+      (
+        "must keep original attribute with `=` syntax",
+        <bound/>,
+        <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>,
+        <root><elem bar="default"/></root>
+      )
     )
 
-    for ((bound, shadow, expected) ← data) {
-      assertXMLDocumentsIgnoreNamespacesInScope(
-        elemToDom4j(expected),
-        XBLTransformer.transform(
-          partAnalysis          = null, // just for tests, we assume it's not going to be used
-          xblSupport            = None,
-          shadowTreeDocument    = elemToDom4j(shadow),
-          boundElement          = elemToDom4jElem(bound),
-          abstractBindingOpt    = None,
-          excludeNestedHandlers = false,
-          excludeNestedLHHA     = false,
-          supportAVTs           = true
+    for ((description, bound, shadow, expected) ← data)
+      it(description) {
+        assertXMLDocumentsIgnoreNamespacesInScope(
+          elemToDom4j(expected),
+          XBLTransformer.transform(
+            partAnalysis          = null, // just for tests, we assume it's not going to be used
+            xblSupport            = None,
+            shadowTreeDocument    = elemToDom4j(shadow),
+            boundElement          = elemToDom4jElem(bound),
+            abstractBindingOpt    = None,
+            excludeNestedHandlers = false,
+            excludeNestedLHHA     = false,
+            supportAVTs           = true
+          )
         )
-      )
-    }
+      }
   }
 }

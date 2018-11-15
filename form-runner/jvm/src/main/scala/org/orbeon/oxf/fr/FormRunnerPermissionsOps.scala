@@ -152,8 +152,8 @@ trait FormRunnerPermissionsOps {
         |!> (w ⇒ wrapperOpt = Some(w))
       )
 
-      val appName  = formEl.elemValue("application-name")
-      val formName = formEl.elemValue("form-name")
+      val appName  = formEl.elemValue(Names.AppName)
+      val formName = formEl.elemValue(Names.FormName)
       val isAdmin  = {
         def canAccessEverything = fbPermissions.contains("*")
         def canAccessAppForm = {

@@ -75,8 +75,8 @@ trait FormRunnerHome {
       val remoteTime = form elemValueOpt "remote-last-modified-time"
 
       Form(
-        form elemValue "application-name",
-        form elemValue "form-name",
+        form elemValue Names.AppName,
+        form elemValue Names.FormName,
         localTime  map (v ⇒ AvailableAndTime((form elemValue "available")        != "false", DateUtils.parseISODateOrDateTime(v))),
         remoteTime map (v ⇒ AvailableAndTime((form elemValue "remote-available") != "false", DateUtils.parseISODateOrDateTime(v))),
         form attTokens "operations"
@@ -92,7 +92,7 @@ trait FormRunnerHome {
     val appFormsSet = selection.splitTo[List]() map appForm toSet
 
     def formIsSelected(form: NodeInfo) =
-      appFormsSet((form elemValue "application-name") → (form elemValue "form-name"))
+      appFormsSet((form elemValue Names.AppName) → (form elemValue Names.FormName))
 
     collectForms(forms, formIsSelected)
   }
@@ -191,7 +191,7 @@ trait FormRunnerHome {
     val combinedIndexIterator = {
 
       def makeAppFormKey(node: NodeInfo) =
-        (node elemValue "application-name", node elemValue "form-name")
+        (node elemValue Names.AppName, node elemValue Names.FormName)
 
       def createIndex(it: SequenceIterator) = asScalaIterator(it) collect {
         case node: NodeInfo ⇒ makeAppFormKey(node) → node
@@ -224,7 +224,7 @@ trait FormRunnerHome {
           localNode
         case (None, Some(remoteNode)) ⇒
           // Don't just use remoteNode, because we need `remote-` prefixes for remote data
-          elementInfo("form", (remoteNode / "application-name" head) :: (remoteNode / "form-name" head) :: remoteElements(remoteNode))
+          elementInfo("form", (remoteNode / Names.AppName head) :: (remoteNode / Names.FormName head) :: remoteElements(remoteNode))
         case (Some(localNode), Some(remoteNode)) ⇒
           insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)
           localNode

@@ -8,31 +8,31 @@ object QName {
   private val namespaceCache  : ju.Map[Namespace, ju.Map[String, QName]] = ju.Collections.synchronizedMap(new ju.WeakHashMap[Namespace, ju.Map[String, QName]]())
 
   // 2017-10-27: 84 usages
-  def apply(name: String): QName = apply(name, Namespace.EmptyNamespace, name)
+  def apply(localName: String): QName = apply(localName, Namespace.EmptyNamespace, localName)
 
   // 2017-10-27: 247 usages
-  def apply(name: String, namespaceOrNull: Namespace): QName = apply(name, namespaceOrNull, null)
+  def apply(localName: String, namespaceOrNull: Namespace): QName = apply(localName, namespaceOrNull, null)
 
   // 2017-10-27: 2 external usage
-  def apply(name: String, namespaceOrNull: Namespace, qualifiedNameOrNull: String): QName = {
+  def apply(localName: String, namespaceOrNull: Namespace, qualifiedNameOrNull: String): QName = {
 
-    require((name ne null) && name.nonEmpty)
+    require((localName ne null) && localName.nonEmpty)
 
     val cache = getOrCreateNamespaceCache(namespaceOrNull)
 
-    var answer = cache.get(name)
+    var answer = cache.get(localName)
 
     if (answer eq null) {
-      answer = applyNormalize(name, namespaceOrNull, qualifiedNameOrNull)
-      cache.put(name, answer)
+      answer = applyNormalize(localName, namespaceOrNull, qualifiedNameOrNull)
+      cache.put(localName, answer)
     }
 
     answer
   }
 
   // 2017-10-27: 17 usages
-  def apply(name: String, prefix: String, uri: String): QName =
-    applyNormalize(name, Namespace(prefix, uri), null)
+  def apply(localName: String, prefix: String, uri: String): QName =
+    applyNormalize(localName, Namespace(prefix, uri), null)
 
   private def getOrCreateNamespaceCache(namespaceOrNull: Namespace): ju.Map[String, QName] = {
     if (namespaceOrNull eq Namespace.EmptyNamespace) { // only one instance of the empty namespace due to cache
@@ -51,22 +51,22 @@ object QName {
   }
 
   private def applyNormalize(
-    name                : String,
+    localName           : String,
     namespaceOrNull     : Namespace, // defaults to `EmptyNamespace`
     qualifiedNameOrNull : String     // if not provided, try to use prefix from namespace to build
   ): QName = {
 
-    require((name ne null) && name.nonEmpty)
+    require((localName ne null) && localName.nonEmpty)
 
     val namespace = if (namespaceOrNull eq null) Namespace.EmptyNamespace else namespaceOrNull
 
     new QName(
-      name,
+      localName,
       namespace,
       if (qualifiedNameOrNull ne null)
         qualifiedNameOrNull
       else
-        if (! namespace.prefix.isEmpty) namespace.prefix + ":" + name else name
+        if (! namespace.prefix.isEmpty) namespace.prefix + ":" + localName else localName
     )
   }
 }

@@ -212,9 +212,11 @@
         <setvalue ref="/*/mode"     matcher-group="3"/>
     </page>
 
-    <!-- Login -->
+    <!-- Login / logout -->
     <page path="/fr/login"       view="login.xhtml"/>
-    <page path="/fr/login-error" view="login-error.xhtml" public-methods="GET HEAD POST"/>
+    <page path="/fr/logout"      view="logout.xhtml"/>
+    <page path="/fr/login-error" view="login-error.xhtml"
+          public-methods="GET HEAD POST"/> <!-- We need ti authorize POST explicitly -->
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

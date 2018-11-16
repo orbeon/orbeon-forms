@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.xbl
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.fr.library.FRComponentParam
 import org.orbeon.oxf.fr.{AppForm, XMLNames}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.xbl.XBLSupport
@@ -58,9 +59,6 @@ object FormRunnerXblSupport extends XBLSupport {
         case None ⇒ true
       }
 
-    import org.orbeon.oxf.util.CollectionUtils._
-    import org.orbeon.oxf.util.CoreUtils._
-
     def isDesignTime =
       partAnalysis.parent.isDefined && (
         partAnalysis.ancestorIterator.lastOption() exists { topLevelPart ⇒
@@ -69,7 +67,7 @@ object FormRunnerXblSupport extends XBLSupport {
           ) contains
             FormBuilderAppName
         }
-      ) kestrel (x ⇒ println(s"xxx isDesignTime = $x"))
+      )
 
     def keepIfDesignTime =
       elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {

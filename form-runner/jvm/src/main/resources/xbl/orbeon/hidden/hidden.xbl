@@ -54,8 +54,6 @@
             <xbl:style src="/xbl/orbeon/hidden/hidden.css"/>
         </xbl:resources>
 
-        <xbl:template>
-            <xh:i class="fa fa-fw fa-eye-slash"/>
-        </xbl:template>
+        <xbl:template><xh:i class="fa fa-fw fa-eye-slash" fr:keep-if-design-time="true"/></xbl:template>
     </xbl:binding>
 </xbl:xbl>

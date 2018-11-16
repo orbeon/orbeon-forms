@@ -16,8 +16,10 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
 import org.orbeon.oxf.xforms.event.EventHandler
 import java.util.{List ⇒ JList}
+
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.dom.Element
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
@@ -26,6 +28,8 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
   def isTopLevel: Boolean
   val parent: Option[PartAnalysis]
+
+  def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance]
 
   def ancestorIterator: Iterator[PartAnalysis]
   def ancestorOrSelfIterator: Iterator[PartAnalysis]

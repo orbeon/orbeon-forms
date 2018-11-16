@@ -14,15 +14,18 @@
 package org.orbeon.oxf.fr.xbl
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.library.FRComponentParam
+import org.orbeon.oxf.fr.{AppForm, XMLNames}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.xbl.XBLSupport
 
 object FormRunnerXblSupport extends XBLSupport {
 
-  private val FRKeepIfParamQName = QName("keep-if-param-non-blank", XMLNames.FRNamespace)
+  private val FRKeepIfParamQName      = QName("keep-if-param-non-blank", XMLNames.FRNamespace)
+  private val FRKeepIfDesignTimeQName = QName("keep-if-design-time",     XMLNames.FRNamespace)
+
+  private val FormBuilderAppName = AppForm("orbeon", "builder")
 
   def keepElement(
     partAnalysis  : PartAnalysisImpl,
@@ -42,16 +45,39 @@ object FormRunnerXblSupport extends XBLSupport {
       ) map
         (_.getStringValue)
 
-    elem.attributeValueOpt(FRKeepIfParamQName) match {
-      case Some(att) ⇒
+    def keepIfParamNonBlank =
+      elem.attributeValueOpt(FRKeepIfParamQName) match {
+        case Some(att) ⇒
 
-        val paramName = QName(att)
+          val paramName = QName(att)
 
-        fromAttribute(paramName)               orElse
-          fromMetadataAndProperties(paramName) exists
-          (_.nonBlank)
+          fromAttribute(paramName)               orElse
+            fromMetadataAndProperties(paramName) exists
+            (_.nonBlank)
 
-      case None ⇒ true
-    }
+        case None ⇒ true
+      }
+
+    import org.orbeon.oxf.util.CollectionUtils._
+    import org.orbeon.oxf.util.CoreUtils._
+
+    def isDesignTime =
+      partAnalysis.parent.isDefined && (
+        partAnalysis.ancestorIterator.lastOption() exists { topLevelPart ⇒
+          FRComponentParam.appFormFromMetadata(
+            FRComponentParam.findConstantMetadataRootElem(topLevelPart)
+          ) contains
+            FormBuilderAppName
+        }
+      ) kestrel (x ⇒ println(s"xxx isDesignTime = $x"))
+
+    def keepIfDesignTime =
+      elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {
+        case Some("true")  ⇒ isDesignTime
+        case Some("false") ⇒ ! isDesignTime
+        case _             ⇒ true
+      }
+
+    ! (! keepIfParamNonBlank || ! keepIfDesignTime)
   }
 }

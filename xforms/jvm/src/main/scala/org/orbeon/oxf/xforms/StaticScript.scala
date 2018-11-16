@@ -68,14 +68,14 @@ object StaticScript {
 
   private val TypeExtractor = "(?:(?:text|application)/)?([a-z]+)".r
 
-  def scriptTypeFromMediatype(mediatype: String, default: Option[ScriptType]) = mediatype match {
+  def scriptTypeFromMediatype(mediatype: String, default: Option[ScriptType]): Option[ScriptType] = mediatype match {
     case null                        ⇒ default
     case TypeExtractor("javascript") ⇒ Some(JavaScriptScriptType)
     case TypeExtractor("xpath")      ⇒ Some(XPathScriptType)
     case _                           ⇒ None
   }
 
-  def scriptTypeFromElem(elem: ElementAnalysis, default: Option[ScriptType]) =
+  def scriptTypeFromElem(elem: ElementAnalysis, default: Option[ScriptType]): Option[ScriptType] =
     scriptTypeFromMediatype(elem.element.attributeValue("type"), default)
 }
 

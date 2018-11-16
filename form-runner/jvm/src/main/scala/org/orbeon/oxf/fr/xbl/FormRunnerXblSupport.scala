@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.xbl.XBLSupport
 
 object FormRunnerXblSupport extends XBLSupport {
 
-  private val XXBLUseIfParamQName = QName("use-if-param-non-blank", XMLNames.FRNamespace)
+  private val FRKeepIfParamQName = QName("keep-if-param-non-blank", XMLNames.FRNamespace)
 
   def keepElement(
     partAnalysis  : PartAnalysisImpl,
@@ -42,7 +42,7 @@ object FormRunnerXblSupport extends XBLSupport {
       ) map
         (_.getStringValue)
 
-    elem.attributeValueOpt(XXBLUseIfParamQName) match {
+    elem.attributeValueOpt(FRKeepIfParamQName) match {
       case Some(att) ⇒
 
         val paramName = QName(att)

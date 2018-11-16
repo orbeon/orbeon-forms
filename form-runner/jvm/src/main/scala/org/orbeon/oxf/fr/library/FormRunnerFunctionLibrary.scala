@@ -324,13 +324,11 @@ private object FormRunnerFunctions {
           )
 
         def fromMetadataAndProperties =
-          FRComponentParam.findConstantMetadataRootElem(staticControl.part) flatMap { constantMetadataRootElem ⇒
-            FRComponentParam.fromMetadataAndProperties(
-              constantMetadataRootElem = constantMetadataRootElem,
-              directNameOpt            = staticControl.abstractBinding.directName,
-              paramName                = paramName
-            )
-          }
+          FRComponentParam.fromMetadataAndProperties(
+            constantMetadataRootElemOpt = FRComponentParam.findConstantMetadataRootElem(staticControl.part),
+            directNameOpt               = staticControl.abstractBinding.directName,
+            paramName                   = paramName
+          )
 
         fromAttributes orElse fromMetadataAndProperties
 
@@ -384,22 +382,24 @@ object FRComponentParam {
       paramElem.getStringValue
 
   def fromMetadataAndProperties(
-    constantMetadataRootElem : NodeInfo,
-    directNameOpt            : Option[QName],
-    paramName                : QName
+    constantMetadataRootElemOpt : Option[NodeInfo],
+    directNameOpt               : Option[QName],
+    paramName                   : QName
   ): Option[AtomicValue] = {
 
     // Instead of using `FormRunnerParams()`, we use the form definition metadata.
     // This also allows support of the edited form in Form Builder.
     def appFormFromMetadata =
       for {
-        appName  ← constantMetadataRootElem elemValueOpt Names.AppName
-        formName ← constantMetadataRootElem elemValueOpt Names.FormName
+        constantMetadataRootElem ← constantMetadataRootElemOpt
+        appName                  ← constantMetadataRootElem elemValueOpt Names.AppName
+        formName                 ← constantMetadataRootElem elemValueOpt Names.FormName
       } yield
         AppForm(appName, formName)
 
     def fromMetadataInstance: Option[StringValue] =
-      findHierarchicalElem(directNameOpt, paramName, constantMetadataRootElem) map
+      constantMetadataRootElemOpt                           flatMap
+        (findHierarchicalElem(directNameOpt, paramName, _)) map
         (new StringValue(_))
 
     def fromPropertiesWithSuffix: Option[AtomicValue] =

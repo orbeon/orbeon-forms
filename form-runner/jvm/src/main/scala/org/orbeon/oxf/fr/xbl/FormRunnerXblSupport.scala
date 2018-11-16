@@ -35,11 +35,12 @@ object FormRunnerXblSupport extends XBLSupport {
       boundElement.attributeValueOpt(paramName)
 
     def fromMetadataAndProperties(paramName: QName) =
-      for {
-        metadata ← FRComponentParam.findConstantMetadataRootElem(partAnalysis)
-        value    ← FRComponentParam.fromMetadataAndProperties(metadata, directNameOpt, paramName)
-      } yield
-        value.getStringValue
+      FRComponentParam.fromMetadataAndProperties(
+        constantMetadataRootElemOpt = FRComponentParam.findConstantMetadataRootElem(partAnalysis),
+        directNameOpt               = directNameOpt,
+        paramName                   = paramName
+      ) map
+        (_.getStringValue)
 
     elem.attributeValueOpt(XXBLUseIfParamQName) match {
       case Some(att) ⇒

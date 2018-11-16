@@ -732,7 +732,10 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                    <xf:model
+                        id="model"
+                        xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
+                        xxf:xbl-support="org.orbeon.oxf.fr.xbl.FormRunnerXblSupport">
                         <xf:instance id="instance">
                             <instance>
                                 <currency>12.34</currency>

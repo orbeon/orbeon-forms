@@ -216,7 +216,7 @@
     <page path="/fr/login"       view="login.xhtml"/>
     <page path="/fr/logout"      view="logout.xhtml"/>
     <page path="/fr/login-error" view="login-error.xhtml"
-          public-methods="GET HEAD POST"/> <!-- We need ti authorize POST explicitly -->
+          public-methods="GET HEAD POST"/> <!-- We need to authorize `POST` explicitly -->
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

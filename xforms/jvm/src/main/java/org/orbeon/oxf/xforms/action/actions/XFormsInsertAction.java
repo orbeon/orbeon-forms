@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.orbeon.dom.*;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
@@ -27,10 +28,11 @@ import org.orbeon.oxf.xforms.model.FlaggedDefaultsStrategy$;
 import org.orbeon.oxf.xforms.model.InstanceDataOps;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.dom.saxon.DocumentWrapper;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.om.AxisIterator;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.ArrayList;
@@ -510,7 +512,7 @@ public class XFormsInsertAction extends XFormsAction {
                 adjustedInsertLocationNodeInfo = parent.getDocumentRoot();
                 adjustedBeforeAfterInto = "into";
             } else {
-                adjustedInsertLocationNodeInfo = rewrapIfNeeded(insertLocationNodeInfo);
+                adjustedInsertLocationNodeInfo = insertLocationNodeInfo;
                 adjustedBeforeAfterInto = beforeAfterInto;
             }
 
@@ -531,20 +533,7 @@ public class XFormsInsertAction extends XFormsAction {
     }
 
     private static int findNodeIndexRewrapIfNeeded(NodeInfo node) {
-        return findNodeIndex(rewrapIfNeeded(node));
-    }
-
-    // See https://github.com/orbeon/orbeon-forms/issues/2803
-    private static NodeInfo rewrapIfNeeded(NodeInfo node) {
-        if (node instanceof VirtualNode) {
-            final DocumentWrapper doc = (DocumentWrapper) node.getDocumentRoot();
-            final Object underlying = ((VirtualNode) node).getUnderlyingNode();
-            if (doc != null)
-                return doc.wrap((Node) underlying);
-            else
-                return DocumentWrapper.makeWrapper((Node) underlying); // unclear whether NodeWrappers are created with a null doc, but if so rewrapping this way should be ok
-        } else
-            return node;
+        return findNodeIndex(node);
     }
 
     private static int findNodeIndex(NodeInfo node) {

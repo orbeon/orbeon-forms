@@ -20,10 +20,10 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
@@ -41,7 +41,7 @@ object XBLTransformer {
   private object DefaultXblSupport extends XBLSupport {
 
     def keepElement(
-      partAnalysis  : PartAnalysisImpl,
+      partAnalysis  : PartAnalysis,
       boundElement  : Element,
       directNameOpt : Option[QName],
       elem          : Element

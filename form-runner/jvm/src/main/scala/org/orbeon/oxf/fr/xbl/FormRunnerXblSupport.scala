@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.library.FRComponentParam
 import org.orbeon.oxf.fr.{AppForm, XMLNames}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
+import org.orbeon.oxf.xforms.PartAnalysis
 import org.orbeon.oxf.xforms.xbl.XBLSupport
 
 object FormRunnerXblSupport extends XBLSupport {
@@ -29,7 +29,7 @@ object FormRunnerXblSupport extends XBLSupport {
   private val FormBuilderAppName = AppForm("orbeon", "builder")
 
   def keepElement(
-    partAnalysis  : PartAnalysisImpl,
+    partAnalysis  : PartAnalysis,
     boundElement  : Element,
     directNameOpt : Option[QName],
     elem          : Element

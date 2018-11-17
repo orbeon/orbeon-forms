@@ -14,7 +14,7 @@ public class TypedDocumentWrapper extends org.orbeon.dom.saxon.DocumentWrapper {
     }
 
     @Override
-    protected org.orbeon.dom.saxon.NodeWrapper makeWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
-        return TypedNodeWrapper.makeTypedWrapper(node, docWrapper, parent, index);
+    protected org.orbeon.dom.saxon.NodeWrapper makeWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent) {
+        return TypedNodeWrapper.makeTypedWrapper(node, docWrapper, parent);
     }
 }

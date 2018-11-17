@@ -33,7 +33,7 @@ public class DocumentWrapper extends org.orbeon.dom.saxon.NodeWrapper implements
     private IdGetter idGetter;
 
     public DocumentWrapper(Document doc, String baseURI, Configuration config) {
-        super(doc, null, 0);
+        super(doc, null);
 
         this.baseURI = baseURI;
 
@@ -53,7 +53,7 @@ public class DocumentWrapper extends org.orbeon.dom.saxon.NodeWrapper implements
      */
     public static NodeInfo makeWrapper(Node node) {
         assert (node.getDocument() == null);
-        return makeWrapperImpl(node, null, null, -1);
+        return makeWrapperImpl(node, null, null);
     }
 
     public int getDocumentNumber() {

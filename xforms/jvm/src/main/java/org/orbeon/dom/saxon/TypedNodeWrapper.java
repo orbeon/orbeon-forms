@@ -33,20 +33,20 @@ import org.orbeon.saxon.value.Value;
  */
 public class TypedNodeWrapper extends org.orbeon.dom.saxon.NodeWrapper {
 
-    private TypedNodeWrapper(Node node, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
-        super(node, parent, index);
+    private TypedNodeWrapper(Node node, org.orbeon.dom.saxon.NodeWrapper parent) {
+        super(node, parent);
     }
 
     @Override
-    protected org.orbeon.dom.saxon.NodeWrapper makeWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
-        return makeTypedWrapper(node, docWrapper, parent, index);
+    protected org.orbeon.dom.saxon.NodeWrapper makeWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent) {
+        return makeTypedWrapper(node, docWrapper, parent);
     }
 
-    static org.orbeon.dom.saxon.NodeWrapper makeTypedWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
+    static org.orbeon.dom.saxon.NodeWrapper makeTypedWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent) {
         if (node instanceof Document) {
             return docWrapper;
         } else {
-            final org.orbeon.dom.saxon.NodeWrapper wrapper = new TypedNodeWrapper(node, parent, index);
+            final org.orbeon.dom.saxon.NodeWrapper wrapper = new TypedNodeWrapper(node, parent);
             wrapper.docWrapper = docWrapper;
             return wrapper;
         }

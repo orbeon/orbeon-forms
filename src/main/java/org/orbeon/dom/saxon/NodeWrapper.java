@@ -32,8 +32,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     protected Node node;
     private NodeWrapper parent;     // null means unknown
     DocumentWrapper docWrapper;
-    // Beware: this is an index over the result of content(), which may contain Namespace nodes
-    protected int index;            // -1 means unknown
 
     /**
      * This constructor is protected: nodes should be created using the wrap
@@ -41,12 +39,10 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      *
      * @param node   The node to be wrapped
      * @param parent The NodeWrapper that wraps the parent of this node
-     * @param index  Position of this node among its siblings
      */
-    protected NodeWrapper(Node node, NodeWrapper parent, int index) {
+    protected NodeWrapper(Node node, NodeWrapper parent) {
         this.node = node;
         this.parent = parent;
-        this.index = index;
     }
 
     /**
@@ -58,7 +54,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      * @return The new wrapper for the supplied node
      */
     NodeWrapper makeWrapper(Node node, DocumentWrapper docWrapper) {
-        return makeWrapper(node, docWrapper, null, -1);
+        return makeWrapper(node, docWrapper, null);
     }
 
     /**
@@ -68,18 +64,17 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      * @param node       The node
      * @param docWrapper The wrapper for the Document containing this node
      * @param parent     The wrapper for the parent of the node
-     * @param index      The position of this node relative to its siblings
      * @return The new wrapper for the supplied node
      */
-    protected NodeWrapper makeWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
-        return makeWrapperImpl(node, docWrapper, parent, index);
+    protected NodeWrapper makeWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent) {
+        return makeWrapperImpl(node, docWrapper, parent);
     }
 
-    static NodeWrapper makeWrapperImpl(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
+    static NodeWrapper makeWrapperImpl(Node node, DocumentWrapper docWrapper, NodeWrapper parent) {
         if (node instanceof Document) {
             return docWrapper;
         } else {
-            final NodeWrapper wrapper = new NodeWrapper(node, parent, index);
+            final NodeWrapper wrapper = new NodeWrapper(node, parent);
             wrapper.docWrapper = docWrapper;
             return wrapper;
         }
@@ -283,66 +278,64 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         return parent;
     }
 
+    private int getSiblingPositionForIterator(AxisIterator iter) {
+        int ix = 0;
+        while (true) {
+            NodeInfo n = (NodeInfo) iter.next();
+            if (n == null) {
+                break;
+            }
+            if (n.isSameNodeInfo(this)) {
+                return ix;
+            }
+            ix++;
+        }
+        throw new IllegalStateException("DOM node not linked to parent node");
+    }
+
     // Get the index position of this node among its siblings (starting from 0)
     public int getSiblingPosition() {
-        if (index == -1) {
-            int ix = 0;
-            getParent();
-            AxisIterator iter;
-            switch (getNodeKind()) {
-                case Type.ELEMENT:
-                case Type.TEXT:
-                case Type.COMMENT:
-                case Type.PROCESSING_INSTRUCTION: {
-                    final NodeWrapper parent = (NodeWrapper) getParent();
-                    final List<Node> children;
-                    if (parent.getNodeKind() == Type.DOCUMENT) {
-                        // This is an attempt to work around a DOM4J bug
-                        // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
-                        final Document document = (Document) parent.node;
-                        final List<Node> content = document.content();
-                        if (content.size() == 0 && document.getRootElement() != null)
-                            children = Collections.<Node>singletonList(document.getRootElement());
-                        else
-                            children = content;
-                    } else {
-                        // Beware: content() contains Namespace nodes (which is broken)!
-                        children = ((Element) parent.node).content();
+        final NodeWrapper parent = (NodeWrapper) getParent();
+        switch (getNodeKind()) {
+            case Type.ELEMENT:
+            case Type.TEXT:
+            case Type.COMMENT:
+            case Type.PROCESSING_INSTRUCTION: {
+                final List<Node> children;
+                if (parent.getNodeKind() == Type.DOCUMENT) {
+                    // This is an attempt to work around a DOM4J bug
+                    // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
+                    // TODO: This logic is also duplicated in this file.
+                    final Document document = (Document) parent.node;
+                    final List<Node> content = document.content();
+                    if (content.size() == 0 && document.getRootElement() != null)
+                        children = Collections.<Node>singletonList(document.getRootElement());
+                    else
+                        children = content;
+                } else {
+                    // Beware: content() contains Namespace nodes (which is broken)!
+                    children = ((Element) parent.node).content();
+                }
+                int ix = 0;
+                for (ListIterator iterator = children.listIterator(); iterator.hasNext(); ) {
+                    final Object n = iterator.next();
+                    if (n == node) {
+                        return ix;
                     }
-                    for (ListIterator iterator = children.listIterator(); iterator.hasNext(); ) {
-                        final Object n = iterator.next();
-                        if (n == node) {
-                            index = ix;
-                            return index;
-                        }
-                        ix++;
-                    }
-                    throw new IllegalStateException("DOM node not linked to parent node");
+                    ix++;
                 }
-                case Type.ATTRIBUTE:
-                    iter = parent.iterateAxis(Axis.ATTRIBUTE);
-                    break;
-                case Type.NAMESPACE:
-                    iter = parent.iterateAxis(Axis.NAMESPACE);
-                    break;
-                default:
-                    index = 0;
-                    return index;
+                throw new IllegalStateException("DOM node not linked to parent node");
             }
-            while (true) {
-                NodeInfo n = (NodeInfo) iter.next();
-                if (n == null) {
-                    break;
-                }
-                if (n.isSameNodeInfo(this)) {
-                    index = ix;
-                    return index;
-                }
-                ix++;
-            }
-            throw new IllegalStateException("DOM node not linked to parent node");
+            case Type.ATTRIBUTE:
+                return getSiblingPositionForIterator(parent.iterateAxis(Axis.ATTRIBUTE));
+            case Type.NAMESPACE:
+                return getSiblingPositionForIterator(parent.iterateAxis(Axis.NAMESPACE));
+            case Type.DOCUMENT:
+                return 0;
+            default:
+                // Should probably not happen, right?
+                return 0;
         }
-        return index;
     }
 
     public AxisIterator iterateAxis(byte axisNumber) {
@@ -535,7 +528,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     private final class AttributeEnumeration extends Navigator.BaseEnumeration {
 
         private Iterator<Attribute> atts;
-        private int ix = 0;
         private NodeWrapper start;
 
         AttributeEnumeration(NodeWrapper start) {
@@ -545,7 +537,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
         public void advance() {
             if (atts.hasNext()) {
-                current = makeWrapper(atts.next(), docWrapper, start, ix++);
+                current = makeWrapper(atts.next(), docWrapper, start);
             } else {
                 current = null;
             }
@@ -561,7 +553,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
         private HashMap<String, Namespace> nslist = new HashMap<String, Namespace>();
         private Iterator<String> prefixes;
-        private int ix = 0;
         private NodeWrapper start;
 
         NamespaceEnumeration(NodeWrapper start) {
@@ -601,7 +592,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             if (prefixes.hasNext()) {
                 final String prefix = prefixes.next();
                 final Namespace ns = nslist.get(prefix);
-                current = makeWrapper(ns, docWrapper, start, ix++);
+                current = makeWrapper(ns, docWrapper, start);
             } else {
                 current = null;
             }
@@ -645,6 +636,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             if (commonParent.getNodeKind() == Type.DOCUMENT) {
                 // This is an attempt to work around a DOM4J bug
                 // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
+                // TODO: This logic is also duplicated in this file.
                 final Document document = (Document) commonParent.node;
                 final List<Node> content = document.content();
                 if (content.size() == 0 && document.getRootElement() != null)
@@ -693,7 +685,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 //                        if (isAtomizing()) {
 //                            current = new UntypedAtomicValue(getStringValue(node));
 //                        } else {
-                    current = makeWrapper(nextChild, docWrapper, commonParent, ix++);
+                    current = makeWrapper(nextChild, docWrapper, commonParent);
 //                        }
                 } else {
                     current = null;
@@ -709,7 +701,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 //                        if (isAtomizing()) {
 //                            current = new UntypedAtomicValue(getStringValue(node));
 //                        } else {
-                    current = makeWrapper(nextChild, docWrapper, commonParent, ix--);
+                    current = makeWrapper(nextChild, docWrapper, commonParent);
 //                        }
                 } else {
                     current = null;

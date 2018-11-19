@@ -325,7 +325,7 @@ class ConcreteElement(var qname: QName)
           val attributeLocalName = attributes.getLocalName(0)
           val attributeValue = attributes.getValue(0)
           val attributeQName = namespaceStack.getAttributeQName(attributeURI, attributeLocalName, name)
-          add(DocumentFactory.createAttribute(this, attributeQName, attributeValue))
+          add(DocumentFactory.createAttribute(attributeQName, attributeValue))
         }
       } else {
         val list = _attributes
@@ -339,7 +339,7 @@ class ConcreteElement(var qname: QName)
             val attributeLocalName = attributes.getLocalName(i)
             val attributeValue = attributes.getValue(i)
             val attributeQName = namespaceStack.getAttributeQName(attributeURI, attributeLocalName, attributeName)
-            val attribute = DocumentFactory.createAttribute(this, attributeQName, attributeValue)
+            val attribute = DocumentFactory.createAttribute(attributeQName, attributeValue)
             list.add(attribute)
             childAdded(attribute)
           }
@@ -419,7 +419,7 @@ class ConcreteElement(var qname: QName)
   def addAttribute(name: String, value: String): Element = {
     val att = attribute(name)
     if (att eq null) {
-      add(DocumentFactory.createAttribute(this, name, value))
+      add(DocumentFactory.createAttribute(name, value))
     } else {
       att.setValue(value)
     }
@@ -429,7 +429,7 @@ class ConcreteElement(var qname: QName)
   def addAttribute(qName: QName, value: String): Element = {
     val att = attribute(qName)
     if (att eq null) {
-      add(DocumentFactory.createAttribute(this, qName, value))
+      add(DocumentFactory.createAttribute(qName, value))
     } else {
       att.setValue(value)
     }

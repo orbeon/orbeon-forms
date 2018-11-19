@@ -553,7 +553,6 @@ public class XFormsUtils {
             return (Node) ((VirtualNode) nodeInfo).getUnderlyingNode();
         else if (nodeInfo.getNodeKind() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
             return DocumentFactory.createAttribute(
-                null,
                 QName.apply(nodeInfo.getLocalPart(), Namespace$.MODULE$.apply(nodeInfo.getPrefix(), nodeInfo.getURI())),
                 nodeInfo.getStringValue()
             );

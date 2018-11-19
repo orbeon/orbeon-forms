@@ -36,7 +36,7 @@ object NodeInfoFactory {
   }
 
   def attributeInfo(name: QName, value: String = ""): NodeInfo =
-    Wrapper.wrap(DocumentFactory.createAttribute(null, name, value))
+    Wrapper.wrap(DocumentFactory.createAttribute(name, value))
 
   def namespaceInfo(prefix: String, uri: String): NodeInfo =
     Wrapper.wrap(Namespace(prefix, uri))

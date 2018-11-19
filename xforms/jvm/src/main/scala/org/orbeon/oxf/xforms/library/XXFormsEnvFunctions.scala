@@ -178,6 +178,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE) // `map(*)`
     )
 
+    Fun("resource-elements", classOf[XXFormsResourceElem], op = 0, min = 1, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+
     Fun("pending-uploads", classOf[XXFormsPendingUploads], op = 0, min = 0, INTEGER, EXACTLY_ONE)
 
     Fun("document-id", classOf[XXFormsDocumentId], op = 0, min = 0, STRING, EXACTLY_ONE)

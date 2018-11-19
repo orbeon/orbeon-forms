@@ -15,12 +15,11 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.{AxisExpression, PathMap, StringLiteral, XPathContext}
+import org.orbeon.saxon.expr._
 import org.orbeon.saxon.function.ProcessTemplate
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.NameTest
@@ -48,11 +47,6 @@ class XXFormsResource extends XFormsFunction {
     }
 
     def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
-
-    def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String) = {
-      val availableLangs = resourcesElement / "resource" /@ "lang"
-      availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
-    }
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
@@ -85,56 +79,12 @@ class XXFormsResource extends XFormsFunction {
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
 
-    // Only support dependencies if we can figure out the resource path statically
-    // In theory, we could also support the case where we don't know the path, and assume that any change to the
-    // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case
-    // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
-    // function must work in either case, readonly and readwrite.
-    val resourcePath = arguments.head match {
-      case s: StringLiteral ⇒
-        flattenResourceName(s.getStringValue) // this removes the indexes if any
-      case _ ⇒
-        pathMap.setInvalidated(true)
-        return null
-    }
-
-    // Dependency on language
-    XXFormsLang.addXMLLangDependency(pathMap)
-    if (pathMap.isInvalidated)
-      return null
-
-    // Dependency on all arguments
-    arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))
-
-    val namePool = getExecutable.getConfiguration.getNamePool
-
-    // Add dependency as if on instance('my-instance-name')
-    def addInstanceDependency(name: String) = {
-
-      def newInstanceExpression = {
-        val instanceExpression = new Instance
-
-        instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
-        instanceExpression.setArguments(Array(new StringLiteral(name)))
-
-        instanceExpression
-      }
-
-      // Start with new instance() root
-      var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
-
-      // Add path elements to pathmap
-      "resource" :: resourcePath foreach { name ⇒
-        val test = new NameTest(Type.ELEMENT, "", name, namePool)
-        target = new AxisExpression(Axis.CHILD, test).addToPathMap(pathMap, target)
-      }
-
-      // The result is used as an atomic value
-      target.setAtomized()
-    }
-
-    addInstanceDependency("orbeon-resources")
-    addInstanceDependency("fr-form-resources")
+    updatePathMap(
+      getExecutable.getConfiguration.getNamePool,
+      arguments,
+      pathMap,
+      pathMapNodeSet
+    )
 
     // We return an atomic value
     null
@@ -180,5 +130,70 @@ object XXFormsResource {
         }
 
       findChild(List(context), tokens)
+  }
+
+  def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String): Option[NodeInfo] = {
+    val availableLangs = resourcesElement / "resource" /@ "lang"
+    availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
+  }
+
+  def updatePathMap(
+    namePool       : NamePool,
+    arguments      : Seq[Expression],
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMap.PathMapNodeSet
+  ): PathMap.PathMapNodeSet = {
+
+    // Only support dependencies if we can figure out the resource path statically
+    // In theory, we could also support the case where we don't know the path, and assume that any change to the
+    // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case
+    // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
+    // function must work in either case, readonly and readwrite.
+    val resourcePath = arguments.head match {
+      case s: StringLiteral ⇒
+        flattenResourceName(s.getStringValue) // this removes the indexes if any
+      case _ ⇒
+        pathMap.setInvalidated(true)
+        return null
+    }
+
+    // Dependency on language
+    XXFormsLang.addXMLLangDependency(pathMap)
+    if (pathMap.isInvalidated)
+      return null
+
+    // Dependency on all arguments
+    arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))
+
+    // Add dependency as if on instance('my-instance-name')
+    def addInstanceDependency(name: String): Unit = {
+
+      def newInstanceExpression = {
+        val instanceExpression = new Instance
+
+        instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
+        instanceExpression.setArguments(Array(new StringLiteral(name)))
+
+        instanceExpression
+      }
+
+      // Start with new instance() root
+      var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
+
+      // Add path elements to pathmap
+      "resource" :: resourcePath foreach { name ⇒
+        val test = new NameTest(Type.ELEMENT, "", name, namePool)
+        target = new AxisExpression(Axis.CHILD, test).addToPathMap(pathMap, target)
+      }
+
+      // The result is used as an atomic value
+      target.setAtomized()
+    }
+
+    addInstanceDependency("orbeon-resources")
+    addInstanceDependency("fr-form-resources")
+
+    // We return an atomic value
+    null
   }
 }

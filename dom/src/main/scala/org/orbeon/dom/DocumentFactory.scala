@@ -2,6 +2,7 @@ package org.orbeon.dom
 
 import org.orbeon.dom.tree._
 
+// NOTE: Should move this as `apply` functions to companion objects of `Document`, `Element`, etc.
 object DocumentFactory {
 
   def createDocument                                            : Document              = new ConcreteDocument

@@ -82,10 +82,12 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
     branchContent.removeAll(c)
   }
 
+  // Operations which don't mutate the content
+
   def size: Int = branchContent.size
 
-  override def isEmpty = branchContent.isEmpty
-  override def contains(o: AnyRef) = branchContent.contains(o)
+  override def isEmpty: Boolean = branchContent.isEmpty
+  override def contains(o: AnyRef): Boolean = branchContent.contains(o)
 
   override def toArray: Array[AnyRef] = branchContent.toArray()
 

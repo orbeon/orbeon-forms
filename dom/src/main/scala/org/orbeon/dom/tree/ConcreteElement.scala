@@ -467,13 +467,13 @@ class ConcreteElement(var qname: QName)
     } else {
       namespace = getNamespaceForPrefix("")
     }
-    var node: Element = null
-    if (namespace ne null) {
-      val qname = QName(localName, namespace)
-      node = DocumentFactory.createElement(qname)
-    } else {
-      node = DocumentFactory.createElement(name)
-    }
+    val node =
+      if (namespace ne null) {
+        val qname = QName(localName, namespace)
+        DocumentFactory.createElement(qname)
+      } else {
+        DocumentFactory.createElement(name)
+      }
     addNewNode(node)
     node
   }

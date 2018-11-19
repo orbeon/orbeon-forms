@@ -22,7 +22,7 @@ class DOMTest extends FunSpec {
   val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
   val XF = Namespace("xf", "http://www.w3.org/2002/xforms")
 
-  def newRootElem = {
+  private def newRootElem = {
     val doc = DocumentFactory.createDocument("root")
 
     val rootElem = doc.getRootElement

@@ -45,13 +45,13 @@ trait Branch extends Node {
 
   /**
    * Adds a new `Element` node with the given name to this branch
-   * and returns a reference to the new node.
+   * and returns a reference to the new element.
    */
   def addElement(name: String): Element
 
   /**
    * Adds a new `Element` node with the given to
-   * this branch and returns a reference to the new node.
+   * this branch and returns a reference to the new element.
    */
   def addElement(qname: QName): Element
 

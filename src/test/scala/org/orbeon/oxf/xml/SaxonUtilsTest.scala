@@ -13,32 +13,43 @@
  */
 package org.orbeon.oxf.xml
 
-import org.junit.Test
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpec
 
-class SaxonUtilsTest extends AssertionsForJUnit {
+class SaxonUtilsTest extends FunSpec {
 
-  @Test def makeNCName(): Unit = {
+  describe("The `makeNCName` function") {
 
-    intercept[IllegalArgumentException] {
-      SaxonUtils.makeNCName("", keepFirstIfPossible = true)
+    it("must not allow an empty name") {
+      intercept[IllegalArgumentException] {
+        SaxonUtils.makeNCName("", keepFirstIfPossible = true)
+      }
     }
 
-    intercept[IllegalArgumentException] {
-      SaxonUtils.makeNCName("  ", keepFirstIfPossible = true)
+    it("must not allow a blank name") {
+      intercept[IllegalArgumentException] {
+        SaxonUtils.makeNCName("  ", keepFirstIfPossible = true)
+      }
     }
 
-    assert("foo"      === SaxonUtils.makeNCName("foo",      keepFirstIfPossible = true))
-    assert("_foo_"    === SaxonUtils.makeNCName(" foo ",    keepFirstIfPossible = true))
-    assert("_42foos"  === SaxonUtils.makeNCName("42foos",   keepFirstIfPossible = true))
-    assert("_2foos"   === SaxonUtils.makeNCName("42foos",   keepFirstIfPossible = false))
-    assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)", keepFirstIfPossible = true))
+    val expected =
+      List(
+        ("foo"     , "foo",      true),
+        ("_foo_"   , " foo ",    true),
+        ("_42foos" , "42foos",   true),
+        ("_2foos"  , "42foos",   false),
+        ("foo_bar_", "foo(bar)", true)
+      )
+
+    for ((out, in, keepFirstIfPossible) ← expected)
+      it(s"must convert `$in` with `keepFirstIfPossible = $keepFirstIfPossible`") {
+        assert(out === SaxonUtils.makeNCName(in, keepFirstIfPossible))
+      }
   }
 
-  @Test def testBuildNodePathHandleNamespaces(): Unit = {
+  describe("The `buildNodePath` function") {
 
     val doc: NodeInfo =
       <xh:html
@@ -80,14 +91,22 @@ class SaxonUtilsTest extends AssertionsForJUnit {
         </xh:body>
     </xh:html>
 
-    val expected = List[(NodeInfo, List[String])](
-      doc.root →
-        Nil,
-      doc.rootElement →
+    val expected = List[(String, NodeInfo, List[String])](
+      (
+        "root node",
+        doc.root,
+        Nil
+      ),
+      (
+        "root element",
+        doc.rootElement,
         List(
           "*:html[namespace-uri() = 'http://www.w3.org/1999/xhtml']"
-        ),
-      (doc descendant "*:label" head) →
+        )
+      ),
+      (
+        "first `*:label` element",
+        doc descendant "*:label" head,
         List(
           "*:html[namespace-uri() = 'http://www.w3.org/1999/xhtml']",
           "*:head[namespace-uri() = 'http://www.w3.org/1999/xhtml'][1]",
@@ -95,8 +114,11 @@ class SaxonUtilsTest extends AssertionsForJUnit {
           "*:instance[namespace-uri() = 'http://www.w3.org/2002/xforms'][1]",
           "*:databound-select1[namespace-uri() = 'http://orbeon.org/oxf/xml/form-runner'][1]",
           "*:label[namespace-uri() = 'http://www.w3.org/2002/xforms'][1]"
-        ),
-      (doc descendant * att "appearance" head) →
+        )
+      ),
+      (
+        "first `appearance` attribute",
+        doc descendant * att "appearance" head,
         List(
           "*:html[namespace-uri() = 'http://www.w3.org/1999/xhtml']",
           "*:head[namespace-uri() = 'http://www.w3.org/1999/xhtml'][1]",
@@ -104,16 +126,22 @@ class SaxonUtilsTest extends AssertionsForJUnit {
           "*:instance[namespace-uri() = 'http://www.w3.org/2002/xforms'][1]",
           "*:databound-select1[namespace-uri() = 'http://orbeon.org/oxf/xml/form-runner'][1]",
           "@appearance"
-        ),
-      (doc descendant "*:input" apply 3) →
+        )
+      ),
+      (
+        "`*:input` element at index 3",
+        doc descendant "*:input" apply 3,
         List(
           "*:html[namespace-uri() = 'http://www.w3.org/1999/xhtml']",
           "*:body[namespace-uri() = 'http://www.w3.org/1999/xhtml'][1]",
           "*:input[namespace-uri() = 'http://www.w3.org/2002/xforms'][4]"
         )
+      )
     )
 
-    for ((node, path) ← expected)
-      assert(path === SaxonUtils.buildNodePath(node))
+    for ((description, node, path) ← expected)
+      it(description) {
+        assert(path === SaxonUtils.buildNodePath(node))
+      }
   }
 }

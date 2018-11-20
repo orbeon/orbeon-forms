@@ -296,7 +296,7 @@ object XFormsAPI {
 
       // Dispatch and make sure the listeners are removed
       try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, properties))
-      finally SubmitEvents foreach (submission.removeListener(_, listener))
+      finally SubmitEvents foreach (submission.removeListener(_, Some(listener)))
 
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either
       //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return

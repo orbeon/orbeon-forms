@@ -292,11 +292,11 @@ class XFormsComponentControl(
     }
   }
 
-  private var _enabledListener: Dispatch.EventListener = _
+  private var _enabledListener: Option[Dispatch.EventListener] = None
 
   private def addEnabledListener(): Unit = {
 
-    assert(_enabledListener eq null)
+    assert(_enabledListener.isEmpty)
 
     // Logic: when the component control receives the `xforms-enabled` event (which occurs during refresh after
     // the nested models have already been initialized) we dispatch `xforms-ready` to the nested models. This is
@@ -304,26 +304,29 @@ class XFormsComponentControl(
     // We could have considered using another event, as the name `xforms-ready` does not fully reflect the
     // meaning associated with the top-level. On the other hand, this makes it easier to translate a top-level
     // model into a nested model.
-    _enabledListener = _ ⇒ {
+    val newListener: Dispatch.EventListener =
+      _ ⇒ {
 
-      // Remove during first run
-      removeEnabledListener()
+        // Remove during first run
+        removeEnabledListener()
 
-      for {
-        container ← _nestedContainerOpt.iterator
-        model     ← container.models
-      } locally {
-        Dispatch.dispatchEvent(new XFormsReadyEvent(model))
+        for {
+          container ← _nestedContainerOpt.iterator
+          model     ← container.models
+        } locally {
+          Dispatch.dispatchEvent(new XFormsReadyEvent(model))
+        }
       }
-    }
 
-    addListener(XFormsEvents.XFORMS_ENABLED, _enabledListener)
+    _enabledListener = Some(newListener)
+
+    addListener(XFormsEvents.XFORMS_ENABLED, newListener)
   }
 
   private def removeEnabledListener(): Unit =
-    if (_enabledListener ne null) {
+    _enabledListener foreach { _ ⇒
       removeListener(XFormsEvents.XFORMS_ENABLED, _enabledListener)
-      _enabledListener = null
+      _enabledListener = None
     }
 
   override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {

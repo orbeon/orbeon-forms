@@ -35,10 +35,6 @@ trait ListenersTrait {
     listeners += eventName → (currentListeners :+ listener)
   }
 
-  // API for Java callers
-  def removeListener(eventName: String, listener: EventListener): Unit =
-    removeListener(eventName, Option(listener))
-
   // Add a given listener (if provided) or all listeners for the given event name
   def removeListener(eventName: String, listener: Option[EventListener]): Unit = {
 

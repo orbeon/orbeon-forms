@@ -53,7 +53,7 @@ object InstanceMirror {
 
   def removeListener(observer: ListenersTrait, listener: EventListener): Unit =
     for (eventName ← MutationEvents)
-      observer.removeListener(eventName, listener)
+      observer.removeListener(eventName, Some(listener ensuring (_ ne null)))
 
   // Factory function to create listeners which check whether they called as the result of an action caused by another
   // listener. If a cycle is detected, we interrupt it and just say that we have processed the event.

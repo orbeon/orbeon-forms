@@ -319,27 +319,26 @@
                     <!-- Expose mode to CSS -->
                     <xh:div class="fb-settings-mode-{{mode}}">
                         <!-- IE warning -->
-                        <xf:group ref=".[$is-new-form and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
-                            <xf:var
+                        <!-- TODO: i18n -->
+                        <xf:group
+                            ref=".[$is-new-form and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']"
+                            class="fb-ie-warning alert alert-error">
+
+                            It appears that you are using
+                            <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>.
+                            Form Builder is likely not working properly with this browser. We recommend you upgrade to
+                            <xf:output
                                 xmlns:BrowserVersion="java:org.orbeon.builder.BrowserVersion"
-                                name="minimal-microsoft-browser"
                                 value="BrowserVersion:MinimalMicrosoftBrowserNameAndVersion()"/>
-                            <xh:div class="fb-ie-warning">
-                                It appears that you are using
-                                <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>.
-                                Form Builder is likely not working
-                                properly with this browser. We recommend you upgrade to
-                                <xf:output value="$minimal-microsoft-browser"/>
-                                or newer, or use
-                                <a href="http://www.google.com/chrome">Google Chrome</a>,
-                                <a href="http://www.mozilla.com/firefox/">Firefox</a>,
-                                or
-                                <a href="http://www.apple.com/safari/">Safari</a>.
-                                If we made a mistake and you are not using
-                                <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>,
-                                please
-                                <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
-                            </xh:div>
+                            or newer, or use
+                            <a href="http://www.google.com/chrome">Google Chrome</a>,
+                            <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                            or
+                            <a href="http://www.apple.com/safari/">Safari</a>.
+                            If we made a mistake and you are not using
+                            <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>,
+                            please
+                            <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
                         </xf:group>
                         <xf:var
                             name="message"
@@ -351,10 +350,11 @@
                                 else
                                     $resources/messages/edit-metadata-output
                         "/>
-                        <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p">
+                        <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p" class="alert alert-info">
                             <!-- Display message to user -->
                             <xf:output value="$message"/>
                         </xf:group>
+
                         <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
 
                         <fr:tabbable class="fb-dialog-form-settings-fields">
@@ -716,32 +716,33 @@
 
                         </fr:tabbable>
 
-                        <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+                    </xh:div>
 
-                        <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
-                        <xh:div class="fr-dialog-buttons" xml:space="preserve">
-                            <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
-                                <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then continue else apply)/label"/>
-                            </xf:trigger>
-                            <xf:output value="$resources/or/label"/>
-                            <xf:trigger appearance="minimal">
-                                <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
-                                <!-- Hide this dialog without saving -->
-                                <xxf:hide
-                                    event="DOMActivate"
-                                    if="not($is-new-form)"
-                                    dialog="dialog"/>
-                                <!-- Or go back to the summary -->
-                                <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
-                                     window.close() in the old home/back button. But it's a bit unclear what's best. -->
-                                <xf:action
-                                    event="DOMActivate"
-                                    if="$is-new-form"
-                                    type="xpath">
-                                    fr:run-process-by-name('oxf.fr.detail.process', 'close')
-                                </xf:action>
-                            </xf:trigger>
-                        </xh:div>
+                    <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+
+                    <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                    <xh:div class="fr-dialog-buttons" xml:space="preserve">
+                        <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then continue else apply)/label"/>
+                        </xf:trigger>
+                        <xf:output value="$resources/or/label"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
+                            <!-- Hide this dialog without saving -->
+                            <xxf:hide
+                                event="DOMActivate"
+                                if="not($is-new-form)"
+                                dialog="dialog"/>
+                            <!-- Or go back to the summary -->
+                            <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
+                                 window.close() in the old home/back button. But it's a bit unclear what's best. -->
+                            <xf:action
+                                event="DOMActivate"
+                                if="$is-new-form"
+                                type="xpath">
+                                fr:run-process-by-name('oxf.fr.detail.process', 'close')
+                            </xf:action>
+                        </xf:trigger>
                     </xh:div>
                 </xxf:dialog>
             </xf:group>

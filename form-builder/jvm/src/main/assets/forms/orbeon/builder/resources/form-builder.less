@@ -192,7 +192,7 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
-    .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
+    .fb-ie-warning {}
 
     .fb-nowrap { white-space: nowrap }
     .fb-hide-alert .xforms-visited > .xforms-alert.xforms-active { display: none }
@@ -528,19 +528,44 @@ div.orbeon.orbeon-portlet-div {
 
     // Metadata editor dialog
     .fb-dialog-form-settings {
-        width: 600px;
+        width: 800px;
         max-width: none;
 
+        div[class ^= "fb-settings-mode-"] {
+            display: grid;
+            grid-template-columns: auto 1fr;
+
+            &> .alert-error {
+                grid-row-start: 1;
+                grid-column-start: 1;
+                grid-column-end: span 2;
+            }
+
+            &> .alert-info {
+                grid-row-start: 2;
+                grid-column-start: 1;
+                grid-column-end: span 2;
+            }
+
+            &> img {
+                grid-row-start: 3;
+                grid-column-start: 1;
+            }
+
+            &> .xbl-fr-tabbable {
+                grid-row-start: 3;
+                grid-column-start: 2;
+            }
+        }
+
         img {
-            float: left;
-            margin: 1em 2em 0 1em;
+            margin: 1em;
         }
 
         .xforms-label { display: block; }
 
         .fb-dialog-form-settings-fields {
-            float: left;
-            width: 475px;
+            width: 100%;
             .xforms-input input, .xforms-textarea textarea {
                 width: 100%;
                 box-sizing: border-box;

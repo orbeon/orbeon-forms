@@ -239,15 +239,14 @@
                             <xf:group ref=".[fr:mode() != 'new' and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
                                 <xf:switch>
                                     <xf:case id="fb-ie-warning-case-on">
-                                        <xf:var
-                                            xmlns:BrowserVersion="java:org.orbeon.builder.BrowserVersion"
-                                            name="minimal-microsoft-browser"
-                                            value="BrowserVersion:MinimalMicrosoftBrowserNameAndVersion()"/>
-                                        <xh:div class="fb-ie-warning">
+                                        <!-- TODO: i18n -->
+                                        <xh:div class="fb-ie-warning alert alert-error">
                                             It appears that you are using
                                             <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>.
                                             Form Builder is likely not working properly with this browser. We recommend you upgrade to
-                                            <xf:output value="$minimal-microsoft-browser"/>
+                                            <xf:output
+                                                xmlns:BrowserVersion="java:org.orbeon.builder.BrowserVersion"
+                                                value="BrowserVersion:MinimalMicrosoftBrowserNameAndVersion()"/>
                                             or newer, or use
                                             <a href="http://www.google.com/chrome">Google Chrome</a>,
                                             <a href="http://www.mozilla.com/firefox/">Firefox</a>,

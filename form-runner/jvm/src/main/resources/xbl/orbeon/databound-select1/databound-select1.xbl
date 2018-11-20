@@ -75,48 +75,30 @@
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="@resource">
-                                <xf:label lang="en">Resource URL</xf:label>
-                                <xf:label lang="es">URL del Recurso</xf:label>
-                                <xf:label lang="fi">Resurssi URL</xf:label>
-                                <xf:label lang="fr">URL de la ressource</xf:label>
-                                <xf:label lang="ru">URL ресурса</xf:label>
-                                <xf:label lang="it">URL della risorsa</xf:label>
-                                <xf:label lang="de">URL der Ressource</xf:label>
-                                <xf:label lang="sv">Resursens adress</xf:label>
-                                <xf:label lang="nl">Resource URL</xf:label>
-                                <xf:label lang="pt">URL do Recurso</xf:label>
-                                <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
-                                <xf:hint lang="es">HTTP URL retornando datos para poblar la lista</xf:hint>
-                                <xf:hint lang="fi">HTTP URL palauttaa pudotusvalikon täyttämiseen käytettyä dataa</xf:hint>
-                                <xf:hint lang="fr">URL HTTP auquel réside le service</xf:hint>
-                                <xf:hint lang="ru">HTTP URL сервиса, данными из которого будет заполнен выпадающий список</xf:hint>
-                                <xf:hint lang="it">URL HTTP che da i dati per il menu a tendina</xf:hint>
-                                <xf:hint lang="de">HTTP URL die die Inhalte für das Dropdown-Menü liefert</xf:hint>
-                                <xf:hint lang="sv">Vanligen en Internetadress som börjar med http://</xf:hint>
-                                <xf:hint lang="nl">HTTP URL als bron voor de gegevens in de selectie</xf:hint>
-                                <xf:hint lang="pt">HTTP URL devolvendo dados para preencher a lista de opções</xf:hint>
+                                <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="xf:itemset/@ref">
-                                <xf:label ref="$resources/dialog-actions/items/label"/>
-                                <xf:hint ref="$resources/dialog-actions/items/hint"/>
+                                <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
                             <xf:input ref="xf:itemset/xf:label/@ref">
-                                <xf:label ref="$resources/dialog-actions/item-label/label"/>
-                                <xf:hint ref="$resources/dialog-actions/item-label/hint"/>
+                                <xf:label ref="xxf:r('dialog-actions.item-label.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.item-label.hint',  '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                         <xh:td>
                             <xf:input ref="xf:itemset/xf:value/@ref">
-                                <xf:label ref="$resources/dialog-actions/item-value/label"/>
-                                <xf:hint ref="$resources/dialog-actions/item-value/hint"/>
+                                <xf:label ref="xxf:r('dialog-actions.item-value.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.item-value.hint',  '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>

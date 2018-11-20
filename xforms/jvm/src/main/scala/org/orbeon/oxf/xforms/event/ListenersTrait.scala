@@ -19,8 +19,8 @@ import Dispatch.EventListener
 // Support for adding/removing/getting event listeners.
 trait ListenersTrait {
 
-  // Not sure Vector is a good fit for small collections. Might use List and reverse upon getListeners.
-  // Use var/null instead of lazy val so that getListeners() won't cause creation of the map
+  // Not sure `Vector` is a good fit for small collections. Might use `List` and reverse upon `getListeners`.
+  // Use `var`/`null` instead of `lazy val` so that `getListeners` won't cause creation of the map.
   private var listeners: mutable.Map[String, Vector[EventListener]] = _
 
   // Add a listener for the given event name

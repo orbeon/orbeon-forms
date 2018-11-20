@@ -67,7 +67,7 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
   }
 }
 
-trait LongValidationFunction   extends ValidationFunction[Long] {
+trait LongValidationFunction extends ValidationFunction[Long] {
   def argumentOpt(implicit xpathContext: XPathContext): Option[Long] = longArgumentOpt(0)
 }
 

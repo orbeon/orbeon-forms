@@ -150,7 +150,7 @@ object XFormsDeleteAction extends Logging {
       if (deletionDescriptors.nonEmpty && (containingDocument ne null)) {
         // Identify the instance that actually changes
         // NOTE: More than one instance may be modified! For now we look at the first one only.
-        val modifiedInstanceOpt = Option(containingDocument.getInstanceForNode(deletionDescriptors.head.nodeInfo))
+        val modifiedInstanceOpt = containingDocument.instanceForNodeOpt(deletionDescriptors.head.nodeInfo)
 
         debugAllowNull(
           "deleted nodes",

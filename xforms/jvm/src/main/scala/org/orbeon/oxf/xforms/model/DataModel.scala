@@ -191,7 +191,7 @@ object DataModel {
   }
 
   private def findInstanceEffectiveId(containingDocument: XFormsContainingDocument, nodeInfo: NodeInfo) =
-    Option(containingDocument.getInstanceForNode(nodeInfo)) map (_.getEffectiveId)
+    containingDocument.instanceForNodeOpt(nodeInfo) map (_.getEffectiveId)
 
   private def logValueChange(
     source              : String,
@@ -213,7 +213,7 @@ object DataModel {
     isCalculate        : Boolean,
     collector          : XFormsEvent ⇒ Unit
   ) =
-    Option(containingDocument.getInstanceForNode(nodeInfo)) match {
+    containingDocument.instanceForNodeOpt(nodeInfo) match {
       case Some(modifiedInstance) ⇒
         // Tell the model about the value change
         modifiedInstance.markModified()

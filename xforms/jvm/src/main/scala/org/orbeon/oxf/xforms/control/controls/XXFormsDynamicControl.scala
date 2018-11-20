@@ -133,9 +133,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       containingDocument.addControlStructuralChange(prefixedId)
 
     // Outer instance
-    val outerInstance = containingDocument.getInstanceForNode(node)
-    if (outerInstance eq null)
-      throw new IllegalArgumentException
+    val outerInstance =
+      containingDocument.instanceForNodeOpt(node) getOrElse (throw new IllegalArgumentException)
 
     // Gather relevant switch state before removing children
     val relevantSwitchState = if (create) Map.empty[String, ControlState] else gatherRelevantSwitchState(this)

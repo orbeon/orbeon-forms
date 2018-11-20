@@ -196,8 +196,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       }
 
       // This is the instance which is effectively going to be updated
-      val instanceToUpdate = containingDocument.getInstanceForNode(destinationNodeInfo)
-      if (instanceToUpdate eq null) {
+      val instanceToUpdate = containingDocument.instanceForNodeOpt(destinationNodeInfo) getOrElse {
         throw new XFormsSubmissionException(
           submission,
           """targetref attribute doesn't point to an element in an existing instance for `replace="instance"`.""",

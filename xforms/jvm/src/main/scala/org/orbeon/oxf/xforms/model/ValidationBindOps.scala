@@ -149,9 +149,8 @@ trait ValidationBindOps extends Logging {
 
       // Remember invalid instances
       if (! typeValidity || ! requiredValidity) {
-        val instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo)
-        if (instanceForNodeInfo ne null)
-          invalidInstances += instanceForNodeInfo.getEffectiveId
+        containingDocument.instanceForNodeOpt(currentNodeInfo) foreach
+          (invalidInstances += _.getEffectiveId)
       }
     }
 
@@ -330,8 +329,8 @@ trait ValidationBindOps extends Logging {
 
       // Remember invalid instances
       if (! bindNode.constraintsSatisfiedForLevel(ErrorLevel)) {
-        val instanceForNodeInfo = containingDocument.getInstanceForNode(currentNode)
-        invalidInstances += instanceForNodeInfo.getEffectiveId
+        containingDocument.instanceForNodeOpt(currentNode) foreach
+          (invalidInstances += _.getEffectiveId)
       }
     }
 

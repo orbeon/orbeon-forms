@@ -239,7 +239,7 @@ object BindingDescriptor {
       )(binding)
   }
 
-  def getAllRelevantDescriptors(bindings: Seq[NodeInfo]) =
+  def getAllRelevantDescriptors(bindings: Seq[NodeInfo]): Seq[BindingDescriptor] =
     getAllSelectorsWithPF(
       bindings,
       (ns, binding) ⇒

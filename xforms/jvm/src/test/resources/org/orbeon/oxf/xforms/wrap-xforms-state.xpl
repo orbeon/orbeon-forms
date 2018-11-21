@@ -29,6 +29,10 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <!-- Exclude Form Builder metadata in included XBL files so as to avoid matching on `xf:model` below. -->
+                <xsl:template match="fb:metadata" xmlns:fb="http://orbeon.org/oxf/xml/form-builder"/>
+
                 <xsl:template match="xf:model[1]">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>

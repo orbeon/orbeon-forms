@@ -4,6 +4,11 @@ log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=%5p [%c] %m%n
 
+log4j.appender.FILE=org.apache.log4j.FileAppender
+log4j.appender.FILE.File=/var/log/orbeon.log
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%5p [%c] %m%n
+
 log4j.logger.org.orbeon.private.apache.http=ERROR
 log4j.logger.org.orbeon.private.apache.http.wire=ERROR
 log4j.logger.org.orbeon.embedding=ERROR

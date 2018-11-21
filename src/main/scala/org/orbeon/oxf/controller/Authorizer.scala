@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{EmptyInputStream, HttpMethod, HttpStatusCodeException, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -86,7 +86,7 @@ object Authorizer extends Logging {
 
     def appendToURI(uri: URI, path: String, query: Option[String]) = {
 
-      val newPath  = dropTrailingSlash(uri.getRawPath) + appendStartingSlash(path)
+      val newPath  = uri.getRawPath.dropTrailingSlash + path.prependSlash
       val newQuery = Option(uri.getRawQuery) ++ query mkString "&"
 
       new URI(uri.getScheme, uri.getRawUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)

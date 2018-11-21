@@ -157,7 +157,7 @@ class LocalRequest(
         servletPath + pathInfo
 
     // Add starting slash if missing
-    appendStartingSlash(requestPath)
+    requestPath.prependSlash
   }
 
   def getRequestURI: String = {

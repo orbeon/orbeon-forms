@@ -184,7 +184,7 @@ object OrbeonXFormsFilter {
   private val RendererPath                 = "/xforms-renderer"
 
   private def normalizeContextPath(s: String) =
-    "/" + dropStartingSlash(dropTrailingSlash(s))
+    "/" + s.dropTrailingSlash.dropStartingSlash
 }
 
 private class FilterRequestWrapper(httpServletRequest: HttpServletRequest)

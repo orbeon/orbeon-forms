@@ -28,10 +28,6 @@ object PathUtils {
     def prependSlash      = if (s.nonEmpty && s.head == '/') s else '/' + s
   }
 
-  def dropTrailingSlash  (s: String) = s.dropTrailingSlash
-  def dropStartingSlash  (s: String) = s.dropStartingSlash
-  def appendStartingSlash(s: String) = s.prependSlash
-
   // Split out a URL's query part
   def splitQuery(url: String): (String, Option[String]) = {
     val index = url.indexOf('?')

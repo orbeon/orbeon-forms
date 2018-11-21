@@ -138,7 +138,7 @@ private object FormRunnerPersistenceProxy {
     val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
     val serviceURI = NetUtils.appendQueryString(
-      dropTrailingSlash(persistenceBaseURL) + path,
+      persistenceBaseURL.dropTrailingSlash + path,
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 

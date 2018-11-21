@@ -138,7 +138,7 @@ object APISupport {
       val (contentOrRedirect, httpResponse) =
         APISupport.callService(RequestDetails(
           content = Some(contentFromRequest),
-          url     = dropTrailingSlash(settings.formRunnerURL) + path,
+          url     = settings.formRunnerURL.dropTrailingSlash + path,
           path    = path,
           headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true).to[List],
           params  = Nil
@@ -181,7 +181,7 @@ object APISupport {
     appendQueryString("/fr/", query getOrElse "")
 
   def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-    appendQueryString(dropTrailingSlash(baseURL) + path, if (embeddable) "orbeon-embeddable=true" else "")
+    appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) "orbeon-embeddable=true" else "")
 
   def requestHeaders(req: HttpServletRequest) =
     for {

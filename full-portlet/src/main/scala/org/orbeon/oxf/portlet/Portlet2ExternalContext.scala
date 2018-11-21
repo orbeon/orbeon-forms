@@ -16,8 +16,8 @@ package org.orbeon.oxf.portlet
 import java.io._
 import java.util.Locale
 import java.{util ⇒ ju}
-import javax.portlet._
 
+import javax.portlet._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}
@@ -25,6 +25,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
@@ -209,7 +210,7 @@ class Portlet2ExternalContext(
           case _                   ⇒ portletRequest.getParameter(WSRPURLRewriter.PathParameterName)
         }
 
-      PathUtils.appendStartingSlash(rawResult.trimAllToEmpty)
+      rawResult.trimAllToEmpty.prependSlash
     }
 
     protected lazy val headerValuesMap = {

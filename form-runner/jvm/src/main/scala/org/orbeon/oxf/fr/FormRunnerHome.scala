@@ -284,7 +284,7 @@ object FormRunnerHome {
               getOrElse (throw new IllegalArgumentException)
             )
 
-            stringValueOrThrow(fields("label")) → dropTrailingSlash(stringValueOrThrow(fields("url")))
+            stringValueOrThrow(fields("label")) → stringValueOrThrow(fields("url")).dropTrailingSlash
         }
       case other ⇒
         throw new IllegalArgumentException
@@ -306,6 +306,6 @@ object FormRunnerHome {
   private def remoteServerFromCompatibilityProperty: Option[String] = (
     properties.getStringOrURIAsStringOpt("oxf.fr.production-server-uri")
     flatMap trimAllToOpt
-    map     dropTrailingSlash
+    map     (_.dropTrailingSlash)
   )
 }

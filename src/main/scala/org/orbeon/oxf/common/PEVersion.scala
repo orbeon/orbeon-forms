@@ -175,7 +175,7 @@ private object PEVersion {
 
     def fromHomeDirectory =
       Try {
-        val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
+        val path = System.getProperty("user.home").dropTrailingSlash + "/.orbeon/license.xml"
 
         useAndClose(new FileInputStream(new File(path))) { is ⇒
           Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)

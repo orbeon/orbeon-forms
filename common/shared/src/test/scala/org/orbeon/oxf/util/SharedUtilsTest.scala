@@ -24,31 +24,31 @@ import scala.collection.mutable
 class SharedUtilsTest extends FunSpec {
 
   describe("The `dropTrailingSlash()` function") {
-    assert("/a" === dropTrailingSlash("/a/"))
-    assert("/a" === dropTrailingSlash("/a"))
-    assert(""   === dropTrailingSlash("/"))
-    assert("/"  === dropTrailingSlash("//"))
+    assert("/a" === "/a/".dropTrailingSlash)
+    assert("/a" === "/a".dropTrailingSlash)
+    assert(""   === "/".dropTrailingSlash)
+    assert("/"  === "//".dropTrailingSlash)
   }
 
   describe("The `dropStartingSlash()` function") {
-    assert("a/" === dropStartingSlash("/a/"))
-    assert("a/" === dropStartingSlash("a/"))
-    assert(""   === dropStartingSlash("/"))
-    assert("/"  === dropStartingSlash("//"))
+    assert("a/" === "/a/".dropStartingSlash)
+    assert("a/" === "a/".dropStartingSlash)
+    assert(""   === "/".dropStartingSlash)
+    assert("/"  === "//".dropStartingSlash)
   }
 
   describe("The `appendStartingSlash()` function") {
     it("must not append if already present") {
-      assert("/a/" === appendStartingSlash("/a/"))
+      assert("/a/" === "/a/".prependSlash)
     }
     it("must append if not present") {
-      assert("/a/" === appendStartingSlash("a/"))
+      assert("/a/" === "a/".prependSlash)
     }
     it("must keep single slash") {
-      assert("/"   === appendStartingSlash("/"))
+      assert("/"   === "/".prependSlash)
     }
     it("must keep double slash") {
-      assert("//"  === appendStartingSlash("//"))
+      assert("//"  === "//".prependSlash)
     }
   }
 

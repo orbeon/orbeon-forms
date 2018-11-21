@@ -22,7 +22,8 @@ import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding.APISupport.FormDynamicResourcesRegex
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.{NetUtils, PathUtils}
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.PathUtils._
 
 import scala.collection.JavaConverters._
 
@@ -75,7 +76,7 @@ class ServletEmbeddingContextWithResponse(
       navigationParameters.asScala.getOrElse(WSRPURLRewriter.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
 
     def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
-      req.getContextPath + orbeonPrefix + '/' + PathUtils.dropStartingSlash(path(navigationParameters))
+      req.getContextPath + orbeonPrefix + '/' + path(navigationParameters).dropStartingSlash
 
     def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
       path(navigationParameters)

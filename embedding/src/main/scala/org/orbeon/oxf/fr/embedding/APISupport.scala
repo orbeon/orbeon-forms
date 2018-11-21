@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
@@ -125,7 +125,7 @@ object APISupport {
         settings.httpClient
       )
 
-      def contentFromRequest =
+      val contentFromRequest =
         StreamedContent(
           inputStream   = req.getInputStream,
           contentType   = Option(req.getContentType),

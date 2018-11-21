@@ -66,7 +66,7 @@ private case class EmbeddingSettings(
   resourcesRegex : String,
   httpClient     : HttpClient
 ) {
-  val OrbeonSubmitPath       = s"$orbeonPrefix/xforms-server-submit"
+  val OrbeonSubmitPath       = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?xforms-server-submit".r
   val OrbeonResourceRegex    = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
   val FormRunnerResourcePath = resourcesRegex.r
 }

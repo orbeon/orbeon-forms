@@ -116,12 +116,12 @@ class ServletFilter extends Filter {
 
       APISupport.scopeSettings(httpReq, settings) {
         NetUtils.getRequestPathInfo(httpReq) match {
+          case settings.OrbeonSubmitPath() ⇒
+            // Request is for an Orbeon submission
+            APISupport.proxySubmission(httpReq, httpRes)
           case settings.OrbeonResourceRegex(namespace, resourcePath) ⇒
             // Request is for an Orbeon resource or Ajax call
             APISupport.proxyServletResources(httpReq, httpRes, namespace, resourcePath)
-          case settings.OrbeonSubmitPath ⇒
-            // Request is for an Orbeon submission
-            APISupport.proxySubmission(httpReq, httpRes)
           case _ ⇒
             // Not an Orbeon resource or submission
             chain.doFilter(httpReq, httpRes)

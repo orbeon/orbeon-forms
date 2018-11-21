@@ -35,7 +35,7 @@
             <xf:var name="loading-indicator-property"
                     value="string-join(('oxf.fr.detail.loading-indicator', $button-name, fr:app-name(), fr:form-name()), '.')"/>
             <xf:var name="loading-indicator"
-                    value="(xxf:property($loading-indicator-property), '')[1]"/>
+                    value="string((xxf:property($loading-indicator-property), '')[1])"/>
             <xf:var name="is-inline"
                     value="$loading-indicator = 'inline'"/>
             <xf:var name="is-modal"

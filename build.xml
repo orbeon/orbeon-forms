@@ -356,7 +356,7 @@
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
                 <include name="slf4j-api-1.7.25.jar"/>
-                <include name="slf4j-log4j12-1.7.21.jar"/>
+                <include name="slf4j-log4j12-1.7.25.jar"/>
                 <include name="log4j-1.2.17.jar"/>
             </lib>
         </war>

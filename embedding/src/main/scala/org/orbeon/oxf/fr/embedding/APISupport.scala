@@ -41,7 +41,7 @@ object APISupport {
 
   import Private._
 
-  val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
+  val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
 
   val AllModes       = List(New, Edit, View)
   val AllModesByName = AllModes map (a ⇒ a.name → a) toMap

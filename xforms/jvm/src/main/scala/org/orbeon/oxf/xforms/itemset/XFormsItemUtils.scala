@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{LHHAValue, XFormsSingleNodeControl}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
@@ -321,7 +322,7 @@ object XFormsItemUtils {
 
                   stack.iterator foreach { currentItem ⇒
                     currentItem match {
-                      case currentNode: om.NodeInfo if isAncestorNode(nodeInfo, currentNode) ⇒
+                      case currentNode: om.NodeInfo if SaxonUtils.isFirstNodeAncestorOfSecondNode(currentNode, nodeInfo, includeSelf = false) ⇒
                         return level
                       case _ ⇒
                     }
@@ -332,17 +333,6 @@ object XFormsItemUtils {
                   // If it's not a node, stay at current level
                   stack.size - 1
               }
-            }
-
-            // Return `true` iif `potentialAncestor` is an ancestor of `nodeToCheck`
-            private def isAncestorNode(nodeToCheck: om.NodeInfo, potentialAncestor: om.NodeInfo): Boolean = {
-              var parent = nodeToCheck.getParent
-              while (parent ne null) {
-                if (parent.isSameNodeInfo(potentialAncestor))
-                  return true
-                parent = parent.getParent
-              }
-              false
             }
           }
         )

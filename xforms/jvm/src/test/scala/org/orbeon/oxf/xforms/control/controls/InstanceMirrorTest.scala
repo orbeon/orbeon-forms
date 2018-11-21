@@ -84,27 +84,27 @@ class InstanceMirrorTest
 
           val unknownChange: MirrorEventListener = _ ⇒ {
             nonInstanceChanges += 1
-            true
+            ListenerResult.Stop
           }
 
           val outerMirrorListener =
             mirrorListener(
               document,
               toInnerInstanceNode(
-                outerInstance.documentInfo,
+                outerInstance.rootElement,
                 document.getStaticState.topLevelPart,
                 document,
                 findOuterInstanceDetailsDynamic
               )
             )
 
-          toEventListener(composeListeners(Seq(outerMirrorListener, unknownChange)))
+          toEventListener(composeListeners(List(outerMirrorListener, unknownChange)))
         }
 
         addListener(outerInstance, outerListener)
 
         // Test insert, value change and delete
-        val expected = Seq(
+        val expected = List(
           ("""<instance><first>Arthur</first></instance>""", 0),
           ("""<instance><first>Arthur</first><last>Clark</last></instance>""" , 0),
           ("""<instance><first>Arthur</first><middle>C.</middle><last>Clark</last></instance>""" , 0),
@@ -193,7 +193,7 @@ class InstanceMirrorTest
         val innerInstance = document.findInstanceInDescendantOrSelf("gaga-instance").get
 
         // Test insert, value change and delete
-        val expected = Seq(
+        val expected = List(
           """<instance><first>Arthur</first></instance>""",
           """<instance><first>Arthur</first><last>Clark</last></instance>""",
           """<instance><first>Arthur</first><middle>C.</middle><last>Clark</last></instance>""",
@@ -212,7 +212,7 @@ class InstanceMirrorTest
         val NestedModelId = "my-gaga" + COMPONENT_SEPARATOR + "gaga-model"
 
         // First update outer instance and check inner instance, then do the reverse
-        for ((targetPrefixedId, mirroredInstance) ← Seq(OuterModelId → innerInstance, NestedModelId → outerInstance))
+        for ((targetPrefixedId, mirroredInstance) ← List(OuterModelId → innerInstance, NestedModelId → outerInstance))
           expected.zipWithIndex foreach {
             case (expectedInstanceValue, index) ⇒
               dispatch(s"update${index + 1}", targetPrefixedId)

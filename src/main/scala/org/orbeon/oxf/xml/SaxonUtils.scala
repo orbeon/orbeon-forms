@@ -235,4 +235,18 @@ object SaxonUtils {
       case _                      ⇒ throw new OXFException(s"Invalid variable type: ${o.getClass}")
     }
 
+  // Return `true` iif `potentialAncestor` is an ancestor of `potentialDescendant`
+  def isFirstNodeAncestorOfSecondNode(
+    potentialAncestor   : NodeInfo,
+    potentialDescendant : NodeInfo,
+    includeSelf         : Boolean
+  ): Boolean = {
+    var parent = if (includeSelf) potentialDescendant else potentialDescendant.getParent
+    while (parent ne null) {
+      if (parent.isSameNodeInfo(potentialAncestor))
+        return true
+      parent = parent.getParent
+    }
+    false
+  }
 }

@@ -14,10 +14,8 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom._
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
@@ -91,8 +89,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
     getBoundElement match {
-      case Some(node) ⇒ updateSubTree(create = true, node)
-      case _ ⇒ // don't create binding (maybe we could for a read-only instance)
+      case Some(boundElem) ⇒
+        updateSubTree(create = true, boundElem)
+      case _ ⇒
+        // Don't create binding (maybe we could for a read-only instance)
         _nested = None
     }
   }
@@ -105,15 +105,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   }
 
   override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit =
-    getBoundElement match {
-      case Some(node) ⇒ updateSubTree(create = false, node)
-      case _ ⇒
+    getBoundElement foreach { boundElem ⇒
+      updateSubTree(create = false, boundElem)
     }
 
-  private def updateSubTree(create: Boolean, node: VirtualNode): Unit =
+  private def updateSubTree(create: Boolean, boundElem: VirtualNode): Unit =
     if (create || previousChangeCount != changeCount) {
       // Document has changed and needs to be fully recreated
-      processFullUpdate(create, node)
+      processFullUpdate(create, boundElem)
     } else {
       // Changes to nested binds
       if (bindChanges.nonEmpty)
@@ -124,7 +123,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         processXBLUpdates()
     }
 
-  private def processFullUpdate(create: Boolean, node: VirtualNode): Unit = {
+  private def processFullUpdate(create: Boolean, boundElem: VirtualNode): Unit = {
     previousChangeCount = changeCount
     xblChanges.clear()
     bindChanges.clear()
@@ -134,7 +133,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     // Outer instance
     val outerInstance =
-      containingDocument.instanceForNodeOpt(node) getOrElse (throw new IllegalArgumentException)
+      containingDocument.instanceForNodeOpt(boundElem) getOrElse (throw new IllegalArgumentException)
 
     // Gather relevant switch state before removing children
     val relevantSwitchState = if (create) Map.empty[String, ControlState] else gatherRelevantSwitchState(this)
@@ -164,8 +163,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
 
     // Create new part
-    val element = node.getUnderlyingNode.asInstanceOf[Element]
-    val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), part)
+    val (template, partAnalysis) =
+      createPartAnalysis(
+        Dom4jUtils.createDocumentCopyElement(boundElem.getUnderlyingNode.asInstanceOf[Element]),
+        part
+      )
 
     // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size
@@ -185,38 +187,36 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     )
 
     // Add listener to the single outer instance
-    val docWrapper = new DocumentWrapper(element.getDocument, null, XPath.GlobalConfiguration)
-
     val newListenerWithCycleDetector = new ListenerCycleDetector
 
     // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
     val outerListener: EventListener = {
 
       // Mark an unknown change, which will require a complete rebuild of the part
-      val unknownChange: MirrorEventListener = { _ ⇒
+      val unknownChange: MirrorEventListener = { x ⇒
         changeCount += 1
         containingDocument.addControlStructuralChange(prefixedId)
-        true
+        ListenerResult.Stop
       }
 
-      def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): Boolean = {
+      def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): ListenerResult = {
         val newChanges = nodes flatMap (findChange(_))
         changes ++= newChanges
-        newChanges.nonEmpty
+        if (newChanges.nonEmpty) ListenerResult.Stop else ListenerResult.NextListener
       }
 
-      def changeListener(record: Seq[NodeInfo] ⇒ Boolean): MirrorEventListener = {
+      def changeListener(record: Seq[NodeInfo] ⇒ ListenerResult): MirrorEventListener = {
         case insert: XFormsInsertEvent              ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
         case delete: XFormsDeleteEvent              ⇒ record(delete.deletedNodes)
         case valueChanged: XXFormsValueChangedEvent ⇒ record(List(valueChanged.node))
-        case _                                      ⇒ false
+        case _                                      ⇒ ListenerResult.NextListener
       }
 
       // Instance mirror listener
       val instanceListener =
         newListenerWithCycleDetector(
           containingDocument,
-          toInnerInstanceNode(docWrapper, partAnalysis, childContainer, findOuterInstanceDetailsDynamic)
+          toInnerInstanceNode(boundElem, partAnalysis, childContainer, findOuterInstanceDetailsDynamic)
         )
 
       // Compose listeners
@@ -237,7 +237,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val innerListener = toEventListener(
       newListenerWithCycleDetector(
         containingDocument,
-        toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis)
+        toOuterInstanceNodeDynamic(outerInstance, boundElem, partAnalysis)
       )
     )
 
@@ -262,7 +262,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val stateToRestore =
       Controls.restoringInstanceControls orElse ((! create) option InstancesControls(Nil, relevantSwitchState))
 
-    def createAndInitializeDynamicSubTree() =
+    def createAndInitializeDynamicSubTree(): Unit =
       tree.createAndInitializeDynamicSubTree(
         container        = childContainer,
         containerControl = this,
@@ -332,7 +332,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     bindChanges.clear()
    }
 
-  private def getBoundElement =
+  private def getBoundElement: Option[VirtualNode] =
     bindingContext.singleNodeOpt match {
       case Some(node: VirtualNode) if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
       case _                                                           ⇒ None
@@ -346,7 +346,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     (template, newPart)
   }
 
-  override def getBackCopy = {
+  override def getBackCopy: XXFormsDynamicControl = {
     val cloned = super.getBackCopy.asInstanceOf[XXFormsDynamicControl]
     cloned.previousChangeCount = -1 // unused
     cloned.changeCount = previousChangeCount
@@ -371,7 +371,11 @@ object XXFormsDynamicControl {
 
   // Compose a Seq of listeners by calling them in order until one has successfully processed the event
   def composeListeners(listeners: Seq[MirrorEventListener]): MirrorEventListener =
-    e ⇒ listeners exists (_(e))
+    e ⇒
+      listeners find (_(e) == ListenerResult.Stop) match {
+        case Some(_) ⇒ ListenerResult.Stop
+        case None    ⇒ ListenerResult.NextListener
+      }
 
   // Find whether the given node is a bind element or attribute and return the associated model id → element mapping
   def findBindChange(node: NodeInfo): Option[(String, Element)] = {

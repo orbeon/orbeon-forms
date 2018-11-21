@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils, TransformerUtils}
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -44,8 +44,24 @@ object InstanceMirror {
   // with Form Builder.
   private val MutationEvents = List(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE, XXFORMS_REPLACE)
 
+  sealed trait ListenerResult
+  object ListenerResult {
+    case object NextListener extends ListenerResult
+    case object Stop         extends ListenerResult
+  }
+
+  sealed trait NodeMatcherResult
+  object NodeMatcherResult {
+    case class  Match(instance: XFormsInstance, node: NodeInfo) extends NodeMatcherResult
+    case object Continue                                        extends NodeMatcherResult
+    case object NonRelevant                                     extends NodeMatcherResult
+  }
+
+  import ListenerResult._
+  import NodeMatcherResult._
+
   // (sourceInstance, sourceNode, siblingIndexOpt) ⇒ Option[(destinationInstance, destinationNode)]
-  type NodeMatcher = (XFormsInstance, NodeInfo, Option[Int]) ⇒ Option[(XFormsInstance, NodeInfo)]
+  type NodeMatcher = (XFormsInstance, NodeInfo, Option[Int]) ⇒ NodeMatcherResult
 
   def addListener(observer: ListenersTrait, listener: EventListener): Unit =
     for (eventName ← MutationEvents)
@@ -62,7 +78,7 @@ object InstanceMirror {
 
     private var inListener = false
 
-    def apply(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher) =
+    def apply(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher): MirrorEventListener =
       wrap(mirrorListener(containingDocument, findMatchingNode))
 
     private def wrap(listener: MirrorEventListener): MirrorEventListener = {
@@ -74,16 +90,16 @@ object InstanceMirror {
           finally
             inListener = false
         } else
-          true
+          Stop
     }
   }
 
   // Type of an event listener
-  type MirrorEventListener = XFormsEvent ⇒ Boolean
+  type MirrorEventListener = XFormsEvent ⇒ ListenerResult
 
   // Implicitly convert a MirrorEventListener to a plain EventListener
-  def toEventListener(f: MirrorEventListener) = new EventListener {
-    def apply(event: XFormsEvent) = f(event)
+  def toEventListener(f: MirrorEventListener): EventListener = new EventListener {
+    def apply(event: XFormsEvent): Unit = f(event)
   }
 
   case class InstanceDetails(id: String, root: VirtualNode, namespaces: NamespaceMapping)
@@ -151,49 +167,55 @@ object InstanceMirror {
 
   // Find the inner instance node from a node in an outer instance
   def toInnerInstanceNode(
-    outerDoc                 : DocumentInfo,
+    boundElem                : NodeInfo,
     partAnalysis             : PartAnalysis,
     container                : XBLContainer,
     findOuterInstanceDetails : (XBLContainer, NodeInfo, Boolean) ⇒ Option[InstanceDetails]
   ): NodeMatcher = {
 
-    (_, outerNode, siblingIndexOpt) ⇒
+    (_, outerNode, siblingIndexOpt) ⇒ {
+      if (SaxonUtils.isFirstNodeAncestorOfSecondNode(boundElem, outerNode, includeSelf = true)) {
+        findOuterInstanceDetails(container, outerNode, siblingIndexOpt.isEmpty) match {
+          case Some(InstanceDetails(instanceId, referenceNode, _)) ⇒
+            // This is a change to an instance
 
-      findOuterInstanceDetails(container, outerNode, siblingIndexOpt.isEmpty) flatMap {
-        case InstanceDetails(instanceId, referenceNode, _) ⇒
-          // This is a change to an instance
+            container.findInstance(instanceId) match {
+              case Some(innerInstance) if ! innerInstance.instance.readonly ⇒
+                // Find destination path in instance
 
-          container.findInstance(instanceId) match {
-            case Some(innerInstance) if ! innerInstance.instance.readonly ⇒
-              // Find destination path in instance
+                // Find path rooted at wrapper
+                val innerPath = {
 
-              // Find path rooted at wrapper
-              val innerPath = {
+                  val pathToWrapper   = SaxonUtils.buildNodePath(referenceNode)
+                  val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
 
-                val pathToWrapper   = SaxonUtils.buildNodePath(referenceNode)
-                val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
+                  assert(pathToOuterNode.startsWith(pathToWrapper))
 
-                assert(pathToOuterNode.startsWith(pathToWrapper))
+                  val innerPathElems =
+                    pathToWrapper match {
+                      case Nil                                            ⇒ "*" :: (pathToOuterNode drop 1)
+                      case _ if pathToOuterNode.size > pathToWrapper.size ⇒ "*" :: (pathToOuterNode drop (pathToWrapper.size + 1))
+                      case _                                              ⇒ Nil
+                    }
 
-                val innerPathElems =
-                  pathToWrapper match {
-                    case Nil                                            ⇒ "*" :: (pathToOuterNode drop 1)
-                    case _ if pathToOuterNode.size > pathToWrapper.size ⇒ "*" :: (pathToOuterNode drop (pathToWrapper.size + 1))
-                    case _                                              ⇒ Nil
-                  }
+                  innerPathElems mkString ("/", "/", "")
+                }
 
-                innerPathElems mkString ("/", "/", "")
-              }
-
-              evalOne(innerInstance.documentInfo, innerPath) match {
-                case newNode: VirtualNode ⇒ Some(innerInstance, newNode)
-                case _                    ⇒ throw new IllegalStateException
-              }
-            case _ ⇒
-              // May not be found if instance was just created or if the instance is readonly
-              None
-          }
+                evalOne(innerInstance.documentInfo, innerPath) match {
+                  case newNode: VirtualNode ⇒ Match(innerInstance, newNode)
+                  case _                    ⇒ throw new IllegalStateException
+                }
+              case _ ⇒
+                // May not be found if instance was just created or if the instance is readonly
+                Continue
+            }
+          case _ ⇒
+            Continue
+        }
+      } else {
+        NonRelevant
       }
+    }
   }
 
   // Get the path of the node given an optional node position within its parent
@@ -209,7 +231,7 @@ object InstanceMirror {
   // Find the outer node in an inline instance from a node in an inner instance
   def toOuterInstanceNodeDynamic(
       outerInstance : XFormsInstance,
-      outerDoc      : DocumentInfo,
+      outerElem     : NodeInfo,
       partAnalysis  : PartAnalysis
   ): NodeMatcher = {
 
@@ -218,17 +240,17 @@ object InstanceMirror {
       // Find instance in original doc
       // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
       evalOne(
-        item       = outerDoc,
-        expr       = "//xf:instance[@id = $sourceId]",
+        item       = outerElem,
+        expr       = ".//xf:instance[@id = $sourceId]",
         namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
         variables  = Map("sourceId" → stringToStringValue(innerInstance.getId))
       ) match {
         case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
           // Outer xf:instance found
           innerNode match {
-            case document: DocumentInfo ⇒
+            case _: DocumentInfo ⇒
               // Root element replaced
-              Some(outerInstance, instanceWrapper) ensuring siblingIndexOpt.isEmpty
+              Match(outerInstance, instanceWrapper) ensuring siblingIndexOpt.isEmpty
             case _ ⇒
               // All other cases
 
@@ -236,7 +258,7 @@ object InstanceMirror {
 
               // Find destination node in inline instance in original doc
               evalOne(instanceWrapper, path) match {
-                case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
+                case newNode: VirtualNode ⇒ Match(outerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
           }
@@ -259,11 +281,12 @@ object InstanceMirror {
 
       if (relativePath.isEmpty)
         // The root element
-        Some(outerInstance, outerNode)
+        Match(outerInstance, outerNode)
       else {
         // Apply path to find node in outer instance
-        Option(evalOne(outerNode, relativePath)) collect {
-          case newNode: NodeInfo ⇒ outerInstance → newNode
+        Option(evalOne(outerNode, relativePath)) match {
+          case Some(newNode: NodeInfo) ⇒ Match(outerInstance, newNode)
+          case _                       ⇒ Continue
         }
       }
   }
@@ -277,7 +300,7 @@ object InstanceMirror {
 
     case valueChanged: XXFormsValueChangedEvent ⇒
       findMatchingNode(valueChanged.targetInstance, valueChanged.node, None) match {
-        case Some((matchingInstance, matchingNode)) ⇒
+        case Match(_, matchingNode) ⇒
           DataModel.setValueIfChanged(
             nodeInfo  = matchingNode,
             newValue  = valueChanged.newValue,
@@ -292,9 +315,9 @@ object InstanceMirror {
             ),
             reason ⇒ throw new OXFException(reason.message)
           )
-          true
-        case _ ⇒
-          false
+          Stop
+        case Continue    ⇒ NextListener
+        case NonRelevant ⇒ Stop
       }
 
     case insert: XFormsInsertEvent if ! insert.isRootElementReplacement ⇒
@@ -304,18 +327,18 @@ object InstanceMirror {
         insert.insertLocationNode,
         insert.position != "into" option insert.insertLocationIndex
       ) match {
-        case Some((matchingInstance, matchingInsertLocation)) ⇒
+        case Match(_, matchingInsertLocation) ⇒
           insert.position match {
             case "into"   ⇒ XFormsAPI.insert(insert.originItems, into   = matchingInsertLocation)
             case "before" ⇒ XFormsAPI.insert(insert.originItems, before = matchingInsertLocation)
             case "after"  ⇒ XFormsAPI.insert(insert.originItems, after  = matchingInsertLocation)
           }
-          true
-        case _ ⇒
-          false
+          Stop
+        case Continue    ⇒ NextListener
+        case NonRelevant ⇒ Stop
       }
 
-    case insert: XFormsInsertEvent if insert.isRootElementReplacement ⇒ true // handled by xxforms-replace
+    case insert: XFormsInsertEvent if insert.isRootElementReplacement ⇒ Stop // handled by `xxforms-replace`
 
     case delete: XFormsDeleteEvent ⇒
 
@@ -327,13 +350,13 @@ object InstanceMirror {
 
           // Find the corresponding parent of the removed node and run the body on it. The body returns
           // Some(Node) if that node can be removed.
-          def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
+          def withNewParent(body: Node ⇒ (Option[Node], ListenerResult)) = {
 
             // If parent is available, find matching node and call body
             Option(deletionDescriptor.parent) match {
               case Some(removedParentNodeInfo) ⇒
                 findMatchingNode(delete.targetInstance, removedParentNodeInfo, None) match {
-                  case Some((matchingInstance, matchingParentNode)) ⇒
+                  case Match(_, matchingParentNode) ⇒
 
                     val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
                     val newParentNode = XFormsUtils.getNodeFromNodeInfo(matchingParentNode, "")
@@ -345,11 +368,11 @@ object InstanceMirror {
                       case (_, result) ⇒
                         result
                     }
-                  case _ ⇒
-                    false
+                  case Continue    ⇒ NextListener
+                  case NonRelevant ⇒ Stop
                 }
               case _ ⇒
-                false
+                NextListener
             }
           }
 
@@ -364,23 +387,23 @@ object InstanceMirror {
                     XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
 
                   newParentElement.attribute(removedAttribute.getQName) match {
-                    case newAttribute: Attribute ⇒ (Some(newAttribute), true)
-                    case _ ⇒ (None, false) // out of sync, so probably safer
+                    case newAttribute: Attribute ⇒ (Some(newAttribute), Stop)
+                    case _ ⇒ (None, NextListener) // out of sync, so probably safer
                   }
                 case _ ⇒
-                  (None, false)
+                  (None, NextListener)
               }
             case ELEMENT_NODE ⇒
               // An element was removed
               withNewParent {
-                case newParentDocument: Document ⇒
+                case _: Document ⇒
                   // Element removed was root element
 
                   // Don't perform the deletion of the root element because we don't support
                   // this in the data model (although maybe we should). However, consider this
                   // a supported change. If the root element is replaced, the subsequent
                   // xxforms-replace event will take care of the replacement.
-                  (None, true)
+                  (None, Stop)
 
                 case newParentElement: Element ⇒
                   // Element removed had a parent element
@@ -392,37 +415,37 @@ object InstanceMirror {
                   if (content.size > removedNodeIndex) {
                     content.get(removedNodeIndex) match {
                       case newElement: Element if newElement.getQName == removedElement.getQName ⇒
-                        (Some(newElement), true)
+                        (Some(newElement), Stop)
                       case _ ⇒
-                        (None, false) // out of sync, so probably safer
+                        (None, NextListener) // out of sync, so probably safer
                     }
                   } else
-                    (None, false) // out of sync, so probably safer
+                    (None, NextListener) // out of sync, so probably safer
                 case _ ⇒
-                  (None, false)
+                  (None, NextListener)
               }
             case TEXT_NODE ⇒
-              false // TODO
+              NextListener // TODO
             case _ ⇒
-              false // we don't know how to propagate the change
+              NextListener // we don't know how to propagate the change
           }
         }
 
-      successes exists identity // "at least one item is true"
+      if (successes contains Stop) Stop else NextListener
 
     case replace: XXFormsReplaceEvent if replace.currentNode.getNodeKind == ELEMENT_NODE ⇒
       // Element replacement
       findMatchingNode(replace.targetInstance, replace.currentNode.getParent, None) match {
-        case Some((matchingInstance, matchingParent)) ⇒
+        case Match(matchingInstance, matchingParent) ⇒
           val deleted  = XFormsAPI.delete(matchingParent child *, doDispatch = false)
           val inserted = XFormsAPI.insert(replace.currentNode, into = matchingParent, doDispatch = false)
 
           Dispatch.dispatchEvent(new XXFormsReplaceEvent(matchingInstance, deleted.head, inserted.head))
-          true
-        case _ ⇒
-          false
+          Stop
+        case Continue    ⇒ NextListener
+        case NonRelevant ⇒ Stop
       }
-    case replace: XXFormsReplaceEvent ⇒ true // handled by xforms-insert
+    case _: XXFormsReplaceEvent ⇒ Stop // handled by `xforms-insert`
     case _ ⇒ throw new IllegalStateException // no other events supported
   }
 }

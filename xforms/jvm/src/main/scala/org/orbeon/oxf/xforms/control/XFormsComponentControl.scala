@@ -171,7 +171,7 @@ class XFormsComponentControl(
         newListenerWithCycleDetector(
           containingDocument,
           toInnerInstanceNode(
-            outerDocument,
+            referenceNode,
             nestedContainer.partAnalysis,
             nestedContainer,
             findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)

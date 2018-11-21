@@ -222,7 +222,7 @@
         }
     }
 
-    .xbl-component {
+     .xbl-fr-grid .xbl-component { // NOTE: 2018-11-06: added `.xbl-fr-grid` only to make rule stronger for the field width
         .input-prepend, .input-append {
 
             display: flex;
@@ -231,10 +231,12 @@
                 .xforms-output-output {
                     white-space: nowrap;
                 }
+                flex-grow: 0; // 0 is the default only if it's NOT the first flex item, so make it the default all the time
             }
 
-            > :not(.add-on) {
-                flex-grow: 1;
+            > :not(.add-on) { // the `input` element
+                flex-grow: 1; // 1 is the default only if it's the first flex item, so make it the default all the time
+                width: auto;  //
                 min-width: 0; // For the input to get smaller than its "implied width"
             }
         }

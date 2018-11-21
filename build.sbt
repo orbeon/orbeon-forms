@@ -202,7 +202,8 @@ def jUnitTestArguments(buildBaseDirectory: File) =
     //"-q",
     "-v",
     "-s",
-    "-a"
+    "-a",
+    "-oF"
   ) ++
     resourceManagerProperties(buildBaseDirectory)
 
@@ -211,6 +212,7 @@ def jUnitTestOptions =
     libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
 
     testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((baseDirectory in ThisBuild).value): _*),
+    testOptions       in Test          += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
     testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
     testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("ClientTest")),
     parallelExecution in Test          := false,

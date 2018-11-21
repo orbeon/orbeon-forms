@@ -115,6 +115,8 @@ object APISupport {
   ): Unit =
     withSettings(req, res.getWriter) { settings ⇒
 
+      Logger.debug("proxying submission")
+
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         req,
         Right(res),
@@ -145,7 +147,7 @@ object APISupport {
       contentOrRedirect match {
         case Redirect(location, true) ⇒
           res.sendRedirect(location)
-        case Redirect(location, false) ⇒
+        case Redirect(_, false) ⇒
           throw new NotImplementedError
         case content: StreamedContent ⇒
 
@@ -200,7 +202,7 @@ object APISupport {
   // Call the Orbeon service at the other end
   def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse) = {
 
-    Logger.debug("proxying page {}", requestDetails.url)
+    Logger.debug("proxying service {}", requestDetails.url)
 
     val cx = connectURL(requestDetails)
 

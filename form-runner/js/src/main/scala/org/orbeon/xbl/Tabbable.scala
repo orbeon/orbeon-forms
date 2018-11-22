@@ -19,7 +19,7 @@ import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
@@ -165,17 +165,17 @@ object Tabbable {
         drake = None
       }
 
+      def findAllTabPanes: JQuery =
+        $(containerElem).children().children(TabContentSelector).children(TabPaneSelector + ExcludeRepeatClassesSelector)
+
       // Called from XBL component
       def selectTabForPane(targetElem: html.Element): Unit = {
 
-        val targetTabPane = $(targetElem).closest(TabPaneSelector)
+        val allTabPanes      = findAllTabPanes
+        val ancestorTabPanes = $(targetElem).parents(TabPaneSelector)
+        val intersectionPane = allTabPanes.filter(ancestorTabPanes)
 
-        if (targetTabPane.length == 0)
-          return
-
-        val allTabPanes = targetTabPane.closest(TabContentSelector).children(TabPaneSelector).filter(ExcludeRepeatClassesSelector)
-
-        val index = allTabPanes.index(targetTabPane)
+        val index = allTabPanes.index(intersectionPane)
         if (index < 0)
             return
 

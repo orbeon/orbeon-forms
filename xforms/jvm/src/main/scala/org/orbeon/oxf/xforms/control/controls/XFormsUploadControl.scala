@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import java.io.File
 import java.net.{URI, URLEncoder}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
@@ -34,8 +33,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
-import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal
 
@@ -174,10 +173,10 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
           // Store the converted value
           convertedValue
 
-        } else if (StringUtils.isEmpty(newValue)) {
+        } else if (newValue.isEmpty) {
           // Setting blank value
 
-          if (StringUtils.isNotEmpty(oldValue))
+          if (oldValue.nonEmpty)
             // TODO: This should probably take place during refresh instead.
             Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter))
 

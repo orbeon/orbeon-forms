@@ -17,9 +17,9 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
-import org.orbeon.oxf.fr._
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
@@ -131,9 +131,6 @@ trait FormRunnerActions {
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
-      val modeElement = parametersInstance.get.rootElement / "mode"
-      val isNew       = modeElement.stringValue == "new"
-
       import GridDataMigration._
 
       val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
@@ -186,7 +183,7 @@ trait FormRunnerActions {
   def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
     val leaseState = persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
-      send("fr-relinquish-lease-submission", Map.empty)((_) ⇒ ())
+      send("fr-relinquish-lease-submission", Map.empty)(_ ⇒ ())
       setvalue(leaseState, "relinquished")
     }
   }

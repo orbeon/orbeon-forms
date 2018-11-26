@@ -48,10 +48,11 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     with FocusableTrait
     with FileMetadata {
 
-  def supportedFileMetadata = FileMetadata.AllMetadataNames
+  def supportedFileMetadata: Seq[String] = FileMetadata.AllMetadataNames
 
   // NOTE: `mediatype` is deprecated as of XForms 2.0, use `accept` instead
-  def acceptValue = extensionAttributeValue(ACCEPT_QNAME) orElse extensionAttributeValue(MEDIATYPE_QNAME)
+  def acceptValue: Option[String] =
+    extensionAttributeValue(ACCEPT_QNAME) orElse extensionAttributeValue(MEDIATYPE_QNAME)
 
   override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
     super.evaluateImpl(relevant, parentRelevant)
@@ -94,7 +95,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   override def performDefaultAction(event: XFormsEvent): Unit = {
     super.performDefaultAction(event)
     event match {
-      case errorEvent: XXFormsUploadErrorEvent ⇒
+      case _: XXFormsUploadErrorEvent ⇒
         // Upload error: sent by the client in case of error
         // It would be good to support i18n at the XForms engine level, but form authors can handle
         // xxforms-upload-error in a custom way if needed. This is what Form Runner does.
@@ -111,7 +112,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
   // TODO: Need to move to using actual unique ids here, see:
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
-  def getUploadUniqueId = getEffectiveId
+  def getUploadUniqueId: String = getEffectiveId
 
   // Called either upon Ajax xxforms-upload-done or upon client form POST (`replace="all"`)
   def handleUploadedFile(value: String, filename: String, mediatype: String, size: String): Unit =
@@ -256,7 +257,7 @@ object XFormsUploadControl {
   // - easily searching instance for uploaded resources
   //
   // The MAC includes the URL protocol, path and metadata
-  def hmacURL(url: String, filename: Option[String], mediatype: Option[String], size: Option[String]) = {
+  def hmacURL(url: String, filename: Option[String], mediatype: Option[String], size: Option[String]): String = {
 
     val candidates = Seq(
       "filename"  → filename,
@@ -291,7 +292,7 @@ object XFormsUploadControl {
   def getMAC(url: String) = getFirstQueryParameter(url, "mac")
 
   // Check that the given URL as a correct MAC
-  def verifyMAC(url: String) =
+  def verifyMAC(url: String): Boolean =
     getMAC(url) match {
       case Some(mac) ⇒ hmac(removeMAC(url)) == mac
       case None      ⇒ false
@@ -322,7 +323,7 @@ object XFormsUploadControl {
     } uploadControl.handleUploadedFile(value, filename, mediatype, size)
 
   // Check if an <xxf:files> element actually contains file uploads to process
-  def hasSubmittedFiles(filesElement: Element) =
+  def hasSubmittedFiles(filesElement: Element): Boolean =
     iterateFileElement(filesElement).nonEmpty
 
   private def iterateFileElement(filesElement: Element) =

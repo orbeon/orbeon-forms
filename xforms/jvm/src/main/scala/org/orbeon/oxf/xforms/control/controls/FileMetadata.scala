@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.upload.UploaderServer
-import org.orbeon.saxon.om.NodeInfo
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal

@@ -39,6 +39,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
       case _       ⇒ ""
     }
 
+  // TODO: review as trimming is ok, but normalization should follow standard semantic, and method renamed if kept
   def getTextTrim: String = {
     val text = getText
     val textContent = new jl.StringBuilder

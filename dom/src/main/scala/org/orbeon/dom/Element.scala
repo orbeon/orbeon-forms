@@ -70,6 +70,7 @@ trait Element extends Branch {
    * @return the trimmed text value where whitespace is trimmed and normalised
    *         into single spaces. This method does not return null.
    */
+  // TODO: review as trimming is ok, but normalization should follow standard semantic, and method renamed if kept
   def getTextTrim: String
 
   /**

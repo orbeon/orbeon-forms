@@ -1093,22 +1093,22 @@
                                         templateClone.className += " " + itemElement.attributes["class"];
                                     }
 
-                                    spanContainer.appendChild(templateClone);
-
-                                    // Restore checked state after copy
-                                    var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];
-                                    if (valueToChecked[itemElement.value] == true) {
-                                        inputCheckboxOrRadio.checked = true;
-                                    }
-
                                     // Set or remove `disabled` depending on whether the control is readonly.
                                     // NOTE: jQuery went back and forth on using `attr()` vs. `prop()` but this seems to work.
                                     var controlEl = document.getElementById(controlId);
                                     var isReadonly = ORBEON.xforms.Controls.isReadonly(controlEl);
+                                    var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];
                                     if (isReadonly)
-                                        $(inputCheckboxOrRadio).attr('disabled', true);
+                                        $(inputCheckboxOrRadio).attr('disabled', 'disabled');
                                     else
                                         $(inputCheckboxOrRadio).removeAttr('disabled');
+
+                                    // Restore checked state after copy
+                                    if (valueToChecked[itemElement.value] == true) {
+                                        inputCheckboxOrRadio.checked = true;
+                                    }
+
+                                    spanContainer.appendChild(templateClone);
                                 });
                             }
 

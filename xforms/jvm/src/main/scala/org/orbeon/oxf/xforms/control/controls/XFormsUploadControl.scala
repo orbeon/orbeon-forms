@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable._
 
 import scala.util.control.NonFatal
 
@@ -316,10 +317,13 @@ object XFormsUploadControl {
   def handleSubmittedFiles(containingDocument: XFormsContainingDocument, filesElement: Element): Unit =
     for {
       (name, value, filename, mediatype, size) ← iterateFileElement(filesElement)
-      // In case of xf:repeat, the name of the template will not match an existing control
-      // In addition, only set value on forControl control if specified
-      uploadControl ← Option(containingDocument.getControlByEffectiveId(name).asInstanceOf[XFormsUploadControl])
-    } uploadControl.handleUploadedFile(value, filename, mediatype, size)
+      // In case of `xf:repeat`, the name of the template will not match an existing control.
+      // In addition, only set value on forControl control if specified.
+      control       ← containingDocument.findControlByEffectiveId(name)
+      uploadControl ← control.cast[XFormsUploadControl]
+    } locally {
+      uploadControl.handleUploadedFile(value, filename, mediatype, size)
+    }
 
   // Check if an <xxf:files> element actually contains file uploads to process
   def hasSubmittedFiles(filesElement: Element): Boolean =
@@ -330,11 +334,13 @@ object XFormsUploadControl {
       parameterElement ← Option(filesElement).toIterator flatMap Dom4j.elements
 
       // Extract all parameters
-      name = parameterElement.element("name").getTextTrim
-      value = parameterElement.element("value").getTextTrim
-      filename = Option(parameterElement.element("filename")) map (_.getTextTrim) getOrElse ""
-      mediatype = Option(parameterElement.element(Headers.ContentTypeLower)) map (_.getTextTrim) getOrElse ""
-      size = parameterElement.element(Headers.ContentLengthLower).getTextTrim
+      name      ← parameterElement.elementOpt("name")                     flatMap (_.getText.trimAllToOpt)
+      value     ← parameterElement.elementOpt("value")                    flatMap (_.getText.trimAllToOpt)
+
+      // TODO: Ideally: `Option[Filename]`, `Option[ContentType]`, `Option[FileSize]`.
+      filename  = parameterElement.elementOpt("filename")                 flatMap (_.getText.trimAllToOpt) getOrElse ""
+      mediatype = parameterElement.elementOpt(Headers.ContentTypeLower)   flatMap (_.getText.trimAllToOpt) getOrElse ""
+      size      = parameterElement.elementOpt(Headers.ContentLengthLower) flatMap (_.getText.trimAllToOpt) getOrElse ""
 
       // A file was selected in the UI (the file may be empty)
       if size != "0" || filename != ""

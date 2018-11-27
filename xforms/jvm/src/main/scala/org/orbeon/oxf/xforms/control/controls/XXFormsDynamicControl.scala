@@ -105,8 +105,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
 
-    if (! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala))
+    if (! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)) {
       fullUpdateChange = true
+      containingDocument.addControlStructuralChange(prefixedId)
+    }
 
     getBoundElement foreach { boundElem ⇒
       updateSubTree(create = false, boundElem)

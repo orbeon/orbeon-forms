@@ -26,7 +26,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
@@ -214,9 +213,8 @@ public class XFormsSubmissionUtils {
      * @param currentInstance       instance containing the nodes to check
      */
     public static void annotateBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        for (XFormsControl currentControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
-            if (currentControl.isRelevant()) {
-                final XFormsUploadControl currentUploadControl = (XFormsUploadControl) currentControl;
+        for (XFormsUploadControl currentUploadControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
+            if (currentUploadControl.isRelevant()) {
                 final Item controlBoundItem = currentUploadControl.getBoundItem();
                 if (controlBoundItem instanceof NodeInfo) {
                     final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;

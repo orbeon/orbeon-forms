@@ -256,12 +256,12 @@ class XFormsControl(
 
 object XFormsControl {
 
-  def controlSupportsRefreshEvents(control: XFormsControl) =
+  def controlSupportsRefreshEvents(control: XFormsControl): Boolean =
     (control ne null) && control.supportsRefreshEvents
 
   // Whether the given item is allowed as a binding item for the given control
   // TODO: don't like pattern matching here and revisit hierarchy
-  def isAllowedBoundItem(control: XFormsControl, item: Item) = control.staticControl match {
+  def isAllowedBoundItem(control: XFormsControl, item: Item): Boolean = control.staticControl match {
     case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
     case repeat: RepeatControl       ⇒ DataModel.isAllowedBoundItem(item)
     case _                           ⇒ false

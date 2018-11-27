@@ -13,11 +13,13 @@
   */
 package org.orbeon.oxf.xforms
 
-import java.{util ⇒ ju}
+import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.ControlState
@@ -25,8 +27,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
-import XFormsConstants._
-import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 
 private class ControlIndex {
 
@@ -80,16 +80,12 @@ private class ControlIndex {
     }
   }
 
-  def effectiveIdsToControls = _effectiveIdsToControls.asScala
+  def effectiveIdsToControls: collection.Map[String, XFormsControl] = _effectiveIdsToControls.asScala
 
-  def controlsOfName(name: String): Iterable[XFormsControl] = {
+  // WARNING: Caller must ensure consistency of `name` and `T`!
+  def controlsOfName[T <: XFormsControl](name: String): Iterable[T] = {
     val result = _controlTypes.get(name)
-    if (result ne null) result.asScala.values else Nil
-  }
-
-  def controlsOfNameAsMap(name: String) = {
-    val result = _controlTypes.get(name)
-    if (result ne null) result.asScala else collection.Map.empty[String, XFormsControl]
+    if (result ne null) result.asScala.values.asInstanceOf[Iterable[T]] else Nil
   }
 }
 
@@ -99,7 +95,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   // Top-level controls
   private var _root: Option[XFormsContainerControl] = None
 
-  def rootOpt = _root
+  def rootOpt: Option[XFormsContainerControl] = _root
 
   def setRoot(root: XFormsContainerControl): Unit =
     this._root = Some(root ensuring (_ ne null))
@@ -111,7 +107,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   private var _initialRepeatIndexes = m.LinkedHashMap.empty[String, Int]
 
   // Only for initial tree after getBackCopy has been called
-  def initialRepeatIndexes = _initialRepeatIndexes
+  def initialRepeatIndexes: m.LinkedHashMap[String, Int] = _initialRepeatIndexes
 
   // Whether the bindings must be reevaluated
   var bindingsDirty = false
@@ -270,15 +266,14 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     case None       ⇒ Nil
   }
 
-  def effectiveIdsToControls           = _controlIndex.effectiveIdsToControls
-  def findControl(effectiveId: String) = effectiveIdsToControls.get(effectiveId)
+  def effectiveIdsToControls: collection.Map[String, XFormsControl] = _controlIndex.effectiveIdsToControls
+  def findControl(effectiveId: String): Option[XFormsControl] = effectiveIdsToControls.get(effectiveId)
 
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
     findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
 
-  def getUploadControlsJava      = _controlIndex.controlsOfName(UPLOAD_NAME).asJava
-  def getUploadControls          = _controlIndex.controlsOfName(UPLOAD_NAME).asInstanceOf[Iterable[XFormsUploadControl]]
-  def getRepeatControls          = _controlIndex.controlsOfName(REPEAT_NAME).asInstanceOf[Iterable[XFormsRepeatControl]]
-  def getDialogControls          = _controlIndex.controlsOfName(XXFORMS_DIALOG_NAME).asInstanceOf[Iterable[XXFormsDialogControl]]
-  def getSelectFullControlsAsMap = _controlIndex.controlsOfNameAsMap(XFORMS_SELECT_QNAME.localName)
+  def getUploadControlsJava : jl.Iterable[XFormsUploadControl] = getUploadControls.asJava
+  def getUploadControls     : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](UPLOAD_NAME)
+  def getRepeatControls     : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](REPEAT_NAME)
+  def getDialogControls     : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_NAME)
 }

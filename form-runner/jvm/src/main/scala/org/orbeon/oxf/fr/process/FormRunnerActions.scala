@@ -387,16 +387,16 @@ trait FormRunnerActions {
 
         val effectiveNonRelevant =
           evaluatedPropertiesAsMap.get("prune").flatten collect {
-            case "false" ⇒ "keep"
-            case _       ⇒ "remove"
+            case "false" ⇒ RelevanceHandling.Keep.entryName.toLowerCase
+            case _       ⇒ RelevanceHandling.Remove.entryName.toLowerCase
           } orElse
-            evaluatedPropertiesAsMap.get("nonrelevant").flatten
+            evaluatedPropertiesAsMap.get(NonRelevantName).flatten
 
         evaluatedPropertiesAsMap +
           ("serialization"   → effectiveSerialization)  +
           ("mediatype"       → effectiveContentType  )  + // `<xf:submission>` uses `mediatype`
           (PruneMetadataName → effectivePruneMetadata)  +
-          ("nonrelevant"     → effectiveNonRelevant)
+          (NonRelevantName   → effectiveNonRelevant)
       }
 
       // Create PDF and/or TIFF if needed
@@ -488,7 +488,7 @@ trait FormRunnerActions {
         List(
           Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
           Some(             Some("method")                → HttpMethod.POST.entryName.toLowerCase),
-          Some(             Some("nonrelevant")           → "keep"),
+          Some(             Some(NonRelevantName)         → RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")               → replace),
           Some(             Some(ShowProgressName)        → showProgress.toString),
           Some(             Some("content")               → "xml"),

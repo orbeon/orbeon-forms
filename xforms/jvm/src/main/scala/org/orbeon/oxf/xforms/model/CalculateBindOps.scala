@@ -186,7 +186,7 @@ trait CalculateBindOps {
     }
 
     // Q: Can bindNode.node ever be null here?
-    def mustEvaluateNode(node: NodeInfo, defaultsStrategy: SomeDefaultsStrategy) =
+    def mustEvaluateNode(node: NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
       defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(

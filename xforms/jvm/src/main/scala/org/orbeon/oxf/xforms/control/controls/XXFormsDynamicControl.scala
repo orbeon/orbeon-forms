@@ -38,9 +38,9 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node.ELEMENT_NODE
 
-import scala.collection.generic.Growable
-import scala.collection.mutable.Buffer
 import scala.collection.JavaConverters._
+import scala.collection.generic.Growable
+import scala.collection.mutable
 
 /**
  * xxf:dynamic control
@@ -65,17 +65,17 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   case class Nested(container: XBLContainer, partAnalysis: PartAnalysisImpl, template: SAXStore, outerListener: EventListener)
 
   private var _nested: Option[Nested] = None
-  def nested = _nested
+  def nested: Option[Nested] = _nested
 
   private var fullUpdateChange = false
-  private val xblChanges       = Buffer[(String, Element)]()
-  private val bindChanges      = Buffer[(String, Element)]()
+  private val xblChanges       = mutable.Buffer[(String, Element)]()
+  private val bindChanges      = mutable.Buffer[(String, Element)]()
 
   // New scripts created during an update (not functional as of 2018-05-03)
   // NOTE: This should instead be accumulated at the level of the request.
   private var _newScripts: List[ShareableScript] = Nil
-  def newScripts = _newScripts
-  def clearNewScripts() = _newScripts = Nil
+  def newScripts: List[ShareableScript] = _newScripts
+  def clearNewScripts(): Unit = _newScripts = Nil
 
   // TODO: This might blow if the control is non-relevant
   override def bindingContextForChildOpt: Option[BindingContext] =
@@ -367,7 +367,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   ): Unit = ()
 
   // Only if we had a structural change
-  override def supportFullAjaxUpdates = containingDocument.getControlsStructuralChanges.contains(prefixedId)
+  override def supportFullAjaxUpdates: Boolean = containingDocument.getControlsStructuralChanges.contains(prefixedId)
 }
 
 object XXFormsDynamicControl {
@@ -415,7 +415,7 @@ object XXFormsDynamicControl {
           id         = ancestor.id
           if id.nonEmpty
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          binding    ← partAnalysis.xblBindings.getBinding(prefixedId)
+          _          ← partAnalysis.xblBindings.getBinding(prefixedId)
           if ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId → unsafeUnwrapElement(ancestor)

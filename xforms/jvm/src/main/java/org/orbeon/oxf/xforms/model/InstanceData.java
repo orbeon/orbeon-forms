@@ -17,7 +17,6 @@ import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xforms.model.BindNode;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -49,7 +48,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     private boolean schemaInvalid;
 
     // Whether to evaluate the default value
-    public boolean requireDefaultValue;
+    private boolean requireDefaultValue;
 
     // Annotations (used only for multipart submission as of 2010-12)
     private Map<String, String> transientAnnotations;
@@ -79,15 +78,6 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     private static final InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
-        @Override
-        public boolean getLocalRelevant() {
-            return Model.DEFAULT_RELEVANT();
-        }
-
-        @Override
-        public boolean getLocalReadonly() {
-            return true;
-        }
 
         @Override
         public boolean getRequired() {
@@ -115,7 +105,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         }
     };
 
-    public boolean getLocalRelevant() {
+    private boolean getLocalRelevant() {
         if (bindNodes != null && bindNodes.size() > 0)
             for (final BindNode bindNode : bindNodes)
                 if (bindNode.relevant() != Model.DEFAULT_RELEVANT())
@@ -124,7 +114,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_RELEVANT();
     }
 
-    public boolean getLocalReadonly() {
+    private boolean getLocalReadonly() {
         if (bindNodes != null && bindNodes.size() > 0)
             for (final BindNode bindNode : bindNodes)
                 if (bindNode.readonly() != Model.DEFAULT_READONLY())
@@ -155,7 +145,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_VALID();
     }
 
-    public scala.collection.immutable.Map<String, String> collectAllCustomMIPs() {
+    private scala.collection.immutable.Map<String, String> collectAllCustomMIPs() {
         return BindNode.collectAllCustomMIPs(bindNodes);
     }
 
@@ -182,13 +172,13 @@ public class InstanceData {// rename to DataNodeProperties once done
         return sb == null ? null : sb.toString();
     }
 
-    public void setTransientAnnotation(String name, String value) {
+    private void setTransientAnnotation(String name, String value) {
         if (transientAnnotations == null)
             transientAnnotations = new HashMap<String, String>();
         transientAnnotations.put(name, value);
     }
 
-    public String getTransientAnnotation(String name) {
+    private String getTransientAnnotation(String name) {
         return (transientAnnotations == null) ? null : transientAnnotations.get(name);
     }
 

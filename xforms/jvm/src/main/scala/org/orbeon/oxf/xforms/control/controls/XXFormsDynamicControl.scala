@@ -40,6 +40,7 @@ import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.generic.Growable
 import scala.collection.mutable.Buffer
+import scala.collection.JavaConverters._
 
 /**
  * xxf:dynamic control
@@ -66,10 +67,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   private var _nested: Option[Nested] = None
   def nested = _nested
 
-  private var previousChangeCount = -1
-  private var changeCount = 0
-  private val xblChanges  = Buffer[(String, Element)]()
-  private val bindChanges = Buffer[(String, Element)]()
+  private var fullUpdateChange = false
+  private val xblChanges       = Buffer[(String, Element)]()
+  private val bindChanges      = Buffer[(String, Element)]()
 
   // New scripts created during an update (not functional as of 2018-05-03)
   // NOTE: This should instead be accumulated at the level of the request.
@@ -100,17 +100,21 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   override def onDestroy(): Unit = {
     // TODO: XXX remove child container from parent
     _nested = None
-    previousChangeCount = 0
-    changeCount = 0
+    fullUpdateChange = false
   }
 
-  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit =
+  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
+
+    if (! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala))
+      fullUpdateChange = true
+
     getBoundElement foreach { boundElem ⇒
       updateSubTree(create = false, boundElem)
     }
+  }
 
   private def updateSubTree(create: Boolean, boundElem: VirtualNode): Unit =
-    if (create || previousChangeCount != changeCount) {
+    if (create || fullUpdateChange) {
       // Document has changed and needs to be fully recreated
       processFullUpdate(create, boundElem)
     } else {
@@ -124,7 +128,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
 
   private def processFullUpdate(create: Boolean, boundElem: VirtualNode): Unit = {
-    previousChangeCount = changeCount
+    fullUpdateChange = false
     xblChanges.clear()
     bindChanges.clear()
 
@@ -193,8 +197,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val outerListener: EventListener = {
 
       // Mark an unknown change, which will require a complete rebuild of the part
-      val unknownChange: MirrorEventListener = { x ⇒
-        changeCount += 1
+      val unknownChange: MirrorEventListener = { _ ⇒
+        fullUpdateChange = true
         containingDocument.addControlStructuralChange(prefixedId)
         ListenerResult.Stop
       }
@@ -348,8 +352,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   override def getBackCopy: XXFormsDynamicControl = {
     val cloned = super.getBackCopy.asInstanceOf[XXFormsDynamicControl]
-    cloned.previousChangeCount = -1 // unused
-    cloned.changeCount = previousChangeCount
+    cloned.fullUpdateChange = false // unused
     cloned._nested = None
 
     cloned

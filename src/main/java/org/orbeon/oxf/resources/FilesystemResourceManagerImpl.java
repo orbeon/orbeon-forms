@@ -14,6 +14,7 @@
 package org.orbeon.oxf.resources;
 
 import org.apache.log4j.Logger;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 
@@ -153,7 +154,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
     protected File getFile(String key) {
         try {
             // The key comes from a URL, and therefore needs to be decoded to be used as a file
-            key = URLDecoder.decode(key, "utf-8");
+            key = URLDecoder.decode(key, CharsetNames.Utf8());
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }

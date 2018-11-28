@@ -17,6 +17,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream}
 import java.net._
 
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
@@ -63,8 +64,8 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             // If the username/password contain special character, those characters will be encoded, since
             // we are getting this from a URL. Now do the decoding.
 
-            val usernameOpt = username.trimAllToOpt map (URLDecoder.decode(_, "utf-8"))
-            val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, "utf-8"))
+            val usernameOpt = username.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
+            val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
 
             usernameOpt map { username ⇒
               Credentials(username, passwordOpt, preemptiveAuth = true, None)

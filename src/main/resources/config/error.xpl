@@ -68,7 +68,7 @@
         <p:input name="config">
             <config>
                 <version>5.0</version>
-                <encoding>utf-8</encoding>
+                <encoding>UTF-8</encoding>
                 <indent>true</indent>
                 <indent-amount>0</indent-amount>
             </config>

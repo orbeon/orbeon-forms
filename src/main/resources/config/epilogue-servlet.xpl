@@ -143,7 +143,7 @@
                                     <config>
                                         <method>xhtml</method>
                                         <omit-xml-declaration>true</omit-xml-declaration>
-                                        <encoding>utf-8</encoding>
+                                        <encoding>UTF-8</encoding>
                                         <content-type>application/xhtml+xml</content-type>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
@@ -162,7 +162,7 @@
                                 <p:input name="config">
                                     <config>
                                         <version>5.0</version>
-                                        <encoding>utf-8</encoding>
+                                        <encoding>UTF-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
                                     </config>
@@ -183,7 +183,7 @@
                             <p:processor name="oxf:identity">
                                 <p:input name="data">
                                     <config>
-                                        <encoding>utf-8</encoding>
+                                        <encoding>UTF-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
                                     </config>
@@ -196,7 +196,7 @@
                                 <p:input name="data">
                                     <config>
                                         <version>5.0</version>
-                                        <encoding>utf-8</encoding>
+                                        <encoding>UTF-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
                                     </config>
@@ -243,7 +243,7 @@
                 <p:input name="config">
                     <config>
                         <version>5.0</version>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <indent>true</indent>
                         <indent-amount>0</indent-amount>
                     </config>
@@ -265,7 +265,7 @@
             <p:processor name="oxf:xml-converter">
                 <p:input name="config">
                     <config>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <content-type>application/atom+xml</content-type>
                         <indent>false</indent>
                         <indent-amount>0</indent-amount>
@@ -300,7 +300,7 @@
             <p:processor name="oxf:xml-converter">
                 <p:input name="config">
                     <config>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <indent>false</indent>
                         <indent-amount>0</indent-amount>
                     </config>

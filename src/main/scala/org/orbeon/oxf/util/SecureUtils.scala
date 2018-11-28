@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.util
 
-import java.security.{Security, SecureRandom, MessageDigest}
+import java.security.{MessageDigest, SecureRandom, Security}
+
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import org.apache.commons.pool.BasePoolableObjectFactory
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.common.OXFException
 
@@ -134,7 +136,7 @@ object SecureUtils {
 
   // Compute a digest
   def digestString(text: String, algorithm: String, encoding: String): String =
-    digestBytes(text.getBytes("utf-8"), algorithm, encoding)
+    digestBytes(text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
   // Compute a digest with the default algorithm
   def digestString(text: String, encoding: String): String =
@@ -151,11 +153,11 @@ object SecureUtils {
 
   // Compute an HMAC with the default password and algorithm
   def hmacString(text: String, encoding: String): String =
-    hmacBytes(getPassword.getBytes("utf-8"), text.getBytes("utf-8"), getHashAlgorithm, encoding)
+    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
 
   // Compute an HMAC
   def hmacString(key: String, text: String, algorithm: String, encoding: String): String =
-    hmacBytes(key.getBytes("utf-8"), text.getBytes("utf-8"), algorithm, encoding)
+    hmacBytes(key.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
   def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: String): String = {
 

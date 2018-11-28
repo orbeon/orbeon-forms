@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.*;
@@ -124,8 +125,8 @@ public class StreamInterceptor {
                         // tidy used does not support a Reader as input.
 
                         // Use utf-8 both ways and hope for the best
-                        inputStream = new ByteArrayInputStream(stringContent.getBytes("utf-8"));
-                        tidy.setInputEncoding("utf-8");
+                        inputStream = new ByteArrayInputStream(stringContent.getBytes(CharsetNames.Utf8()));
+                        tidy.setInputEncoding(CharsetNames.Utf8());
                     }
 
                     final Document document = tidy.parseDOM(inputStream, null);

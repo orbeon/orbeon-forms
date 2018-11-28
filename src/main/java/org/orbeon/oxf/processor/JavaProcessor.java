@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.OutputCacheKey;
@@ -353,7 +354,7 @@ public class JavaProcessor extends ProcessorImpl {
             if (!file.exists()) {
                 // Try to decode only if we cannot find the file
                 try {
-                    fileName = URLDecoder.decode(fileName, "utf-8");
+                    fileName = URLDecoder.decode(fileName, CharsetNames.Utf8());
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen
                     throw new ValidationException(e, locationData);

@@ -1,5 +1,7 @@
+package org.orbeon.io
+
 /**
-  * Copyright (C) 2018 Orbeon, Inc.
+  * Copyright (C) 2007 Orbeon, Inc.
   *
   * This program is free software; you can redistribute it and/or modify it under the terms of the
   * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,9 +13,6 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.io
-
-
 object CharsetNames {
   val Utf8     = "UTF-8"
   val Iso88591 = "ISO-8859-1"

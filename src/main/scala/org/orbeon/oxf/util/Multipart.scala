@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.io.LimiterInputStream
+import org.orbeon.io.{CharsetNames, LimiterInputStream}
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -172,7 +172,7 @@ object Multipart {
 
   private object Private {
 
-    val StandardParameterEncoding = "utf-8"
+    val StandardParameterEncoding = CharsetNames.Utf8
 
     def adjustMaxSize(maxSize: Long): Long =
       if (maxSize < 0L) -1L else maxSize max DefaultBufferSize

@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.{util ⇒ ju}
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.HttpMethod
@@ -57,7 +58,7 @@ abstract class SimpleExternalContext extends ExternalContext {
     def isUserInRole(role: String)                                                    = false
     def getSession(create: Boolean): Session                                          = session
     def sessionInvalidate()                                                           = ()
-    def getCharacterEncoding                                                          = "utf-8"
+    def getCharacterEncoding                                                          = CharsetNames.Utf8
     def getContentLength                                                              = 0
     def getContentType                                                                = ""
     def getServerName                                                                 = ""

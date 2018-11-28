@@ -14,6 +14,7 @@
 package org.orbeon.oxf.controller;
 
 import org.orbeon.dom.*;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;
@@ -65,7 +66,7 @@ public class PageFlowControllerBuilder {
                         Document config = DocumentFactory.createDocument("config");
                         Element rootElement = config.getRootElement();
                         rootElement.addElement("version").addText("5.0");
-                        rootElement.addElement("encoding").addText("utf-8");
+                        rootElement.addElement("encoding").addText(CharsetNames.Utf8());
                         addInput(new ASTInput("config", config));
                         addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
                         //setLocationData(TODO);

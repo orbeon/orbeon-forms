@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.log4j.Logger;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;
@@ -42,7 +43,7 @@ public class NetUtils {
     private static final Pattern PATTERN_NO_AMP;
 
     public static final int COPY_BUFFER_SIZE = 8192;
-    public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
+    public static final String STANDARD_PARAMETER_ENCODING = CharsetNames.Utf8();
 
     private static FileItemFactory fileItemFactory;
 

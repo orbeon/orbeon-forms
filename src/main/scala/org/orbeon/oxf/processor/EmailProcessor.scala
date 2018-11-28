@@ -15,14 +15,15 @@ package org.orbeon.oxf.processor
 
 import java.io._
 import java.util.{Properties ⇒ JProperties}
+
 import javax.activation.{DataHandler, DataSource}
 import javax.mail.Message.RecipientType
 import javax.mail._
 import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
-
 import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -364,7 +365,7 @@ private object EmailProcessor {
   val ConfigNamespaceURI = "http://www.orbeon.com/oxf/email"
 
   // Use utf-8 as most email clients support it. This allows us not to have to pick an inferior encoding.
-  val DefaultCharacterEncoding = "utf-8"
+  val DefaultCharacterEncoding = CharsetNames.Utf8
 
   // Get Some(trimmed value of the element) or None if the element is null
   def optionalValueTrim(e: Element) = (Option(e) map(_.getStringValue) orNull).trimAllToOpt
@@ -378,7 +379,7 @@ private object EmailProcessor {
   }
 
   class SimpleTextDataSource(val getName: String, val getContentType: String, text: String) extends ReadonlyDataSource {
-    def getInputStream  = new ByteArrayInputStream(text.getBytes("utf-8"))
+    def getInputStream  = new ByteArrayInputStream(text.getBytes(CharsetNames.Utf8))
   }
 
   class SimpleBinaryDataSource(val getName: String, val getContentType: String, data: Array[Byte]) extends ReadonlyDataSource {

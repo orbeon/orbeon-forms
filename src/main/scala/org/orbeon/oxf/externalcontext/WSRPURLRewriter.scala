@@ -17,6 +17,7 @@ import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.{NetUtils, StringConversions, URLRewriterUtils}
 
@@ -207,7 +208,7 @@ object WSRPURLRewriter {
       sb.append('&')
       sb.append(NavigationalStateParam)
       sb.append('=')
-      sb.append(URLEncoder.encode(navigationalState, "utf-8"))
+      sb.append(URLEncoder.encode(navigationalState, CharsetNames.Utf8))
     }
     sb.append(EndTag)
 
@@ -246,7 +247,7 @@ object WSRPURLRewriter {
     val navigationParameters = {
       val navigationalStateValue = getFirstValueFromStringArray(wsrpParameters.get(NavigationalStateParam))
       if (navigationalStateValue ne null)
-        NetUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), "utf-8"))
+        NetUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), CharsetNames.Utf8))
       else
         ju.Collections.emptyMap[String, Array[String]]
     }

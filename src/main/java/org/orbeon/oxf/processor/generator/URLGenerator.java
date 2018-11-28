@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.generator;
 
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -819,7 +820,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readJSON(InputStream is, XMLReceiver output) throws IOException {
 
-            final Reader reader     = new InputStreamReader(is, "utf-8");
+            final Reader reader     = new InputStreamReader(is, CharsetNames.Utf8());
             final String jsonString = NetUtils.readStreamAsString(reader);
 
             Converter.jsonStringToXmlStream(jsonString, output, Symbols.JSON());

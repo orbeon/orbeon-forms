@@ -17,6 +17,7 @@ import java.io._
 import java.{util ⇒ ju}
 
 import enumeratum.values.{IntEnum, IntEnumEntry}
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.NumericUtils
 
@@ -31,7 +32,7 @@ import scala.collection.JavaConverters._
   */
 object ExternalContext {
 
-  val StandardCharacterEncoding       = "utf-8"
+  val StandardCharacterEncoding       = CharsetNames.Utf8
   val StandardHeaderCharacterEncoding = StandardCharacterEncoding
   val StandardFormCharacterEncoding   = StandardCharacterEncoding
 

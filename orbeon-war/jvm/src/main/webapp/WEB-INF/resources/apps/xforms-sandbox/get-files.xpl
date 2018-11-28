@@ -43,19 +43,19 @@
         </p:input>
         <p:output name="data" id="sorted"/>
     </p:processor>
-    
+
     <!-- Convert and serialize to XML -->
     <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config>
                 <indent>false</indent>
-                <encoding>utf-8</encoding>
+                <encoding>UTF-8</encoding>
             </config>
         </p:input>
         <p:input name="data" href="#sorted"/>
         <p:output name="data" id="converted"/>
     </p:processor>
-    
+
      <p:processor name="oxf:http-serializer">
         <p:input name="config">
             <config>

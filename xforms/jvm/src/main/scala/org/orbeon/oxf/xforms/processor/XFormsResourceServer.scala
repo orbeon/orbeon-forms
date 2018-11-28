@@ -17,7 +17,7 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.UriScheme
+import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -81,7 +81,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
         )
 
-        useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
+        useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer ⇒
           fromCurrentStateOpt orElse fromInitialStateOpt foreach { content ⇒
             writer.write(content)
           }
@@ -101,7 +101,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
           response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
-          useAndClose(new OutputStreamWriter(response.getOutputStream, "utf-8")) { writer ⇒
+          useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer ⇒
             ScriptBuilder.writeScripts(
               state.topLevelPart.uniqueJsScripts,
               writer.write
@@ -160,7 +160,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
         // Handle as attachment
         // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"))
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, CharsetNames.Utf8))
 
         // Copy stream out
         try {

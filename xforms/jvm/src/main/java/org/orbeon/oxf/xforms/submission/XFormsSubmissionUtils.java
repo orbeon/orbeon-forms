@@ -21,6 +21,7 @@ import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
 import org.orbeon.dom.VisitorSupport;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -73,9 +74,9 @@ public class XFormsSubmissionUtils {
                             sb.append(separator);
 
                         try {
-                            sb.append(URLEncoder.encode(localName, "UTF-8"));
+                            sb.append(URLEncoder.encode(localName, CharsetNames.Utf8()));
                             sb.append('=');
-                            sb.append(URLEncoder.encode(text, "UTF-8"));
+                            sb.append(URLEncoder.encode(text, CharsetNames.Utf8()));
                             // TODO: check if line breaks will be correcly encoded as "%0D%0A"
                         } catch (UnsupportedEncodingException e) {
                             // Should not happen: UTF-8 must be supported
@@ -125,7 +126,7 @@ public class XFormsSubmissionUtils {
                                 } else {
                                     // Value is invalid as per xs:anyURI
                                     // Just use the value as is (could also ignore it)
-                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
+                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8())));
                                 }
 
                             } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
@@ -137,11 +138,11 @@ public class XFormsSubmissionUtils {
                                 } else {
                                     // Value is invalid as per xs:base64Binary
                                     // Just use the value as is (could also ignore it)
-                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
+                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8())));
                                 }
                             } else {
                                 // Just use the value as is
-                                multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
+                                multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8())));
                             }
                         }
                     }

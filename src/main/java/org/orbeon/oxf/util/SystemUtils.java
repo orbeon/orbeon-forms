@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 
 import java.io.File;
@@ -136,7 +137,7 @@ public class SystemUtils {
             // should anyone use something other than jdk class loaders we
             // will end up unencoded urls.
             if (!fil.exists()) {
-                final String unEncNam = URLDecoder.decode(fnam, "utf-8");
+                final String unEncNam = URLDecoder.decode(fnam, CharsetNames.Utf8());
                 final File unEncFil = new File(unEncNam);
                 if (unEncFil.exists()) sbuf.append(unEncNam);
             } else {
@@ -168,7 +169,7 @@ public class SystemUtils {
                         File file = new File(fileName);
                         if (!file.exists()) {
                             // Try to decode only if we cannot find the file (see explanation in other method above)
-                            fileName = URLDecoder.decode(fileName, "utf-8");
+                            fileName = URLDecoder.decode(fileName, CharsetNames.Utf8());
                         }
 
                         File jarDirectory = new File(fileName).getParentFile();

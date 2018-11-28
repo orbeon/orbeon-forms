@@ -123,7 +123,7 @@
             <p:processor name="oxf:xml-converter">
                 <p:input name="config">
                     <config>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <indent>false</indent>
                         <indent-amount>0</indent-amount>
                     </config>

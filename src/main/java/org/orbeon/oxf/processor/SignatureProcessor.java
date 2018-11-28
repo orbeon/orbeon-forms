@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.dom.Document;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.*;
@@ -60,7 +61,7 @@ public class SignatureProcessor extends ProcessorImpl {
 
                     final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
                     final String dataStr = Dom4jUtils.domToString(data);
-                    dsa.update(dataStr.getBytes("utf-8"));
+                    dsa.update(dataStr.getBytes(CharsetNames.Utf8()));
                     final String sig = Base64.encode(dsa.sign(), true);
 
                     final LocationSAXWriter saxw = new LocationSAXWriter();

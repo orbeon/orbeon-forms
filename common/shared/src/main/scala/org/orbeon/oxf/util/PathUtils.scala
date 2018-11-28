@@ -16,6 +16,8 @@ package org.orbeon.oxf.util
 import java.net.URLDecoder.{decode ⇒ decodeURL}
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 
+import org.orbeon.io.CharsetNames
+
 
 object PathUtils {
 
@@ -61,8 +63,8 @@ object PathUtils {
       if nameValueArray.size >= 1
       encodedName    = nameValueArray(0)
       if encodedName.nonEmpty
-      decodedName    = decodeURL(encodedName, "utf-8")
-      decodedValue   = decodeURL(nameValueArray.lift(1) getOrElse "", "utf-8")
+      decodedName    = decodeURL(encodedName, CharsetNames.Utf8)
+      decodedValue   = decodeURL(nameValueArray.lift(1) getOrElse "", CharsetNames.Utf8)
     } yield
       decodedName → decodedValue
 
@@ -75,7 +77,7 @@ object PathUtils {
 
   // Encode a sequence of pairs to a query string
   def encodeSimpleQuery(parameters: TraversableOnce[(String, String)]): String =
-    parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
+    parameters map { case (name, value) ⇒ encodeURL(name, CharsetNames.Utf8) + '=' + encodeURL(value, CharsetNames.Utf8) } mkString "&"
 
   // Find a path extension
   def findExtension(path: String): Option[String] =

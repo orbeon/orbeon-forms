@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -100,7 +101,7 @@ trait FormRunnerEmail {
     } yield {
       // This appears necessary for non-ASCII characters to make it through.
       // Verified that this works with GMail.
-      javax.mail.internet.MimeUtility.encodeText(name, "UTF-8", null)
+      javax.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
     }
   }
 }

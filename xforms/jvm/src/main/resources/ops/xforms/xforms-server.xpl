@@ -48,7 +48,7 @@
                     <config>
                         <!-- Unneeded, and also we don't want to have one if we return an empty document -->
                         <omit-xml-declaration>true</omit-xml-declaration>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <indent>false</indent>
                     </config>
                 </p:input>
@@ -101,7 +101,7 @@
                 <p:input name="config">
                     <config>
                         <version>5.0</version>
-                        <encoding>utf-8</encoding>
+                        <encoding>UTF-8</encoding>
                         <indent>false</indent>
                     </config>
                 </p:input>

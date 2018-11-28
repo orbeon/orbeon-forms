@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.Element
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
@@ -649,7 +650,7 @@ object PathMapXPathAnalysis {
             val presenter = new ExpressionPresenter(configuration, out)
             expression.explain(presenter)
             presenter.close()
-            XML.loadString(out.toString("utf-8"))
+            XML.loadString(out.toString(CharsetNames.Utf8))
           }
 
           def getStep(step: Expression, targetNode: PathMapNode) =

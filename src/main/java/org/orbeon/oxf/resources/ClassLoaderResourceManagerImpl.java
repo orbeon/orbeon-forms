@@ -14,6 +14,7 @@
 package org.orbeon.oxf.resources;
 
 import org.apache.log4j.Logger;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -114,7 +115,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
                         if (f.exists()) {
                             ret = f.lastModified();
                         } else {
-                            final String fnamDec = URLDecoder.decode(fnam, "utf-8");
+                            final String fnamDec = URLDecoder.decode(fnam, CharsetNames.Utf8());
                             final File fdec = new File(fnamDec);
                             ret = fdec.lastModified();
                         }

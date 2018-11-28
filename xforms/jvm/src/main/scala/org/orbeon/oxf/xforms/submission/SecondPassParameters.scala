@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Credentials, HttpMethod}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
@@ -31,7 +32,7 @@ case class SecondPassParameters(
 object SecondPassParameters {
 
   private val DefaultSeparator = "&" // XForms 1.1 changes back the default to `&` as of February 2009
-  private val DefaultEncoding  = "UTF-8"
+  private val DefaultEncoding  = CharsetNames.Utf8
   private val Asynchronous     = "asynchronous"
   private val Application      = "application"
   private val CacheableMethods = Set(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT): Set[HttpMethod]

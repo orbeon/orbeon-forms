@@ -17,6 +17,7 @@ import java.io.Writer
 
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.QName
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -44,7 +45,7 @@ object HTMLFragmentSerializer {
       null,
       null,
       null,
-      "utf-8",
+      CharsetNames.Utf8,
       true,
       null,
       false,

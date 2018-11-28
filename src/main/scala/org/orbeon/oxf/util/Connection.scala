@@ -20,7 +20,7 @@ import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
-import org.orbeon.io.{FileUtils, UriScheme}
+import org.orbeon.io.{CharsetNames, FileUtils, UriScheme}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -780,7 +780,7 @@ object Connection extends Logging {
     if (ContentTypes.isXMLMediatype(mediatype) ||
       ContentTypes.isTextOrJSONContentType(mediatype) ||
       mediatype == "application/x-www-form-urlencoded")
-      logger.logDebug("submission", "setting request body", "body", new String(messageBody, "UTF-8"))
+      logger.logDebug("submission", "setting request body", "body", new String(messageBody, CharsetNames.Utf8))
     else
       logger.logDebug("submission", "setting binary request body")
 }

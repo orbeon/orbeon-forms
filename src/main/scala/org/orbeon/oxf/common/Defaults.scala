@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.common
 
+import org.orbeon.io.CharsetNames
+
 
 object Defaults {
-  val DefaultEncodingForModernUse            = "UTF-8"
-  val DefaultEncodingForServletCompatibility = "ISO-8859-1" // from RFC 2616 (RFC 7231 removes this) and Servlet
+  val DefaultEncodingForModernUse            = CharsetNames.Utf8
+  val DefaultEncodingForServletCompatibility = CharsetNames.Iso88591 // from RFC 2616 (RFC 7231 removes this) and Servlet
 }

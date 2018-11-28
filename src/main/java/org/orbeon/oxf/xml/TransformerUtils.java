@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
@@ -54,7 +55,7 @@ import java.util.Properties;
  */
 public class TransformerUtils {
 
-    public static final String DEFAULT_OUTPUT_ENCODING = "utf-8";
+    public static final String DEFAULT_OUTPUT_ENCODING = CharsetNames.Utf8();
 
     /**
      * Property name to use for choosing the amount of indentation.
@@ -493,7 +494,7 @@ public class TransformerUtils {
      */
     public static DocumentInfo stringToTinyTree(Configuration configuration, String string, boolean handleXInclude, boolean handleLexical) {
         try {
-            return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude, handleLexical);
+            return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes(CharsetNames.Utf8())), null, handleXInclude, handleLexical);
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);// should not happen
         }

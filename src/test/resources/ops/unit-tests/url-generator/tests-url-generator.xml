@@ -128,7 +128,7 @@
                         <config>
                             <url>oxf:/ops/unit-tests/url-generator/sample-text-utf-8.txt</url>
                             <content-type>text/plain</content-type>
-                            <encoding>utf-8</encoding>
+                            <encoding>UTF-8</encoding>
                          </config>
                     </p:input>
                     <p:output name="data" id="document"/>

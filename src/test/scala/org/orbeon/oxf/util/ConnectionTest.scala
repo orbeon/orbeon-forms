@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import org.junit.Test
 import org.mockito.Mockito
-import org.orbeon.io.UriScheme
+import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
@@ -63,7 +63,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         method            = GET,
         hasCredentials    = false,
         mediatype         = null,
-        encodingForSOAP   = "UTF-8",
+        encodingForSOAP   = CharsetNames.Utf8,
         customHeaders     = customHeaderValuesMap,
         headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
         getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
@@ -99,7 +99,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
   @Test def combinedParameters(): Unit = {
 
     val queryString = "name1=value1a&name2=value2a&name3=value3"
-    val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes("utf-8")
+    val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes(CharsetNames.Utf8)
 
     // POST configuration
     val method = POST
@@ -112,7 +112,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         method           = method,
         hasCredentials   = false,
         mediatype        = bodyMediaType,
-        encodingForSOAP  = "UTF-8",
+        encodingForSOAP  = CharsetNames.Utf8,
         customHeaders    = explicitHeaders,
         headersToForward = Set(),
         getHeader        = _ ⇒ None)(

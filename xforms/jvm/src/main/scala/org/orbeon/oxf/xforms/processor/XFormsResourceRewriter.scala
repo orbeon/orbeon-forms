@@ -17,6 +17,7 @@ package org.orbeon.oxf.xforms.processor
 import java.io._
 import java.util.regex.Matcher
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -94,7 +95,7 @@ object XFormsResourceRewriter extends Logging {
     def tryReadCSS(path: String, is: InputStream) =
       Try {
         val sbw = new StringBuilderWriter
-        copyReader(new InputStreamReader(is, "utf-8"), sbw)
+        copyReader(new InputStreamReader(is, CharsetNames.Utf8), sbw)
         sbw.toString
       } onFailure
         logFailure(path)
@@ -106,7 +107,7 @@ object XFormsResourceRewriter extends Logging {
       } yield
         path → originalCSS
 
-    val outputWriter = new OutputStreamWriter(os, "utf-8")
+    val outputWriter = new OutputStreamWriter(os, CharsetNames.Utf8)
 
     // Output Orbeon Forms version if allowed
     Version.versionStringIfAllowed foreach { version ⇒
@@ -172,7 +173,7 @@ object XFormsResourceRewriter extends Logging {
     logger     : IndentedLogger
   ): Unit = {
 
-    val outputWriter = new OutputStreamWriter(os, "utf-8")
+    val outputWriter = new OutputStreamWriter(os, CharsetNames.Utf8)
 
     // Output Orbeon Forms version if allowed
     Version.versionStringIfAllowed foreach { version ⇒

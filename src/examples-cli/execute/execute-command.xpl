@@ -52,7 +52,7 @@
     <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config>
-                <encoding>utf-8</encoding>
+                <encoding>UTF-8</encoding>
                 <indent>true</indent>
                 <indent-amount>4</indent-amount>
             </config>

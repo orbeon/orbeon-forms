@@ -17,6 +17,7 @@ import java.io.File
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.dom.Element
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils._
@@ -265,7 +266,7 @@ object XFormsUploadControl {
       "size"      → size
     )
 
-    val query = candidates collect { case (name, Some(value)) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
+    val query = candidates collect { case (name, Some(value)) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
     val urlWithQuery = NetUtils.appendQueryString(url, query)
 
     NetUtils.appendQueryString(urlWithQuery, "mac=" + hmac(urlWithQuery))
@@ -280,7 +281,7 @@ object XFormsUploadControl {
     val uri = new URI(url)
     // NOTE: Use getRawQuery, as the query might encode & and =, and we should not decode them before decoding the query
     val query = Option(uri.getRawQuery) map decodeSimpleQuery getOrElse Seq()
-    val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
+    val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
 
     NetUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
   }

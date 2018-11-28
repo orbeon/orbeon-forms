@@ -71,7 +71,7 @@
         <p:input name="config">
             <config>
                 <indent>false</indent>
-                <encoding>utf-8</encoding>
+                <encoding>UTF-8</encoding>
                 <standalone>true</standalone>
             </config>
         </p:input>

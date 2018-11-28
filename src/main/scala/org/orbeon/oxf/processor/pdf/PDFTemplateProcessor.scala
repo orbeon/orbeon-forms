@@ -23,7 +23,7 @@ import com.lowagie.text.{Image, Rectangle}
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.UriScheme
+import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
@@ -107,7 +107,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
       // Add substitution fonts for Acrobat fields
       for (element ← configRoot.elements("substitution-font").asScala) {
-        val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), "utf-8")
+        val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), CharsetNames.Utf8)
         val embed            = element.attributeValue("embed") == "true"
 
         try initialContext.acroFields.addSubstitutionFont(createFont(fontFamilyOrPath, embed))

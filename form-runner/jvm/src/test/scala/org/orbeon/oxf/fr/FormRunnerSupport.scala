@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunnerSupport._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
@@ -76,7 +77,7 @@ trait FormRunnerSupport extends DocumentTestBase {
       )
 
     val responseContent = BufferedContent(response.content)
-    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, "utf-8")) map (_.group(1))
+    val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
 
     val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
 

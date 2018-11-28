@@ -19,6 +19,7 @@ import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.exception.OrbeonFormatter;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -483,7 +484,7 @@ public class ImageServer extends ProcessorImpl {
             if (sb.length() > 0)
                 sb.append(File.separatorChar);
             try {
-                sb.append(URLEncoder.encode(st.nextToken(), "utf-8").replace('+', ' '));
+                sb.append(URLEncoder.encode(st.nextToken(), CharsetNames.Utf8()).replace('+', ' '));
             } catch (UnsupportedEncodingException e) {
                 throw new OXFException(e);
             }
@@ -493,7 +494,7 @@ public class ImageServer extends ProcessorImpl {
 
     private String computePathNameFlat(String path) {
         try {
-            return URLEncoder.encode(path, "utf-8");
+            return URLEncoder.encode(path, CharsetNames.Utf8());
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }

@@ -15,11 +15,12 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder
-import javax.xml.transform.stream.StreamResult
 
+import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{Connection, ContentTypes, XPath}
@@ -54,21 +55,21 @@ object SerializationParameters {
           // Form author set data to serialize
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
-              messageBody            = overriddenSerializedData.getBytes("UTF-8"),
+              messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8),
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype("application/xml")
             )
           } else {
             SerializationParameters(
               messageBody            = null,
-              queryString            = URLEncoder.encode(overriddenSerializedData, "UTF-8"),
+              queryString            = URLEncoder.encode(overriddenSerializedData, CharsetNames.Utf8),
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }
         case serialization @ "application/x-www-form-urlencoded" ⇒
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
-              messageBody            = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8"),
+              messageBody            = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8),
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )

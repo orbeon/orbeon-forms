@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.joda.time.DateTime
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
@@ -140,7 +141,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               httpResponse.setHeader(Headers.Created,      DateUtils.RFC1123Date.print(new DateTime(createdDateTime)))
               httpResponse.setHeader(Headers.LastModified, DateUtils.RFC1123Date.print(new DateTime(lastModifiedDateTime)))
 
-              val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
+              val writer = new OutputStreamWriter(httpResponse.getOutputStream, CharsetNames.Utf8)
               NetUtils.copyStream(stream, writer)
               writer.close()
             }

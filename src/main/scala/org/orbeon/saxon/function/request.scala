@@ -14,6 +14,7 @@
 package org.orbeon.saxon.function
 
 
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, RuntimeDependentFunction}
@@ -38,26 +39,51 @@ class GetWindowState extends DefaultFunctionSupport with RuntimeDependentFunctio
 }
 
 class GetRequestParameter extends RequestFunction {
-  def fromRequest(request: Request, name: String) =
+  def fromRequest(request: Request, name: String)(implicit ctx: XPathContext): Option[List[String]] =
     Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
 class GetRequestHeader extends RequestFunction {
-  def fromRequest(request: Request, name: String) =
-    Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
+  def fromRequest(request: Request, name: String)(implicit ctx: XPathContext): Option[List[String]] =
+    GetRequestHeader.getAndDecodeHeader(
+      name     = name,
+      encoding = stringArgumentOpt(1),
+      getter   = s ⇒ Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(s)) map (_.toList)
+    )
+}
+
+object GetRequestHeader {
+
+  def getAndDecodeHeader(
+    name     : String,
+    encoding : Option[String],
+    getter   : String ⇒ Option[List[String]]
+  ): Option[List[String]] = {
+
+    import CharsetNames._
+
+    val decode: String ⇒ String =
+      encoding map (_.toUpperCase) match {
+        case None | Some(Iso88591) ⇒ identity
+        case Some(Utf8)            ⇒ (s: String) ⇒ new String(s.getBytes(Iso88591), Utf8)
+        case Some(other)           ⇒ throw new IllegalArgumentException(s"invalid `$$encoding` argument `$other`")
+      }
+
+    getter(name.toLowerCase) map (_ map decode)
+  }
 }
 
 trait RequestFunction extends DefaultFunctionSupport with RuntimeDependentFunction {
 
-  def fromRequest(request: Request, name: String): Option[List[String]]
+  def fromRequest(request: Request, name: String)(implicit ctx: XPathContext): Option[List[String]]
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     val name =
-    stringArgument(0)(xpathContext)
+      stringArgument(0)(xpathContext)
 
     val values =
-      fromRequest(NetUtils.getExternalContext.getRequest, name)
+      fromRequest(NetUtils.getExternalContext.getRequest, name)(xpathContext)
 
     values map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
   }

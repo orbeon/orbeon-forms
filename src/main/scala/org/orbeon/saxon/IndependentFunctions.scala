@@ -51,16 +51,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
     Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 
-    Fun("get-request-path", classOf[GetRequestPath], op = 0, 0, STRING, ALLOWS_ONE)
-
-    Fun("get-request-header", classOf[GetRequestHeader], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-      Arg(STRING, EXACTLY_ONE)
-    )
-
-    Fun("get-request-parameter", classOf[GetRequestParameter], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-      Arg(STRING, EXACTLY_ONE)
-    )
-
     Fun("get-session-attribute", classOf[GetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)

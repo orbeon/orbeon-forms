@@ -13,36 +13,36 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.function.GetRequestHeader
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
 class GetRequestParameterTryXFormsDocument extends RequestFunction {
 
-  def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String)(implicit ctx: XPathContext): Option[List[String]] =
     containingDocument.getRequestParameters.get(name)
-
-//  def fromRequest(request: Request, name: String) =
-//    Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
 class GetRequestHeaderTryXFormsDocument extends RequestFunction {
 
-  def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
-    containingDocument.getRequestHeaders.get(name.toLowerCase)
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String)(implicit ctx: XPathContext): Option[List[String]] =
+    GetRequestHeader.getAndDecodeHeader(
+      name     = name,
+      encoding = stringArgumentOpt(1),
+      getter   = containingDocument.getRequestHeaders.get
+    )
 
-//  def fromRequest(request: Request, name: String) =
-//    Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
 }
 
 trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 
-  def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
-//  def fromRequest(request: Request, name: String): Option[List[String]]
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String)(implicit ctx: XPathContext): Option[List[String]]
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

@@ -18,6 +18,8 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.function._
 
+// Versions of these functions which do not look at an `XFormsContainingDocument`.
+// See also `XXFormsEnvFunctions`.
 trait IndependentRequestFunctions extends OrbeonFunctionLibrary {
 
   // Define in early definition of subclass
@@ -28,6 +30,7 @@ trait IndependentRequestFunctions extends OrbeonFunctionLibrary {
     Fun("get-request-path", classOf[GetRequestPath], op = 0, 0, STRING, ALLOWS_ONE)
 
     Fun("get-request-header", classOf[GetRequestHeader], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 

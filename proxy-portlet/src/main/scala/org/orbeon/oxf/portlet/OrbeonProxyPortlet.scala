@@ -21,7 +21,6 @@ import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http.{ApacheHttpClient, HttpClient, HttpClientSettings, StreamedContent}
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
@@ -39,13 +38,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   import OrbeonProxyPortlet._
 
   private case class PortletSettings(
-    forwardHeaders         : Map[String, String], // lowercase name → original name
-    forwardParams          : Set[String],
-    forwardProperties      : Map[String, String], // lowercase name → original name
-    keepParams             : Set[String],
-    useShortNamespaces     : Boolean,
-    resourcesRegex         : String,
-    httpClient             : HttpClient
+    forwardHeaders     : Map[String, String], // lowercase name → original name
+    forwardParams      : Set[String],
+    forwardProperties  : Map[String, String], // lowercase name → original name
+    keepParams         : Set[String],
+    useShortNamespaces : Boolean,
+    resourcesRegex     : String,
+    httpClient         : HttpClient
    ) {
     val FormRunnerResourcePath = resourcesRegex.r
   }

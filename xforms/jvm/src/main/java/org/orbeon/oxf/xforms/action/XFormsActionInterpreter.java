@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -58,10 +58,10 @@ public class XFormsActionInterpreter {
     private final String handlerEffectiveId;
 
     public final XFormsEvent event;
-    public final XFormsEventObserver eventObserver;
+    public final XFormsEventTarget eventObserver;
 
     public XFormsActionInterpreter(XBLContainer container, XFormsContextStack actionXPathContext, Element outerActionElement,
-                                   String handlerEffectiveId, XFormsEvent event, XFormsEventObserver eventObserver) {
+                                   String handlerEffectiveId, XFormsEvent event, XFormsEventTarget eventObserver) {
 
         this._container = container;
         this._containingDocument = container.getContainingDocument();

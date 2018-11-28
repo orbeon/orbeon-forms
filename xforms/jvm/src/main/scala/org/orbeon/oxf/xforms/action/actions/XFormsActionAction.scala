@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.action._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
-import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xml.Dom4j
 
 /**

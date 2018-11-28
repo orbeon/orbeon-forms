@@ -45,9 +45,7 @@ object Dispatch extends Logging {
       } finally
         containingDocument.endHandleEvent()
 
-    // This cast is not nice and we should fix the class hierarchy, since any XFormsEventTarget is also an
-    // XFormsEventObserver.
-    val target = event.targetObject.asInstanceOf[XFormsEventObserver]
+    val target = event.targetObject
 
     try {
       var statHandleEvent = 0
@@ -69,7 +67,7 @@ object Dispatch extends Logging {
       }
 
       // Call native listeners on target if any
-      def callNativeListeners(target: XFormsEventObserver): Unit =
+      def callNativeListeners(target: XFormsEventTarget): Unit =
         for (listener ← target.getListeners(event.name)) {
           listener.apply(event)
           statNativeHandlers += 1
@@ -85,7 +83,7 @@ object Dispatch extends Logging {
             // The strategy we use here is to traverse all the observers. But we could instead determine the
             // effective id from prefixed id and then lookup the object by effective id. It is not clear at
             // this point which is faster.
-            def doPhase(observers: List[XFormsEventObserver], staticHandlers: Map[String, List[EventHandler]], phase: Phase) =
+            def doPhase(observers: List[XFormsEventTarget], staticHandlers: Map[String, List[EventHandler]], phase: Phase) =
               for {
                 observer ← observers
                 handlers ← staticHandlers.get(observer.getPrefixedId).toList

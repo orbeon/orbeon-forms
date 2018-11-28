@@ -40,5 +40,5 @@ trait EventHandler {
   def getKeyModifiers: String
   def getKeyText: String
 
-  def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent)
+  def handleEvent(eventObserver: XFormsEventTarget, event: XFormsEvent)
 }

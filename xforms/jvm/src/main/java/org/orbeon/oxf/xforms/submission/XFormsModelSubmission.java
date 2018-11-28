@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
@@ -120,7 +120,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         return staticSubmission.locationData();
     }
 
-    public XFormsEventObserver parentEventObserver() {
+    public XFormsEventTarget parentEventObserver() {
         return model;
     }
 

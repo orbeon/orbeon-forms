@@ -17,6 +17,9 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xforms.XFormsObject
+import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+
+import scala.collection.immutable
 
 /**
  * XFormsEventTarget is implemented by classes that support dispatching of events.
@@ -31,10 +34,14 @@ trait XFormsEventTarget extends XFormsObject {
 
   def getLocationData: LocationData
 
-  def parentEventObserver: XFormsEventObserver
+  def parentEventObserver: XFormsEventTarget
 
   def performTargetAction(event: XFormsEvent): Unit
   def performDefaultAction(event: XFormsEvent): Unit
 
   def allowExternalEvent(eventName: String): Boolean
+
+  def addListener(eventName: String, listener: EventListener)
+  def removeListener(eventName: String, listener: Option[EventListener])
+  def getListeners(eventName: String): immutable.Seq[EventListener]
 }

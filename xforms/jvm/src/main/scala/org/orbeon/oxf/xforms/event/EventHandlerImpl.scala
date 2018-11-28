@@ -203,7 +203,7 @@ class EventHandlerImpl(
   /**
    * Process the event on the given observer.
    */
-  def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent): Unit = {
+  def handleEvent(eventObserver: XFormsEventTarget, event: XFormsEvent): Unit = {
 
     assert(_observersPrefixedIds ne null)
     assert(_targetPrefixedIds ne null)
@@ -313,7 +313,7 @@ object EventHandlerImpl extends Logging {
   def resolveHandler(
     containingDocument : XFormsContainingDocument,
     handler            : EventHandlerImpl,
-    eventObserver      : XFormsEventObserver,
+    eventObserver      : XFormsEventTarget,
     targetObject       : XFormsEventTarget
   ): Option[XFormsEventHandler] = {
 

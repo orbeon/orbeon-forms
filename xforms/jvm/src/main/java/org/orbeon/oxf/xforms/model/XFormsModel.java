@@ -52,7 +52,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel extends XFormsModelBase implements XFormsEventObserver {
+public class XFormsModel extends XFormsModelBase implements XFormsEventTarget {
 
     public static final String LOGGING_CATEGORY = "model";
 
@@ -129,7 +129,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
         for (final EventHandlerImpl staticEventHandler : staticModel.jEventHandlers()) {
             final ElementAnalysis staticParent = staticEventHandler.parent().get();
 
-            final XFormsEventObserver parent;
+            final XFormsEventTarget parent;
             if (staticParent instanceof Submission) {
                 parent = submissions.get(staticParent.staticId());
             } else {
@@ -743,7 +743,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver 
         }
     }
 
-    public XFormsEventObserver parentEventObserver() {
+    public XFormsEventTarget parentEventObserver() {
         // There is no point for events to propagate beyond the model
         // NOTE: This could change in the future once models are more integrated in the components hierarchy
         return null;

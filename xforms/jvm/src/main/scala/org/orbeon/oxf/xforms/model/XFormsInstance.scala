@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import javax.xml.transform.stream.StreamResult
-
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
@@ -103,7 +102,7 @@ class XFormsInstance(
   var valid                   : Boolean                   // whether instance was valid as of the last revalidation
 ) extends ListenersTrait
   with XFormsInstanceIndex
-  with XFormsEventObserver
+  with XFormsEventTarget
   with Logging {
 
   require(! (_readonly && _documentInfo.isInstanceOf[VirtualNode]))
@@ -163,7 +162,7 @@ class XFormsInstance(
       case None      ⇒ new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
     }
 
-  def parentEventObserver: XFormsEventObserver = model
+  def parentEventObserver: XFormsEventTarget = model
 
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {

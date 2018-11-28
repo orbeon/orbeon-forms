@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventObserver, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -37,8 +37,7 @@ import scala.collection.mutable
 
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait
-     with XFormsEventTarget
-     with XFormsEventObserver {
+     with XFormsEventTarget {
 
   thisSubmission: XFormsModelSubmission ⇒
 

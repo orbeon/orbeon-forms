@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.{Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
-import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLUtils}
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsId
-
 import org.xml.sax.Attributes
 
 import scala.collection.Seq
@@ -54,7 +53,6 @@ class XFormsControl(
      with ControlBindingSupport
      with ControlXMLDumpSupport
      with XFormsEventTarget
-     with XFormsEventObserver
      with Logging {
 
   // Type of the associated static control

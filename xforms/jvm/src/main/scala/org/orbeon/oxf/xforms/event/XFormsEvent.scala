@@ -67,13 +67,13 @@ abstract class XFormsEvent(
 
   // Mutable phase and observer as the event is being dispatched
   private[this] var _currentPhase: Phase = _
-  private[this] var _currentObserver: XFormsEventObserver = _
+  private[this] var _currentObserver: XFormsEventTarget = _
 
   final def currentPhase: Phase = _currentPhase
   final def currentPhase_=(currentPhase: Phase): Unit = _currentPhase = currentPhase
 
-  final def currentObserver: XFormsEventObserver = _currentObserver
-  final def currentObserver_=(currentObserver: XFormsEventObserver): Unit = _currentObserver = currentObserver
+  final def currentObserver: XFormsEventTarget = _currentObserver
+  final def currentObserver_=(currentObserver: XFormsEventTarget): Unit = _currentObserver = currentObserver
 
   // Return a property of the given type
   // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!

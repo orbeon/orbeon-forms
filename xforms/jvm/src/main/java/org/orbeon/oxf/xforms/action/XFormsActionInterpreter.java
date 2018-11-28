@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
@@ -27,11 +26,9 @@ import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -435,7 +432,7 @@ public class XFormsActionInterpreter {
         return _container.getFullPrefix() + getActionStaticId(actionElement);
     }
 
-    public String getActionStaticId(Element actionElement) {
+    private String getActionStaticId(Element actionElement) {
         final String staticId = XFormsUtils.getElementId(actionElement);
         assert staticId != null;
         return staticId;
@@ -443,31 +440,6 @@ public class XFormsActionInterpreter {
 
     public Scope getActionScope(Element actionElement) {
         return _container.getPartAnalysis().scopeForPrefixedId(getActionPrefixedId(actionElement));
-    }
-
-    /**
-     * Search a model given a static id and/or the current action element.
-     *
-     * @param actionElement     current action element
-     * @param modelStaticId     static id of the model searched, or null if current model
-     * @return                  model
-     */
-    public XFormsModel resolveModel(Element actionElement, String modelStaticId) {
-        final XFormsModel model;
-        if (modelStaticId != null) {
-            // Id is specified, resolve the effective object
-            final XFormsObject o = resolveObject(actionElement, modelStaticId);
-            if (!(o instanceof XFormsModel))
-                throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
-            model = (XFormsModel) o;
-        } else {
-            // Id is not specified
-            final Option<XFormsModel> modelOpt = _actionXPathContext.getCurrentBindingContext().modelOpt();
-            model = modelOpt.isDefined() ? modelOpt.get() : null;
-        }
-        if (model == null)
-            throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
-        return model;
     }
 
     public boolean isDeferredUpdates(Element actionElement) {

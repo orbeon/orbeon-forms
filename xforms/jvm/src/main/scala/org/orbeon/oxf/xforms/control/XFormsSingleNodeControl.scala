@@ -384,7 +384,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   // Dispatch creation events
-  override def dispatchCreationEvents() = {
+  override def dispatchCreationEvents(): Unit = {
     super.dispatchCreationEvents()
 
     // MIP events

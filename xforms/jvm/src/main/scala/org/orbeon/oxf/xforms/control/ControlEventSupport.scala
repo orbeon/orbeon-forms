@@ -25,7 +25,7 @@ trait ControlEventSupport extends ListenersTrait {
   self: XFormsControl ⇒
 
   def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case ev @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) ⇒
+    case _ @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) ⇒
       // Try to update xf:repeat indexes based on this
 
       // Find current path through ancestor xf:repeat elements, if any
@@ -90,13 +90,13 @@ trait ControlEventSupport extends ListenersTrait {
   def performTargetAction(event: XFormsEvent): Unit = ()
 
   // Check whether this concrete control supports receiving the external event specified
-  final def allowExternalEvent(eventName: String) = staticControl match {
+  final def allowExternalEvent(eventName: String): Boolean = staticControl match {
     case viewTrait: ViewTrait ⇒ viewTrait.externalEvents(eventName)
     case _ ⇒ false
   }
 
   // TODO LATER: should probably return true because most controls could then dispatch relevance events
-  def supportsRefreshEvents = false
+  def supportsRefreshEvents: Boolean = false
 
   // Dispatch creation events
   def dispatchCreationEvents(): Unit = {
@@ -107,7 +107,7 @@ trait ControlEventSupport extends ListenersTrait {
   }
 
   // Dispatch change events (between the control becoming enabled and disabled)
-  def dispatchChangeEvents() = ()
+  def dispatchChangeEvents(): Unit = ()
 
   // Dispatch destruction events
   def dispatchDestructionEvents(): Unit = {

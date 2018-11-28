@@ -69,7 +69,7 @@ object Dispatch extends Logging {
       }
 
       // Call native listeners on target if any
-      def callNativeListeners(target: XFormsEventObserver) =
+      def callNativeListeners(target: XFormsEventObserver): Unit =
         for (listener ← target.getListeners(event.name)) {
           listener.apply(event)
           statNativeHandlers += 1

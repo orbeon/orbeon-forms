@@ -17,7 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
@@ -36,7 +36,6 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.collection.{mutable ⇒ m}
-import org.orbeon.oxf.util.CoreUtils._
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(
@@ -65,15 +64,15 @@ class XFormsRepeatControl(
   setLocal(new XFormsRepeatControlLocal)
 
   // The repeat's sequence binding
-  final override def binding = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
+  final override def binding: Seq[Item] = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
 
   // Store initial repeat index information
   private val startIndexString = element.attributeValue("startindex")
   private val startIndex = Option(startIndexString) map (_.toInt) getOrElse  1
-  def getStartIndex = startIndex
+  def getStartIndex: Int = startIndex
 
   override def supportsRefreshEvents = true
-  override def children = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
+  override def children: Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
@@ -123,10 +122,10 @@ class XFormsRepeatControl(
   // Scenario:
   // - call index() or xxf:index() from within a variable within the iteration:
   // - not all iterations have been added, but the size must be known
-  override def getSize =
+  override def getSize: Int =
     Option(bindingContext) map (_.nodeset.size) getOrElse  0
 
-  def getIndex =
+  def getIndex: Int =
     if (isRelevant) {
       val local = getCurrentLocal.asInstanceOf[XFormsRepeatControl.XFormsRepeatControlLocal]
       if (local.index != -1)
@@ -212,11 +211,11 @@ class XFormsRepeatControl(
     // TODO: should dispatch xxforms-move instead of xforms-insert?
   }
 
-  def isDnD =
+  def isDnD: Boolean =
     element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
 
   // Push binding but ignore non-relevant iterations
-  override protected def computeBinding(parentContext: BindingContext) = {
+  override protected def computeBinding(parentContext: BindingContext): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
     contextStack.pushBinding(element, effectiveId, staticControl.scope)
@@ -615,16 +614,16 @@ class XFormsRepeatControl(
 
   // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
   // repeat object associated with the repeat index"
-  override def focusableControls =
+  override def focusableControls: Iterator[XFormsControl] =
     if (isRelevant && getIndex > 0)
       children(getIndex - 1).focusableControls
     else
       Iterator.empty
 
   // NOTE: pushBindingImpl ensures that any item we are bound to is relevant
-  override def computeRelevant = super.computeRelevant && getSize > 0
+  override def computeRelevant: Boolean = super.computeRelevant && getSize > 0
 
-  override def performDefaultAction(event: XFormsEvent) = event match {
+  override def performDefaultAction(event: XFormsEvent): Unit = event match {
     case e: XXFormsSetindexEvent ⇒ setIndex(e.index)
     case e: XXFormsDndEvent      ⇒ doDnD(e)
     case _                       ⇒ super.performDefaultAction(event)
@@ -667,7 +666,7 @@ object XFormsRepeatControl {
   )
 
   // Find the initial repeat indexes for the given doc
-  def initialIndexes(doc: XFormsContainingDocument) =
+  def initialIndexes(doc: XFormsContainingDocument): m.LinkedHashMap[String, Int] =
     findIndexes(
       doc.getControls.getCurrentControlTree,
       doc.getStaticOps.repeats,
@@ -675,11 +674,11 @@ object XFormsRepeatControl {
     )
 
   // Find the current repeat indexes for the given doc
-  def currentIndexes(doc: XFormsContainingDocument) =
+  def currentIndexes(doc: XFormsContainingDocument): m.LinkedHashMap[String, Int] =
     findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getIndex)
 
   // Find the current repeat indexes for the given doc, as a string
-  def currentNamespacedIndexesString(doc: XFormsContainingDocument) = {
+  def currentNamespacedIndexesString(doc: XFormsContainingDocument): String = {
 
     val ns = doc.getContainerNamespace
 
@@ -692,7 +691,7 @@ object XFormsRepeatControl {
 
   // For the given control, return the matching control that follows repeat indexes
   // This might be the same as the given control if it is within the repeat indexes chain, or another control if not
-  def findControlFollowIndexes(control: XFormsControl) = {
+  def findControlFollowIndexes(control: XFormsControl): Option[XFormsControl] = {
     val doc  = control.containingDocument
     val tree = doc.getControls.getCurrentControlTree
 

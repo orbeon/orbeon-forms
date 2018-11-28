@@ -263,7 +263,7 @@ object XFormsControl {
   // TODO: don't like pattern matching here and revisit hierarchy
   def isAllowedBoundItem(control: XFormsControl, item: Item): Boolean = control.staticControl match {
     case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
-    case repeat: RepeatControl       ⇒ DataModel.isAllowedBoundItem(item)
+    case _: RepeatControl            ⇒ DataModel.isAllowedBoundItem(item)
     case _                           ⇒ false
   }
 

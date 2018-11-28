@@ -214,7 +214,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
         resultOpt foreach { case (updater, controlsEffectiveIds) ⇒
           // Dispatch events
-          currentControlTree.dispatchRefreshEvents(controlsEffectiveIds)
+          currentControlTree.dispatchRefreshEvents(controlsEffectiveIds, isInitial = false)
           // Handle focus changes
           Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
 
@@ -235,7 +235,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
     // Update bindings starting at the container control
     val updater = updateSubtreeBindings(containerControl)
 
-    currentControlTree.dispatchRefreshEvents(gatherControlsForRefresh(containerControl))
+    currentControlTree.dispatchRefreshEvents(gatherControlsForRefresh(containerControl), isInitial = false)
 
     Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
   }

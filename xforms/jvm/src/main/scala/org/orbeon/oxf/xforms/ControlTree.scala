@@ -22,6 +22,8 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.events.XXFormsInitiallyDisabledEvent
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
@@ -125,7 +127,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       val allControls = _controlIndex.effectiveIdsToControls.values
       if (state.isEmpty) {
         // Copy list because it can be modified concurrently as events are being dispatched and handled
-        dispatchRefreshEvents(_controlIndex.effectiveIdsToControls.keysIterator.to[List])
+        dispatchRefreshEvents(_controlIndex.effectiveIdsToControls.keysIterator.to[List], isInitial = true)
       } else {
         // Make sure all control state such as relevance, value changed, etc. does not mark a difference
         for (control ← allControls)
@@ -135,7 +137,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       debugResults(List("controls created" → allControls.size.toString))
     }
 
-  def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String]): Unit = {
+  def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String], isInitial: Boolean): Unit = {
     withDebug("dispatching refresh events") {
 
       def dispatchRefreshEvents(control: XFormsControl): Unit =
@@ -151,6 +153,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
           } else if (newRelevantState) {
             // Control was and is relevant
             control.dispatchChangeEvents()
+          } else if (isInitial) {
+            // Initialization and control is non-relevant
+            Dispatch.dispatchEvent(new XXFormsInitiallyDisabledEvent(control))
           }
         }
 
@@ -234,7 +239,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   }
 
   def initializeSubTree(containerControl: XFormsContainerControl, includeCurrent: Boolean): Unit =
-    dispatchRefreshEvents(ControlsIterator(containerControl, includeCurrent).map(_.getEffectiveId).to[List])
+    dispatchRefreshEvents(ControlsIterator(containerControl, includeCurrent).map(_.getEffectiveId).to[List], isInitial = true)
 
   def createAndInitializeDynamicSubTree(
     container        : XBLContainer,

@@ -116,6 +116,11 @@ class XXFormsHiddenEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
+class XXFormsInitiallyDisabledEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsUIEvent(XXFORMS_INITIALLY_DISABLED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XXFormsVisitedEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XXFORMS_VISITED, target.asInstanceOf[XFormsControl], properties) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)

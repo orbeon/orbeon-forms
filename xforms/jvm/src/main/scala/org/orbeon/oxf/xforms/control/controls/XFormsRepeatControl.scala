@@ -286,7 +286,7 @@ class XFormsRepeatControl(
 
       // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events
       // if needed on the repeat control itself (subtrees are handled above).
-      containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(List(getEffectiveId))
+      containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(List(getEffectiveId), isInitial = false)
 
       // Handle focus changes
       Focus.updateFocusWithEvents(focusedBeforeOpt, partialFocusRepeatOption)(containingDocument)

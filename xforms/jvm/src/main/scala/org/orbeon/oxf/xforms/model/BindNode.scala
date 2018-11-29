@@ -98,8 +98,8 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   def setTypeValid(value: Boolean, mip: StaticBind#MIP)             = this._invalidTypeValidation = if (! value) mip else null
   def setRequiredValid(value: Boolean, mip: Option[StaticBind#MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
 
-  def setCustom(name: String, value: String) = _customMips += name → value
-  def clearCustom(name: String)              = _customMips -= name
+  def setCustom(name: String, value: String): Unit = _customMips += name → value
+  def clearCustom(name: String): Unit = _customMips -= name
 
   def relevant        = _relevant
   def readonly        = _readonly
@@ -126,7 +126,7 @@ object BindNode {
   // NOTE: This takes the first custom MIP of a given name associated with the bind. We do store multiple
   // ones statically, but don't have yet a solution to combine them. Should we string-join them? See also
   // XFormsModelBindsBase.evaluateCustomMIP.
-  def collectAllCustomMIPs(bindNodes: ju.List[BindNode]) =
+  def collectAllCustomMIPs(bindNodes: ju.List[BindNode]): Map[String, String] =
     if (bindNodes eq null)
       Map.empty[String, String]
     else if (bindNodes.size == 1)

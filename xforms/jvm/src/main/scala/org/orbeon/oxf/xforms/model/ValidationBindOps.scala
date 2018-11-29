@@ -346,11 +346,11 @@ trait ValidationBindOps extends Logging {
 
         val result =
           XPath.evaluateSingle(
-            contextItems        = bindNode.parentBind.items,
-            contextPosition     = bindNode.position,
-            compiledExpression  = xpathMIP.compiledExpression,
-            functionContext     = functionContext,
-            variableResolver    = model.variableResolver
+            contextItems       = bindNode.parentBind.items,
+            contextPosition    = bindNode.position,
+            compiledExpression = xpathMIP.compiledExpression,
+            functionContext    = functionContext,
+            variableResolver   = model.variableResolver
           ).asInstanceOf[Boolean]
 
         functionContext.properties foreach { propertiesMap ⇒

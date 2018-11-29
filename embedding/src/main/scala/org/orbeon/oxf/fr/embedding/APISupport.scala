@@ -82,7 +82,7 @@ object APISupport {
         settings.httpClient
       )
 
-      APISupport.sanitizeResourceId(resourcePath, settings.FormRunnerResourcePath) match {
+      APISupport.sanitizeResourceId(resourcePath, settings.FormRunnerResourcePathRegex) match {
         case Some(sanitizedResourcePath) ⇒
 
           val url = formRunnerURL(settings.formRunnerURL, sanitizedResourcePath, embeddable = false)

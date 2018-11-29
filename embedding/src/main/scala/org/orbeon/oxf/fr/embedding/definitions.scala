@@ -41,13 +41,13 @@ case class RequestDetails(
   headers : immutable.Seq[(String, String)],
   params  : immutable.Seq[(String, String)]
 ) {
-  def contentType =
+  def contentType: Option[String] =
     content flatMap (_.contentType)
 
-  def contentTypeHeader =
+  def contentTypeHeader: Option[(String, String)] =
     contentType map (Headers.ContentType →)
 
-  def headersMapWithContentType =
+  def headersMapWithContentType: Map[String, List[String]] =
     combineValues[String, String, List](headers).toMap ++ (contentType map (Headers.ContentType → List(_)))
 }
 
@@ -74,7 +74,7 @@ private case class EmbeddingSettings(
   resourcesRegex : String,
   httpClient     : HttpClient
 ) {
-  val OrbeonSubmitPath       = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?xforms-server-submit".r
-  val OrbeonResourceRegex    = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
-  val FormRunnerResourcePath = resourcesRegex.r
+  val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?xforms-server-submit".r
+  val OrbeonResourcePathRegex     : Regex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
+  val FormRunnerResourcePathRegex : Regex = resourcesRegex.r
 }

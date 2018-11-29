@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.StringUtils._
 import scala.collection.JavaConverters._
 import scala.collection.breakOut
 import scala.util.control.NonFatal
+import scala.util.matching.Regex
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -46,7 +47,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     resourcesRegex     : String,
     httpClient         : HttpClient
    ) {
-    val FormRunnerResourcePath = resourcesRegex.r
+    val FormRunnerResourcePathRegex: Regex = resourcesRegex.r
   }
 
   // We extend the context just to provide a custom `decodeURL`
@@ -154,7 +155,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   // Portlet action
   override def processAction(request: ActionRequest, response: ActionResponse): Unit =
-    settingsOpt foreach { settings ⇒
+    settingsOpt foreach { _ ⇒
       request.getPortletMode match {
         case PortletMode.VIEW ⇒ doViewAction(request, response)
         case PortletMode.EDIT ⇒ doEditAction(request, response)
@@ -195,7 +196,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.useShortNamespaces
         )
 
-        APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePath) match {
+        APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePathRegex) match {
           case Some(sanitizedResourcePath) ⇒
             val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
@@ -268,13 +269,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         case path @ "/xforms-server-submit" ⇒
           path
         // Incoming path is Form Runner path without document id
-        case FormRunnerPath(appName, formName, mode, _, query) ⇒
+        case FormRunnerPathRegex(appName, formName, mode, _, query) ⇒
           APISupport.formRunnerPath(appName, formName, filterMode(mode), None, Option(query))
         // Incoming path is Form Runner path with document id
-        case FormRunnerDocumentPath(appName, formName, mode, documentId, _, query) ⇒
+        case FormRunnerDocumentPathRegex(appName, formName, mode, documentId, _, query) ⇒
           APISupport.formRunnerPath(appName, formName, filterMode(mode), Some(documentId), Option(query))
         // Incoming path is Form Runner Home page
-        case FormRunnerHome(_, query) ⇒
+        case FormRunnerHomePathRegex(_, query) ⇒
           APISupport.formRunnerHomePath(Option(query))
         // Unsupported path
         case otherPath ⇒
@@ -414,9 +415,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
 private[portlet] object OrbeonProxyPortlet {
 
-  val FormRunnerHome           = """/fr/(\?(.*))?""".r
-  val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
-  val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
+  val FormRunnerHomePathRegex     : Regex = """/fr/(\?(.*))?""".r
+  val FormRunnerPathRegex         : Regex = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
+  val FormRunnerDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
 
   def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
     try body

@@ -73,9 +73,6 @@ trait FunctionSupport extends SystemFunction {
   def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
 
-  def stringValueArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
-    itemArgumentOpt(i) map (_.getStringValue)
-
   def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
 

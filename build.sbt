@@ -8,7 +8,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 val DefaultOrbeonFormsVersion     = "2017.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
-val ScalaJsDomVersion             = "0.9.4"
+val ScalaJsDomVersion             = "0.9.6"
 val ScalaJsJQueryVersion          = "0.9.2"
 val JUnitInterfaceVersion         = "0.11"
 val CirceVersion                  = "0.6.0"
@@ -21,13 +21,14 @@ val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
 val AutowireVersion               = "0.2.6"
+val ScalaXmlVersion               = "1.1.1"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumVersion,
   "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
   "io.spray"                    %% "spray-json"                     % "1.3.2",
-  "org.scala-lang.modules"      %% "scala-xml"                      % "1.0.6",
+  "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % "3.9.0",
   "joda-time"                   %  "joda-time"                      % "2.1",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
@@ -470,8 +471,9 @@ lazy val formRunnerJS = formRunner.js
   .settings(
 
     libraryDependencies            ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+      "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
+      "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",

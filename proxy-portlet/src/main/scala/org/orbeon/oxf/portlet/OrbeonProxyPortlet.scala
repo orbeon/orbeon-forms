@@ -262,7 +262,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           )
 
       def filterMode(mode: String) =
-        if (getBooleanPreference(request, ReadOnly) && mode == Edit.name) View.name else mode
+        if (getBooleanPreference(request, ReadOnly) && mode == FormRunnerMode.Edit.entryName) FormRunnerMode.View.entryName else mode
 
       pathParameterOpt getOrElse defaultPath match {
         case path @ "/xforms-server-submit" ⇒

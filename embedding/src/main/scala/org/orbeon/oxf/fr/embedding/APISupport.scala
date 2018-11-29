@@ -43,8 +43,8 @@ object APISupport {
 
   val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
 
-  val AllModes       = List(New, Edit, View)
-  val AllModesByName = AllModes map (a ⇒ a.name → a) toMap
+  val AllModes       = List(FormRunnerMode.New, FormRunnerMode.Edit, FormRunnerMode.View)
+  val AllModesByName = AllModes map (a ⇒ a.entryName → a) toMap
 
   def proxyPage(
     baseURL      : String,

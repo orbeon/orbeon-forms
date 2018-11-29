@@ -15,16 +15,24 @@ package org.orbeon.oxf.fr.embedding
 
 import java.io.{OutputStream, Writer}
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 
 import scala.collection.immutable
 import scala.util.matching.Regex
 
-sealed trait  Mode              { val name: String }
-case   object New  extends Mode { val name = "new" }
-case   object Edit extends Mode { val name = "edit" }
-case   object View extends Mode { val name = "view" }
+sealed trait FormRunnerMode extends EnumEntry with Lowercase
+
+object FormRunnerMode extends Enum[FormRunnerMode] {
+
+  val values = findValues
+
+  case object New  extends FormRunnerMode
+  case object Edit extends FormRunnerMode
+  case object View extends FormRunnerMode
+}
 
 case class RequestDetails(
   content : Option[StreamedContent],

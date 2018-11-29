@@ -309,7 +309,13 @@ lazy val commonScalaJsSettings = Seq(
   scalaJSUseMainModuleInitializer in Test    := false,
 
   scalacOptions ++= {
-    if (scalaJSVersion.startsWith("0.6.")) Seq("-P:scalajs:sjsDefinedByDefault") else Nil
+    if (scalaJSVersion.startsWith("0.6."))
+      List(
+        "-P:scalajs:sjsDefinedByDefault",
+        "-P:scalajs:suppressExportDeprecations" // see https://www.scala-js.org/news/2018/11/29/announcing-scalajs-0.6.26/
+      )
+    else
+      Nil
   }
 )
 

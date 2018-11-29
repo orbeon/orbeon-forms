@@ -42,8 +42,8 @@ public class NetUtils {
 
     private static final Pattern PATTERN_NO_AMP;
 
-    public static final int COPY_BUFFER_SIZE = 8192;
-    public static final String STANDARD_PARAMETER_ENCODING = CharsetNames.Utf8();
+    private static final int COPY_BUFFER_SIZE = 8192;
+    private static final String STANDARD_PARAMETER_ENCODING = CharsetNames.Utf8();
 
     private static FileItemFactory fileItemFactory;
 
@@ -233,41 +233,6 @@ public class NetUtils {
         final StringBuilderWriter writer = new StringBuilderWriter();
         copyStream(reader, writer);
         return writer.toString();
-    }
-
-    public static Map<String, String> getContentTypeParameters(String contentType) {
-        if (contentType == null)
-            return Collections.emptyMap();
-
-        // Check whether there may be parameters
-        final int semicolonIndex = contentType.indexOf(";");
-        if (semicolonIndex == -1)
-            return Collections.emptyMap();
-
-        // Tokenize
-        final StringTokenizer st = new StringTokenizer(contentType, ";");
-
-        if (!st.hasMoreTokens())
-            return Collections.emptyMap(); // should not happen as there should be at least the content type
-
-        st.nextToken();
-
-        // No parameters
-        if (!st.hasMoreTokens())
-            return Collections.emptyMap();
-
-        // Parse parameters
-        final Map<String, String> parameters = new HashMap<String, String>();
-        while (st.hasMoreTokens()) {
-            final String parameter = StringUtils.trimAllToEmpty(st.nextToken());
-            final int equalIndex = parameter.indexOf('=');
-            if (equalIndex == -1)
-                continue;
-            final String name = StringUtils.trimAllToEmpty(parameter.substring(0, equalIndex));
-            final String value = StringUtils.trimAllToEmpty(parameter.substring(equalIndex + 1));
-            parameters.put(name, value);
-        }
-        return parameters;
     }
 
     /**
@@ -614,7 +579,7 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnRequestEnd(final FileItem fileItem, final Logger logger) {
+    private static void deleteFileOnRequestEnd(final FileItem fileItem, final Logger logger) {
         // Make sure the file is deleted at the end of request
         PipelineContext.get().addContextListener(new PipelineContext.ContextListenerAdapter() {
             public void contextDestroyed(boolean success) {
@@ -628,7 +593,7 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnSessionTermination(final FileItem fileItem, final Logger logger) {
+    private static void deleteFileOnSessionTermination(final FileItem fileItem, final Logger logger) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(false);
@@ -654,7 +619,7 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnApplicationDestroyed(final FileItem fileItem, final Logger logger) {
+    private static void deleteFileOnApplicationDestroyed(final FileItem fileItem, final Logger logger) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = getExternalContext();
         externalContext.getWebAppContext().addListener(new WebAppListener() {

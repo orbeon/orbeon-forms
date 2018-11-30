@@ -74,13 +74,13 @@
             <xbl:handler event="xxforms-visible xxforms-iteration-moved">
                 <xf:action type="javascript">
                     <xf:param name="format" value="xxf:property('oxf.xforms.format.input.date')"/>
-                    <xf:body>ORBEON.xforms.XBL.instanceForControl(this).setFormat(format)</xf:body>
+                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.setFormat(format)</xf:body>
                 </xf:action>
             </xbl:handler>
             <xbl:handler event="xxforms-visible xxforms-iteration-moved fr-date-dates-disabled-changed">
                 <xf:action type="javascript">
                     <xf:param name="datesDisabled" value="xxf:instance('fr-form-instance')//excluded"/>
-                    <xf:body>ORBEON.xforms.XBL.instanceForControl(this).setDatesDisabled(datesDisabled)</xf:body>
+                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.setDatesDisabled(datesDisabled)</xf:body>
                 </xf:action>
             </xbl:handler>
         </xbl:handlers>
@@ -113,6 +113,13 @@
                     property('xxf:readonly-appearance') = 'static' or
                     fr:mode() = 'pdf'
                 "/>
+
+            <xf:var name="excluded-dates" value="xxf:custom-mip($binding, 'excluded-dates')">
+                <xf:action event="xxforms-visible xforms-value-changed xxforms-iteration-moved" type="javascript">
+                    <xf:param name="dates" value="string($excluded-dates)"/>
+                    <xf:body>alert('Excluded dates: ' + dates);</xf:body>
+                </xf:action>
+            </xf:var>
 
             <xf:group ref=".[not($view)]">
                 <xf:var name="dates-disabled" value="xxf:instance('fr-form-instance')//excluded/string()">

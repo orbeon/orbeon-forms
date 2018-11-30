@@ -549,6 +549,7 @@
                 <item id="fraction-digits">Maximum Fractional Digits</item>
                 <item id="upload-max-size">Maximum Attachment Size</item>
                 <item id="upload-mediatypes">Supported File Types</item>
+                <item id="excluded-dates">Dates to Exclude</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -1692,6 +1693,7 @@
                 <item id="fraction-digits">Maximum chiffres fractionnaires </item>
                 <item id="upload-max-size">Taille maximale du fichier joint</item>
                 <item id="upload-mediatypes">Types de fichiers supportés</item>
+                <item id="excluded-dates">Dates à exclure</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2838,6 +2840,7 @@
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -4010,6 +4013,7 @@
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -5183,6 +5187,7 @@
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -6348,6 +6353,7 @@
                 <item id="fraction-digits">Maximale Nachkommastellen</item>
                 <item id="upload-max-size">Maximale Größe des Dateianhangs</item>
                 <item id="upload-mediatypes">Erlaubte Dateitypen</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label>Formel</label>
@@ -7516,6 +7522,7 @@
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -8681,6 +8688,7 @@
                 <item id="fraction-digits">Máximo de dígitos para fracciones</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -9847,6 +9855,7 @@
                 <item id="fraction-digits">Maximum aantal decimalen</item>
                 <item id="upload-max-size">Maximum bijlagegrootte</item>
                 <item id="upload-mediatypes">Ondersteunde bestandstypen</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -10992,6 +11001,7 @@
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -12164,6 +12174,7 @@
                 <item id="fraction-digits">Decimaler max</item>
                 <item id="upload-max-size" todo="true">[Maximum Attachment Size]</item>
                 <item id="upload-mediatypes" todo="true">[Supported File Types</item>
+                <item id="excluded-dates" todo="true">[Dates to Exclude]</item>
             </constraint>
             <formula>
                 <label>Formel</label>

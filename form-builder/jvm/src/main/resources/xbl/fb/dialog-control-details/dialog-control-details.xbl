@@ -525,9 +525,14 @@
                     value="$integer-constraints, 'fraction-digits'"/>
 
                 <!-- 2017-03-22: Unused still. -->
+                <!-- `$min-max-constraints` -->
+                <xf:var
+                    name="date-arg-constraints"
+                    value="'excluded-dates'"/>
+
                 <xf:var
                     name="date-constraints"
-                    value="$min-max-constraints"/>
+                    value="$date-arg-constraints"/>
 
                 <xf:var
                     name="attachment-constraints"
@@ -588,12 +593,12 @@
                             relevant="not($type = $noargs-constraints)"/>
 
                         <xf:bind
-                            ref="constraint/@argument[not(../../@type = ($noargs-constraints, $string-arg-constraints))]"
+                            ref="constraint/@argument[not($type = ($noargs-constraints, $string-arg-constraints, $date-arg-constraints))]"
                             type="xf:integer"
                             constraint=". ge 0"/>
 
                         <xf:bind
-                            ref="constraint/@argument[../../@type = 'upload-mediatypes']"
+                            ref="constraint/@argument[$type = 'upload-mediatypes']"
                             constraint="fbf:isValidListOfMediatypeRanges(.)"/>
 
                         <xf:bind
@@ -849,6 +854,8 @@
                                                         $decimal-constraints
                                                     else if ($builtin-type = 'anyURI') then
                                                         $attachment-constraints
+                                                    else if ($builtin-type = 'date') then
+                                                        $date-constraints
                                                     else
                                                         ()
                                                 ),
@@ -943,7 +950,7 @@
 
                                             <!-- Formula or common constraint argument -->
                                             <xf:group ref=".[not($validation-type = ('required', 'datatype'))]">
-                                                <xf:textarea ref="constraint/@expression">
+                                                <xf:textarea ref="constraint/@argument[$validation-type = 'excluded-dates'], constraint/@expression">
                                                     <xf:label
                                                         class="xforms-hidden"
                                                         appearance="minimal"

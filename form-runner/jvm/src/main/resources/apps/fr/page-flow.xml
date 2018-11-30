@@ -213,7 +213,11 @@
     </page>
 
     <!-- Login / logout -->
-    <page path="/fr/login"       view="login.xhtml"/>
+    <page path="/fr/login"       model="login.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">home</setvalue>
+    </page>
     <page path="/fr/logout"      view="logout.xhtml"/>
     <page path="/fr/login-error" view="login-error.xhtml"
           public-methods="GET HEAD POST"/> <!-- We need to authorize `POST` explicitly -->

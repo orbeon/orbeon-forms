@@ -11,29 +11,64 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>Form Runner Login</title>
-    </head>
-    <body>
-        <p>
-            Please enter your login and password:
-        </p>
-        <form action="/j_security_check" method="post">
-            <table>
-                <tr>
-                    <td align="right">Login:</td>
-                    <td><input name="j_username"/></td>
-                </tr>
-                <tr>
-                    <td align="right">Password:</td>
-                    <td><input type="password" name="j_password"/></td>
-                </tr>
-                <tr>
-                    <td/><td>
-                    <input type="submit" value="Login"/></td>
-                </tr>
-            </table>
-        </form>
-    </body>
-</html>
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xf="http://www.w3.org/2002/xforms">
+
+    <xh:head>
+        <xh:title>Form Runner Login</xh:title>
+        <xf:model id="fr-form-model" xxf:revisit-handling="reload">
+            <xf:instance id="login-instance">
+                <login>
+                    <username/>
+                    <password/>
+                </login>
+            </xf:instance>
+            <xf:submission
+                id="login-submission"
+                method="post"
+                resource="/j_security_check"
+                serialization="application/x-www-form-urlencoded"
+                replace="all"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:navbar/>
+            <fr:row>
+                <xh:form action="/j_security_check" method="post">
+                    <xh:p>
+                        Please enter your login and password:
+                    </xh:p>
+                    <xh:table>
+                        <xh:tr>
+                            <xh:td align="right">Login:</xh:td>
+                            <xh:td><xf:input ref="username"/></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td align="right">Password:</xh:td>
+                            <xh:td><xf:secret ref="password"/></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td/>
+                            <xh:td>
+                                <xf:trigger>
+                                    <xf:label>Login</xf:label>
+                                    <xf:action type="javascript" event="DOMActivate">
+                                        <xf:param name="username" value="username"/>
+                                        <xf:param name="password" value="password"/>
+                                        <xf:body>
+                                            ORBEON.fr.private.API.submitLogin(username, password);
+                                        </xf:body>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xh:form>
+            </fr:row>
+        </fr:view>
+    </xh:body>
+</xh:html>

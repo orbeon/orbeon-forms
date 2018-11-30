@@ -14,11 +14,15 @@
 package org.orbeon.fr
 
 import org.orbeon.xforms.$
+import org.scalajs.dom
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import dom.experimental.domparser.DOMParser
+import dom.experimental.domparser.SupportedType
+import org.scalajs.dom.raw.HTMLFormElement
 
 @JSExportTopLevel("ORBEON.fr.private.API")
 @JSExportAll
@@ -40,4 +44,22 @@ object FormRunnerPrivateAPI {
         ListenerEvents,
         ((_: JQueryEventObject) ⇒ Message): js.Function
       )
+
+  def submitLogin(
+    username: String,
+    password: String
+  ): Unit = {
+
+    val formElem =
+      <form action="/orbeon/j_security_check" method="post">
+        <input type="hidden" name="j_username" value={username}/>
+        <input type="hidden" name="j_password" value={password}/>
+      </form>
+
+    val domParser    = new DOMParser
+    val formDocument = domParser.parseFromString(formElem.toString, SupportedType.`text/html`)
+    val formElement  = formDocument.querySelector("form").asInstanceOf[HTMLFormElement]
+    dom.document.body.appendChild(formElement)
+    formElement.submit()
+  }
 }

@@ -191,7 +191,7 @@ object NumberSupportJava extends NumberSupport[Item] {
 
   def getCustomMipOpt(binding: Item, name: String): Option[String] =
     binding match {
-      case v: NodeInfo ⇒ Option(InstanceData.collectAllCustomMIPs(v)) flatMap (_ get name)
+      case v: NodeInfo ⇒ InstanceData.findCustomMip(v, name)
       case _           ⇒ None
     }
 

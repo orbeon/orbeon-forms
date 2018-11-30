@@ -231,7 +231,7 @@ class StaticBind(
         att           ← Dom4j.attributes(element).iterator
         if bindTree.isCustomMIP(att.getQName)
         value         = att.getValue
-        customMIPName = buildCustomMIPName(att.getQualifiedName)
+        customMIPName = buildInternalCustomMIPName(att.getQName)
       } yield
         (staticId, customMIPName, value)
 

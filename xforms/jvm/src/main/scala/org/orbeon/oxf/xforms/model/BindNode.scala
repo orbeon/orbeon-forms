@@ -126,13 +126,24 @@ object BindNode {
   // NOTE: This takes the first custom MIP of a given name associated with the bind. We do store multiple
   // ones statically, but don't have yet a solution to combine them. Should we string-join them? See also
   // XFormsModelBindsBase.evaluateCustomMIP.
-  def collectAllCustomMIPs(bindNodes: ju.List[BindNode]): Map[String, String] =
+  def collectAllClientCustomMIPs(bindNodes: ju.List[BindNode]): Map[String, String] =
     if (bindNodes eq null)
       Map.empty[String, String]
     else if (bindNodes.size == 1)
-      bindNodes.get(0)._customMips
+      bindNodes.get(0)._customMips.filterKeys(_.contains(':')) // NOTE: `filterKeys` is a view on the original map.
     else
-      bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips)
+      bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips).filterKeys(_.contains(':')) // NOTE: `filterKeys` is a view on the original map.
+
+  // NOTE: This finds the first custom MIP with the given name found.
+  def findCustomMip(bindNodes: ju.List[BindNode], mipName: String): Option[String] =
+    if (bindNodes eq null)
+      None
+    else if (bindNodes.size == 1)
+      bindNodes.get(0)._customMips.get(mipName)
+    else
+      bindNodes.asScala.iterator flatMap (_._customMips.iterator) collectFirst {
+        case (`mipName`, mipValue) ⇒ mipValue
+      }
 
   // - prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
   //   might be better to use another validation level, for example Missing, to handle this. But supporting this

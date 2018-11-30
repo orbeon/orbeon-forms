@@ -92,7 +92,7 @@ object XMLOutput extends XMLReceiverSupport {
           "valid"    → c.isValid.toString
         ) ++
           (c.valueTypeOpt.toList map (t ⇒ "datatype" → t.uriQualifiedName)) ++
-          c.customMIPs // CHECK
+          c.customMIPs // TODO
       )
   }
 

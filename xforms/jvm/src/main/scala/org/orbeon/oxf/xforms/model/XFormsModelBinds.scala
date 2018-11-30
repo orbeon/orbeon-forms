@@ -74,7 +74,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
     def evaluateCustomMIPByName(mipType: QName) =
       evaluateCustomMIP(
         bindNode,
-        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.qualifiedName)).head,
+        bindNode.staticBind.customMIPNameToXPathMIP(buildInternalCustomMIPName(mipType)).head,
         collector
       )
 

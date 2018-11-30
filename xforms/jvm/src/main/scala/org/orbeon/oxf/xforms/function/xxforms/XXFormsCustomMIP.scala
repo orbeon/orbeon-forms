@@ -30,12 +30,11 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
       case nodeInfo: NodeInfo ⇒
         // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
         // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
-        // the one used on the binds.
+        // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
         val qName = getQNameFromExpression(argument(1))(xpathContext)
-        val name  = Model.buildCustomMIPName(qName.qualifiedName)
+        val name  = Model.buildInternalCustomMIPName(qName)
 
-        // Return the value or null
-        Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap (_ get name)
+        InstanceData.findCustomMip(nodeInfo, name)
       case _ ⇒
         // $item is empty or its first item is not a node
         None

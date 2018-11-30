@@ -33,6 +33,8 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
 import org.xml.sax.helpers.AttributesImpl
 
+import scala.collection.{immutable ⇒ i}
+
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
 */
@@ -84,7 +86,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Custom MIPs
   private var _customMIPs = Map.empty[String, String]
   def customMIPs: Map[String, String] = _customMIPs
-  def customMIPsClasses = customMIPs map { case (k, v) ⇒ k + '-' + v }
+  def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) ⇒ Model.buildExternalCustomMIPName(k) + '-' + v }
 
   override def onDestroy(): Unit = {
     super.onDestroy()
@@ -126,7 +128,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
           readValidation foreach setValidation
 
         // Custom MIPs
-        this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
+        this._customMIPs = InstanceData.collectAllClientCustomMIPs(nodeInfo) map (_.toMap) getOrElse Map()
 
       case _: AtomicValue ⇒
         // Control is not bound to a node (i.e. bound to an atomic value)
@@ -204,7 +206,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   final override def binding: Seq[Item] = Option(_boundItem).toList
 
   // Bound node if any
-  final def boundNode = Option(_boundItem) collect { case node: NodeInfo ⇒ node }
+  final def boundNode: Option[NodeInfo] = Option(_boundItem) collect { case node: NodeInfo ⇒ node }
 
   // Single-node controls support refresh events
   override def supportsRefreshEvents = true
@@ -375,7 +377,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Output custom MIPs classes
     for ((name, value) ← customMIPs)
-      write(name, value)
+      write(Model.buildExternalCustomMIPName(name), value)
 
     // Output type class
     (getBuiltinTypeNameOpt map ("xforms-type" →))        orElse
@@ -451,14 +453,14 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 object XFormsSingleNodeControl {
 
   // Item relevance (atomic values are considered relevant)
-  def isRelevantItem(item: Item) =
+  def isRelevantItem(item: Item): Boolean =
     item match {
       case info: NodeInfo ⇒ InstanceData.getInheritedRelevant(info)
       case _              ⇒ true
     }
 
   // Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
-  def isRelevant(control: XFormsSingleNodeControl) = Option(control) exists (_.isRelevant)
+  def isRelevant(control: XFormsSingleNodeControl): Boolean = Option(control) exists (_.isRelevant)
 
   // NOTE: Similar to AjaxSupport.addAjaxClasses. Should unify handling of classes.
   def addAjaxCustomMIPs(
@@ -481,13 +483,13 @@ object XFormsSingleNodeControl {
         // Custom MIPs changed
         val customMIPs1 = control1.customMIPs
 
-        def diff(mips1: Map[String, String], mips2: Map[String, String], prefix: Char) =
+        def diff(mips1: Map[String, String], mips2: Map[String, String], plusOrMinusPrefix: Char) =
           for {
             (name, value1) ← mips1
-            value2 = mips2.get(name)
+            value2         = mips2.get(name)
             if Option(value1) != value2
           } yield
-            prefix + name + '-' + value1 // TODO: encode so that there are no spaces
+            plusOrMinusPrefix + Model.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
 
         val classesToRemove = diff(customMIPs1, customMIPs2, '-')
         val classesToAdd    = diff(customMIPs2, customMIPs1, '+')

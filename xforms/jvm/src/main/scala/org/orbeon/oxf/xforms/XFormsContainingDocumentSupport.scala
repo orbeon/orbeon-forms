@@ -40,7 +40,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
-import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
@@ -173,10 +173,13 @@ trait ContainingDocumentUpload {
 
   def getUploadChecker: UploadCheckerLogic = UploadChecker
 
+  // NOTE: The control no longer loads `NCName` custom MIPs during refresh. So we go to the
+  // bound node instead.
+  // See also https://github.com/orbeon/orbeon-forms/issues/3721.
   private def customMipForControl(controlEffectiveId: String, mipName: String) =
     getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
       CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
-      (_.customMIPs.get(mipName))
+      (_.boundNode) flatMap (InstanceData.findCustomMip(_, mipName))
 
   private object UploadChecker extends UploadCheckerLogic {
 

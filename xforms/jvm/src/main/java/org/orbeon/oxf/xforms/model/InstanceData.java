@@ -145,8 +145,12 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_VALID();
     }
 
-    private scala.collection.immutable.Map<String, String> collectAllCustomMIPs() {
-        return BindNode.collectAllCustomMIPs(bindNodes);
+    private scala.collection.immutable.Map<String, String> collectAllClientCustomMIPs() {
+        return BindNode.collectAllClientCustomMIPs(bindNodes);
+    }
+
+    private scala.Option<String> findCustomMip(String mipName) {
+        return BindNode.findCustomMip(bindNodes, mipName);
     }
 
     public QName getSchemaOrBindType() {
@@ -192,9 +196,14 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData == null) ? null : existingInstanceData.getTransientAnnotation(name);
     }
 
-    public static scala.collection.immutable.Map<String, String> collectAllCustomMIPs(NodeInfo nodeInfo) {
+    public static scala.Option<scala.collection.immutable.Map<String, String>> collectAllClientCustomMIPs(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? null : existingInstanceData.collectAllCustomMIPs();
+        return scala.Option.apply((existingInstanceData == null) ? null : existingInstanceData.collectAllClientCustomMIPs());
+    }
+
+    public static scala.Option<String> findCustomMip(NodeInfo nodeInfo, String mipName) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return (existingInstanceData == null) ?scala.Option.<String>apply(null) : existingInstanceData.findCustomMip(mipName);
     }
 
     public static boolean getInheritedRelevant(NodeInfo nodeInfo) {

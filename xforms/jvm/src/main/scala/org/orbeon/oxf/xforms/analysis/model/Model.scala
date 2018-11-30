@@ -361,7 +361,8 @@ object Model {
   val StandardCustomMIPsQNames = Set(XXFORMS_EVENT_MODE_QNAME)
   val NeverCustomMIPsURIs      = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
 
-  def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
+  def buildInternalCustomMIPName(qName: QName): String = qName.qualifiedName
+  def buildExternalCustomMIPName(name: String): String = name.replace(':', '-')
 
   // MIP default values
   val DEFAULT_RELEVANT   = true

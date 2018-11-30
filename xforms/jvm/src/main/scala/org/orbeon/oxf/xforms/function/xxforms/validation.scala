@@ -134,7 +134,7 @@ object NumericValidation {
     case Right(bigDecimal) ⇒ bigDecimal.signum
   }
 
-  // Don't use Long.parseLong or similar as they throw exceptions, and we can have invalid data in many cases.
+  // Don't use `Long.parseLong` or similar as they throw exceptions, and we can have invalid data in many cases.
   // With this:
   //
   // - "small" integers (15 or 16 digits?) don't throw if invalid
@@ -145,10 +145,10 @@ object NumericValidation {
     IntegerValue.stringToInteger(value) match {
       case v: Int64Value        ⇒ Some(Left(v.longValue))
       case v: BigIntegerValue   ⇒ Some(Right(v.asDecimal))
-      case v: ValidationFailure ⇒
+      case _: ValidationFailure ⇒
         DecimalValue.makeDecimalValue(value, true) match {
           case v: DecimalValue      ⇒ Some(Right(v.getDecimalValue))
-          case v: ValidationFailure ⇒ None
+          case _: ValidationFailure ⇒ None
         }
     }
 

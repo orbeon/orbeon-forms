@@ -112,7 +112,7 @@ trait FunctionSupport extends SystemFunction {
   def evaluateAsLong(e: Expression)(implicit xpathContext: XPathContext): Option[Long] =
     Option(e.evaluateItem(xpathContext)) flatMap {
       case v: Int64Value   ⇒ Some(v.longValue)
-      case v: IntegerValue ⇒ throw new IllegalArgumentException("integer value out of range for Long")
-      case v               ⇒ None
+      case _: IntegerValue ⇒ throw new IllegalArgumentException("integer value out of range for Long")
+      case _               ⇒ None
     }
 }

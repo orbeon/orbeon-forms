@@ -511,15 +511,15 @@ trait AlertsAndConstraintsOps extends ControlOps {
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
 
-    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext) = {
+    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[ConstraintValidation] = {
 
       def normalizedAttOpt(attName: String) =
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
-        case "formula"                                        ⇒ normalizedAttOpt("expression")
+        case "formula"                                    ⇒ normalizedAttOpt("expression")
         case vn @ UploadMediatypesValidation.PropertyName ⇒ Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')")
-        case vn                                               ⇒ Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")
+        case vn                                           ⇒ Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")
       }
 
       constraintExpressionOpt map { expr ⇒

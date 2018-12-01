@@ -537,7 +537,7 @@
                         <!-- Logout -->
                         <xf:var
                             name="logout-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.logout')"/>
+                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.logout'))"/>
                         <xf:var
                             name="logout-class"
                             value="
@@ -571,7 +571,7 @@
                         <!-- Register -->
                         <xf:var
                             name="register-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.register')"/>
+                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.register'))"/>
                         <xf:var
                             name="register-class"
                             value="

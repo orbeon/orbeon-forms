@@ -38,36 +38,34 @@
         <fr:view>
             <fr:navbar/>
             <fr:row>
-                <xh:form action="/j_security_check" method="post">
-                    <xh:p>
-                        Please enter your login and password:
-                    </xh:p>
-                    <xh:table>
-                        <xh:tr>
-                            <xh:td align="right">Login:</xh:td>
-                            <xh:td><xf:input ref="username"/></xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td align="right">Password:</xh:td>
-                            <xh:td><xf:secret ref="password"/></xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td/>
-                            <xh:td>
-                                <xf:trigger>
-                                    <xf:label>Login</xf:label>
-                                    <xf:action type="javascript" event="DOMActivate">
-                                        <xf:param name="username" value="username"/>
-                                        <xf:param name="password" value="password"/>
-                                        <xf:body>
-                                            ORBEON.fr.private.API.submitLogin(username, password);
-                                        </xf:body>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xh:td>
-                        </xh:tr>
-                    </xh:table>
-                </xh:form>
+                <xh:p>
+                    Please enter your login and password:
+                </xh:p>
+                <xh:table>
+                    <xh:tr>
+                        <xh:td align="right">Login:</xh:td>
+                        <xh:td><xf:input ref="username"/></xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td align="right">Password:</xh:td>
+                        <xh:td><xf:secret ref="password"/></xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td/>
+                        <xh:td>
+                            <xf:trigger>
+                                <xf:label>Login</xf:label>
+                                <xf:action type="javascript" event="DOMActivate">
+                                    <xf:param name="username" value="username"/>
+                                    <xf:param name="password" value="password"/>
+                                    <xf:body>
+                                        ORBEON.fr.private.API.submitLogin(username, password);
+                                    </xf:body>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:td>
+                    </xh:tr>
+                </xh:table>
             </fr:row>
         </fr:view>
     </xh:body>

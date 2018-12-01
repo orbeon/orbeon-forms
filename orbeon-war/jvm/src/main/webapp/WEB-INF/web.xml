@@ -338,11 +338,10 @@
     </resource-ref>-->
     <!-- End relational persistence, and change oracle if necessary -->
     <!-- Uncomment this for the Form Runner authentication -->
-    <!--
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>Form Runner pages</web-resource-name>
-            <url-pattern>/fr/*</url-pattern>
+            <web-resource-name>Form Runner</web-resource-name>
+            <url-pattern>/fr/auth</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>orbeon-user</role-name>
@@ -354,7 +353,6 @@
             <url-pattern>/fr/service/*</url-pattern>
             <url-pattern>/fr/style/*</url-pattern>
             <url-pattern>/fr/not-found</url-pattern>
-            <url-pattern>/fr/unauthorized</url-pattern>
             <url-pattern>/fr/error</url-pattern>
             <url-pattern>/fr/login</url-pattern>
             <url-pattern>/fr/login-error</url-pattern>
@@ -369,7 +367,7 @@
     </login-config>
     <security-role>
         <role-name>orbeon-user</role-name>
-    </security-role>-->
+    </security-role>
     <!-- End Form Runner authentication -->
     <session-config>
         <session-timeout>60</session-timeout>

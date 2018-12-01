@@ -213,14 +213,36 @@
     </page>
 
     <!-- Login / logout -->
-    <page path="/fr/login"       model="login.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+    <page
+        path="/fr/auth"
+        model="authentication/auth.xpl"/>
+    <page
+        path="/fr/login"
+        model="authentication/login.xhtml"
+        view="html-view.xpl"
+        default-submission="request-parameters.xml"
+    >
         <setvalue ref="/*/app">*</setvalue>
         <setvalue ref="/*/form">*</setvalue>
         <setvalue ref="/*/mode">home</setvalue>
     </page>
-    <page path="/fr/logout"      view="logout.xhtml"/>
-    <page path="/fr/login-error" view="login-error.xhtml"
-          public-methods="GET HEAD POST"/> <!-- We need to authorize `POST` explicitly -->
+    <page
+        path="/fr/logout"
+        model="authentication/logout.xpl"/>
+    <page
+        path="/fr/logout-done"
+        model="authentication/logout-done.xhtml"
+        view="html-view.xpl"
+        default-submission="request-parameters.xml"
+    >
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">home</setvalue>
+    </page>
+    <page
+        path="/fr/login-error"
+        view="authentication/login-error.xhtml"
+        public-methods="GET HEAD POST"/> <!-- We need to authorize `POST` explicitly -->
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

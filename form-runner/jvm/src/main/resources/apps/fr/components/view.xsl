@@ -554,7 +554,7 @@
                         <!-- Login -->
                         <xf:var
                             name="login-url"
-                            value="xxf:property('oxf.fr.authentication.user-menu.uri.login')"/>
+                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.login'))"/>
                         <xf:var
                             name="login-class"
                             value="

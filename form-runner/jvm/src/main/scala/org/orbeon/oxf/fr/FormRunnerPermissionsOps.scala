@@ -200,6 +200,19 @@ trait FormRunnerPermissionsOps {
   def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =
     orbeonRolesFromCurrentRequest.iterator
 
+  //@XPathFunction
+  def redirectToHomePageIfLoggedIn(): Unit = {
+    val request  = NetUtils.getExternalContext.getRequest
+    val response = NetUtils.getExternalContext.getResponse
+    val username = request.getUsername
+    if (username != null)
+      response.sendRedirect(
+        response.rewriteRenderURL("/fr/"),
+        isServerSide = false,
+        isExitPortal = false
+      )
+  }
+
   private def allOperationsIfNoPermissionsDefined
     (permissionsElOrNull : NodeInfo)
     (computePermissions  : List[Permission] ⇒ List[String]

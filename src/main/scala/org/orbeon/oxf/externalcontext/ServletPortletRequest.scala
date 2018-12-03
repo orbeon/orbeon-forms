@@ -24,7 +24,7 @@ object ServletPortletRequest {
   def findCredentialsInSession(session: SessionFacade): Option[Credentials] = // portlet/servlet session
      collectByErasedType[Credentials](session.getAttribute(CredentialsSessionKey))
 
-   def storeCredentialsInSession(session: SessionFacade, credentials: Credentials) =
+   def storeCredentialsInSession(session: SessionFacade, credentials: Credentials): Unit =
     session.setAttribute(CredentialsSessionKey, credentials)
 }
 

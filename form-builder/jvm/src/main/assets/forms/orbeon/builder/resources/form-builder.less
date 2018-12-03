@@ -517,12 +517,13 @@ div.orbeon.orbeon-portlet-div {
         fieldset { padding: 0 }
 
         .tab-content {
-
-            margin-bottom: 10px;
-
             .tab-pane > .xbl-fr-grid:last-child {
                 margin-bottom: 0; // default is set to 10px somewhere else
             }
+        }
+
+        .xforms-tabbable-appearance-left > .tabs-left {
+            display: flex; // so that the border of the left tabs goes all the way to the bottom
         }
     }
 

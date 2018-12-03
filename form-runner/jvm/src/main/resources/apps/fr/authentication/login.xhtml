@@ -19,6 +19,7 @@
 
     <xh:head>
         <xh:title>Form Runner Login</xh:title>
+        <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-login.css" type="text/css" media="all"/>
         <xf:model id="fr-form-model" xxf:revisit-handling="reload">
             <xf:instance id="login-instance">
                 <login>
@@ -37,36 +38,32 @@
     <xh:body>
         <fr:view>
             <fr:navbar/>
-            <fr:row>
-                <xh:p>
-                    Please enter your login and password:
-                </xh:p>
-                <xh:table>
-                    <xh:tr>
-                        <xh:td align="right">Login:</xh:td>
-                        <xh:td><xf:input ref="username"/></xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td align="right">Password:</xh:td>
-                        <xh:td><xf:secret ref="password"/></xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td/>
-                        <xh:td>
-                            <xf:trigger>
-                                <xf:label>Login</xf:label>
-                                <xf:action type="javascript" event="DOMActivate">
-                                    <xf:param name="username" value="username"/>
-                                    <xf:param name="password" value="password"/>
-                                    <xf:body>
-                                        ORBEON.fr.private.API.submitLogin(username, password);
-                                    </xf:body>
-                                </xf:action>
-                            </xf:trigger>
-                        </xh:td>
-                    </xh:tr>
-                </xh:table>
-            </fr:row>
+            <fr:body>
+                <fr:grid>
+                    <fr:c x="1" y="1" w="4">
+                        <xf:input ref="username">
+                            <xf:label>Login</xf:label>
+                        </xf:input>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="4">
+                        <xf:secret ref="password">
+                            <xf:label>Password</xf:label>
+                        </xf:secret>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="4">
+                        <xf:trigger appearance="xxf:primary">
+                            <xf:label>Login</xf:label>
+                            <xf:action type="javascript" event="DOMActivate">
+                                <xf:param name="username" value="username"/>
+                                <xf:param name="password" value="password"/>
+                                <xf:body>
+                                    ORBEON.fr.private.API.submitLogin(username, password);
+                                </xf:body>
+                            </xf:action>
+                        </xf:trigger>
+                    </fr:c>
+                </fr:grid>
+            </fr:body>
         </fr:view>
     </xh:body>
 </xh:html>

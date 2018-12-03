@@ -241,8 +241,15 @@
     </page>
     <page
         path="/fr/login-error"
-        view="authentication/login-error.xhtml"
-        public-methods="GET HEAD POST"/> <!-- We need to authorize `POST` explicitly -->
+        model="authentication/login-error.xhtml"
+        view="html-view.xpl"
+        default-submission="request-parameters.xml"
+        public-methods="GET HEAD POST"
+    >
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">home</setvalue>
+    </page>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

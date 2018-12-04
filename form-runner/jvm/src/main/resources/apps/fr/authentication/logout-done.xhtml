@@ -19,7 +19,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms">
 
     <xh:head>
-        <xh:title>Form Runner Logout</xh:title>
+        <xh:title><xf:output ref="$fr-resources/authentication/logout-done/title"/></xh:title>
         <xf:model id="fr-form-model" xxf:revisit-handling="reload">
             <xf:action type="xpath" event="xforms-model-construct-done">
                 frf:redirectToHomePageIfLoggedIn()
@@ -30,7 +30,7 @@
         <fr:view>
             <fr:navbar/>
             <fr:row>
-                You're logged out.
+                <xf:output ref="$fr-resources/authentication/logout-done/message"/>
             </fr:row>
         </fr:view>
     </xh:body>

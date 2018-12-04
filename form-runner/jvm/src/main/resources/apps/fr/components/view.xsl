@@ -528,7 +528,14 @@
                             "/>
                         <xh:li role="presentation" class="disabled {{$logged-in-class}}">
                             <xh:a role="menuitem" href="#">
-                                Logged in as <xh:b><xf:output value="xxf:username()"/></xh:b>
+                                <xf:output value="
+                                    xxf:format-message(
+                                        xxf:r(
+                                            'authentication.menu.logged-in-as',
+                                            'fr-fr-resources'
+                                        ),
+                                        xxf:username()
+                                    )"/>
                             </xh:a>
                         </xh:li>
 
@@ -547,7 +554,11 @@
                             "/>
                         <xh:li role="presentation" class="{{$logout-class}}">
                             <xh:a role="menuitem" href="{{$logout-url}}">
-                                Logout
+                                <xf:output value="
+                                    xxf:r(
+                                        'authentication.menu.logout',
+                                        'fr-fr-resources'
+                                    )"/>
                             </xh:a>
                         </xh:li>
 
@@ -564,7 +575,11 @@
                             "/>
                         <xh:li role="presentation" class="{{$login-class}}">
                             <xh:a role="menuitem" href="{{$login-url}}">
-                                Login
+                                <xf:output value="
+                                    xxf:r(
+                                        'authentication.menu.login',
+                                        'fr-fr-resources'
+                                    )"/>
                             </xh:a>
                         </xh:li>
 
@@ -581,7 +596,11 @@
                             "/>
                         <xh:li role="presentation" class="{{$register-class}}">
                             <xh:a role="menuitem" href="{{$register-url}}">
-                                Register
+                                <xf:output value="
+                                    xxf:r(
+                                        'authentication.menu.register',
+                                        'fr-fr-resources'
+                                    )"/>
                             </xh:a>
                         </xh:li>
 

@@ -18,7 +18,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms">
 
     <xh:head>
-        <xh:title>Form Runner Login</xh:title>
+        <xh:title><xf:output ref="$fr-resources/authentication/login/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-login.css" type="text/css" media="all"/>
         <xf:model id="fr-form-model" xxf:revisit-handling="reload">
             <xf:instance id="login-instance">
@@ -42,17 +42,17 @@
                 <fr:grid>
                     <fr:c x="1" y="1" w="4">
                         <xf:input ref="username">
-                            <xf:label>Login</xf:label>
+                            <xf:label ref="$fr-resources/authentication/login/username"/>
                         </xf:input>
                     </fr:c>
                     <fr:c x="1" y="2" w="4">
                         <xf:secret ref="password">
-                            <xf:label>Password</xf:label>
+                            <xf:label ref="$fr-resources/authentication/login/password"/>
                         </xf:secret>
                     </fr:c>
                     <fr:c x="1" y="3" w="4">
                         <xf:trigger appearance="xxf:primary">
-                            <xf:label>Login</xf:label>
+                            <xf:label ref="$fr-resources/authentication/login/login"/>
                             <xf:action type="javascript" event="DOMActivate">
                                 <xf:param name="username" value="username"/>
                                 <xf:param name="password" value="password"/>

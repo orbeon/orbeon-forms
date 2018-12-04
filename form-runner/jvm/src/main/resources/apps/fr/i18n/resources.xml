@@ -373,6 +373,29 @@
                 <reencrypt-finished>Re-encryption finished</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as>Logged in as {0}</logged-in-as>
+                <logout>Logout</logout>
+                <login>Login</login>
+                <register>Register</register>
+            </menu>
+            <login>
+                <title>Form Runner Login</title>
+                <username>Username</username>
+                <password>Password</password>
+                <login>Login</login>
+            </login>
+            <logout-done>
+                <title>Form Runner Logout</title>
+                <message>You're logged out.</message>
+            </logout-done>
+            <login-error>
+                <title>Form Runner Login Error</title>
+                <unrecognized>The username or password you entered wasn't recognized.</unrecognized>
+                <try-again>Please try again.</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="fr">
         <common>
@@ -739,6 +762,29 @@
                 <reencrypt-finished>Recryptage terminé</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as>Connecté comme {0}</logged-in-as>
+                <logout>Se déconnecter</logout>
+                <login>Se connecter</login>
+                <register>S'enregistrer</register>
+            </menu>
+            <login>
+                <title>Form Runner - Connection</title>
+                <username>Nom d'utilisateur</username>
+                <password>Mot de passe</password>
+                <login>Se connecter</login>
+            </login>
+            <logout-done>
+                <title>Form Runner - Déconnexion</title>
+                <message>Vous êtes déconnecté(e).</message>
+            </logout-done>
+            <login-error>
+                <title>Form Runner - Error de connection</title>
+                <unrecognized>Le nom d'utilisateur ou le mot de passe entré n'ont pas été reconnus.</unrecognized>
+                <try-again>Réessayer.</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="es">
         <common>
@@ -1091,6 +1137,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="no">
         <common>
@@ -1442,6 +1511,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="ru">
         <common>
@@ -1791,6 +1883,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="it">
         <common>
@@ -2153,6 +2268,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="de">
         <common>
@@ -2515,6 +2653,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="fi">
         <common>
@@ -2877,6 +3038,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="sv">
         <common>
@@ -3239,6 +3423,29 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="nl">
         <common>
@@ -3600,6 +3807,29 @@
                 <reencrypt-finished>Her-encryptie voltooid</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
     <resource xml:lang="pt">
         <common>
@@ -3961,5 +4191,28 @@
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
         </home>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
     </resource>
 </resources>

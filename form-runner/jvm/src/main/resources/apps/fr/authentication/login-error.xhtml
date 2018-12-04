@@ -18,15 +18,17 @@
     xmlns:xf="http://www.w3.org/2002/xforms">
 
     <xh:head>
-        <xh:title>Form Runner Login Error</xh:title>
+        <xh:title><xf:output ref="$fr-resources/authentication/login-error/title"/></xh:title>
         <xf:model id="fr-form-model" xxf:revisit-handling="reload"/>
     </xh:head>
     <xh:body>
         <fr:view>
             <fr:navbar/>
             <fr:row>
-                The username or password you entered wasn't recognized.
-                <xh:a href="{xxf:get-request-header('referer')}">Please try again</xh:a>.
+                <xf:output ref="$fr-resources/authentication/login-error/unrecognized"/>
+                <xh:a href="{xxf:get-request-header('referer')}">
+                    <xf:output ref="$fr-resources/authentication/login-error/try-again"/>
+                </xh:a>
             </fr:row>
         </fr:view>
     </xh:body>

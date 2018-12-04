@@ -122,6 +122,7 @@
                                     <xsl:choose>
                                         <xsl:when test="$repeat">
                                             <xf:repeat xxbl:scope="outer" xxf:dnd="true">
+                                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                                 <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
                                                 <xf:action event="xxforms-index-changed" type="javascript">
                                                     <xf:param

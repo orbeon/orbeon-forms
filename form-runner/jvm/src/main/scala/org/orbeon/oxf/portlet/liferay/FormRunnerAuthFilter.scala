@@ -31,16 +31,16 @@ class AddOrbeonAuthHeadersFilter
 
   import FormRunnerAuthFilter._
 
-  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain) =
+  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain) =
+  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain) =
+  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain) =
+  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
   def init(filterConfig: filter.FilterConfig) = ()
@@ -56,16 +56,16 @@ class AddLiferayUserHeadersFilter
 
   import FormRunnerAuthFilter._
 
-  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain) =
+  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain) =
+  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain) =
+  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain) =
+  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
   def init(filterConfig: filter.FilterConfig) = ()

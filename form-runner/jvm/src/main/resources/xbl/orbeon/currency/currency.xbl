@@ -11,7 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -52,6 +54,153 @@
                     </fr:currency>
                 </view>
             </templates>
+            <!-- FIXME: This doesn't work as of 2018-12-03 because we read this with `doc()` which doesn't process XInclude. -->
+            <!--<xi:include-->
+                <!--xmlns:fb="http://orbeon.org/oxf/xml/form-builder"-->
+                <!--href="/xbl/orbeon/number/number.xbl"-->
+                <!--xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
+            <!-- So all this is duplicated from `fr:number` for now. -->
+            <control-details>
+                <xf:model xmlns="" >
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <local>
+                            <prefix/>
+                            <suffix/>
+                            <decimal-separator/>
+                            <grouping-separator/>
+                            <digits-after-decimal/>
+                            <round-when-formatting/>
+                            <round-when-storing/>
+                        </local>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="prefix | suffix | digits-after-decimal" xxf:whitespace="trim"/>
+                        <xf:bind ref="digits-after-decimal" type="xf:integer" constraint="xxf:is-blank() or xxf:non-negative()"/>
+                        <xf:bind ref="decimal-separator | grouping-separator" constraint="xxf:max-length(1)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <resources>
+                            <resource xml:lang="en">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimal Separator</decimal-separator>
+                                <grouping-separator>Grouping Separator</grouping-separator>
+                                <digits-after-decimal>Digits after decimal</digits-after-decimal>
+                                <round-when-formatting>Round when formatting</round-when-formatting>
+                                <round-when-storing>Round when storing</round-when-storing>
+                                <default-always-never>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Always</item>
+                                    <item id="2">Never</item>
+                                </default-always-never>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <prefix>Préfixe</prefix>
+                                <suffix>Suffixe</suffix>
+                                <decimal-separator>Séparateur décimal</decimal-separator>
+                                <grouping-separator>Séparateur de groupe</grouping-separator>
+                                <digits-after-decimal>Chiffres après la virgule</digits-after-decimal>
+                                <round-when-formatting>Arrondir au formattage</round-when-formatting>
+                                <round-when-storing>Arrondir au stockage</round-when-storing>
+                                <default-always-never>
+                                    <item id="0">Utiliser la défaut</item>
+                                    <item id="1">Toujours</item>
+                                    <item id="2">Jamais</item>
+                                </default-always-never>
+                            </resource>
+                        </resources>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/prefix" id="prefix-control">
+                                <xf:label ref="xxf:r('prefix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/suffix" id="suffix-control">
+                                <xf:label ref="xxf:r('suffix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <fr:number ref="instance('local')/digits-after-decimal"  id="digits-after-decimal-control">
+                                <xf:label ref="xxf:r('digits-after-decimal')"/>
+                                <xf:alert/>
+                            </fr:number>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/decimal-separator"  id="decimal-separator-control">
+                                <xf:label ref="xxf:r('decimal-separator')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/grouping-separator"  id="grouping-separator-control">
+                                <xf:label ref="xxf:r('grouping-separator')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full xxf:horizontal" id="round-when-formatting-control">
+                                <xf:label ref="xxf:r('round-when-formatting')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full xxf:horizontal" id="round-when-storing-control">
+                                <xf:label ref="xxf:r('round-when-storing')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    event="xforms-value-changed"
+                    observer="
+                        prefix-control
+                        suffix-control
+                        decimal-separator-control
+                        grouping-separator-control
+                        digits-after-decimal-control
+                        round-when-formatting-control
+                        round-when-storing-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>

@@ -41,6 +41,7 @@
             <display-name lang="sv">Dynamisk rullgardinsmeny</display-name>
             <display-name lang="nl">Selectie met dynamische gegevens</display-name>
             <display-name lang="pt">Lista de Opções Dinâmica</display-name>
+            <form-settings show="false"/>
             <icon>
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>

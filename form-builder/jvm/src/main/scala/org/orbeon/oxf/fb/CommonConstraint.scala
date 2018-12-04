@@ -13,6 +13,8 @@
   */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
@@ -21,7 +23,6 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.value._
 
 import scala.util.Try
-
 
 object CommonConstraint {
 
@@ -45,11 +46,27 @@ object CommonConstraint {
         )
       )
 
-    def findArgument(xpathString: String): String = {
-      val start = xpathString.indexOf("(")
-      val end   = xpathString.lastIndexOf(")")
-      xpathString.substring(start + 1, end)
+    def contentWithinNestedBrackets(s: String): Option[String] = {
+
+      val start = s.indexOf("(")
+      val end   = s.lastIndexOf(")")
+
+      start != -1 && end > start option {
+        s.substring(start + 1, end)
+      }
     }
+
+    def removeEnclosingBracketsIfPresent(s: String): String =
+      if (s.head == '(' && s.last == ')')
+        s.tail.init
+      else
+        s
+
+    def findExpressionArgument(s: String): String =
+      contentWithinNestedBrackets(s)     map
+        (_.trimAllToEmpty)               map
+        removeEnclosingBracketsIfPresent getOrElse // expected to have an extra level of brackets but if not we ignore it for compatibility
+        (throw new IllegalArgumentException)
 
     // NOTE: In the future, we could handle more types of literals, possibly all of the `AtomicValue` literals. In this case,
     // we should return the type of the literal, and a correctly-serialized string value of the string. We will also have to
@@ -65,7 +82,7 @@ object CommonConstraint {
         case e: ValidationFunction[_] ⇒
           e.arguments.headOption match {
             case Some(l: Literal) if isSupportedLiteral(l) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
-            case Some(_)                                   ⇒ Some(e.propertyName → Some(findArgument(xpathString)))
+            case Some(_)                                   ⇒ Some(e.propertyName → Some(findExpressionArgument(xpathString)))
             case None                                      ⇒ Some(e.propertyName → None)
             case _                                         ⇒ None
           }

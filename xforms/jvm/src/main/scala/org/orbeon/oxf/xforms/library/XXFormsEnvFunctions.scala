@@ -301,7 +301,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("excluded-dates", classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+    Fun(ExcludedDatesValidation.PropertyName, classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(DATE, ALLOWS_ZERO_OR_MORE)
     )
   }

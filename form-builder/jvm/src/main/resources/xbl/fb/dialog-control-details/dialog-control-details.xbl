@@ -603,6 +603,10 @@
                             constraint="fbf:isValidListOfMediatypeRanges(.)"/>
 
                         <xf:bind
+                            ref="constraint/@argument[$type = 'excluded-dates']"
+                            type="xxf:xpath2"/>
+
+                        <xf:bind
                             ref="required"
                             type="xxf:xpath2"
                             xxf:whitespace="trim"

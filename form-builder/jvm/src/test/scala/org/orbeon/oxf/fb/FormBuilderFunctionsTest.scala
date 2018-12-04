@@ -413,7 +413,9 @@ class FormBuilderFunctionsTest
       (Some("upload-max-size"   → Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
       (Some("upload-mediatypes" → Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
       (Some("min-length"        → Some("foo"))                                           , "xxf:min-length(foo)"),
-      (Some("excluded-dates"    → Some("(xs:date('2018-11-29'), xs:date('2018-12-02'))")), "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
+      (Some("excluded-dates"    → Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
+      (Some("excluded-dates"    → Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
+      (Some("excluded-dates"    → Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
       (None                                                                              , "xxf:foobar(5)")
     )
 

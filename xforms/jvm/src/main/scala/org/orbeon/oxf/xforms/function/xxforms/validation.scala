@@ -257,11 +257,15 @@ class UploadMediatypesValidation extends StringValidationFunction {
 //
 class ExcludedDatesValidation extends DateSeqValidationFunction {
 
-  val propertyName = "excluded-dates"
+  val propertyName = ExcludedDatesValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Seq[DateValue]]): Boolean =
     DateUtils.tryParseISODate(value, DateUtils.TimeZone.UTC) exists { dateInstant ⇒
        // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
       ! (constraintOpt.iterator.flatten exists (_.getCalendar.getTimeInMillis == dateInstant))
     }
+}
+
+object ExcludedDatesValidation {
+  val PropertyName = "excluded-dates"
 }

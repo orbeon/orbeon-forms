@@ -20,12 +20,13 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.PartAnalysis
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
-import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.{PartAnalysis, function}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
@@ -39,6 +40,7 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
+import shapeless.syntax.typeable._
 
 // The Form Runner function library
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -237,7 +239,7 @@ private object FormRunnerFunctions {
       concatFn.setContainer(getContainer)
       ExpressionTool.copyLocationInfo(this, concatFn)
 
-      val instanceFn = new Instance
+      val instanceFn = new function.Instance
       instanceFn.setDetails(XFormsFunctionLibrary.getEntry(XFORMS_NAMESPACE_URI, "instance", 1).get)
       instanceFn.setFunctionName(new StructuredQName("", XFORMS_NAMESPACE_URI, "instance"))
       instanceFn.setArguments(Array(concatFn))
@@ -355,12 +357,19 @@ object FRComponentParam {
 
   import org.orbeon.scaxon.SimplePath._
 
-  def findConstantMetadataRootElem(part: PartAnalysis): Option[NodeInfo] =
+  def findConstantMetadataRootElem(part: PartAnalysis): Option[NodeInfo] = {
+
+    // Tricky: When asking for the instance, the instance might not yet have been indexed, while the
+    // `ElementAnalysis` has been. So we get the element instead of using `findInstanceInScope`.
+    val instancePrefixedId = part.startScope.prefixedIdForStaticId(Names.MetadataInstance)
+
     for {
-      metadataInstance ← part.findInstanceInScope(part.startScope, Names.MetadataInstance)
-      constantContent  ← metadataInstance.constantContent
+      elementAnalysis ← part.findControlAnalysis(instancePrefixedId)
+      instance        ← elementAnalysis.cast[model.Instance]
+      constantContent ← instance.constantContent
     } yield
       constantContent.rootElement
+  }
 
   // Find in a hierarchical structure, such as:
   //
@@ -377,9 +386,9 @@ object FRComponentParam {
       directName    ← directNameOpt
       xblElem       ← rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
       componentElem ← xblElem.firstChildOpt(directName)
-      paramElem     ← componentElem.firstChildOpt(paramName)
+      paramValue    ← componentElem.attValueOpt(paramName)
     } yield
-      paramElem.getStringValue
+      paramValue
 
   // Instead of using `FormRunnerParams()`, we use the form definition metadata.
   // This also allows support of the edited form in Form Builder.

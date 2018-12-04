@@ -104,6 +104,85 @@
                         value="''"/>
                 </xf:action>
 
+                <!-- Process fb:control-details -->
+
+                <!-- Initialize specific control settings -->
+                <!-- NOTE: Part of this is duplicated in `dialog-control-details.xbl`. -->
+                <xf:action>
+
+                    <xf:delete
+                        ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
+
+                    <xf:var
+                        name="all-metadata-with-control-details"
+                        value="event('component-bindings')/fb:metadata[exists(fb:control-details) and not(fb:form-settings/@show = 'false')]"/>
+
+                    <xf:insert
+                        context="instance('control-details-metadata')"
+                        origin="$all-metadata-with-control-details"/>
+
+                    <xf:action iterate="$all-metadata-with-control-details/fb:control-details">
+
+                        <xf:var
+                            name="control-details"
+                            value="."/>
+
+                        <xf:var
+                            name="mutable-control-details"
+                            value="xxf:mutable-document($control-details)/*"/>
+
+                        <!-- Process the LHHA of each details control -->
+                        <xf:var name="current-language" value="fbf:currentLang()"/>
+                        <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
+                            <xf:var name="lhha" value="."/>
+                            <!-- If it has a lang attribute, only keep if matches the current language -->
+                            <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
+                            <!-- If it has a `ref="$resources/..."`, evaluate it -->
+                            <xf:action if="starts-with($lhha/@ref, '$resources/')">
+                                <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
+                                <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
+                                <xf:delete ref="$lhha/@ref"/>
+                            </xf:action>
+                        </xf:action>
+
+                        <!-- Complete the custom form -->
+                        <xf:insert
+                            context="instance('dynamic')"
+                            ref="*"
+                            origin="instance('dynamic-template')"/>
+
+                        <xf:var
+                            name="inserted"
+                            value="instance('dynamic')/*[last()]"/>
+
+                        <xf:insert
+                            context="$inserted//xf:model"
+                            ref="*"
+                            origin="$mutable-control-details/xf:model/*"/>
+
+                        <xf:var
+                            name="view-template"
+                            value="($control-details/../fb:templates/fb:view/*)[1]"/>
+
+                        <xf:var
+                            name="existing-params"
+                            value="(event('xbl')/*[node-name(.) = node-name($view-template)])[1]"/>
+
+                        <xf:insert
+                            context="$inserted//xf:instance"
+                            origin="
+                                if (exists($existing-params)) then
+                                    $existing-params
+                                else
+                                    xf:element(node-name($view-template))"/>
+
+                        <xf:insert
+                            context="$inserted//xh:body"
+                            origin="$mutable-control-details/(* except xf:model)"/>
+
+                    </xf:action>
+                </xf:action>
+
                 <xxf:show dialog="dialog"/>
 
                 <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
@@ -190,7 +269,19 @@
                                 ' '
                             )"/>
 
+                    <xf:property
+                        name="xbl"
+                        value="
+                            for $subform in instance('dynamic')/*
+                            return
+                                ($subform//xf:instance/*)[1]
+                    "/>
+
                 </xf:dispatch>
+
+                <!-- Don't leave this stuff around -->
+                <xf:delete
+                    ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
 
                 <!-- Hide this dialog -->
                 <xxf:hide dialog="dialog"/>
@@ -220,6 +311,7 @@
                         <mode/>
                         <data-migration/>
                         <analysis-calculate/>
+                        <xbl/>
                     </instance>
                 </xf:instance>
 
@@ -288,7 +380,30 @@
                 <xf:bind
                     ref="data-migration"
                     relevant="fr:is-pe()"/>
-                
+
+                <xf:instance id="dynamic" xxf:exclude-result-prefixes="#all">
+                    <forms/>
+                </xf:instance>
+
+                <xf:instance id="control-details-metadata">
+                    <empty/>
+                </xf:instance>
+
+                <xf:instance id="dynamic-template" xxf:readonly="true">
+                    <xh:html>
+                        <xh:head>
+                            <xf:model id="custom-model">
+                                <xf:instance id="custom-instance"/>
+                            </xf:model>
+                        </xh:head>
+                        <xh:body/>
+                    </xh:html>
+                </xf:instance>
+
+                <xf:instance id="modified">
+                    <modified i="" dynamic=""/>
+                </xf:instance>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -298,8 +413,8 @@
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
                 <xf:var name="fr-resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
 
-                <xf:var name="is-new-form"      value="mode = 'new'"/>
-                <xf:var name="is-save-as"       value="mode = 'save-as'"/>
+                <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
+                <xf:var name="is-save-as"       value="$i/mode = 'save-as'"/>
                 <xf:var name="is-form-settings" value="not($is-new-form or $is-save-as)"/>
 
                 <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
@@ -587,6 +702,25 @@
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>
+
+                            </fr:tab>
+
+                            <fr:tab class="fb-dialog-form-settings-control-options" visible="$is-form-settings">
+                                <fr:label value="$resources/dialog-form-settings/control-settings"/>
+
+                                <fr:tabbable
+                                    appearance="left"
+                                    readonly="true"
+                                    id="fb-control-settings-tabbable"
+                                    ref="instance('control-details-metadata')">
+                                    <fr:tab ref="instance('control-details-metadata')/*:metadata">
+                                        <xf:label value="(*:display-name[@lang = fbf:currentLang()], *:display-name)[1]"/>
+
+                                        <xf:var name="i" value="count(preceding-sibling::fb:metadata) + 1"/>
+                                        <xxf:dynamic ref="instance('dynamic')/*[$i]" id="custom-properties"/>
+
+                                    </fr:tab>
+                                </fr:tabbable>
 
                             </fr:tab>
 

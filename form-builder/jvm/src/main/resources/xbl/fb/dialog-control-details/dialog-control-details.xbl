@@ -53,7 +53,8 @@
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
-                <!-- Process fb:control-details -->
+                <!-- Process `fb:control-details` -->
+                <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->
                 <xf:action>
 
                     <xf:delete
@@ -70,7 +71,7 @@
                             value="xxf:mutable-document($control-details)/*"/>
 
                         <!-- Process the LHHA of each details control -->
-                        <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
+                        <xf:var name="current-language" value="fbf:currentLang()"/>
                         <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
                             <xf:var name="lhha" value="."/>
                             <!-- If it has a lang attribute, only keep if matches the current language -->

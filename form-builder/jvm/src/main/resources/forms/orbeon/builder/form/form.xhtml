@@ -383,6 +383,14 @@
                                             context="bind('fb-form-model-bind')"
                                             origin="xf:attribute('xxf:analysis.calculate', event('analysis-calculate'))"/>
 
+                                        <xf:delete
+                                            bind="xbl-bind"/>
+                                        <xf:insert
+                                            if="exists(event('xbl')/@*)"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('xbl', event('xbl')[exists(@*)])"/>
+
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action

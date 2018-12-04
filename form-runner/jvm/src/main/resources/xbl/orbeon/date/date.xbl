@@ -77,12 +77,6 @@
                     <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.setFormat(format)</xf:body>
                 </xf:action>
             </xbl:handler>
-            <xbl:handler event="xxforms-visible xxforms-iteration-moved fr-date-dates-disabled-changed">
-                <xf:action type="javascript">
-                    <xf:param name="datesDisabled" value="xxf:instance('fr-form-instance')//excluded"/>
-                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.setDatesDisabled(datesDisabled)</xf:body>
-                </xf:action>
-            </xbl:handler>
         </xbl:handlers>
 
         <xbl:resources>
@@ -114,19 +108,19 @@
                     fr:mode() = 'pdf'
                 "/>
 
-            <xf:var name="excluded-dates" value="xxf:custom-mip($binding, 'excluded-dates')">
-                <xf:action event="xxforms-visible xforms-value-changed xxforms-iteration-moved" type="javascript">
-                    <xf:param name="dates" value="string($excluded-dates)"/>
-                    <xf:body>alert('Excluded dates: ' + dates);</xf:body>
-                </xf:action>
-            </xf:var>
-
             <xf:group ref=".[not($view)]">
-                <xf:var name="dates-disabled" value="xxf:instance('fr-form-instance')//excluded/string()">
-                    <xf:action event="xforms-value-changed">
-                        <xf:dispatch name="fr-date-dates-disabled-changed" targetid="fr-date"/>
+
+                <!-- Pass excluded dates from custom MIP to Date.scala -->
+                <xf:var name="excluded-dates" value="xxf:custom-mip($binding, 'excluded-dates')">
+                    <xf:action event="xxforms-visible xforms-value-changed xxforms-iteration-moved" type="javascript">
+                        <xf:param name="excludedDates" value="string($excluded-dates)"/>
+                        <xf:body>
+                            var i = ORBEON.xforms.XBL.instanceForControl(this);
+                            if (i) i.setExcludedDates(excludedDates);
+                        </xf:body>
                     </xf:action>
                 </xf:var>
+
                 <xh:div class="input-append date">
                     <xf:var
                         name="placeholder"

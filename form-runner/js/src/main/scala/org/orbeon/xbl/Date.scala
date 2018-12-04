@@ -109,9 +109,9 @@ private class DateCompanion extends XBLCompanion {
     }
   }
 
-  def setDatesDisabled(datesDisabled: String): Unit = {
+  def setExcludedDates(excludedDates: String): Unit = {
     datePicker.options.datesDisabled =
-      datesDisabled
+      excludedDates
         .splitTo[js.Array]()
         .map(new js.Date(_))
     datePicker.update()

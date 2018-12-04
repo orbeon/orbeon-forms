@@ -173,7 +173,7 @@ class PartAnalysisImpl(
 
       // Index new models
       for (model ← models)
-        indexModel(model, eventHandlers)
+        indexModel(model)
 
       // Some controls need special processing
       analyzeCustomControls(attributes)
@@ -241,7 +241,7 @@ class PartAnalysisImpl(
 
       // Index new models
       for (model ← models)
-        indexModel(model, eventHandlers)
+        indexModel(model)
 
       // Some controls need special processing
       analyzeCustomControls(attributes)

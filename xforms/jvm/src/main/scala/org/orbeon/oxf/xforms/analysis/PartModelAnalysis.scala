@@ -73,7 +73,7 @@ trait PartModelAnalysis extends TransientState {
     prefixedIdIt.nextOption()
   }
 
-  protected def indexModel(model: Model, eventHandlers: mutable.Buffer[EventHandlerImpl]): Unit = {
+  protected def indexModel(model: Model): Unit = {
     val models = modelsByScope.getOrElseUpdate(model.scope, mutable.Buffer[Model]())
     models += model
     modelsByPrefixedId += model.prefixedId → model

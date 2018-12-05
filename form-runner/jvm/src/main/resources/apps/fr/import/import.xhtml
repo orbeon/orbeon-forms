@@ -38,6 +38,10 @@
                 name="allow-invalid-documents"
                 value="xxf:property(string-join(('oxf.fr.import.allow-invalid-documents', $app, $form), '.')) = true()"/>
 
+            <xf:var
+                name="restrict-to-latest-version"
+                value="xxf:property(string-join(('oxf.fr.import.restrict-to-latest-version', $app, $form), '.')) = true()"/>
+
             <xf:action event="xforms-model-construct-done">
 
                 <xf:action if="not(fr:is-pe())" type="xpath">
@@ -418,7 +422,7 @@
                 id="fb-read-form-metadata"
                 method="get"
                 serialization="none"
-                resource="{frf:createFormMetadataPath($app, $form)}?all-versions=true"
+                resource="{frf:createFormMetadataPath($app, $form)}?all-versions={not($restrict-to-latest-version)}"
                 replace="instance"
                 instance="fb-publish-form-metadata">
 

@@ -31,7 +31,7 @@
             <xf:var name="form" value="fr:form-name()"/>
 
             <xf:var
-                name="versioning-supported"
+                name="versioning-supported-on-data-side"
                 value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
 
             <xf:var
@@ -50,10 +50,27 @@
                     frf:sendError(404)
                 </xf:action>
 
+                <!-- Deal with default for `selected-version` -->
+                <xf:setvalue
+                    ref="instance('fr-form-instance')/version/selected-version"
+                    value="
+                        if (not($versioning-supported-on-data-side)) then
+                            (: No support on the data side so we always pass 1 as version :)
+                            1
+                        else if (count(instance('fb-publish-form-metadata')/form/form-version) gt 1) then
+                            (: Support on the data side and multiple possible versions so leave blank for the user to select :)
+                            ''
+                        else
+                            (: Support on the data side and only one possible version so skip the selection :)
+                            instance('fb-publish-form-metadata')/form/form-version"/>
+
+                <!-- If we selected a version automatically, then run the search -->
                 <xf:send
-                    if="exists(instance('fb-publish-form-metadata')/*) and not($versioning-supported)"
+                    if="xxf:non-blank(instance('fr-form-instance')/version/selected-version/string())"
                     submission="fr-import-search-submission">
-                    <xf:property name="form-version" value="1"/>
+                    <xf:property
+                        name="form-version"
+                        value="instance('fr-form-instance')/version/selected-version"/>
                 </xf:send>
 
             </xf:action>
@@ -99,13 +116,16 @@
             </xf:instance>
 
             <xf:bind ref="instance('fr-form-instance')">
-                <xf:bind ref="version" relevant="$versioning-supported and $latest-version gt 0">
+                <xf:bind
+                    ref="version"
+                    relevant="
+                        $versioning-supported-on-data-side and
+                        $latest-version gt 0               and
+                        count(instance('fb-publish-form-metadata')/form/form-version) gt 1">
                     <xf:bind
                         ref="selected-version"
                         type="xs:integer"
-                        required="true()"
-                        xxf:default="if ($versioning-supported) then '' else 1"
-                    />
+                        required="true()"/>
                     <xf:bind
                         ref="existing-comment"
                         readonly="true()"/>
@@ -376,7 +396,7 @@
             <!-- START: Shared with `dialog-publish.xml` -->
             <xf:instance id="fb-publish-instance" xxf:expose-xpath-types="true">
                 <publish>
-                    <latest-version>-1</latest-version> <!-- set on dialog open by `fb-read-form-metadata` -->
+                    <latest-version>-1</latest-version> <!-- set on `xforms-model-construct-done` by `fb-read-form-metadata` -->
                 </publish>
             </xf:instance>
 
@@ -403,15 +423,34 @@
                 instance="fb-publish-form-metadata">
 
                 <xf:action event="xforms-submit-done">
-                    <xf:setvalue
-                        ref="instance('fb-publish-instance')/latest-version"
-                        value="
-                            (
+                    <xf:action
+                        context="instance('fb-publish-form-metadata')"
+                        if="exists(form)">
+
+                        <xf:var name="i" value="."/>
+
+                        <!--
+                            Persistence might not return any version information if it doesn' support versioning. So we
+                            insert one version which defaults to "1".
+                            NOTE: In this case, the API must return only one `<form>` element!
+                        -->
+                        <xf:insert
+                            context="$i/form"
+                            if="empty(form-version)"
+                            ref="*"
+                            origin="xf:element('form-version', 1)"/>
+
+                        <xf:setvalue
+                            ref="instance('fb-publish-instance')/latest-version"
+                            value="
                                 max(
-                                    instance('fb-publish-form-metadata')/form/form-version[. castable as xs:integer]/xs:integer(.)
-                                ),
-                                -1
-                            )[1]"/>
+                                    $i//form/form-version[
+                                        . castable as xs:integer
+                                    ]/xs:integer(.)
+                                )"/>
+
+                    </xf:action>
+
                 </xf:action>
 
                 <xf:message event="xforms-submit-error">An error occurred while reading form metadata.</xf:message>
@@ -576,7 +615,7 @@
                             <xh:td colspan="3">
                                 <xf:output
                                     class="alert alert-info"
-                                    ref=".[not($versioning-supported)]"
+                                    ref=".[not($versioning-supported-on-data-side)]"
                                     value="
                                         if (instance('fr-import-search-response')/@search-total/string() castable as xs:integer) then
                                             xxf:format-message(

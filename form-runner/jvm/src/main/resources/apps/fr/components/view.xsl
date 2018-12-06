@@ -99,8 +99,8 @@
             <xh:i class="fa fa-lock" aria-hidden="true"/>
 
             <fr:alert-dialog id="fr-lease-renew-dialog">
-                <fr:label>Renew lease?</fr:label>
-                <fr:message>Your lease is about to expire. Would you like to renew it now?</fr:message>
+                <fr:label ref="$fr-resources/detail/lease/renew-lease-title"/>
+                <fr:message value="$fr-resources/detail/lease/renew-lease-message"/>
                 <fr:negative-choice/>
                 <fr:positive-choice>
                     <xf:send event="DOMActivate" submission="fr-acquire-lease-submission"/>

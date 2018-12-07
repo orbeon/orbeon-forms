@@ -317,9 +317,12 @@
                             name="grid-has-relevant-control-xpath"
                             select="
                                 string-join(
-                                    for $id
-                                        in fr:c/(* except fr:hidden)/@id/string()
-                                        return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
+                                    (
+                                        for $id
+                                            in fr:c/(* except fr:hidden)/@id/string()
+                                            return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
+                                        'false()'
+                                    ),
                                     ' or '
                                 )
                             "/>

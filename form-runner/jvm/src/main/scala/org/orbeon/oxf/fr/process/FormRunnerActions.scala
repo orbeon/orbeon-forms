@@ -492,8 +492,8 @@ trait FormRunnerActions {
           Some(             Some("replace")               → replace),
           Some(             Some(ShowProgressName)        → showProgress.toString),
           Some(             Some("content")               → "xml"),
-          Some(             Some(DataFormatVersionName)   → "edge"),
-          Some(             Some(PruneMetadataName)       → "false"),
+          Some(             Some(DataFormatVersionName)   → DataFormatVersionEdge),
+          Some(             Some(PruneMetadataName)       → false.toString),
           Some(             Some("parameters")            → s"form-version $DataFormatVersionName"),
           formTargetOpt.map(Some(FormTargetName)          → _),
           Some(             Some("response-is-resource")  → responseIsResource.toString)

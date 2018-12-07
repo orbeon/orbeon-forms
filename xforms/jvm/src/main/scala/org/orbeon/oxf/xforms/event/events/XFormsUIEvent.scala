@@ -69,7 +69,7 @@ private object XFormsUIEvent {
     xxfName("level")            → level
   )
 
-  def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
+  def binding(e: XFormsUIEvent) = Option(e.targetControl.bindingEvenIfNonRelevant)
 
   def controlPosition(e: XFormsUIEvent) =
     e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)

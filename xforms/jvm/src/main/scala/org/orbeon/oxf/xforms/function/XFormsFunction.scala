@@ -56,6 +56,13 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
       { case control: XFormsControl if control.isRelevant ⇒ control }
 
+  def findControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
+    findControl(arguments(i).evaluateAsString(xpathContext).toString)
+
+  def findControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
+    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
+      { case control: XFormsControl ⇒ control }
+
   // Resolve an object by id
   def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
     context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)

@@ -20,7 +20,7 @@ import org.orbeon.scaxon.Implicits._
 class XXFormsBinding extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext) =
-    relevantControl(0)(xpathContext) map (_.binding)
+    findControl(0)(xpathContext) map (_.bindingEvenIfNonRelevant)
 
   // TODO: PathMap
 }

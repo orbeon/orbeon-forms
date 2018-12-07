@@ -27,7 +27,10 @@ trait ControlBindingSupport {
   final def bindingContext = _bindingContext
 
   // The control's binding, by default none
-  def binding: Seq[Item] = Nil
+  // NOTE: This is only used by `event('xxf:binding')` and `xxf:binding()`. Following
+  // https://github.com/orbeon/orbeon-forms/issues/3829, we decide to return the binding even if the
+  // control is non-relevant.
+  def bindingEvenIfNonRelevant: Seq[Item] = Nil
 
   // Find the control's binding context
   final def contextForBinding: Option[Item] =
@@ -91,14 +94,14 @@ trait ControlBindingSupport {
   }
 
   // Default binding evaluation
-  protected def computeBinding(parentContext: BindingContext) = {
+  protected def computeBinding(parentContext: BindingContext): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
     contextStack.pushBinding(element, effectiveId, staticControl.scope)
     contextStack.getCurrentBindingContext
   }
 
-  final protected def computeBindingCopy(context: BindingContext) = {
+  final protected def computeBindingCopy(context: BindingContext): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(context)
     contextStack.pushCopy()

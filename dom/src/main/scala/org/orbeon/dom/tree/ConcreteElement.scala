@@ -164,7 +164,7 @@ class ConcreteElement(var qname: QName)
     import scala.collection.JavaConverters._
 
     internalContent.iterator.asScala exists {
-      case e: Element ⇒ true
+      case _: Element ⇒ true
       case _          ⇒ false
     }
   }
@@ -264,6 +264,7 @@ class ConcreteElement(var qname: QName)
     elements(QName(name, namespace))
   }
 
+  //  FIXME: These all make copies of the content. But some callers rely on this to prevent concurrent changes.
   def elementIterator(): ju.Iterator[Element] = elements.iterator()
   def elementIterator(name: String): ju.Iterator[Element] = elements(name).iterator()
   def elementIterator(qName: QName): ju.Iterator[Element] = elements(qName).iterator()

@@ -160,7 +160,7 @@ object Wizard {
           val sectionName = controlNameFromId(sectionId)
 
           val sectionBoundNode =
-            XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNode) getOrElse (throw new IllegalStateException)
+            XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNodeOpt) getOrElse (throw new IllegalStateException)
 
           val isVisited = sectionBoundNode hasAtt "*:section-status"
 

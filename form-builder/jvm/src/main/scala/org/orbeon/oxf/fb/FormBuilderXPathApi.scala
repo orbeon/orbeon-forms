@@ -417,7 +417,7 @@ object FormBuilderXPathApi {
   def findControlBoundNodeByName(controlName: String): Option[NodeInfo] = (
     findConcreteControlByName(controlName)(FormBuilderDocContext())
     collect { case c: XFormsSingleNodeControl ⇒ c }
-    flatMap (_.boundNode)
+    flatMap (_.boundNodeOpt)
   )
 
   //@XPathFunction

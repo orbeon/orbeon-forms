@@ -141,34 +141,34 @@ class XFormsInputControl(
   override def getFormattedValue: Option[String] =
     getValueUseFormat(format) orElse Option(getExternalValue)
 
-  private def formatSubValue(valueType: String, value: String) = {
-    val variables = Map[String, ValueRepresentation]("v" → stringToStringValue(value))
+  private def formatSubValue(valueType: String, value: String): Option[String] =
+    boundItemOpt match {
+      case None ⇒
+        // No need to format
+        null
+      case boundItem @ Some(_) ⇒
 
-    val boundItem = getBoundItem
-    if (boundItem eq null)
-      // No need to format
-      null
-    else {
-      // Format
-      val xpathExpression =
-        "if ($v castable as xs:" +
-        valueType +
-        ") then format-" +
-        valueType +
-        "(xs:" +
-        valueType +
-        "($v), '" +
-        containingDocument.getTypeInputFormat(valueType) +
-        "', 'en', (), ()) else $v"
+        // Format
+        val xpathExpression =
+          "if ($v castable as xs:" +
+          valueType +
+          ") then format-" +
+          valueType +
+          "(xs:" +
+          valueType +
+          "($v), '" +
+          containingDocument.getTypeInputFormat(valueType) +
+          "', 'en', (), ()) else $v"
 
-      evaluateAsString(
-        xpathString        = xpathExpression,
-        contextItem        = Option(boundItem),
-        namespaceMapping   = XFormsValueControl.FormatNamespaceMapping,
-        variableToValueMap = variables.asJava
-      )
+        val variables = Map[String, ValueRepresentation]("v" → stringToStringValue(value))
+
+        evaluateAsString(
+          xpathString        = xpathExpression,
+          contextItem        = boundItem,
+          namespaceMapping   = XFormsValueControl.FormatNamespaceMapping,
+          variableToValueMap = variables.asJava
+        )
     }
-  }
 
   def getFirstValueType: String = {
     val typeName = getBuiltinTypeName

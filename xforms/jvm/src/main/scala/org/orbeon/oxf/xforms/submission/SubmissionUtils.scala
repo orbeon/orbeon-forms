@@ -147,8 +147,6 @@ object SubmissionUtils {
       response.addHeader(headerName, headerValue)
     }
 
-  import org.orbeon.oxf.util.CollectionUtils._
-
   // Whether there is at least one relevant upload control with pending upload bound to any node of the given instance
   def hasBoundRelevantPendingUploadControls(
     doc         : XFormsContainingDocument,
@@ -161,7 +159,7 @@ object SubmissionUtils {
           for {
             uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
-            node          ← collectByErasedType[NodeInfo](uploadControl.getBoundItem)
+            node          ← uploadControl.boundNodeOpt
             if instance eq instance.model.getInstanceForNode(node)
           } yield
             uploadControl

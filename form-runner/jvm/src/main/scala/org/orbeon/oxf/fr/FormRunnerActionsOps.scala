@@ -93,7 +93,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
       val boundNodes =
         findControls collect {
-          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
+          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNodeOpt
         } flatten
 
       boundNodes.nonEmpty option boundNodes.iterator
@@ -166,7 +166,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
               tree.findRepeatControl(ancestorRepeatPrefixedId + Controls.buildSuffix(commonIndexesLeafToRoot.tail.reverse)) getOrElse
                 (throw new IllegalStateException)
 
-            val iterationBoundNode = repeat.children(commonIndexesLeafToRoot.head - 1).boundNode
+            val iterationBoundNode = repeat.children(commonIndexesLeafToRoot.head - 1).boundNodeOpt
 
             // For section templates we must make sure we don't return a node which is not within the template instance
             iterationBoundNode filter (_.root == formInstance.root) orElse Some(formInstance)

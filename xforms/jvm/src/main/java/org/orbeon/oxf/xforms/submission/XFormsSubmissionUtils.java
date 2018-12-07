@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.ByteArrayInputStream;
@@ -216,9 +215,9 @@ public class XFormsSubmissionUtils {
     public static void annotateBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
         for (XFormsUploadControl currentUploadControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
             if (currentUploadControl.isRelevant()) {
-                final Item controlBoundItem = currentUploadControl.getBoundItem();
-                if (controlBoundItem instanceof NodeInfo) {
-                    final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;
+                final scala.Option<NodeInfo> controlBoundNodeOpt = currentUploadControl.boundNodeOpt();
+                if (controlBoundNodeOpt.isDefined()) {
+                    final NodeInfo controlBoundNodeInfo = controlBoundNodeOpt.get();
                     if (currentInstance == currentInstance.model().getInstanceForNode(controlBoundNodeInfo)) {
                         // Found one relevant upload control bound to the instance we are submitting
                         // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those

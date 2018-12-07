@@ -144,7 +144,7 @@ class XFormsSelect1Control(
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
       case select: XFormsSelectEvent ⇒
-        boundNode match {
+        boundNodeOpt match {
           case Some(boundNode) ⇒
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,

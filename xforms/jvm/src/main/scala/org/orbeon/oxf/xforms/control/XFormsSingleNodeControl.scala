@@ -45,9 +45,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   override type Control <: SingleNodeTrait
 
-  // Bound item
   private var _boundItem: Item = null
-  final def getBoundItem = _boundItem
+  final def boundItemOpt = Option(_boundItem)
+  final def boundNodeOpt: Option[NodeInfo] = boundItemOpt collect { case node: NodeInfo ⇒ node }
 
   // Standard MIPs
   private var _readonly = Model.DEFAULT_READONLY
@@ -204,9 +204,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   // Binding as a Seq of Item
   final override def binding: Seq[Item] = Option(_boundItem).toList
-
-  // Bound node if any
-  final def boundNode: Option[NodeInfo] = Option(_boundItem) collect { case node: NodeInfo ⇒ node }
 
   // Single-node controls support refresh events
   override def supportsRefreshEvents = true

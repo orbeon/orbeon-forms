@@ -141,7 +141,7 @@ class XFormsSelectControl(
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
       case deselect: XFormsDeselectEvent ⇒
-        boundNode match {
+        boundNodeOpt match {
           case Some(boundNode) ⇒
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
@@ -157,7 +157,7 @@ class XFormsSelectControl(
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
       case select: XFormsSelectEvent ⇒
-        boundNode match {
+        boundNodeOpt match {
           case Some(boundNode) ⇒
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,

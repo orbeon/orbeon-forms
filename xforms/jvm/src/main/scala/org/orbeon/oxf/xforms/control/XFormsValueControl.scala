@@ -83,7 +83,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   }
 
   def evaluateValue(): Unit =
-    setValue(DataModel.getValue(getBoundItem))
+    setValue(DataModel.getValue(boundItemOpt))
 
   def evaluateExternalValue(): Unit =
     setExternalValue(
@@ -120,20 +120,22 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // NOTE: Standard value controls should be bound to simple content only. Is there anything we should / can do
     // about this? See: https://github.com/orbeon/orbeon-forms/issues/13
 
-    val boundItem = getBoundItem
-    if (! boundItem.isInstanceOf[NodeInfo])// this should not happen
-      throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
-
-    translateExternalValue(externalValue) foreach { translatedValue ⇒
-      DataModel.setValueIfChangedHandleErrors(
-        containingDocument = containingDocument,
-        eventTarget        = this,
-        locationData       = getLocationData,
-        nodeInfo           = boundItem.asInstanceOf[NodeInfo],
-        valueToSet         = translatedValue,
-        source             = "client",
-        isCalculate        = false
-      )
+    boundNodeOpt match {
+      case None ⇒
+        // This should not happen
+        throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+      case Some(boundNode) ⇒
+        translateExternalValue(externalValue) foreach { translatedValue ⇒
+          DataModel.setValueIfChangedHandleErrors(
+            containingDocument = containingDocument,
+            eventTarget        = this,
+            locationData       = getLocationData,
+            nodeInfo           = boundNode,
+            valueToSet         = translatedValue,
+            source             = "client",
+            isCalculate        = false
+          )
+        }
     }
 
     // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks

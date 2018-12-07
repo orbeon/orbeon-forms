@@ -199,7 +199,7 @@ object FormRunnerMetadata {
 
     def isBoundToFormDataInScope(control: XFormsSingleNodeControl): Boolean = {
 
-      val boundNode = control.boundNode
+      val boundNode = control.boundNodeOpt
       val data      = instanceInScope(control, FormInstance)
 
       (boundNode map (_.getDocumentRoot)) == (data map (_.root))
@@ -260,7 +260,7 @@ object FormRunnerMetadata {
         resourcesInstance ← resourcesInstance(control)
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
         controlName       ← FormRunner.controlNameFromIdOpt(control.getId)
-        boundNode         ← control.boundNode
+        boundNode         ← control.boundNodeOpt
         dataHash          = SubmissionUtils.dataNodeHash(boundNode)
       } yield
         dataHash →
@@ -303,7 +303,7 @@ object FormRunnerMetadata {
     def isBoundToFormDataInScope(control: XFormsControl): Boolean = control match {
       case c: XFormsSingleNodeControl ⇒
 
-        val boundNode = c.boundNode
+        val boundNode = c.boundNodeOpt
         val data      = instanceInScope(c, FormInstance)
 
         (boundNode map (_.getDocumentRoot)) == (data map (_.root))
@@ -385,7 +385,7 @@ object FormRunnerMetadata {
         val singleNodeControlOpt = collectByErasedType[XFormsSingleNodeControl](control)
 
         val resourcesInstanceOpt = singleNodeControlOpt flatMap resourcesInstance
-        val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNode)
+        val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNodeOpt)
         val dataHashOpt          = boundNodeOpt map SubmissionUtils.dataNodeHash
 
         dataHashOpt → {

@@ -86,9 +86,14 @@ object DataModel {
    * - manually run revalidation
    * - XFormsModelBinds gets node value for validation
    */
-  def getValue(item: Item) = item match {
+  def getValue(item: Item): String = item match {
     case null ⇒ null
     case item ⇒ item.getStringValue
+  }
+
+  def getValue(item: Option[Item]): String = item match {
+    case None       ⇒ null
+    case Some(item) ⇒ item.getStringValue
   }
 
   /**

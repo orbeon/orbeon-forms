@@ -341,6 +341,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_EXPOSE_XPATH_TYPES_QNAME = QName.apply(XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY, XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXCLUDE_RESULT_PREFIXES = QName.apply("exclude-result-prefixes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_CUSTOM_MIPS_QNAME = QName.apply("custom-mips", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_RELEVANT_ATTRIBUTE_QNAME = QName.apply("relevant-attribute", XXFORMS_NAMESPACE_SHORT);
     public static final QName XXFORMS_ANNOTATE_QNAME = QName.apply("annotate", XXFORMS_NAMESPACE_SHORT);
 
     public static final QName XXFORMS_INSTANCE_QNAME = QName.apply("instance", XXFORMS_NAMESPACE);

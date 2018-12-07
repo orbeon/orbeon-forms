@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
@@ -76,7 +77,8 @@ abstract class XFormsModelSubmissionBase
     currentInstance   : Option[XFormsInstance],
     validate          : Boolean,
     relevanceHandling : RelevanceHandling,
-    annotateWith      : Set[String])(implicit
+    annotateWith      : Set[String],
+    relevantAttOpt    : Option[QName])(implicit
     indentedLogger    : IndentedLogger
   ): Document = {
 
@@ -94,11 +96,12 @@ abstract class XFormsModelSubmissionBase
     // Get selected nodes (re-root and handle relevance)
     val documentToSubmit =
       prepareXML(
-        containingDocument,
-        currentNodeInfo,
-        relevanceHandling,
-        Dom4jUtils.getNamespaceContext(getSubmissionElement).asScala.toMap,
-        annotateWith
+        xfcd              = containingDocument,
+        ref               = currentNodeInfo,
+        relevanceHandling = relevanceHandling,
+        namespaceContext  = Dom4jUtils.getNamespaceContext(getSubmissionElement).asScala.toMap,
+        annotateWith      = annotateWith,
+        relevantAttOpt    = relevantAttOpt
       )
 
     // Check that there are no validation errors
@@ -143,7 +146,8 @@ object XFormsModelSubmissionBase {
     ref               : NodeInfo,
     relevanceHandling : RelevanceHandling,
     namespaceContext  : Map[String, String],
-    annotateWith      : Set[String]
+    annotateWith      : Set[String],
+    relevantAttOpt    : Option[QName]
   ): Document =
     ref match {
       case virtualNode: VirtualNode ⇒
@@ -176,16 +180,31 @@ object XFormsModelSubmissionBase {
         attributeNamesForTokens.get("id") foreach
           (annotateWithHashes(copy, _))
 
+        // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
+        // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
+        val isNonRelevantSupportAnnotationIfPresent: Node ⇒ Boolean =
+          relevantAttOpt                          map
+            isLocallyNonRelevantSupportAnnotation getOrElse
+            isLocallyNonRelevant _
+
         relevanceHandling match {
-          case RelevanceHandling.Keep  ⇒
-            attributeNamesForTokens.get("relevant") foreach
-              (annotateNonRelevantElements(copy, _))
+          case RelevanceHandling.Keep | RelevanceHandling.Empty ⇒
+
+            val relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
+
+            if (relevanceHandling == RelevanceHandling.Empty)
+              blankNonRelevantNodes(copy, relevantAnnotationAttQNameOpt.toSet ++ relevantAttOpt, isNonRelevantSupportAnnotationIfPresent)
+
+            relevantAnnotationAttQNameOpt foreach { relevantAnnotationAttName ⇒
+              annotateNonRelevantElements(copy, relevantAnnotationAttName, isNonRelevantSupportAnnotationIfPresent)
+            }
+
+            if (relevantAnnotationAttQNameOpt != relevantAttOpt)
+              relevantAttOpt foreach { relevantAtt ⇒
+                removeNestedAnnotations(copy.getRootElement, relevantAtt, includeSelf = true)
+              }
           case RelevanceHandling.Remove ⇒
-            pruneNonRelevantNodes(copy)
-          case RelevanceHandling.Empty ⇒
-            blankNonRelevantNodes(copy)
-            attributeNamesForTokens.get("relevant") foreach
-              (annotateNonRelevantElements(copy, _))
+            pruneNonRelevantNodes(copy, isNonRelevantSupportAnnotationIfPresent)
         }
 
         annotateWithAlerts(
@@ -208,26 +227,52 @@ object XFormsModelSubmissionBase {
         TransformerUtils.tinyTreeToDom4j(ref.getRoot)
     }
 
-  def pruneNonRelevantNodes(doc: Document): Unit =
-    Iterator.iterateWhileDefined(findFirstNonRelevantElementOrAttribute(doc)) foreach (_.detach())
+  def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
 
-  def blankNonRelevantNodes(doc: Document): Unit = {
-
-    def processElement(e: Element): Unit = {
-
-      e.attributes.asScala foreach { a ⇒
-        if (! InstanceData.getInheritedRelevant(a))
-          a.setValue("")
+    def processElement(e: Element): Iterator[Node] =
+      if (isLocallyNonRelevant(e)) {
+        Iterator(e)
+      } else {
+        (e.attributeIterator.asScala filter isLocallyNonRelevant) ++
+          (e.elementIterator.asScala flatMap processElement)
       }
 
+    // NOTE: Using `Iterator` should work, as `elementIterator` makes a copy of the content before iterating.
+    processElement(doc.getRootElement) foreach (_.detach())
+  }
+
+  def blankNonRelevantNodes(doc: Document, attsToPreserve: Set[QName], isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
+
+    def processElement(e: Element, parentNonRelevant: Boolean): Unit = {
+
+      val elemNonRelevant = parentNonRelevant || isLocallyNonRelevant(e)
+
+      // NOTE: Make sure not to blank attributes corresponding to annotations if present!
+      e.attributeIterator.asScala                                                          filter
+        (a ⇒ ! attsToPreserve(a.getQName) && (elemNonRelevant || isLocallyNonRelevant(a))) foreach
+        (_.setValue(""))
+
       if (e.containsElement)
-        e.elements.asScala foreach processElement
-      else if (! InstanceData.getInheritedRelevant(e))
+        e.elements.asScala foreach (processElement(_, elemNonRelevant))
+      else if (elemNonRelevant)
         e.setText("")
     }
 
-    processElement(doc.getRootElement)
+    processElement(doc.getRootElement, parentNonRelevant = false)
+  }
 
+  def annotateNonRelevantElements(doc: Document, relevantAnnotationAttQName: QName, isNonRelevant: Node ⇒ Boolean): Unit = {
+
+    def processElem(e: Element): Unit =
+      if (isNonRelevant(e)) {
+        e.addAttribute(relevantAnnotationAttQName, false.toString)
+        removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
+      } else {
+        e.removeAttribute(relevantAnnotationAttQName)
+        e.elements.asScala foreach processElem
+      }
+
+    processElem(doc.getRootElement)
   }
 
   def annotateWithHashes(doc: Document, attQName: QName): Unit = {
@@ -277,7 +322,7 @@ object XFormsModelSubmissionBase {
 
         val relevantLevels = elementsToAnnotate.keySet
 
-        def controlsIterator =
+        def controlsIterator: Iterator[XFormsSingleNodeControl] =
           controls.iterator collect {
             case (_, control: XFormsSingleNodeControl)
               if control.isRelevant && control.alertLevel.toList.toSet.subsetOf(relevantLevels) ⇒ control
@@ -285,7 +330,7 @@ object XFormsModelSubmissionBase {
 
         var annotated = false
 
-        def annotateElementIfPossible(control: XFormsSingleNodeControl) = {
+        def annotateElementIfPossible(control: XFormsSingleNodeControl): Unit = {
           // NOTE: We check on the whole set of constraint ids. Since the control reads in all the failed
           // constraints for the level, the sets of ids must match.
           for {
@@ -389,21 +434,29 @@ object XFormsModelSubmissionBase {
         case _ if httpMethod == HttpMethod.GET  || httpMethod == HttpMethod.DELETE ⇒ "application/x-www-form-urlencoded"
       }
 
-    def annotateNonRelevantElements(doc: Document, attQname: QName): Unit = {
+    def isLocallyNonRelevant(node: Node): Boolean =
+      ! InstanceData.getLocalRelevant(node)
 
-      def processElem(e: Element): Unit =
-        if (! InstanceData.getInheritedRelevant(e))
-          e.addAttribute(attQname, "false")
-        else {
-          e.removeAttribute(attQname)
-          e.elements.asScala foreach processElem
-        }
-
-      processElem(doc.getRootElement)
+    // NOTE: Optimize by not calling `getInheritedRelevant`, as we go from root to leaf. Also, we know
+    // that MIPs are not stored on `Document` and other nodes.
+    def isLocallyNonRelevantSupportAnnotation(attQname: QName): Node ⇒ Boolean = {
+      case e: Element   ⇒ ! InstanceData.getLocalRelevant(e) || (e.attributeValueOpt(attQname) contains false.toString)
+      case a: Attribute ⇒ ! InstanceData.getLocalRelevant(a)
+      case _            ⇒ false
     }
 
-    def findFirstNonRelevantElementOrAttribute(startNode: Node): Option[Node] =
-      findFirstElementOrAttributeWith(startNode, node ⇒ ! InstanceData.getInheritedRelevant(node))
+    def removeNestedAnnotations(startElem: Element, attQname: QName, includeSelf: Boolean): Unit = {
+
+      def processElem(e: Element): Unit = {
+        e.removeAttribute(attQname)
+        e.elements.asScala foreach processElem
+      }
+
+      if (includeSelf)
+        processElem(startElem)
+      else
+        startElem.elements.asScala foreach processElem
+    }
 
     def findFirstElementOrAttributeWith(startNode: Node, check: Node ⇒ Boolean): Option[Node] = {
 
@@ -415,6 +468,7 @@ object XFormsModelSubmissionBase {
       tryBreakable[Option[Node]] {
         startNode.accept(
           new VisitorSupport {
+
             override def visit(element: Element)     = checkNodeAndBreakIfFail(element)
             override def visit(attribute: Attribute) = checkNodeAndBreakIfFail(attribute)
 
@@ -431,7 +485,7 @@ object XFormsModelSubmissionBase {
       }
     }
 
-    def addRootElementNamespace(doc: Document) =
+    def addRootElementNamespace(doc: Document): Unit =
       doc.getRootElement.addNamespace(XXFORMS_NAMESPACE_SHORT.prefix, XXFORMS_NAMESPACE_SHORT.uri)
   }
 }

@@ -14,6 +14,7 @@
 <xf:model
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"
     xmlns:metadata="java:org.orbeon.oxf.fr.FormRunnerMetadata">
@@ -25,6 +26,7 @@
         resource="{instance('fr-send-submission-params')/@uri}"
         nonrelevant="{instance('fr-send-submission-params')/@nonrelevant}"
         validate="false"
+        xxf:relevant-attribute="fr:relevant"
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
@@ -111,6 +113,7 @@
         id="fr-create-update-submission"
         validate="false"
         nonrelevant="keep"
+        xxf:relevant-attribute="fr:relevant"
         xxf:annotate="relevant=fr:relevant"
         method="put"
         ref="event('holder')"

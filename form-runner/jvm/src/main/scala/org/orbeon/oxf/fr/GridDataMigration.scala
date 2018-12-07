@@ -299,7 +299,10 @@ object GridDataMigration {
       // Attributes: see https://github.com/orbeon/orbeon-forms/issues/3568
       val allElements = mutableData descendant *
 
-      val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR) toList
+      // Prune except `fr:relevant` attributes, as we need them to handle extra relevance information. Those will
+      // be kept/removed later as needed by the submission code.
+      // https://github.com/orbeon/orbeon-forms/issues/3568
+      val frAttributes = allElements /@ @* filter (a ⇒ a.namespaceURI == XMLNames.FR && a.localname != "relevant") toList
 
       frAttributes.foreach (delete(_, doDispatch = false))
 

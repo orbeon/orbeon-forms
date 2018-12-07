@@ -227,6 +227,11 @@ public class InstanceData {// rename to DataNodeProperties once done
         return true;
     }
 
+    public static boolean getLocalRelevant(Node node) {
+        final InstanceData currentInstanceData = getLocalInstanceData(node);
+        return (currentInstanceData == null) ? Model.DEFAULT_RELEVANT() : currentInstanceData.getLocalRelevant();
+    }
+
     public static boolean getRequired(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
         return (existingInstanceData == null) ? Model.DEFAULT_REQUIRED() : existingInstanceData.getRequired();

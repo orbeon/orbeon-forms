@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
@@ -27,6 +28,7 @@ case class SubmissionParameters(
   relevanceHandling              : RelevanceHandling,
   xxfCalculate                   : Boolean,
   xxfUploads                     : Boolean,
+  xxfRelevantAttOpt              : Option[QName],
   xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
   isDeferredSubmission           : Boolean,
@@ -140,6 +142,19 @@ object SubmissionParameters {
     val resolvedXxfUploads =
       serialize && ! (staticSubmission.avtXxfUploadsOpt flatMap booleanAvtOpt contains false)
 
+    val resolvedXxfRelevantAtt: Option[QName] =
+      if (serialize)
+        staticSubmission.avtXxfRelevantAttOpt flatMap
+          stringAvtTrimmedOpt                 map (
+            Dom4jUtils.extractTextValueQName(
+              staticSubmission.namespaceMapping.mapping.asJava,
+              _,
+              true
+            )
+          )
+      else
+        None
+
     val resolvedXxfAnnotate: Set[String] =
       if (serialize)
         staticSubmission.avtXxfAnnotateOpt flatMap
@@ -210,6 +225,7 @@ object SubmissionParameters {
       relevanceHandling              = resolvedRelevanceHandling,
       xxfCalculate                   = resolvedXxfCalculate,
       xxfUploads                     = resolvedXxfUploads,
+      xxfRelevantAttOpt              = resolvedXxfRelevantAtt,
       xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
       isDeferredSubmission           = isDeferredSubmission,

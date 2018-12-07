@@ -221,6 +221,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                             p.validate(),
                             relevanceHandling,
                             p.xxfAnnotate(),
+                            p.xxfRelevantAttOpt(),
                             indentedLogger
                         );
                     }
@@ -259,6 +260,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         p.validate(),
                         relevanceHandling,
                         p.xxfAnnotate(),
+                        p.xxfRelevantAttOpt(),
                         indentedLogger
                     );
 

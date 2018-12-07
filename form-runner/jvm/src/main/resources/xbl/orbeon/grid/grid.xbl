@@ -313,6 +313,29 @@
 
                             See also: https://github.com/orbeon/orbeon-forms/issues/1935
                         -->
+                        <xsl:variable
+                            name="grid-has-relevant-control-xpath"
+                            select="
+                                string-join(
+                                    for $id
+                                        in fr:c/(* except fr:hidden)/@id/string()
+                                        return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
+                                    ' or '
+                                )
+                            "/>
+                        <xsl:variable
+                            name="fr-grid-non-empty-xpath"
+                            select="
+                                concat(
+                                    ''' fr-grid-non-empty''[',
+                                    $grid-has-relevant-control-xpath,
+                                    ']'
+                                )
+                            "/>
+                        <xf:var name="fr-grid-non-empty">
+                            <xxf:value value="{$fr-grid-non-empty-xpath}" xxbl:scope="outer"/>
+                        </xf:var>
+
                         <xsl:element name="{$table-elem}">
                             <xsl:if test="$is-content-repeat">
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
@@ -322,7 +345,7 @@
                             <xsl:variable
                                 name="classes-for-runtime"
                                 select="
-                                    'fr-grid',
+                                    'fr-grid{$fr-grid-non-empty}',
                                     concat('fr-grid-', $static-col-count),
                                     'fr-grid-css'[$use-css-grids-output],
                                     (: Control name might not be available (unclear why normalize-space() is needed) :)

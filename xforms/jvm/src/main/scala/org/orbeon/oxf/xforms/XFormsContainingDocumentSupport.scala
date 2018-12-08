@@ -179,7 +179,7 @@ trait ContainingDocumentUpload {
   private def customMipForControl(controlEffectiveId: String, mipName: String) =
     getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
       CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
-      (_.boundNode) flatMap (InstanceData.findCustomMip(_, mipName))
+      (_.boundNodeOpt) flatMap (InstanceData.findCustomMip(_, mipName))
 
   private object UploadChecker extends UploadCheckerLogic {
 

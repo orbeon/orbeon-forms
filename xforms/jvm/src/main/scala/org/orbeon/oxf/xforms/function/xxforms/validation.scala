@@ -79,11 +79,8 @@ trait StringValidationFunction extends ValidationFunction[String] {
 
 trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
 
-   // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
   override def toMipValue(constraintOpt: Option[Seq[DateValue]]): Option[String] =
-    constraintOpt map { dates ⇒
-      dates map (d ⇒ DateUtils.DateNoZone.print(d.getCalendar.getTimeInMillis)) mkString " "
-    }
+    constraintOpt map (_ map (_.getStringValueCS) mkString " ")
 
   def argumentOpt(implicit xpathContext: XPathContext): Option[Seq[DateValue]] =
     itemsArgumentOpt(0) map { itemsIt ⇒

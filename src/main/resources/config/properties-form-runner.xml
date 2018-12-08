@@ -87,7 +87,7 @@
     <!-- E.g. "orbeon admin user" -->
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles.split"                value=",|\s+"/>
-    <property as="xs:boolean" name="oxf.fr.authentication.user-menu.enable"                     value="true"/>
+    <property as="xs:boolean" name="oxf.fr.authentication.user-menu.enable"                     value="false"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.login"                  value="/fr/auth?source={xxf:get-request-path()}"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"               value=""/>

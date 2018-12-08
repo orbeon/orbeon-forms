@@ -727,6 +727,55 @@
         </output>
     </test>
 
+    <test description="xf:setfocus on fr:date" name="oxf:pipeline">
+        <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                        <xf:instance id="instance">
+                            <instance>
+                                <date>2010-01-13</date>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setfocus control="my-date"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xi:include href="oxf:/xbl/orbeon/date/date.xbl" xxi:omit-xml-base="true"/>
+                </xh:head>
+                <xh:body>
+                    <fr:date id="my-date" ref="date"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-date" init="true">
+                            <xxf:value>2010-01-13</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-date≡xf-7" readonly="true"/>
+                        <xxf:attribute for="my-date≡xf-13" name="placeholder"/>
+                        <xxf:control id="my-date≡xf-15" relevant="false"/>
+                    </xxf:control-values>
+                    <xxf:script name="xf_a46d07e9482de772ed31f906f2af5a479e143a2e" target-id="my-date" observer-id="my-date">
+                        <xxf:param>[M]/[D]/[Y]</xxf:param>
+                    </xxf:script>
+                    <xxf:script name="xf_a4eab2a6a8d67a153ee170572991a2d448077958" target-id="my-date≡xf-8" observer-id="my-date≡xf-7">
+                        <xxf:param/>
+                    </xxf:script>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xf:setfocus on fr:currency" name="oxf:pipeline">
         <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
         <input name="document">

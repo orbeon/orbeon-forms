@@ -315,21 +315,23 @@
                         </xf:action>
                     </xf:action>
 
-                    <!-- Annotate all leaf elements as initially non-relevant. Then, as the controls become relevant, they will
-                         remove the annotations. See https://github.com/orbeon/orbeon-forms/issues/3829.
-                         NOTE: There is a question about leaf elements which might not be bound to XBL components. Are there
-                         any such cases? The intent is to annotate only: section, grid, iteration, and leaf elements. -->
+                    <!-- Annotate section, grid, iteration, and control elements as initially non-relevant. Then, as the controls become
+                         relevant, they will remove the annotations. See https://github.com/orbeon/orbeon-forms/issues/3829. -->
                     <xf:action event="xforms-model-construct-done">
                         <xf:insert
-                            iterate="instance()//*[empty(*)]"
+                            iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())"
                             context= "."
-                            origin= "xf:attribute('fr:relevant', 'false')"/>
+                            origin= "xf:attribute('fr:relevant', 'false')"
+                            xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"/>
                     </xf:action>
 
-                    <!-- Propagate out relevance, see https://github.com/orbeon/orbeon-forms/issues/3829 -->
+                    <!--
+                        Propagate out relevance, see https://github.com/orbeon/orbeon-forms/issues/3829. We use `xxf:phantom="true"` so
+                        we can catch the relevance events for the grid. See https://github.com/orbeon/orbeon-forms/issues/1947. -->
                     <xf:insert
                         observer="fr-section-template-view"
                         event="xforms-disabled"
+                        xxf:phantom="true"
                         if="event('xxf:binding')/root()/* is instance('fr-form-instance')"
 
                         context="event('xxf:binding')"
@@ -338,6 +340,7 @@
                     <xf:delete
                         observer="fr-section-template-view"
                         event="xforms-enabled"
+                        xxf:phantom="true"
                         if="event('xxf:binding')/root() is instance('fr-form-instance')/root()"
 
                         ref="event('xxf:binding')/@fr:relevant"/>

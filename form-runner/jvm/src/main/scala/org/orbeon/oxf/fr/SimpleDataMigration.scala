@@ -18,11 +18,12 @@ import enumeratum.EnumEntry.Lowercase
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunner.{formRunnerProperty, _}
 import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -54,6 +55,8 @@ object SimpleDataMigration {
       require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
       require(templateInstanceRootElem.isElement)
       require(dataToMigrateRootElem.isElement)
+
+      implicit val doc = inScopeContainingDocument
 
       getConfiguredDataMigrationBehavior match {
         case DataMigrationBehavior.Disabled ⇒
@@ -87,6 +90,46 @@ object SimpleDataMigration {
         logger.error(OrbeonFormatter.format(t))
         throw t
     }
+
+  //@XPathFunction
+  def iterateBinds(
+    enclosingModelAbsoluteId : String,
+    dataRootElem             : NodeInfo
+  ): SequenceIterator = {
+
+    implicit val doc = inScopeContainingDocument
+
+    def processLevel(
+      parents          : List[NodeInfo],
+      binds            : Seq[StaticBind],
+      path             : List[String]
+    ): List[NodeInfo] = {
+
+      def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[NodeInfo] =
+        parents flatMap { parent ⇒
+
+          val nestedElems =
+            parent / bindName toList
+
+          nestedElems ::: processLevel(
+            parents = nestedElems,
+            binds   = bind.children,
+            path    = bindName :: path
+          )
+        }
+
+      scanBinds(binds, findOps)
+    }
+
+    // The root bind has id `fr-form-binds` at the top-level as well as within section templates
+    findFormBindsRoot(findEnclosingModel(enclosingModelAbsoluteId)).toList flatMap { bind ⇒
+      processLevel(
+        parents = List(dataRootElem),
+        binds   = bind.children,
+        path    = Nil
+      )
+    }
+  }
 
   private object Private {
 
@@ -127,18 +170,39 @@ object SimpleDataMigration {
         DataMigrationBehavior.Disabled
     }
 
+    def findEnclosingModel(enclosingModelAbsoluteId: String)(implicit doc: XFormsContainingDocument): XFormsModel =
+      doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
+        (_.cast[XFormsModel])                                                                 getOrElse
+        (throw new IllegalStateException)
+
+    def findFormBindsRoot(enclosingModel: XFormsModel)(implicit doc: XFormsContainingDocument): Option[StaticBind] =
+      enclosingModel.staticModel.bindsById.get(Names.FormBinds)
+
+    def scanBinds[T](
+      binds : Seq[StaticBind],
+      find  : (Option[StaticBind], StaticBind, String) ⇒ List[T]
+    ): List[T] = {
+
+      var result: List[T] = Nil
+
+      binds.scanLeft(None: Option[StaticBind]) { case (prevBindOpt, bind) ⇒
+        bind.nameOpt foreach { bindName ⇒
+          result = find(prevBindOpt, bind, bindName) ::: result
+        }
+        Some(bind)
+      }
+
+      result
+    }
+
     def gatherMigrationOps(
       enclosingModelAbsoluteId : String,
       templateInstanceRootElem : NodeInfo,
-      dataToMigrateRootElem    : NodeInfo
+      dataToMigrateRootElem    : NodeInfo)(implicit
+      doc                      : XFormsContainingDocument
     ): List[DataMigrationOp] = {
 
-      val doc = inScopeContainingDocument
-
-      val enclosingModel =
-        doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
-          (_.cast[XFormsModel])                                                                 getOrElse
-          (throw new IllegalStateException)
+      val enclosingModel = findEnclosingModel(enclosingModelAbsoluteId)
 
       val templateIterationNamesToRootElems =
         (
@@ -184,20 +248,6 @@ object SimpleDataMigration {
 
         val allBindNames = binds flatMap (_.nameOpt) toSet
 
-        def iterateBinds(find: (Option[StaticBind], StaticBind, String) ⇒ List[DataMigrationOp]): List[DataMigrationOp] = {
-
-          var result: List[DataMigrationOp] = Nil
-
-          binds.scanLeft(None: Option[StaticBind]) { case (prevBindOpt, bind) ⇒
-            bind.nameOpt foreach { bindName ⇒
-              result = find(prevBindOpt, bind, bindName) ::: result
-            }
-            Some(bind)
-          }
-
-          result
-        }
-
         def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[DataMigrationOp] =
           parents flatMap { parent ⇒
 
@@ -233,16 +283,16 @@ object SimpleDataMigration {
             deleteOps ++: nestedOps
           }
 
-        iterateBinds(findOps)
+        scanBinds(binds, findOps)
       }
 
       // The root bind has id `fr-form-binds` at the top-level as well as within section templates
-      enclosingModel.staticModel.bindsById.get(Names.FormBinds).toList flatMap { bind ⇒
+      findFormBindsRoot(enclosingModel).toList flatMap { bind ⇒
         processLevel(
           parents          = List(dataToMigrateRootElem),
           binds            = bind.children.to[List],
           templateRootElem = templateInstanceRootElem,
-          Nil
+          path             = Nil
         )
       }
     }

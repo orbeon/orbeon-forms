@@ -353,7 +353,7 @@ trait BindingLoader extends Logging {
   private def findBindingPathByName(uri: String, localname: String) =
     findBindingPathByNameUseMappings(readURLMappingsCacheAgainstProperty, uri, localname)
 
-  private def readXBLResource(xblPath: String) = {
+  private def readXBLResource(xblPath: String): (Element, Long) = {
 
     val lastModified = lastModifiedByPath(xblPath)
 
@@ -381,8 +381,8 @@ trait BindingLoader extends Logging {
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement          ← Dom4j.elements(xblElement, XBL_BINDING_QNAME).to[List]
-      currentElementAttribute ← Option(bindingElement.attributeValue(ELEMENT_QNAME))
+      bindingElement ← Dom4j.elements(xblElement, XBL_BINDING_QNAME).to[List]
+      _              ← Option(bindingElement.attributeValue(ELEMENT_QNAME))
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)
   }

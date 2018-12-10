@@ -594,16 +594,16 @@
                             relevant="not($type = $noargs-constraints)"/>
 
                         <xf:bind
-                            ref="constraint/@argument[not($type = ($noargs-constraints, $string-arg-constraints, $date-arg-constraints))]"
+                            ref="constraint/@argument[not(../../@type = ($noargs-constraints, $string-arg-constraints, $date-arg-constraints))]"
                             type="xf:integer"
                             constraint=". ge 0"/>
 
                         <xf:bind
-                            ref="constraint/@argument[$type = 'upload-mediatypes']"
+                            ref="constraint/@argument[../../@type = 'upload-mediatypes']"
                             constraint="fbf:isValidListOfMediatypeRanges(.)"/>
 
                         <xf:bind
-                            ref="constraint/@argument[$type = 'excluded-dates']"
+                            ref="constraint/@argument[../../@type = 'excluded-dates']"
                             type="xxf:xpath2"/>
 
                         <xf:bind

@@ -175,6 +175,10 @@
                                 $format-migrated
                     "/>
 
+                <!-- Be consistent with `fr-get-document-submission` -->
+                <xf:delete
+                    ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
+
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
                 <xf:setvalue
@@ -737,6 +741,10 @@
         <xf:insert
             context="xxf:instance('fr-form-instance')/root()"
             origin="grid-migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>
+
+        <!-- Be consistent with `fr-get-document-submission` -->
+        <xf:delete
+            ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
     </xf:action>
 
     <!-- Initial instance (to support clear) -->

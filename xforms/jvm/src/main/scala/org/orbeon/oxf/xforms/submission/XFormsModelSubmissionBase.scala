@@ -180,32 +180,12 @@ object XFormsModelSubmissionBase {
         attributeNamesForTokens.get("id") foreach
           (annotateWithHashes(copy, _))
 
-        // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
-        // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
-        val isNonRelevantSupportAnnotationIfPresent: Node ⇒ Boolean =
-          relevantAttOpt                          map
-            isLocallyNonRelevantSupportAnnotation getOrElse
-            isLocallyNonRelevant _
-
-        relevanceHandling match {
-          case RelevanceHandling.Keep | RelevanceHandling.Empty ⇒
-
-            val relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
-
-            if (relevanceHandling == RelevanceHandling.Empty)
-              blankNonRelevantNodes(copy, relevantAnnotationAttQNameOpt.toSet ++ relevantAttOpt, isNonRelevantSupportAnnotationIfPresent)
-
-            relevantAnnotationAttQNameOpt foreach { relevantAnnotationAttName ⇒
-              annotateNonRelevantElements(copy, relevantAnnotationAttName, isNonRelevantSupportAnnotationIfPresent)
-            }
-
-            if (relevantAnnotationAttQNameOpt != relevantAttOpt)
-              relevantAttOpt foreach { relevantAtt ⇒
-                removeNestedAnnotations(copy.getRootElement, relevantAtt, includeSelf = true)
-              }
-          case RelevanceHandling.Remove ⇒
-            pruneNonRelevantNodes(copy, isNonRelevantSupportAnnotationIfPresent)
-        }
+        processRelevant(
+          doc = copy,
+          relevanceHandling = relevanceHandling,
+          relevantAttOpt = relevantAttOpt,
+          relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
+        )
 
         annotateWithAlerts(
           xfcd             = xfcd,
@@ -227,52 +207,54 @@ object XFormsModelSubmissionBase {
         TransformerUtils.tinyTreeToDom4j(ref.getRoot)
     }
 
-  def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
+  def processRelevant(
+    doc                           : Document,
+    relevanceHandling             : RelevanceHandling,
+    relevantAttOpt                : Option[QName],
+    relevantAnnotationAttQNameOpt : Option[QName]
+  ): Unit = {
+    // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
+    // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
+    val isNonRelevantSupportAnnotationIfPresent: Node ⇒ Boolean =
+      relevantAttOpt                          map
+        isLocallyNonRelevantSupportAnnotation getOrElse
+        isLocallyNonRelevant _
 
-    def processElement(e: Element): Iterator[Node] =
-      if (isLocallyNonRelevant(e)) {
-        Iterator(e)
-      } else {
-        (e.attributeIterator.asScala filter isLocallyNonRelevant) ++
-          (e.elementIterator.asScala flatMap processElement)
-      }
+    relevanceHandling match {
+      case RelevanceHandling.Keep | RelevanceHandling.Empty ⇒
 
-    // NOTE: Using `Iterator` should work, as `elementIterator` makes a copy of the content before iterating.
-    processElement(doc.getRootElement) foreach (_.detach())
-  }
+        if (relevanceHandling == RelevanceHandling.Empty)
+          blankNonRelevantNodes(
+            doc                  = doc,
+            attsToPreserve       = relevantAnnotationAttQNameOpt.toSet ++ relevantAttOpt,
+            isLocallyNonRelevant = isNonRelevantSupportAnnotationIfPresent
+          )
 
-  def blankNonRelevantNodes(doc: Document, attsToPreserve: Set[QName], isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
+        relevantAnnotationAttQNameOpt foreach { relevantAnnotationAttName ⇒
+          annotateNonRelevantElements(
+            doc                        = doc,
+            relevantAnnotationAttQName = relevantAnnotationAttName,
+            isNonRelevant              = isNonRelevantSupportAnnotationIfPresent
+          )
+        }
 
-    def processElement(e: Element, parentNonRelevant: Boolean): Unit = {
+        if (relevantAnnotationAttQNameOpt != relevantAttOpt)
+          relevantAttOpt foreach { relevantAtt ⇒
+            removeNestedAnnotations(doc.getRootElement, relevantAtt, includeSelf = true)
+          }
 
-      val elemNonRelevant = parentNonRelevant || isLocallyNonRelevant(e)
+      case RelevanceHandling.Remove ⇒
 
-      // NOTE: Make sure not to blank attributes corresponding to annotations if present!
-      e.attributeIterator.asScala                                                          filter
-        (a ⇒ ! attsToPreserve(a.getQName) && (elemNonRelevant || isLocallyNonRelevant(a))) foreach
-        (_.setValue(""))
+        pruneNonRelevantNodes(doc, isNonRelevantSupportAnnotationIfPresent)
 
-      if (e.containsElement)
-        e.elements.asScala foreach (processElement(_, elemNonRelevant))
-      else if (elemNonRelevant)
-        e.setText("")
+        // There can be leftover annotations, in particular attributes with value `true`!
+        val attsToRemove = relevantAttOpt.toList :::
+          (if (relevantAnnotationAttQNameOpt != relevantAttOpt) relevantAnnotationAttQNameOpt.toList else Nil)
+
+        attsToRemove foreach { attQName ⇒
+          removeNestedAnnotations(doc.getRootElement, attQName, includeSelf = true)
+        }
     }
-
-    processElement(doc.getRootElement, parentNonRelevant = false)
-  }
-
-  def annotateNonRelevantElements(doc: Document, relevantAnnotationAttQName: QName, isNonRelevant: Node ⇒ Boolean): Unit = {
-
-    def processElem(e: Element): Unit =
-      if (isNonRelevant(e)) {
-        e.addAttribute(relevantAnnotationAttQName, false.toString)
-        removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
-      } else {
-        e.removeAttribute(relevantAnnotationAttQName)
-        e.elements.asScala foreach processElem
-      }
-
-    processElem(doc.getRootElement)
   }
 
   def annotateWithHashes(doc: Document, attQName: QName): Unit = {
@@ -443,6 +425,62 @@ object XFormsModelSubmissionBase {
       case e: Element   ⇒ ! InstanceData.getLocalRelevant(e) || (e.attributeValueOpt(attQname) contains false.toString)
       case a: Attribute ⇒ ! InstanceData.getLocalRelevant(a)
       case _            ⇒ false
+    }
+
+    def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
+
+      def processElement(e: Element): Iterator[Node] =
+        if (isLocallyNonRelevant(e)) {
+          Iterator(e)
+        } else {
+          (e.attributeIterator.asScala filter isLocallyNonRelevant) ++
+            (e.elementIterator.asScala flatMap processElement)
+        }
+
+      // NOTE: Using `Iterator` should work, as `elementIterator` makes a copy of the content before iterating.
+      processElement(doc.getRootElement) foreach (_.detach())
+    }
+
+    def blankNonRelevantNodes(
+      doc                  : Document,
+      attsToPreserve       : Set[QName],
+      isLocallyNonRelevant : Node ⇒ Boolean
+    ): Unit = {
+
+      def processElement(e: Element, parentNonRelevant: Boolean): Unit = {
+
+        val elemNonRelevant = parentNonRelevant || isLocallyNonRelevant(e)
+
+        // NOTE: Make sure not to blank attributes corresponding to annotations if present!
+        e.attributeIterator.asScala                                                          filter
+          (a ⇒ ! attsToPreserve(a.getQName) && (elemNonRelevant || isLocallyNonRelevant(a))) foreach
+          (_.setValue(""))
+
+        if (e.containsElement)
+          e.elements.asScala foreach (processElement(_, elemNonRelevant))
+        else if (elemNonRelevant)
+          e.setText("")
+      }
+
+      processElement(doc.getRootElement, parentNonRelevant = false)
+    }
+
+    def annotateNonRelevantElements(
+      doc                        : Document,
+      relevantAnnotationAttQName : QName,
+      isNonRelevant              : Node ⇒ Boolean
+    ): Unit = {
+
+      def processElem(e: Element): Unit =
+        if (isNonRelevant(e)) {
+          e.addAttribute(relevantAnnotationAttQName, false.toString)
+          removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
+        } else {
+          e.removeAttribute(relevantAnnotationAttQName)
+          e.elements.asScala foreach processElem
+        }
+
+      processElem(doc.getRootElement)
     }
 
     def removeNestedAnnotations(startElem: Element, attQname: QName, includeSelf: Boolean): Unit = {

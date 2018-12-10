@@ -20,33 +20,84 @@ import org.scalatest.FunSpec
 import org.orbeon.oxf.xml.Dom4j._
 
 class SubmissionRelevanceTest extends FunSpec with XMLSupport {
-  
+
   describe("Submission relevance options") {
 
-    val doc: Document =
+    def newDoc: Document =
       <form xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-        <e1 xf:relevant="false"/>
+        <e1 xf:relevant="false">e1</e1>
         <e2 xxf:relevant="false"/>
+        <e3 xf:relevant="true"/>
+        <e4 xxf:relevant="true"/>
+        <e5>
+          <e5-iteration xf:relevant="false">
+            <e6 xf:relevant="true">e61</e6>
+          </e5-iteration>
+          <e5-iteration>
+            <e6 xf:relevant="false">e62</e6>
+          </e5-iteration>
+        </e5>
       </form>
 
-    val expected: Document =
-      <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
-        <e1 xf:relevant="false" xxf:relevant="false"/>
-        <e2 xxf:relevant="false"/>
-      </form>
+    val expected: Map[RelevanceHandling, Document] =
+      Map(
+        RelevanceHandling.Keep →
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
+            <e1 xxf:relevant="false">e1</e1>
+            <e2/>
+            <e3/>
+            <e4/>
+            <e5>
+              <e5-iteration xxf:relevant="false">
+                <e6>e61</e6>
+              </e5-iteration>
+              <e5-iteration>
+                <e6 xxf:relevant="false">e62</e6>
+              </e5-iteration>
+            </e5>
+          </form>,
+        RelevanceHandling.Remove →
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
+            <e2/>
+            <e3/>
+            <e4/>
+            <e5>
+              <e5-iteration/>
+            </e5>
+          </form>,
+        RelevanceHandling.Empty →
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
+            <e1 xxf:relevant="false"/>
+            <e2/>
+            <e3/>
+            <e4/>
+            <e5>
+              <e5-iteration xxf:relevant="false">
+                <e6/>
+              </e5-iteration>
+              <e5-iteration>
+                <e6 xxf:relevant="false"/>
+              </e5-iteration>
+            </e5>
+          </form>
+      )
 
-    val XfRelevantQName  = QName("relevant", XFormsConstants.XFORMS_NAMESPACE_SHORT)
+    val XFRelevantQName  = QName("relevant", XFormsConstants.XFORMS_NAMESPACE_SHORT)
     val XXFRelevantQName = QName("relevant", XFormsConstants.XXFORMS_NAMESPACE_SHORT)
 
-    val isNonRelevant: Node ⇒ Boolean = {
-      case e: Element   ⇒ (e.attributeValueOpt(XfRelevantQName) contains false.toString) || (e.attributeValueOpt(XXFRelevantQName) contains false.toString)
-      case _            ⇒ false
-    }
+    for (relevanceHandling ← RelevanceHandling.values)
+      it(s"must annotate and keep existing annotation when needed with $relevanceHandling") {
 
-    it("must annotate and keep existing annotation when needed") {
-      XFormsModelSubmissionBase.annotateNonRelevantElements(doc, XXFRelevantQName, isNonRelevant)
-      assertXMLDocumentsIgnoreNamespacesInScope(expected, doc)
-    }
+        val doc = newDoc
+
+        XFormsModelSubmissionBase.processRelevant(
+          doc                           = doc,
+          relevanceHandling             = relevanceHandling,
+          relevantAttOpt                = Some(XFRelevantQName),
+          relevantAnnotationAttQNameOpt = Some(XXFRelevantQName)
+        )
+        assertXMLDocumentsIgnoreNamespacesInScope(expected(relevanceHandling), doc)
+      }
   }
 
 }

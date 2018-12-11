@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 // Static event handler
 trait EventHandler {
+
+  def scope: Scope
 
   def staticId: String
   def prefixedId: String

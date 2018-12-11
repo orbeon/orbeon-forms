@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
@@ -288,10 +288,10 @@ trait ElementEventHandlers {
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
   // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
-  private[analysis] def relevantObservers: List[ElementAnalysis] = {
+  private[analysis] def relevantObserversFromLeafToRoot: List[ElementAnalysis] = {
 
     def observersInAncestorParts =
-      part.elementInParent.toList flatMap (_.relevantObservers)
+      part.elementInParent.toList flatMap (_.relevantObserversFromLeafToRoot)
 
     def relevant(observer: ElementAnalysis) =
       observer.scope == element.scope || hasPhantomHandler(observer)
@@ -299,21 +299,26 @@ trait ElementEventHandlers {
     (ancestorOrSelfIterator(element) filter relevant) ++: observersInAncestorParts
   }
 
-  // Find all the handlers for the given event name
+  // Find all the handlers for the given event name if an event with that name is dispatched to this element.
   // For all relevant observers, find the handlers which match by phase
   private def handlersForEventImpl(eventName: String): HandlerAnalysis = {
 
+    // NOTE: For `phase == Target`, `observer eq element`.
     def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
 
+      // FIXME: This seems wrong!
       val isPhantom = observer.scope != element.scope
 
       def matchesPhaseNameTarget(eventHandler: EventHandler) =
-        (eventHandler.isCapturePhaseOnly && phase == Capture ||
-         eventHandler.isTargetPhase      && phase == Target  ||
-         eventHandler.isBubblingPhase    && phase == Bubbling) && eventHandler.isMatchByNameAndTarget(eventName, element.prefixedId)
+        (
+          eventHandler.isCapturePhaseOnly && phase == Capture ||
+          eventHandler.isTargetPhase      && phase == Target  ||
+          eventHandler.isBubblingPhase    && phase == Bubbling
+        ) &&
+          eventHandler.isMatchByNameAndTarget(eventName, element.prefixedId)
 
       def matches(eventHandler: EventHandler) =
-        if (isPhantom)
+        if (isPhantom) // FIXME: This seems wrong!
           eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
         else
           matchesPhaseNameTarget(eventHandler)
@@ -330,13 +335,25 @@ trait ElementEventHandlers {
       val propagate            = relevantHandlers forall (_.isPropagate)
       val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction)
 
-      (propagate, performDefaultAction, relevantHandlers)
+      // See https://github.com/orbeon/orbeon-forms/issues/3844
+      def placeInnerHandlersFirst(handlers: List[EventHandler]): List[EventHandler] = {
+
+        def isHandlerInnerHandlerOfObserver(handler: EventHandler) =
+          handler.scope.parent contains observer.containerScope
+
+        val (inner, outer) =
+          handlers partition isHandlerInnerHandlerOfObserver
+
+        inner ::: outer
+      }
+
+      (propagate, performDefaultAction, placeInnerHandlersFirst(relevantHandlers))
     }
 
     var propagate = true
     var performDefaultAction = true
 
-    def handlersForPhase(observers: List[ElementAnalysis], phase: Phase) = {
+    def handlersForPhase(observers: List[ElementAnalysis], phase: Phase): Option[(Phase, Map[String, List[EventHandler]])] = {
       val result = mutable.Map[String, List[EventHandler]]()
       breakable {
         for (observer ← observers) {
@@ -361,20 +378,20 @@ trait ElementEventHandlers {
         None
     }
 
-    val observers = relevantObservers
+    val observersFromLeafToRoot = relevantObserversFromLeafToRoot
 
     val captureHandlers =
-      handlersForPhase(observers.reverse.init, Capture)
+      handlersForPhase(observersFromLeafToRoot.reverse.init, Capture)
 
     val targetHandlers =
       if (propagate)
-        handlersForPhase(List(observers.head), Target)
+        handlersForPhase(List(observersFromLeafToRoot.head), Target)
       else
         None
 
     val bubblingHandlers =
       if (propagate)
-        handlersForPhase(observers.tail, Bubbling)
+        handlersForPhase(observersFromLeafToRoot.tail, Bubbling)
       else
         None
 

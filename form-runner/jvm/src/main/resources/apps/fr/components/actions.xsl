@@ -403,7 +403,61 @@
         <!-- Initial status -->
         <xf:action event="xforms-model-construct-done">
 
-            <!-- TODO -->
+            <xf:var
+                name="left-container"
+                value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))"/>
+            <xf:var
+                name="right-container"
+                value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
+
+            <xf:var
+                name="repeat-template"
+                value="instance(frf:templateId(frf:controlNameFromId('{$right-id}')))"/>
+
+            <xf:var
+                name="diff"
+                value="count($right-container/*) - count($left-container/*)"/>
+
+            <!-- Remove extra iterations if any -->
+            <xf:delete
+                if="$diff gt 0"
+                ref="$right-container/*[position() gt count($left-container/*)]"/>
+
+            <!-- Insert iterations if needed  -->
+            <xf:insert
+                context="$right-container"
+                if="$diff lt 0"
+                ref="*"
+                origin="
+                    let $t := frf:updateTemplateFromInScopeItemsetMaps($right-container, $repeat-template)
+                    return
+                        for $i in (1 to -$diff)
+                        return $t"
+                position="after"
+                xxf:defaults="{$apply-defaults}"/>
+
+            <xf:action if="$diff != 0">
+                <xf:rebuild/>
+                <xf:revalidate/>
+            </xf:action>
+
+            <!-- Update all values -->
+            <xf:action iterate="1 to count($left-container/*)">
+
+                <xf:var name="p" value="."/>
+
+                <xsl:for-each select="fr:map">
+                    <xf:action>
+                        <xf:var name="src" context="$left-container/*[$p]"  value="bind(frf:bindId('{@left}'))"/>
+                        <xf:var name="dst" context="$right-container/*[$p]" value="bind(frf:bindId('{@right}'))"/>
+
+                        <xf:setvalue
+                            ref="$dst"
+                            value="$src"/>
+                    </xf:action>
+                </xsl:for-each>
+
+            </xf:action>
 
         </xf:action>
 
@@ -510,16 +564,16 @@
                     <xf:var name="new-p" value="if (event('xxf:type') = 'fr-insert-above') then $p else $p + 1"/>
 
                     <xf:var
-                        name="left-context"
-                        value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))/*[$new-p]"/>
+                        name="left-container"
+                        value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))"/>
                     <xf:var
-                        name="right-context"
-                        value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))/*[$new-p]"/>
+                        name="right-container"
+                        value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
 
                     <xsl:for-each select="fr:map">
                         <xf:action>
-                            <xf:var name="src" context="$left-context"  value="bind(frf:bindId('{@left}'))"/>
-                            <xf:var name="dst" context="$right-context" value="bind(frf:bindId('{@right}'))"/>
+                            <xf:var name="src" context="$left-container/*[$new-p]"  value="bind(frf:bindId('{@left}'))"/>
+                            <xf:var name="dst" context="$right-container/*[$new-p]" value="bind(frf:bindId('{@right}'))"/>
 
                             <xf:setvalue
                                 ref="$dst"

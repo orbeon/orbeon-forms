@@ -298,6 +298,11 @@
         select="$action-bindings/generate-id()"/>
 
     <xsl:variable
+        name="sync-actions-ids"
+        select="
+            $action-models/fr:synchronize-content/generate-id()"/>
+
+    <xsl:variable
         name="service-instances"
         select="
             $action-models/
@@ -378,6 +383,155 @@
             <xsl:attribute name="replace"     >instance</xsl:attribute>
             <xsl:attribute name="xxf:instance">fr-service-response-instance</xsl:attribute>
         </xsl:copy>
+    </xsl:template>
+
+    <!-- Implement synchronization actions -->
+    <xsl:template
+        match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/*[
+                    generate-id() = $sync-actions-ids
+                ]">
+
+        <xsl:variable name="left-id"  select="@left"/>
+        <xsl:variable name="right-id" select="@right"/>
+
+        <xsl:variable name="apply-defaults" select="true()"/>
+
+        <!-- Initial status -->
+        <xf:action event="xforms-model-construct-done">
+
+            <!-- TODO -->
+
+        </xf:action>
+
+        <!-- Propagate value changes -->
+        <xsl:for-each select="fr:map">
+            <xf:action
+                event="xforms-value-changed"
+                observer="{@left}-control"
+                target="#observer">
+
+                <xf:var
+                    name="p"
+                    value="
+                        for $i in event('xxf:repeat-indexes')[last()]
+                        return xs:integer($i)"/>
+
+                <xf:var
+                    name="right-context"
+                    value="
+                        bind(
+                            frf:bindId(
+                                frf:controlNameFromId('{$right-id}')
+                            )
+                        )/*[$p]"/>
+
+                <xf:setvalue
+                    context="$right-context"
+                    ref="bind(frf:bindId('{@right}'))"
+                    value="event('xxf:value')"/>
+
+            </xf:action>
+        </xsl:for-each>
+
+        <!-- NOTE: There is a lot of logic duplication here with `fr:grid` and `fr:repeater`. We need
+             to consolidate this code. -->
+        <!-- Propagate inserts, moves, and remove -->
+        <xf:action event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove" observer="{$left-id}">
+
+            <xf:var name="repeat-template" value="instance(frf:templateId(frf:controlNameFromId('{$right-id}')))"/>
+            <xf:var name="context"         value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
+            <xf:var name="items"           value="$context/*"/>
+            <xf:var name="p"               value="xs:integer(event('row'))"/>
+            <xf:var name="source"          value="$items[$p]"/>
+            <xf:var name="instance"        value="$source/root()"/>
+
+            <xf:delete
+                if="event('xxf:type') = ('fr-remove', 'fr-move-up', 'fr-move-down')"
+                ref="$source"/>
+
+            <xf:action if="event('xxf:type') = 'fr-remove'">
+                <xf:action type="xpath">
+                    frf:garbageCollectMetadataItemsets($instance)
+                </xf:action>
+            </xf:action>
+
+            <xf:action if="event('xxf:type') = 'fr-move-up'">
+
+                <xf:insert
+                    context="$context"
+                    ref="$items[$p - 1]"
+                    origin="$source"
+                    position="before"/>
+
+            </xf:action>
+
+            <xf:action if="event('xxf:type') = 'fr-move-down'">
+
+                <xf:insert
+                    context="$context"
+                    ref="$items[$p + 1]"
+                    origin="$source"
+                    position="after"/>
+
+            </xf:action>
+
+            <xf:action if="event('xxf:type') = 'fr-insert-above'">
+
+                <xf:insert
+                    context="$context"
+                    ref="$items[$p]"
+                    origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                    position="before"
+                    xxf:defaults="{$apply-defaults}"/>
+
+            </xf:action>
+
+            <xf:action if="event('xxf:type') = 'fr-insert-below'">
+
+                <xf:insert
+                    context="$context"
+                    ref="$items[$p]"
+                    origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                    position="after"
+                    xxf:defaults="{$apply-defaults}"/>
+
+            </xf:action>
+
+            <xsl:if test="exists(fr:map)">
+                <xf:action if="event('xxf:type') = ('fr-insert-above', 'fr-insert-below')">
+
+                    <xf:rebuild/>
+                    <xf:revalidate/>
+
+                    <xf:var name="new-p" value="if (event('xxf:type') = 'fr-insert-above') then $p else $p + 1"/>
+
+                    <xf:var
+                        name="left-context"
+                        value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))/*[$new-p]"/>
+                    <xf:var
+                        name="right-context"
+                        value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))/*[$new-p]"/>
+
+                    <xsl:for-each select="fr:map">
+                        <xf:action>
+                            <xf:var name="src" context="$left-context"  value="bind(frf:bindId('{@left}'))"/>
+                            <xf:var name="dst" context="$right-context" value="bind(frf:bindId('{@right}'))"/>
+
+                            <xf:setvalue
+                                ref="$dst"
+                                value="$src"/>
+                        </xf:action>
+                    </xsl:for-each>
+
+                </xf:action>
+            </xsl:if>
+
+        </xf:action>
+
     </xsl:template>
 
     <!-- Match and modify action `xf:action`s -->

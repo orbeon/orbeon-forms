@@ -142,36 +142,16 @@
                                         value="count($repeat-sequence)"/>
                                 </xsl:otherwise>
                             </xsl:choose>
-                            <xf:insert
-                                context="$repeat-context"
-                                ref="$repeat-sequence"
-                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
-                                at="$p"
-                                xxf:defaults="{$apply-defaults}"/>
-                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                            <xf:setfocus
-                                control="repeat-group"
-                                xxf:repeat-indexes="{{$p + 1}}"
-                                id="sf0"
-                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
-                            <!-- Let the outside world know -->
-                            <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added"/>
+                            <xf:dispatch name="fr-insert-below" targetid="fr-repeater-binding">
+                                <xf:property name="row" value="$p"/>
+                            </xf:dispatch>
                         </xf:action>
 
                         <xf:action event="DOMActivate" observer="fr-repeater-remove-bottom">
                             <xf:var name="p" value="count($repeat-sequence)"/>
-                            <xf:delete
-                                ref="$repeat-sequence[last()]"/>
-                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                            <xf:setfocus
-                                control="repeat-group"
-                                xxf:repeat-indexes="{{$p - 1}}"
-                                id="sf6"
-                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
-                            <!-- Let the outside world know -->
-                            <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-removed"/>
+                            <xf:dispatch name="fr-remove" targetid="fr-repeater-binding">
+                                <xf:property name="row" value="$p"/>
+                            </xf:dispatch>
                         </xf:action>
 
                         <!-- Placeholder to add first iteration when empty (could have `and count($repeat-sequence) = 0`,
@@ -280,7 +260,7 @@
                                         <xf:insert
                                             context="$context"
                                             ref="$items[$p - 1]"
-                                            origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template), $source"
+                                            origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template), $source"
                                             position="after"
                                             xxf:defaults="{$apply-defaults}"/>
 
@@ -292,6 +272,11 @@
                                             includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
                                             excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
+                                        <!-- Let the outside world know -->
+                                        <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added">
+                                            <xf:property name="index" value="$p"/>
+                                        </xf:dispatch>
+
                                     </xf:action>
 
                                     <xf:action if="event('xxf:type') = 'fr-insert-below'">
@@ -299,7 +284,7 @@
                                         <xf:insert
                                             context="$context"
                                             ref="$items[$p - 1]"
-                                            origin="$source, frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
+                                            origin="$source, frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
                                             position="after"
                                             xxf:defaults="{$apply-defaults}"/>
 
@@ -310,6 +295,11 @@
                                             id="sf4"
                                             includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
                                             excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+
+                                        <!-- Let the outside world know -->
+                                        <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added">
+                                            <xf:property name="index" value="$p + 1"/>
+                                        </xf:dispatch>
 
                                     </xf:action>
                                 </xf:action>

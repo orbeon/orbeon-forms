@@ -168,10 +168,9 @@
                                                             event="fr-iteration-added fr-iteration-removed"
                                                             target="#observer"
                                                             propagate="stop">
-                                                            <xf:dispatch
-                                                                xxbl:scope="inner"
-                                                                targetid="fr-section"
-                                                                name="{{event('xxf:type')}}"/>
+                                                            <xf:dispatch xxbl:scope="inner" targetid="fr-section" name="{{event('xxf:type')}}">
+                                                                <xf:property name="index" value="event('index')"/>
+                                                            </xf:dispatch>
                                                         </xf:action>
 
                                                         <xsl:if test="$repeat-menu">

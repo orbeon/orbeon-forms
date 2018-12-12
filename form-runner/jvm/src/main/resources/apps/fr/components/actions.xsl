@@ -300,7 +300,7 @@
     <xsl:variable
         name="sync-actions"
         select="
-            $action-models/fr:synchronize-content"/>
+            $action-models/fr:synchronize-repeated-content[@version = '2018.2']"/>
 
     <xsl:variable
         name="sync-actions-ids"
@@ -400,8 +400,8 @@
                     generate-id() = $sync-actions-ids
                 ]">
 
-        <xsl:variable name="left-id"  select="@left"/>
-        <xsl:variable name="right-id" select="@right"/>
+        <xsl:variable name="left-name"  select="@left"/>
+        <xsl:variable name="right-name" select="@right"/>
 
         <xsl:variable name="apply-defaults" select="true()"/>
 
@@ -410,14 +410,14 @@
 
             <xf:var
                 name="left-container"
-                value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))"/>
+                value="bind(frf:bindId('{$left-name}'))"/>
             <xf:var
                 name="right-container"
-                value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
+                value="bind(frf:bindId('{$right-name}'))"/>
 
             <xf:var
                 name="repeat-template"
-                value="instance(frf:templateId(frf:controlNameFromId('{$right-id}')))"/>
+                value="instance(frf:templateId('{$right-name}'))"/>
 
             <xf:var
                 name="diff"
@@ -483,9 +483,7 @@
                     name="right-context"
                     value="
                         bind(
-                            frf:bindId(
-                                frf:controlNameFromId('{$right-id}')
-                            )
+                            frf:bindId('{$right-name}')
                         )/*[$p]"/>
 
                 <xf:setvalue
@@ -499,10 +497,10 @@
         <!-- NOTE: There is a lot of logic duplication here with `fr:grid` and `fr:repeater`. We need
              to consolidate this code. -->
         <!-- Propagate inserts, moves, and remove -->
-        <xf:action event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove" observer="{$left-id}">
+        <xf:action event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove" observer="{$left-name}-grid {$left-name}-section">
 
-            <xf:var name="repeat-template" value="instance(frf:templateId(frf:controlNameFromId('{$right-id}')))"/>
-            <xf:var name="context"         value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
+            <xf:var name="repeat-template" value="instance(frf:templateId('{$right-name}'))"/>
+            <xf:var name="context"         value="bind(frf:bindId('{$right-name}'))"/>
             <xf:var name="items"           value="$context/*"/>
             <xf:var name="p"               value="xs:integer(event('row'))"/>
             <xf:var name="source"          value="$items[$p]"/>
@@ -570,10 +568,10 @@
 
                     <xf:var
                         name="left-container"
-                        value="bind(frf:bindId(frf:controlNameFromId('{$left-id}')))"/>
+                        value="bind(frf:bindId('{$left-name}'))"/>
                     <xf:var
                         name="right-container"
-                        value="bind(frf:bindId(frf:controlNameFromId('{$right-id}')))"/>
+                        value="bind(frf:bindId('{$right-name}'))"/>
 
                     <xsl:for-each select="fr:map">
                         <xf:action>

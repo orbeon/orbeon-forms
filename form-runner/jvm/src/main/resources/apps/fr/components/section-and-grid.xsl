@@ -62,7 +62,7 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:if test="$sync-actions/@right = @id">
+            <xsl:if test="$sync-actions/@right = frf:controlNameFromId(@id)">
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 

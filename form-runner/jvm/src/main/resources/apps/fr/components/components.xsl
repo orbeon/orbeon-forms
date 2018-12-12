@@ -27,6 +27,7 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="actions.xsl"/>
+    <xsl:import href="actions-20182.xsl"/>
 
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
@@ -666,7 +667,7 @@
 
             <!-- Common actions implementation -->
             <xsl:if test="$fr-form-model-id = $models-with-itemset-actions-models-ids">
-                <xsl:copy-of select="fr:itemset-action-common-impl()"/>
+                <xsl:copy-of select="fr:itemset-action-common-impl('fr-form-model')"/>
             </xsl:if>
             <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
 

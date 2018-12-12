@@ -19,7 +19,8 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind}
+import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel, XFormsModelBase}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
@@ -47,11 +48,12 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   // We first try to resolve a concrete target control based on the source and the control name. If that works, great,
   // we then find the bound nodes if any. This returns:
   //
-  // - 0 to 1 node if `followIndexes = false`
+  // - 0 to n node if `followIndexes = false` (2018-12-13: that seems to be the case based on the code!)
   // - 0 to n nodes if `followIndexes = true` (since 2016-02-25).
   //
   // If no node is returned above, this means that no target controls are relevant. We fall back to searching binds.
-  // We first identify a bind for the source, if any. Then resolve the target bind. This returns 0 to n nodes.
+  // We first identify a bind for the source, if any. Then resolve the target bind. This returns 0 to n nodes. The
+  // `followIndexes` is ignored when searching binds.
   //
   // Other considerations:
   //
@@ -73,35 +75,53 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       followIndexes
     ) map (new SequenceExtent(_)) orNull
 
-  def resolveTargetRelativeToActionSourceOpt(
+  //@XPathFunction
+  def resolveTargetRelativeToActionSourceFromBinds(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String
+  ): ValueRepresentation = {
+
+    val functionContext = XFormsFunction.context
+
+    resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
+      functionContext.container,
+      functionContext.modelOpt,
+      functionContext.sourceEffectiveId,
+      actionSourceAbsoluteId,
+      targetControlName
+    ) map (new SequenceExtent(_)) orNull
+  }
+
+  def resolveTargetRelativeToActionSourceFromControlsOpt(
+    container              : XBLContainer,
     actionSourceAbsoluteId : String,
     targetControlName      : String,
     followIndexes          : Boolean
+  ): Option[Iterator[NodeInfo]] = {
+
+    def findControls =
+      Controls.resolveControlsById(
+        containingDocument       = container.containingDocument,
+        sourceControlEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
+        targetStaticId           = controlId(targetControlName),
+        followIndexes            = followIndexes
+      )
+
+    val boundNodes =
+      findControls collect {
+        case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
+      } flatten
+
+    boundNodes.nonEmpty option boundNodes.iterator
+  }
+
+  def resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
+    container              : XBLContainer,
+    modelOpt               : Option[XFormsModel],
+    sourceEffectiveId      : String,
+    actionSourceAbsoluteId : String,
+    targetControlName      : String
   ): Option[Iterator[Item]] = {
-
-    val container = XFormsFunction.context.container
-
-    def fromControl: Option[Iterator[NodeInfo]] = {
-
-      def findControls =
-        Controls.resolveControlsById(
-          containingDocument       = container.containingDocument,
-          sourceControlEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
-          targetStaticId           = controlId(targetControlName),
-          followIndexes            = followIndexes
-        )
-
-      val boundNodes =
-        findControls collect {
-          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNodeOpt
-        } flatten
-
-      boundNodes.nonEmpty option boundNodes.iterator
-    }
-
-    def fromBind: Option[Iterator[Item]] = {
-
-      val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
 
       def findBindForSource =
         container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
@@ -115,7 +135,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
           sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
 
       for {
-        model             ← XFormsFunction.context.modelOpt
+        model             ← modelOpt
         modelBinds        ← model.modelBindsOpt
         targetStaticBind  ← model.staticModel.bindsById.get(bindId(targetControlName))
         value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
@@ -123,7 +143,27 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         value
     }
 
-    fromControl orElse fromBind
+  def resolveTargetRelativeToActionSourceOpt(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean
+  ): Option[Iterator[Item]] = {
+
+    val container = XFormsFunction.context.container
+
+    resolveTargetRelativeToActionSourceFromControlsOpt(
+      container,
+      actionSourceAbsoluteId,
+      targetControlName,
+      followIndexes
+    ) orElse
+      resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
+        container,
+        XFormsFunction.context.modelOpt,
+        XFormsFunction.context.sourceEffectiveId,
+        actionSourceAbsoluteId,
+        targetControlName
+      )
   }
 
   // Find the node which must store itemset map information

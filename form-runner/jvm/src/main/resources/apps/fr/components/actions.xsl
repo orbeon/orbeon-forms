@@ -25,46 +25,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-
-    <xsl:variable
-        name="form-load-fr-action-names"
-        select="
-            'fr-run-form-load-action-before-data',
-            'fr-run-form-load-action-after-data',
-            'fr-run-form-load-action-after-controls'
-    "/>
-
-    <!-- NOTE: The order of this must match `$fr-action-names` above. -->
-    <xsl:variable
-        name="form-load-xforms-action-names"
-        select="
-            'xforms-model-construct',
-            'xforms-model-construct-done',
-            'xforms-ready'
-    "/>
-
-    <xsl:variable
-        name="controls-xforms-action-names"
-        select="
-            'xforms-value-changed',
-            'xforms-enabled',
-            'DOMActivate'
-    "/>
-
-    <xsl:variable
-        name="request-action-classes"
-        select="
-            'fr-set-service-value-action',
-            'fr-set-database-service-value-action'
-    "/>
-
-    <xsl:variable
-        name="response-action-classes"
-        select="
-            'fr-set-control-value-action',
-            'fr-itemset-action',
-            'fr-save-to-dataset-action'
-    "/>
+    <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
     <xsl:function name="fr:has-known-action-event" as="xs:boolean">
         <xsl:param name="elem" as="element()"/>
@@ -98,11 +59,14 @@
 
     <!-- Common implementation of itemset actions (one per model) -->
     <xsl:function name="fr:itemset-action-common-impl" as="element(xf:action)">
+        <xsl:param name="model-id" as="xs:string"/>
+
         <xf:action event="fr-call-itemset-action">
 
-            <xf:var name="control-name"       value="event('control-name')"/>
-            <xf:var name="new-itemset-id"     value="event('new-itemset-id')"/>
-            <xf:var name="new-itemset-holder" value="event('new-itemset-holder')"/>
+            <xf:var name="control-name"       value="event('control-name')"       as="xs:string"/>
+            <xf:var name="new-itemset-id"     value="event('new-itemset-id')"     as="xs:string"/>
+            <xf:var name="new-itemset-holder" value="event('new-itemset-holder')" as="element(itemset)"/>
+            <xf:var name="at"                 value="event('at')"                 as="xs:string?"/>
 
             <xf:var
                 name="action-source"
@@ -110,7 +74,21 @@
 
             <xf:var
                 name="resolved-data-holders"
-                value="frf:resolveTargetRelativeToActionSource($action-source, $control-name, false())"/>
+                value="
+                    if (empty($at)) then
+                        frf:resolveTargetRelativeToActionSource($action-source, $control-name, false())
+                    else
+                        frf:resolveTargetRelativeToActionSourceFromBinds('{$model-id}', $control-name)[
+                            if ($at = 'end') then
+                                'last()'
+                            else if ($at = 'start') then
+                                '1'
+                            else if ($at castable as xs:integer) then
+                                xs:integer($at)
+                            else
+                                error()
+                        ]
+            "/>
 
             <xf:var
                 name="choices-count"
@@ -263,7 +241,7 @@
         select="/xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model"/>
 
     <xsl:variable
-        name="action-models"
+        name="candidate-action-models"
         select="$fr-form-model, $xbl-models"/>
 
     <xsl:variable
@@ -271,13 +249,13 @@
         select="$xbl-models/generate-id()"/>
 
     <xsl:variable
-        name="action-models-ids"
+        name="candidate-action-models-ids"
         select="$fr-form-model-id, $xbl-models-ids"/>
 
     <xsl:variable
         name="fr-service-instance-ids"
         select="
-            $action-models/
+            $candidate-action-models/
                 xf:instance[
                     @id = (
                         'fr-service-request-instance',
@@ -288,7 +266,7 @@
     <xsl:variable
         name="action-bindings"
         select="
-            $action-models/
+            $candidate-action-models/
                 xf:action[
                     ends-with(@id, '-binding')
                 ]"/>
@@ -308,9 +286,21 @@
             $sync-actions/generate-id()"/>
 
     <xsl:variable
+        name="action-bindings-2018.2"
+        select="
+            $candidate-action-models/
+                fr:action[
+                    @version = '2018.2'
+                ]"/>
+
+    <xsl:variable
+        name="action-bindings-ids-2018.2"
+        select="$action-bindings-2018.2/generate-id()"/>
+
+    <xsl:variable
         name="service-instances"
         select="
-            $action-models/
+            $candidate-action-models/
                 xf:instance[
                     p:has-class('fr-service') or p:has-class('fr-database-service')
                 ]"/>
@@ -322,7 +312,7 @@
     <xsl:variable
         name="service-submissions-ids"
         select="
-            $action-models/
+            $candidate-action-models/
                 xf:submission[
                     p:has-class('fr-service') or p:has-class('fr-database-service')
                 ]/generate-id()"/>
@@ -331,7 +321,7 @@
         name="models-with-actions-model-ids"
         select="
             distinct-values(
-                $action-bindings/
+                ($action-bindings, $action-bindings-2018.2)/
                     (ancestor::xf:model[1])/
                     generate-id()
             )"/>
@@ -345,30 +335,35 @@
                 ]"/>
 
     <xsl:variable
+        name="itemset-actions-elements-2018.2"
+        select="$action-bindings-2018.2//fr:control-setitems"/>
+
+    <xsl:variable
         name="models-with-itemset-actions-models-ids"
         select="
             distinct-values(
-                $itemset-actions-elements/
+                ($itemset-actions-elements, $itemset-actions-elements-2018.2)/
                     (ancestor::xf:model[1])/
                     generate-id()
             )"/>
 
     <xsl:variable
-        name="itemset-actions-ids"
-        select="$itemset-actions-elements/generate-id()"/>
-
-    <xsl:variable
         name="itemset-actions-control-ids"
         select="
-            for $e in $itemset-actions-elements return
-            replace($e/(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1], '^''(.+)''$', '$1-control')"/>
+            for $e in $itemset-actions-elements
+            return
+                replace($e/(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1], '^''(.+)''$', '$1-control'),
+            for $e in $itemset-actions-elements-2018.2
+            return
+                concat($e/@control, '-control')
+        "/>
 
     <!-- Remove service `xf:instance`s (they will be placed in `fr-actions-model`) and existing Form Runner service instances if any -->
     <xsl:template
         match="
             /xh:html/xh:head//
                 xf:model[
-                    generate-id() = $action-models-ids
+                    generate-id() = $candidate-action-models-ids
                 ]/xf:instance[
                     generate-id() = ($fr-service-instance-ids, $service-instance-ids)
                 ]"/>
@@ -378,7 +373,7 @@
         match="
             /xh:html/xh:head//
                 xf:model[
-                    generate-id() = $action-models-ids
+                    generate-id() = $candidate-action-models-ids
                 ]/xf:submission[
                     generate-id() = $service-submissions-ids
                 ]">
@@ -596,7 +591,7 @@
         match="
             /xh:html/xh:head//
                 xf:model[
-                    generate-id() = $action-models-ids
+                    generate-id() = $candidate-action-models-ids
                 ]/xf:action[
                     generate-id() = $action-bindings-ids
                 ]">
@@ -876,7 +871,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xsl:if test="generate-id() = $models-with-itemset-actions-models-ids">
-                <xsl:copy-of select="fr:itemset-action-common-impl()"/>
+                <xsl:copy-of select="fr:itemset-action-common-impl($model/@id/string())"/>
             </xsl:if>
             <xsl:copy-of select="fr:common-dataset-actions-impl($model)"/>
         </xsl:copy>

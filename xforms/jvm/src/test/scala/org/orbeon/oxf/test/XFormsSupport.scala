@@ -24,9 +24,10 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyGetter
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
-import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
@@ -90,12 +91,12 @@ trait XFormsSupport extends MockitoSugar {
   }
 
   // Dispatch a custom event to the object with the given prefixed id
-  def dispatch(name: String, effectiveId: String) =
+  def dispatch(name: String, effectiveId: String, properties: PropertyGetter = XFormsEvent.EmptyGetter): Unit =
     Dispatch.dispatchEvent(
       new XFormsCustomEvent(
         name,
         document.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsEventTarget],
-        Map(),
+        properties,
         bubbles = true,
         cancelable = true)
     )

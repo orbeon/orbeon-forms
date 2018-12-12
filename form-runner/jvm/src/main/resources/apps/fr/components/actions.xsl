@@ -298,9 +298,14 @@
         select="$action-bindings/generate-id()"/>
 
     <xsl:variable
+        name="sync-actions"
+        select="
+            $action-models/fr:synchronize-content"/>
+
+    <xsl:variable
         name="sync-actions-ids"
         select="
-            $action-models/fr:synchronize-content/generate-id()"/>
+            $sync-actions/generate-id()"/>
 
     <xsl:variable
         name="service-instances"

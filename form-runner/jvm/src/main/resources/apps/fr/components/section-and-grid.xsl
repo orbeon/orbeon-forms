@@ -62,11 +62,15 @@
                 </xsl:otherwise>
             </xsl:choose>
 
+            <xsl:if test="$sync-actions/@right = @id">
+                <xsl:attribute name="readonly">true</xsl:attribute>
+            </xsl:if>
 
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
             </xsl:apply-templates>
+
         </xsl:copy>
     </xsl:template>
 

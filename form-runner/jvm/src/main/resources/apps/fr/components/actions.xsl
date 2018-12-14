@@ -278,7 +278,7 @@
     <xsl:variable
         name="sync-actions"
         select="
-            $action-models/fr:synchronize-repeated-content[@version = '2018.2']"/>
+            $candidate-action-models/fr:synchronize-repeated-content[@version = '2018.2']"/>
 
     <xsl:variable
         name="sync-actions-ids"
@@ -390,7 +390,7 @@
         match="
             /xh:html/xh:head//
                 xf:model[
-                    generate-id() = $action-models-ids
+                    generate-id() = $candidate-action-models-ids
                 ]/*[
                     generate-id() = $sync-actions-ids
                 ]">

@@ -109,7 +109,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val boundNodes =
       findControls collect {
-        case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
+        case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNodeOpt
       } flatten
 
     boundNodes.nonEmpty option boundNodes.iterator

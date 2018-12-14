@@ -183,6 +183,26 @@
                     else
                         xxf:instance('fr-language-instance')"/>
 
+        <xf:var name="metadata" value="frf:metadataInstanceRootOpt($template)"/>
+
+        <xf:delete ref="$metadata/created-with-version"/>
+
+        <xf:insert
+            xmlns:version="java:org.orbeon.oxf.common.Version"
+            context="$metadata"
+            ref="*"
+            origin="
+                xf:element(
+                    'created-with-version',
+                    string-join(
+                        (
+                            version:VersionNumber(),
+                            version:Edition()
+                        ),
+                        ' '
+                    )
+                )"/>
+
         <xf:setvalue
             iterate="$template//@xml:lang[xxf:is-blank()]"
             ref="."
@@ -199,7 +219,7 @@
                 )[1]"/>
 
         <xf:setvalue
-            ref="frf:metadataInstanceRootOpt($template)/title"
+            ref="$metadata/title"
             value="$form-resources/template/untitled-form"/>
         <xf:setvalue
             ref="frf:resourcesInstanceRootElemOpt($template)/resource/section-1/label"
@@ -351,6 +371,7 @@
                 <xf:property name="form"                          value="$requested-form"/>
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>
@@ -378,6 +399,7 @@
                 <xf:property name="form"                          value="($requested-form,        bind('form-name-bind'))[1]"/>
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>
@@ -407,6 +429,7 @@
                     <xf:bind id="form-name-bind"              ref="form-name"/>
                     <xf:bind id="title-bind"                  ref="title[@xml:lang = $fb-lang]"/>
                     <xf:bind id="description-bind"            ref="description[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="created-with-version-bind"   ref="created-with-version"/>
                     <xf:bind id="singleton-bind"              ref="singleton"/>
                     <xf:bind id="wizard-bind"                 ref="wizard"/>
                     <xf:bind id="wizard-mode-bind"            ref="wizard-mode"/>

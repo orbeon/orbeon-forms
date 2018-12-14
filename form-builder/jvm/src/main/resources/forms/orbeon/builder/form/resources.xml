@@ -383,6 +383,10 @@
                 <label>Automatic Calculations Dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions>Versions</versions>
+            <current-version>Current Version</current-version>
+            <created-with-version>Created with Version</created-with-version>
+            <updated-with-versions>Updated with Versions</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -1533,6 +1537,10 @@
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
             </analysis-calculate>
+            <versions>Versions</versions>
+            <current-version>Version courante</current-version>
+            <created-with-version>Créé avec la version</created-with-version>
+            <updated-with-versions>Mis à jour avec les versions</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -2685,6 +2693,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -3865,6 +3877,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -5045,6 +5061,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -6217,6 +6237,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -7392,6 +7416,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -8564,6 +8592,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -9737,6 +9769,10 @@
                 <label>Automatische afhankelijkheid calculatie</label>
                 <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control-instellingen</label>
@@ -10889,6 +10925,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -12068,6 +12108,10 @@
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
             </analysis-calculate>
+            <versions todo="true">[Versions]</versions>
+            <current-version todo="true">[Current Version]</current-version>
+            <created-with-version todo="true">[Created with Version]</created-with-version>
+            <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>
@@ -12849,7 +12893,7 @@
             <delete-action>Bekräfta att du vill ta bort detta kommando</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
             <metadata-edit-title>Metadata</metadata-edit-title>
-            <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare):</new-metadata-output>
+            <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare).</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Var god definiera namn på område och formulär att användas för kopian av formuläret:</save-as-metadata-output>
             <xpath-errors>Det finns {0,choice,1#ett XPath-fel|1&lt;{0,number,integer} XPath-fel} i formuläret.</xpath-errors>

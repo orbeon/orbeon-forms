@@ -47,7 +47,6 @@
                     <xf:model id="fr-form-model">
 
                         <fr:listener
-                            name="my-listener"
                             version="2018.2"
 
                             modes="new"
@@ -57,7 +56,6 @@
                             actions="my-action"/>
 
                         <fr:listener
-                            name="other-listener"
                             version="2018.2"
 
                             events="form-load-after-controls"
@@ -126,18 +124,24 @@
             <xf:model id="fr-form-model">
 
                 <xf:action
-                    observer="my-control"
+                    observer="my-control-control"
                     event="xforms-enabled DOMActivate"
                     if="fr:mode() = ('new')">
-                    <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model"/>
+                    <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
                 </xf:action>
 
                 <xf:action
                     target="fr-form-model"
                     event="fr-run-form-load-action-after-controls">
 
-                    <xf:dispatch name="fr-call-user-my-action-action"    targetid="fr-form-model"/>
-                    <xf:dispatch name="fr-call-user-other-action-action" targetid="fr-form-model"/>
+                    <xf:dispatch name="fr-call-user-my-action-action"    targetid="fr-form-model">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
+                    <xf:dispatch name="fr-call-user-other-action-action" targetid="fr-form-model">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
                 </xf:action>
 
                 <xf:action
@@ -145,7 +149,7 @@
                     event="fr-call-user-my-action-action"
                     target="fr-form-model">
 
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('action-source'))</xf:action>
                     <xf:action>
                         <xf:var name="value" value="'before'"/>
                         <xf:rebuild/>
@@ -169,13 +173,13 @@
                             ref="/*/param3"
                             value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control3', true())"/>
                     </xf:action>
-                    <xf:action type="xpath">xxf:set-request-attribute($continuation-key, 'my-action-1-id')</xf:action>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-service-continuation-id', 'my-action-1-id')</xf:action>
                     <xf:send submission="my-service-gaga-submission"/>
                     <xf:action
                         observer="my-service-gaga-submission"
                         event="xforms-submit-done"
                         context="xxf:instance('fr-service-response-instance')"
-                        if="xxf:get-request-attribute($continuation-key) = 'my-action-1-id'">
+                        if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-1-id'">
                         <xf:action>
                             <xf:var name="value" value="/response/foo"/>
                             <xf:rebuild/>
@@ -220,14 +224,14 @@
                                         ''''
                                     )"/>
                         </xf:action>
-                        <xf:action type="xpath">xxf:set-request-attribute($continuation-key, 'my-action-2-id')</xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-service-continuation-id', 'my-action-2-id')</xf:action>
                         <xf:send submission="my-service-toto-submission"/>
                     </xf:action>
                     <xf:action
                         observer="my-service-toto-submission"
                         event="xforms-submit-done"
                         context="xxf:instance('fr-service-response-instance')"
-                        if="xxf:get-request-attribute($continuation-key) = 'my-action-2-id'">
+                        if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-2-id'">
                         <xf:action>
                             <xf:var name="value" value="'after'"/>
                             <xf:rebuild/>
@@ -245,7 +249,7 @@
                                 origin="$value"/>
                         </xf:action>
                         <xf:delete ref="bind(frf:bindId('my-grid'))/*"/>
-                        <xf:action iterate="@ref">
+                        <xf:action iterate="/response/row">
                             <xf:action>
                                 <xf:var
                                     name="container"

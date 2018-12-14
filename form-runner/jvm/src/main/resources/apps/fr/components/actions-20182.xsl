@@ -40,10 +40,10 @@
 
         <xsl:variable name="model-id" select="../@id/string()" as="xs:string"/>
 
-        <xsl:variable name="modes"    select="p:split(@modes)"/>
-        <xsl:variable name="events"   select="p:split(@events)"/>
-        <xsl:variable name="controls" select="p:split(@controls)"/>
-        <xsl:variable name="actions"  select="p:split(@actions)"/>
+        <xsl:variable name="modes"          select="p:split(@modes)"/>
+        <xsl:variable name="events"         select="p:split(@events)"/>
+        <xsl:variable name="control-names"  select="p:split(@controls)"/>
+        <xsl:variable name="actions"        select="p:split(@actions)"/>
 
         <xsl:variable name="model-events"   select="$events[. = $form-load-2018.2-action-names]"/>
         <xsl:variable name="control-events" select="$events[. = $controls-2018.2-action-names]"/>
@@ -62,7 +62,9 @@
                 </xsl:if>
 
                 <xsl:for-each select="$actions">
-                    <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}"/>
+                    <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
                 </xsl:for-each>
 
             </xf:action>
@@ -70,7 +72,7 @@
 
         <xsl:if test="exists($control-events)">
             <xf:action
-                observer="{$controls}"
+                observer="{for $c in $control-names return concat($c, '-control')}"
                 event="{
                     for $e in $control-events
                     return $controls-xforms-action-names[index-of($controls-2018.2-action-names, $e)]
@@ -82,7 +84,9 @@
                 </xsl:if>
 
                 <xsl:for-each select="$actions">
-                    <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}"/>
+                    <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
                 </xsl:for-each>
 
             </xf:action>
@@ -110,15 +114,19 @@
 
             <!-- Choose to iterate or not on `$iterate-control-name` -->
             <!-- Also store the absolute id of the source in the request -->
+            <!-- NOTE: If another action was triggered during the execution of this action, there
+                 could be a race condition and `fr-action-source` might be set to the incorrect
+                 value. -->
             <xsl:choose>
                 <xsl:when test="exists($var)">
                     <xsl:copy-of select="$var"/>
-                    <xf:action iterate="frf:findRepeatedControlsForTarget(event('xxf:absolute-targetid'), $iterate-control-name)">
+                    <!-- Q: Why `@iterate` and not `@context`, or just on the nested action? -->
+                    <xf:action iterate="frf:findRepeatedControlsForTarget(event('action-source'), $iterate-control-name)">
                         <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', string(.))</xf:action>
                     </xf:action>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('action-source'))</xf:action>
                 </xsl:otherwise>
             </xsl:choose>
 
@@ -147,7 +155,7 @@
                             observer="{$preceding-service-name}-submission"
                             event="xforms-submit-done"
                             context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-request-attribute($continuation-key) = '{$preceding-continuation-id}'">
+                            if="xxf:get-request-attribute('{$continuation-key}') = '{$preceding-continuation-id}'">
 
                             <!-- TODO: check whether we need to put this at the top-level -->
 
@@ -223,14 +231,14 @@
             </xf:action>
         </xsl:if>
 
-        <xf:action type="xpath">xxf:set-request-attribute($continuation-key, '<xsl:value-of select="$continuation-id"/>')</xf:action>
+        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="$continuation-key"/>', '<xsl:value-of select="$continuation-id"/>')</xf:action>
         <xf:send submission="{$service-name}-submission"/>
 
     </xsl:template>
 
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
 
-        <xf:action iterate="@ref">
+        <xf:action iterate="{@ref}">
             <xsl:if test="exists(fr:service-call)">
                 <xsl:message terminate="yes">Nested `fr:service-call` are not supported yet!</xsl:message>
             </xsl:if>

@@ -719,17 +719,17 @@
                                 <xsl:choose>
                                     <xsl:when test="p:has-class('fr-set-control-value-action')">
                                         <!-- Keep parameters but override implementation -->
-                                            <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
-                                            <!-- Set values (we choose to set all targets returned) -->
-                                            <xf:setvalue
-                                                iterate="
-                                                    frf:resolveTargetRelativeToActionSource(
-                                                        xxf:get-request-attribute('fr-action-source'),
-                                                        $control-name,
-                                                        true()
-                                                    )"
-                                                ref="."
-                                                value="$control-value"/>
+                                        <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
+                                        <!-- Set values (we choose to set all targets returned) -->
+                                        <xf:setvalue
+                                            iterate="
+                                                frf:resolveTargetRelativeToActionSource(
+                                                    xxf:get-request-attribute('fr-action-source'),
+                                                    $control-name,
+                                                    true()
+                                                )"
+                                            ref="."
+                                            value="$control-value"/>
                                     </xsl:when>
                                     <xsl:when test="p:has-class('fr-itemset-action')">
                                         <!-- Keep parameters but override implementation -->
@@ -838,7 +838,7 @@
     </xsl:template>
 
     <!-- Match models with at least one action -->
-    <!-- This does not match the main model handled in components.xsl -->
+    <!-- This does NOT match the main model handled in components.xsl -->
     <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $models-with-actions-model-ids]">
 
         <xsl:variable name="model" select="."/>

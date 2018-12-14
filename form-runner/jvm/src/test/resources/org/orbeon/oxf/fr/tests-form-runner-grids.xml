@@ -19,7 +19,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
 
-    description="Form Runner grids" xmlns:xslL="http://www.w3.org/1999/XSL/Transform">
+    description="Form Runner Grids" xmlns:xslL="http://www.w3.org/1999/XSL/Transform">
 
     <test description="Runtime grids conversions" name="oxf:unsafe-xslt">
         <input name="config">

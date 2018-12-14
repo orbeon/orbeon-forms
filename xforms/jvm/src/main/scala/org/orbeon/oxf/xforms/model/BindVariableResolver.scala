@@ -81,12 +81,13 @@ object BindVariableResolver {
           modelBinds,
           targetStaticBind.staticId,
           concreteAncestorIteration
-        ) orElse resolveMultiple(
-          modelBinds,
-          targetAncestorOrSelf,
-          concreteAncestorIteration,
-          childBindOnTargetBranch.staticId
-        )
+        ) orElse
+          resolveMultiple(
+            modelBinds,
+            targetAncestorOrSelf,
+            concreteAncestorIteration,
+            childBindOnTargetBranch.staticId
+          )
     }
   }
 

@@ -24,7 +24,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
 
-    description="XForms XPath Analysis"
+    description="Form Runner XPath Analysis"
     edition="pe">
 
     <test description="fr:dataset() rewriting" name="oxf:java">

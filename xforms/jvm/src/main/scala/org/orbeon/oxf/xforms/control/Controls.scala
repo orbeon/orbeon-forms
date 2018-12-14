@@ -211,13 +211,13 @@ object Controls {
     for {
       controls           ← Option(containingDocument.getControls).toList
       effectiveControlId ←
-      resolveControlsEffectiveIds(
-        containingDocument.getStaticOps,
-        controls.getCurrentControlTree,
-        sourceControlEffectiveId,
-        targetPrefixedId,
-        followIndexes
-      )
+        resolveControlsEffectiveIds(
+          containingDocument.getStaticOps,
+          controls.getCurrentControlTree,
+          sourceControlEffectiveId,
+          targetPrefixedId,
+          followIndexes
+        )
       control            ← controls.findObjectByEffectiveId(effectiveControlId)
     } yield
       control

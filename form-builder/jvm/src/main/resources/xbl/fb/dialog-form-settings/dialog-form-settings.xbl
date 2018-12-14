@@ -456,26 +456,26 @@
                             please
                             <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
                         </xf:group>
-                        <xf:var
-                            name="message"
-                            value="
-                                if ($is-new-form) then
-                                    $resources/messages/new-metadata-output
-                                else if ($is-save-as) then
-                                    $resources/messages/save-as-metadata-output
-                                else
-                                    $resources/messages/edit-metadata-output
-                        "/>
-                        <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p" class="alert alert-info">
-                            <!-- Display message to user -->
-                            <xf:output value="$message"/>
-                        </xf:group>
 
                         <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
 
                         <fr:tabbable class="fb-dialog-form-settings-fields">
                             <fr:tab>
                                 <fr:label ref="$resources/general-settings"/>
+
+                                <xf:var
+                                    name="message"
+                                    value="
+                                        if ($is-new-form) then
+                                            $resources/messages/new-metadata-output
+                                        else if ($is-save-as) then
+                                            $resources/messages/save-as-metadata-output
+                                        else
+                                            $resources/messages/edit-metadata-output
+                                "/>
+                                <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p" class="alert alert-info">
+                                    <xf:output value="$message"/>
+                                </xf:group>
 
                                 <fr:grid>
                                     <xh:tr>
@@ -803,8 +803,8 @@
                                                 </xf:output>
                                             </xh:td>
                                             <xh:td>
-                                                <xf:output value="$i/updated-with-version">
-                                                    <xf:label value="$resources/dialog-form-settings/updated-with-version"/>
+                                                <xf:output value="$i/updated-with-versions">
+                                                    <xf:label value="$resources/dialog-form-settings/updated-with-versions"/>
                                                 </xf:output>
                                             </xh:td>
                                         </xh:tr>

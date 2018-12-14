@@ -247,18 +247,18 @@
 
     </xsl:template>
 
-    <xsl:template match="fr:grid-clear" mode="within-action-2018.2">
+    <xsl:template match="fr:repeat-clear" mode="within-action-2018.2">
 
-        <xsl:variable name="grid-name" select="@grid/string()" as="xs:string"/>
+        <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
 
-        <xf:delete ref="bind(frf:bindId('{$grid-name}'))/*"/>
+        <xf:delete ref="bind(frf:bindId('{$repeat-name}'))/*"/>
 
     </xsl:template>
 
-    <xsl:template match="fr:grid-add-iteration" mode="within-action-2018.2">
+    <xsl:template match="fr:repeat-add-iteration" mode="within-action-2018.2">
 
-        <xsl:variable name="grid-name" select="@grid/string()" as="xs:string"/>
-        <xsl:variable name="at"        select="@at/string()"   as="xs:string"/>
+        <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"   as="xs:string"/>
 
         <!-- TODO -->
         <xsl:variable name="apply-defaults" select="true()"/>
@@ -269,10 +269,10 @@
         <xf:action>
             <xf:var
                 name="container"
-                value="bind(frf:bindId('{$grid-name}'))"/>
+                value="bind(frf:bindId('{$repeat-name}'))"/>
             <xf:var
                 name="repeat-template"
-                value="instance(frf:templateId('{$grid-name}'))"/>
+                value="instance(frf:templateId('{$repeat-name}'))"/>
             <xf:insert
                 context="$container"
                 ref="*[{

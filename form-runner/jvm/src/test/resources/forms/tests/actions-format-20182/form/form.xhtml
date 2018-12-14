@@ -163,10 +163,10 @@
                     <fr:value control="bar" ref="/*/request/bar"/>
                 </fr:service-call>
 
-                <fr:grid-clear grid="my-repeated-grid"/>
+                <fr:repeat-clear repeat="my-repeated-grid"/>
 
                 <fr:data-iterate ref="/*/response/row">
-                    <fr:grid-add-iteration grid="my-repeated-grid" at="end"/>
+                    <fr:repeat-add-iteration repeat="my-repeated-grid" at="end"/>
                     <fr:control-setvalue value="@field" control="result-field" at="end"/>
                     <fr:control-setvalue value="@dropdown" control="result-dropdown" at="end"/>
                 </fr:data-iterate>

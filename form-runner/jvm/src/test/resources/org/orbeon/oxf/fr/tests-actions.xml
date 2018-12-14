@@ -85,10 +85,10 @@
                             <fr:control-setvalue value="'after'" control="control-after"/>
                             <fr:dataset-write name="my-dataset"/>
 
-                            <fr:grid-clear grid="my-grid"/>
+                            <fr:repeat-clear repeat="my-grid"/>
 
                             <fr:data-iterate ref="/response/row">
-                                <fr:grid-add-iteration grid="my-grid" at="end"/>
+                                <fr:repeat-add-iteration repeat="my-grid" at="end"/>
                                 <fr:control-setvalue value="name" control="my-name" at="end"/>
                                 <fr:control-setitems items="item" label="@label" value="@value" control="my-dropdown" at="end"/>
                             </fr:data-iterate>
@@ -99,7 +99,7 @@
                                                      <!--at="position('section-iterate')"/>-->
 
                                 <!--<fr:data-iterate ref="foo" name="grid-iterate">-->
-                                    <!--<fr:grid-add-iteration grid="my-grid" at="end end"/>-->
+                                    <!--<fr:repeat-add-iteration repeat="my-grid" at="end end"/>-->
                                     <!--<fr:control-setitems items="item" label="@label" value="@value" control="my-dropdown" -->
                                                          <!--at="position('section-iterate') position('grid-iterate')"/>-->
                                 <!--</fr:data-iterate>-->

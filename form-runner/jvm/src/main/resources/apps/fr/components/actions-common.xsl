@@ -45,15 +45,25 @@
         select="
             'xforms-value-changed',
             'xforms-enabled',
-            'DOMActivate'
+            'DOMActivate',
+            'xxforms-visible',
+            'xforms-disabled',
+            'xxforms-hidden',
+            'xforms-select',
+            'xforms-deselect'
     "/>
 
     <xsl:variable
         name="controls-2018.2-action-names"
         select="
             'value-changed',
+            'enabled',
+            'activated',
             'visible',
-            'activate'
+            'disabled',
+            'hidden',
+            'item-selected',
+            'item-deselected'
     "/>
 
     <xsl:variable

@@ -73,6 +73,7 @@
                             <digits-after-decimal/>
                             <round-when-formatting/>
                             <round-when-storing/>
+                            <field-width/>
                         </local>
                     </xf:instance>
 
@@ -174,6 +175,25 @@
                             </xf:select1>
                         </xh:td>
                     </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
                 </fr:grid>
                 <xf:action
                     event="xforms-value-changed"
@@ -184,7 +204,8 @@
                         grouping-separator-control
                         digits-after-decimal-control
                         round-when-formatting-control
-                        round-when-storing-control">
+                        round-when-storing-control
+                        field-width-control">
 
                     <xf:var name="name"      value="name(event('xxf:binding'))"/>
                     <xf:var name="new-value" value="string(event('xxf:binding'))"/>
@@ -270,8 +291,9 @@
             <xf:group ref="$binding[not($view)]">
 
 
-                <xf:var name="prefix" value="fr:component-param-value('prefix')"/>
-                <xf:var name="suffix" value="fr:component-param-value('suffix')"/>
+                <xf:var name="prefix"      value="fr:component-param-value('prefix')"/>
+                <xf:var name="suffix"      value="fr:component-param-value('suffix')"/>
+                <xf:var name="field-width" value="fr:component-param-value('field-width')"/>
 
                 <!-- See also https://github.com/orbeon/orbeon-forms/issues/2495 -->
 
@@ -296,7 +318,8 @@
                     class="{
                         (
                             'input-prepend'[xxf:non-blank($prefix)],
-                            'input-append' [xxf:non-blank($suffix)]
+                            'input-append' [xxf:non-blank($suffix)],
+                            concat('fr-field-width-', $field-width)
                         )
                     }">
                     <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>

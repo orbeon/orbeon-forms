@@ -1120,7 +1120,12 @@
             <default-stage>Default</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width>Field width</field-width>
+            <default>Use default</default>
+            <full>Full</full>
+            <natural>Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
             <delete-grid>Are you sure you want to delete the current grid?</delete-grid>
@@ -2266,7 +2271,12 @@
             <default-stage>Défaut</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width>Largeur du champs</field-width>
+            <default>Défaut</default>
+            <full>Espace disponible</full>
+            <natural>Naturel</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
             <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante ?</delete-grid>
@@ -3441,7 +3451,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
             <delete-grid>Er du sikker på at du ønsker å slette dette rutenettet?</delete-grid>
@@ -4615,7 +4630,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>
             <delete-grid>Вы уверены, что хотите удалить текущую сетку?</delete-grid>
@@ -5782,7 +5802,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Sei sicuro di voler cancellare la sezione attuale?</delete-section>
             <delete-grid>Sei sicuro di voler cancellare la griglia attuale?</delete-grid>
@@ -6950,7 +6975,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
             <delete-grid>Sind Sie sicher, dass Sie das aktuelle Raster löschen wollen?</delete-grid>
@@ -8120,7 +8150,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
             <delete-grid>Haluatko varmasti poistaa nykyisen ruudukon?</delete-grid>
@@ -9287,7 +9322,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Está seguro de eliminar la Sección actual?</delete-section>
             <delete-grid>Está seguro de eliminar la Grilla actual?</delete-grid>
@@ -10434,7 +10474,12 @@
             <default-stage>Standaard</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Weet u zeker dat u de huidige sectie wilt verwijderen?</delete-section>
             <delete-grid>Weet u zeker dat u het huidige grid wilt verwijderen?</delete-grid>
@@ -11608,7 +11653,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
             <delete-grid>Tem a certeza que deseja remover a grelha actual?</delete-grid>
@@ -12783,7 +12833,12 @@
             <default-stage todo="true">[Default]</default-stage>
 
         </dialog-workflow>
-        <!-- Messages -->
+        <xbl-control-settings>
+            <field-width todo="true">[Field width]</field-width>
+            <default todo="true">Use default</default>
+            <full todo="true">Full</full>
+            <natural todo="true">Natural</natural>
+        </xbl-control-settings>
         <messages>
             <delete-section>Bekräfta att du vill ta bort denna sektion</delete-section>
             <delete-grid>Bekräfta att du vill ta bort detta rutnät</delete-grid>

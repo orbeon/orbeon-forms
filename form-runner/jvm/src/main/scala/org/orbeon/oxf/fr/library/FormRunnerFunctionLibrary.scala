@@ -114,6 +114,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
 
     Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+
+    Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
   }
 }
 
@@ -318,21 +322,24 @@ private object FormRunnerFunctions {
         val staticControl   = sourceComponent.staticControl
         val concreteBinding = staticControl.bindingOrThrow
 
-        def fromAttributes: Option[StringValue] =
-          fromElemAlsoTryAvt(
-            concreteBinding.boundElementAtts.lift,
-            sourceComponent.evaluateAvt,
-            paramName
+        def fromAttributes: Option[AtomicValue] =
+          fromElem(
+            atts        = concreteBinding.boundElementAtts.lift,
+            paramName   = paramName
           )
 
-        def fromMetadataAndProperties =
+        def fromMetadataAndProperties: Option[AtomicValue] =
           FRComponentParam.fromMetadataAndProperties(
             constantMetadataRootElemOpt = FRComponentParam.findConstantMetadataRootElem(staticControl.part),
             directNameOpt               = staticControl.abstractBinding.directName,
             paramName                   = paramName
           )
 
-        fromAttributes orElse fromMetadataAndProperties
+        val paramValueOpt = fromAttributes orElse fromMetadataAndProperties
+        paramValueOpt map {
+            case paramValue: StringValue ⇒ stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
+            case paramValue              ⇒ paramValue
+          }
 
       } orNull
     }
@@ -350,6 +357,20 @@ private object FormRunnerFunctions {
           )
         )
       }
+  }
+
+  class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): BooleanValue = {
+      val metadataVersionOpt = FormRunner.metadataElemValueOpt(Names.CreatedWithVersion)
+      metadataVersionOpt match {
+        case None ⇒
+          // If no version info the metadata, or no metadata, do as if the form was created with an old version
+          false
+        case Some(metadataVersion) ⇒
+          val paramVersion = stringArgument(0)(context)
+          Version.compare(metadataVersion, paramVersion).exists(_ >= 0)
+      }
+    }
   }
 }
 

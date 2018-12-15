@@ -41,11 +41,12 @@ class XXFormsComponentParam extends XFormsFunction {
       // NOTE: In the future, we would like constant values to be available right away, and
       // AVTs to support dependencies. Those should probably be stored lazily at the control
       // level.
-      fromElemAlsoTryAvt(
-        concreteBinding.boundElementAtts.lift,
-        sourceComponent.evaluateAvt,
-        paramName
-      ) orElse
+      val attrValue =
+        fromElem(
+          concreteBinding.boundElementAtts.lift,
+          paramName
+        )
+      attrValue orElse
         fromProperties(
           paramName,
           Nil,
@@ -70,12 +71,11 @@ object XXFormsComponentParam {
   // NOTE: In the future, we would like constant values to be available right away, and
   // AVTs to support dependencies. Those should probably be stored lazily at the control
   // level.
-  def fromElemAlsoTryAvt(
+  def fromElem(
     atts            : QName ⇒ Option[String],
-    evaluateAvt     : String ⇒ String,
     paramName       : QName
-  ): Option[StringValue] =
-    atts(paramName) map evaluateAvt map stringToStringValue
+  ): Option[AtomicValue] =
+    atts(paramName) map stringToStringValue
 
   def fromProperties(
     paramName       : QName,

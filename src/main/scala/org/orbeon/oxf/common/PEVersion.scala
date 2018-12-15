@@ -97,18 +97,10 @@ private object PEVersion {
   val LicenseMessage     = "Please make sure a proper license file is placed under WEB-INF/resources" + LicensePath + '.'
 
   def isVersionExpired(currentVersion: String, licenseVersion: String): Boolean =
-    (majorMinor(currentVersion), majorMinor(licenseVersion)) match {
-      case (Some((currentMajor, currentMinor)), Some((licenseMajor, licenseMinor))) ⇒
-        currentMajor > licenseMajor || (currentMajor == licenseMajor && currentMinor > licenseMinor)
-      case _ ⇒
-        true
+    Version.compare(currentVersion, licenseVersion) match {
+      case Some(comparison) ⇒ comparison > 0
+      case None             ⇒ true
     }
-
-  def majorMinor(versionString: String): Option[(Int, Int)] = {
-    // Allow `-` as separator as well so we can handle things like "2016.3-SNAPSHOT"
-    val ints = versionString.splitTo[Array](sep = ".-") take 2 map (_.toInt)
-    if (ints.size == 2) Some(ints(0), ints(1)) else None
-  }
 
   private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
 

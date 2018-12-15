@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 
 import scala.util.control.NonFatal
+import org.orbeon.oxf.util.StringUtils._
 
 // Product version information
 // NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.
@@ -52,6 +53,23 @@ object Version {
     versionStringIfAllowedOrEmpty
 
   val logger = LoggerFactory.createLogger(classOf[Version])
+
+  def compare(leftVersion: String, rightVersion: String): Option[Int] = {
+    (majorMinor(leftVersion), majorMinor(rightVersion)) match {
+      case (Some((leftMajor, leftMinor)), Some((rightMajor, rightMinor))) ⇒
+        if      (leftMajor > rightMajor || (leftMajor == rightMajor && leftMinor > rightMinor)) Some( 1)
+        else if (leftMajor < rightMajor || (leftMajor == rightMajor && leftMinor < rightMinor)) Some(-1)
+        else                                                                                    Some( 0)
+      case _ ⇒
+        None
+    }
+  }
+
+  private def majorMinor(versionString: String): Option[(Int, Int)] = {
+    // Allow `-` as separator as well so we can handle things like "2016.3-SNAPSHOT"
+    val ints = versionString.splitTo[Array](sep = ".-") take 2 map (_.toInt)
+    if (ints.size == 2) Some(ints(0), ints(1)) else None
+  }
 
   // Create a Version instance using reflection
   lazy val instance: Version = {

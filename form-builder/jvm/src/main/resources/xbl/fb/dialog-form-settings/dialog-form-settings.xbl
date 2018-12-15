@@ -44,6 +44,10 @@
                     value="event(context())"/>
 
                 <xf:setvalue
+                    ref="$i/updated-with-versions"
+                    value="string-join(event('updated-with-versions'), ', ')"/>
+
+                <xf:setvalue
                     iterate="'attachment-max-size', 'attachment-max-size-aggregate'"
                     ref="$i/*[name() = context()]"
                     value="(event(context()), -2)[1]"/>
@@ -310,6 +314,7 @@
                         <hints-placeholders/>
                         <mode/>
                         <created-with-version/>
+                        <updated-with-versions/>
                         <data-migration/>
                         <analysis-calculate/>
                         <xbl/>
@@ -789,7 +794,7 @@
                             </fr:tab>
 
                             <!-- Stats -->
-                            <fr:tab class="fb-dialog-form-settings-stats" visible="$is-form-settings">
+                            <fr:tab class="fb-dialog-form-settings-info" visible="$is-form-settings">
                                 <fr:label value="$resources/dialog-form-settings/stats"/>
 
                                 <xf:group>
@@ -802,8 +807,8 @@
                                                     <xf:label value="$resources/dialog-form-settings/created-with-version"/>
                                                 </xf:output>
                                             </xh:td>
-                                            <xh:td>
-                                                <xf:output value="$i/updated-with-versions">
+                                            <xh:td rowspan="2">
+                                                <xf:output ref="$i/updated-with-versions" appearance="xxf:multiline">
                                                     <xf:label value="$resources/dialog-form-settings/updated-with-versions"/>
                                                 </xf:output>
                                             </xh:td>
@@ -812,14 +817,7 @@
                                             <xh:td>
                                                 <xf:output
                                                     xmlns:version="java:org.orbeon.oxf.common.Version"
-                                                    value="
-                                                        string-join(
-                                                            (
-                                                                version:VersionNumber(),
-                                                                version:Edition()
-                                                            ),
-                                                            ' '
-                                                        )">
+                                                    value="version:versionWithEdition()">
                                                     <xf:label value="$resources/dialog-form-settings/current-version"/>
                                                 </xf:output>
                                             </xh:td>
@@ -847,7 +845,7 @@
                                             fbf:countAllNonContainers($body),
                                             fbf:countAllControls($body)
                                     "/>
-                                    <xh:table>
+                                    <xh:table class="fb-dialog-form-settings-stats">
                                         <xf:repeat ref="1 to count($labels)">
                                             <xf:var name="i" value="position()"/>
                                             <xh:tr>

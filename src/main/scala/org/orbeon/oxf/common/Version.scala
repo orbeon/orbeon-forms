@@ -39,13 +39,15 @@ object Version {
   val VersionNumber : String = org.orbeon.oxf.common.BuildInfo.orbeonVersion
   val Edition       : String = org.orbeon.oxf.common.BuildInfo.orbeonEdition
 
-  val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
+  val VersionString = "Orbeon Forms " + versionWithEdition
 
-  def versionStringIfAllowed =
+  def versionWithEdition: String = VersionNumber + ' ' + Edition
+
+  def versionStringIfAllowed: Option[String] =
     Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
 
   // For XPath callers
-  def versionStringIfAllowedOrEmpty =
+  def versionStringIfAllowedOrEmpty: String =
     versionStringIfAllowed.orNull
 
   // For backward compatibility

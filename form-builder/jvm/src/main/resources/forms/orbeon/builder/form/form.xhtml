@@ -402,7 +402,7 @@
                                         <xf:setvalue ref="bind('form-name-bind')"        value="event('form')"/>
                                         <!-- Refresh components -->
                                         <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                                        <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
+                                        <xf:dispatch targetid="fr-form-model" name="fb-deannotate"/>
                                         <xf:send submission="fb-load-toolbox">
                                             <xf:property name="app"  value="event('app')"/>
                                             <xf:property name="form" value="event('form')"/>

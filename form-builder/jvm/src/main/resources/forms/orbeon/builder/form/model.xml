@@ -288,8 +288,7 @@
 
     </xf:action>
 
-    <!-- De-annotate data before saving -->
-    <xf:action ev:event="fr-data-save-prepare">
+    <xf:action event="fb-deannotate">
         <xf:insert
             ref="instance('fr-form-instance')"
             origin="
@@ -300,6 +299,25 @@
                     'data'
                 )"
             />
+    </xf:action>
+
+    <xf:action event="fr-data-save-prepare">
+
+        <!-- De-annotate data -->
+        <xf:dispatch name="fb-deannotate" targetid="fr-form-model"/>
+
+        <!-- Add `<updated-with-version>` as needed -->
+        <xf:var
+            xmlns:version="java:org.orbeon.oxf.common.Version"
+            name="current-version"
+            value="version:versionWithEdition()"/>
+
+        <xf:insert
+            context="frf:metadataInstanceRootOpt(instance('fr-form-instance'))"
+            if="not(updated-with-version = $current-version)"
+            ref="(updated-with-version[last()], created-with-version, *)[1]"
+            origin="xf:element('updated-with-version', $current-version)"/>
+
     </xf:action>
 
     <!-- Update attachment URLs, if any, after saving -->
@@ -372,6 +390,7 @@
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
+                <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>
@@ -400,6 +419,7 @@
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
+                <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>

@@ -48,6 +48,7 @@
                             <xf:property name="title"                         value="bind('title-bind')"/>
                             <xf:property name="description"                   value="bind('description-bind')"/>
                             <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
+                            <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                             <xf:property name="singleton"                     value="bind('singleton-bind')"/>
                             <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
                             <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
@@ -318,7 +319,7 @@
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
                                 <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                                <xf:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
+                                <xf:dispatch name="fb-deannotate" targetid="fr-form-model"/>
                                 <!-- Invalidate and reload the toolbox -->
                                 <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
                                 <xf:send submission="fb-load-toolbox">

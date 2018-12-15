@@ -90,6 +90,15 @@ body.orbeon {
         white-space: nowrap;
     }
 
+    .xforms-output.xforms-output-appearance-xxforms-multiline {
+        output[role = textbox] {
+            white-space: normal;
+            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+            min-height: @controlsHeight;
+            height: auto;
+        }
+    }
+
     select,
     textarea,
     input[type="text"],             // Like Bootstrap, use all the specific types to exclude checkbox/radio

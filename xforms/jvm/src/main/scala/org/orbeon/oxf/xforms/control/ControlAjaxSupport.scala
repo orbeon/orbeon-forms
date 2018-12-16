@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable._
 
 import scala.collection.mutable
 
@@ -75,12 +76,16 @@ trait ControlAjaxSupport {
     var added = false
 
     for {
-      lhha ← LHHA.values
-      value1 = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
-      lhha2  = self.lhhaProperty(lhha)
-      value2 = lhha2.value()
+      staticLhhaSupport ← staticControl.cast[StaticLHHASupport].toList
+      lhha              ← LHHA.values
+      // https://github.com/orbeon/orbeon-forms/issues/3836
+      // Q: Could we just check `isLocal` instead of `isForRepeat`?
+      if staticLhhaSupport.hasLHHANotForRepeat(lhha)
+      value1            = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
+      lhha2             = self.lhhaProperty(lhha)
+      value2            = lhha2.value()
       if value1 != value2
-      attributeValue = Option(lhha2.escapedValue()) getOrElse ""
+      attributeValue    = Option(lhha2.escapedValue()) getOrElse ""
     } yield
       added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhha.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 

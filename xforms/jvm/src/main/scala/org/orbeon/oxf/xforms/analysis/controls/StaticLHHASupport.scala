@@ -89,6 +89,9 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
   def hasLocal(lhhaType: LHHA): Boolean =
     lhhaAsList(lhhaType) exists (_.isLocal)
 
+  def hasLHHANotForRepeat(lhhaType: LHHA): Boolean =
+    lhhaAsList(lhhaType) exists (! _.isForRepeat)
+
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
     lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 

@@ -23,7 +23,7 @@ findInputOrTextarea = (control) ->
 # When the label/hint changes, set the value of the placeholder
 do ->
     Controls.lhhaChangeEvent.subscribe (event) ->
-        if $(event.control).is('.xforms-input, .xforms-textarea')
+        if (event.type == 'label' or event.type == 'hint') and $(event.control).is('.xforms-input, .xforms-textarea')
             labelHint = Controls.getControlLHHA event.control, event.type
             if not labelHint?
                 # Update placeholder attribute and show it

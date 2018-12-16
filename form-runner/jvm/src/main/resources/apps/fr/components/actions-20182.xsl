@@ -188,45 +188,64 @@
         <xsl:variable name="request-actions" select="fr:value | fr:url-param | fr:sql-param"/>
 
         <xsl:if test="exists($request-actions)">
+
+            <xsl:if test="exists($request-actions/self::fr:*/@value)">
+                <xf:var
+                    name="original-context"
+                    value="."/>
+            </xsl:if>
+
             <xf:action context="xxf:instance('fr-service-request-instance')">
                 <xsl:for-each select="$request-actions">
-                    <xsl:choose>
-                        <xsl:when test="./self::fr:value">
-                            <xsl:variable name="ref"     select="@ref/string()"     as="xs:string"/>
-                            <xsl:variable name="control" select="@control/string()" as="xs:string"/>
-
-                            <xf:setvalue
-                                ref="{$ref}"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true())"/>
-                        </xsl:when>
-                        <xsl:when test="./self::fr:sql-param">
-                            <xsl:variable name="index"   select="xs:integer(@index)" as="xs:integer"/>
-                            <xsl:variable name="control" select="@control/string()"  as="xs:string"/>
-                            <xf:setvalue
-                                xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                ref="/sql:config/sql:query/sql:param[{$index}]/(@value | @select)[1]"
-                                value="
-                                    concat(
-                                        '''',
-                                        replace(
-                                            string(
-                                                frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true())
-                                            ),
+                    <xf:action>
+                        <xsl:choose>
+                            <xsl:when test="exists(@control)">
+                                <xsl:variable name="control" select="@control/string()" as="xs:string"/>
+                                <xf:var
+                                    name="value"
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true())"/>
+                            </xsl:when>
+                            <xsl:when test="exists(@value)">
+                                <xsl:variable name="value" select="@value/string()" as="xs:string"/>
+                                <xf:var
+                                    name="value"
+                                    context="$original-context"
+                                    value="{$value}"/>
+                            </xsl:when>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="./self::fr:value">
+                                <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
+                                <xf:setvalue
+                                    ref="{$ref}"
+                                    value="$value"/>
+                            </xsl:when>
+                            <xsl:when test="./self::fr:sql-param">
+                                <xsl:variable name="index" select="xs:integer(@index)" as="xs:integer"/>
+                                <xf:setvalue
+                                    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+                                    ref="/sql:config/sql:query/sql:param[{$index}]/(@value | @select)[1]"
+                                    value="
+                                        concat(
                                             '''',
-                                            ''''''
-                                        ),
-                                        ''''
-                                    )"/>
-                        </xsl:when>
-                        <xsl:when test="./self::fr:url-param">
-                            <xsl:variable name="name"    select="@name/string()"    as="xs:string"/>
-                            <xsl:variable name="control" select="@control/string()" as="xs:string"/>
-
-                            <xf:setvalue
-                                ref="/*/{$name}"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true())"/>
-                        </xsl:when>
-                    </xsl:choose>
+                                            replace(
+                                                string(
+                                                    $value
+                                                ),
+                                                '''',
+                                                ''''''
+                                            ),
+                                            ''''
+                                        )"/>
+                            </xsl:when>
+                            <xsl:when test="./self::fr:url-param">
+                                <xsl:variable name="name" select="@name/string()" as="xs:string"/>
+                                <xf:setvalue
+                                    ref="/*/{$name}"
+                                    value="$value"/>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xf:action>
                 </xsl:for-each>
             </xf:action>
         </xsl:if>
@@ -293,6 +312,31 @@
                         'after'
                 }"
                 xxf:defaults="{$apply-defaults}"/>
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:repeat-remove-iteration" mode="within-action-2018.2">
+
+        <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"   as="xs:string"/>
+
+        <xf:action>
+            <xf:var
+                name="container"
+                value="bind(frf:bindId('{$repeat-name}'))"/>
+            <xf:delete
+                context="$container"
+                ref="*[{
+                    if ($at = 'end') then
+                        'last()'
+                    else if ($at = 'start') then
+                        '1'
+                    else if ($at castable as xs:integer) then
+                        $at
+                    else
+                        error()
+                }]"/>
         </xf:action>
 
     </xsl:template>

@@ -162,6 +162,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // knowing that `my-repeat` refers to a repeat and without knowing the repeat hierarchy, so we should change it
   // in the future, but in the meanwhile we map this id to `my-repeat~iteration⊙1` based on static information.
   // NOTE: Leave public for unit tests
+  // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853.
   def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
     doc.getStaticOps.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)) match {
       case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == XFormsId.getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒

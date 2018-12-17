@@ -104,7 +104,7 @@ class XBLContainer(
     new XBLContainer(associatedControl, self, concreteBinding.innerScope)
   }
 
-  def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: PartAnalysis) =
+  def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: PartAnalysis): XBLContainer =
     new XBLContainer(associatedControl, self, childPartAnalysis.startScope) {
       // Start with specific part
       override def partAnalysis = childPartAnalysis
@@ -404,7 +404,11 @@ trait ContainerResolver {
     // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
     //    and return the control associated with the bound element.
     // TODO: should this use sourceControlEffectiveId?
-    val bindingIdOpt = containingDocument.getStaticOps.getBinding(prefixedId) map (_.bindingId)
+
+    // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853. Unclear. For `xxf:dynamic`, `self.prefixedId`
+    // is the prefixed id of the `xxf:dynamic` in the outer scope. So we can't just use `getPartAnalysis`. Use parent
+    // part if any?
+    val bindingIdOpt = containingDocument.getStaticOps.getBinding(self.prefixedId) map (_.bindingId)
     if (bindingIdOpt.contains(staticOrAbsoluteId))
       return containingDocument.getControlByEffectiveId(effectiveId)
 

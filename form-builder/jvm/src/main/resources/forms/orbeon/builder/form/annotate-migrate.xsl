@@ -346,6 +346,24 @@
         </fr:date>
     </xsl:template>
 
+    <!-- Convert `xf:input` of type time to `fr:time` -->
+    <xsl:template
+        mode="within-body"
+        match="
+            xf:input[
+                exists(
+                    for $bind-id in @bind return
+                    $model//xf:bind[
+                        @id   = $bind-id and
+                        @type = ('xf:time', 'xs:time')
+                    ]
+                )
+            ]">
+        <fr:time>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+        </fr:time>
+    </xsl:template>
+
     <!-- Convert xf:output[@mediatype = 'image/*'] to fr:image -->
     <xsl:template match="xf:output[@mediatype = 'image/*']"
                   mode="within-body">

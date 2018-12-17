@@ -57,7 +57,7 @@
                 </view>
             </templates>
             <control-details>
-                <xf:model xmlns="" >
+                <xf:model xmlns="" id="fb-editor-number-model">
 
                     <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
                         <xf:var name="c" value="."/>
@@ -116,7 +116,7 @@
                         </resources>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="">
+                <fr:grid xmlns="" id="fb-editor-number-grid">
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="instance('local')/prefix" id="prefix-control">
@@ -196,6 +196,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
+                    id="fb-editor-number-action"
                     event="xforms-value-changed"
                     observer="
                         prefix-control

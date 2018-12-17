@@ -61,7 +61,7 @@
                 <!--xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
             <!-- So all this is duplicated from `fr:number` for now. -->
             <control-details>
-                <xf:model xmlns="" >
+                <xf:model xmlns="" id="fb-editor-currency-model">
 
                     <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
                         <xf:var name="c" value="."/>
@@ -120,7 +120,7 @@
                         </resources>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="">
+                <fr:grid xmlns="" id="fb-editor-currency-grid">
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="instance('local')/prefix" id="prefix-control">
@@ -200,6 +200,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
+                    id="fb-editor-currency-action"
                     event="xforms-value-changed"
                     observer="
                         prefix-control

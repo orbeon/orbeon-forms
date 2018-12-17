@@ -18,6 +18,7 @@ import java.{lang ⇒ jl}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
@@ -55,20 +56,20 @@ abstract class XFormsBaseHandlerXHTML (
   import XFormsBaseHandlerXHTML._
 
   // Used by `XFormsSelect1Handler` only
-  def getHandlerContext = this.xformsHandlerContext
+  def getHandlerContext: HandlerContext = this.xformsHandlerContext
 
   final val isTemplate     = xformsHandlerContext.isTemplate
   final val getPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
   final val getEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-  final def staticControlOpt = containingDocument.getStaticOps.findControlAnalysis(getPrefixedId)
+  final def staticControlOpt: Option[ElementAnalysis] = xformsHandlerContext.getPartAnalysis.findControlAnalysis(getPrefixedId)
 
   final val currentControlOpt =
     ! isTemplate                                               option
     containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
     (! _.contains(null))
 
-  final def currentControlOrNull = currentControlOpt.orNull // legacy
+  final def currentControlOrNull: XFormsControl = currentControlOpt.orNull // legacy
 
   // May be overridden by subclasses
   protected def isDefaultIncremental                                                = false
@@ -88,7 +89,7 @@ abstract class XFormsBaseHandlerXHTML (
       appendWithSpace("xforms-disabled")
 
     // MIP classes for a concrete control
-    if (isRelevant && containingDocument.getStaticOps.hasBinding(controlPrefixedId)) {
+    if (isRelevant && xformsHandlerContext.getPartAnalysis.hasBinding(controlPrefixedId)) {
 
       if (control.visited)
         appendWithSpace("xforms-visited")
@@ -354,7 +355,7 @@ abstract class XFormsBaseHandlerXHTML (
     handleMIPClasses(prefixedId, xformsControl)
 
     // Static classes
-    containingDocument.getStaticOps.appendClasses(classes, prefixedId)
+    xformsHandlerContext.getPartAnalysis.appendClasses(classes, prefixedId)
 
     // Dynamic classes added by the control
     addCustomClasses(classes, xformsControl)
@@ -387,7 +388,7 @@ abstract class XFormsBaseHandlerXHTML (
     }
 
   final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {
-    val globalOps = containingDocument.getStaticOps
+    val globalOps = xformsHandlerContext.getPartAnalysis
     if (lhha == LHHA.Alert)
       globalOps.getAlerts(controlPrefixedId).head
     else // for alerts, take the first one, but does this make sense?

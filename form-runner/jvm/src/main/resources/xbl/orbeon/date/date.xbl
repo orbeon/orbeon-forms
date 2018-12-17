@@ -69,7 +69,7 @@
                 </view>
             </templates>
             <control-details>
-                <xf:model xmlns="" >
+                <xf:model xmlns="" id="fb-editor-date-model">
 
                     <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
                         <xf:var name="c" value="."/>
@@ -82,7 +82,7 @@
                         </local>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="">
+                <fr:grid xmlns="" id="fb-editor-date-grid">
                     <xh:tr>
                         <xh:td colspan="6">
                             <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
@@ -104,6 +104,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
+                     id="fb-editor-date-action"
                     event="xforms-value-changed"
                     observer="field-width-control">
 

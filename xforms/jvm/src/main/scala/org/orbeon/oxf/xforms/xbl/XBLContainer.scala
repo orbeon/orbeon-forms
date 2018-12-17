@@ -357,7 +357,7 @@ trait ContainerResolver {
       val scope = partAnalysis.scopeForPrefixedId(sourcePrefixedId)
       val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
 
-      containingDocument.getStaticOps.findControlAnalysis(repeatPrefixedId) match {
+      getPartAnalysis.findControlAnalysis(repeatPrefixedId) match {
         case Some(repeat: RepeatControl) ⇒ Some(0)
         case _                           ⇒ None
       }

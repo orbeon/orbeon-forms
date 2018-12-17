@@ -52,7 +52,7 @@ abstract class XFormsGroupHandler(
 
     // Copy over existing label classes if any
     val labelClassAttribute =
-      containingDocument.getStaticOps.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsConstants.CLASS_QNAME)
+      xformsHandlerContext.getPartAnalysis.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsConstants.CLASS_QNAME)
 
     if (labelClassAttribute ne null) {
       labelClasses.append(' ')

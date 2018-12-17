@@ -219,8 +219,8 @@ abstract class XFormsControlLifecyleHandler(
     def hasLocalHelp  = hasLocalLHHA(LHHA.Help)
     def hasLocalAlert = hasLocalLHHA(LHHA.Alert)
 
-    def hasLocalLHHA(lhhaType: LHHA) =
-      containingDocument.getStaticOps.getControlAnalysis(getPrefixedId) match {
+    def hasLocalLHHA(lhhaType: LHHA): Boolean =
+      xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId) match {
         case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
         case _                          ⇒ false
       }

@@ -165,7 +165,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
             final XFormsContainingDocument containingDocument = xformsHandlerContext.getContainingDocument();
 
-            final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
+            final boolean hasAVT = xformsHandlerContext.getPartAnalysis().hasAttributeControl(prefixedId);
             final String effectiveId = xformsHandlerContext.getEffectiveId(attributes);
             boolean found = false;
             if (hasAVT) {
@@ -182,7 +182,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
 
                         // Control analysis
-                        final AttributeControl controlAnalysis = containingDocument.getStaticOps().getAttributeControl(prefixedId, attributeQName);
+                        final AttributeControl controlAnalysis = xformsHandlerContext.getPartAnalysis().getAttributeControl(prefixedId, attributeQName);
 
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId = controlAnalysis.staticId();

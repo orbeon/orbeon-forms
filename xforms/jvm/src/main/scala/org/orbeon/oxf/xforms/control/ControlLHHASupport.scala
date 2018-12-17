@@ -75,7 +75,7 @@ trait ControlLHHASupport {
 
       // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
       val property =
-        if (containingDocument.getStaticOps.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
+        if (part.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
           self match {
             case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert ⇒
               new MutableAlertProperty(singleNodeControl, lhha, lhhaHTMLSupport(lhha))

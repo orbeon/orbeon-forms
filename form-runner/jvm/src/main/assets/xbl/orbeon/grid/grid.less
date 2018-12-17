@@ -294,6 +294,13 @@
                 }
             }
 
+            // Fixed-width pre-2018.2 date and time width, kept for backward compatibility
+            .xforms-input input {
+                &.xforms-type-date, &.xforms-type-time {
+                    width: 7.5em;
+                }
+            }
+
             // But for boolean inputs, don't size (for IE)
             .xforms-type-boolean input {
                 width: auto;

@@ -84,12 +84,14 @@
                                 $v"/>
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
-                <xh:span class="input-append">
+                <xf:var
+                    name="field-width"
+                    value="fr:component-param-value('field-width')"/>
+                <xh:span class="input-append fr-field-width-{$field-width}">
                     <xf:input
                         id="input"
                         xbl:attr="navindex navindex=tabindex"
                         ref="."
-                        class="fr-width-10em"
                         xxf:maxlength="14"
                         xxf:format="$formatted"
                         xxf:unformat="
@@ -100,7 +102,9 @@
                                     .">
                         <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
                     </xf:input>
-                    <xh:span class="add-on"/>
+                    <xh:span class="add-on">
+                        <xh:i class="fa fa-fw fa-phone"/>
+                    </xh:span>
                 </xh:span>
             </xf:group>
             <!-- View mode -->

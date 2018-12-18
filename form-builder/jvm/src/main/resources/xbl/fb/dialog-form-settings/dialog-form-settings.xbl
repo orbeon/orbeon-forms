@@ -21,6 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -720,7 +721,7 @@
                                     id="fb-control-settings-tabbable"
                                     ref="instance('control-details-metadata')">
                                     <fr:tab ref="instance('control-details-metadata')/*:metadata">
-                                        <xf:label value="(*:display-name[@lang = fbf:currentLang()], *:display-name)[1]"/>
+                                        <xf:label value="(*:display-name[@lang = frf:currentLang()], *:display-name)[1]"/>
 
                                         <xf:var name="i" value="count(preceding-sibling::fb:metadata) + 1"/>
                                         <xxf:dynamic ref="instance('dynamic')/*[$i]" id="custom-properties"/>

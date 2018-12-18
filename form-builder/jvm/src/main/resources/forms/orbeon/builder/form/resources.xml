@@ -310,6 +310,7 @@
             <options>Form Options</options>
             <wizard-options>Wizard Options</wizard-options>
             <control-settings>Control Settings</control-settings>
+            <about>About this Form</about>
             <stats>Form Statistics</stats>
             <sections>Sections</sections>
             <repeats>Repeats</repeats>
@@ -1464,6 +1465,7 @@
             <options>Options</options>
             <wizard-options>Options wizard</wizard-options>
             <control-settings>Options contrôles</control-settings>
+            <about>Au sujet de ce formulaire</about>
             <stats>Statistiques</stats>
             <sections>Sections</sections>
             <repeats>Grilles répétées</repeats>
@@ -2620,6 +2622,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats todo="true">[Form Statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -3804,6 +3807,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats todo="true">[Form statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -4988,6 +4992,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Statistiche del modulo</stats>
             <sections>Sezioni</sections>
             <repeats>Ripetizioni</repeats>
@@ -6164,6 +6169,7 @@
             <options>Formulareinstellungen</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
@@ -7343,6 +7349,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Lomatilastot</stats>
             <sections>Lohkot</sections>
             <repeats>Toistot</repeats>
@@ -8519,6 +8526,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Estadísticas del Formulario</stats>
             <sections>Secciones</sections>
             <repeats>Repeticiones</repeats>
@@ -9696,6 +9704,7 @@
             <options>Form opties</options>
             <wizard-options>Wizard opties</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Form-statistieken</stats>
             <sections>Secties</sections>
             <repeats>Herhalingen</repeats>
@@ -10852,6 +10861,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Estatística do Formulário</stats>
             <sections>Secções</sections>
             <repeats>Repetições</repeats>
@@ -12035,6 +12045,7 @@
             <options todo="true">[Form Options]</options>
             <wizard-options todo="true">[Wizard Options]</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
+            <about todo="true">[About this Form]</about>
             <stats>Formulärstatistik</stats>
             <sections>Sektioner</sections>
             <repeats>Upprepningar</repeats>

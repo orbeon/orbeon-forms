@@ -793,9 +793,9 @@
                                 </fr:grid>
                             </fr:tab>
 
-                            <!-- Stats -->
+                            <!-- About -->
                             <fr:tab class="fb-dialog-form-settings-info" visible="$is-form-settings">
-                                <fr:label value="$resources/dialog-form-settings/stats"/>
+                                <fr:label value="$resources/dialog-form-settings/about"/>
 
                                 <xf:group>
                                     <xf:label value="$resources/dialog-form-settings/versions"/>

@@ -10,6 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@import (reference) "../../../../../../../../../bootstrap-src/less/variables";
 @import (reference) "../../../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-common";
 
 @darkBlue: #004B92;
@@ -600,14 +601,19 @@ div.orbeon.orbeon-portlet-div {
                 grid-row: 1;
                 grid-column: 2;
                 padding-left: 10px;
+
+                // Format stats table
+                table tbody {
+
+                    th { text-align: left  }
+                    td { text-align: right }
+
+                    // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
+                    tr:nth-child(4n+3) > th, tr:nth-child(4n+3) > td {
+                        background-color: @tableBackgroundAccent;
+                    }
+                }
             }
-        }
-
-        .fb-dialog-form-settings-stats {
-
-            th { text-align: left }
-            td { text-align: right; padding-left: .5em }
-            &> .xforms-label { border-bottom: 1px solid #DDE }
         }
 
         .fb-attachment-max-size-control, .fb-attachment-max-size-aggregate-control, .fb-attachment-mediatypes-control {

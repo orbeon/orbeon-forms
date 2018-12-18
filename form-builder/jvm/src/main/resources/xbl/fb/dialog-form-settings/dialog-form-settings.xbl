@@ -849,7 +849,7 @@
                                                 fbf:countAllNonContainers($body),
                                                 fbf:countAllControls($body)
                                         "/>
-                                        <xh:table class="fb-dialog-form-settings-stats">
+                                        <xh:table class="table table-condensed">
                                             <xf:repeat ref="1 to count($labels)">
                                                 <xf:var name="i" value="position()"/>
                                                 <xh:tr>

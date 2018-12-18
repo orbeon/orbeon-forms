@@ -5897,7 +5897,7 @@
             <hint>Das Logo erscheint oberhalb des Formulars</hint>
         </logo>
         <general-settings>
-            <label>Allgemeine Einstellungen</label>
+            <label>Allgemein</label>
         </general-settings>
         <custom-settings>
             <label>Erweiterte Einstellungen</label>
@@ -5929,9 +5929,9 @@
             <delete-row>Zeile entfernen</delete-row>
             <insert-row>Zeile einfügen</insert-row>
             <control-settings>Steuerelement-Einstellungen</control-settings>
-            <move-wall todo="true">[move wall]</move-wall>
-            <split-cell todo="true">[split cell]</split-cell>
-            <merge-cell todo="true">[merge cell]</merge-cell>
+            <move-wall>Zelle ändern</move-wall>
+            <split-cell>Zelle teilen</split-cell>
+            <merge-cell>Zellen zusammenführen</merge-cell>
         </undo-redo>
         <merge-section>
             <label>Abschnittsvorlage zusammenführen</label>
@@ -5940,7 +5940,7 @@
             <label>Struktur des Formulars</label>
         </form-structure>
         <controls>
-            <label>Steuerelemente</label>
+            <label>Standard</label>
         </controls>
         <i18n>
             <label>Internationalisierung</label>
@@ -6144,21 +6144,21 @@
         <components>
             <parameters-editor>
                 <name>
-                    <label todo="true">[Name]</label>
-                    <alert todo="true">[Missing or incorrect value]</alert>
+                    <label>Name</label>
+                    <alert>Fehlender oder falscher Wert</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label>XPath Ausdruck</label>
+                    <alert>Ungültiger XPath Ausdruck</alert>
                 </xpath>
                 <control>
-                    <label todo="true">[Control]</label>
-                    <alert todo="true">[Missing value]</alert>
+                    <label>Steuerelement</label>
+                    <alert>Fehlender Wert</alert>
                 </control>
                 <type>
-                    <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
-                    <item id="2" todo="true">[All Control Values]</item>
+                    <item id="0">Steuerelement-Wert</item>
+                    <item id="1">XPath Ausdruck</item>
+                    <item id="2">Werte aller Steuerelemente</item>
                 </type>
             </parameters-editor>
         </components>
@@ -6166,11 +6166,11 @@
             <label>Formulareinstellungen</label>
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
-            <options>Formulareinstellungen</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <options>Formular</options>
+            <wizard-options>Wizard</wizard-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
-            <stats>Formularstatistiken</stats>
+            <stats>Statistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
             <grids>Raster</grids>
@@ -6194,16 +6194,16 @@
                 <item id="3">Streng</item>
             </wizard-mode>
             <wizard-subsections-nav>
-                <label todo="true">[Wizard Subsections Navigation]</label>
-                <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+                <label todo="true">Wizard Unterabschnitts-Navigation</label>
+                <hint todo="true">Aktiviert die Navigation für Unterabschnitte in Hauptsektionen</hint>
             </wizard-subsections-nav>
             <wizard-subsections-toc>
-                <label>Wizard Subsections Table of Contents</label>
-                <hint>How the wizard table of contents shows subsections</hint>
-                <item id="0">Use property</item>
-                <item id="1">Show Subsections for the Active Section Only</item>
-                <item id="2">Show Subsections for All Sections</item>
-                <item id="3">Don't Show Subsections</item>
+                <label>Wizard Unterabschnitts-Inhaltsverzeichnis</label>
+                <hint>Definiert, wie das Inhaltsverzeichnis die Unterabschnitte darstellt</hint>
+                <item id="0">Standard</item>
+                <item id="1">Unterabschnitte nur für den aktiven Abschnitt zeigen</item>
+                <item id="2">Alle Unterabschnitte zeigen</item>
+                <item id="3">Keine Unterabschnitte</item>
             </wizard-subsections-toc>
             <attachment-max-size>
                 <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
@@ -6240,8 +6240,8 @@
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
             <analysis-calculate>
-                <label todo="true">[Automatic Calculations Dependencies]</label>
-                <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+                <label>Abhängigkeiten automatisch ermitteln</label>
+                <hint>Definiert die Auswertungsreihenfolge von "Berechneten Werten" und "Initialen Werten" automatisch</hint>
             </analysis-calculate>
             <versions todo="true">[Versions]</versions>
             <current-version todo="true">[Current Version]</current-version>
@@ -6272,7 +6272,7 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label todo="true">[Encrypt data at rest]</label>
+                    <label>Daten in der Datenbank verschlüsseln</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
@@ -6299,11 +6299,11 @@
                     <value>fr-email-attachment</value>
                 </item>
                 <item>
-                    <label todo="true">[Exclude from Email Body]</label>
+                    <label>In E-Mail Text ausblenden</label>
                     <value>fr-exclude-from-email-body</value>
                 </item>
                 <item>
-                    <label todo="true">In E-Mail-Betreff anzeigen</label>
+                    <label>In E-Mail-Betreff anzeigen</label>
                     <value>fr-email-subject</value>
                 </item>
             </email-options>
@@ -6473,7 +6473,7 @@
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
-            <parameters todo="true">[Template Parameters]</parameters>
+            <parameters>Vorlagen-Parameter</parameters>
         </dialog-control-details>
         <dialog-container-details>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
@@ -6641,10 +6641,10 @@
                 <label>PDF-Datei</label>
             </pdf-upload>
             <attachment-name>
-                <label todo="true">[Name]</label>
+                <label>Name</label>
             </attachment-name>
             <attachment-language>
-                <label todo="true">[Language]</label>
+                <label>Sprache</label>
             </attachment-language>
         </dialog-pdf>
         <dialog-itemsets>
@@ -6948,12 +6948,12 @@
             </message>
         </dialog-pe>
         <dialog-email-settings>
-            <label todo="true">[Email Settings]</label>
-            <subject todo="true">[Email Subject]</subject>
-            <body todo="true">[Email Body]</body>
-            <from-properties todo="true">[Template from Properties]</from-properties>
+            <label>E-Mail-Einstellungen</label>
+            <subject>E-Mail Betreff</subject>
+            <body>E-Mail Text</body>
+            <from-properties>Vorlage aus Eigenschaften</from-properties>
             <template>
-                <label todo="true">[Template]</label>
+                <label>Vorlage</label>
             </template>
         </dialog-email-settings>
         <dialog-permissions>

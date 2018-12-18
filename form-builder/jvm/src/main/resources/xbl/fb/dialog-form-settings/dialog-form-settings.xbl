@@ -794,67 +794,72 @@
                             </fr:tab>
 
                             <!-- About -->
-                            <fr:tab class="fb-dialog-form-settings-info" visible="$is-form-settings">
+                            <fr:tab visible="$is-form-settings">
                                 <fr:label value="$resources/dialog-form-settings/about"/>
 
-                                <xf:group>
-                                    <xf:label value="$resources/dialog-form-settings/versions"/>
+                                <xh:div class="fb-dialog-form-settings-info">
 
-                                    <fr:grid>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <xf:output value="$i/created-with-version">
-                                                    <xf:label value="$resources/dialog-form-settings/created-with-version"/>
-                                                </xf:output>
-                                            </xh:td>
-                                            <xh:td rowspan="2">
-                                                <xf:output ref="$i/updated-with-versions" appearance="xxf:multiline">
-                                                    <xf:label value="$resources/dialog-form-settings/updated-with-versions"/>
-                                                </xf:output>
-                                            </xh:td>
-                                        </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <xf:output
-                                                    xmlns:version="java:org.orbeon.oxf.common.Version"
-                                                    value="version:versionWithEdition()">
-                                                    <xf:label value="$resources/dialog-form-settings/current-version"/>
-                                                </xf:output>
-                                            </xh:td>
-                                        </xh:tr>
-                                    </fr:grid>
-                                </xf:group>
+                                    <xf:group class="fb-dialog-form-settings-info-versions">
+                                        <xf:label value="$resources/dialog-form-settings/versions"/>
 
-                                <xf:group>
-                                    <xf:label value="$resources/dialog-form-settings/stats"/>
-
-                                    <xf:var
-                                        name="labels"
-                                        value="
-                                            $resources/dialog-form-settings/(
-                                                sections, repeats, grids, section-templates, controls, all
-                                            )
-                                    "/>
-                                    <xf:var
-                                        name="counts"
-                                        value="
-                                            fbf:countSections($body),
-                                            fbf:countRepeats($body),
-                                            fbf:countGrids($body),
-                                            fbf:countSectionTemplates($body),
-                                            fbf:countAllNonContainers($body),
-                                            fbf:countAllControls($body)
-                                    "/>
-                                    <xh:table class="fb-dialog-form-settings-stats">
-                                        <xf:repeat ref="1 to count($labels)">
-                                            <xf:var name="i" value="position()"/>
+                                        <fr:grid>
                                             <xh:tr>
-                                                <xh:th><xf:output value="$labels[$i]"/></xh:th>
-                                                <xh:td><xf:output value="$counts[$i]"/></xh:td>
+                                                <xh:td>
+                                                    <xf:output value="$i/created-with-version">
+                                                        <xf:label value="$resources/dialog-form-settings/created-with-version"/>
+                                                    </xf:output>
+                                                </xh:td>
                                             </xh:tr>
-                                        </xf:repeat>
-                                    </xh:table>
-                                </xf:group>
+                                            <xh:tr>
+                                                <xh:td>
+                                                    <xf:output ref="$i/updated-with-versions" appearance="xxf:multiline">
+                                                        <xf:label value="$resources/dialog-form-settings/updated-with-versions"/>
+                                                    </xf:output>
+                                                </xh:td>
+                                            </xh:tr>
+                                            <xh:tr>
+                                                <xh:td>
+                                                    <xf:output
+                                                        xmlns:version="java:org.orbeon.oxf.common.Version"
+                                                        value="version:versionWithEdition()">
+                                                        <xf:label value="$resources/dialog-form-settings/current-version"/>
+                                                    </xf:output>
+                                                </xh:td>
+                                            </xh:tr>
+                                        </fr:grid>
+                                    </xf:group>
+
+                                    <xf:group class="fb-dialog-form-settings-info-stats">
+                                        <xf:label value="$resources/dialog-form-settings/stats"/>
+
+                                        <xf:var
+                                            name="labels"
+                                            value="
+                                                $resources/dialog-form-settings/(
+                                                    sections, repeats, grids, section-templates, controls, all
+                                                )
+                                        "/>
+                                        <xf:var
+                                            name="counts"
+                                            value="
+                                                fbf:countSections($body),
+                                                fbf:countRepeats($body),
+                                                fbf:countGrids($body),
+                                                fbf:countSectionTemplates($body),
+                                                fbf:countAllNonContainers($body),
+                                                fbf:countAllControls($body)
+                                        "/>
+                                        <xh:table class="fb-dialog-form-settings-stats">
+                                            <xf:repeat ref="1 to count($labels)">
+                                                <xf:var name="i" value="position()"/>
+                                                <xh:tr>
+                                                    <xh:th><xf:output value="$labels[$i]"/></xh:th>
+                                                    <xh:td><xf:output value="$counts[$i]"/></xh:td>
+                                                </xh:tr>
+                                            </xf:repeat>
+                                        </xh:table>
+                                    </xf:group>
+                                </xh:div>
 
                             </fr:tab>
 

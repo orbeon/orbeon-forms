@@ -228,17 +228,21 @@ object ControlAjaxSupport {
     }
   }
 
+  val AriaLabelledby  = "aria-labelledby"
+  val AriaDescribedby = "aria-describedby"
+  val AriaDetails     = "aria-details"
+
   val LhhaWithAriaAttName = List(
-    LHHA.Label → "aria-labelledby",
-    LHHA.Hint  → "aria-describedby",
-    LHHA.Help  → "aria-details"
+    LHHA.Label → AriaLabelledby,
+    LHHA.Hint  → AriaDescribedby,
+    LHHA.Help  → AriaDetails
   )
 
   def findAriaBy(
     staticControl      : ElementAnalysis,
     controlOpt         : Option[XFormsControl],
     lhha               : LHHA,
-    force              : Boolean)(
+    condition          : LHHAAnalysis ⇒ Boolean)(
     containingDocument : XFormsContainingDocument
   ): Option[String] = {
 
@@ -249,7 +253,7 @@ object ControlAjaxSupport {
       currentControl    ← controlOpt
       staticLhhaSupport ← staticControl.cast[StaticLHHASupport]
       staticLhha        ← staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
-      if force || staticLhha.isForRepeat
+      if condition(staticLhha)
     } yield
       if (staticLhha.isLocal) {
         XFormsBaseHandler.getLHHACId(containingDocument, currentControl.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))

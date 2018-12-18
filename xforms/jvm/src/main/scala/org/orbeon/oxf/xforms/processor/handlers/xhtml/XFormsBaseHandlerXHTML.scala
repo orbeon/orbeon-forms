@@ -372,19 +372,20 @@ abstract class XFormsBaseHandlerXHTML (
 
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      staticControl   ← staticControlOpt
-      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, LHHA.Label, force = true)(containingDocument)
+      staticControl ← staticControlOpt
+      attValue      ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, LHHA.Label, condition = _ ⇒ true)(containingDocument)
+      attName       = ControlAjaxSupport.AriaLabelledby
     } locally {
-      atts.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, value)
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }
 
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
       staticControl   ← staticControlOpt
       (lhha, attName) ← ControlAjaxSupport.LhhaWithAriaAttName
-      value           ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha, force = false)(containingDocument)
+      attValue        ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha, condition = _.isForRepeat)(containingDocument)
     } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, value)
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }
 
   final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {

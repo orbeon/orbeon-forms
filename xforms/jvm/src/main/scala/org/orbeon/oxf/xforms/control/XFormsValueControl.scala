@@ -311,7 +311,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (previousControl.isEmpty && ! isStaticReadonly) {
       for {
         (lhha, attName)          ← ControlAjaxSupport.LhhaWithAriaAttName
-        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, Some(this), lhha, force = false)(containingDocument)
+        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, Some(this), lhha, condition = _.isForRepeat)(containingDocument)
         ariaByControlEffectiveId ← findAriaByControlEffectiveId
       } locally {
         ControlAjaxSupport.outputAttributeElement(

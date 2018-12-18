@@ -523,7 +523,19 @@ div.orbeon.orbeon-portlet-div {
         }
 
         .xforms-tabbable-appearance-left > .tabs-left {
-            display: flex; // so that the border of the left tabs goes all the way to the bottom
+            display: grid; // tried with `flex` but didn't manage to make things work nicely (kind of with `min-width` though)
+            &> .nav-tabs {
+                grid-row: 1;
+                grid-column: 1;
+                max-width: 120px;     // arbitrary for now, to fit all existing tab labels in English
+                padding-bottom: 40px; // so that we don't have a too small "notch" at the bottom
+                float: none; // to
+                //min-width: fit-content; // could use this once Edge supports it
+            }
+            &> .tab-content {
+                grid-row: 1;
+                grid-column: 2;
+            }
         }
     }
 

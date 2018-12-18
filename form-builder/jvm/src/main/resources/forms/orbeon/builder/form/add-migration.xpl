@@ -41,7 +41,21 @@
                 <!-- Add migration information -->
                 <xsl:template match="metadata[generate-id() = $metadata-root-id]">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node() except updated-with-version"/>
+
+                        <!-- We wan the `updated-with-version` to be contiguous, so we explicitly apply the existing ones here. -->
+                        <xsl:apply-templates select="updated-with-version"/>
+
+                        <xsl:variable
+                            xmlns:version="java:org.orbeon.oxf.common.Version"
+                            name="current-version"
+                            select="version:versionWithEdition()"/>
+
+                        <xsl:if test="not(updated-with-version = $current-version)">
+                            <xsl:element name="updated-with-version">
+                                <xsl:value-of select="$current-version"/>
+                            </xsl:element>
+                        </xsl:if>
 
                         <xsl:variable
                             xmlns:migration="java:org.orbeon.oxf.fb.MigrationOps"
@@ -54,10 +68,11 @@
                                 <xsl:value-of select="$migration"/>
                             </xsl:element>
                         </xsl:if>
+
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Remove existing migration information -->
+                <!-- Remove existing `migration` element if any-->
                 <xsl:template match="metadata[generate-id() = $metadata-root-id]/migration[@version = '4.8.0']"/>
 
             </xsl:stylesheet>

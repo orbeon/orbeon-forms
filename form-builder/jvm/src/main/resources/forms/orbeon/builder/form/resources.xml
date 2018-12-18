@@ -6168,7 +6168,7 @@
             <open><label>Formulareinstellungen</label></open>
             <options>Formular</options>
             <wizard-options>Wizard</wizard-options>
-            <control-settings todo="true">[Control Settings]</control-settings>
+            <control-settings>Steuerelement</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Statistiken</stats>
             <sections>Abschnitte</sections>

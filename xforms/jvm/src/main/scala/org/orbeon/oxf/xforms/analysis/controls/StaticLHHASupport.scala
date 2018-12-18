@@ -95,6 +95,13 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
     lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 
+  def hasLHHAPlaceholder(lhhaType: LHHA): Boolean =
+    lhh(lhhaType) match {
+      case Some(lhh) ⇒ lhh.isPlaceholder
+      case None      ⇒ false
+
+    }
+
   val beforeAfterTokensOpt: Option[(List[String], List[String])] =
     element.attributeValueOpt(XFormsConstants.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
 

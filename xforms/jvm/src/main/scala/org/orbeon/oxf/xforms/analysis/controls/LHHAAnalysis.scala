@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.CoreUtils._
 
 class LHHAAnalysis(
   staticStateContext : StaticStateContext,
@@ -49,7 +49,7 @@ class LHHAAnalysis(
 
   def getParent = parent.get // TODO: rename `parent` to `parentOpt`, and this `def` to `parent`
 
-  def lhhaType = LHHA.withName(localName)
+  def lhhaType: LHHA = LHHA.withNameOption(localName) getOrElse LHHA.Label // FIXME: Because `SelectionControlTrait` calls this for `value`!
 
   val forStaticIdOpt = element.attributeValueOpt(FOR_QNAME)
   val isLocal        = forStaticIdOpt.isEmpty
@@ -91,6 +91,22 @@ class LHHAAnalysis(
       gatherAlertLevels(Option(element.attributeValue(LEVEL_QNAME)))
     else
       Set.empty[ValidationLevel]
+
+  // Placeholder is only supported for label or hint. This in fact only makes sense for a limited set
+  // of controls, namely text fields or text areas at this point.
+  val isPlaceholder: Boolean =
+    lhhaType match {
+      case LHHA.Label | LHHA.Hint ⇒
+        hasLocalMinimalAppearance || (
+          ! hasLocalFullAppearance &&
+          stringToSet(
+            staticStateContext.partAnalysis.staticState.staticStringProperty(
+              if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+            )
+          )(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
+        )
+      case _ ⇒ false
+    }
 
   // Attach this LHHA to its target control if any
   def attachToControl(): Unit = {
@@ -293,28 +309,6 @@ object LHHAAnalysis {
       reporter           = null
     ).asInstanceOf[Boolean]
   }
-
-  // Whether the control has a placeholder for the given LHHA type
-  // TODO: This should be computed statically.
-  def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: LHHA): Boolean =
-    elementAnalysis match {
-      case lhhaTrait: StaticLHHASupport ⇒
-        lhhaTrait.lhh(lhhaType) match {
-          case Some(labelOrHint) ⇒
-            labelOrHint.hasLocalMinimalAppearance || (
-              ! labelOrHint.hasLocalFullAppearance &&
-              stringToSet(
-                elementAnalysis.part.staticState.staticStringProperty(
-                  if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
-                )
-              )(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
-          )
-          case None ⇒
-            false
-        }
-      case _ ⇒
-        false
-    }
 
   def gatherAlertValidations(validationAtt: Option[String]) =
     stringOptionToSet(validationAtt)

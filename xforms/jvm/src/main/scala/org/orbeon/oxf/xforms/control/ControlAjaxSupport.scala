@@ -80,7 +80,7 @@ trait ControlAjaxSupport {
       lhha              ← LHHA.values
       // https://github.com/orbeon/orbeon-forms/issues/3836
       // Q: Could we just check `isLocal` instead of `isForRepeat`?
-      if staticLhhaSupport.hasLHHANotForRepeat(lhha)
+      if staticLhhaSupport.hasLHHANotForRepeat(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
       value1            = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
       lhha2             = self.lhhaProperty(lhha)
       value2            = lhha2.value()

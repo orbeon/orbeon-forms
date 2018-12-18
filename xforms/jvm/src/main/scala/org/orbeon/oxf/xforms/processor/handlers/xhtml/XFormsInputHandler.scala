@@ -54,7 +54,7 @@ class XFormsInputHandler(
   ) with HandlerSupport {
 
   private val placeHolderInfo: Option[PlaceHolderInfo] =
-    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(containingDocument, _, currentControlOpt))
+    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControlOpt))
 
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
     currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate

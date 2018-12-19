@@ -86,13 +86,13 @@
                             <xsl:choose>
                                 <xsl:when test="fr:message">
                                     <!-- Use static message -->
-                                    <xf:output value="''" xxbl:scope="outer">
-                                        <xf:label><xsl:copy-of select="fr:message/(@* | node())"/></xf:label>
+                                    <xf:output xxbl:scope="outer">
+                                        <xsl:copy-of select="fr:message/(@* | node())"/>
                                     </xf:output>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <!-- use dynamic message -->
-                                    <xf:output value="''"><xf:label ref="$local/message"/></xf:output>
+                                    <xf:output ref="$local/message"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xh:div>

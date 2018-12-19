@@ -138,6 +138,7 @@
                     aria-label="{xxf:label('fr-tinymce')}"
                     xbl:attr="style tabindex tabindex=navindex"/>
             </xf:group>
+            <!-- FIXME: This should have a label at runtime to help with CSS, see https://github.com/orbeon/orbeon-forms/issues/3856. -->
             <xf:output mediatype="text/html" ref="$binding[not($script)]"/>
 
         </xbl:template>

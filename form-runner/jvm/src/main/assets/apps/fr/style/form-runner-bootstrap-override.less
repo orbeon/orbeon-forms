@@ -225,18 +225,20 @@ body.orbeon {
     }
 
     // Style static readonly plain text and rich text the same as Bootstrap's pre (see code.less)
-    .fr-grid .xforms-textarea.xforms-static pre,
-    .fr-grid .xforms-mediatype-text-html.xforms-static {
-        color: @grayDark;
-        display: block;
-        padding: (@baseLineHeight - 1) / 2;             // We override these in form-runner-base.less, do we need this here?
-        margin: 0 0 @baseLineHeight / 2;                // We override these in form-runner-base.less, do we need this here?
-        font-size: @baseFontSize - 1; // 14px to 13px
-        line-height: @baseLineHeight;
-        background-color: darken(@inputBackground, 5%);
-        border: 1px solid #ccc; // fallback for IE7-8
-        border: 1px solid rgba(0, 0, 0, .15);
-        .border-radius(4px);
+    .fr-grid .xforms-static.xforms-readonly {
+        &.xforms-textarea pre, &.xforms-output.xforms-mediatype-text-html {
+            &:not(.xforms-text) {
+                color: @grayDark;
+                display: block;
+                padding: (@baseLineHeight - 1) / 2; // We override these in form-runner-base.less, do we need this here?
+                margin: 0 0 @baseLineHeight / 2;    // We override these in form-runner-base.less, do we need this here?
+                font-size: @baseFontSize - 1;       // 14px to 13px
+                line-height: @baseLineHeight;
+                background-color: darken(@inputBackground, 5%);
+                border: 1px solid rgba(0, 0, 0, .15);
+                .border-radius(4px);
+            }
+        }
     }
 
     // Force white icons

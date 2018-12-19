@@ -1162,7 +1162,7 @@
             <delete-action>Are you sure you want to delete action</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
-            <new-metadata-output>Please provide an application and form name, which will be used to identify your form (you can also change those later).</new-metadata-output>
+            <new-metadata-output>Please provide an application and form name to identify your form. You can easily change those later.</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
             <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.</xpath-errors>
@@ -2339,7 +2339,7 @@
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
-            <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard).</new-metadata-output>
+            <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire. Vous pourrez les changer plus tard.</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire qui sera utilisé pour la copie de ce formulaire:</save-as-metadata-output>
             <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>

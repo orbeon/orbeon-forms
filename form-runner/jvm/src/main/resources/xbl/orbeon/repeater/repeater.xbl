@@ -157,7 +157,7 @@
                         <xsl:if test="$appearance = 'full' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-top-buttons">
                                 <xf:trigger
-                                    appearance="minimal"
+                                    appearance="xxf:small"
                                     ref="if ($can-add) then $repeat-context else ''"
                                     tabindex="-1"
                                     id="fr-repeater-add"

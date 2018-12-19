@@ -546,6 +546,14 @@ div.orbeon.orbeon-portlet-div {
         width: 800px;
         max-width: none;
 
+        // Override `white-space: pre-wrap` which we set by default following
+        // https://github.com/orbeon/orbeon-forms/issues/1618. That works for
+        // plain text, but here we want HTML content and we want regular white-space.
+        // We need a better solution!
+        .popover.xforms-help-popover .popover-content {
+            white-space: normal;
+        }
+
         div[class ^= "fb-settings-mode-"] {
             display: grid;
             grid-template-columns: auto 1fr;

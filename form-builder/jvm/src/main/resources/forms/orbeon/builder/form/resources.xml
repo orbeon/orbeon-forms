@@ -17,12 +17,33 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Application Name</label>
-            <hint>Identifies a group of forms, for instance by functionality or department (e.g. "sales"). If you have one group of forms, you can use your organization name (e.g. "acme"). This name shows in the URL of the deployed form, so we recommend you use only lowercases characters.</hint>
+            <hint>Identifies a group of forms (for example "acme" or "sales")</hint>
+            <help>
+                &lt;p>
+                The application name is a name which allows grouping form together. The application name (or app name) can be, for example:
+                &lt;/p>
+                &lt;ul>
+                    &lt;li>a company name such as "orbeon" or "acme"&lt;/li>
+                    &lt;li>a company entity such as "hr" or "sales" or "engineering"&lt;/li>
+                    &lt;li>a project name such as "mercury" or "phoenix"&lt;/li>
+                &lt;/ul>
+                &lt;p>
+                This name shows in the URL of the deployed form, so we recommend you use only lowercase characters.
+                &lt;/p>
+            </help>
             <alert>Use ASCII letters, digits, "-" or "_"</alert>
         </application-name>
         <form-name>
             <label>Form Name</label>
-            <hint>Identifies this specific form (e.g. "health-record" or "claim"). This name shows in the URL, so we recommend you use only lowercases characters.</hint>
+            <hint>Identifies this specific form (for example "claim")</hint>
+            <help>
+                &lt;p>
+                The Form name is a name which is local to an application name, for example "address" or "claim".
+                &lt;/p>
+                &lt;p>
+                This name shows in the URL, so we recommend you use only lowercase characters.
+                &lt;/p>
+            </help>
             <alert>Use ASCII letters, digits, "-" or "_"</alert>
         </form-name>
         <title>
@@ -1172,12 +1193,33 @@
     <resource xml:lang="fr">
         <application-name>
             <label>Nom de l'application</label>
-            <hint>Identifie un groupe de formulaire, par exemple par fonctionnalité ou département (ex. "ventes"). Si vous n'avez qu'un groupe de formulaires, vous pouvez utiliser le nom de votre organisation (e.g. "acme"). Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.</hint>
+            <hint>Identifie un groupe de formulaires (ex. "ventes")</hint>
+            <help>
+                &lt;p>
+                Le nom de l'application est un nom qui permet de grouper des formulaires. Le nom d'application peut être, par exemple :
+                &lt;/p>
+                &lt;ul>
+                    &lt;li>un nom de compagnie, comme "orbeon" ou "acme"&lt;/li>
+                    &lt;li>une entité dans une compagnie, comme "rh" ou "ventes" or "recherche"&lt;/li>
+                    &lt;li>un nom de projet comme "mercury" ou "phoenix"&lt;/li>
+                &lt;/ul>
+                &lt;p>
+                Le nom est visible dans les URLs du formulaire déployé, et il est recommandé d'utiliser des minuscules uniquement.
+                &lt;/p>
+            </help>
             <alert>Utiliser des lettres ASCII, des chiffres, "-" ou "_"</alert>
         </application-name>
         <form-name>
             <label>Nom du formulaire</label>
-            <hint>Identifie ce formulaire en particulier (ex. "emprunt" ou "question"). Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.</hint>
+            <hint>Identifie ce formulaire en particulier (ex. "demande").</hint>
+            <help>
+                &lt;p>
+                Le nom du formulaire est un nom qui est local à une application, par exemple "adresse" ou "demande".
+                &lt;/p>
+                &lt;p>
+                Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
+                &lt;/p>
+            </help>
             <alert>Utiliser des lettres ASCII, des chiffres, "-" ou "_"</alert>
         </form-name>
         <title>
@@ -2329,12 +2371,14 @@
         <!-- Form metadata -->
         <application-name>
             <label>Applikasjonsnavn</label>
-            <hint>Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
+            <hint todo="true">Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
+            <help todo="true"/>
             <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Skjemanavn</label>
-            <hint>Identifiserer et spesifikt skjema. Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
+            <hint todo="true">Identifiserer et spesifikt skjema. Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
+            <help todo="true"/>
             <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
@@ -3514,12 +3558,14 @@
         <!-- Form metadata -->
         <application-name>
             <label>Название приложения</label>
-            <hint>Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+            <hint todo="true">Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+            <help todo="true"/>
             <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Название формы</label>
-            <hint>Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+            <hint todo="true">Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
+            <help todo="true"/>
             <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
@@ -4699,12 +4745,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Nome dell'applicazione</label>
-            <hint>Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se c'é solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
+            <hint todo="true">Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se c'é solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
+            <help todo="true"/>
             <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nome del modulo</label>
-            <hint>Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
+            <hint todo="true">Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
+            <help todo="true"/>
             <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
         </form-name>
         <title>
@@ -5876,12 +5924,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Name der Anwendung</label>
-            <hint>Kennzeichnet eine Gruppe von Formularen, z.B. unterteilt nach Funktion oder Abteilung. Wenn Sie eine Gruppe von Formularen haben, können Sie auch den Namen Ihres Unternehmens verwenden. Da dieser Name im URL des Formulars angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <hint todo="true">Kennzeichnet eine Gruppe von Formularen, z.B. unterteilt nach Funktion oder Abteilung. Wenn Sie eine Gruppe von Formularen haben, können Sie auch den Namen Ihres Unternehmens verwenden. Da dieser Name im URL des Formulars angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <help todo="true"/>
             <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </application-name>
         <form-name>
             <label>Name des Formulars</label>
-            <hint>Wird zu Identifikation des Formulars verwendet(z.B.: "Krankenakte"). Da dieser Name im URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <hint todo="true">Wird zu Identifikation des Formulars verwendet(z.B.: "Krankenakte"). Da dieser Name im URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <help todo="true"/>
             <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </form-name>
         <title>
@@ -7055,12 +7105,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Sovelluksen nimi</label>
-            <hint>Tunnistaa ryhmän lomakkeita, esimerkiksi toiminnallisuuden tai osaston perusteella (esim. "myynnit"). Jos sinulla on lomakeryhmä, voit käyttää organisaatiosi nimeä (esim. "huippu"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <hint todo="true">Tunnistaa ryhmän lomakkeita, esimerkiksi toiminnallisuuden tai osaston perusteella (esim. "myynnit"). Jos sinulla on lomakeryhmä, voit käyttää organisaatiosi nimeä (esim. "huippu"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <help todo="true"/>
             <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
         </application-name>
         <form-name>
             <label>Lomakkeen nimi</label>
-            <hint>Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <hint todo="true">Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <help todo="true"/>
             <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
         </form-name>
         <title>
@@ -8234,12 +8286,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Nombre de la Aplicación</label>
-            <hint>Identifica a un grupo de formularios, por funcionalidad o departamento ("ventas"). Si usted tiene un grupo de formularios, puede usar el nombre de la organización (e.g. "acme"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
+            <hint todo="true">Identifica a un grupo de formularios, por funcionalidad o departamento ("ventas"). Si usted tiene un grupo de formularios, puede usar el nombre de la organización (e.g. "acme"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
+            <help todo="true"/>
             <alert>Usar caracteres ASCII , numeros, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nombre del formulario</label>
-            <hint>Identifica el formulario especifico (e.g. "denuncias" or "consulta"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
+            <hint todo="true">Identifica el formulario especifico (e.g. "denuncias" or "consulta"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
+            <help todo="true"/>
             <alert>Usar caracteres ASCII , números, "-" o "_"</alert>
         </form-name>
         <title>
@@ -9411,12 +9465,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Applicatienaam</label>
-            <hint>Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
+            <hint todo="true">Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
+            <help todo="true"/>
             <alert>Gebruik ASCII letters, cijfers, "-" of "_"</alert>
         </application-name>
         <form-name>
             <label>Form naam</label>
-            <hint>Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
+            <hint todo="true">Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
+            <help todo="true"/>
             <alert>Gebruik ASCII letters, cijfers, "-" of "_"</alert>
         </form-name>
         <title>
@@ -10568,12 +10624,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Nome da Aplicação</label>
-            <hint>Identifica um grupo de formulários, agrupado por exemplo por funcionalidade ou departamento (exemplo: vendas). Tendo um grupo de formulários, pode-se usar o nome da organização (ex. "acme"). Este nome é visível no URL do formulário publicado pelo que recomendamos o uso de minúsculas.</hint>
+            <hint todo="true">Identifica um grupo de formulários, agrupado por exemplo por funcionalidade ou departamento (exemplo: vendas). Tendo um grupo de formulários, pode-se usar o nome da organização (ex. "acme"). Este nome é visível no URL do formulário publicado pelo que recomendamos o uso de minúsculas.</hint>
+            <help todo="true"/>
             <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
         </application-name>
         <form-name>
             <label>Nome do Formulário</label>
-            <hint>Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
+            <hint todo="true">Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
+            <help todo="true"/>
             <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
         </form-name>
         <title>
@@ -11752,12 +11810,14 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Område</label>
-            <hint>Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <hint todo="true">Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <help todo="true"/>
             <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
         </application-name>
         <form-name>
             <label>Formulär</label>
-            <hint>Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <hint todo="true">Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <help todo="true"/>
             <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
         </form-name>
         <title>

@@ -492,6 +492,7 @@
                                                 <xf:input ref="app" id="fb-app-name-input" xxf:autocomplete="off">
                                                     <xf:label ref="$resources/application-name/label"/>
                                                     <xf:hint ref="$resources/application-name/hint"/>
+                                                    <xf:help ref="$resources/application-name/help" mediatype="text/html"/>
                                                     <xf:alert ref="$resources/application-name/alert"/>
                                                 </xf:input>
                                             </xf:group>
@@ -512,19 +513,18 @@
                                                 </xf:output>
                                             </xf:group>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <!-- Form name -->
                                             <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
                                                 <xf:label ref="$resources/form-name/label"/>
                                                 <xf:hint ref="$resources/form-name/hint"/>
+                                                <xf:help ref="$resources/form-name/help" mediatype="text/html"/>
                                                 <xf:alert ref="$resources/form-name/alert"/>
                                             </xf:input>
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td>
+                                        <xh:td colspan="2">
                                             <!-- Title -->
                                             <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
                                                 <xf:label ref="$resources/title/label"/>
@@ -534,7 +534,7 @@
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td>
+                                        <xh:td colspan="2">
                                             <!-- Description -->
                                             <xf:textarea ref="description" id="fb-description-textarea">
                                                 <xf:label ref="$resources/description/label"/>

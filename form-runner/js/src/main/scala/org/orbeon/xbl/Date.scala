@@ -97,6 +97,9 @@ private class DateCompanion extends XBLCompanion {
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
     inputEl.prop("disabled", readonly)
 
+  override def xformsFocus(): Unit =
+    inputEl.focus()
+
   def setFormat(format: String): Unit = {
     // On iOS, ignore the format as the native widget uses its own format
     if (! iOS) {

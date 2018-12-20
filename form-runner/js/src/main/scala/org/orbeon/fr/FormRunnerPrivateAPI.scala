@@ -15,14 +15,14 @@ package org.orbeon.fr
 
 import org.orbeon.xforms.$
 import org.scalajs.dom
+import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
+import org.scalajs.dom.raw.HTMLFormElement
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-import dom.experimental.domparser.DOMParser
-import dom.experimental.domparser.SupportedType
-import org.scalajs.dom.raw.HTMLFormElement
+
 
 @JSExportTopLevel("ORBEON.fr.private.API")
 @JSExportAll
@@ -33,6 +33,8 @@ object FormRunnerPrivateAPI {
 
   // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
   private val Message = "You may lose some unsaved changes."
+
+  private val NewPathSuffix = "/new"
 
   def setDataStatus(safe: Boolean): Unit =
     if (safe)
@@ -61,5 +63,16 @@ object FormRunnerPrivateAPI {
     val formElement  = formDocument.querySelector("form").asInstanceOf[HTMLFormElement]
     dom.document.body.appendChild(formElement)
     formElement.submit()
+  }
+
+  def newToEdit(documentId: String): Unit = {
+
+    val location = dom.window.location
+
+    if (location.pathname.endsWith(NewPathSuffix)) {
+      // `search`: for example `?form-version=42`
+      // `hash`: for now not used by Form Runner, but it is safer to keep it
+      dom.window.history.replaceState(null, "", s"edit/$documentId${location.search}${location.hash}")
+    }
   }
 }

@@ -344,26 +344,15 @@
             <!-- Expose document id to JavaScript -->
             <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" class="xforms-hidden"/>
 
-            <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
+            <!-- When the mode changes to `edit` after a save from `/new`, attempt to change the URL. -->
             <!-- NOTE: Keep `xxf:instance()`, see https://github.com/orbeon/orbeon-forms/issues/2872 -->
-            <xf:var name="mode-for-save" value="xxf:instance('fr-parameters-instance')/mode/string()">
-                <!-- If URI is /new (it should be), change it to /edit/id -->
-                <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
-                <xf:action type="javascript" ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
-                    <![CDATA[
-                        if (history && history.replaceState) {
-                            var NewSuffix = '/new';
-                            var endsWithNew = location.pathname.indexOf(NewSuffix, location.pathname.length - NewSuffix.length) != -1;
-                            if (endsWithNew) {
-                                var documentId = ORBEON.xforms.Document.getValue("fr-parameters-instance-document");
-                                var editSuffix = "edit/" +
-                                    documentId +
-                                    location.search +   // E.g. ?form-version=42
-                                    location.hash;      // For now not used by Form Runner, but it is safer to keep it
-                                history.replaceState(null, "", editSuffix);
-                            }
-                        }
-                    ]]>
+            <xf:var name="mode-for-save" value="fr:mode()">
+                <xf:action
+                    type="javascript"
+                    event="xforms-value-changed"
+                    if="$mode-for-save = 'edit'">
+                    <xf:param name="documentId" value="fr:document-id()"/>
+                    <xf:body>ORBEON.fr.private.API.newToEdit(documentId)</xf:body>
                 </xf:action>
             </xf:var>
 

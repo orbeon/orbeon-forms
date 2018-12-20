@@ -690,6 +690,12 @@
                 <alert>Incorrect value</alert>
                 <hint>Positive number or XPath expression</hint>
             </max>
+            <freeze>
+                <label>Freeze Repetitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Non-negative number or XPath expression</hint>
+            </freeze>
+            <no-freeze>No freeze</no-freeze>
             <apply-defaults>
                 <label>Apply initial value formulas when adding iterations</label>
             </apply-defaults>
@@ -1866,6 +1872,11 @@
                 <alert>Valeur incorrecte</alert>
                 <hint>Nombre positif ou expression XPath</hint>
             </max>
+            <freeze>
+                <label>Geler les répétitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Non-negative number or XPath expression</hint>
+            </freeze>
             <apply-defaults>
                 <label>Applique les valeurs initiales pour les nouvelles itérations</label>
             </apply-defaults>
@@ -3026,6 +3037,11 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Positive number or XPath expression]</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -4212,6 +4228,11 @@
                 <alert>Некорректное значение</alert>
                 <hint todo="true">Положительное число [or XPath expression]</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -5399,6 +5420,11 @@
                 <alert>Valore invalido</alert>
                 <hint>Numero positivo o espressione XPath</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -6578,6 +6604,11 @@
                 <alert>Ungültiger Wert</alert>
                 <hint>Positive Zahl oder XPath-Ausdruck</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label>Formeln für Initialwerte berechnen, wenn Iterationen hinzugefügt werden</label>
             </apply-defaults>
@@ -7760,6 +7791,11 @@
                 <alert>Virheellinen arvo</alert>
                 <hint>Positiivinen numero tai XPath-lauseke</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -8939,6 +8975,11 @@
                 <alert>Valor Incorrecto</alert>
                 <hint>Número positivo o expresión XPath</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label>Aplicar Formulas de cálculo inicial cuando se agregan iteraciones.</label>
             </apply-defaults>
@@ -10119,6 +10160,11 @@
                 <alert>Onjuiste waarde</alert>
                 <hint>Positief aantal of XPath expressie</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label>Pas initiële waarde formules toe bij toevoegen van iteraties</label>
             </apply-defaults>
@@ -11278,6 +11324,11 @@
                 <alert>Valor incorrecto</alert>
                 <hint>Número positivo</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -12464,6 +12515,11 @@
                 <alert>Felaktigt värde</alert>
                 <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
             </max>
+            <freeze>
+                <label todo="true">[Freeze Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
+            </freeze>
             <apply-defaults>
                 <label>Tillämpa startvärdesformlerna när upprepning läggs till</label>
             </apply-defaults>

@@ -36,7 +36,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
 
         val expected =
           elemToDom4j(
@@ -69,7 +69,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
         renameControlIterationIfNeeded("my-section", "foo", None, None)
         renameControlIfNeeded("my-section", "foo")
 
@@ -104,7 +104,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
         renameControlIterationIfNeeded("my-section", "foo", None, Some("bar"))
 
         val expected =
@@ -138,7 +138,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "1", "2", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "1", "2", "", "", applyDefaults = false, "")
 
         val section = findControlByName(doc, "my-section").get
 
@@ -155,7 +155,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", "", applyDefaults = false, "")
 
         val section = findControlByName(doc, "my-section").get
 
@@ -167,12 +167,30 @@ class RepeatedSectionsTest
       }
     }
 
+    it("must change freeze") {
+      withActionAndFBDoc(Doc) { implicit ctx ⇒
+
+        val doc = ctx.formDefinitionRootElem
+
+        setRepeatProperties("my-section", repeat = true, "3", "4", "2", "", applyDefaults = false, "")
+
+        val section = findControlByName(doc, "my-section").get
+
+        assert("3" === section.attValue("min"))
+        assert("4" === section.attValue("max"))
+        assert("2" === section.attValue("freeze"))
+
+        assert("3" === getNormalizedMin(doc, "my-section"))
+        assert(Some("4") === getNormalizedMax(doc, "my-section"))
+      }
+    }
+
     it("must move section into it") {
       withActionAndFBDoc(Doc) { implicit ctx ⇒
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
         moveSectionRight(findControlByName(doc, "other-section").get)
 
         val expected =
@@ -206,8 +224,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true,  "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-section", repeat = false, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true,  "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = false, "", "", "", "", applyDefaults = false, "")
 
         val expected =
           elemToDom4j(
@@ -247,7 +265,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
 
         // Expect 1 iteration of `my-grid`
         val expected =
@@ -274,8 +292,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, "", "", "", "", applyDefaults = false, "first")
 
         // Expect 2 iterations of `my-grid`
         val expected =
@@ -305,8 +323,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "first")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, "", "", "", "", applyDefaults = false, "first")
 
         val myTextareaCell = findControlByName(doc, "my-textarea").get.parentUnsafe
 
@@ -346,8 +364,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, "", "", "", "", applyDefaults = false, "")
 
         // Expect 1 iteration of `my-grid`
         val expected =

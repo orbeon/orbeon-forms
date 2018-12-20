@@ -300,14 +300,17 @@ trait GridOps extends ContainerOps {
   def getNormalizedMin(doc: NodeInfo, gridName: String): String =
     FormRunner.findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
 
-  // Convert a min/max value to a value suitable to be written to the @min/@max attributes.
+  def getNormalizedFreeze(doc: NodeInfo, gridName: String): String =
+    FormRunner.findControlByName(doc, gridName) flatMap (_ attValueOpt "freeze") map trimSimpleAVT getOrElse "0"
+
+  // Convert a min/max/freeze value to a value suitable to be written to the @min/@max/@freeze attributes.
   //
   // - blank value                → None
   // - non-positive integer value → None
   // - positive integer value     → Some(int: String)
   // - any other value            → Some("{expression}")
   //
-  def minMaxForAttribute(s: String): Option[String] = s.trimAllToOpt flatMap { value ⇒
+  def minMaxFreezeForAttribute(s: String): Option[String] = s.trimAllToOpt flatMap { value ⇒
     try {
       val int = value.toInt
       int > 0 option int.toString

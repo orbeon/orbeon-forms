@@ -88,6 +88,7 @@ object FormBuilderXPathApi {
     repeat               : Boolean,
     min                  : String,
     max                  : String,
+    freeze               : String,
     iterationNameOrEmpty : String,
     applyDefaults        : Boolean,
     initialIterations    : String
@@ -97,6 +98,7 @@ object FormBuilderXPathApi {
       repeat               = repeat,
       min                  = min,
       max                  = max,
+      freeze               = freeze,
       iterationNameOrEmpty = iterationNameOrEmpty,
       applyDefaults        = applyDefaults,
       initialIterations    = initialIterations
@@ -270,6 +272,10 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def getNormalizedMin(doc: NodeInfo, gridName: String): String =
     FormBuilder.getNormalizedMin(doc, gridName)
+
+  //@XPathFunction
+  def getNormalizedFreeze(doc: NodeInfo, gridName: String): String =
+    FormBuilder.getNormalizedFreeze(doc, gridName)
 
   // Get the grid's normalized max attribute, the empty sequence if no maximum
   //@XPathFunction

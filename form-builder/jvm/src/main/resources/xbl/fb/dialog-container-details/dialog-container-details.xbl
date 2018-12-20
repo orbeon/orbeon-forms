@@ -59,6 +59,7 @@
 
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/freeze"                         value="fbf:getNormalizedFreeze($form, $i/control-name)"/>
 
                 <xf:setvalue ref="$i/relevant"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant'), 'true()' )[1]"/>
                 <xf:setvalue ref="$i/readonly"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly'), 'false()')[1]"/>
@@ -175,6 +176,7 @@
                             $i/is-repeat = true(),
                             $i/min-repeat,
                             $i/max-repeat,
+                            $i/freeze,
                             $i/custom-iteration-name/string(),
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
@@ -288,8 +290,9 @@
                         <apply-defaults/>
                         <initial-iterations/>
 
-                        <min-repeat/>            <!-- Minimum number of repetitions -->
-                        <max-repeat/>            <!-- Maximum number of repetitions -->
+                        <min-repeat/>
+                        <max-repeat/>
+                        <freeze/>
 
                         <control-names/>         <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
@@ -373,13 +376,13 @@
 
                 <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
                 <xf:bind
-                    ref="min-repeat | max-repeat"
+                    ref="min-repeat | max-repeat | freeze"
                     type="xxf:xpath2"
                     xxf:whitespace="trim"
                     readonly="false()"/>
 
                 <xf:bind
-                    ref="min-repeat"
+                    ref="min-repeat | freeze"
                     required="../is-repeat = true()"
                     constraint="
                         ../is-repeat = false()               or
@@ -402,6 +405,24 @@
                             string(../min-repeat) castable as xs:integer
                         ) or
                         (xs:integer(.) ge xs:integer(../min-repeat))"/>
+
+                <xf:bind
+                    ref="freeze"
+                    constraint="
+                        ../is-repeat = false() or
+                        (
+                            not(
+                                string() castable as xs:integer and
+                                string(../min-repeat) castable as xs:integer
+                            ) or
+                            (xs:integer(.) le xs:integer(../min-repeat))
+                        ) and (
+                            not(
+                                string() castable as xs:integer and
+                                string(../max-repeat) castable as xs:integer
+                            ) or
+                            (xs:integer(.) le xs:integer(../max-repeat))
+                        )"/>
 
                 <xf:bind
                     ref="prev-control-id, next-control-id"
@@ -507,6 +528,7 @@
                                                 <xf:setvalue ref="$i/custom-iteration-name"    value="''"/>
                                                 <xf:setvalue ref="$i/min-repeat"               value="1"/>
                                                 <xf:setvalue ref="$i/max-repeat"               value="''"/>
+                                                <xf:setvalue ref="$i/freeze"                   value="0"/>
                                                 <xf:setvalue ref="$i/apply-defaults"           value="true()"/>
                                                 <xf:setvalue ref="$i/initial-iterations"       value="true()"/>
                                             </xf:action>
@@ -532,7 +554,6 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <!-- Min -->
                                             <xf:select1 ref="$i/min-repeat" appearance="full" id="min-repeat">
                                                 <xf:label value="$resources/dialog-container-details/min/label"/>
                                                 <xf:item>
@@ -557,7 +578,6 @@
                                             </xf:input>
                                         </xh:td>
                                         <xh:td>
-                                            <!-- Max -->
                                             <xf:select1 ref="$i/max-repeat" appearance="full" id="max-repeat">
                                                 <xf:label value="$resources/dialog-container-details/max/label"/>
                                                 <xf:item>
@@ -581,6 +601,30 @@
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
+                                        <xh:td rowspan="2">
+                                            <xf:select1 ref="$i/freeze" appearance="full" id="freeze">
+                                                <xf:label value="$resources/dialog-container-details/freeze/label"/>
+                                                <xf:item>
+                                                    <xf:label value="$resources/dialog-container-details/no-freeze"/>
+                                                    <xf:value>0</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="$resources/dialog-container-details/one"/>
+                                                    <xf:value>1</xf:value>
+                                                </xf:item>
+                                                <xf:itemset ref=".">
+                                                    <xf:label value="$resources/dialog-container-details/other"/>
+                                                    <xf:value value="if (string() = ('0', '1')) then '' else ."/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                            <xf:input ref="$i/freeze[not(string() = ('0', '1'))]" id="freeze-input">
+                                                <xf:alert ref="$resources/dialog-container-details/freeze/alert"/>
+                                                <xf:hint ref="$resources/dialog-container-details/freeze/hint"/>
+
+                                                <!-- Focus when enabled. Upon initial enabled, xxforms-dialog-open will override this -->
+                                                <xf:setfocus ev:event="xforms-enabled" control="freeze-input"/>
+                                            </xf:input>
+                                        </xh:td>
                                         <xh:td>
                                             <fr:checkbox-input ref="is-custom-iteration-name">
                                                 <xf:label ref="$resources/dialog-container-details/custom-iteration-name/label"/>
@@ -592,6 +636,8 @@
                                                 </xf:action>
                                             </fr:checkbox-input>
                                         </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
                                         <xh:td>
                                             <xf:input ref="custom-iteration-name[$i/is-custom-iteration-name = true()]" incremental="true" >
                                                 <xf:label ref="$resources/dialog-container-details/iteration-name/label"/>

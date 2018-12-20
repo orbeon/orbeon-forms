@@ -212,6 +212,7 @@ trait ContainerOps extends ControlOps {
     repeat               : Boolean,
     min                  : String,
     max                  : String,
+    freeze               : String,
     iterationNameOrEmpty : String,
     applyDefaults        : Boolean,
     initialIterations    : String)(implicit
@@ -226,8 +227,9 @@ trait ContainerOps extends ControlOps {
       val wasRepeat = isRepeat(control)
       val oldInitialIterationsAttribute = getInitialIterationsAttribute(control)
 
-      val minOpt = minMaxForAttribute(min)
-      val maxOpt = minMaxForAttribute(max)
+      val minOpt    = minMaxFreezeForAttribute(min)
+      val maxOpt    = minMaxFreezeForAttribute(max)
+      val freezeOpt = minMaxFreezeForAttribute(freeze)
 
       val initialIterationsOpt = initialIterations.trimAllToOpt
 
@@ -237,6 +239,7 @@ trait ContainerOps extends ControlOps {
       toggleAttribute(control, "repeat",          RepeatContentToken,                              repeat)
       toggleAttribute(control, "min",             minOpt.get,                                      repeat && minOpt.isDefined)
       toggleAttribute(control, "max",             maxOpt.get,                                      repeat && maxOpt.isDefined)
+      toggleAttribute(control, "freeze",          freezeOpt.get,                                   repeat && freezeOpt.isDefined)
       toggleAttribute(control, "template",        makeInstanceExpression(templateId(controlName)), repeat)
       toggleAttribute(control, "apply-defaults",  "true",                                          repeat && applyDefaults)
       toggleAttribute(control, InitialIterations, initialIterationsOpt.get,                        repeat && initialIterationsOpt.isDefined)

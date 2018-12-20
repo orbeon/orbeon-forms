@@ -312,6 +312,7 @@ object ToolboxOps {
         repeat               = true,
         min                  = "1",
         max                  = "",
+        freeze               = "",
         iterationNameOrEmpty = "",
         applyDefaults        = true,
         initialIterations    = "first"

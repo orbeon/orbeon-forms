@@ -159,9 +159,9 @@
                         <xf:label class="fb-tools-title" value="$form-resources/form-structure/label"/>
                         <!-- Add new section -->
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" >
+                            <xf:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger">
                                 <xf:label>
-                                    <xh:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
+                                    <xh:i class="fa fa-fw fa-newspaper-o"/>
                                     <xf:output value="$form-resources/new-section/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
@@ -173,7 +173,7 @@
                         <xh:div class="fb-tool">
                             <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
                                 <xf:label>
-                                    <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                    <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-grid/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
@@ -184,7 +184,7 @@
                         <xh:div class="fb-tool">
                             <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
                                 <xf:label>
-                                    <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                    <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-repeated-grid/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">

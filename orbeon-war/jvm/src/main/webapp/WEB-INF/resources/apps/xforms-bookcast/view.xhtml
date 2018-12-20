@@ -188,7 +188,11 @@
             }
 
             .orbeon .xforms-label { font-weight: bold; display: inline-block; min-width: 9em }
-            .orbeon .xforms-select1-appearance-full .xforms-label { vertical-align: top }
+            .orbeon .xforms-select1-appearance-full .xforms-label { float: left }
+
+            .orbeon .xforms-input , .orbeon .xforms-textarea , .orbeon .xforms-select1  {
+                clear: both;
+            }
 
             .orbeon .xforms-input input, .orbeon .xforms-textarea textarea, .orbeon .xforms-select1 select {
                 width: 20em;
@@ -196,8 +200,6 @@
             }
 
             .orbeon .xforms-repeat-selected-item-1 .form-td { background-color: #f5f5f5 }
-
-            .orbeon .xforms-items { display: inline-block }
         </style>
     </head>
     <body>
@@ -274,7 +276,7 @@
                             <xf:label>Link</xf:label>
                             <xf:alert>The link is incorrect</xf:alert>
                         </xf:input>
-                        <xf:select1 ref="rating" appearance="full">
+                        <xf:select1 ref="rating" appearance="full xxf:horizontal">
                             <xf:label>Rating</xf:label>
                             <xf:item>
                                 <xf:label>None</xf:label>

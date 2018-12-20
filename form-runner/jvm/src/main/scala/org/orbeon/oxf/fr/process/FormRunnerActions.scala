@@ -333,7 +333,7 @@ trait FormRunnerActions {
         case name @ "process"             ⇒ name → runningProcessId.get
         case name @ "app"                 ⇒ name → app
         case name @ "form"                ⇒ name → form
-        case name @ "form-version"        ⇒ name → formVersion.toString
+        case name @ FormVersionParam      ⇒ name → formVersion.toString
         case name @ "document"            ⇒ name → document.get
         case name @ "valid"               ⇒ name → dataValid.toString
         case name @ "language"            ⇒ name → currentLang
@@ -424,23 +424,23 @@ trait FormRunnerActions {
     }
 
   private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
-    LanguageParam   → (() ⇒ currentLang,             _ ⇒ false  ),
-    EmbeddableParam → (() ⇒ isEmbeddable.toString,   _ == "true")
+    LanguageParam    → (() ⇒ currentLang,                             _ ⇒ false  ),
+    EmbeddableParam  → (() ⇒ isEmbeddable.toString,                   _ == "true"),
+    FormVersionParam → (() ⇒ FormRunnerParams().formVersion.toString, _ ⇒ false  )
   )
 
-  private val StateParamNames               = (StateParams map (_._1) toSet) + "form-version"
+  private val StateParamNames               = StateParams map (_._1) toSet
   private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName
 
-  // Automatically prepend `fr-language` and `orbeon-embeddable` based on their current value unless
+  // Automatically prepend `fr-language`, `orbeon-embeddable` and `form-version` based on their current value unless
   // they are already specified in the given path.
   //
   // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
   // are part of the state the user expects to be kept.
   //
-  // We didn't use to propagate fr-language, as the current language is kept in the session. But this caused an issue,
-  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only (that is, when
-  // `optimize == false`.
-  private def prependCommonFormRunnerParameters(pathQuery: String, optimize: Boolean) =
+  // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
+  // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
+  private def prependCommonFormRunnerParameters(pathQuery: String, forNavigate: Boolean) =
     if (! NetUtils.urlHasProtocol(pathQuery)) { // heuristic, which might not always be a right guess?
 
       val (path, params) = splitQueryDecodeParams(pathQuery)
@@ -450,7 +450,7 @@ trait FormRunnerActions {
           (name, (valueFromCurrent, keepValue)) ← StateParams
           valueFromPath                         = params collectFirst { case (`name`, v) ⇒ v }
           effectiveValue                        = valueFromPath getOrElse valueFromCurrent.apply
-          if ! optimize || optimize && keepValue(effectiveValue)
+          if ! forNavigate || forNavigate && (valueFromPath.isDefined || keepValue(effectiveValue)) // keep parameter if explicit!
         } yield
           name → effectiveValue
 
@@ -474,7 +474,7 @@ trait FormRunnerActions {
   }
 
   private def tryNavigateTo(path: String): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(path, optimize = true), progress = false))
+    Try(load(prependCommonFormRunnerParameters(path, forNavigate = true), progress = false))
 
   private def tryChangeMode(
     replace            : String,
@@ -486,7 +486,7 @@ trait FormRunnerActions {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
+          Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
           Some(             Some("method")                → HttpMethod.POST.entryName.toLowerCase),
           Some(             Some(NonRelevantName)         → RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")               → replace),
@@ -494,7 +494,7 @@ trait FormRunnerActions {
           Some(             Some("content")               → "xml"),
           Some(             Some(DataFormatVersionName)   → DataFormatVersionEdge),
           Some(             Some(PruneMetadataName)       → false.toString),
-          Some(             Some("parameters")            → s"form-version $DataFormatVersionName"),
+          Some(             Some("parameters")            → s"$FormVersionParam $DataFormatVersionName"),
           formTargetOpt.map(Some(FormTargetName)          → _),
           Some(             Some("response-is-resource")  → responseIsResource.toString)
         )

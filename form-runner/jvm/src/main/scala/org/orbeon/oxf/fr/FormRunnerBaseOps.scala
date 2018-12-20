@@ -59,14 +59,15 @@ case class AppForm(app: String, form: String) {
 
 trait FormRunnerBaseOps {
 
-  val LanguageParam         = "fr-language"
-  val EmbeddableParam       = "orbeon-embeddable"
+  val LanguageParam          = "fr-language"
+  val EmbeddableParam        = "orbeon-embeddable"
+  val FormVersionParam       = "form-version"
 
-  val LiferayLanguageHeader = "orbeon-liferay-language"
+  val LiferayLanguageHeader  = "orbeon-liferay-language"
 
   val DefaultIterationSuffix = "-iteration"
 
-  val TemplateSuffix        = "-template"
+  val TemplateSuffix         = "-template"
 
   // Get an id based on a name
   // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid

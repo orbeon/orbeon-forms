@@ -181,8 +181,9 @@
           path="/fr/([^/^.]+)/([^/^.]+)(/summary)"
           default-submission="request-parameters.xml"
           model="summary/view.xhtml" view="html-view.xpl">
-        <setvalue ref="/*/app"      matcher-group="1"/>
-        <setvalue ref="/*/form"     matcher-group="2"/>
+        <setvalue ref="/*/app"           matcher-group="1"/>
+        <setvalue ref="/*/form"          matcher-group="2"/>
+        <setvalue ref="/*/form-version"  parameter="form-version"/>
         <setvalue ref="/*/mode">summary</setvalue>
     </page>
 

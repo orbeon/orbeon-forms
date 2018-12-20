@@ -189,6 +189,7 @@
             <messages>
                 <no-form-found>No form data was found.</no-form-found>
                 <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding drafts are deleted as well.</delete-confirmation>
+                <version>Form Version {0,number,integer}</version>
             </messages>
             <labels>
                 <draft>Draft</draft>
@@ -654,6 +655,7 @@
             <messages>
                 <no-form-found>Aucun formulaire trouvé.</no-form-found>
                 <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document enregistré, les brouillons correspondants sont également supprimés.</delete-confirmation>
+                <version>Version de formulaire {0,number,integer}</version>
             </messages>
             <labels>
                 <draft>Brouillons</draft>
@@ -1111,6 +1113,7 @@
             <messages>
                 <no-form-found>No se encontró el formulario.</no-form-found>
                 <delete-confirmation>Esta seguro que desea borrar uno o más formularios? Nota cuando borra un formulario guardado, se borrarán los formularios en estado borrador también.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Borradores</draft>
@@ -1564,6 +1567,7 @@
             <messages>
                 <no-form-found>Ingen skjema funnet.</no-form-found>
                 <delete-confirmation>Vil du slette markerte skjema? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft todo="true">[Draft]</draft>
@@ -2014,6 +2018,7 @@
             <messages>
                 <no-form-found>Форм не найдено.</no-form-found>
                 <delete-confirmation>Вы уверены, что хотите удалить формы? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>черновик</draft>
@@ -2469,6 +2474,7 @@
             <messages>
                 <no-form-found>I dati del modulo non sono stati trovati.</no-form-found>
                 <delete-confirmation> Sei sicuro di voler cancellare uno o più moduli? Nota: Quando elimini un documento salvato, le bozze corrispondenti vengono eliminate pure.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Bozza</draft>
@@ -2931,6 +2937,7 @@
             <messages>
                 <no-form-found>Es wurde kein Formular gefunden.</no-form-found>
                 <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? Hinweis: Wenn Sie ein bereits gespeichertes Dokument löschen, werden auch die entsprechenden Entwürfe gelöscht.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Entwurf</draft>
@@ -3393,6 +3400,7 @@
             <messages>
                 <no-form-found>Taulukkotietoja ei löytynyt.</no-form-found>
                 <delete-confirmation>Haluatko varmasti poistaa yhden tai yhden tai useampia taulukoita?</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Luonnos</draft>
@@ -3855,6 +3863,7 @@
             <messages>
                 <no-form-found>Inget formulär hittades.</no-form-found>
                 <delete-confirmation>Bekräfta att du vill ta bort formulären. Om du tar bort ett sparat formulär så tas motsvarande utkast också bort.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Utkast</draft>
@@ -4317,6 +4326,7 @@
             <messages>
                 <no-form-found>Er zijn geen formgegevens gevonden.</no-form-found>
                 <delete-confirmation>Weet u zeker dat u één of meerdere form wilt verwijderen? Merk op dat u door het verwijderen van een opgeslagen document, ook de bijbehorende conceptversies verwijdert.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Concept</draft>
@@ -4778,6 +4788,7 @@
             <messages>
                 <no-form-found>Não foram encontrados formulários.</no-form-found>
                 <delete-confirmation>Tem certeza de que deseja apagar um ou mais formulários? Note que ao apagar um documento guardado, os rascunhos correspondentes também serão apagados.</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
             <labels>
                 <draft>Rascunho</draft>

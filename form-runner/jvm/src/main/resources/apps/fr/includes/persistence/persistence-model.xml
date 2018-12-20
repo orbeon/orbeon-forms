@@ -646,6 +646,8 @@
 
     <!-- Get document -->
     <xf:submission
+        xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava"
+
         id="fr-get-document-submission"
         method="get"
         serialization="none"
@@ -667,8 +669,7 @@
                 frp:providerDataFormatVersion($app, $form)
             }"
         replace="instance"
-        xxf:instance="fr-form-instance"
-        xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava">
+        xxf:instance="fr-form-instance">
 
         <xf:action event="xforms-submit-done">
             <!-- Save value of Orbeon-Operations header -->

@@ -102,7 +102,7 @@
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
                  improve submissions to handle conditional GET as well when using caching. -->
             <xf:submission
-                id="get-source-form-submission"
+                id="fr-get-source-form-submission"
                 method="get"
                 serialization="none"
                 resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
@@ -110,7 +110,36 @@
                 instance="fr-source-form-instance"
                 xxf:readonly="true"
                 xxf:cache="false"
-                xxf:xinclude="true"/>
+                xxf:xinclude="true">
+
+                <xf:header>
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="event('form-definition-version')"/>
+                </xf:header>
+
+                <!--
+                    Update the current form definition version globally so that `fr:form-version()` will work too. But note that
+                    the `resource` provider doesn't return a version, in particular, so we set it to `1`.
+                 -->
+                <xf:setvalue
+                    event="xforms-submit-done"
+                    ref="$parameters/form-version"
+                    value="
+                        (
+                            event('response-headers')[
+                                lower-case(name) = 'orbeon-form-definition-version'
+                            ]/value[
+                                . castable as xs:integer
+                            ],
+                            1
+                        )[1]"/>
+
+                <xf:action event="xforms-submit-error">
+                    <!-- TODO: i18n -->
+                    <xf:message>Error loading source form.</xf:message>
+                </xf:action>
+
+            </xf:submission>
 
             <!-- Standard Form Runner data instance -->
             <!-- TODO: Can we remove this? -->
@@ -138,7 +167,7 @@
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
             <xf:action event="fr-summary-create">
-                <xf:load resource="/fr/{$app}/{$form}/new"/>
+                <xf:load resource="/fr/{$app}/{$form}/new?form-version={fr:form-version()}"/>
             </xf:action>
 
             <xf:action event="fr-summary-view" if="$selection-is-one-document">
@@ -239,42 +268,69 @@
                 <selection xmlns=""/>
             </xf:instance>
 
-            <!-- 1. Load source form -->
+            <!-- 1. Load form metadata -->
             <xf:action event="xforms-model-construct-done">
-                <xf:var name="source-form" value="xxf:get-request-attribute('fr-form-definition')"/>
-                <xf:action if="exists($source-form)">
-                    <!-- Got it from the request -->
-                    <xf:message level="xxf:log-debug">Got source form from request.</xf:message>
-                    <xf:insert ref="instance('fr-source-form-instance')" origin="$source-form"/>
-                </xf:action>
-                <xf:action if="not(exists($source-form))">
-                    <!-- Try submission -->
-                    <xf:message level="xxf:log-debug">Could not get source form from request. Trying submission instead.</xf:message>
-                    <xf:send submission="get-source-form-submission"/>
-                </xf:action>
+                <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
+                    <xf:property name="restrict-to-latest-version" value="false()"/>
+                </xf:dispatch>
+            </xf:action>
 
-                <!-- Send a "Not Found" error if the form definition is not found -->
-                <xf:action if="empty(instance('fr-source-form-instance')/xh:head/xf:model)" type="xpath">
+            <!-- 2. Load source form -->
+            <xf:action event="fr-versions-read" observer="fr-versioning-model">
+
+                <xf:var
+                    name="requested-version"
+                    as="xs:integer?"
+                    value="xs:integer(xxf:get-request-parameter('form-version')[1][. castable as xs:integer])"/>
+
+                <!-- 404 if requested version is not available -->
+                <xf:action if="exists($requested-version) and not(event('versions') = $requested-version)" type="xpath">
                     frf:sendError(404)
                 </xf:action>
+
+                <xf:setvalue
+                    ref="$parameters/form-version"
+                    value="
+                        if (empty($requested-version)) then
+                            (: Pick latest version :)
+                            max(event('versions'))
+                        else
+                            (: Should be a NOP since the parameter is already stored :)
+                            $requested-version"/>
+
+                <xf:send submission="fr-get-source-form-submission">
+                    <xf:property name="form-definition-version" value="fr:form-version()"/>
+                </xf:send>
+
+                <!-- Send a "Not Found" error if the form definition is not found OR if the form is not available. -->
+                <!-- NOTE: `fr-read-versions` only returns available versions so we don't need to check availability here. -->
+                <xf:action
+                    if="empty(instance('fr-source-form-instance')/xh:head/xf:model) or
+                        $source-form-metadata/available = 'false'"
+                    type="xpath">
+
+                    frf:sendError(404)
+                </xf:action>
+
             </xf:action>
 
-            <!-- 2. Check for authorized operations -->
-            <xf:action event="xforms-model-construct-done">
-
-                <!-- Send a "Not Found" error if the form is not available -->
-                <xf:action if="$source-form-metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
+            <!-- 3. Check for authorized operations -->
+            <xf:action event="xforms-submit-done" observer="fr-get-source-form-submission">
 
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xf:var name="permissions"                value="$source-form-metadata/permissions"/>
-                <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRolesXPath($permissions)"/>
+                <xf:var
+                    name="operations-from-role"
+                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions)"/>
 
                 <!-- Remember global operations -->
-                <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($operations-from-role, ' ')"/>
+                <xf:setvalue
+                    ref="xxf:instance('fr-authorized-operations')"
+                    value="string-join($operations-from-role, ' ')"/>
+
             </xf:action>
 
-            <!-- 3. Rest of initialization -->
-            <xf:action event="xforms-model-construct-done">
+            <!-- 4. Rest of initialization -->
+            <xf:action event="xforms-submit-done" observer="fr-get-source-form-submission">
 
                 <!-- Load resources -->
                 <!-- Dereference `@src` for Form Builder if needed -->
@@ -300,6 +356,11 @@
                     value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
                 <!-- Create elements holding structured search data -->
+                <xf:delete
+                    ref="
+                        instance('fr-search-labels-instance')/* |
+                        instance('fr-search-instance')/query[exists(@name)]"/>
+
                 <xf:insert
                     context="instance('fr-search-labels-instance')"
                     origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form)"/>
@@ -320,11 +381,11 @@
                     origin="xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only'))"/>
 
                 <!-- Query initial list of documents -->
-                <xf:send submission="search-submission"/>
+                <xf:send submission="fr-summary-search-submission"/>
 
             </xf:action>
 
-            <!-- 4. If roles are enabled but no role applies, the page is unauthorized.
+            <!-- 5. If roles are enabled but no role applies, the page is unauthorized.
                 NOTE: Do this upon `xforms-ready` because `fb-permissions` instance is not ready upon
                 `xforms-model-construct-done`. -->
             <xf:action
@@ -341,7 +402,7 @@
                 <xf:setindex repeat="documents-repeat" index="1"/>
                 <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
 
-                <xf:send submission="search-submission"/>
+                <xf:send submission="fr-summary-search-submission"/>
             </xf:action>
 
             <!-- Summary data -->
@@ -362,13 +423,18 @@
 
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
             <xf:submission
-                id="search-submission"
+                id="fr-summary-search-submission"
                 ref="instance('fr-search-instance')"
                 validate="false"
                 method="post"
                 resource="/fr/service/persistence/search/{$app}/{$form}"
                 replace="instance"
                 instance="fr-summary-instance">
+
+                <xf:header>
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="fr:form-version()"/>
+                </xf:header>
 
                 <!-- Set language upon submitting -->
                 <xf:action event="xforms-submit">
@@ -377,7 +443,7 @@
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
-                    <!-- i18n -->
+                    <!-- TODO: i18n -->
                     <xf:message>Error performing search.</xf:message>
                 </xf:action>
             </xf:submission>
@@ -388,7 +454,7 @@
                 observer="fr-language-selector"
                 event="xforms-value-changed"
                 if="$is-fb"
-                submission="search-submission"/>
+                submission="fr-summary-search-submission"/>
 
             <!-- Duplicate -->
             <xf:instance id="fr-duplicate" xmlns=""><document-id/></xf:instance>
@@ -415,6 +481,8 @@
             </xf:submission>
 
         </xf:model>
+        <!-- Needs to be after the first model as it makes use of `fr:app()`, etc. -->
+        <xi:include href="oxf:/apps/fr/includes/versioning-model.xml"  xxi:omit-xml-base="true"/>
     </head>
     <body>
         <fr:navbar/>
@@ -452,6 +520,38 @@
                             target="search-select1"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
+
+                        <xf:var
+                            name="versions"
+                            model="fr-versioning-model"
+                            value="
+                                xxf:sort(
+                                    instance('fr-versioning-form-metadata')/
+                                        form[
+                                            not(available = 'false')
+                                        ]/
+                                        form-version,
+                                    .,
+                                    'number',
+                                    'descending'
+                                )"/>
+
+                        <xf:select1 appearance="minimal" ref="$parameters/form-version[count($versions) gt 1]" class="fr-summary-form-version">
+                            <xf:label ref="$fr-resources/import/form-version/label" class="xforms-hidden"/>
+                            <xf:itemset ref="$versions">
+                                <xf:label ref="xxf:format-message($fr-resources/summary/messages/version, xs:integer(.))"/>
+                                <xf:value ref="."/>
+                            </xf:itemset>
+                            <xf:action event="xforms-value-changed">
+
+                                <xf:send submission="fr-get-source-form-submission">
+                                    <xf:property name="form-definition-version" value="fr:form-version()"/>
+                                </xf:send>
+
+                                <xf:send submission="fr-summary-search-submission"/>
+
+                            </xf:action>
+                        </xf:select1>
 
                         <xf:switch id="search-switch">
                             <!-- Free-text search -->
@@ -912,7 +1012,7 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="search-submission"/>
+                                    <xf:send submission="fr-summary-search-submission"/>
                                 </xf:action>
                             </xf:trigger>
                         </li>
@@ -924,7 +1024,7 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="search-submission"/>
+                                    <xf:send submission="fr-summary-search-submission"/>
                                 </xf:action>
                             </xf:trigger>
                         </li>
@@ -951,7 +1051,7 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="search-submission"/>
+                                    <xf:send submission="fr-summary-search-submission"/>
                                 </xf:action>
                             </xf:trigger>
                         </li>
@@ -963,7 +1063,7 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="search-submission"/>
+                                    <xf:send submission="fr-summary-search-submission"/>
                                 </xf:action>
                             </xf:trigger>
                         </li>

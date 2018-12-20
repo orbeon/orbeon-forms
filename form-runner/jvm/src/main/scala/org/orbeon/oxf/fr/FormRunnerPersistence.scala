@@ -52,8 +52,12 @@ object FormOrData extends Enum[FormOrData] {
 
 object FormRunnerPersistenceJava {
   //@XPathFunction
-  def providerDataFormatVersion(app: String, form: String) =
+  def providerDataFormatVersion(app: String, form: String): String =
     FormRunnerPersistence.providerDataFormatVersion(app, form)
+
+  //@XPathFunction
+  def findProvider(app: String, form: String, formOrData: String): Option[String] =
+    FormRunnerPersistence.findProvider(app, form, FormOrData.withName(formOrData))
 }
 
 object FormRunnerPersistence {

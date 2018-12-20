@@ -274,7 +274,15 @@
     <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='form-runner-home'/>
     <property as="xs:string"  name="oxf.fr.detail.process.summary.*.*">
         relinquish-lease
-        then navigate(uri = "/fr/{xxf:instance('fr-parameters-instance')/app}/{xxf:instance('fr-parameters-instance')/form}/summary")
+        then navigate(
+            uri = "/fr/{
+                fr:app-name()
+            }/{
+                fr:form-name()
+            }/summary?form-version={
+                fr:form-version()
+            }"
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URLDecoder.{decode ⇒ decodeURL}
-import java.net.URLEncoder.{encode ⇒ encodeURL}
-
-import org.orbeon.io.CharsetNames
-
 
 object PathUtils {
+
+  trait UrlEncoderDecoder {
+    def encode(s: String): String
+    def decode(s: String): String
+  }
 
   implicit class PathOps(val s: String) extends AnyVal {
     def dropTrailingSlash = if (s.isEmpty || s.last != '/')  s else s.init
@@ -37,7 +37,7 @@ object PathUtils {
       (url.substring(0, index), Some(url.substring(index + 1)))
   }
 
-  def splitQueryDecodeParams(url: String): (String, List[(String, String)]) = {
+  def splitQueryDecodeParams(url: String)(implicit ed: UrlEncoderDecoder): (String, List[(String, String)]) = {
     val index = url.indexOf('?')
     if (index == -1)
       (url, Nil)
@@ -46,12 +46,12 @@ object PathUtils {
   }
 
   // Recombine a path/query and parameters into a resulting URL
-  def recombineQuery(pathQuery: String, params: TraversableOnce[(String, String)]): String =
+  def recombineQuery(pathQuery: String, params: TraversableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
     pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
   // Decode a query string into a list of pairs
   // We assume that there are no spaces in the input query
-  def decodeSimpleQuery(query: String): List[(String, String)] =
+  def decodeSimpleQuery(query: String)(implicit ed: UrlEncoderDecoder): List[(String, String)] =
     for {
       nameValue      ← query.split('&').toList
       if nameValue.nonEmpty
@@ -59,21 +59,21 @@ object PathUtils {
       if nameValueArray.size >= 1
       encodedName    = nameValueArray(0)
       if encodedName.nonEmpty
-      decodedName    = decodeURL(encodedName, CharsetNames.Utf8)
-      decodedValue   = decodeURL(nameValueArray.lift(1) getOrElse "", CharsetNames.Utf8)
+      decodedName    = ed.decode(encodedName)
+      decodedValue   = ed.decode(nameValueArray.lift(1) getOrElse "")
     } yield
       decodedName → decodedValue
 
   // Get the first query parameter value for the given name
-  def getFirstQueryParameter(url: String, name: String): Option[String] = {
+  def getFirstQueryParameter(url: String, name: String)(implicit ed: UrlEncoderDecoder): Option[String] = {
     val (_, params) = splitQueryDecodeParams(url)
 
     params collectFirst { case (`name`, v) ⇒ v }
   }
 
   // Encode a sequence of pairs to a query string
-  def encodeSimpleQuery(parameters: TraversableOnce[(String, String)]): String =
-    parameters map { case (name, value) ⇒ encodeURL(name, CharsetNames.Utf8) + '=' + encodeURL(value, CharsetNames.Utf8) } mkString "&"
+  def encodeSimpleQuery(parameters: TraversableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
+    parameters map { case (name, value) ⇒ ed.encode(name) + '=' + ed.encode(value) } mkString "&"
 
   // Find a path extension
   def findExtension(path: String): Option[String] =

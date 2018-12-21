@@ -155,7 +155,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
             control.dispatchChangeEvents()
           } else if (isInitial) {
             // Initialization and control is non-relevant
-            Dispatch.dispatchEvent(new XXFormsInitiallyDisabledEvent(control))
+            // 2018-12-20: Since we don't actually have a need for this, we are not dispatching this
+            // event at this time. If the need arises we can uncomment the code below. See #3829.
+            //Dispatch.dispatchEvent(new XXFormsInitiallyDisabledEvent(control))
           }
         }
 

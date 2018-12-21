@@ -178,9 +178,9 @@
             </titles>
             <search>
                 <search>Search</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Search forms</search-forms>
-                <show-options>Show search options</show-options>
-                <close-options>Close search options</close-options>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Search Forms</search-forms>
+                <show-options>Show Search Options</show-options>
+                <close-options>Hide Search Options</close-options>
             </search>
             <paging>
                 <to>to</to>
@@ -644,7 +644,7 @@
             </titles>
             <search>
                 <search>Recherche</search>
-                <search-forms>Rechercher</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Rechercher</search-forms>
                 <show-options>Montrer les options de recherche</show-options>
                 <close-options>Cacher les options de recherche</close-options>
             </search>
@@ -1556,7 +1556,7 @@
             </titles>
             <search>
                 <search>Søk</search>
-                <search-forms>Søk etter skjema</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Søk etter skjema</search-forms>
                 <show-options>Vis alternativer for søk</show-options>
                 <close-options>Lukk alternativer for søk</close-options>
             </search>
@@ -2007,7 +2007,7 @@
             </titles>
             <search>
                 <search>Поиск</search>
-                <search-forms>Поиск формы</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Поиск формы</search-forms>
                 <show-options>Показать настройки поиска</show-options>
                 <close-options>Закрыть настройки поиска</close-options>
             </search>
@@ -3389,7 +3389,7 @@
             </titles>
             <search>
                 <search>Etsi</search>
-                <search-forms>Etsi lomakkeita</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Etsi lomakkeita</search-forms>
                 <show-options>Näytä hakuvaihtoehdot</show-options>
                 <close-options>Sulje hakuvaihtoehdot</close-options>
             </search>
@@ -3852,7 +3852,7 @@
             </titles>
             <search>
                 <search>Sök</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Sök formulär</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Sök formulär</search-forms>
                 <show-options>Visa sökalternativ</show-options>
                 <close-options>Dölj sökalternativ</close-options>
             </search>
@@ -4315,7 +4315,7 @@
             </titles>
             <search>
                 <search>Zoeken</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Forms zoeken</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Forms zoeken</search-forms>
                 <show-options>Zoekopties tonen</show-options>
                 <close-options>Zoektopties sluiten</close-options>
             </search>
@@ -4777,7 +4777,7 @@
             </titles>
             <search>
                 <search>Procurar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Procurar formulários</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Procurar formulários</search-forms>
                 <show-options>Mostrar opções de procura</show-options>
                 <close-options>Fechar opções de procura</close-options>
             </search>

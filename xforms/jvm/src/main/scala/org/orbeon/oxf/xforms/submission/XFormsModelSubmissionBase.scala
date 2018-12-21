@@ -35,6 +35,7 @@ import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.breakOut
 
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait
@@ -429,15 +430,14 @@ object XFormsModelSubmissionBase {
 
     def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node ⇒ Boolean): Unit = {
 
-      def processElement(e: Element): Iterator[Node] =
+      def processElement(e: Element): List[Node] =
         if (isLocallyNonRelevant(e)) {
-          Iterator(e)
+          List(e)
         } else {
-          (e.attributeIterator.asScala filter isLocallyNonRelevant) ++
-            (e.elementIterator.asScala flatMap processElement)
+          e.attributes.asScala.filter(isLocallyNonRelevant) ++:
+            (e.elements.asScala.flatMap(processElement)(breakOut): List[Node])
         }
 
-      // NOTE: Using `Iterator` should work, as `elementIterator` makes a copy of the content before iterating.
       processElement(doc.getRootElement) foreach (_.detach())
     }
 

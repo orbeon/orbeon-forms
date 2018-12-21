@@ -10,6 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
@@ -22,14 +23,18 @@
 
         .fr-repeater-repeat-iteration {
             display: flex;
-            border-bottom: 5px solid #dddddd;
-            margin-bottom: 5px; // https://github.com/orbeon/orbeon-forms/issues/3745
+            border-bottom: 3px solid #ddd;
+            margin-bottom: 0; // https://github.com/orbeon/orbeon-forms/issues/3745
         }
 
         .fr-repeat-menu {
             width: 22px;
             padding: 2px 2px 0 2px;
-            background-color: #ddd;
+
+            background-color: @wellBackground;
+            border: 1px solid darken(@wellBackground, 7%);
+            border-top: none;
+            border-bottom: none;
         }
 
         .fr-repeat-content {
@@ -68,9 +73,9 @@
         .fr-repeater-top-buttons {
 
             display: block;
-            margin-bottom: 4px; // looks nicer in Form Builder
+            margin-bottom: 0;
             padding-bottom: 4px;
-            border-bottom: 4px solid #ddd;
+            border-bottom: 3px solid #ddd;
 
             .xforms-trigger button {
                 padding: 2px 4px 0px; // try to make it visually balanced

@@ -1877,6 +1877,7 @@
                 <alert>Incorrect value</alert>
                 <hint>Non-negative number or XPath expression</hint>
             </freeze>
+            <no-freeze>Ne pas geler</no-freeze>
             <apply-defaults>
                 <label>Applique les valeurs initiales pour les nouvelles itérations</label>
             </apply-defaults>
@@ -3042,6 +3043,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -4233,6 +4235,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -5425,6 +5428,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -6609,6 +6613,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label>Formeln für Initialwerte berechnen, wenn Iterationen hinzugefügt werden</label>
             </apply-defaults>
@@ -7796,6 +7801,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -8980,6 +8986,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label>Aplicar Formulas de cálculo inicial cuando se agregan iteraciones.</label>
             </apply-defaults>
@@ -10165,6 +10172,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label>Pas initiële waarde formules toe bij toevoegen van iteraties</label>
             </apply-defaults>
@@ -11329,6 +11337,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label todo="true">[Apply initial value formulas when adding iterations]</label>
             </apply-defaults>
@@ -12520,6 +12529,7 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Non-negative number or XPath expression]</hint>
             </freeze>
+            <no-freeze todo="true">[No freeze]</no-freeze>
             <apply-defaults>
                 <label>Tillämpa startvärdesformlerna när upprepning läggs till</label>
             </apply-defaults>

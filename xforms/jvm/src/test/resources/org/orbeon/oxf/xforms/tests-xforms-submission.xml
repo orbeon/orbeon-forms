@@ -2111,5 +2111,58 @@ az4K</document>
         </output>
     </test>
 
+    <test description="#3860/#3829: prune non-relevant nodes" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <search>
+                                <query search-field="true" summary-field="false" match="substring" html-label="false"/>
+                            </search>
+                        </xf:instance>
+
+                        <xf:bind ref="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
+
+                        <xf:instance id="result-instance"><dummy/></xf:instance>
+
+                        <xf:submission
+                            id="submission"
+                            ref="instance()"
+                            validate="false"
+                            method="post"
+                            resource="echo:"
+                            replace="instance"
+                            instance="result-instance"/>
+
+                        <xf:send event="xforms-model-construct-done" submission="submission"/>
+
+                        <xf:message event="xforms-submit-error">error</xf:message>
+                        <xf:message event="xforms-submit-done">done</xf:message>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="result-instance" model-id="model">
+                                <search>
+                                    <query search-field="true" match="substring" html-label="false"/>
+                                </search>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">done</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

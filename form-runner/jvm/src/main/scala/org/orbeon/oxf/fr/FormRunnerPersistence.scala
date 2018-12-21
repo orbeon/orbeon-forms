@@ -17,6 +17,7 @@ import java.io.File
 import java.net.URI
 import java.{util ⇒ ju}
 
+import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
@@ -40,14 +41,14 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-sealed abstract class FormOrData(override val entryName: String) extends EnumEntry
+sealed abstract class FormOrData extends EnumEntry with Lowercase
 
 object FormOrData extends Enum[FormOrData] {
 
   val values = findValues
 
-  case object Form extends FormOrData("form")
-  case object Data extends FormOrData("data")
+  case object Form extends FormOrData
+  case object Data extends FormOrData
 }
 
 object FormRunnerPersistenceJava {

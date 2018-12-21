@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 2018.1.3 November 2018
+Last updated for Orbeon Forms 2018.2 December 2018
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -20,6 +20,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2018.2](https://blog.orbeon.com/2018/12/orbeon-forms-20182.html)
 - [Orbeon Forms 2018.1.3](https://blog.orbeon.com/2018/11/orbeon-forms-201813-pe.html)
 - [Orbeon Forms 2018.1.2](https://blog.orbeon.com/2018/10/orbeon-forms-201812-pe.html)
 - [Orbeon Forms 2018.1.1](https://blog.orbeon.com/2018/09/orbeon-forms-201811-pe-and-ce.html)

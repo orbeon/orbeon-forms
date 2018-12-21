@@ -550,6 +550,11 @@
 
                                 <xf:send submission="fr-summary-search-submission"/>
 
+                                <xf:action type="javascript">
+                                    <xf:param name="version" value="fr:form-version()"/>
+                                    <xf:body>ORBEON.fr.private.API.updateLocationFormVersion(Number(version))</xf:body>
+                                </xf:action>
+
                             </xf:action>
                         </xf:select1>
 

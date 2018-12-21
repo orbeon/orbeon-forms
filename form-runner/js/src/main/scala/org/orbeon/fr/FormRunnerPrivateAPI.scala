@@ -13,6 +13,7 @@
   */
 package org.orbeon.fr
 
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.xforms.$
 import org.scalajs.dom
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
@@ -74,5 +75,16 @@ object FormRunnerPrivateAPI {
       // `hash`: for now not used by Form Runner, but it is safer to keep it
       dom.window.history.replaceState(null, "", s"edit/$documentId${location.search}${location.hash}")
     }
+  }
+
+  def updateLocationFormVersion(version: Int): Unit = {
+
+    val location = dom.window.location
+
+    val (_, query) = PathUtils.splitQueryDecodeParams(location.search)
+
+    val newParams = ("form-version" → version.toString) :: (query filterNot (_._1 == "form-version"))
+
+    dom.window.history.replaceState(null, "", PathUtils.recombineQuery(location.pathname, newParams) + location.hash)
   }
 }

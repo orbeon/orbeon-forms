@@ -169,4 +169,63 @@
         </output>
     </test>
 
+    <test description="For #3563: fr:component-param-value() function" name="oxf:pipeline">
+        <input name="config" href="../xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model
+                        id="model"
+                        xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
+                            <xbl:template>
+                                <fr:foo id="foo-internal">
+                                    <xf:output id="my-output" value="fr:component-param-value('foo')"/>
+                                </fr:foo>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="gaga-1"/>
+                    <fr:gaga id="gaga-2" foo="This is a constant value."/>
+                    <fr:gaga id="gaga-3" foo="This {concat('i', 's')} an AVT."/>
+                    <fr:foo id="foo-1">
+                        <fr:gaga id="gaga-4" foo="This is a constant value."/>
+                        <fr:gaga id="gaga-5" foo="This {concat('i', 's')} an AVT."/>
+                    </fr:foo>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="gaga-2≡foo-internal≡my-output">
+                            <xxf:value>This is a constant value.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga-3≡foo-internal≡my-output">
+                            <xxf:value>This is an AVT.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo-1≡gaga-4≡foo-internal≡my-output">
+                            <xxf:value>This is a constant value.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo-1≡gaga-5≡foo-internal≡my-output">
+                            <xxf:value>This is an AVT.</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

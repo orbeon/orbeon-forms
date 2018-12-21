@@ -448,7 +448,9 @@
 
     <xsl:template match="fr:logo">
         <xsl:if test="not($hide-logo) and exists($default-logo-uri)">
-            <xh:img src="{$default-logo-uri}" alt=""/>
+            <xh:div>
+                <xh:img src="{$default-logo-uri}" alt=""/>
+            </xh:div>
         </xsl:if>
     </xsl:template>
 

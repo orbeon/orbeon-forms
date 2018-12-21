@@ -28,30 +28,55 @@
 
     .fr-summary-search {
 
-        .fr-search-free {
-            display: inline-block;
-            width: auto;
+        .fr-summary-search-top {
+            display: flex;
+            align-items: center;
+        }
+
+        .fr-summary-form-version, .fr-summary-search-free-input, .fr-summary-search-search-button, .fr-summary-search-show-button {
+            margin-right: 10px;
+        }
+
+        .fr-summary-search-free-input {
+            flex-grow: 1;
 
             input {
-                width: 25em;
+                width: 100%;
             }
+        }
+
+        .fr-summary-search-show-button {
+            margin-right: 0;
         }
 
         .fr-search-options {
             display: block; // so that search buttons will always be underneath
 
+            border: 1px solid #e1e1e8;
+            border-radius: 4px;
+
+            background-color: white;
+
+            padding: @spacing;
+            margin: @spacing 0;
+
+            .fr-search-options-close {
+
+            }
+
             .fr-summary-search-item {
                 display: inline-block;
                 margin-bottom: @spacing;
+
+                .xforms-label {
+                    display: table;
+                    margin-bottom: 2px;
+                }
 
                 input, select {
                     width: 12em;
                 }
             }
-        }
-
-        .fr-search-buttons {
-            display: inline-block;  // will be next to free search, but under search items
         }
     }
 
@@ -122,6 +147,4 @@
         margin-top: 7px;
         margin-bottom: 0;
     }
-
-    .xforms-readonly input { background-color: white; background-image: none; border: 0 solid white }
 }

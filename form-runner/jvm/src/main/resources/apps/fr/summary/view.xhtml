@@ -536,37 +536,74 @@
                                     'descending'
                                 )"/>
 
-                        <xf:select1 appearance="minimal" ref="$parameters/form-version[count($versions) gt 1]" class="fr-summary-form-version">
-                            <xf:label ref="$fr-resources/import/form-version/label" class="xforms-hidden"/>
-                            <xf:itemset ref="$versions">
-                                <xf:label ref="xxf:format-message($fr-resources/summary/messages/version, xs:integer(.))"/>
-                                <xf:value ref="."/>
-                            </xf:itemset>
-                            <xf:action event="xforms-value-changed">
+                        <xh:div class="fr-summary-search-top">
+                            <xf:select1
+                                appearance="minimal"
+                                ref="$parameters/form-version[count($versions) gt 1]"
+                                class="fr-summary-form-version">
+                                <xf:label ref="$fr-resources/import/form-version/label" class="xforms-hidden"/>
+                                <xf:itemset ref="$versions">
+                                    <xf:label ref="xxf:format-message($fr-resources/summary/messages/version, xs:integer(.))"/>
+                                    <xf:value ref="."/>
+                                </xf:itemset>
+                                <xf:action event="xforms-value-changed">
 
-                                <xf:send submission="fr-get-source-form-submission">
-                                    <xf:property name="form-definition-version" value="fr:form-version()"/>
-                                </xf:send>
+                                    <xf:send submission="fr-get-source-form-submission">
+                                        <xf:property name="form-definition-version" value="fr:form-version()"/>
+                                    </xf:send>
 
-                                <xf:send submission="fr-summary-search-submission"/>
+                                    <xf:send submission="fr-summary-search-submission"/>
 
-                                <xf:action type="javascript">
-                                    <xf:param name="version" value="fr:form-version()"/>
-                                    <xf:body>ORBEON.fr.private.API.updateLocationFormVersion(Number(version))</xf:body>
+                                    <xf:action type="javascript">
+                                        <xf:param name="version" value="fr:form-version()"/>
+                                        <xf:body>ORBEON.fr.private.API.updateLocationFormVersion(Number(version))</xf:body>
+                                    </xf:action>
+
                                 </xf:action>
+                            </xf:select1>
 
-                            </xf:action>
-                        </xf:select1>
+                            <xf:input
+                                id="fr-search-free-input"
+                                ref="if (case('fr-search-options-switch') = 'fr-search-free-case') then instance('fr-search-instance')/query else ''"
+                                class="fr-summary-search-free-input"/>
 
-                        <xf:switch id="search-switch">
-                            <!-- Free-text search -->
-                            <xf:case id="search-free">
-                                <xh:div class="fr-search-free">
-                                    <xf:input ref="instance('fr-search-instance')/query"/>
-                                </xh:div>
-                            </xf:case>
-                            <!-- Search options -->
-                            <xf:case id="search-options">
+                            <xf:trigger class="fr-summary-search-search-button">
+                                <xf:label mediatype="text/html" value="$fr-resources/summary/search/search-forms"/>
+                            </xf:trigger>
+
+                            <!-- Don't allow showing search options if there are no search fields specified -->
+                            <xf:trigger
+                                appearance="minimal"
+                                ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]"
+                                class="fr-summary-search-show-button">
+
+                                <!-- Switch label depending on which case is shown -->
+                                <xf:label ref="$fr-resources/summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-options else close-options)"/>
+                                <xf:action event="DOMActivate">
+                                    <!-- Clear all queries when switching -->
+                                    <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
+
+                                    <xf:toggle
+                                        case="{
+                                            if (case('fr-search-options-switch') = 'fr-search-free-case') then
+                                                'fr-search-options-case'
+                                            else
+                                                'fr-search-free-case'
+                                        }"/>
+                                    <xf:setfocus
+                                        control="{
+                                            if (case('fr-search-options-switch') = 'fr-search-free-case') then
+                                                'fr-search-free-input'
+                                            else
+                                                'fr-search-options-switch'
+                                        }"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:div>
+
+                        <xf:switch id="fr-search-options-switch">
+                            <xf:case id="fr-search-free-case"/>
+                            <xf:case id="fr-search-options-case">
                                 <xh:div class="fr-search-options">
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
@@ -689,24 +726,6 @@
                                 </xh:div>
                             </xf:case>
                         </xf:switch>
-
-                        <xh:div class="fr-search-buttons">
-                            <xf:trigger>
-                                <xf:label mediatype="text/html" value="$fr-resources/summary/search/search-forms"/>
-                            </xf:trigger>
-                            <!-- Don't allow showing search options if there are no search fields specified -->
-                            <xf:trigger appearance="minimal" ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
-                                <!-- Switch label depending on which case is shown -->
-                                <xf:label ref="$fr-resources/summary/search/(if (case('search-switch') = 'search-free') then show-options else close-options)"/>
-                                <xf:action event="DOMActivate">
-                                    <!-- Clear all queries when switching -->
-                                    <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
-                                    <!-- Switch the other case -->
-                                    <xf:toggle case="search-{if (case('search-switch') = 'search-free') then 'options' else 'free'}"/>
-                                    <xf:setfocus control="search-switch"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </xh:div>
                     </xf:group>
 
                     <xf:group ref="instance('fr-summary-instance')" xxf:update="full">

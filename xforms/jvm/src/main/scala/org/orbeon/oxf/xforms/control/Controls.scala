@@ -138,7 +138,7 @@ object Controls {
       control ⇒
         // Index the new control
         // NOTE: We used to do this after evaluating the binding. In general it shouldn't hurt to do it here.
-        // The reason to move indexing before is that
+        // 2018-12-21: The probable reason to move indexing before is so that variables can resolve controls indexed so far.
         controlIndex.indexControl(control)
 
         // Determine binding

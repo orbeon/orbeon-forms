@@ -346,9 +346,12 @@
 
             // But if there is a nested table, show those in the label in the column header of that table
             .fr-grid-head .fr-grid-th {
-                .xforms-label { display: block }                                    // Label in repeat table header is block so yellow background in FB takes the whole width
-                .xforms-help { margin-top: @frGridCellPadding }
-
+                .xforms-label {
+                    display: block; // label in repeat table header is block so yellow background in FB takes the whole width
+                }
+                .xforms-help {
+                    margin-top: 3px;
+                }
                 word-wrap: break-word;
             }
 

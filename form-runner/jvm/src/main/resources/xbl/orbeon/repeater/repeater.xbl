@@ -159,7 +159,6 @@
                                 <xf:trigger
                                     appearance="xxf:small"
                                     ref="if ($can-add) then $repeat-context else ''"
-                                    tabindex="-1"
                                     id="fr-repeater-add"
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
                                     <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/></xf:label>

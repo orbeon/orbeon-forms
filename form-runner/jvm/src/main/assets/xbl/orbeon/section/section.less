@@ -40,7 +40,7 @@
         }
 
         .fr-section-title {
-            .xforms-help {
+            .xforms-help:not(:empty) {
                 float: left;                       // Help on the same line as section title in display: block
                 margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
                 margin-right: 5px;                 // Space between help icon and section title

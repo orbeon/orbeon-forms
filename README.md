@@ -1,7 +1,10 @@
-Orbeon Forms - Open source web forms done the right way
-=======================================================
+Orbeon Forms
+============
 
-Last updated for Orbeon Forms 2018.2 December 2018
+Web Forms for the Enterprise. Done the Right Way.
+-------------------------------------------------
+
+Last updated for Orbeon Forms 2018.2 (December 2018)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -10,9 +13,8 @@ What is Orbeon Forms?
 
 Orbeon Forms is an open source, standard-based web forms solution, which includes:
 
-- Form Builder: a browser-based WYSIWYG form authoring tool
-- Form Runner: a runtime environment which facilitates the deployment and integration of large and complex forms
-- a core forms processing engine which implements the XForms specification and an XBL-inspired component model
+- __Form Builder:__ a browser-based visual form authoring tool
+- __Form Runner:__ a runtime environment which facilitates the deployment and integration of large and complex forms
 
 For more information about Orbeon Forms, please visit [orbeon.com](https://www.orbeon.com/).
 
@@ -21,14 +23,14 @@ What's new
 ----------
 
 - [Orbeon Forms 2018.2](https://blog.orbeon.com/2018/12/orbeon-forms-20182.html)
-- [Orbeon Forms 2018.1.3](https://blog.orbeon.com/2018/11/orbeon-forms-201813-pe.html)
-- [Orbeon Forms 2018.1.2](https://blog.orbeon.com/2018/10/orbeon-forms-201812-pe.html)
-- [Orbeon Forms 2018.1.1](https://blog.orbeon.com/2018/09/orbeon-forms-201811-pe-and-ce.html)
+- [Orbeon Forms 2018.1.3 PE](https://blog.orbeon.com/2018/11/orbeon-forms-201813-pe.html)
+- [Orbeon Forms 2018.1.2 PE](https://blog.orbeon.com/2018/10/orbeon-forms-201812-pe.html)
+- [Orbeon Forms 2018.1.1 PE](https://blog.orbeon.com/2018/09/orbeon-forms-201811-pe-and-ce.html)
 - [Orbeon Forms 2018.1](https://blog.orbeon.com/2018/09/orbeon-forms-20181.html)
-- [Orbeon Forms 2017.2.2](https://blog.orbeon.com/2018/05/orbeon-forms-201722-pe.html)
-- [Orbeon Forms 2017.2.1](https://blog.orbeon.com/2018/03/orbeon-forms-201721-pe.html)
+- [Orbeon Forms 2017.2.2 PE](https://blog.orbeon.com/2018/05/orbeon-forms-201722-pe.html)
+- [Orbeon Forms 2017.2.1 PE](https://blog.orbeon.com/2018/03/orbeon-forms-201721-pe.html)
 - [Orbeon Forms 2017.2](https://blog.orbeon.com/2017/12/orbeon-forms-20172.html)
-- [Orbeon Forms 2017.1.1](https://blog.orbeon.com/2017/09/orbeon-forms-201711-pe.html)
+- [Orbeon Forms 2017.1.1 PE](https://blog.orbeon.com/2017/09/orbeon-forms-201711-pe.html)
 - [Orbeon Forms 2017.1](https://blog.orbeon.com/2017/06/orbeon-forms-20171.html)
 - [Orbeon Forms 2016.3.1 PE](https://blog.orbeon.com/2017/05/orbeon-forms-201631.html)
 - [Orbeon Forms 2016.3](https://blog.orbeon.com/2016/12/orbeon-forms-20163.html)

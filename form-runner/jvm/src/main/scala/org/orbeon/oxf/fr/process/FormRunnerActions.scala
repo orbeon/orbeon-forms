@@ -322,35 +322,47 @@ trait FormRunnerActions {
         fromParam orElse fromProperty orElse fromDefault
       }
 
-      // This is used both as URL parameter and as submission parameter
-      val dataVersion =
-        findParamValue(DataFormatVersionName) map evaluateValueTemplate get
-
-      val paramsToAppend =
-        stringOptionToSet(findParamValue("parameters")).to[List]
-
-      val paramValuesToAppend = paramsToAppend collect {
-        case name @ "process"             ⇒ name → runningProcessId.get
-        case name @ "app"                 ⇒ name → app
-        case name @ "form"                ⇒ name → form
-        case name @ FormVersionParam      ⇒ name → formVersion.toString
-        case name @ "document"            ⇒ name → document.get
-        case name @ "valid"               ⇒ name → dataValid.toString
-        case name @ "language"            ⇒ name → currentLang
-        case name @ DataFormatVersionName ⇒ name → dataVersion
-      }
-
-      val propertiesAsPairs =
-        SendParameterKeys map (key ⇒ key → findParamValue(key))
-
       // Append query parameters to the URL and evaluate XVTs
-      val evaluatedPropertiesAsMap =
+      val evaluatedPropertiesAsMap = {
+
+        // This is used both as URL parameter and as submission parameter
+        val dataVersion =
+          findParamValue(DataFormatVersionName) map evaluateValueTemplate get
+
+        def paramsToAppend(paramNames: Set[String]): List[(String, String)] =
+          paramNames.to[List] collect {
+            case name @ "process"             ⇒ name → runningProcessId.get
+            case name @ "app"                 ⇒ name → app
+            case name @ "form"                ⇒ name → form
+            case name @ FormVersionParam      ⇒ name → formVersion.toString
+            case name @ "document"            ⇒ name → document.get
+            case name @ "valid"               ⇒ name → dataValid.toString
+            case name @ "language"            ⇒ name → currentLang
+            case name @ DataFormatVersionName ⇒ name → dataVersion
+          }
+
+        def updateUriWithParams(uri: String) = {
+
+          val (path, params) = splitQueryDecodeParams(uri)
+
+          val requestedParamNames = stringOptionToSet(findParamValue("parameters"))
+          val incomingParamNames  = (params map (_._1)).to[Set]
+
+          // Give priority to parameters on the URI, see:
+          // https://github.com/orbeon/orbeon-forms/issues/3861
+          recombineQuery(path, paramsToAppend(requestedParamNames -- incomingParamNames) ::: params)
+        }
+
+        val propertiesAsPairs =
+          SendParameterKeys map (key ⇒ key → findParamValue(key))
+
         propertiesAsPairs map {
-          case (n @ "uri",    s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (recombineQuery(_, paramValuesToAppend)))
+          case (n @ "uri",    s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map updateUriWithParams)
           case (n @ "method", s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (_.toLowerCase))
           case (n,            s @ Some(_)) ⇒ n → (s map evaluateValueTemplate)
           case other                       ⇒ other
         } toMap
+      }
 
       val contentToken = evaluatedPropertiesAsMap("content").get.trimAllToEmpty
 

@@ -688,7 +688,7 @@
                                                                 'default'
                                                             else if (@id = 1) then
                                                                 'enabled'
-                                                            else if (@id = 1) then
+                                                            else if (@id = 2) then
                                                                 'disabled'
                                                             else
                                                                 'error'"/>

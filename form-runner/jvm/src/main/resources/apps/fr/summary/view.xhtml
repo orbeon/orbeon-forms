@@ -552,7 +552,7 @@
                                         <xf:property name="form-definition-version" value="fr:form-version()"/>
                                     </xf:send>
 
-                                    <xf:send submission="fr-summary-search-submission"/>
+                                    <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
 
                                     <xf:action type="javascript">
                                         <xf:param name="version" value="fr:form-version()"/>

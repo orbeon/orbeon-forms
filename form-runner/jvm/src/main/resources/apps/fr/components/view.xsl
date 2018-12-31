@@ -497,7 +497,12 @@
     </xsl:template>
 
     <xsl:template match="fr:user-nav">
-        <xf:group class="fr-user-nav" ref=".[xxf:property('oxf.fr.authentication.user-menu.enable')]">
+        <xf:group
+            class="fr-user-nav"
+            ref=".[
+                xxf:property('oxf.fr.authentication.user-menu.enable') and
+                not(xxf:get-request-parameter('orbeon-embeddable') = 'true')
+            ]">
             <xh:ul class="nav pull-right">
                 <xh:li class="dropdown">
                     <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">

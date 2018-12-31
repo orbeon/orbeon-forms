@@ -40,12 +40,13 @@
         }
 
         .fr-section-title {
+
+            .help-icon();
+
             .xforms-help:not(:empty) {
                 float: left;                       // Help on the same line as section title in display: block
                 margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
                 margin-right: 5px;                 // Space between help icon and section title
-
-                .help-icon();
                 margin-bottom: -1px;               // as `.help-icon()` sets a different margin
             }
         }

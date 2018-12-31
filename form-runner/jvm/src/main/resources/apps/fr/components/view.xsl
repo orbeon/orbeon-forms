@@ -456,7 +456,7 @@
 
     <xsl:template match="fr:language-selector">
         <!-- Switch language -->
-        <xf:group xxf:element="div" model="fr-form-model" ref=".[not($fr-mode = ('view', 'pdf', 'email'))]" class="fr-language-choice">
+        <xf:group xxf:element="div" model="fr-form-model" class="fr-language-choice">
             <!-- Put default language first, then other languages -->
             <xf:var
                 name="available-languages"
@@ -471,6 +471,7 @@
                 model="fr-resources-model"
                 ref="
                     .[
+                        not(fr:is-readonly-mode())       and
                         count($available-languages) gt 1 and
                         xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
                     ]">

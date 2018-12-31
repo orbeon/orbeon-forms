@@ -640,7 +640,7 @@
 
             _self.ctx.clearRect(0, 0, _self.canvas.width, _self.canvas.height);
 
-            $(myImage).load(function () {
+            $(myImage).on("load", function () {
                 _self.ctx.drawImage(myImage, 0, 0, _self.canvas.width, _self.canvas.height);
                 if (addUndo) {
                     _self.addUndo();
@@ -656,7 +656,7 @@
 
             _self.ctxBg.clearRect(0, 0, _self.canvasBg.width, _self.canvasBg.height);
 
-            $(myImage).load(function () {
+            $(myImage).on("load", function () {
                 _self.ctxBg.drawImage(myImage, 0, 0, _self.canvasBg.width, _self.canvasBg.height);
             });
         },

@@ -488,9 +488,7 @@
     <!-- Dialog to tell the user that the feature is PE-only -->
     <fr:alert-dialog id="fb-pe-dialog">
         <fr:label ref="$form-resources/dialog-pe/label"/>
-        <fr:message>
-            <xf:output value="xxf:serialize($form-resources/dialog-pe/message/*[1], 'html')" mediatype="text/html"/>
-        </fr:message>
+        <fr:message value="xxf:serialize($form-resources/dialog-pe/message/*[1], 'html')" mediatype="text/html"/>
         <fr:neutral-choice/>
     </fr:alert-dialog>
 

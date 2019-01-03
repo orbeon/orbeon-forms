@@ -13,12 +13,17 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals}
+import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals, Properties}
 import org.scalajs.dom
+import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 
+import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import scala.scalajs.js.{URIUtils, |}
@@ -219,4 +224,104 @@ object DocumentAPI {
       Globals.formClientState(formId).value = stateString
     }
   }
+
+  def initialize(formElement: html.Form): Unit = {
+
+    val formID = formElement.id
+
+    formElement.elements.iterator collect { case e: html.Input ⇒ e } foreach {
+      case e if e.name == "$uuid"           ⇒ Globals.formUUID        (formID) = e
+      case e if e.name == "$static-state"   ⇒ Globals.formStaticState (formID) = e
+      case e if e.name == "$dynamic-state"  ⇒ Globals.formDynamicState(formID) = e
+      case e if e.name == "$server-events"  ⇒ Globals.formServerEvents(formID) = e
+      case e if e.name == "$client-state"   ⇒
+        Globals.formClientState(formID) = e
+        if (e.value.isBlank) {
+          // If the client state is empty, store the initial dynamic state (old system) or UUID (new system).
+          // If it is not empty, this means that we already have an initial state stored there, and that this
+          // function runs because the user reloaded or navigated back to this page.
+          storeInClientState(formID, "initial-dynamic-state",  Globals.formDynamicState(formID).value)
+          storeInClientState(formID, "uuid", Globals.formUUID(formID).value)
+        } else {
+          // The user reloaded or navigated back to this page. Reset the value of the $uuid field to
+          // the value found in the client state, because the browser sometimes restores the value of
+          // hidden fields in an erratic way, for example from the value the hidden field had from
+          // the same URL loaded in another tab (e.g. Chrome, Firefox).
+          Globals.formUUID(formID).value = getFromClientState(formID, "uuid")
+        }
+
+      case e if e.name == "$repeat-tree"    ⇒ processRepeatHierarchy(e.value)
+      case e if e.name == "$repeat-indexes" ⇒ processRepeatIndexes(e.value)
+
+      case _ ⇒ // NOP
+    }
+
+    // Ask server to resend events if this is not the first time load is called
+    if (getFromClientState(formID, "load-did-run") eq null) {
+        storeInClientState(formID, "load-did-run", "true")
+        storeInClientState(formID, "sequence", "1")
+    } else {
+        if (Properties.revisitHandling.get() == "reload") {
+            Globals.isReloading = true
+            g.window.location.reload(true)
+            //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
+        } else {
+            AjaxServer.fireEvents(
+              events      = js.Array(new AjaxServer.Event(formElement, null, null, "xxforms-all-events-required")),
+              incremental = false
+            )
+        }
+    }
+  }
+
+  def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
+    for {
+      repeatIndexes ← repeatIndexesString.splitTo[List](",")
+      repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
+    } yield
+      repeatInfos.head → repeatInfos.last
+
+  def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
+    for {
+     repeatTree  ← repeatTreeString.splitTo[List](",")
+     repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
+     if repeatInfos.size > 1
+   } yield
+     repeatInfos.head → repeatInfos.last
+
+  def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
+
+    val parentToChildren = m.Map[String, js.Array[String]]()
+
+     childToParentMap foreach { case (child, parent) ⇒
+       Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+         parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
+       }
+     }
+
+    parentToChildren
+  }
+
+  def processRepeatIndexes(repeatIndexesString: String): Unit = {
+    Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
+  }
+
+  // NOTE: Also called from AjaxServer.js
+  def processRepeatHierarchy(repeatTreeString: String): Unit = {
+
+     val childToParent    = parseRepeatTree(repeatTreeString)
+     val childToParentMap = childToParent.toMap
+
+     Globals.repeatTreeChildToParent = childToParentMap.toJSDictionary
+
+     val parentToChildren = m.Map[String, js.Array[String]]()
+
+     childToParentMap foreach { case (child, parent) ⇒
+       Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+         parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
+       }
+     }
+
+     Globals.repeatTreeParentToAllChildren = createParentToChildrenMap(childToParentMap).toJSDictionary
+   }
 }

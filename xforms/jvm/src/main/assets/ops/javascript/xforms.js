@@ -3453,33 +3453,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
                 changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
                 topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
-                        ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered,
-
-                // Parse and store initial repeat hierarchy
-                processRepeatHierarchy: function (repeatTreeString) {
-
-                    ORBEON.xforms.Globals.repeatTreeChildToParent = {};
-                    ORBEON.xforms.Globals.repeatTreeParentToAllChildren = {};
-
-                    var repeatTree = repeatTreeString.split(",");
-                    for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
-                        var repeatInfo = repeatTree[repeatIndex].split(" ");
-                        var id = repeatInfo[0];
-                        if (repeatInfo.length > 1) {
-                            var parent = repeatInfo[repeatInfo.length - 1];
-                            ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
-                        }
-                    }
-                    for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
-                        var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
-                        while (parent != null) {
-                            if (! ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent])
-                                ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = [];
-                            ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent].push(child);
-                            parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-                        }
-                    }
-                }
+                        ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
             });
 
             // Add yui-skin-sam class on body, if not already there.
@@ -3568,71 +3542,8 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                     }
                 });
 
-                var elements = formElement.elements;
-                var xformsRepeatTree;
-                var xformsRepeatIndices;
-                for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-                    var element = elements[elementIndex];
-                    if (element.name.indexOf("$uuid") != -1) {
-                        ORBEON.xforms.Globals.formUUID[formID] = element;
-                    } else if (element.name.indexOf("$static-state") != -1) {
-                        ORBEON.xforms.Globals.formStaticState[formID] = element;
-                    } else if (element.name.indexOf("$dynamic-state") != -1) {
-                        ORBEON.xforms.Globals.formDynamicState[formID] = element;
-                    } else if (element.name.indexOf("$server-events") != -1) {
-                        ORBEON.xforms.Globals.formServerEvents[formID] = element;
-                    } else if (element.name.indexOf("$client-state") != -1) {
-                        ORBEON.xforms.Globals.formClientState[formID] = element;
-                        if (element.value == "") {
-                            // If the client state is empty, store the initial dynamic state (old system) or UUID (new system).
-                            // If it is not empty, this means that we already have an initial state stored there, and that this
-                            // function runs because the user reloaded or navigated back to this page.
-                            ORBEON.xforms.Document.storeInClientState(formID, "initial-dynamic-state",
-                                    ORBEON.xforms.Globals.formDynamicState[formID].value);
-                            ORBEON.xforms.Document.storeInClientState(formID, "uuid",
-                                    ORBEON.xforms.Globals.formUUID[formID].value);
-                        } else {
-                            // The user reloaded or navigated back to this page. Reset the value of the $uuid field to
-                            // the value found in the client state, because the browser sometimes restores the value of
-                            // hidden fields in an erratic way, for example from the value the hidden field had from
-                            // the same URL loaded in another tab (e.g. Chrome, Firefox).
-                            ORBEON.xforms.Globals.formUUID[formID].value = ORBEON.xforms.Document.getFromClientState(formID, "uuid");
-                        }
-                    } else if (element.name.indexOf("$repeat-tree") != -1) {
-                        xformsRepeatTree = element;
-                    } else if (element.name.indexOf("$repeat-indexes") != -1) {
-                        xformsRepeatIndices = element;
-                        // This is the last input field we are interested in
-                        break;
-                    }
-                }
-
-                ORBEON.xforms.Globals.processRepeatHierarchy(xformsRepeatTree.value);
-
-                // Parse and store initial repeat indexes
-                var repeatIndexesString = xformsRepeatIndices.value;
-                var repeatIndexes = repeatIndexesString.split(",");
-                for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
-                    var repeatInfo = repeatIndexes[repeatIndex].split(" ");
-                    var id = repeatInfo[0];
-                    var index = repeatInfo[repeatInfo.length - 1];
-                    ORBEON.xforms.Globals.repeatIndexes[id] = index;
-                }
-
-                // Ask server to resend events if this is not the first time load is called
-                if (ORBEON.xforms.Document.getFromClientState(formID, "load-did-run") == null) {
-                    ORBEON.xforms.Document.storeInClientState(formID, "load-did-run", "true");
-                    ORBEON.xforms.Document.storeInClientState(formID, "sequence", "1");
-                } else {
-                    if (ORBEON.util.Properties.revisitHandling.get() == "reload") {
-                        ORBEON.xforms.Globals.isReloading = true;
-                        window.location.reload(true);
-                        //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
-                    } else {
-                        var event = new ORBEON.xforms.server.AjaxServer.Event(formElement, null, null, "xxforms-all-events-required");
-                        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-                    }
-                }
+                // Implemented in Scala.js
+                ORBEON.xforms.Document.initialize(formElement);
 
                 // Initialize controls, listeners, server-events
                 if (! (window.orbeonInitData === undefined)) {

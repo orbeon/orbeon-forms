@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import java.{util ⇒ ju}
+
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -110,9 +113,10 @@ trait PartControlsAnalysis extends TransientState {
     controlTypes.get(controlName).toList flatMap (_.values)
 
   // Repeats
-  def repeats = controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Seq.empty
+  def repeats: Iterable[RepeatControl] =
+    controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Nil
 
-  def getRepeatHierarchyString(ns: String) =
+  def getRepeatHierarchyString(ns: String): String =
     controlTypes.get("repeat") map { repeats ⇒
       val repeatsWithAncestors =
         for {
@@ -128,9 +132,9 @@ trait PartControlsAnalysis extends TransientState {
       repeatsWithAncestors mkString ","
     } getOrElse ""
 
-  def getTopLevelControls = Seq(controlTypes("root").values.head)
+  def getTopLevelControls: List[ElementAnalysis] = List(controlTypes("root").values.head)
 
-  def getTopLevelControlElements =
+  def getTopLevelControlElements: ju.List[Element] =
     Seq(controlTypes("root").values.head.element) ++
       (xblBindings.allGlobals map (_.compactShadowTree.getRootElement)) asJava
 

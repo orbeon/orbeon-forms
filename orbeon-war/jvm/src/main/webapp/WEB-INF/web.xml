@@ -337,7 +337,8 @@
         <res-auth>Container</res-auth>
     </resource-ref>-->
     <!-- End relational persistence, and change oracle if necessary -->
-    <!-- Uncomment this for the Form Runner authentication -->
+    <!-- Form Runner authentication -->
+    <!-- Require the security role on /fr/auth by default. To protect everything this must be changed. -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Form Runner</web-resource-name>
@@ -347,6 +348,7 @@
             <role-name>orbeon-user</role-name>
         </auth-constraint>
     </security-constraint>
+    <!-- The following pages and services are allowed without constraints by default -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Form Runner services and public pages and resources</web-resource-name>
@@ -358,6 +360,28 @@
             <url-pattern>/fr/login-error</url-pattern>
         </web-resource-collection>
     </security-constraint>
+    <!-- This will cause redirect from HTTP to HTTPS but not for eXist -->
+    <!--
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Entire Application</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>eXist</web-resource-name>
+            <url-pattern>/exist/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    -->
+    <!-- Use the form-based method by default -->
     <login-config>
         <auth-method>FORM</auth-method>
         <form-login-config>
@@ -365,10 +389,10 @@
             <form-error-page>/fr/login-error</form-error-page>
         </form-login-config>
     </login-config>
+    <!-- Default security role, which can be changed as needed -->
     <security-role>
         <role-name>orbeon-user</role-name>
     </security-role>
-    <!-- End Form Runner authentication -->
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>

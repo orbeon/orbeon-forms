@@ -3077,7 +3077,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         },
 
         errorReloadClicked: function (event, errorPanel) {
-            ORBEON.xforms.Globals.isReloading = true;
             window.location.reload(true);// force reload
             //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
         },
@@ -3441,7 +3440,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
                 lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
                 sliderYui: {},                       // Maps slider id to the YUI object for that slider
-                isReloading: false,                  // Whether the form is being reloaded from the server
                 lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
                 // Data relative to a form is stored in an array indexed by form id.
                 formErrorPanel: {},                  // YUI panel used to report errors

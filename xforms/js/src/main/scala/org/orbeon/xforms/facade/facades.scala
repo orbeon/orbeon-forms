@@ -128,7 +128,6 @@ object Globals extends js.Object {
 
   val xformsServerUploadURL         : js.Dictionary[String]           = js.native
   var loadingOtherPage              : Boolean                         = js.native
-  var isReloading                   : Boolean                         = js.native
   val ns                            : js.Dictionary[String]           = js.native
   val eventQueue                    : js.Array[js.Any]                = js.native
   val requestInProgress             : Boolean                         = js.native

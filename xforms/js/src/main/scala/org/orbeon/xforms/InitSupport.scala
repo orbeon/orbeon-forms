@@ -73,7 +73,6 @@ object InitSupport {
         StateHandling.log("state found with `revisitHandling` set to `reload`, reloading page")
 
         StateHandling.clearClientState(formId)
-        Globals.isReloading = true
         dom.window.location.reload(flag = true)
 
       case Some(state) ⇒

@@ -31,6 +31,7 @@ object FormBuilderApp extends App {
     ControlEditor
     ControlLabelHintTextEditor
     GridWallDnD
+    FormBuilderPrivateAPI
     BrowserCheck.checkSupportedBrowser()
   }
 }

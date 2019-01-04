@@ -249,7 +249,7 @@
                                                         name="effectiveId"
                                                         value="$effective-id"/>
                                                     <xf:body>
-                                                        ORBEON.Builder.controlAdded.fire(effectiveId);
+                                                        ORBEON.builder.controlAdded.fire(effectiveId);
                                                     </xf:body>
                                                 </xf:action>
                                             </xf:action>

@@ -32,7 +32,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 
 object ControlLabelHintTextEditor {
 
-  @JSExportTopLevel("ORBEON.Builder.controlAdded")
+  @JSExportTopLevel("ORBEON.builder.controlAdded")
   val controlAdded: JQueryCallback = $.Callbacks()
 
   locally {

@@ -3542,7 +3542,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 });
 
                 // Implemented in Scala.js
-                ORBEON.xforms.Document.initialize(formElement);
+                ORBEON.xforms.InitSupport.initialize(formElement);
 
                 // Initialize controls, listeners, server-events
                 if (! (window.orbeonInitData === undefined)) {

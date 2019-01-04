@@ -379,7 +379,7 @@
                         // Add form UUID
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxf:uuid>');
-                        requestDocumentString.push(ORBEON.xforms.Document.getFormUuid(formID));
+                        requestDocumentString.push(ORBEON.xforms.StateHandling.getFormUuid(formID));
                         requestDocumentString.push('</xxf:uuid>\n');
 
                         // Increment and send sequence number if we have at least one event which is not a request for upload progress or session heartbeat
@@ -389,7 +389,7 @@
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxf:sequence>');
                         if (requestWithSequenceNumber) {
-                            var currentSequenceNumber = ORBEON.xforms.Document.getSequence(formID);
+                            var currentSequenceNumber = ORBEON.xforms.StateHandling.getSequence(formID);
                             requestDocumentString.push(currentSequenceNumber);
                             AjaxServer.ajaxResponseReceived.add(function incrementSequenceNumber() {
                                 // Increment sequence number, now that we know the server processed our request
@@ -398,7 +398,7 @@
                                 //      response is processed, we incur the risk of incrementing the counter while the response is
                                 //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
                                 var newSeq = parseInt(currentSequenceNumber) + 1;
-                                ORBEON.xforms.Document.updateSequence(formID, newSeq);
+                                ORBEON.xforms.StateHandling.updateSequence(formID, newSeq);
                                 AjaxServer.ajaxResponseReceived.remove(incrementSequenceNumber);
                             })
                         }
@@ -1797,7 +1797,7 @@
 
                                 // Update repeat hierarchy
                                 case "repeat-hierarchy": {
-                                    ORBEON.xforms.Globals.processRepeatHierarchy(ORBEON.util.Dom.getStringValue(childNode));
+                                    ORBEON.xforms.InitSupport.processRepeatHierarchy(ORBEON.util.Dom.getStringValue(childNode));
                                     break;
                                 }
 

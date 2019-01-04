@@ -14,30 +14,17 @@
 package org.orbeon.xforms
 
 import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals}
 import org.scalajs.dom
-import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 
-import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-import scala.scalajs.js.{Dictionary, |}
+import scala.scalajs.js.|
 
 @JSExportTopLevel("ORBEON.xforms.Document")
 @JSExportAll
 object DocumentAPI {
-
-  case class ClientState(
-    uuid     : String,
-    sequence : Int
-  )
 
   import Private._
 
@@ -156,164 +143,7 @@ object DocumentAPI {
   // Return the current index of the repeat (equivalent to `index($repeatId)`)
   def getRepeatIndex(repeatId: String): String = Globals.repeatIndexes(repeatId)
 
-  def getFormUuid(formId: String): String =
-    getClientStateOrThrow(formId).uuid
-
-  def getSequence(formId: String): String =
-    getClientStateOrThrow(formId).sequence.toString
-
-  def updateSequence(formId: String, newSequence: Int): Unit =
-    updateClientState(
-      formId      = formId,
-      clientState = getClientStateOrThrow(formId).copy(sequence = newSequence)
-    )
-
-  def initialize(formElement: html.Form): Unit = {
-
-    val formId = formElement.id
-
-    formElement.elements.iterator collect { case e: html.Input ⇒ e } foreach {
-      case e if e.name == "$uuid"           ⇒ Globals.formUUID        (formId) = e
-      case e if e.name == "$server-events"  ⇒ Globals.formServerEvents(formId) = e
-      case e if e.name == "$repeat-tree"    ⇒ processRepeatHierarchy(e.value)
-      case e if e.name == "$repeat-indexes" ⇒ processRepeatIndexes(e.value)
-      case _ ⇒ // NOP
-    }
-
-    findClientState(formId) match {
-      case None ⇒
-        // Initial state
-        updateClientState(
-          formId,
-          ClientState(
-            uuid     = Globals.formUUID(formId).value,
-            sequence = 1
-          )
-        )
-      case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
-        // The user reloaded or navigated back to this page and we must reload the page
-
-        clearClientState(formId)
-        Globals.isReloading = true
-        dom.window.location.reload(flag = true)
-        // NOTE: You would think that if reload is canceled, you would reset this to false, but
-        // somehow this fails with IE.
-      case Some(state) ⇒
-        // The user reloaded or navigated back to this page and we must restore state
-
-        // Old comment: Reset the value of the `$uuid` field to the value found in the client state,
-        // because the browser sometimes restores the value of hidden fields in an erratic way, for
-        // example from the value the hidden field had from the same URL loaded in another tab (e.g.
-        // Chrome, Firefox).
-        Globals.formUUID(formId).value = state.uuid
-
-        AjaxServer.fireEvents(
-          events      = js.Array(new AjaxServer.Event(formElement, null, null, "xxforms-all-events-required")),
-          incremental = false
-        )
-    }
-  }
-
-  def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
-    for {
-      repeatIndexes ← repeatIndexesString.splitTo[List](",")
-      repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
-    } yield
-      repeatInfos.head → repeatInfos.last
-
-  def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
-    for {
-     repeatTree  ← repeatTreeString.splitTo[List](",")
-     repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
-     if repeatInfos.size > 1
-   } yield
-     repeatInfos.head → repeatInfos.last
-
-  private def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
-
-    val parentToChildren = m.Map[String, js.Array[String]]()
-
-     childToParentMap foreach { case (child, parent) ⇒
-       Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-         parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-       }
-     }
-
-    parentToChildren
-  }
-
-  private def processRepeatIndexes(repeatIndexesString: String): Unit = {
-    Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
-  }
-
-  // NOTE: Also called from AjaxServer.js
-  def processRepeatHierarchy(repeatTreeString: String): Unit = {
-
-    val childToParent    = parseRepeatTree(repeatTreeString)
-    val childToParentMap = childToParent.toMap
-
-    Globals.repeatTreeChildToParent = childToParentMap.toJSDictionary
-
-    val parentToChildren = m.Map[String, js.Array[String]]()
-
-    childToParentMap foreach { case (child, parent) ⇒
-      Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-        parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-      }
-    }
-
-    Globals.repeatTreeParentToAllChildren = createParentToChildrenMap(childToParentMap).toJSDictionary
-  }
-
   private object Private {
-
-    def log(s: String): Unit = ()
-//      println(s"state handling: $s")
-
-    // Assume the state is a `js.Dictionary[String]` mapping form ids to serialized state
-    private def findRawState: Option[Dictionary[String]] =
-      Option(dom.window.history.state) map
-        (_.asInstanceOf[js.Dictionary[String]])
-
-    def getClientStateOrThrow(formId: String): ClientState =
-      findClientState(formId) getOrElse (throw new IllegalStateException(s"client state not found for form `$formId`"))
-
-    def findClientState(formId: String): Option[ClientState] =
-      findRawState flatMap (_.get(formId)) flatMap { serialized ⇒
-        decode[ClientState](serialized) match {
-          case Left(_)  ⇒
-            log(s"error parsing state for form `$formId` and value `$serialized`")
-            None
-          case Right(state) ⇒
-            log(s"found state for form `$formId` and value `$state`")
-            Some(state)
-        }
-      }
-
-    def updateClientState(formId: String, clientState: ClientState): Unit = {
-
-      val dict       = findRawState getOrElse js.Dictionary[String]()
-      val serialized = clientState.asJson.noSpaces
-
-      log(s"updating client state for form `$formId` with value `$serialized`")
-
-      dict(formId) = serialized
-
-      dom.window.history.replaceState(
-        statedata = dict,
-        title     = "",
-        url       = null
-      )
-    }
-
-    def clearClientState(formId: String): Unit =
-      findRawState foreach { state ⇒
-        dom.window.history.replaceState(
-          statedata = state -= formId,
-          title     = "",
-          url       = null
-        )
-      }
 
     def adjustIdNamespace(
       formElem : js.UndefOr[html.Element],

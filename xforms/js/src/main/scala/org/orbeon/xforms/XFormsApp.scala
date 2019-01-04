@@ -17,6 +17,8 @@ package org.orbeon.xforms
 object XFormsApp extends App {
 
   def load(): Unit = {
+    InitSupport
+    StateHandling
     Upload
   }
 }

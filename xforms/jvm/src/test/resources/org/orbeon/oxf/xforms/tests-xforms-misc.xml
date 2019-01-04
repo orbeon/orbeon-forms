@@ -711,7 +711,6 @@
                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$server-events" value=""/>
-                        <xh:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
                         <xh:input type="hidden" name="$repeat-tree" value="xf-1"/>
                         <xh:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">

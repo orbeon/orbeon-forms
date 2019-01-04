@@ -26,6 +26,8 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object StateHandling {
 
+  private var skipLoadPopstate = true
+
   import Private._
 
   case class ClientState(
@@ -85,10 +87,10 @@ object StateHandling {
       )
     }
 
-  private object Private {
+  def log(s: String): Unit = ()
+//    println(s"state handling: $s")
 
-    def log(s: String): Unit = ()
-//      println(s"state handling: $s")
+  private object Private {
 
     // Assume the state is a `js.Dictionary[String]` mapping form ids to serialized state
     def findRawState: Option[Dictionary[String]] =

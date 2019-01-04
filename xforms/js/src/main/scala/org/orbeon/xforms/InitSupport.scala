@@ -25,7 +25,6 @@ import org.scalajs.dom.html
 import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
@@ -45,26 +44,39 @@ object InitSupport {
       case _ ⇒ // NOP
     }
 
+    def setInitialState(uuid: String): Unit =
+      StateHandling.updateClientState(
+        formId,
+        ClientState(
+          uuid     = uuid,
+          sequence = 1
+        )
+      )
+
     StateHandling.findClientState(formId) match {
       case None ⇒
-        // Initial state
-        StateHandling.updateClientState(
-          formId,
-          ClientState(
-            uuid     = Globals.formUUID(formId).value,
-            sequence = 1
-          )
-        )
+
+        StateHandling.log("no state found, setting initial state")
+
+        setInitialState(Globals.formUUID(formId).value)
+
+      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
+
+        StateHandling.log("state found upon reload, setting initial state")
+
+        setInitialState(Globals.formUUID(formId).value)
+
       case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
-        // The user reloaded or navigated back to this page and we must reload the page
+
+        StateHandling.log("state found with `revisitHandling` set to `reload`, reloading page")
 
         StateHandling.clearClientState(formId)
         Globals.isReloading = true
         dom.window.location.reload(flag = true)
-        // NOTE: You would think that if reload is canceled, you would reset this to false, but
-        // somehow this fails with IE.
+
       case Some(state) ⇒
-        // The user reloaded or navigated back to this page and we must restore state
+
+        StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
 
         // Old comment: Reset the value of the `$uuid` field to the value found in the client state,
         // because the browser sometimes restores the value of hidden fields in an erratic way, for

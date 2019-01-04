@@ -106,22 +106,22 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
              * Return null when the attribute is not there.
              */
             getAttribute: function(element, name) {
-                if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
-                    // IE incorrectly already return null when the attribute is not there,
-                    // but this happens to be what we want to do here
+
+                // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#Notes
+                //
+                // "Essentially all web browsers (Firefox, Internet Explorer, recent versions of Opera, Safari, Konqueror,
+                // and iCab, as a non-exhaustive list) return null when the specified attribute does not exist on the specified
+                // element; this is what the current DOM specification draft specifies. The old DOM 3 Core specification, on
+                // the other hand, says that the correct return value in this case is actually the empty string, and some DOM
+                // implementations implement this behavior. The implementation of getAttribute() in XUL (Gecko) actually
+                // follows the DOM 3 Core specification and returns an empty string. Consequently, you should use
+                // element.hasAttribute() to check for an attribute's existence prior to calling getAttribute() if it is
+                // possible that the requested attribute does not exist on the specified element."
+
+                if (element.hasAttribute(name)) {
                     return element.getAttribute(name);
                 } else {
-                    // Other browsers that follow the spec return an empty string when the attribute is not there,
-                    // so we use hasAttribute() which is not implemented by IE to detect that case.
-                    if (element.hasAttribute(name)) {
-                        if (ORBEON.xforms.Globals.renderingEngineWebCoreOrZero) {
-                            return ORBEON.util.StringOps.replace(element.getAttribute(name), "&#38;", "&");
-                        } else {
-                            return element.getAttribute(name);
-                        }
-                    } else {
-                        return null;
-                    }
+                    return null;
                 }
             },
 
@@ -931,49 +931,8 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 }
 
                 // Update name attribute
-                if (element.name) {
-                    var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
-                    if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                            && ORBEON.xforms.Globals.renderingEngineTridentOrZero > 0
-                            && ORBEON.xforms.Globals.renderingEngineTridentOrZero < 9) {
-                        //
-                        // The following is for IE8 and below only.
-                        //
-                        // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
-                        // cause the name in the programming model to change in the collection of elements". This has a implication
-                        // for radio buttons where using a same name for a set of radio buttons is used to group them together.
-                        // https://msdn.microsoft.com/en-us/library/ms534184(v=vs.85).aspx
-
-                        // NOTE: Here we only fix the case of radio button groups. However, the name attribute issue is present
-                        // for other controls as well. With IE versions (including IE 8 in quirks mode) that exhibit this bug,
-                        // you cannot safely call document.getElementById() of a form element within a template once the template
-                        // has been cloned. For example, in a template:
-                        //
-                        // <span id="my-input"><input id="my-input$$c" name="my-input">...
-                        //
-                        // getElementById("my-input") correctly returns <span id="my-input">
-                        //
-                        // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c⊙1" name="my-input﻿⊙1">
-                        //
-                        // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
-                        // the cloned element.
-                        //
-                        // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
-                        // only those with type="radio".
-                        var clone = document.createElement("<" + element.tagName + " name='" + newName + "' type='" + element.type + "'>");
-                        for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
-                            var attribute = element.attributes[attributeIndex];
-                            if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "type" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
-                                clone.setAttribute(attribute.nodeName, attribute.nodeValue);
-                        }
-                        YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
-                        YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
-                        YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
-                        element.replaceNode(clone);
-                    } else {
-                        element.name = newName;
-                    }
-                }
+                if (element.name)
+                    element.name = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
 
                 // Recurse through children
                 for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
@@ -2798,9 +2757,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                             ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
                         }
                     }
-                } else if ($(target).is('.xforms-dialog-appearance-minimal')) {
-                    // Minimal dialog: record more is back inside the dialog
-                    ORBEON.xforms.Globals.dialogMinimalLastMouseOut[target.id] = -1;
                 }
 
                 // Help tooltip
@@ -2815,16 +2771,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         YAHOO.util.Dom.generateId(target);
                         ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, 0, event);
                     }
-                }
-
-                // Check if this control is inside a minimal dialog, in which case we are also inside that dialog
-                var current = target;
-                while (current != null && current != document) {
-                    if ($(current).is('.xforms-dialog-appearance-minimal')) {
-                        ORBEON.xforms.Globals.dialogMinimalLastMouseOut[current.id] = -1;
-                        break;
-                    }
-                    current = current.parentNode;
                 }
             }
         },
@@ -3392,7 +3338,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
             _.extend(ORBEON.xforms.Globals, {
                 // Browser detection
-                renderingEngineWebCoreOrZero: YAHOO.env.ua.webkit,       // Safari
                 renderingEngineTridentOrZero: YAHOO.env.ua.ie,           // Internet Explorer
 
                 formUUID: {},                        // used for 2-pass submission, points to the `$uuid` hidden input
@@ -3431,21 +3376,16 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
                 activeControl: null,                 // The currently active control, used to disable hint
                 dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-                dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
                 dialogTimerIds: {},                  // Maps dialog ids to timer ids for dialogs shown asynchronously (iOS)
                 hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
                 alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
                 helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
                 debugDiv: null,                      // Points to the div when debug messages are displayed
-                debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
                 lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
                 sliderYui: {},                       // Maps slider id to the YUI object for that slider
                 lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
                 // Data relative to a form is stored in an array indexed by form id.
                 formErrorPanel: {},                  // YUI panel used to report errors
-                formHelpPanel: {},                   // Help dialog: YUI panel
-                formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
-                formHelpPanelCloseButton: {},        // Help dialog: close button
                 modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
                 modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
                 changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
@@ -3855,7 +3795,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
     });
 
     YAHOO.util.Event.throwErrors = true;
-    ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     ORBEON.onJavaScriptLoaded.fire();
 

@@ -359,20 +359,32 @@
             <!-- This is a HACK for Form Builder only: place non-relevant instances of all toolbox controls so that
                  xxf:dynamic will have all the JavaScript and CSS resources available on the client.
                  See: https://github.com/orbeon/orbeon-forms/issues/31 -->
-            <xsl:if test="$is-form-builder and $is-detail" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <xsl:if
+                test="$is-form-builder and $is-detail"
+                xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
 
-                <xsl:variable name="property-names"
-                              select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
-                <xsl:variable name="resources-names"
-                              select="distinct-values(for $n in $property-names return p:split(p:property($n)))" as="xs:string*"/>
+                <xsl:variable
+                    name="property-names"
+                    select="p:properties-start-with('oxf.fb.toolbox.group')"
+                    as="xs:string*"/>
 
-                <xsl:variable name="resources"
-                              select="for $uri in $resources-names return doc($uri)" as="document-node()*"/>
+                <xsl:variable
+                    name="resources-names"
+                    select="distinct-values(for $n in $property-names return p:split(p:property($n)))"
+                    as="xs:string*"/>
+
+                <xsl:variable
+                    name="resources"
+                    select="for $uri in $resources-names return doc($uri)"
+                    as="document-node()*"/>
 
                 <xsl:if test="$resources">
                     <!-- Non-relevant group -->
                     <xf:group ref="()">
-                        <xsl:apply-templates select="$resources/*/xbl:binding/fb:metadata/(fb:template | fb:templates/fb:view)/*" mode="filter-fb-template"/>
+                        <xsl:apply-templates
+                            select="$resources/*/xbl:binding/fb:metadata/(fb:template | fb:templates/fb:view)/*"
+                            mode="filter-fb-template"/>
                         <!-- So that the xxbl:global for repeated sections is included -->
                         <fr:repeater/>
                     </xf:group>

@@ -208,6 +208,12 @@ object Properties extends js.Object {
   val revisitHandling                  : Property[String] = js.native
 }
 
+@js.native
+trait InitData extends js.Object {
+  val repeatTree    : String = js.native
+  val repeatIndexes : String = js.native
+}
+
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {

@@ -17,7 +17,7 @@ import io.circe.generic.auto._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.StateHandling.ClientState
-import org.orbeon.xforms.facade.{AjaxServer, Globals, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Globals, InitData, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
@@ -26,6 +26,7 @@ import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
@@ -39,10 +40,11 @@ object InitSupport {
     formElement.elements.iterator collect { case e: html.Input ⇒ e } foreach {
       case e if e.name == "$uuid"           ⇒ Globals.formUUID        (formId) = e
       case e if e.name == "$server-events"  ⇒ Globals.formServerEvents(formId) = e
-      case e if e.name == "$repeat-tree"    ⇒ processRepeatHierarchy(e.value)
-      case e if e.name == "$repeat-indexes" ⇒ processRepeatIndexes(e.value)
       case _ ⇒ // NOP
     }
+
+    processRepeatHierarchy(getInitData(formId).repeatTree)
+    processRepeatIndexes(getInitData(formId).repeatIndexes)
 
     def setInitialState(uuid: String): Unit =
       StateHandling.updateClientState(
@@ -90,6 +92,9 @@ object InitSupport {
         )
     }
   }
+
+  def getInitData: js.Dictionary[InitData] =
+    g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
   def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
     for {

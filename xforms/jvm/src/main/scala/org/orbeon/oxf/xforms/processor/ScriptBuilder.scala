@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils.{RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSION_NUMBER_PROPERTY, getApplicationResourceVersion}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
@@ -212,6 +213,9 @@ object ScriptBuilder {
       val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
       sb.append(XFormsUtils.getFormId(containingDocument))
       sb.append("\"] = {")
+
+      sb.append(s""""repeatTree": "${containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)}",""")
+      sb.append(s""""repeatIndexes": "${XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)}",""")
 
       // Output path information
       if (hasPaths) {

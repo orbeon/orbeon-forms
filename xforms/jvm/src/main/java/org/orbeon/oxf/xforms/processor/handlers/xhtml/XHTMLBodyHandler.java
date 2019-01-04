@@ -126,23 +126,27 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 doMultipartPOST ? "enctype" : null, doMultipartPOST ? "multipart/form-data" : null});
 
         {
-            // Output encoded static and dynamic state
+            // Only for 2-pass submission
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$uuid", "value", containingDocument.getUUID()
             });
+
             // NOTE: we don't need $sequence here as HTML form posts are either:
             //
             // - 2nd phase of replace="all" submission: we don't (and can't) retry
             // - background upload: we don't want a sequence number as this run in parallel
             //
-            // NOTE: Keep empty static state and dynamic state until client is able to deal without them
-            final Option<String> clientEncodedStaticStateOpt = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
+
+            // Output encoded static and dynamic state, only for client state handling (no longer supported in JavaScript)
+            final Option<String> clientEncodedStaticStateOpt =
+                    XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
             if (clientEncodedStaticStateOpt.isDefined()) {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$static-state", "value", clientEncodedStaticStateOpt.get()
                 });
             }
-            final Option<String> clientEncodedDynamicStateOpt = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
+            final Option<String> clientEncodedDynamicStateOpt =
+                    XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
             if (clientEncodedDynamicStateOpt.isDefined()) {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$dynamic-state", "value", clientEncodedDynamicStateOpt.get()
@@ -151,23 +155,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         {
-            // Other fields used by JavaScript
+            // Only for 2-pass submission
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
-            });
-
-            // Store information about nested repeats hierarchy
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden",
-                    "name", "$repeat-tree",
-                    "value", containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace())
-            });
-
-            // Store information about the initial index of each repeat
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden",
-                    "name", "$repeat-indexes",
-                    "value", XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)
             });
 
             // Ajax error panel

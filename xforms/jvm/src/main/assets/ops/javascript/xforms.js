@@ -3338,27 +3338,30 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
             _.extend(ORBEON.xforms.Globals, {
                 // Browser detection
-                renderingEngineTridentOrZero: YAHOO.env.ua.ie,           // Internet Explorer
+                renderingEngineTridentOrZero: YAHOO.env.ua.ie, // One usage left to check as of 2019-01-04.
 
+                // NOTE: Indexed by form id
                 formUUID: {},                        // used for 2-pass submission, points to the `$uuid` hidden input
                 formServerEvents: {},                // used for 2-pass submission, points to the `$server-events` hidden input
 
-                repeatTreeChildToParent: {},         // Describes the repeat hierarchy
-                repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-                repeatIndexes: {},                   // The current index for each repeat
-
-                /**
-                 * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
-                 * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
-                 * just registering the event handler on the window object.
-                 */
                 ns: {},                              // Namespace of ids (for portlets)
                 xformsServerURL: {},                 // XForms Server URL
                 xformsServerUploadURL: {},           // XForms Server upload URL
                 calendarImageURL: {},                // calendar.png image URL (should be ideally handled by a template)
+                discardableTimerIds: {},             // to array of discardable events (used by the server as a form of polling)
+                formErrorPanel: {},                  // YUI panel used to report errors
+
+                dialogTimerIds: {},                  // Maps dialog ids to timer ids for dialogs shown asynchronously (iOS)
+
+                // NOTE: NOT indexed by form id!
+                repeatTreeChildToParent: {},         // Describes the repeat hierarchy
+                repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
+                repeatIndexes: {},                   // The current index for each repeat
+
+                // Other
                 eventQueue: [],                      // Events to be sent to the server
                 eventsFirstEventTime: 0,             // Time when the first event in the queue was added
-                discardableTimerIds: {},             // Maps form id to array of discardable events (which are used by the server as a form of polling)
+
                 requestForm: null,                   // HTML for the request currently in progress
                 requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
                 requestInProgress: false,            // Indicates whether an Ajax request is currently in process
@@ -3376,7 +3379,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
                 activeControl: null,                 // The currently active control, used to disable hint
                 dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-                dialogTimerIds: {},                  // Maps dialog ids to timer ids for dialogs shown asynchronously (iOS)
                 hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
                 alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
                 helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
@@ -3384,10 +3386,11 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
                 sliderYui: {},                       // Maps slider id to the YUI object for that slider
                 lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
-                // Data relative to a form is stored in an array indexed by form id.
-                formErrorPanel: {},                  // YUI panel used to report errors
+
+
                 modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
                 modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
+
                 changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
                 topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
                         ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered

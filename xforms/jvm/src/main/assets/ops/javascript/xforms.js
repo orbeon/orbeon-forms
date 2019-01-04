@@ -3396,6 +3396,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 renderingEngineWebCoreOrZero: YAHOO.env.ua.webkit,       // Safari
                 renderingEngineTridentOrZero: YAHOO.env.ua.ie,           // Internet Explorer
 
+                formUUID: {},                        // used for 2-pass submission, points to the `$uuid` hidden input
+                formServerEvents: {},                // used for 2-pass submission, points to the `$server-events` hidden input
+
+                repeatTreeChildToParent: {},         // Describes the repeat hierarchy
+                repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
+                repeatIndexes: {},                   // The current index for each repeat
+
                 /**
                  * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
                  * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
@@ -3419,9 +3426,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 currentFocusControlId: null,         // Id of the control that got the focus last
                 currentFocusControlElement: null,    // Element for the control that got the focus last
                 htmlAreaNames: [],                   // Names of the HTML editors, which we need to reenable them on Firefox
-                repeatTreeChildToParent: {},         // Describes the repeat hierarchy
-                repeatIndexes: {},                   // The current index for each repeat
-                repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
                 yuiCalendar: null,                   // Reusable calendar widget
                 tooltipLibraryInitialized: false,
                 changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
@@ -3444,11 +3448,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 formHelpPanel: {},                   // Help dialog: YUI panel
                 formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
                 formHelpPanelCloseButton: {},        // Help dialog: close button
-                formUUID: {},                        // UUID of the form/containing document
-                formStaticState: {},                 // State that does not change for the life of the page
-                formDynamicState: {},                // State that changes at every request
-                formServerEvents: {},                // Server events information
-                formClientState: {},                 // Store for information we want to keep when the page is reloaded
                 modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
                 modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
                 changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener

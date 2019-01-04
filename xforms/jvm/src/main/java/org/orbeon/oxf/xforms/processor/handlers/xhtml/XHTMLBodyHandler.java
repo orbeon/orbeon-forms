@@ -137,29 +137,23 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             //
             // NOTE: Keep empty static state and dynamic state until client is able to deal without them
             final Option<String> clientEncodedStaticStateOpt = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$static-state",
-                    "value", clientEncodedStaticStateOpt.isDefined() ? clientEncodedStaticStateOpt.get() : null
-            });
+            if (clientEncodedStaticStateOpt.isDefined()) {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                    "type", "hidden", "name", "$static-state", "value", clientEncodedStaticStateOpt.get()
+                });
+            }
             final Option<String> clientEncodedDynamicStateOpt = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$dynamic-state",
-                    "value", clientEncodedDynamicStateOpt.isDefined() ? clientEncodedDynamicStateOpt.get() : null
-            });
+            if (clientEncodedDynamicStateOpt.isDefined()) {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                    "type", "hidden", "name", "$dynamic-state", "value", clientEncodedDynamicStateOpt.get()
+                });
+            }
         }
 
         {
             // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
-            });
-            if (containingDocument.isServeInlineResources())
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "text", "name", "$client-state", "value", "", "style", "display: none"
-                });
-            else
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "text", "name", "$client-state", "value", "", "class", "xforms-initially-hidden"
             });
 
             // Store information about nested repeats hierarchy

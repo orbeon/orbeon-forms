@@ -119,23 +119,20 @@ object AjaxServerOps {
 @JSGlobal("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
-  val formUUID                      : js.Dictionary[html.Input]       = js.native // TODO: contemplate removing (check usages)
-  val formStaticState               : js.Dictionary[html.Input]       = js.native // TODO: contemplate removing (check usages)
-  val formDynamicState              : js.Dictionary[html.Input]       = js.native // TODO: contemplate removing (check usages)
-  val formServerEvents              : js.Dictionary[html.Input]       = js.native // TODO: contemplate removing (check usages)
+  val formUUID                      : js.Dictionary[html.Input]       = js.native
+  val formServerEvents              : js.Dictionary[html.Input]       = js.native
+
+  var repeatTreeChildToParent       : js.Dictionary[String]           = js.native
+  var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]] = js.native
+  var repeatIndexes                 : js.Dictionary[String]           = js.native
 
   val xformsServerUploadURL         : js.Dictionary[String]           = js.native
-  val formClientState               : js.Dictionary[html.Input]       = js.native
   var loadingOtherPage              : Boolean                         = js.native
   var isReloading                   : Boolean                         = js.native
-  var repeatIndexes                 : js.Dictionary[String]           = js.native
   val ns                            : js.Dictionary[String]           = js.native
   val eventQueue                    : js.Array[js.Any]                = js.native
   val requestInProgress             : Boolean                         = js.native
   val dialogs                       : js.Dictionary[js.Dynamic]       = js.native
-
-  var repeatTreeChildToParent       : js.Dictionary[String]           = js.native
-  var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]] = js.native
 }
 
 @js.native

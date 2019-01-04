@@ -379,7 +379,7 @@
                         // Add form UUID
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxf:uuid>');
-                        requestDocumentString.push(ORBEON.xforms.Document.getFromClientState(formID, "uuid"));
+                        requestDocumentString.push(ORBEON.xforms.Document.getFormUuid(formID));
                         requestDocumentString.push('</xxf:uuid>\n');
 
                         // Increment and send sequence number if we have at least one event which is not a request for upload progress or session heartbeat
@@ -389,7 +389,7 @@
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxf:sequence>');
                         if (requestWithSequenceNumber) {
-                            var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
+                            var currentSequenceNumber = ORBEON.xforms.Document.getSequence(formID);
                             requestDocumentString.push(currentSequenceNumber);
                             AjaxServer.ajaxResponseReceived.add(function incrementSequenceNumber() {
                                 // Increment sequence number, now that we know the server processed our request
@@ -398,37 +398,11 @@
                                 //      response is processed, we incur the risk of incrementing the counter while the response is
                                 //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
                                 var newSeq = parseInt(currentSequenceNumber) + 1;
-                                ORBEON.xforms.Document.storeInClientState(formID, "sequence", newSeq);
+                                ORBEON.xforms.Document.updateSequence(formID, newSeq);
                                 AjaxServer.ajaxResponseReceived.remove(incrementSequenceNumber);
                             })
                         }
                         requestDocumentString.push('</xxf:sequence>\n');
-
-                        // Add static state
-                        var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;
-                        if (staticState != null && staticState != "") {
-                            requestDocumentString.push(indent);
-                            requestDocumentString.push('<xxf:static-state>');
-                            requestDocumentString.push(staticState);
-                            requestDocumentString.push('</xxf:static-state>\n');
-                        }
-
-                        // Add dynamic state
-                        var dynamicState = ORBEON.xforms.Globals.formDynamicState[formID].value;
-                        if (dynamicState != null && dynamicState != "") {
-                            requestDocumentString.push(indent);
-                            requestDocumentString.push('<xxf:dynamic-state>');
-                            requestDocumentString.push(dynamicState);
-                            requestDocumentString.push('</xxf:dynamic-state>\n');
-                        }
-
-                        // Add initial dynamic state if needed
-                        if (sendInitialDynamicState) {
-                            requestDocumentString.push(indent);
-                            requestDocumentString.push('<xxf:initial-dynamic-state>');
-                            requestDocumentString.push(ORBEON.xforms.Document.getFromClientState(formID, "initial-dynamic-state"));
-                            requestDocumentString.push('</xxf:initial-dynamic-state>\n');
-                        }
 
                         // Keep track of the events we have handled, so we can later remove them from the queue
 
@@ -732,16 +706,7 @@
 
             _.each(responseRoot.childNodes, function(childNode) {
 
-                // Store new dynamic and static state as soon as we find it. This is because the server only keeps the last
-                // dynamic state. So if a JavaScript error happens later on while processing the response,
-                // the next request we do we still want to send the latest dynamic state known to the AjaxServer.
-                if (ORBEON.util.Utils.getLocalName(childNode) == "dynamic-state") {
-                    var newDynamicState = ORBEON.util.Dom.getStringValue(childNode);
-                    ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
-                } else if (ORBEON.util.Utils.getLocalName(childNode) == "static-state") {
-                    var newStaticState = ORBEON.util.Dom.getStringValue(childNode);
-                    ORBEON.xforms.Globals.formStaticState[formID].value = newStaticState;
-                } else if (ORBEON.util.Utils.getLocalName(childNode) == "action") {
+                if (ORBEON.util.Utils.getLocalName(childNode) == "action") {
 
                     var actionElement = childNode;
 

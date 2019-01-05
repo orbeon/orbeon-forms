@@ -1691,7 +1691,7 @@
 
                             // Handle initializations
                             if (initValue) {
-                                ORBEON.xforms.Init.initializeJavaScriptControls(JSON.parse(initValue));
+                                ORBEON.xforms.InitSupport.initializeJavaScriptControls(JSON.parse(initValue));
                             }
 
                             // If the element that had the focus is not in the document anymore, it might have been replaced by

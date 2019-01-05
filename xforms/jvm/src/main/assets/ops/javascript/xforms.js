@@ -3490,9 +3490,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
                     var formInitData = window.orbeonInitData[formID];
 
-                    // Iterate over controls
-                    ORBEON.xforms.Init.initializeJavaScriptControls(formInitData);
-
                     // Register key listeners
                     var keyListeners = formInitData["keylisteners"];
                     if (YAHOO.lang.isArray(keyListeners)) {
@@ -3646,36 +3643,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
             ORBEON.xforms.Globals.xformsServerUploadURL[formID] = xformsServerUploadURL;
             ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
-        },
-
-        initializeJavaScriptControls: function (formInitData) {
-            _.each(formInitData.controls, function(idValueOpt) {
-                var control = document.getElementById(idValueOpt.id);
-                if (control) {
-                    var jControl = $(control);
-                    // Exclude controls in repeat templates
-                    if (jControl.parents(".xforms-repeat-template").length == 0) {
-                        if (ORBEON.xforms.XBL.isComponent(control)) {
-                            // Custom XBL component initialization
-                            var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                            if (_.isObject(instance)) {
-                                if (_.isString(idValueOpt.value)) {
-                                    ORBEON.xforms.Controls.setCurrentValue(control, idValueOpt.value);
-                                }
-                            }
-                        } else if (jControl.is('.xforms-dialog.xforms-dialog-visible-true')) {
-                            // Initialized visible dialogs
-                            ORBEON.xforms.Init._dialog(control);
-                        } else if (jControl.is('.xforms-select1-appearance-compact, .xforms-select-appearance-compact')) {
-                            // Legacy JavaScript initialization
-                            ORBEON.xforms.Init._compactSelect(control);
-                        } else if (jControl.is('.xforms-range')) {
-                            // Legacy JavaScript initialization
-                            ORBEON.xforms.Init._range(control);
-                        }
-                    }
-                }
-            });
         },
 
         // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.

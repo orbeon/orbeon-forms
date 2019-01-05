@@ -16,8 +16,9 @@ package org.orbeon.xforms
 import io.circe.generic.auto._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.Constants._
 import org.orbeon.xforms.StateHandling.ClientState
-import org.orbeon.xforms.facade.{AjaxServer, Globals, InitData, Properties}
+import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
@@ -28,8 +29,6 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-
-import Constants._
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
@@ -108,6 +107,54 @@ object InitSupport {
     // Set global values
     Globals.formUUID        (formId).value = uuid
     Globals.formServerEvents(formId).value = ""
+
+    // Initialize controls, listeners, server-events
+
+    // Iterate over controls
+    initializeJavaScriptControls(initData)
+  }
+
+  // Also used by AjaxServer.js
+  def initializeJavaScriptControls(formInitData: InitData): Unit = {
+
+    import io.circe.generic.auto._
+    import io.circe.parser._
+
+    formInitData.controls.toOption foreach { controls ⇒
+      decode[rpc.Controls](controls) match {
+        case Left(_)  ⇒
+          // TODO: error
+          None
+        case Right(rpc.Controls(controls)) ⇒
+
+          controls foreach { case rpc.Control(id, valueOpt) ⇒
+              Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
+                val jControl = $(control)
+                // Exclude controls in repeat templates
+                if (jControl.parents(".xforms-repeat-template").length == 0) {
+                    if (XBL.isComponent(control)) {
+                      // Custom XBL component initialization
+                      val instance = XBL.instanceForControl(control)
+                      if (instance ne null) {
+                        valueOpt foreach { value ⇒
+                          Controls.setCurrentValue(control, value)
+                        }
+                      }
+                    } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+                        // Initialized visible dialogs
+                        Init._dialog(control)
+                    } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+                        // Legacy JavaScript initialization
+                        Init._compactSelect(control)
+                    } else if (jControl.is(".xforms-range")) {
+                        // Legacy JavaScript initialization
+                        Init._range(control)
+                    }
+                }
+              }
+          }
+      }
+    }
   }
 
   def getInitDataForAllForms: js.Dictionary[InitData] =

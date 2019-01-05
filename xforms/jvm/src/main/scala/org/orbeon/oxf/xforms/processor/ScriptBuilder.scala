@@ -61,22 +61,16 @@ object ScriptBuilder {
     if (controlsToInitialize.nonEmpty) {
       if (prependComma)
         sb.append(',')
-      sb.append("\"controls\":[")
-      val it = controlsToInitialize.iterator
-      while (it.hasNext) {
-        val (controlId, valueOpt) = it.next()
+      sb.append("\"controls\": ")
 
-        val namespacedId = namespaceId(containingDocument, controlId)
+      import io.circe.generic.auto._
+      import io.circe.syntax._
+      import org.orbeon.xforms.rpc
 
-        valueOpt match {
-          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(namespacedId)},"value":${quoteString(value)}}""")
-          case None        ⇒ sb.append(s"""{"id":${quoteString(namespacedId)}}""")
-        }
+      val jsonString =
+        rpc.Controls(controlsToInitialize map (rpc.Control.apply _).tupled).asJson.noSpaces
 
-        if (it.hasNext)
-          sb.append(',')
-      }
-      sb.append(']')
+      sb.append(quoteString(jsonString))
     }
 
   def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
@@ -196,100 +190,97 @@ object ScriptBuilder {
     }
   }
 
-  def findJavaScriptInitialData(
+  def buildJavaScriptInitialData(
     containingDocument   : XFormsContainingDocument,
     rewriteResource      : String ⇒ String,
     controlsToInitialize : List[(String, Option[String])]
-  ): Option[String] = {
+  ): String = {
 
     // Produce JSON output
-    val hasPaths                = true
     val hasControlsToInitialize = controlsToInitialize.nonEmpty
     val hasKeyListeners         = containingDocument.getStaticOps.keypressHandlers.nonEmpty
     val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
-    val outputInitData          = hasPaths || hasControlsToInitialize || hasKeyListeners || hasServerEvents
 
-    outputInitData option {
-      val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
-      sb.append(XFormsUtils.getFormId(containingDocument))
-      sb.append("\"] = {")
+    val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
+    sb.append(XFormsUtils.getFormId(containingDocument))
+    sb.append("\"] = {")
 
-      sb.append(s""""uuid": "${containingDocument.getUUID}",""")
-      sb.append(s""""repeatTree": "${containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)}",""")
-      sb.append(s""""repeatIndexes": "${XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)}",""")
+    sb.append(s""""uuid": "${containingDocument.getUUID}",""")
+    sb.append(s""""repeatTree": "${containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)}",""")
+    sb.append(s""""repeatIndexes": "${XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)}",""")
 
-      // Output path information
-      if (hasPaths) {
-        sb.append("\"paths\":{")
-        sb.append("\"xforms-server\": \"")
-        sb.append(rewriteResource("/xforms-server"))
-        sb.append("\",\"xforms-server-upload\": \"")
-        sb.append(rewriteResource("/xforms-server/upload"))
+    // Output path information
+    locally {
+      sb.append("\"paths\":{")
+      sb.append("\"xforms-server\": \"")
+      sb.append(rewriteResource("/xforms-server"))
+      sb.append("\",\"xforms-server-upload\": \"")
+      sb.append(rewriteResource("/xforms-server/upload"))
 
-        // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
-        // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
-        // for use in portlets. This should ideally be handled by a template and/or the server should provide
-        // the markup directly when needed.
-        val calendarImage = "/ops/images/xforms/calendar.png"
-        val rewrittenCalendarImage = rewriteResource(calendarImage)
-        sb.append("\",\"calendar-image\": \"")
-        sb.append(rewrittenCalendarImage)
-        sb.append('"')
-        sb.append('}')
-      }
+      // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
+      // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
+      // for use in portlets. This should ideally be handled by a template and/or the server should provide
+      // the markup directly when needed.
+      val calendarImage = "/ops/images/xforms/calendar.png"
+      val rewrittenCalendarImage = rewriteResource(calendarImage)
+      sb.append("\",\"calendar-image\": \"")
+      sb.append(rewrittenCalendarImage)
+      sb.append('"')
+      sb.append('}')
+    }
 
+    if (hasControlsToInitialize)
+      buildJavaScriptInitializations(containingDocument, prependComma = true, controlsToInitialize, sb)
+
+    // Output key listener information
+    if (hasKeyListeners) {
       if (hasControlsToInitialize)
-        buildJavaScriptInitializations(containingDocument, hasPaths, controlsToInitialize, sb)
-
-      // Output key listener information
-      if (hasKeyListeners) {
-        if (hasPaths || hasControlsToInitialize)
+        sb.append(',')
+      sb.append("\"keylisteners\":[")
+      var first = true
+      for (handler ← containingDocument.getStaticOps.keypressHandlers) {
+        if (! first)
           sb.append(',')
-        sb.append("\"keylisteners\":[")
-        var first = true
-        for (handler ← containingDocument.getStaticOps.keypressHandlers) {
-          if (! first)
-            sb.append(',')
-          for (observer ← handler.observersPrefixedIds) {
-            sb.append('{')
-            sb.append("\"observer\":\"")
-            sb.append(observer)
+        for (observer ← handler.observersPrefixedIds) {
+          sb.append('{')
+          sb.append("\"observer\":\"")
+          sb.append(observer)
+          sb.append('"')
+          if (handler.getKeyModifiers ne null) {
+            sb.append(",\"modifier\":\"")
+            sb.append(handler.getKeyModifiers)
             sb.append('"')
-            if (handler.getKeyModifiers ne null) {
-              sb.append(",\"modifier\":\"")
-              sb.append(handler.getKeyModifiers)
-              sb.append('"')
-            }
-            if (handler.getKeyText ne null) {
-              sb.append(",\"text\":\"")
-              sb.append(handler.getKeyText)
-              sb.append('"')
-            }
-            sb.append('}')
-            first = false
           }
-        }
-        sb.append(']')
-      }
-
-      // Output server events
-      if (hasServerEvents) {
-        if (hasPaths || hasControlsToInitialize || hasKeyListeners)
-          sb.append(',')
-        sb.append("\"server-events\":[")
-        val currentTime = System.currentTimeMillis
-        var first = true
-        for (delayedEvent ← containingDocument.delayedEvents) {
-          if (! first)
-            sb.append(',')
-          delayedEvent.writeAsJSON(sb, currentTime)
+          if (handler.getKeyText ne null) {
+            sb.append(",\"text\":\"")
+            sb.append(handler.getKeyText)
+            sb.append('"')
+          }
+          sb.append('}')
           first = false
         }
-        sb.append(']')
       }
-      sb.append("};")
-      sb.toString
+      sb.append(']')
     }
+
+    // Output server events
+    if (hasServerEvents) {
+      if (hasControlsToInitialize || hasKeyListeners)
+        sb.append(',')
+      sb.append("\"server-events\":[")
+      val currentTime = System.currentTimeMillis
+      var first = true
+      for (delayedEvent ← containingDocument.delayedEvents) {
+        if (! first)
+          sb.append(',')
+        delayedEvent.writeAsJSON(sb, currentTime)
+        first = false
+      }
+      sb.append(']')
+    }
+    sb.append("};")
+
+    sb.toString
   }
 
   def findScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {

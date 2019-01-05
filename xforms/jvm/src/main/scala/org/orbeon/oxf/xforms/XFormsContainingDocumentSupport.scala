@@ -670,11 +670,13 @@ trait ContainingDocumentClientState {
         URLRewriterUtils.isResourcesVersioned,
         XFormsStateManager.getHeartbeatDelay(this, NetUtils.getExternalContext)
       ).toList :::
-      ScriptBuilder.findJavaScriptInitialData(
-        containingDocument   = this,
-        rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-        controlsToInitialize = getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
-      ).toList
+      List(
+        ScriptBuilder.buildJavaScriptInitialData(
+          containingDocument   = this,
+          rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
+        )
+      )
 
     _initialClientScript = Some(scripts.fold("")(_ + _))
   }

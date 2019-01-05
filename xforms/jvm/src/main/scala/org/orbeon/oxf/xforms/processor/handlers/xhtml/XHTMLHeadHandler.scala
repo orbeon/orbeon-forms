@@ -154,10 +154,12 @@ class XHTMLHeadHandler(
         findScriptInvocations(containingDocument) foreach
           writeContent
 
-        findJavaScriptInitialData(
-          containingDocument   = containingDocument,
-          rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-          controlsToInitialize = containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse Nil
+        List(
+          buildJavaScriptInitialData(
+            containingDocument   = containingDocument,
+            rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+            controlsToInitialize = containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse Nil
+          )
         ) foreach
           writeContent
       }

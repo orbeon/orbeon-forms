@@ -52,7 +52,11 @@ object Document extends DocumentTrait
 
 @js.native
 trait InitTrait extends js.Object {
-  def document(): Unit = js.native
+  def document()                            : Unit = js.native
+
+  def _range(control: html.Element)         : Unit = js.native
+  def _compactSelect(control: html.Element) : Unit = js.native
+  def _dialog(control: html.Element)        : Unit = js.native
 }
 
 @js.native
@@ -169,7 +173,9 @@ class XBLCompanion extends js.Object {
 @JSGlobal("ORBEON.xforms.XBL")
 @js.native
 object XBL extends js.Object {
-  def declareCompanion(name: String, companion: XBLCompanion): Unit = js.native
+  def declareCompanion(name: String, companion: XBLCompanion): Unit         = js.native
+  def isComponent(control: html.Element)                     : Boolean      = js.native
+  def instanceForControl(control: html.Element)              : XBLCompanion = js.native
 }
 
 @JSGlobal("ORBEON.xforms.Controls")
@@ -209,9 +215,10 @@ object Properties extends js.Object {
 
 @js.native
 trait InitData extends js.Object {
-  val uuid          : String = js.native
-  val repeatTree    : String = js.native
-  val repeatIndexes : String = js.native
+  val uuid          : String             = js.native
+  val repeatTree    : String             = js.native
+  val repeatIndexes : String             = js.native
+  val controls      : js.UndefOr[String] = js.native
 }
 
 @JSGlobal("ORBEON.util.Utils")

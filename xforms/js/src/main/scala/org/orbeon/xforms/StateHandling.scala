@@ -26,8 +26,6 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object StateHandling {
 
-  private var skipLoadPopstate = true
-
   import Private._
 
   case class ClientState(

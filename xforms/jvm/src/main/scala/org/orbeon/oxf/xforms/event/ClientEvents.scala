@@ -34,7 +34,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{EventNames, XFormsId}
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -99,7 +99,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     }
 
     def filterEvents(events: List[LocalEvent]) = events filter {
-      case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
+      case a if a.name == EventNames.XXFormsAllEventsRequired ⇒ false
       case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
         debug("ignoring invalid client event", List(
           "control id" → a.targetEffectiveId,
@@ -141,7 +141,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Whether we got a request for all events
     val gotAllEvents = allClientAndServerEvents exists
-      (_.name == XXFORMS_ALL_EVENTS_REQUIRED)
+      (_.name == EventNames.XXFormsAllEventsRequired)
 
     // Set of all control ids for which we got value events
     val valueChangeControlIdsAndValues = allClientAndServerEvents collect {

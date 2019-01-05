@@ -25,7 +25,6 @@ public class XFormsEvents {
     public static final Logger logger = LoggerFactory.createLogger(XFormsEvents.class);
 
     // Custom initialization events
-    public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";
     public static final String XXFORMS_READY = "xxforms-ready";
 
     // Other custom events

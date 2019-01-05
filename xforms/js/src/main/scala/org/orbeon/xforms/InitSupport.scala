@@ -29,6 +29,7 @@ import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
+import Constants._
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
@@ -89,7 +90,7 @@ object InitSupport {
           StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
 
           AjaxServer.fireEvents(
-            events      = js.Array(new AjaxServer.Event(formElement, null, null, "xxforms-all-events-required")),
+            events      = js.Array(new AjaxServer.Event(formElement, null, null, EventNames.XXFormsAllEventsRequired)),
             incremental = false
           )
 
@@ -131,9 +132,6 @@ object InitSupport {
   }
 
   private object Private {
-
-    val UuidFieldName         = "$uuid"
-    val ServerEventsFieldName = "$server-events"
 
     private val TwoPassSubmissionFields = Set(UuidFieldName, ServerEventsFieldName)
 

@@ -40,13 +40,14 @@ object InitSupport {
 
   def initialize(formElement: html.Form): Unit = {
 
-    val formId = formElement.id
+    val formId   = formElement.id
+    val initData = getInitDataForAllForms(formId)
 
     val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElement)
 
     // Sets `repeatTreeChildToParent`, `repeatTreeParentToAllChildren`, `repeatIndexes`
-    processRepeatHierarchy(getInitDataForAllForms(formId).repeatTree)
-    processRepeatIndexes(getInitDataForAllForms(formId).repeatIndexes)
+    processRepeatHierarchy(initData.repeatTree)
+    processRepeatIndexes(initData.repeatIndexes)
 
     def setInitialState(uuid: String): Unit =
       StateHandling.updateClientState(
@@ -63,7 +64,7 @@ object InitSupport {
 
           StateHandling.log("no state found, setting initial state")
 
-          val uuid =  getInitDataForAllForms(formId).uuid
+          val uuid = initData.uuid
           setInitialState(uuid)
           uuid
 
@@ -71,7 +72,7 @@ object InitSupport {
 
           StateHandling.log("state found upon reload, setting initial state")
 
-          val uuid =  getInitDataForAllForms(formId).uuid
+          val uuid = initData.uuid
           setInitialState(uuid)
           uuid
 

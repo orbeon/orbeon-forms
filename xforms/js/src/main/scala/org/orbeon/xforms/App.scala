@@ -13,9 +13,9 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.liferay._
 import org.orbeon.xforms.facade.Init
 import org.scalajs.dom
-import org.orbeon.liferay._
 
 
 trait App {

@@ -209,6 +209,7 @@ object Properties extends js.Object {
 
 @js.native
 trait InitData extends js.Object {
+  val uuid          : String = js.native
   val repeatTree    : String = js.native
   val repeatIndexes : String = js.native
 }

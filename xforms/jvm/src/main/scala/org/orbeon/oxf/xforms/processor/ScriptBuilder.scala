@@ -214,6 +214,7 @@ object ScriptBuilder {
       sb.append(XFormsUtils.getFormId(containingDocument))
       sb.append("\"] = {")
 
+      sb.append(s""""uuid": "${containingDocument.getUUID}",""")
       sb.append(s""""repeatTree": "${containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)}",""")
       sb.append(s""""repeatIndexes": "${XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)}",""")
 

@@ -21,30 +21,31 @@ import org.orbeon.xforms.facade.{AjaxServer, Globals, InitData, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
+import org.scalajs.dom.html.Input
 
 import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
 @JSExportAll
 object InitSupport {
 
+  import Private._
+
   def initialize(formElement: html.Form): Unit = {
 
     val formId = formElement.id
 
-    formElement.elements.iterator collect { case e: html.Input ⇒ e } foreach {
-      case e if e.name == "$uuid"           ⇒ Globals.formUUID        (formId) = e
-      case e if e.name == "$server-events"  ⇒ Globals.formServerEvents(formId) = e
-      case _ ⇒ // NOP
-    }
+    val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElement)
 
-    processRepeatHierarchy(getInitData(formId).repeatTree)
-    processRepeatIndexes(getInitData(formId).repeatIndexes)
+    // Sets `repeatTreeChildToParent`, `repeatTreeParentToAllChildren`, `repeatIndexes`
+    processRepeatHierarchy(getInitDataForAllForms(formId).repeatTree)
+    processRepeatIndexes(getInitDataForAllForms(formId).repeatIndexes)
 
     def setInitialState(uuid: String): Unit =
       StateHandling.updateClientState(
@@ -55,79 +56,62 @@ object InitSupport {
         )
       )
 
-    StateHandling.findClientState(formId) match {
-      case None ⇒
+    val uuid =
+      StateHandling.findClientState(formId) match {
+        case None ⇒
 
-        StateHandling.log("no state found, setting initial state")
+          StateHandling.log("no state found, setting initial state")
 
-        setInitialState(Globals.formUUID(formId).value)
+          val uuid =  getInitDataForAllForms(formId).uuid
+          setInitialState(uuid)
+          uuid
 
-      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
+        case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
 
-        StateHandling.log("state found upon reload, setting initial state")
+          StateHandling.log("state found upon reload, setting initial state")
 
-        setInitialState(Globals.formUUID(formId).value)
+          val uuid =  getInitDataForAllForms(formId).uuid
+          setInitialState(uuid)
+          uuid
 
-      case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
+        case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
 
-        StateHandling.log("state found with `revisitHandling` set to `reload`, reloading page")
+          StateHandling.log("state found with `revisitHandling` set to `reload`, reloading page")
 
-        StateHandling.clearClientState(formId)
-        dom.window.location.reload(flag = true)
+          StateHandling.clearClientState(formId)
+          dom.window.location.reload(flag = true)
 
-      case Some(state) ⇒
+          // No need to continue the initialization
+          return
 
-        StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
+        case Some(state) ⇒
 
-        // Old comment: Reset the value of the `$uuid` field to the value found in the client state,
-        // because the browser sometimes restores the value of hidden fields in an erratic way, for
-        // example from the value the hidden field had from the same URL loaded in another tab (e.g.
-        // Chrome, Firefox).
-        Globals.formUUID(formId).value = state.uuid
+          StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
 
-        AjaxServer.fireEvents(
-          events      = js.Array(new AjaxServer.Event(formElement, null, null, "xxforms-all-events-required")),
-          incremental = false
-        )
+          AjaxServer.fireEvents(
+            events      = js.Array(new AjaxServer.Event(formElement, null, null, "xxforms-all-events-required")),
+            incremental = false
+          )
+
+          state.uuid // should be the same as `getInitDataForAllForms(formId).uuid`!
+      }
+
+    // Set global pointers to elements
+    twoPassSubmissionFields foreach {
+      case (UuidFieldName, e)         ⇒ Globals.formUUID        (formId) = e
+      case (ServerEventsFieldName, e) ⇒ Globals.formServerEvents(formId) = e
+      case _ ⇒
     }
+
+    // Set global values
+    Globals.formUUID        (formId).value = uuid
+    Globals.formServerEvents(formId).value = ""
   }
 
-  def getInitData: js.Dictionary[InitData] =
+  def getInitDataForAllForms: js.Dictionary[InitData] =
     g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
-  def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
-    for {
-      repeatIndexes ← repeatIndexesString.splitTo[List](",")
-      repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
-    } yield
-      repeatInfos.head → repeatInfos.last
-
-  def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
-    for {
-     repeatTree  ← repeatTreeString.splitTo[List](",")
-     repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
-     if repeatInfos.size > 1
-   } yield
-     repeatInfos.head → repeatInfos.last
-
-  private def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
-
-    val parentToChildren = m.Map[String, js.Array[String]]()
-
-     childToParentMap foreach { case (child, parent) ⇒
-       Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-         parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-       }
-     }
-
-    parentToChildren
-  }
-
-  private def processRepeatIndexes(repeatIndexesString: String): Unit = {
-    Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
-  }
-
-  // NOTE: Also called from AjaxServer.js
+  // NOTE: Public for now as it is also called from AjaxServer.js
   def processRepeatHierarchy(repeatTreeString: String): Unit = {
 
     val childToParent    = parseRepeatTree(repeatTreeString)
@@ -144,5 +128,50 @@ object InitSupport {
     }
 
     Globals.repeatTreeParentToAllChildren = createParentToChildrenMap(childToParentMap).toJSDictionary
+  }
+
+  private object Private {
+
+    val UuidFieldName         = "$uuid"
+    val ServerEventsFieldName = "$server-events"
+
+    private val TwoPassSubmissionFields = Set(UuidFieldName, ServerEventsFieldName)
+
+    def collectTwoPassSubmissionFields(formElement: html.Form): Map[String, Input] =
+      formElement.elements.iterator collect
+        { case e: html.Input if TwoPassSubmissionFields(e.name) ⇒ e } map
+        { e ⇒ e.name → e } toMap
+
+    def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
+      for {
+        repeatIndexes ← repeatIndexesString.splitTo[List](",")
+        repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
+      } yield
+        repeatInfos.head → repeatInfos.last
+
+    def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
+      for {
+       repeatTree  ← repeatTreeString.splitTo[List](",")
+       repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
+       if repeatInfos.size > 1
+     } yield
+       repeatInfos.head → repeatInfos.last
+
+    def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
+
+      val parentToChildren = m.Map[String, js.Array[String]]()
+
+       childToParentMap foreach { case (child, parent) ⇒
+         Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+           parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
+         }
+       }
+
+      parentToChildren
+    }
+
+    def processRepeatIndexes(repeatIndexesString: String): Unit = {
+      Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
+    }
   }
 }

@@ -15,9 +15,11 @@ package org.orbeon.oxf.xforms.processor
 
 import java.{lang ⇒ jl}
 
-import org.apache.commons.lang3.StringUtils
+import io.circe.generic.auto._
+import io.circe.syntax._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{Modifier, URLRewriterUtils}
 import org.orbeon.oxf.util.URLRewriterUtils.{RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSION_NUMBER_PROPERTY, getApplicationResourceVersion}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
@@ -25,6 +27,8 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.xforms.rpc
+import org.orbeon.xforms.rpc.KeyListeners
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
@@ -36,7 +40,7 @@ object ScriptBuilder {
 
   def escapeJavaScriptInsideScript (js: String): String =
     // Method from https://stackoverflow.com/a/23983448/5295
-    StringUtils.replace(js, "</script", "</scr\\ipt")
+    org.apache.commons.lang3.StringUtils.replace(js, "</script", "</scr\\ipt")
 
   def writeScripts(shareableScripts: Iterable[ShareableScript], write: String ⇒ Unit): Unit =
     for (shareableScript ← shareableScripts) {
@@ -61,11 +65,7 @@ object ScriptBuilder {
     if (controlsToInitialize.nonEmpty) {
       if (prependComma)
         sb.append(',')
-      sb.append("\"controls\": ")
-
-      import io.circe.generic.auto._
-      import io.circe.syntax._
-      import org.orbeon.xforms.rpc
+      sb.append(""""controls": """)
 
       val jsonString =
         rpc.Controls(controlsToInitialize map (rpc.Control.apply _).tupled).asJson.noSpaces
@@ -229,38 +229,29 @@ object ScriptBuilder {
       sb.append('}')
     }
 
-    if (hasControlsToInitialize)
-      buildJavaScriptInitializations(containingDocument, prependComma = true, controlsToInitialize, sb)
+    buildJavaScriptInitializations(
+      containingDocument   = containingDocument,
+      prependComma         = true,
+      controlsToInitialize = controlsToInitialize,
+      sb                   = sb
+    )
 
-    // Output key listener information
     if (hasKeyListeners) {
       if (hasControlsToInitialize)
         sb.append(',')
-      sb.append("\"keylisteners\":[")
-      var first = true
-      for (handler ← containingDocument.getStaticOps.keypressHandlers) {
-        if (! first)
-          sb.append(',')
-        for (observer ← handler.observersPrefixedIds) {
-          sb.append('{')
-          sb.append("\"observer\":\"")
-          sb.append(observer)
-          sb.append('"')
-          if (handler.getKeyModifiers ne null) {
-            sb.append(",\"modifier\":\"")
-            sb.append(handler.getKeyModifiers)
-            sb.append('"')
-          }
-          if (handler.getKeyText ne null) {
-            sb.append(",\"text\":\"")
-            sb.append(handler.getKeyText)
-            sb.append('"')
-          }
-          sb.append('}')
-          first = false
-        }
-      }
-      sb.append(']')
+      sb.append(""""keyListeners": """)
+
+      val jsonString =
+        KeyListeners(
+          for {
+            handler  ← containingDocument.getStaticOps.keypressHandlers
+            observer ← handler.observersPrefixedIds
+            keyText  ← handler.keyText
+          } yield
+            rpc.KeyListener(observer, keyText, handler.keyModifiers)
+        ).asJson.noSpaces
+
+      sb.append(quoteString(jsonString))
     }
 
     // Output server events

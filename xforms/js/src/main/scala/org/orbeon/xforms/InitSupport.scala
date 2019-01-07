@@ -14,6 +14,8 @@
 package org.orbeon.xforms
 
 import io.circe.generic.auto._
+import io.circe.parser.decode
+import org.orbeon.facades.Mousetrap
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.Constants._
@@ -37,12 +39,12 @@ object InitSupport {
 
   import Private._
 
-  def initialize(formElement: html.Form): Unit = {
+  def initialize(formElem: html.Form): Unit = {
 
-    val formId   = formElement.id
+    val formId   = formElem.id
     val initData = getInitDataForAllForms(formId)
 
-    val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElement)
+    val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElem)
 
     // Sets `repeatTreeChildToParent`, `repeatTreeParentToAllChildren`, `repeatIndexes`
     processRepeatHierarchy(initData.repeatTree)
@@ -90,7 +92,7 @@ object InitSupport {
           StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
 
           AjaxServer.fireEvents(
-            events      = js.Array(new AjaxServer.Event(formElement, null, null, EventNames.XXFormsAllEventsRequired)),
+            events      = js.Array(new AjaxServer.Event(formElem, null, null, EventNames.XXFormsAllEventsRequired)),
             incremental = false
           )
 
@@ -108,19 +110,52 @@ object InitSupport {
     Globals.formUUID        (formId).value = uuid
     Globals.formServerEvents(formId).value = ""
 
-    // Initialize controls, listeners, server-events
-
-    // Iterate over controls
     initializeJavaScriptControls(initData)
+    initializeKeyListeners(initData, formElem)
+  }
+
+  private def initializeKeyListeners(initData: InitData, formElem: html.Form): Unit = {
+    initData.keyListeners.toOption foreach { keyListeners ⇒
+      decode[rpc.KeyListeners](keyListeners) match {
+        case Left(_)  ⇒
+          // TODO: error
+          None
+        case Right(rpc.KeyListeners(listeners)) ⇒
+          // TODO: Maybe deduplicate listeners, here or on server
+          listeners foreach { case rpc.KeyListener(observer, keyText, modifiers) ⇒
+
+            val mousetrap =
+              if (observer == "#document")
+                Mousetrap
+              else //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
+                Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
+
+            val modifierStrings =
+              modifiers.toList map (_.entryName)
+
+            val modifierString =
+              modifierStrings mkString " "
+
+            val callback: js.Function = () ⇒ {
+              DocumentAPI.dispatchEvent(
+                targetId    = observer,
+                eventName   = "keypress",
+                incremental = false,
+                properties  = Map("text" → keyText) ++ (modifiers map (_ ⇒ "modifiers" → modifierString)) toJSDictionary
+              )
+            }
+
+            val keys = modifierStrings ::: List(keyText.toLowerCase) mkString "+"
+
+            mousetrap.bind(keys, callback)
+          }
+      }
+    }
   }
 
   // Also used by AjaxServer.js
-  def initializeJavaScriptControls(formInitData: InitData): Unit = {
-
-    import io.circe.generic.auto._
-    import io.circe.parser._
-
-    formInitData.controls.toOption foreach { controls ⇒
+  def initializeJavaScriptControls(initData: InitData): Unit = {
+    initData.controls.toOption foreach { controls ⇒
       decode[rpc.Controls](controls) match {
         case Left(_)  ⇒
           // TODO: error

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import org.orbeon.oxf.util.Modifier
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
 
@@ -40,8 +41,8 @@ trait EventHandler {
   def isMatchByName(eventName: String): Boolean
   def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean
 
-  def getKeyModifiers: String
-  def getKeyText: String
+  def keyText: Option[String]
+  def keyModifiers: Set[Modifier]
 
   def handleEvent(eventObserver: XFormsEventTarget, event: XFormsEvent)
 }

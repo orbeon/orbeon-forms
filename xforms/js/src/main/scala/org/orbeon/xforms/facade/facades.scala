@@ -13,8 +13,7 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.{DocumentAPI, YUICustomEvent}
-import org.scalajs.dom
+import org.orbeon.xforms.YUICustomEvent
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
 import org.scalajs.jquery.JQueryCallback
@@ -219,6 +218,7 @@ trait InitData extends js.Object {
   val repeatTree    : String             = js.native
   val repeatIndexes : String             = js.native
   val controls      : js.UndefOr[String] = js.native
+  val keyListeners  : js.UndefOr[String] = js.native
 }
 
 @JSGlobal("ORBEON.util.Utils")

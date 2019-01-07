@@ -30,15 +30,13 @@ class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
   import KeypressEvent._
 
   override def matches(handler: EventHandler): Boolean = {
-    val handlerKeyModifiers = handler.getKeyModifiers
-    val handlerKeyText = handler.getKeyText
-
-    // NOTE: We check on an exact match for modifiers, should be smarter
-    (handlerKeyModifiers == null || keyModifiers == handlerKeyModifiers) && (handlerKeyText == null || keyText == handlerKeyText)
+    // TODO: We check on an exact match for modifiers, should be smarter
+    handler.keyText.contains(keyText) &&
+      (handler.keyModifiers.isEmpty || handler.keyModifiers.contains(keyModifiers))
   }
 
-  def keyModifiers = property[String](ModifiersProperty).orNull
-  def keyText      = property[String](TextProperty).orNull
+  def keyModifiers: String = property[String](ModifiersProperty).orNull
+  def keyText: String = property[String](TextProperty).orNull
 }
 
 object KeypressEvent {

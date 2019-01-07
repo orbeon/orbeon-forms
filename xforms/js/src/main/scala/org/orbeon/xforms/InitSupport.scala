@@ -19,6 +19,7 @@ import org.orbeon.facades.Mousetrap
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.Constants._
+import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.ClientState
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
@@ -139,9 +140,9 @@ object InitSupport {
             val callback: js.Function = () ⇒ {
               DocumentAPI.dispatchEvent(
                 targetId    = observer,
-                eventName   = "keypress",
+                eventName   = EventNames.KeyPress,
                 incremental = false,
-                properties  = Map("text" → keyText) ++ (modifiers map (_ ⇒ "modifiers" → modifierString)) toJSDictionary
+                properties  = Map(KeyTextPropertyName → keyText) ++ (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString)) toJSDictionary
               )
             }
 

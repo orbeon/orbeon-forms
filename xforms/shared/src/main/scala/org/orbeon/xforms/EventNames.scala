@@ -24,4 +24,8 @@ object EventNames {
   val XXFormsUploadError       = Prefix + "error"
 
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
+  val KeyPress                 = "keypress"
+
+  val KeyTextPropertyName      = "text"
+  val KeyModifiersPropertyName = "modifiers"
 }

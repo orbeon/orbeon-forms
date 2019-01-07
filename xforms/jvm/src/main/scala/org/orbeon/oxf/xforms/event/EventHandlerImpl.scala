@@ -81,19 +81,8 @@ class EventHandlerImpl(
   // "true" means "perform", "false" means "cancel"
   val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
 
-  val keyText = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-
-  val keyModifiers =
-    attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME) match {
-      case Some(attValue) ⇒
-        attValue.splitTo[Set]() map (_.toLowerCase) map {
-          case "control" ⇒ "ctrl"
-          case other     ⇒ other
-        } flatMap
-          Modifier.withNameLowercaseOnlyOption
-      case None ⇒
-        Set.empty
-    }
+  val keyText      = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+  val keyModifiers = parseKeyModifiers(attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
 
   val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
   val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
@@ -354,4 +343,16 @@ object EventHandlerImpl extends Logging {
 
     resolvedObject map (_.asInstanceOf[XFormsEventHandler])
   }
+
+  def parseKeyModifiers(value: Option[String]): Set[Modifier] =
+    value match {
+      case Some(attValue) ⇒
+        attValue.splitTo[Set]() map (_.toLowerCase) map {
+          case "control" ⇒ "ctrl"
+          case other     ⇒ other
+        } flatMap
+          Modifier.withNameLowercaseOnlyOption
+      case None ⇒
+        Set.empty[Modifier]
+    }
 }

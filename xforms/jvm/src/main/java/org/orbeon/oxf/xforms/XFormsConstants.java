@@ -19,6 +19,7 @@ import org.orbeon.dom.QName;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.xforms.EventNames;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -201,8 +202,8 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = QName.apply("defaultAction", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = QName.apply("defaultAction");
 
-    public static final QName XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = QName.apply("modifiers", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = QName.apply("text", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = QName.apply(EventNames.KeyModifiersPropertyName(), XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = QName.apply(EventNames.KeyTextPropertyName(), XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME = QName.apply("phantom", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME = QName.apply("if-non-relevant", XXFORMS_NAMESPACE);
 

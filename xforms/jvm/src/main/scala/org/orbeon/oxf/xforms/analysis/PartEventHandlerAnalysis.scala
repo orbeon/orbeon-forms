@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl, XFormsEvents}
+import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl}
 import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.xforms.EventNames
 
 import scala.collection.mutable
 
@@ -65,7 +66,7 @@ trait PartEventHandlerAnalysis {
     _eventNames ++= eventHandlers flatMap (_.eventNames)
 
     // Gather all keypress handlers
-    _keypressHandlers ++= eventHandlers filter (_.eventNames(XFormsEvents.KEYPRESS))
+    _keypressHandlers ++= eventHandlers filter (_.eventNames(EventNames.KeyPress))
 
     gatherScripts()
   }
@@ -131,7 +132,7 @@ trait PartEventHandlerAnalysis {
   def deregisterEventHandler(eventHandler: EventHandlerImpl): Unit = {
     eventHandler.observersPrefixedIds foreach (_handlersForObserver -= _)
 
-    if (eventHandler.eventNames(XFormsEvents.KEYPRESS))
+    if (eventHandler.eventNames(EventNames.KeyPress))
       _keypressHandlers = _keypressHandlers filterNot (_ eq eventHandler)
 
     if (ActionNames(eventHandler.localName))

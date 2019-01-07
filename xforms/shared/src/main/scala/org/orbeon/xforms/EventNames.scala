@@ -25,6 +25,9 @@ object EventNames {
 
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
   val KeyPress                 = "keypress"
+  val TouchStart               = "touchstart"
+  val FocusIn                  = "focusin"
+  val FocusOut                 = "focusout"
 
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"

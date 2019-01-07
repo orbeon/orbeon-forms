@@ -17,7 +17,7 @@ import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms.$
+import org.orbeon.xforms.{$, EventNames}
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -85,7 +85,7 @@ object LabelEditor {
           val labelInput = $("<input class='fb-edit-section-label'/>")
           $(".fb-main").append(labelInput)
           labelInput.on("blur", () ⇒ asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
-          labelInput.on("keypress", (e: JQueryEventObject) ⇒ asUnit { if (e.which == 13) sendNewLabelValue() })
+          labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ asUnit { if (e.which == 13) sendNewLabelValue() })
           Events.ajaxResponseProcessedEvent.subscribe(() ⇒ labelInput.hide())
           labelInputOpt = labelInput
           labelInput

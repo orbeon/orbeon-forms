@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.AjaxServerOps._
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI}
+import org.orbeon.xforms.{$, DocumentAPI, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
@@ -57,10 +57,10 @@ object Number {
         companion.visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
 
         // Switch the input type after cleaning up the value for edition
-        $(companion.visibleInputElem).on("touchstart.number focusin.number", {
+        $(companion.visibleInputElem).on(s"${EventNames.TouchStart}.number ${EventNames.FocusIn}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            log("focusin")
+            log(EventNames.FocusIn)
 
             // Don"t set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state ⇒
@@ -73,10 +73,10 @@ object Number {
         }: js.ThisFunction)
 
         // Restore input type, send the value to the server, and updates value after server response
-        $(companion.visibleInputElem).on("focusout.number", {
+        $(companion.visibleInputElem).on(s"${EventNames.FocusOut}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            log("focusout")
+            log(EventNames.FocusOut)
 
             setInputType("text")
             sendValueToServer()
@@ -101,10 +101,10 @@ object Number {
           }
         }: js.ThisFunction)
 
-        $(companion.visibleInputElem).on("keypress.number", {
-          (bound: html.Element, e: JQueryEventObject) ⇒ {
+        $(companion.visibleInputElem).on(s"${EventNames.KeyPress}.number", {
+          (_: html.Element, e: JQueryEventObject) ⇒ {
 
-            log("keypress")
+            log(EventNames.KeyPress)
 
             if (e.which == 13)
               sendValueToServer()

@@ -120,8 +120,6 @@ public class XFormsEvents {
     public static final String DOM_FOCUS_OUT = "DOMFocusOut";
     public static final String DOM_FOCUS_IN = "DOMFocusIn";
 
-    public static final String KEYPRESS = "keypress";
-
     // Exceptions and errors
     public static final String XFORMS_LINK_EXCEPTION = "xforms-link-exception";
     public static final String XFORMS_LINK_ERROR = "xforms-link-error";

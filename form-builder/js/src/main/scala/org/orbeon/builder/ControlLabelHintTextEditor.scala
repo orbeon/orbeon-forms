@@ -193,7 +193,7 @@ object ControlLabelHintTextEditor {
          $(".fb-main").append(container)
 
         // Event handlers
-        textfield.on("keypress", (e: JQueryEventObject) ⇒ asUnit {
+        textfield.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ asUnit {
           // End edit when users press enter
           if (e.which == 13)
             resourceEditorEndEdit()

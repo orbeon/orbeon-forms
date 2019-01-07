@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import XFormsEvents._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.xforms.EventNames
 
 // Factory for XForms events
 object XFormsEventFactory {
@@ -70,7 +70,7 @@ object XFormsEventFactory {
     XXFORMS_ITERATION_MOVED     → (new XXFormsIterationMovedEvent(_, _)),
     XXFORMS_REPEAT_ACTIVATE     → (new XXFormsRepeatActivateEvent(_, _)),
     // Other other events ;)
-    KEYPRESS                    → (new KeypressEvent(_, _)),
+    EventNames.KeyPress         → (new KeypressEvent(_, _)),
     XFORMS_DESELECT             → (new XFormsDeselectEvent(_, _)),
     XFORMS_INSERT               → (new XFormsInsertEvent(_, _)),
     XFORMS_LINK_ERROR           → (new XFormsLinkErrorEvent(_, _)),

@@ -1381,15 +1381,15 @@
                         </xf:instance>
 
                         <xf:action ev:event="xforms-ready">
-                            <xf:dispatch name="keypress" targetid="my-group">
+                            <xf:dispatch name="keydown" targetid="my-group">
                                 <xf:property name="modifiers" value="'control alt'"/>
                                 <xf:property name="text" value="'v'"/>
                             </xf:dispatch>
-                            <xf:dispatch name="keypress" targetid="my-group">
+                            <xf:dispatch name="keydown" targetid="my-group">
                                 <xf:property name="modifiers" value="'control alt'"/>
                                 <xf:property name="text" value="'w'"/>
                             </xf:dispatch>
-                            <xf:dispatch name="keypress" targetid="my-group">
+                            <xf:dispatch name="keydown" targetid="my-group">
                                 <xf:property name="modifiers" value="'shift'"/>
                                 <xf:property name="text" value="'v'"/>
                             </xf:dispatch>

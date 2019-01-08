@@ -185,7 +185,7 @@ class ItemsetTest
             val selectionControls = TransformerUtils.urlToTinyTree("oxf:/forms/orbeon/builder/xbl/selection-select1-full.xbl")
             val selectionBindings = selectionControls.rootElement.child("binding")
             val radioBinding = selectionBindings.find(_.id == "fb-input-select1-full").get
-            ToolboxOps.insertNewControl(doc, radioBinding)
+            ToolboxOps.insertNewControl(radioBinding)
             doc.descendant("select1").last
           }
 

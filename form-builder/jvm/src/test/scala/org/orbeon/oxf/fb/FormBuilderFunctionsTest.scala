@@ -213,7 +213,7 @@ class FormBuilderFunctionsTest
         val frExplanation = {
           val selectionControls = TransformerUtils.urlToTinyTree("oxf:/xbl/orbeon/explanation/explanation.xbl")
           val explanationBinding = selectionControls.rootElement.child("binding").head
-          ToolboxOps.insertNewControl(doc, explanationBinding)
+          ToolboxOps.insertNewControl(explanationBinding)
           doc.descendant("*:explanation").head
         }
 

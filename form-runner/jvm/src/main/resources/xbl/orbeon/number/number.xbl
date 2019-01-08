@@ -21,14 +21,14 @@
          xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava">
 
     <xbl:binding
-            id="fr-number"
-            element="
-                fr|number,
-                xf|input:xxf-type('xs:decimal'),
-                xf|input:xxf-type('xs:integer')"
-            xxbl:mode="lhha binding value focus javascript-lifecycle"
-            xxf:external-events="fr-set-client-value"
-            xxbl:label-for="html-input">
+        id="fr-number"
+        element="
+            fr|number,
+            xf|input:xxf-type('xs:decimal'),
+            xf|input:xxf-type('xs:integer')"
+        xxbl:mode="lhha binding value focus javascript-lifecycle"
+        xxf:external-events="fr-set-client-value"
+        xxbl:label-for="html-input">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>

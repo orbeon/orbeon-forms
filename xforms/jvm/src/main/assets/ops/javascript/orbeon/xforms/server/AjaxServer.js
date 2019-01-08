@@ -58,25 +58,7 @@
     AjaxServer.showError = function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
         if (! ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
-            var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
-            if (formErrorPanel) {
-                // Render the dialog if needed
-                formErrorPanel.element.style.display = "block";
-                if (details != null) {
-                    formErrorPanel.errorDetailsDiv.innerHTML = details;
-                    // Restore arrow button in case we had called errorHideAllDetails() before
-                    ORBEON.xforms.Events.errorShowHideDetails.apply(formErrorPanel.errorBodyDiv);
-                } else {
-                    // No details so don't show the arrow to show the details
-                    ORBEON.xforms.Events.errorHideAllDetails(formErrorPanel.errorBodyDiv);
-                }
-                formErrorPanel.show();
-                ORBEON.xforms.Globals.lastDialogZIndex += 2;
-                formErrorPanel.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex);
-                formErrorPanel.center();
-                // Focus within the dialog so that screen readers handle aria attributes
-                $('.xforms-error-panel .container-close').focus();
-            }
+            ORBEON.xforms.ErrorPanel.showError(formID, details);
         }
     };
 

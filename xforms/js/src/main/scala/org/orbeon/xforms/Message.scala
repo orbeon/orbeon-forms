@@ -13,12 +13,15 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom.raw
+
 import scala.collection.mutable
 import org.scalajs.dom.document
+
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.js.Dynamic.{newInstance => jsnew}
+import scala.scalajs.js.Dynamic.{newInstance ⇒ jsnew}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.xforms.action.Message")
@@ -77,7 +80,7 @@ object Message {
 
       messageDialog.setHeader("Message")
       messageDialog.render(document.body)
-      g.ORBEON.util.Utils.overlayUseDisplayHidden(messageDialog)
+      Utils.overlayUseDisplayHidden(messageDialog)
 
       // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
       $("#xforms-message-dialog").attr("aria-live", "polite")

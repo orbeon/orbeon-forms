@@ -177,46 +177,27 @@ object ScriptBuilder {
     controlsToInitialize : List[(String, Option[String])]
   ): String = {
 
-    // Produce JSON output
-    val hasControlsToInitialize = controlsToInitialize.nonEmpty
-    val hasKeyboardHandlers     = containingDocument.getStaticOps.keyboardHandlers.nonEmpty
-    val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
+    val currentTime = System.currentTimeMillis
 
-    val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
+    val sb = new jl.StringBuilder("""var orbeonInitData = orbeonInitData || {}; orbeonInitData["""")
     sb.append(XFormsUtils.getFormId(containingDocument))
-    sb.append("\"] = {")
+    sb.append(""""] = {""")
 
-    sb.append(s""""uuid": "${containingDocument.getUUID}",""")
-    sb.append(s""""repeatTree": "${containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)}",""")
-    sb.append(s""""repeatIndexes": "${XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)}",""")
-
-    // Output path information
-    locally {
-      sb.append("\"paths\":{")
-      sb.append("\"xforms-server\": \"")
-      sb.append(rewriteResource("/xforms-server"))
-      sb.append("\",\"xforms-server-upload\": \"")
-      sb.append(rewriteResource("/xforms-server/upload"))
-
-      // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
-      // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
-      // for use in portlets. This should ideally be handled by a template and/or the server should provide
-      // the markup directly when needed.
-      val calendarImage = "/ops/images/xforms/calendar.png"
-      val rewrittenCalendarImage = rewriteResource(calendarImage)
-      sb.append("\",\"calendar-image\": \"")
-      sb.append(rewrittenCalendarImage)
-      sb.append('"')
-      sb.append('}')
-    }
-
-    sb.append(',')
     sb.append(""""initializations": """)
 
-    val currentTime = System.currentTimeMillis
+    // NOTE: `calendarImage` is to handle the minimal date picker. Because the client must re-generate markup
+    // when the control becomes relevant or changes type, it needs the image URL, and that URL must be
+    // rewritten for use in portlets. This should ideally be handled by a template and/or the server should
+    // provide the markup directly when needed.
 
     val jsonString =
       rpc.Initializations(
+        uuid                   = containingDocument.getUUID,
+        repeatTree             = containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
+        repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
+        xformsServerPath       = rewriteResource("/xforms-server"),
+        xformsServerUploadPath = rewriteResource("/xforms-server/upload"),
+        calendarImagePath      = rewriteResource("/ops/images/xforms/calendar.png"),
         controls  =
           for {
             (id, valueOpt) ← controlsToInitialize

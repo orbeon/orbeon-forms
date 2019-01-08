@@ -766,7 +766,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 this.loginPageDetectionRegexp         = new ORBEON.util.Property("login-page-detection-regexp", "");
                 this.clientEventMode                  = new ORBEON.util.Property("client.events.mode", "default");
                 this.clientEventsFilter               = new ORBEON.util.Property("client.events.filter", "");
-                this.resourcesVersioned               = new ORBEON.util.Property("oxf.resources.versioned", false);
                 this.retryDelayIncrement              = new ORBEON.util.Property("retry.delay-increment", 5000);
                 this.retryMaxDelay                    = new ORBEON.util.Property("retry.max-delay", 30000);
                 this.useARIA                          = new ORBEON.util.Property("use-aria", false);
@@ -2976,58 +2975,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         },
 
         /**
-         * Called when end-users click on the show/hide details link in the error panel.
-         */
-        errorShowHideDetails: function () {
-            var errorBodyDiv = this.parentNode.parentNode.parentNode;
-            var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
-            var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
-            if (this.className == "xforms-error-panel-show-details") {
-                YAHOO.util.Dom.addClass   (detailsHidden, "xforms-disabled");
-                YAHOO.util.Dom.removeClass(detailsShown , "xforms-disabled");
-            } else {
-                YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-                YAHOO.util.Dom.addClass   (detailsShown , "xforms-disabled");
-            }
-        },
-
-        /**
-         * Hide both show and hide details section in the error dialog.
-         */
-        errorHideAllDetails: function (errorBodyDiv) {
-            var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
-            var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
-
-            if (detailsHidden != null)
-                YAHOO.util.Dom.addClass(detailsHidden, "xforms-disabled");
-
-            if (detailsShown != null)
-                YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled");
-        },
-
-        /**
-         * When the error dialog is closed, we make sure that the "details" section is closed,
-         * so it will be closed the next time the dialog is opened.
-         */
-        errorPanelClosed: function (type, args, formID) {
-            var errorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
-            var errorBodyDiv = errorPanel.errorDetailsDiv.parentNode.parentNode;
-            var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
-            var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
-            YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-            YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled");
-        },
-
-        errorCloseClicked: function (event, errorPanel) {
-            errorPanel.hide();
-        },
-
-        errorReloadClicked: function (event, errorPanel) {
-            window.location.reload(true);// force reload
-            //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
-        },
-
-        /**
          * Called for each minimal dialog when there is a click on the document.
          * We have one listener per dialog, which listens to those events all the time,
          * not just when the dialog is open.
@@ -3408,83 +3355,8 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()))
                 $(document.body).addClass('xforms-mobile');
 
-            // Initialize attributes on form
-            var xformsForms = _.filter(document.forms, function(formElement) {
-                return $(formElement).is('.xforms-form');
-            });
-
-            _.each(xformsForms, function(formElement, formIndex) {
-
-                var formID = formElement.id;
-
-                ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
-
-                // Initialize XForms server URL
-                ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get());
-
-                // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
-                // interaction with the form before it is initialized
-                YAHOO.util.Dom.removeClass(formElement, "xforms-initially-hidden");
-
-                // Create Orbeon Form object, which give it a change to perform its own initialization
-                ORBEON.xforms.Page.getForm(formID);
-
-                // Initialize loading and error indicator
-                ORBEON.xforms.Globals.formErrorPanel[formID] = null;
-
-                _.each($(formElement).find('.xforms-error-dialogs > .xforms-error-panel'), function (errorPanelEl) {
-                    // Create and store error panel
-                    YAHOO.util.Dom.generateId(errorPanelEl);
-                    YAHOO.util.Dom.removeClass(errorPanelEl, "xforms-initially-hidden");
-                    var errorPanel = new YAHOO.widget.Panel(errorPanelEl.id, {
-                        modal: true,
-                        fixedcenter: false,
-                        underlay: "shadow",
-                        visible: false,
-                        constraintoviewport: true,
-                        draggable: true
-                    });
-                    errorPanel.render();
-                    ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
-                    errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
-                    ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
-
-                    // Find reference to elements in the details hidden section
-                    var titleDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "hd");
-                    var bodyDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "bd");
-                    var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
-                    var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
-                    YAHOO.util.Dom.generateId(showDetailsA);
-
-                    // Find reference to elements in the details shown section
-                    var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
-                    var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
-                    YAHOO.util.Dom.generateId(hideDetailsA);
-                    errorPanel.errorTitleDiv = titleDiv;
-                    errorPanel.errorBodyDiv = bodyDiv;
-                    errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
-
-                    // Register listener that will show/hide the detail section
-                    YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-                    YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-
-                    // Handle listeners on error panel
-                    var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, errorPanelEl);
-                    if (closeA.length != 0) {
-                        YAHOO.util.Dom.generateId(closeA[0]);
-                        YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
-                    }
-
-                    var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, errorPanelEl);
-                    if (reloadA.length != 0) {
-                        YAHOO.util.Dom.generateId(reloadA[0]);
-                        YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
-                    }
-                });
-
-                // Implemented in Scala.js
-                ORBEON.xforms.InitSupport.initialize(formElement);
-            });
+            // Done in Scala.js
+            ORBEON.xforms.InitSupport.initialize();
 
             // Special registration for focus, blur, and change events
             $(document).on('focusin', ORBEON.xforms.Events.focus);
@@ -3535,30 +3407,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             window.setTimeout(function () {
                 ORBEON.xforms.Events.orbeonLoadedEvent.fire();
             }, ORBEON.util.Properties.internalShortDelay.get());
-        },
-
-        _setBasePaths: function (formID, scripts, versioned) {
-            var xformsServerURL = null;
-            var xformsServerUploadURL = null;
-            var calendarImageURL = null;
-
-            if (! (window.orbeonInitData === undefined)) {
-                // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
-                // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
-                // detection, as that works in portals. The concern with using the server values was proxying. But should
-                // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
-                // server values it is.
-                var formInitData = window.orbeonInitData[formID];
-                if (formInitData && formInitData["paths"]) {
-                    xformsServerURL = formInitData["paths"]["xforms-server"];
-                    xformsServerUploadURL = formInitData["paths"]["xforms-server-upload"];
-                    calendarImageURL = formInitData["paths"]["calendar-image"];
-                }
-            }
-
-            ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
-            ORBEON.xforms.Globals.xformsServerUploadURL[formID] = xformsServerUploadURL;
-            ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
         },
 
         // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.

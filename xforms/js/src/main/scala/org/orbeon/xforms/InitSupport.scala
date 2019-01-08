@@ -40,16 +40,48 @@ object InitSupport {
 
   import Private._
 
-  def initialize(formElem: html.Form): Unit = {
+  def initialize(): Unit =
+    dom.document.forms                      filter
+      (_.classList.contains("xforms-form")) foreach
+      (e ⇒ initialize(e.asInstanceOf[html.Form]))
 
-    val formId   = formElem.id
-    val initData = getInitDataForAllForms(formId)
+  private def initialize(formElem: html.Form): Unit = {
+
+    // The error panel shouldn't depend on much and is useful early on
+    ErrorPanel.initializeErrorPanel(formElem)
+
+    val formId = formElem.id
+
+    Globals.ns(formId) = formId.substring(0, formId.indexOf("xforms-form"))
+
+    val initializations =
+      decode[rpc.Initializations](getInitDataForAllForms(formId).initializations) match {
+        case Left(e) ⇒
+          ErrorPanel.showError(formId, e.getMessage)
+          return
+        case Right(initializations) ⇒
+          initializations
+      }
+
+    // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
+    // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
+    // detection, as that works in portals. The concern with using the server values was proxying. But should
+    // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
+    // server values it is.
+    Globals.xformsServerURL(formId)       = initializations.xformsServerPath
+    Globals.xformsServerUploadURL(formId) = initializations.xformsServerUploadPath
+    Globals.calendarImageURL(formId)      = initializations.calendarImagePath
+
+    $(formElem).removeClass("xforms-initially-hidden")
+
+    // Causes some initializations
+    Page.getForm(formId)
 
     val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElem)
 
     // Sets `repeatTreeChildToParent`, `repeatTreeParentToAllChildren`, `repeatIndexes`
-    processRepeatHierarchy(initData.repeatTree)
-    processRepeatIndexes(initData.repeatIndexes)
+    processRepeatHierarchy(initializations.repeatTree)
+    processRepeatIndexes(initializations.repeatIndexes)
 
     def setInitialState(uuid: String): Unit =
       StateHandling.updateClientState(
@@ -66,7 +98,7 @@ object InitSupport {
 
           StateHandling.log("no state found, setting initial state")
 
-          val uuid = initData.uuid
+          val uuid = initializations.uuid
           setInitialState(uuid)
           uuid
 
@@ -74,7 +106,7 @@ object InitSupport {
 
           StateHandling.log("state found upon reload, setting initial state")
 
-          val uuid = initData.uuid
+          val uuid = initializations.uuid
           setInitialState(uuid)
           uuid
 
@@ -111,17 +143,9 @@ object InitSupport {
     Globals.formUUID        (formId).value = uuid
     Globals.formServerEvents(formId).value = ""
 
-    initData.initializations.toOption foreach { initializations ⇒
-      decode[rpc.Initializations](initializations) match {
-        case Left(_)  ⇒
-          // TODO: error handling
-          None
-        case Right(rpc.Initializations(controls, listeners, events)) ⇒
-          initializeJavaScriptControls(controls)
-          initializeKeyListeners(listeners, formElem)
-          initializeServerEvents(events, formElem)
-      }
-    }
+    initializeJavaScriptControls(initializations.controls)
+    initializeKeyListeners(initializations.listeners, formElem)
+    initializeServerEvents(initializations.events, formElem)
   }
 
   // Used by AjaxServer.js
@@ -278,6 +302,5 @@ object InitSupport {
           formId       = formElem.id
         )
       }
-
   }
 }

@@ -133,16 +133,21 @@ object Globals extends js.Object {
   val formUUID                      : js.Dictionary[html.Input]       = js.native
   val formServerEvents              : js.Dictionary[html.Input]       = js.native
 
+  val ns                            : js.Dictionary[String]           = js.native
+  val xformsServerURL               : js.Dictionary[String]           = js.native
+  val xformsServerUploadURL         : js.Dictionary[String]           = js.native
+  val calendarImageURL              : js.Dictionary[String]           = js.native
+  val formErrorPanel                : js.Dictionary[js.Object]        = js.native
+
   var repeatTreeChildToParent       : js.Dictionary[String]           = js.native
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]] = js.native
   var repeatIndexes                 : js.Dictionary[String]           = js.native
 
-  val xformsServerUploadURL         : js.Dictionary[String]           = js.native
   var loadingOtherPage              : Boolean                         = js.native
-  val ns                            : js.Dictionary[String]           = js.native
   val eventQueue                    : js.Array[js.Any]                = js.native
   val requestInProgress             : Boolean                         = js.native
   val dialogs                       : js.Dictionary[js.Dynamic]       = js.native
+  var lastDialogZIndex              : Int                             = js.native
 }
 
 @js.native
@@ -213,19 +218,16 @@ class Property[T] extends js.Object {
 @JSGlobal("ORBEON.util.Properties")
 @js.native
 object Properties extends js.Object {
-  val delayBeforeIncrementalRequest    : Property[Int]    = js.native
-  val delayBeforeUploadProgressRefresh : Property[Int]    = js.native
-  val delayBeforeDisplayLoading        : Property[Int]    = js.native
-  val internalShortDelay               : Property[Double] = js.native
-  val revisitHandling                  : Property[String] = js.native
+  val delayBeforeIncrementalRequest    : Property[Int]     = js.native
+  val delayBeforeUploadProgressRefresh : Property[Int]     = js.native
+  val delayBeforeDisplayLoading        : Property[Int]     = js.native
+  val internalShortDelay               : Property[Double]  = js.native
+  val revisitHandling                  : Property[String]  = js.native
 }
 
 @js.native
 trait InitData extends js.Object {
-  val uuid            : String             = js.native
-  val repeatTree      : String             = js.native
-  val repeatIndexes   : String             = js.native
-  val initializations : js.UndefOr[String] = js.native
+  val initializations : String = js.native
 }
 
 @JSGlobal("ORBEON.util.Utils")
@@ -234,6 +236,7 @@ object Utils extends js.Object {
   def appendToEffectiveId(effectiveId: String, ending: String) : String =           js.native
   def getRepeatIndexes(effectiveId: String)                    : js.Array[String] = js.native
   def findRepeatDelimiter(repeatId: String, iteration: Int)    : raw.Element =      js.native
+  def overlayUseDisplayHidden(o: js.Object): Unit = js.native
 }
 
 @JSGlobal("ORBEON.xforms.control.Control")

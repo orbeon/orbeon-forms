@@ -22,7 +22,13 @@ case class KeyListener(eventName: Set[String], observer: String, keyText: String
 case class ServerEvent(delay: Long, discardable: Boolean, showProgress: Boolean, event: String)
 
 case class Initializations(
-  controls  : List[Control],
-  listeners : List[KeyListener],
-  events    : List[ServerEvent]
+  uuid                   : String,
+  repeatTree             : String,
+  repeatIndexes          : String,
+  xformsServerPath       : String,
+  xformsServerUploadPath : String,
+  calendarImagePath      : String,
+  controls               : List[Control],
+  listeners              : List[KeyListener],
+  events                 : List[ServerEvent]
 )

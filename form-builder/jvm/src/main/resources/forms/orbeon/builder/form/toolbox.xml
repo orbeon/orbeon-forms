@@ -165,7 +165,7 @@
                                     <xf:output value="$form-resources/new-section/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
-                                    toolboxOps:insertNewSection($model, true())
+                                    toolboxOps:insertNewSection(true())
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
@@ -177,7 +177,7 @@
                                     <xf:output value="$form-resources/new-grid/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
-                                    toolboxOps:insertNewGrid($model)
+                                    toolboxOps:insertNewGrid()
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
@@ -188,7 +188,7 @@
                                     <xf:output value="$form-resources/new-repeated-grid/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
-                                    toolboxOps:insertNewRepeatedGrid($model)
+                                    toolboxOps:insertNewRepeatedGrid()
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
@@ -239,7 +239,7 @@
                                             </xf:action>
                                             <xf:action if="not($is-section-component)">
                                                 <xf:action type="xpath">
-                                                    toolboxOps:insertNewControl($model, $binding)
+                                                    toolboxOps:insertNewControl($binding)
                                                 </xf:action>
                                                 <xf:var
                                                     name="effective-id"

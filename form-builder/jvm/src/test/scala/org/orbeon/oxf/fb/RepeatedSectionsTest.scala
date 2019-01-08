@@ -332,7 +332,7 @@ class RepeatedSectionsTest
 
         val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
 
-        insertNewControl(doc, binding)
+        insertNewControl(binding)
 
         // Expect new control in 2 iterations in the template
         val expected =

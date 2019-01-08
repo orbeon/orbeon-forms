@@ -173,7 +173,7 @@ class FormBuilderFunctionsTest
 
         // Insert a new control into the next empty td
         selectFirstCell()
-        val newControlNameOption = insertNewControl(doc, <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
+        val newControlNameOption = insertNewControl(<binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
         // Check the control's name
         assert(newControlNameOption === Some("control-2"))
@@ -244,7 +244,7 @@ class FormBuilderFunctionsTest
 
         // Insert a new repeated grid after the current grid
         selectFirstCell()
-        val newRepeatNameOption = insertNewRepeatedGrid(doc)
+        val newRepeatNameOption = insertNewRepeatedGrid()
 
         assert(newRepeatNameOption === Some("grid-2"))
         val newRepeatName          = newRepeatNameOption.get
@@ -271,7 +271,7 @@ class FormBuilderFunctionsTest
         }
 
         // Insert a new control
-        val newControlNameOption = insertNewControl(doc, <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
+        val newControlNameOption = insertNewControl(<binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>)
 
         assert(newControlNameOption === Some("control-2"))
         val newControlName = newControlNameOption.get

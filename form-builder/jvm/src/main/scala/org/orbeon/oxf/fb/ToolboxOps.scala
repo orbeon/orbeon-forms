@@ -51,7 +51,7 @@ object ToolboxOps {
 
   // Insert a new control in a cell
   //@XPathFunction
-  def insertNewControl(doc: NodeInfo, binding: NodeInfo): Option[String] = {
+  def insertNewControl(binding: NodeInfo): Option[String] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -175,7 +175,7 @@ object ToolboxOps {
 
   // Insert a new grid
   //@XPathFunction
-  def insertNewGrid(inDoc: NodeInfo): Unit = {
+  def insertNewGrid(): Unit = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -207,7 +207,7 @@ object ToolboxOps {
 
   // Insert a new section with optionally a nested grid
   //@XPathFunction
-  def insertNewSection(inDoc: NodeInfo, withGrid: Boolean): Some[NodeInfo] = {
+  def insertNewSection(withGrid: Boolean): Some[NodeInfo] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -271,7 +271,7 @@ object ToolboxOps {
 
   // Insert a new repeat
   //@XPathFunction
-  def insertNewRepeatedGrid(inDoc: NodeInfo): Some[String] = {
+  def insertNewRepeatedGrid(): Some[String] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -337,7 +337,7 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     // Insert new section first
-    insertNewSection(inDoc, withGrid = false) map { section ⇒
+    insertNewSection(withGrid = false) map { section ⇒
 
       val selector = binding attValue "element"
 

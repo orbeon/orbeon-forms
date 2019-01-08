@@ -114,22 +114,12 @@ object InitSupport {
     initData.initializations.toOption foreach { initializations ⇒
       decode[rpc.Initializations](initializations) match {
         case Left(_)  ⇒
-          // TODO: error
+          // TODO: error handling
           None
         case Right(rpc.Initializations(controls, listeners, events)) ⇒
-
           initializeJavaScriptControls(controls)
           initializeKeyListeners(listeners, formElem)
-
-          events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
-            AjaxServer.createDelayedServerEvent(
-              serverEvents = event,
-              delay        = delay.toDouble,
-              showProgress = showProgress,
-              discardable  = discardable,
-              formId       = formElem.id
-            )
-          }
+          initializeServerEvents(events, formElem)
       }
     }
   }
@@ -144,10 +134,7 @@ object InitSupport {
         initializeJavaScriptControls(controls)
     }
 
-  private def getInitDataForAllForms: js.Dictionary[InitData] =
-    g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
-
-  // NOTE: Public for now as it is also called from AjaxServer.js
+  // Used by AjaxServer.js
   def processRepeatHierarchy(repeatTreeString: String): Unit = {
 
     val childToParent    = parseRepeatTree(repeatTreeString)
@@ -169,6 +156,9 @@ object InitSupport {
   private object Private {
 
     private val TwoPassSubmissionFields = Set(UuidFieldName, ServerEventsFieldName)
+
+    def getInitDataForAllForms: js.Dictionary[InitData] =
+      g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
     def collectTwoPassSubmissionFields(formElement: html.Form): Map[String, Input] =
       formElement.elements.iterator collect
@@ -205,6 +195,34 @@ object InitSupport {
 
     def processRepeatIndexes(repeatIndexesString: String): Unit =
       Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
+
+    def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
+      controls foreach { case rpc.Control(id, valueOpt) ⇒
+        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
+          val jControl = $(control)
+          // Exclude controls in repeat templates
+          if (jControl.parents(".xforms-repeat-template").length == 0) {
+              if (XBL.isComponent(control)) {
+                // Custom XBL component initialization
+                val instance = XBL.instanceForControl(control)
+                if (instance ne null) {
+                  valueOpt foreach { value ⇒
+                    Controls.setCurrentValue(control, value)
+                  }
+                }
+              } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+                  // Initialized visible dialogs
+                  Init._dialog(control)
+              } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+                  // Legacy JavaScript initialization
+                  Init._compactSelect(control)
+              } else if (jControl.is(".xforms-range")) {
+                  // Legacy JavaScript initialization
+                  Init._range(control)
+              }
+          }
+        }
+      }
 
     def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
@@ -250,32 +268,16 @@ object InitSupport {
         }
       }
 
-    def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
-      controls foreach { case rpc.Control(id, valueOpt) ⇒
-        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
-          val jControl = $(control)
-          // Exclude controls in repeat templates
-          if (jControl.parents(".xforms-repeat-template").length == 0) {
-              if (XBL.isComponent(control)) {
-                // Custom XBL component initialization
-                val instance = XBL.instanceForControl(control)
-                if (instance ne null) {
-                  valueOpt foreach { value ⇒
-                    Controls.setCurrentValue(control, value)
-                  }
-                }
-              } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
-                  // Initialized visible dialogs
-                  Init._dialog(control)
-              } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
-                  // Legacy JavaScript initialization
-                  Init._compactSelect(control)
-              } else if (jControl.is(".xforms-range")) {
-                  // Legacy JavaScript initialization
-                  Init._range(control)
-              }
-          }
-        }
+    def initializeServerEvents(events: List[rpc.ServerEvent], formElem: html.Form): Unit =
+      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
+        AjaxServer.createDelayedServerEvent(
+          serverEvents = event,
+          delay        = delay.toDouble,
+          showProgress = showProgress,
+          discardable  = discardable,
+          formId       = formElem.id
+        )
       }
+
   }
 }

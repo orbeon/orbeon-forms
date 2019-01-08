@@ -46,6 +46,7 @@ import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
+import org.orbeon.xforms.rpc
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -729,18 +730,11 @@ case class DelayedEvent(
     )
   }
 
-  def writeAsJSON(sb: java.lang.StringBuilder, currentTime: Long): Unit = {
-    sb.append('{')
-    sb.append("\"delay\":")
-    sb.append(time - currentTime)
-    if (discardable) {
-      sb.append(",\"discardable\":true")
-    }
-    sb.append(",\"show-progress\":")
-    sb.append(showProgress)
-    sb.append(",\"event\":\"")
-    sb.append(asEncodedDocument)
-    sb.append('"')
-    sb.append("}")
-  }
+  def toServerEvent(currentTime: Long): rpc.ServerEvent =
+    rpc.ServerEvent(
+      delay        = time - currentTime,
+      discardable  = true,
+      showProgress = showProgress,
+      event        = asEncodedDocument
+    )
 }

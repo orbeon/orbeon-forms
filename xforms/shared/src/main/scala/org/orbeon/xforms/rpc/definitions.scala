@@ -18,10 +18,11 @@ import org.orbeon.oxf.util.Modifier
 
 
 case class Control(id: String, valueOpt: Option[String])
-
-case class Controls(controls: List[Control])
-
-
 case class KeyListener(eventName: Set[String], observer: String, keyText: String, modifiers: Set[Modifier])
+case class ServerEvent(delay: Long, discardable: Boolean, showProgress: Boolean, event: String)
 
-case class KeyListeners(listeners: List[KeyListener])
+case class Initializations(
+  controls  : List[Control],
+  listeners : List[KeyListener],
+  events    : List[ServerEvent]
+)

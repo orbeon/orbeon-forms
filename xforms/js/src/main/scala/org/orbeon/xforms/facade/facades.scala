@@ -68,6 +68,14 @@ trait AjaxServerTrait extends js.Object {
   def beforeSendingEvent                                                   : JQueryCallback = js.native
   def ajaxResponseReceived                                                 : JQueryCallback = js.native
   def fireEvents(events: js.Array[AjaxServer.Event], incremental: Boolean) : Unit           = js.native
+
+  def createDelayedServerEvent(
+    serverEvents : String,
+    delay        : Double,
+    showProgress : Boolean,
+    discardable  : Boolean,
+    formId       : String
+  ): Unit = js.native
 }
 
 @js.native
@@ -214,11 +222,10 @@ object Properties extends js.Object {
 
 @js.native
 trait InitData extends js.Object {
-  val uuid          : String             = js.native
-  val repeatTree    : String             = js.native
-  val repeatIndexes : String             = js.native
-  val controls      : js.UndefOr[String] = js.native
-  val keyListeners  : js.UndefOr[String] = js.native
+  val uuid            : String             = js.native
+  val repeatTree      : String             = js.native
+  val repeatIndexes   : String             = js.native
+  val initializations : js.UndefOr[String] = js.native
 }
 
 @JSGlobal("ORBEON.util.Utils")

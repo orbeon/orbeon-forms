@@ -24,7 +24,7 @@ import org.orbeon.xforms.StateHandling.ClientState
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.{KeyboardEvent, html}
+import org.scalajs.dom.html
 import org.scalajs.dom.html.Input
 
 import scala.collection.{mutable ⇒ m}
@@ -111,101 +111,40 @@ object InitSupport {
     Globals.formUUID        (formId).value = uuid
     Globals.formServerEvents(formId).value = ""
 
-    initializeJavaScriptControls(initData)
-    initializeKeyListeners(initData, formElem)
-  }
-
-  private def initializeKeyListeners(initData: InitData, formElem: html.Form): Unit = {
-    initData.keyListeners.toOption foreach { keyListeners ⇒
-      decode[rpc.KeyListeners](keyListeners) match {
+    initData.initializations.toOption foreach { initializations ⇒
+      decode[rpc.Initializations](initializations) match {
         case Left(_)  ⇒
           // TODO: error
           None
-        case Right(rpc.KeyListeners(listeners)) ⇒
-          // TODO: Maybe deduplicate listeners, here or on server
-          listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
+        case Right(rpc.Initializations(controls, listeners, events)) ⇒
 
-            // NOTE: 2019-01-07: We don't handle dialogs yet.
-            //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
+          initializeJavaScriptControls(controls)
+          initializeKeyListeners(listeners, formElem)
 
-            val mousetrap =
-              if (observer == "#document")
-                Mousetrap
-              else
-                Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
-
-            val modifierStrings =
-              modifiers.toList map (_.entryName)
-
-            val modifierString =
-              modifierStrings mkString " "
-
-            val callback: js.Function = (e: dom.KeyboardEvent, combo: String) ⇒ {
-
-              val properties =
-                Map(KeyTextPropertyName → keyText) ++
-                  (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString))
-
-              DocumentAPI.dispatchEvent(
-                targetId    = observer,
-                eventName   = e.`type`,
-                incremental = false,
-                properties  = properties.toJSDictionary
-              )
-
-              if (modifiers.nonEmpty)
-                e.preventDefault()
-            }
-
-            val keys = modifierStrings ::: List(keyText.toLowerCase) mkString "+"
-
-            // TODO: Handle multiple event names.
-            mousetrap.bind(keys, callback, eventNames.head)
+          events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
+            AjaxServer.createDelayedServerEvent(
+              serverEvents = event,
+              delay        = delay.toDouble,
+              showProgress = showProgress,
+              discardable  = discardable,
+              formId       = formElem.id
+            )
           }
       }
     }
   }
 
-  // Also used by AjaxServer.js
-  def initializeJavaScriptControls(initData: InitData): Unit = {
-    initData.controls.toOption foreach { controls ⇒
-      decode[rpc.Controls](controls) match {
-        case Left(_)  ⇒
-          // TODO: error
-          None
-        case Right(rpc.Controls(controls)) ⇒
-
-          controls foreach { case rpc.Control(id, valueOpt) ⇒
-              Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
-                val jControl = $(control)
-                // Exclude controls in repeat templates
-                if (jControl.parents(".xforms-repeat-template").length == 0) {
-                    if (XBL.isComponent(control)) {
-                      // Custom XBL component initialization
-                      val instance = XBL.instanceForControl(control)
-                      if (instance ne null) {
-                        valueOpt foreach { value ⇒
-                          Controls.setCurrentValue(control, value)
-                        }
-                      }
-                    } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
-                        // Initialized visible dialogs
-                        Init._dialog(control)
-                    } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
-                        // Legacy JavaScript initialization
-                        Init._compactSelect(control)
-                    } else if (jControl.is(".xforms-range")) {
-                        // Legacy JavaScript initialization
-                        Init._range(control)
-                    }
-                }
-              }
-          }
-      }
+  // Used by AjaxServer.js
+  def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
+    decode[List[rpc.Control]](initData) match {
+      case Left(_)  ⇒
+        // TODO: error
+        None
+      case Right(controls) ⇒
+        initializeJavaScriptControls(controls)
     }
-  }
 
-  def getInitDataForAllForms: js.Dictionary[InitData] =
+  private def getInitDataForAllForms: js.Dictionary[InitData] =
     g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
   // NOTE: Public for now as it is also called from AjaxServer.js
@@ -264,8 +203,77 @@ object InitSupport {
       parentToChildren
     }
 
-    def processRepeatIndexes(repeatIndexesString: String): Unit = {
+    def processRepeatIndexes(repeatIndexesString: String): Unit =
       Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
-    }
+
+      def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
+      // TODO: Maybe deduplicate listeners, here or on server
+      listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
+
+        // NOTE: 2019-01-07: We don't handle dialogs yet.
+        //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
+
+        val mousetrap =
+          if (observer == "#document")
+            Mousetrap
+          else
+            Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
+
+        val modifierStrings =
+          modifiers.toList map (_.entryName)
+
+        val modifierString =
+          modifierStrings mkString " "
+
+        val callback: js.Function = (e: dom.KeyboardEvent, combo: String) ⇒ {
+
+          val properties =
+            Map(KeyTextPropertyName → keyText) ++
+              (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString))
+
+          DocumentAPI.dispatchEvent(
+            targetId    = observer,
+            eventName   = e.`type`,
+            incremental = false,
+            properties  = properties.toJSDictionary
+          )
+
+          if (modifiers.nonEmpty)
+            e.preventDefault()
+        }
+
+        val keys = modifierStrings ::: List(keyText.toLowerCase) mkString "+"
+
+        // TODO: Handle multiple event names.
+        mousetrap.bind(keys, callback, eventNames.head)
+      }
+
+    def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
+      controls foreach { case rpc.Control(id, valueOpt) ⇒
+        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
+          val jControl = $(control)
+          // Exclude controls in repeat templates
+          if (jControl.parents(".xforms-repeat-template").length == 0) {
+              if (XBL.isComponent(control)) {
+                // Custom XBL component initialization
+                val instance = XBL.instanceForControl(control)
+                if (instance ne null) {
+                  valueOpt foreach { value ⇒
+                    Controls.setCurrentValue(control, value)
+                  }
+                }
+              } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+                  // Initialized visible dialogs
+                  Init._dialog(control)
+              } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+                  // Legacy JavaScript initialization
+                  Init._compactSelect(control)
+              } else if (jControl.is(".xforms-range")) {
+                  // Legacy JavaScript initialization
+                  Init._range(control)
+              }
+          }
+        }
+      }
   }
 }

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.{lang ⇒ jl}
-
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -25,6 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.rpc
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.control.Breaks
@@ -317,21 +316,15 @@ class ControlsComparator(
 
       val controlsToInitialize = ScriptBuilder.gatherJavaScriptInitializations(control)
       if (controlsToInitialize.nonEmpty) {
-        val sb = new jl.StringBuilder
-        sb.append('{')
-        ScriptBuilder.buildJavaScriptInitializations(
-          containingDocument   = document,
-          prependComma         = false,
-          controlsToInitialize = controlsToInitialize,
-          sb                   = sb
-        )
-        sb.append('}')
+
+        import io.circe.generic.auto._
+        import io.circe.syntax._
 
         element(
           "init",
           prefix = "xxf",
           uri    = XXFORMS_NAMESPACE_URI,
-          text   = sb.toString
+          text   = (controlsToInitialize map (rpc.Control.apply _).tupled).asJson.noSpaces
         )
       }
     }

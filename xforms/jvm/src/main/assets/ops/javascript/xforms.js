@@ -3484,24 +3484,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
                 // Implemented in Scala.js
                 ORBEON.xforms.InitSupport.initialize(formElement);
-
-                // Initialize controls, listeners, server-events
-                if (! (window.orbeonInitData === undefined)) {
-
-                    var formInitData = window.orbeonInitData[formID];
-
-                    // Handle server events
-                    var serverEvents = formInitData["server-events"];
-                    if (YAHOO.lang.isArray(serverEvents)) {
-                        // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
-                        for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
-                            var serverEvent = serverEvents[serverEventIndex];
-                            var discardable = ! _.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
-                            ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
-                                    serverEvent["show-progress"], discardable, formElement.id);
-                        }
-                    }
-                }
             });
 
             // Special registration for focus, blur, and change events

@@ -18,8 +18,7 @@ import java.{lang ⇒ jl}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Modifier, URLRewriterUtils}
+import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils.{RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSION_NUMBER_PROPERTY, getApplicationResourceVersion}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
@@ -28,7 +27,6 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.xforms.rpc
-import org.orbeon.xforms.rpc.KeyListeners
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
@@ -54,23 +52,6 @@ object ScriptBuilder {
       write(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n")
       write(shareableScript.body)
       write("}\n")
-    }
-
-  def buildJavaScriptInitializations(
-    containingDocument   : XFormsContainingDocument,
-    prependComma         : Boolean,
-    controlsToInitialize : List[(String, Option[String])],
-    sb                   : jl.StringBuilder
-  ): Unit =
-    if (controlsToInitialize.nonEmpty) {
-      if (prependComma)
-        sb.append(',')
-      sb.append(""""controls": """)
-
-      val jsonString =
-        rpc.Controls(controlsToInitialize map (rpc.Control.apply _).tupled).asJson.noSpaces
-
-      sb.append(quoteString(jsonString))
     }
 
   def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
@@ -229,46 +210,34 @@ object ScriptBuilder {
       sb.append('}')
     }
 
-    buildJavaScriptInitializations(
-      containingDocument   = containingDocument,
-      prependComma         = true,
-      controlsToInitialize = controlsToInitialize,
-      sb                   = sb
-    )
+    sb.append(',')
+    sb.append(""""initializations": """)
 
-    if (hasKeyboardHandlers) {
-      if (hasControlsToInitialize)
-        sb.append(',')
-      sb.append(""""keyListeners": """)
+    val currentTime = System.currentTimeMillis
 
-      val jsonString =
-        KeyListeners(
+    val jsonString =
+      rpc.Initializations(
+        controls  =
+          for {
+            (id, valueOpt) ← controlsToInitialize
+          } yield
+            rpc.Control(id, valueOpt),
+        listeners =
           for {
             handler  ← containingDocument.getStaticOps.keyboardHandlers
             observer ← handler.observersPrefixedIds
             keyText  ← handler.keyText
           } yield
-            rpc.KeyListener(handler.eventNames, observer, keyText, handler.keyModifiers)
-        ).asJson.noSpaces
+            rpc.KeyListener(handler.eventNames, observer, keyText, handler.keyModifiers),
+        events    =
+          for {
+            delayedEvent ← containingDocument.delayedEvents
+          } yield
+            delayedEvent.toServerEvent(currentTime)
+      ).asJson.noSpaces
 
-      sb.append(quoteString(jsonString))
-    }
+    sb.append(quoteString(jsonString))
 
-    // Output server events
-    if (hasServerEvents) {
-      if (hasControlsToInitialize || hasKeyboardHandlers)
-        sb.append(',')
-      sb.append("\"server-events\":[")
-      val currentTime = System.currentTimeMillis
-      var first = true
-      for (delayedEvent ← containingDocument.delayedEvents) {
-        if (! first)
-          sb.append(',')
-        delayedEvent.writeAsJSON(sb, currentTime)
-        first = false
-      }
-      sb.append(']')
-    }
     sb.append("};")
 
     sb.toString

@@ -79,7 +79,7 @@
                         toolboxOps:cutToClipboard($current-td)
                     </xf:action>
                 </xf:trigger>
-                <xf:trigger appearance="minimal" class="fb-copy-button" ref="$xcv/copy-trigger">
+                <xf:trigger appearance="minimal" class="fb-copy-button" ref="$xcv/copy-trigger" id="copy-trigger">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/copy/label}"
@@ -89,7 +89,7 @@
                         toolboxOps:copyToClipboard($current-td)
                     </xf:action>
                 </xf:trigger>
-                <xf:trigger appearance="minimal" class="fb-paste-button" ref="$xcv/paste-trigger">
+                <xf:trigger appearance="minimal" class="fb-paste-button" ref="$xcv/paste-trigger" id="paste-trigger">
                     <xf:label>
                         <xh:i
                             title="{$form-resources/paste/label}"
@@ -116,7 +116,7 @@
                         else
                             ''"/>
 
-                <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger">
+                <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger" id="undo-trigger">
                     <xf:label>
                         <xh:i title="{$undo-title}" class="fa fa-undo fa-fw"/>
                     </xf:label>
@@ -136,7 +136,7 @@
                         else
                             ''"/>
 
-                <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger">
+                <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger" id="redo-trigger">
                     <xf:label>
                         <xh:i title="{$redo-title}" class="fa fa-repeat fa-fw"/>
                     </xf:label>

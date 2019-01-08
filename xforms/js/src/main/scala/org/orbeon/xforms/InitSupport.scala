@@ -24,7 +24,7 @@ import org.orbeon.xforms.StateHandling.ClientState
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html
+import org.scalajs.dom.{KeyboardEvent, html}
 import org.scalajs.dom.html.Input
 
 import scala.collection.{mutable ⇒ m}
@@ -123,12 +123,15 @@ object InitSupport {
           None
         case Right(rpc.KeyListeners(listeners)) ⇒
           // TODO: Maybe deduplicate listeners, here or on server
-          listeners foreach { case rpc.KeyListener(observer, keyText, modifiers) ⇒
+          listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
+
+            // NOTE: 2019-01-07: We don't handle dialogs yet.
+            //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
 
             val mousetrap =
               if (observer == "#document")
                 Mousetrap
-              else //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
+              else
                 Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
 
             val modifierStrings =
@@ -137,18 +140,27 @@ object InitSupport {
             val modifierString =
               modifierStrings mkString " "
 
-            val callback: js.Function = () ⇒ {
+            val callback: js.Function = (e: dom.KeyboardEvent, combo: String) ⇒ {
+
+              val properties =
+                Map(KeyTextPropertyName → keyText) ++
+                  (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString))
+
               DocumentAPI.dispatchEvent(
                 targetId    = observer,
-                eventName   = EventNames.KeyPress,
+                eventName   = e.`type`,
                 incremental = false,
-                properties  = Map(KeyTextPropertyName → keyText) ++ (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString)) toJSDictionary
+                properties  = properties.toJSDictionary
               )
+
+              if (modifiers.nonEmpty)
+                e.preventDefault()
             }
 
             val keys = modifierStrings ::: List(keyText.toLowerCase) mkString "+"
 
-            mousetrap.bind(keys, callback)
+            // TODO: Handle multiple event names.
+            mousetrap.bind(keys, callback, eventNames.head)
           }
       }
     }

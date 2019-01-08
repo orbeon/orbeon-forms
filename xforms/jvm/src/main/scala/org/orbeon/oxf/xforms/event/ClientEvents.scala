@@ -428,7 +428,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     // Only a few events specify custom properties that can be set by the client
     val AllStandardProperties =
       XXFormsDndEvent.StandardProperties        ++
-      KeypressEvent.StandardProperties          ++
+      KeyboardEvent.StandardProperties          ++
       XXFormsUploadDoneEvent.StandardProperties ++
       XXFormsLoadEvent.StandardProperties
 

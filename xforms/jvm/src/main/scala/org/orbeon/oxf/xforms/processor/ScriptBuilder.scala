@@ -198,7 +198,7 @@ object ScriptBuilder {
 
     // Produce JSON output
     val hasControlsToInitialize = controlsToInitialize.nonEmpty
-    val hasKeyListeners         = containingDocument.getStaticOps.keypressHandlers.nonEmpty
+    val hasKeyboardHandlers     = containingDocument.getStaticOps.keyboardHandlers.nonEmpty
     val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
 
     val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
@@ -236,7 +236,7 @@ object ScriptBuilder {
       sb                   = sb
     )
 
-    if (hasKeyListeners) {
+    if (hasKeyboardHandlers) {
       if (hasControlsToInitialize)
         sb.append(',')
       sb.append(""""keyListeners": """)
@@ -244,11 +244,11 @@ object ScriptBuilder {
       val jsonString =
         KeyListeners(
           for {
-            handler  ← containingDocument.getStaticOps.keypressHandlers
+            handler  ← containingDocument.getStaticOps.keyboardHandlers
             observer ← handler.observersPrefixedIds
             keyText  ← handler.keyText
           } yield
-            rpc.KeyListener(observer, keyText, handler.keyModifiers)
+            rpc.KeyListener(handler.eventNames, observer, keyText, handler.keyModifiers)
         ).asJson.noSpaces
 
       sb.append(quoteString(jsonString))
@@ -256,7 +256,7 @@ object ScriptBuilder {
 
     // Output server events
     if (hasServerEvents) {
-      if (hasControlsToInitialize || hasKeyListeners)
+      if (hasControlsToInitialize || hasKeyboardHandlers)
         sb.append(',')
       sb.append("\"server-events\":[")
       val currentTime = System.currentTimeMillis

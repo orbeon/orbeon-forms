@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.{EventHandler, XFormsEvent, XFormsEventTarget}
 import org.orbeon.xforms.EventNames._
 
-class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(KeyPress, target, KeypressEvent.filter(properties), bubbles = true, cancelable = false) {
+abstract class KeyboardEvent(name: String, target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(name, target, KeyboardEvent.filter(properties), bubbles = true, cancelable = false) {
 
   // NOTE: Not sure if should be cancelable, this seems to indicate that "special keys" should not
   // be cancelable: http://www.quirksmode.org/dom/events/keys.html
@@ -38,7 +38,18 @@ class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def keyText: String = property[String](KeyTextPropertyName).orNull
 }
 
-object KeypressEvent {
+class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends KeyboardEvent(KeyPress, target, properties)
+
+class KeydownEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends KeyboardEvent(KeyDown, target, properties)
+
+class KeyupEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends KeyboardEvent(KeyUp, target, properties)
+
+object KeyboardEvent {
+
+  private val Properties = List(KeyModifiersPropertyName, KeyTextPropertyName)
 
   // Filter incoming properties
   private def filter(properties: PropertyGetter): PropertyGetter = new PropertyGetter {
@@ -50,5 +61,5 @@ object KeypressEvent {
     }
   }
 
-  val StandardProperties = Map(KeyPress → List(KeyModifiersPropertyName, KeyTextPropertyName))
+  val StandardProperties: Map[String, List[String]] = KeyboardEvents map (_ → Properties) toMap
 }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, Modifier}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
@@ -346,13 +345,7 @@ object EventHandlerImpl extends Logging {
 
   def parseKeyModifiers(value: Option[String]): Set[Modifier] =
     value match {
-      case Some(attValue) ⇒
-        attValue.splitTo[Set]() map (_.toLowerCase) map {
-          case "control" ⇒ "ctrl"
-          case other     ⇒ other
-        } flatMap
-          Modifier.withNameLowercaseOnlyOption
-      case None ⇒
-        Set.empty[Modifier]
+      case Some(attValue) ⇒ Modifier.parseStringToSet(attValue)
+      case None           ⇒ Set.empty[Modifier]
     }
 }

@@ -31,7 +31,7 @@ trait PartEventHandlerAnalysis {
 
   private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map()
   private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set()
-  private[PartEventHandlerAnalysis] var _keypressHandlers: List[EventHandler] = List()
+  private[PartEventHandlerAnalysis] var _keyboardHandlers: List[EventHandler] = List()
 
   // Scripts
   private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
@@ -65,8 +65,8 @@ trait PartEventHandlerAnalysis {
     // Gather all event names (NOTE: #all is also included if present)
     _eventNames ++= eventHandlers flatMap (_.eventNames)
 
-    // Gather all keypress handlers
-    _keypressHandlers ++= eventHandlers filter (_.eventNames(EventNames.KeyPress))
+    // Gather all keyboard handlers
+    _keyboardHandlers ++= eventHandlers filter (_.eventNames intersect EventNames.KeyboardEvents nonEmpty)
 
     gatherScripts()
   }
@@ -132,8 +132,8 @@ trait PartEventHandlerAnalysis {
   def deregisterEventHandler(eventHandler: EventHandlerImpl): Unit = {
     eventHandler.observersPrefixedIds foreach (_handlersForObserver -= _)
 
-    if (eventHandler.eventNames(EventNames.KeyPress))
-      _keypressHandlers = _keypressHandlers filterNot (_ eq eventHandler)
+    if (eventHandler.eventNames intersect EventNames.KeyboardEvents nonEmpty)
+      _keyboardHandlers = _keyboardHandlers filterNot (_ eq eventHandler)
 
     if (ActionNames(eventHandler.localName))
       _scriptsByPrefixedId -= eventHandler.prefixedId
@@ -148,7 +148,7 @@ trait PartEventHandlerAnalysis {
     _handlersForObserver.get(observerPrefixedId) exists
       (handlers ⇒ handlers exists (_.isMatchByName(eventName)))
 
-  def keypressHandlers = _keypressHandlers
+  def keyboardHandlers: List[EventHandler] = _keyboardHandlers
 
   /**
    * Returns whether there is any event handler registered anywhere in the controls for the given event name.

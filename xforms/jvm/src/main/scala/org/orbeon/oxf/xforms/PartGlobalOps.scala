@@ -46,7 +46,7 @@ trait PartGlobalOps {
   // Events
   def hasHandlerForEvent(eventName: String): Boolean
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean
-  def keypressHandlers: Seq[EventHandler]
+  def keyboardHandlers: Seq[EventHandler]
 
   // XBL
   def getBinding(prefixedId: String): Option[ConcreteBinding]

@@ -71,6 +71,8 @@ object XFormsEventFactory {
     XXFORMS_REPEAT_ACTIVATE     → (new XXFormsRepeatActivateEvent(_, _)),
     // Other other events ;)
     EventNames.KeyPress         → (new KeypressEvent(_, _)),
+    EventNames.KeyDown          → (new KeydownEvent(_, _)),
+    EventNames.KeyUp            → (new KeyupEvent(_, _)),
     XFORMS_DESELECT             → (new XFormsDeselectEvent(_, _)),
     XFORMS_INSERT               → (new XFormsInsertEvent(_, _)),
     XFORMS_LINK_ERROR           → (new XFormsLinkErrorEvent(_, _)),

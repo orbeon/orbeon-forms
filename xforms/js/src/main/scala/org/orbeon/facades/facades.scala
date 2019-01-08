@@ -21,7 +21,7 @@ import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
 trait Mousetrap extends js.Object {
-  def bind(command: String, callback: js.Function, mode: String = "keydown"): Unit = js.native
+  def bind(command: String, callback: js.Function, mode: String = "keydown", action: js.UndefOr[String] = js.undefined): Unit = js.native
 }
 
 @js.native

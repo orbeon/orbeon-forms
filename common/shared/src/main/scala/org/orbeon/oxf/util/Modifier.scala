@@ -16,6 +16,8 @@ package org.orbeon.oxf.util
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 
+import StringUtils._
+
 // NOTE: We place this in a separate module also to help with Circe issues, see:
 // https://github.com/circe/circe/issues/639
 sealed trait Modifier extends EnumEntry with Lowercase
@@ -24,7 +26,19 @@ object Modifier extends Enum[Modifier] with CirceEnum[Modifier] {
 
   val values = findValues
 
-  case object Ctrl  extends Modifier
   case object Shift extends Modifier
+  case object Ctrl  extends Modifier
   case object Alt   extends Modifier
+  case object Meta  extends Modifier
+
+  def parseStringToSet(s: String): Set[Modifier] = {
+    s.splitTo[Set]() map (_.toLowerCase) map {
+        case "control" ⇒ "ctrl"
+        case "option"  ⇒ "alt"
+        case "command" ⇒ "meta"
+        case other     ⇒ other
+      } map
+        withNameLowercaseOnly
+  }
 }
+

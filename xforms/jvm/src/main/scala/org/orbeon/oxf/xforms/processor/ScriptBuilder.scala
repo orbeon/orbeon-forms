@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
-import org.orbeon.xforms.rpc
+import org.orbeon.xforms.{EventNames, rpc}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
@@ -223,12 +223,14 @@ object ScriptBuilder {
           } yield
             rpc.Control(id, valueOpt),
         listeners =
-          for {
-            handler  ← containingDocument.getStaticOps.keyboardHandlers
-            observer ← handler.observersPrefixedIds
-            keyText  ← handler.keyText
-          } yield
-            rpc.KeyListener(handler.eventNames, observer, keyText, handler.keyModifiers),
+          (
+            for {
+              handler  ← containingDocument.getStaticOps.keyboardHandlers
+              observer ← handler.observersPrefixedIds
+              keyText  ← handler.keyText
+            } yield
+              rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
+            ).distinct,
         events    =
           for {
             delayedEvent ← containingDocument.delayedEvents

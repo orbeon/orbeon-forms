@@ -206,8 +206,7 @@ object InitSupport {
     def processRepeatIndexes(repeatIndexesString: String): Unit =
       Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
-      def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
-      // TODO: Maybe deduplicate listeners, here or on server
+    def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
 
         // NOTE: 2019-01-07: We don't handle dialogs yet.
@@ -244,8 +243,11 @@ object InitSupport {
 
         val keys = modifierStrings ::: List(keyText.toLowerCase) mkString "+"
 
-        // TODO: Handle multiple event names.
-        mousetrap.bind(keys, callback, eventNames.head)
+        // It is unlikely that supporting multiple event names is very useful, but you can imagine
+        // in theory supporting both `keydown` and `keyup` for example.
+        eventNames foreach { eventName ⇒
+          mousetrap.bind(keys, callback, eventName)
+        }
       }
 
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =

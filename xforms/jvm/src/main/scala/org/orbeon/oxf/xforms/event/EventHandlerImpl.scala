@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{EventNames, XFormsId}
 
 import scala.util.control.NonFatal
 
@@ -60,7 +60,26 @@ class EventHandlerImpl(
   // TODO: no null
   private def att(name1: QName, name2: QName)          =  attOption(name1) orElse attOption(name2) orNull
 
-  val eventNames = attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++ attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
+  // These are only relevant when listening to keyboard events
+  val keyText      : Option[String] = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
+
+  val eventNames: Set[String] = {
+
+    val names =
+      attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++
+        attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
+
+    // For backward compatibility, still support `keypress` even with modifiers, but translate that to `keydown`,
+    // as modifiers require `keydown` in browsers.
+    if (keyModifiers.nonEmpty)
+      names map {
+        case EventNames.KeyPress ⇒ EventNames.KeyDown
+        case other               ⇒ other
+      }
+    else
+      names
+  }
 
   // NOTE: If #all is present, ignore all other specific events
   val (actualEventNames, isAllEvents) =
@@ -79,9 +98,6 @@ class EventHandlerImpl(
   val isPropagate            = att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) != "stop"
   // "true" means "perform", "false" means "cancel"
   val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
-
-  val keyText      = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-  val keyModifiers = parseKeyModifiers(attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
 
   val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
   val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"

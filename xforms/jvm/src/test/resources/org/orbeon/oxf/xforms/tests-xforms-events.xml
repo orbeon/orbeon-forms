@@ -1381,7 +1381,6 @@
                         </xf:instance>
 
                         <xf:action ev:event="xforms-ready">
-                            <!-- Dispatch custom keypress events -->
                             <xf:dispatch name="keypress" targetid="my-group">
                                 <xf:property name="modifiers" value="'control alt'"/>
                                 <xf:property name="text" value="'v'"/>
@@ -1399,16 +1398,33 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <!-- Match both -->
                     <xf:group id="my-group">
-                        <xf:insert ev:event="keypress" xxf:modifiers="control alt" xxf:text="v"
-                                       context="instance('events')" ref="*" origin="xf:element('handler1')"/>
-                        <xf:insert ev:event="keypress" xxf:modifiers="shift" xxf:text="w"
-                                       context="instance('events')" ref="*" origin="xf:element('handler2')"/>
-                        <xf:insert ev:event="keypress" xxf:modifiers="control alt"
-                                       context="instance('events')" ref="*" origin="xf:element('handler3')"/>
-                        <xf:insert ev:event="keypress" xxf:text="v"
-                                       context="instance('events')" ref="*" origin="xf:element('handler4')"/>
+                        <xf:insert
+                            event="keypress"
+                            xxf:modifiers="control alt"
+                            xxf:text="v"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element('handler1')"/>
+                        <xf:insert
+                            event="keypress"
+                            xxf:modifiers="shift"
+                            xxf:text="w"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element('handler2')"/>
+                        <xf:insert
+                            event="keypress"
+                            xxf:modifiers="control alt"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element('handler3')"/>
+                        <xf:insert
+                            event="keypress"
+                            xxf:text="v"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xf:element('handler4')"/>
                     </xf:group>
                 </xh:body>
             </xh:html>
@@ -1422,9 +1438,7 @@
                                 <events>
                                     <handler1/>
                                     <handler3/>
-                                    <handler4/>
                                     <handler3/>
-                                    <handler4/>
                                 </events>
                             </instance>
                         </instances>

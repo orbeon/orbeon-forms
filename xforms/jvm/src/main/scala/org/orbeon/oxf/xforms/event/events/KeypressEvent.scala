@@ -28,7 +28,7 @@ abstract class KeyboardEvent(name: String, target: XFormsEventTarget, properties
   // NOTE: For now, not an XFormsUIEvent because can also be targeted at XFormsContainingDocument
 
   override def matches(handler: EventHandler): Boolean =
-    handler.keyText == property[String](KeyTextPropertyName) && {
+    (handler.keyText.isEmpty || handler.keyText == property[String](KeyTextPropertyName)) && {
       handler.keyModifiers == keyModifiersSet
     }
 

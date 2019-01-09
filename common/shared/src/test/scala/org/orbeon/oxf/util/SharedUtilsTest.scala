@@ -234,4 +234,22 @@ class SharedUtilsTest extends FunSpec {
     for ((in, out) ← expected)
       assert(out === in.trimAllToEmpty)
   }
+
+  describe("The `substringAfter` function") {
+
+    val expected = Seq(
+      ("abcdef", "abc", "def"),
+      ("abcdef", "def", ""),
+      ("abcdef", "xyz", ""),
+      ("abcdef", "",    "abcdef"),
+      ("",       "",    ""),
+      ("",       "abc", "")
+    )
+
+    for ((s, search, expected) ← expected)
+      it(s"must pass with `$s`/`$search`") {
+        assert(expected === s.substringAfter(search))
+      }
+
+  }
 }

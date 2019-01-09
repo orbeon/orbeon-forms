@@ -196,6 +196,13 @@ object StringUtils {
       sb.toString
     }
 
+    def substringAfter(search: String): String = {
+      val index = s.indexOf(search)
+      if (index >= 0)
+        s.substring(index + search.length)
+      else
+        ""
+    }
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

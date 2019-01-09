@@ -77,7 +77,8 @@ object XFormsExtractor {
   *     <foo:bar ...>
   *   </root>
   *   <!-- Global properties -->
-  *   <properties xxf:noscript="true" .../>
+  *   <properties name="sanitize"            value="..."    inline="false"/>
+  *   <properties name="readonly-appearance" value="static" inline="true"/>
   *   <!-- Last id used (for id generation in XBL after deserialization) -->
   *   <last-id id="123"/>
   *   <!-- Template (for full updates) -->
@@ -284,7 +285,7 @@ class XFormsExtractor(
 
     // Handle properties of the form @xxf:* when outside of models or controls
     if (! inXFormsOrExtension && ! isXFormsOrExtension)
-      addPropertiesIfAny(attributes)
+      addInlinePropertiesIfAny(attributes)
 
     if (level == 0 && isTopLevel)
       isHTMLDocument = localname == "html" && (uri == "" || uri == XHTML_NAMESPACE_URI)
@@ -299,7 +300,7 @@ class XFormsExtractor(
 
       // Handle properties on top-level model elements
       if (isXForms && localname == "model")
-        addPropertiesIfAny(attributes)
+        addInlinePropertiesIfAny(attributes)
 
       outputFirstElementIfNeeded()
 
@@ -486,7 +487,7 @@ trait ExtractorProperties {
   // (although this case is degenerate: `TRUE` really shouldn't be allowed, but it is by Java!). In general, this
   // is not a problem, and the worst case scenario is that a few too many properties are kept in the static state.
 
-  private val unparsedLocalProperties = m.HashMap[String, String]()
+  private val unparsedInlineProperties = m.HashMap[String, String]()
 
   protected def outputNonDefaultProperties(): Unit =
     xmlReceiverOpt foreach { implicit xmlReceiver ⇒
@@ -499,27 +500,26 @@ trait ExtractorProperties {
           defaultValue = prop.defaultValue
           globalValue  = propertySet.getObject(XFORMS_PROPERTY_PREFIX + name, defaultValue)
         } yield
-          unparsedLocalProperties.get(name) match {
-            case Some(localValue) ⇒ localValue  != defaultValue.toString option (name → localValue)
-            case None             ⇒ globalValue != defaultValue          option (name → globalValue.toString)
+          unparsedInlineProperties.get(name) match {
+            case Some(localValue) ⇒ localValue  != defaultValue.toString option (name, localValue          , true)
+            case None             ⇒ globalValue != defaultValue          option (name, globalValue.toString, false)
           }
       } flatten
 
-      val newAttributes = new AttributesImpl
-
-      for ((name, value) ← propertiesToKeep)
-        newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, "xxf:" + name, XMLReceiverHelper.CDATA, value)
-
-      xmlReceiver.startPrefixMapping("xxf", XXFORMS_NAMESPACE_URI)
-      element(localName = "properties", atts = newAttributes)
-      xmlReceiver.endPrefixMapping("xxf")
+      for ((name, value, inline) ← propertiesToKeep) {
+        val newAttributes = new AttributesImpl
+        newAttributes.addAttribute("", "name",   "name",   XMLReceiverHelper.CDATA, name)
+        newAttributes.addAttribute("", "value",  "value",  XMLReceiverHelper.CDATA, value)
+        newAttributes.addAttribute("", "inline", "inline", XMLReceiverHelper.CDATA, inline.toString)
+        element(localName = STATIC_STATE_PROPERTIES_QNAME.localName, atts = newAttributes)
+      }
     }
 
-  protected def addPropertiesIfAny(attributes: Attributes): Unit =
+  protected def addInlinePropertiesIfAny(attributes: Attributes): Unit =
     for {
       i ← 0 until attributes.getLength
       if attributes.getURI(i) == XXFORMS_NAMESPACE_URI
     } locally {
-      unparsedLocalProperties.getOrElseUpdate(attributes.getLocalName(i), attributes.getValue(i))
+      unparsedInlineProperties.getOrElseUpdate(attributes.getLocalName(i), attributes.getValue(i))
     }
 }

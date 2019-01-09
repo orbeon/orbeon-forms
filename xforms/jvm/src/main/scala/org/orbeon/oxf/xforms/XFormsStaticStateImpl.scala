@@ -87,7 +87,7 @@ class XFormsStaticStateImpl(
   }
 
   private def loadClass[T : ClassTag](propertyName: String): Option[T] =
-    staticStateDocument.nonDefaultProperties.get(propertyName) flatMap trimAllToOpt match {
+    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap trimAllToOpt match {
       case Some(className) ⇒
 
         def tryFromScalaObject: Try[AnyRef] = Try {
@@ -169,13 +169,13 @@ class XFormsStaticStateImpl(
   def isServerStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
 
   private lazy val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
-    staticStateDocument.nonDefaultProperties map { case (name, rawPropertyValue) ⇒
+    staticStateDocument.nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) ⇒
       name → {
         val maybeAVT = XFormsUtils.maybeAVT(rawPropertyValue)
         topLevelPart.defaultModel match {
-          case Some(model) if maybeAVT ⇒
+          case Some(model) if isInline && maybeAVT ⇒
             Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))
-          case None if maybeAVT ⇒
+          case None if isInline && maybeAVT ⇒
             throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
           case _ ⇒
             Left(P.getPropertyDefinition(name).parseProperty(rawPropertyValue))
@@ -190,6 +190,7 @@ class XFormsStaticStateImpl(
   // For properties known to be static
   private def staticPropertyOrDefault(name: String) =
     staticStateDocument.nonDefaultProperties.get(name) map
+      (_._1)                                           map
       P.getPropertyDefinition(name).parseProperty      getOrElse
       P.getPropertyDefinition(name).defaultValue
 
@@ -426,14 +427,14 @@ object XFormsStaticStateImpl {
 
     // Extract properties
     // NOTE: XFormsExtractor takes care of propagating only non-default properties
-    val nonDefaultProperties = {
+    val nonDefaultProperties: Map[String, (String, Boolean)] = {
       for {
         element       ← Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
-        attribute     ← Dom4j.attributes(element)
-        propertyName  = attribute.getName
-        propertyValue = attribute.getValue
+        propertyName  = element.attributeValue("name")
+        propertyValue = element.attributeValue("value")
+        isInline      = element.attributeValue("inline") == true.toString
       } yield
-        (propertyName, propertyValue)
+        (propertyName, propertyValue → isInline)
     } toMap
 
     val isHTMLDocument = staticStateElement.attributeValueOpt("is-html") contains "true"
@@ -445,8 +446,8 @@ object XFormsStaticStateImpl {
         NumberUtils.toHexString(digestContentHandler.getResult)
       }
 
-    private def isClientStateHandling = {
-      def nonDefault = nonDefaultProperties.get(P.STATE_HANDLING_PROPERTY) map (_ == STATE_HANDLING_CLIENT_VALUE)
+    private def isClientStateHandling: Boolean = {
+      def nonDefault = nonDefaultProperties.get(P.STATE_HANDLING_PROPERTY) map (_._1 == STATE_HANDLING_CLIENT_VALUE)
       def default    = P.getPropertyDefinition(P.STATE_HANDLING_PROPERTY).defaultValue.toString == STATE_HANDLING_CLIENT_VALUE
 
       nonDefault getOrElse default

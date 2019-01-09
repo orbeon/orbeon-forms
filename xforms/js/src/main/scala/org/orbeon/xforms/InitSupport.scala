@@ -25,7 +25,6 @@ import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
-import org.scalajs.dom.html.Input
 
 import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
@@ -66,16 +65,17 @@ object InitSupport {
     // Q: Do this later?
     $(formElem).removeClass("xforms-initially-hidden")
 
-    def setInitialState(uuid: String): Unit =
-      StateHandling.updateClientState(
-        formId,
-        ClientState(
-          uuid     = uuid,
-          sequence = 1
-        )
-      )
+    val uuid = {
 
-    val uuid =
+      def setInitialState(uuid: String): Unit =
+        StateHandling.updateClientState(
+          formId,
+          ClientState(
+            uuid     = uuid,
+            sequence = 1
+          )
+        )
+
       StateHandling.findClientState(formId) match {
         case None ⇒
 
@@ -114,24 +114,10 @@ object InitSupport {
 
           state.uuid // should be the same as `getInitDataForAllForms(formId).uuid`!
       }
-
-    val (uuidInput, serverEventInput) = {
-
-      var uuidInput        : html.Input = null
-      var serverEventInput : html.Input = null
-
-      // Set global pointers to elements
-      collectTwoPassSubmissionFields(formElem) foreach {
-        case (UuidFieldName, e)         ⇒ uuidInput = e
-        case (ServerEventsFieldName, e) ⇒ serverEventInput = e
-        case _ ⇒
-      }
-
-      assert(uuidInput ne null)
-      assert(serverEventInput ne null)
-
-      uuidInput → serverEventInput
     }
+
+    val uuidInput        = getTwoPassSubmissionField(formElem, UuidFieldName)
+    val serverEventInput = getTwoPassSubmissionField(formElem, ServerEventsFieldName)
 
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
       processRepeatHierarchy(initializations.repeatTree)
@@ -159,13 +145,14 @@ object InitSupport {
       )
     )
 
-    uuidInput.value = uuid
+    // TODO: We set those here, but we could set them just before submission instead.
+    uuidInput.value        = uuid
     serverEventInput.value = ""
 
     initializeJavaScriptControls(initializations.controls)
     initializeKeyListeners(initializations.listeners, formElem)
 
-    runInitialServerEvents(initializations.events, formElem)
+    runInitialServerEvents(initializations.events, formId)
 
     // Special registration for `focus`, `blur`, and `change` events
     $(dom.document).on("focusin",  Events.focus)
@@ -173,6 +160,7 @@ object InitSupport {
     $(dom.document).on("change",   Events.change)
 
     // Register events that bubble on document for all browsers
+    // TODO: Move away from YUI even listeners.
     if (! Globals.topLevelListenerRegistered) {
       g.YAHOO.util.Event.addListener(dom.document, "keypress",  Events.keypress)
       g.YAHOO.util.Event.addListener(dom.document, "keydown",   Events.keydown)
@@ -193,6 +181,7 @@ object InitSupport {
     }
 
     // Run other code sent by server
+    // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
     if (hasOtherScripts)
       g.xformsPageLoadedServer()
   }
@@ -221,15 +210,13 @@ object InitSupport {
 
   private object Private {
 
-    private val TwoPassSubmissionFields = Set(UuidFieldName, ServerEventsFieldName)
-
     def getInitDataForAllForms: js.Dictionary[InitData] =
       g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
-    def collectTwoPassSubmissionFields(formElement: html.Form): Map[String, Input] =
-      formElement.elements.iterator collect
-        { case e: html.Input if TwoPassSubmissionFields(e.name) ⇒ e } map
-        { e ⇒ e.name → e } toMap
+    def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =
+      formElem.elements.iterator                          collectFirst
+        { case e: html.Input if fieldName == e.name ⇒ e } getOrElse
+        (throw new IllegalStateException(s"missing hidden field for form `$fieldName`"))
 
     def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {
@@ -350,14 +337,14 @@ object InitSupport {
         }
       }
 
-    def runInitialServerEvents(events: List[rpc.ServerEvent], formElem: html.Form): Unit =
+    def runInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
       events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
         AjaxServer.createDelayedServerEvent(
           serverEvents = event,
           delay        = delay.toDouble,
           showProgress = showProgress,
           discardable  = discardable,
-          formId       = formElem.id
+          formId       = formId
         )
       }
   }

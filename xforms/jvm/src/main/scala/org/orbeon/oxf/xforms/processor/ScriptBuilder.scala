@@ -274,6 +274,8 @@ object ScriptBuilder {
           sb append s"""(function(){$body})();"""
         }
 
+        // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
+
         // Initial modal xf:message to run if present
         if (messagesToRun.nonEmpty) {
           val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.message)}"""")

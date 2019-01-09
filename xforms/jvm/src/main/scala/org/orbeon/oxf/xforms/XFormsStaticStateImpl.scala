@@ -423,7 +423,7 @@ object XFormsStaticStateImpl {
     }
 
     // Optional template as Base64
-    def template = Option(staticStateElement.element("template")) map (_.getText)
+    def template: Option[String] = staticStateElement.elementOpt("template") map (_.getText)
 
     // Extract properties
     // NOTE: XFormsExtractor takes care of propagating only non-default properties
@@ -437,9 +437,10 @@ object XFormsStaticStateImpl {
         (propertyName, propertyValue → isInline)
     } toMap
 
-    val isHTMLDocument = staticStateElement.attributeValueOpt("is-html") contains "true"
+    val isHTMLDocument: Boolean =
+      staticStateElement.attributeValueOpt("is-html") contains "true"
 
-    def getOrComputeDigest(digest: Option[String]) =
+    def getOrComputeDigest(digest: Option[String]): String =
       digest getOrElse {
         val digestContentHandler = new DigestContentHandler
         TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)

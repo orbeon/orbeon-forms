@@ -383,7 +383,6 @@ public class XFormsConstants {
     public static final char COMPONENT_SEPARATOR    = '\u2261'; // ≡ IDENTICAL TO
     public static final char REPEAT_SEPARATOR       = '\u2299'; // ⊙ CIRCLED DOT OPERATOR
     public static final char REPEAT_INDEX_SEPARATOR = '-';      // - (just has to not be a digit)
-    public static final char ABSOLUTE_ID_SEPARATOR  = '|';      // | see https://github.com/orbeon/orbeon-forms/issues/551
 
     public static final String REPEAT_INDEX_SEPARATOR_STRING = "" + REPEAT_INDEX_SEPARATOR;
 

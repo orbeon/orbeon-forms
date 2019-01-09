@@ -129,9 +129,6 @@ object DocumentAPI {
     dispatchEvent(targetId = control.id, eventName = "xforms-focus")
   }
 
-  // Return the current index of the repeat (equivalent to `index($repeatId)`)
-  def getRepeatIndex(repeatId: String): String = Globals.repeatIndexes(repeatId)
-
   private object Private {
 
     def adjustIdNamespace(
@@ -139,18 +136,11 @@ object DocumentAPI {
       targetId : String
     ): (html.Element, String) = {
 
-      val form = Support.formElemOrDefaultForm(formElem)
-      val ns   = Globals.ns(form.id)
+      val form   = Support.formElemOrDefaultForm(formElem)
+      val formId = form.id
 
-      // For backward compatibility, handle the case where the id is already prefixed.
-      // This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,
-      // `o1`, etc. It might be safer to disable the short namespaces feature because of this.
-      form → (
-        if (targetId.startsWith(ns))
-          targetId
-        else
-          ns + targetId
-      )
+      // See comment on `namespaceIdIfNeeded`
+      form → Page.namespaceIdIfNeeded(formId, targetId)
     }
 
     def findControlOrThrow(

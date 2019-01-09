@@ -115,11 +115,8 @@
             AjaxServer.fireEvents([event]);
         }, delay);
         // Save timer id for this discardable timer
-        if (discardable) {
-            var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds;
-            discardableTimerIds[formID] = discardableTimerIds[formID] || [];
-            discardableTimerIds[formID].push(timerId);
-        }
+        if (discardable)
+            ORBEON.xforms.Page.getForm(formID).addDiscardableTimerId(timerId);
     };
 
     AjaxServer._debugEventQueue = function() {
@@ -333,14 +330,8 @@
                     // But only do this if we are not just sending a heartbeat event, which is handled in a more efficient
                     // way by the server, skipping the "normal" processing which includes checking if there are
                     // any discardable events waiting to be executed.
-                    if (foundEventOtherThanHeartBeat) {
-
-                        _.each(ORBEON.xforms.Globals.discardableTimerIds[formID] || [], function(discardableTimerId) {
-                            window.clearTimeout(discardableTimerId);
-                        });
-
-                        ORBEON.xforms.Globals.discardableTimerIds[formID] = [];
-                    }
+                    if (foundEventOtherThanHeartBeat)
+                        ORBEON.xforms.Page.getForm(formID).clearDiscardableTimerIds();
 
                     // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
                     var loadingIndicator = ORBEON.xforms.Page.getForm(formID).loadingIndicator;
@@ -399,7 +390,7 @@
                             requestDocumentString.push('<xxf:event');
                             requestDocumentString.push(' name="' + event.eventName + '"');
                             if (event.targetId != null)
-                                requestDocumentString.push(' source-control-id="' + event.targetId.substring(ORBEON.xforms.Globals.ns[formID].length) + '"');
+                                requestDocumentString.push(' source-control-id="' + ORBEON.xforms.Page.deNamespaceIdIfNeeded(formID, event.targetId) + '"');
                             requestDocumentString.push('>');
                             if (event.value != null) {
                                 // When the range is used we get an int here when the page is first loaded
@@ -468,7 +459,12 @@
                 argument: { formId: formId }
             };
             AjaxServer.setTimeoutOnCallback(callback);
-            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formId], callback, ORBEON.xforms.Globals.requestDocument);
+            YAHOO.util.Connect.asyncRequest(
+                "POST",
+                ORBEON.xforms.Page.getForm(formId).xformsServerPath,
+                callback,
+                ORBEON.xforms.Globals.requestDocument
+            );
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
             AjaxServer.exceptionWhenTalkingToServer(e, formID);
@@ -1294,11 +1290,10 @@
                                             newInputElement.setAttribute("type", "text");
                                             newInputElement.className = "xforms-input-input " + typeClassName;
                                             newInputElement.id = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
+
                                             // In portlet mode, name is not prefixed
-                                            if (newInputElement.id.indexOf(ORBEON.xforms.Globals.ns[formID]) == 0)
-                                                newInputElement.name = newInputElement.id.substring(ORBEON.xforms.Globals.ns[formID].length);
-                                            else
-                                                newInputElement.name = newInputElement.id; // should not happen as ns should be valid or ""
+                                            newInputElement.name = ORBEON.xforms.Page.deNamespaceIdIfNeeded(formID, newInputElement.id);
+
                                             return newInputElement;
                                         }
 
@@ -1316,7 +1311,7 @@
                                         } else if (newType.type == "date" && isMinimal) {
                                             // Create image element
                                             var image = document.createElement("img");
-                                            image.setAttribute("src", ORBEON.xforms.Globals.calendarImageURL[formID]);
+                                            image.setAttribute("src", ORBEON.xforms.Page.getForm(formID).calendarImagePath);
                                             image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
                                             insertIntoDocument([image]);
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
@@ -1712,7 +1707,7 @@
                             var relevant = ORBEON.util.Dom.getAttribute(elem, "relevant");
                             // Remove or add xforms-disabled on elements after this delimiter
                             if (relevant != null)
-                                ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatId, iteration, relevant == "true" ? true : false);
+                                ORBEON.xforms.Controls.setRepeatIterationRelevance(formID, repeatId, iteration, relevant == "true" ? true : false);
                         }
 
                         function handleDialog(elem) {
@@ -1727,11 +1722,7 @@
                                 // If the dialog hasn't been initialized yet, there is nothing we need to do to hide it
                                 if (_.isObject(yuiDialog)) {
                                     // Remove timer to show the dialog asynchronously so it doesn't show later!
-                                    var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID];
-                                    if (dialogTimerIdsMap && dialogTimerIdsMap[id]) {
-                                        clearTimeout(dialogTimerIdsMap[id]);
-                                        delete dialogTimerIdsMap[id];
-                                    }
+                                    ORBEON.xforms.Page.getForm(formID).removeDialogTimerId(id);
 
                                     ORBEON.xforms.Globals.maskDialogCloseEvents = true;
                                     yuiDialog.hide();
@@ -1783,7 +1774,7 @@
 
                                 // Update repeat hierarchy
                                 case "repeat-hierarchy": {
-                                    ORBEON.xforms.InitSupport.processRepeatHierarchy(ORBEON.util.Dom.getStringValue(childNode));
+                                    ORBEON.xforms.InitSupport.processRepeatHierarchyUpdateForm(formID, ORBEON.util.Dom.getStringValue(childNode));
                                     break;
                                 }
 
@@ -1801,14 +1792,19 @@
                                     });
                                     // For each repeat id that changes, see if all the children are also included in
                                     // newRepeatIndexes. If they are not, add an entry with the index unchanged.
+
+                                    var form = ORBEON.xforms.Page.getForm(formID);
+                                    var repeatTreeParentToAllChildren = form.repeatTreeParentToAllChildren;
+                                    var repeatIndexes                 = form.repeatIndexes;
+
                                     for (var repeatId in newRepeatIndexes) {
                                         if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
-                                            var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
+                                            var children = repeatTreeParentToAllChildren[repeatId];
                                             if (children != null) { // test on null is a hack because repeatId may be trash when some libraries override Object
                                                 for (var childIndex in children) {
                                                     var child = children[childIndex];
                                                     if (! newRepeatIndexes[child])
-                                                        newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
+                                                        newRepeatIndexes[child] = repeatIndexes[child];
                                                 }
                                             }
                                         }
@@ -1816,16 +1812,16 @@
                                     // Unhighlight items at old indexes
                                     for (var repeatId in newRepeatIndexes) {
                                         if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
-                                            var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
+                                            var oldIndex = repeatIndexes[repeatId];
                                             if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
-                                                var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
+                                                var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(formID, repeatId, oldIndex);
                                                 if (oldItemDelimiter != null) { // https://github.com/orbeon/orbeon-forms/issues/3689
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
                                                            (! $(cursor).is('.xforms-repeat-delimiter')
                                                                    && ! $(cursor).is('.xforms-repeat-begin-end'))) {
                                                         if (cursor.nodeType == ELEMENT_TYPE)
-                                                            YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
+                                                            YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(formID, repeatId));
                                                         cursor = cursor.nextSibling;
                                                     }
                                                 }
@@ -1835,21 +1831,21 @@
                                     // Store new indexes
                                     for (var repeatId in newRepeatIndexes) {
                                         var newIndex = newRepeatIndexes[repeatId];
-                                        ORBEON.xforms.Globals.repeatIndexes[repeatId] = newIndex;
+                                        repeatIndexes[repeatId] = newIndex;
                                     }
                                     // Highlight item at new index
                                     for (var repeatId in newRepeatIndexes) {
                                         if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
                                             var newIndex = newRepeatIndexes[repeatId];
                                             if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
-                                                var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
+                                                var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(formID, repeatId, newIndex);
                                                 if (newItemDelimiter != null) { // https://github.com/orbeon/orbeon-forms/issues/3689
                                                     var cursor = newItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
                                                            (! $(cursor).is('.xforms-repeat-delimiter')
                                                                    && ! $(cursor).is('.xforms-repeat-begin-end'))) {
                                                         if (cursor.nodeType == ELEMENT_TYPE)
-                                                            YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
+                                                            YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(formID, repeatId));
                                                         cursor = cursor.nextSibling;
                                                     }
                                                 }
@@ -1888,7 +1884,8 @@
                                     var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
 
-                                    ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsValue != null ? serverEventsValue : "";
+                                    ORBEON.xforms.Page.updateServerEventsInput(formID, serverEventsValue);
+
                                     // Increment and send sequence number
                                     var requestForm = document.getElementById(formID);
                                     // Go to another page
@@ -2062,11 +2059,10 @@
                             handleOtherActions(actionElement);
                         }, 200);
 
-                        var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID] || {};
-                        ORBEON.xforms.Globals.dialogTimerIds[formID] = dialogTimerIdsMap;
+                        var form = ORBEON.xforms.Page.getForm(formID)
 
                         _.each(responseDialogIdsToShowAsynchronously, function(dialogId) {
-                            dialogTimerIdsMap[dialogId] = timerId;
+                            form.addDialogTimerId(dialogId, timerId);
                         });
 
                     } else {

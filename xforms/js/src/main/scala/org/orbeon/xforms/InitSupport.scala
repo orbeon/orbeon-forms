@@ -29,6 +29,7 @@ import org.scalajs.dom.html.Input
 
 import scala.collection.{mutable ⇒ m}
 import scala.scalajs.js
+import scala.scalajs.js.Dictionary
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -47,12 +48,11 @@ object InitSupport {
 
   private def initialize(formElem: html.Form): Unit = {
 
-    // The error panel shouldn't depend on much and is useful early on
-    ErrorPanel.initializeErrorPanel(formElem)
-
     val formId = formElem.id
 
-    Globals.ns(formId) = formId.substring(0, formId.indexOf("xforms-form"))
+    // The error panel shouldn't depend on much and is useful early on
+    val errorPanel = ErrorPanel.initializeErrorPanel(formElem) getOrElse
+      (throw new IllegalStateException(s"missing error panel element for form `$formId`"))
 
     val initializations =
       decode[rpc.Initializations](getInitDataForAllForms(formId).initializations) match {
@@ -63,25 +63,8 @@ object InitSupport {
           initializations
       }
 
-    // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
-    // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
-    // detection, as that works in portals. The concern with using the server values was proxying. But should
-    // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
-    // server values it is.
-    Globals.xformsServerURL(formId)       = initializations.xformsServerPath
-    Globals.xformsServerUploadURL(formId) = initializations.xformsServerUploadPath
-    Globals.calendarImageURL(formId)      = initializations.calendarImagePath
-
+    // Q: Do this later?
     $(formElem).removeClass("xforms-initially-hidden")
-
-    // Causes some initializations
-    Page.getForm(formId)
-
-    val twoPassSubmissionFields = collectTwoPassSubmissionFields(formElem)
-
-    // Sets `repeatTreeChildToParent`, `repeatTreeParentToAllChildren`, `repeatIndexes`
-    processRepeatHierarchy(initializations.repeatTree)
-    processRepeatIndexes(initializations.repeatIndexes)
 
     def setInitialState(uuid: String): Unit =
       StateHandling.updateClientState(
@@ -132,20 +115,57 @@ object InitSupport {
           state.uuid // should be the same as `getInitDataForAllForms(formId).uuid`!
       }
 
-    // Set global pointers to elements
-    twoPassSubmissionFields foreach {
-      case (UuidFieldName, e)         ⇒ Globals.formUUID        (formId) = e
-      case (ServerEventsFieldName, e) ⇒ Globals.formServerEvents(formId) = e
-      case _ ⇒
+    val (uuidInput, serverEventInput) = {
+
+      var uuidInput        : html.Input = null
+      var serverEventInput : html.Input = null
+
+      // Set global pointers to elements
+      collectTwoPassSubmissionFields(formElem) foreach {
+        case (UuidFieldName, e)         ⇒ uuidInput = e
+        case (ServerEventsFieldName, e) ⇒ serverEventInput = e
+        case _ ⇒
+      }
+
+      assert(uuidInput ne null)
+      assert(serverEventInput ne null)
+
+      uuidInput → serverEventInput
     }
 
-    // Set global values
-    Globals.formUUID        (formId).value = uuid
-    Globals.formServerEvents(formId).value = ""
+    val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
+      processRepeatHierarchy(initializations.repeatTree)
+
+    // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
+    // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
+    // detection, as that works in portals. The concern with using the server values was proxying. But should
+    // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
+    // server values it is.
+
+    Page.setForm(
+      formId,
+      new Form(
+        elem                          = formElem,
+        uuidInput                     = uuidInput,
+        serverEventInput              = serverEventInput,
+        ns                            = formId.substring(0, formId.indexOf("xforms-form")),
+        xformsServerPath              = initializations.xformsServerPath,
+        xformsServerUploadPath        = initializations.xformsServerUploadPath,
+        calendarImagePath             = initializations.calendarImagePath,
+        errorPanel                    = errorPanel,
+        repeatTreeChildToParent       = repeatTreeChildToParent,
+        repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
+        repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes)
+      )
+    )
+
+    uuidInput.value = uuid
+    serverEventInput.value = ""
 
     initializeJavaScriptControls(initializations.controls)
     initializeKeyListeners(initializations.listeners, formElem)
-    initializeServerEvents(initializations.events, formElem)
+
+    runInitialServerEvents(initializations.events, formElem)
   }
 
   // Used by AjaxServer.js
@@ -159,22 +179,15 @@ object InitSupport {
     }
 
   // Used by AjaxServer.js
-  def processRepeatHierarchy(repeatTreeString: String): Unit = {
+  def processRepeatHierarchyUpdateForm(formId: String, repeatTreeString: String): Unit = {
 
-    val childToParent    = parseRepeatTree(repeatTreeString)
-    val childToParentMap = childToParent.toMap
+    val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
+      processRepeatHierarchy(repeatTreeString)
 
-    Globals.repeatTreeChildToParent = childToParentMap.toJSDictionary
+    val form = Page.getForm(formId)
 
-    val parentToChildren = m.Map[String, js.Array[String]]()
-
-    childToParentMap foreach { case (child, parent) ⇒
-      Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-        parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-      }
-    }
-
-    Globals.repeatTreeParentToAllChildren = createParentToChildrenMap(childToParentMap).toJSDictionary
+    form.repeatTreeChildToParent       = repeatTreeChildToParent
+    form.repeatTreeParentToAllChildren = repeatTreeParentToAllChildren
   }
 
   private object Private {
@@ -217,8 +230,24 @@ object InitSupport {
       parentToChildren
     }
 
-    def processRepeatIndexes(repeatIndexesString: String): Unit =
-      Globals.repeatIndexes = parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
+    def processRepeatHierarchy(repeatTreeString: String): (Dictionary[String], Dictionary[js.Array[String]]) = {
+
+      val childToParent    = parseRepeatTree(repeatTreeString)
+      val childToParentMap = childToParent.toMap
+
+      val parentToChildren = m.Map[String, js.Array[String]]()
+
+      childToParentMap foreach { case (child, parent) ⇒
+        Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+          parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
+        }
+      }
+
+      (childToParentMap.toJSDictionary, createParentToChildrenMap(childToParentMap).toJSDictionary)
+    }
+
+    def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
+      parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, valueOpt) ⇒
@@ -292,7 +321,7 @@ object InitSupport {
         }
       }
 
-    def initializeServerEvents(events: List[rpc.ServerEvent], formElem: html.Form): Unit =
+    def runInitialServerEvents(events: List[rpc.ServerEvent], formElem: html.Form): Unit =
       events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
         AjaxServer.createDelayedServerEvent(
           serverEvents = event,

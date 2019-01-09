@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.{AjaxServer, ConnectCallbackArgument, Globals, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, ConnectCallbackArgument, Properties}
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.XMLHttpRequest
 
@@ -194,7 +194,7 @@ object UploaderClient {
           currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter toList
         }
 
-        def setDisabled(e: html.Element, value: Boolean) =
+        def setDisabled(e: html.Element, value: Boolean): Unit =
           e match {
             case e: html.Select   ⇒ e.disabled = value
             case e: html.Button   ⇒ e.disabled = value
@@ -214,7 +214,7 @@ object UploaderClient {
           Some(
             YUIConnect.asyncRequest(
               "POST",
-              Globals.xformsServerUploadURL(currentEvent.form.id),
+              Page.getForm(currentEvent.form.id).xformsServerUploadPath,
               new YUICallback {
                 val upload: js.Function = uploadSuccess _
                 // Failure isn't called; instead we detect if an upload is interrupted through

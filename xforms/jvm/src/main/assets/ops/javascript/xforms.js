@@ -797,7 +797,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 if (! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
                     if (! ORBEON.xforms.Globals.modalProgressPanel) {
                         ORBEON.xforms.Globals.modalProgressPanel =
-                            new YAHOO.widget.Panel(ORBEON.xforms.Globals.ns[formID] + "orbeon-spinner", {
+                            new YAHOO.widget.Panel(ORBEON.xforms.Page.namespaceIdIfNeeded(formID, "orbeon-spinner"), {
                                 width: "60px",
                                 fixedcenter: true,
                                 close: false,
@@ -944,11 +944,11 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 }
             },
 
-            getClassForRepeatId: function(repeatId) {
+            getClassForRepeatId: function(formID, repeatId) {
                 var depth = 1;
                 var currentRepeatId = repeatId;
                 while (true) {
-                    currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
+                    currentRepeatId = ORBEON.xforms.Page.getForm(formID).repeatTreeChildToParent[currentRepeatId];
                     if (currentRepeatId == null) break;
                     depth = (depth == 4) ? 1 : depth + 1;
                 }
@@ -1067,18 +1067,23 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
              *                      does not necessarily apply to the current "foobar".
              * @param index
              */
-            findRepeatDelimiter: function(repeatId, index) {
+            findRepeatDelimiter: function(formID, repeatId, index) {
 
                 // Find id of repeat begin for the current repeatId
                 var parentRepeatIndexes = "";
                 {
                     var currentId = repeatId;
+                    var form = ORBEON.xforms.Page.getForm(formID);
+                    var repeatTreeChildToParent = form.repeatTreeChildToParent;
+                    var repeatIndexes           = form.repeatIndexes;
                     while (true) {
-                        var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
+                        var parent = repeatTreeChildToParent[currentId];
                         if (parent == null) break;
-                        var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-                        parentRepeatIndexes = (grandParent == null ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR)
-                                + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
+                        var grandParent = repeatTreeChildToParent[parent];
+                        parentRepeatIndexes =
+                                (grandParent == null ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR)
+                                + repeatIndexes[parent]
+                                + parentRepeatIndexes;
                         currentId = parent;
                     }
                 }
@@ -1829,11 +1834,11 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             }
         },
 
-        setRepeatIterationRelevance: function (repeatID, iteration, relevant) {
+        setRepeatIterationRelevance: function(formID, repeatID, iteration, relevant) {
             var OU = ORBEON.util.Utils;
             var FN = ORBEON.xforms.FlatNesting;
 
-            var delimiter = OU.findRepeatDelimiter(repeatID, iteration);
+            var delimiter = OU.findRepeatDelimiter(formID, repeatID, iteration);
             FN.setRelevant(delimiter, relevant);
         },
 
@@ -3288,24 +3293,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 // Browser detection
                 renderingEngineTridentOrZero: YAHOO.env.ua.ie, // One usage left to check as of 2019-01-04.
 
-                // NOTE: Indexed by form id
-                formUUID: {},                        // used for 2-pass submission, points to the `$uuid` hidden input
-                formServerEvents: {},                // used for 2-pass submission, points to the `$server-events` hidden input
-
-                ns: {},                              // Namespace of ids (for portlets)
-                xformsServerURL: {},                 // XForms Server URL
-                xformsServerUploadURL: {},           // XForms Server upload URL
-                calendarImageURL: {},                // calendar.png image URL (should be ideally handled by a template)
-                discardableTimerIds: {},             // to array of discardable events (used by the server as a form of polling)
-                formErrorPanel: {},                  // YUI panel used to report errors
-
-                dialogTimerIds: {},                  // Maps dialog ids to timer ids for dialogs shown asynchronously (iOS)
-
-                // NOTE: NOT indexed by form id!
-                repeatTreeChildToParent: {},         // Describes the repeat hierarchy
-                repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-                repeatIndexes: {},                   // The current index for each repeat
-
                 // Other
                 eventQueue: [],                      // Events to be sent to the server
                 eventsFirstEventTime: 0,             // Time when the first event in the queue was added
@@ -3324,7 +3311,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 yuiCalendar: null,                   // Reusable calendar widget
                 tooltipLibraryInitialized: false,
                 changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
-                loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
+                loadingOtherPage: false,             // Flag set when loading other page that prevents the loading indicator to disappear
                 activeControl: null,                 // The currently active control, used to disable hint
                 dialogs: {},                         // Map for dialogs: id -> YUI dialog object
                 hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element

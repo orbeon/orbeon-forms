@@ -124,30 +124,16 @@ object AjaxServerOps {
       result.future
     }
   }
-
 }
 
 @JSGlobal("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
-  val formUUID                      : js.Dictionary[html.Input]       = js.native
-  val formServerEvents              : js.Dictionary[html.Input]       = js.native
-
-  val ns                            : js.Dictionary[String]           = js.native
-  val xformsServerURL               : js.Dictionary[String]           = js.native
-  val xformsServerUploadURL         : js.Dictionary[String]           = js.native
-  val calendarImageURL              : js.Dictionary[String]           = js.native
-  val formErrorPanel                : js.Dictionary[js.Object]        = js.native
-
-  var repeatTreeChildToParent       : js.Dictionary[String]           = js.native
-  var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]] = js.native
-  var repeatIndexes                 : js.Dictionary[String]           = js.native
-
-  var loadingOtherPage              : Boolean                         = js.native
-  val eventQueue                    : js.Array[js.Any]                = js.native
-  val requestInProgress             : Boolean                         = js.native
-  val dialogs                       : js.Dictionary[js.Dynamic]       = js.native
-  var lastDialogZIndex              : Int                             = js.native
+  var loadingOtherPage      : Boolean                     = js.native
+  val eventQueue            : js.Array[js.Any]            = js.native
+  val requestInProgress     : Boolean                     = js.native
+  val dialogs               : js.Dictionary[js.Dynamic]   = js.native
+  var lastDialogZIndex      : Int                         = js.native
 }
 
 @js.native

@@ -29,7 +29,7 @@ object ErrorPanel {
 
   import Private._
 
-  def initializeErrorPanel(formElem: html.Form): Unit = {
+  def initializeErrorPanel(formElem: html.Form): Option[js.Object] = {
 
     // Expected layout of the HTML:
     //
@@ -62,91 +62,87 @@ object ErrorPanel {
     //   </div>
     // </div>
 
-    val panelElem: js.UndefOr[html.Element] =
+    val panelElemOrUndef: js.UndefOr[html.Element] =
       $(formElem).find(".xforms-error-dialogs > .xforms-error-panel")(0)
 
-    Globals.formErrorPanel(formElem.id) =
-      panelElem.toOption match {
-        case Some(errorPanelElem) ⇒
+    panelElemOrUndef.toOption map { panelElem ⇒
 
-          val jErrorPanelElem = $(errorPanelElem)
+      val jPanelElem = $(panelElem)
 
-          jErrorPanelElem.removeClass("xforms-initially-hidden")
+      jPanelElem.removeClass("xforms-initially-hidden")
 
-          val errorPanel = newInstance(g.YAHOO.widget.Panel)(errorPanelElem, new js.Object {
-            val modal               = true
-            val fixedcenter         = false
-            val underlay            = "shadow"
-            val visible             = false
-            val constraintoviewport = true
-            val draggable           = true
-          })
+      val panel = newInstance(g.YAHOO.widget.Panel)(panelElem, new js.Object {
+        val modal               = true
+        val fixedcenter         = false
+        val underlay            = "shadow"
+        val visible             = false
+        val constraintoviewport = true
+        val draggable           = true
+      })
 
-          errorPanel.render()
+      panel.render()
 
-          Utils.overlayUseDisplayHidden(errorPanel)
+      Utils.overlayUseDisplayHidden(panel)
 
-          // When the error dialog is closed, we make sure that the "details" section is closed,
-          // so it will be closed the next time the dialog is opened.
-          errorPanel.beforeHideEvent.subscribe(
-            ((_: js.Any) ⇒ toggleDetails(errorPanelElem, show = false)): js.Function
-          )
+      // When the error dialog is closed, we make sure that the "details" section is closed,
+      // so it will be closed the next time the dialog is opened.
+      panel.beforeHideEvent.subscribe(
+        ((_: js.Any) ⇒ toggleDetails(panelElem, show = false)): js.Function
+      )
 
-          jErrorPanelElem.onWithSelector(
-            events   = "click",
-            selector = ".xforms-error-panel-show-details",
-            handler  = (_: JQueryEventObject) ⇒ toggleDetails(errorPanelElem, show = true)
-          )
+      jPanelElem.onWithSelector(
+        events   = "click",
+        selector = ".xforms-error-panel-show-details",
+        handler  = (_: JQueryEventObject) ⇒ toggleDetails(panelElem, show = true)
+      )
 
-          jErrorPanelElem.onWithSelector(
-            events   = "click",
-            selector = ".xforms-error-panel-hide-details",
-            handler  = (_: JQueryEventObject) ⇒ toggleDetails(errorPanelElem, show = false)
-          )
+      jPanelElem.onWithSelector(
+        events   = "click",
+        selector = ".xforms-error-panel-hide-details",
+        handler  = (_: JQueryEventObject) ⇒ toggleDetails(panelElem, show = false)
+      )
 
-          jErrorPanelElem.onWithSelector(
-            events   = "click",
-            selector = ".xforms-error-panel-close",
-            handler  = (_: JQueryEventObject) ⇒ errorPanel.hide()
-          )
+      jPanelElem.onWithSelector(
+        events   = "click",
+        selector = ".xforms-error-panel-close",
+        handler  = (_: JQueryEventObject) ⇒ panel.hide()
+      )
 
-          jErrorPanelElem.onWithSelector(
-            events   = "click",
-            selector = ".xforms-error-panel-reload",
-            handler  = (_: JQueryEventObject) ⇒ dom.window.location.reload(flag = true)
-          )
+      jPanelElem.onWithSelector(
+        events   = "click",
+        selector = ".xforms-error-panel-reload",
+        handler  = (_: JQueryEventObject) ⇒ dom.window.location.reload(flag = true)
+      )
 
-          errorPanel
-
-        case None ⇒ null
-      }
+      panel
+    }
   }
 
   // Called by AjaxServer.js
-  def showError(formId: String, detailsOrNull: String): Unit =
-    Option(Globals.formErrorPanel(formId).asInstanceOf[js.Dynamic]) foreach { formErrorPanel ⇒
+  def showError(formId: String, detailsOrNull: String): Unit = {
+    val formErrorPanel = Page.getForm(formId).errorPanel.asInstanceOf[js.Dynamic]
 
-      val jErrorPanelElem = $(formErrorPanel.element)
+    val jErrorPanelElem = $(formErrorPanel.element)
 
-      jErrorPanelElem.css("display: block")
+    jErrorPanelElem.css("display: block")
 
-      Option(detailsOrNull) match {
-        case Some(details) ⇒
-          jErrorPanelElem.find(".xforms-error-panel-details").html(details)
-          toggleDetails(jErrorPanelElem(0), show = true)
-        case None ⇒
-          jErrorPanelElem.find(".xforms-error-panel-details-hidden").addClass("xforms-disabled")
-          jErrorPanelElem.find(".xforms-error-panel-details-shown").addClass("xforms-disabled")
-      }
-
-      formErrorPanel.show()
-      Globals.lastDialogZIndex += 2
-      formErrorPanel.cfg.setProperty("zIndex", Globals.lastDialogZIndex)
-      formErrorPanel.center()
-
-      // Focus within the dialog so that screen readers handle aria attributes
-      jErrorPanelElem.find(".container-close").focus()
+    Option(detailsOrNull) match {
+      case Some(details) ⇒
+        jErrorPanelElem.find(".xforms-error-panel-details").html(details)
+        toggleDetails(jErrorPanelElem(0), show = true)
+      case None ⇒
+        jErrorPanelElem.find(".xforms-error-panel-details-hidden").addClass("xforms-disabled")
+        jErrorPanelElem.find(".xforms-error-panel-details-shown").addClass("xforms-disabled")
     }
+
+    formErrorPanel.show()
+    Globals.lastDialogZIndex += 2
+    formErrorPanel.cfg.setProperty("zIndex", Globals.lastDialogZIndex)
+    formErrorPanel.center()
+
+    // Focus within the dialog so that screen readers handle aria attributes
+    jErrorPanelElem.find(".container-close").focus()
+  }
 
   private object Private {
 

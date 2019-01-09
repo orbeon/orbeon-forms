@@ -36,6 +36,7 @@
                         var visibility = YD.getStyle(errorPanelContainer.id, "visibility");
                         // Hide error panel in case it was visible
                         var form = ORBEON.xforms.Controls.getForm(errorPanel);
+                        // 2019-01-09: `formErrorPanel` is no longer available.
                         ORBEON.xforms.Globals.formErrorPanel[form.id].hide();
                         // Check visibility and listener called are what we expected
                         Assert.areEqual(showErrorDialog ? "visible" : "hidden", visibility);

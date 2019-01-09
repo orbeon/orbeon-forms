@@ -20,6 +20,7 @@ import org.scalajs.dom.raw.{Attr, MutationObserver, MutationRecord}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import org.orbeon.oxf.util.StringUtils._
 
 @JSExportTopLevel("ORBEON.xforms.Page") // used by `xforms.js`, `AjaxServer.js`, `Calendar.coffee`
 @JSExportAll
@@ -32,15 +33,36 @@ object Page {
   private var controlConstructors: List[ConstructorPredicate] = Nil
   private var idToControl = Map[String, Control]()
 
+  def setForm(id: String, form: Form): Unit =
+    forms += id → form
+
   def getForm(id: String): Form =
-    forms.get(id) match {
-      case Some(form) ⇒
-        form
-      case None ⇒
-        val newForm = new Form(dom.document.getElementById(id).asInstanceOf[html.Element])
-        forms += id → newForm
-        newForm
-    }
+    forms.getOrElse(id, throw new IllegalArgumentException(s"form `$id` not found"))
+
+  def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
+    getForm(formId).serverEventInput.value = if (serverEventsValue ne null) serverEventsValue else ""
+
+  // Handle the case where the id is already prefixed. This is not great as we don't know for sure
+  // whether the control starts with a short namespace, e.g. `o0`, `o1`, etc. Short namespaces are
+  // disabled by default which mitigates this problem. As of 2019-01-09 this can be a problem only
+  // for one caller of this API.
+  def namespaceIdIfNeeded(formId: String, id: String): String = {
+    val ns = getForm(formId).ns
+    if (id.startsWith(ns))
+      id
+    else
+      ns + id
+  }
+
+  // See comment for `namespaceIdIfNeeded`
+  def deNamespaceIdIfNeeded(formId: String, id: String): String = {
+    val ns = getForm(formId).ns
+    if (id.startsWith(ns))
+      id.substringAfter(ns)
+    else
+      id
+  }
+
 
   private val LangAttr = "lang"
 

@@ -13,10 +13,43 @@
   */
 package org.orbeon.xforms
 
+import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
 
-class Form(formElem: html.Element) extends js.Object {
-  val loadingIndicator = new LoadingIndicator // used by `AjaxServer.js`
+class Form(
+  val elem                          : html.Element,
+  val uuidInput                     : html.Input,
+  val serverEventInput              : html.Input,
+  val ns                            : String,
+  val xformsServerPath              : String,
+  val xformsServerUploadPath        : String,
+  val calendarImagePath             : String,
+  val errorPanel                    : js.Object,
+  var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
+  var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
+  val repeatIndexes                 : js.Dictionary[String]            // for JavaScript access
+) extends js.Object { // so that properties/methods can be accessed from JavaScript
+
+  private var discardableTimerIds: List[Int] = Nil
+  private var dialogTimerIds: Map[String, Int] = Map.empty
+
+  val loadingIndicator = new LoadingIndicator
+
+  def addDiscardableTimerId(id: Int): Unit =
+    discardableTimerIds ::= id
+
+  def clearDiscardableTimerIds(): Unit = {
+    discardableTimerIds foreach dom.window.clearTimeout
+    discardableTimerIds = Nil
+  }
+
+  def addDialogTimerId(dialogId: String, id: Int): Unit =
+    dialogTimerIds += dialogId → id
+
+  def removeDialogTimerId(dialogId: String): Unit = {
+    dialogTimerIds.get(dialogId) foreach dom.window.clearTimeout
+    dialogTimerIds -= dialogId
+  }
 }

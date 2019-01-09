@@ -31,15 +31,15 @@ import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 // Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
-@JSExportAll
 object InitSupport {
 
   import Private._
 
+  @JSExport
   def initialize(): Unit =
     dom.document.forms                      filter
       (_.classList.contains("xforms-form")) foreach
@@ -186,7 +186,7 @@ object InitSupport {
       g.xformsPageLoadedServer()
   }
 
-  // Used by AjaxServer.js
+  @JSExport
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
       case Left(_)  ⇒
@@ -196,7 +196,7 @@ object InitSupport {
         initializeJavaScriptControls(controls)
     }
 
-  // Used by AjaxServer.js
+  @JSExport
   def processRepeatHierarchyUpdateForm(formId: String, repeatTreeString: String): Unit = {
 
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =

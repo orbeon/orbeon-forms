@@ -20,10 +20,9 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.xforms.StateHandling")
-@JSExportAll
 object StateHandling {
 
   import Private._
@@ -33,12 +32,15 @@ object StateHandling {
     sequence : Int
   )
 
+  @JSExport
   def getFormUuid(formId: String): String =
     getClientStateOrThrow(formId).uuid
 
+  @JSExport
   def getSequence(formId: String): String =
     getClientStateOrThrow(formId).sequence.toString
 
+  @JSExport
   def updateSequence(formId: String, newSequence: Int): Unit =
     updateClientState(
       formId      = formId,

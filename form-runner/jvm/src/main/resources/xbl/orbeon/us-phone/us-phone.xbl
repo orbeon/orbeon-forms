@@ -53,6 +53,57 @@
                     </fr:us-phone>
                 </view>
             </templates>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-datetime-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <local>
+                            <field-width/>
+                        </local>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-datetime-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-datetime-action"
+                    event="xforms-value-changed"
+                    observer="field-width-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>

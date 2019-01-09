@@ -32,7 +32,6 @@ object Page {
   private var controlConstructors: List[ConstructorPredicate] = Nil
   private var idToControl = Map[String, Control]()
 
-  // Return the form object (not HTML element) corresponding to the specified id.
   def getForm(id: String): Form =
     forms.get(id) match {
       case Some(form) ⇒

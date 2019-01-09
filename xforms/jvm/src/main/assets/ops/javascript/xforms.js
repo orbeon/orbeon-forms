@@ -3283,6 +3283,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         document: function () {
 
+            // TODO: Move all globals which are per form to Page/Form
             _.extend(ORBEON.xforms.Globals, {
                 // Browser detection
                 renderingEngineTridentOrZero: YAHOO.env.ua.ie, // One usage left to check as of 2019-01-04.

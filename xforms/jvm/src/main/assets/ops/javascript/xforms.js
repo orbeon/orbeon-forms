@@ -3346,28 +3346,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             // Done in Scala.js
             ORBEON.xforms.InitSupport.initialize();
 
-            // Special registration for focus, blur, and change events
-            $(document).on('focusin', ORBEON.xforms.Events.focus);
-            $(document).on('focusout', ORBEON.xforms.Events.blur);
-            $(document).on('change', ORBEON.xforms.Events.change);
-
-            // Register events that bubble on document for all browsers
-            if (! ORBEON.xforms.Globals.topLevelListenerRegistered) {
-                YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
-                YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
-                YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
-                YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
-                YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
-                YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
-                YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
-                YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
-            }
-
-            // Run code sent by server
-            if (typeof xformsPageLoadedServer != "undefined") {
-                xformsPageLoadedServer();
-            }
-
             // Run call-back function interested in knowing when the form is initialized
             try {
                 if (window.parent.childWindowOrbeonReady) {

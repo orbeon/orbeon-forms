@@ -2036,7 +2036,7 @@
                                     var paramValues = _.map(paramElements, function(paramElement) {
                                         return $(paramElement).text();
                                     });
-                                    args = [functionName, targetId, observerId].concat(paramValues);
+                                    var args = [formID, functionName, targetId, observerId].concat(paramValues);
                                     ORBEON.xforms.server.Server.callUserScript.apply(ORBEON.xforms.server.Server, args);
                                     break;
                                 }

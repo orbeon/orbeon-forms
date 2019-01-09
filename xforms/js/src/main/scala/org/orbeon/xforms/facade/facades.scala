@@ -129,11 +129,12 @@ object AjaxServerOps {
 @JSGlobal("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
-  var loadingOtherPage      : Boolean                     = js.native
-  val eventQueue            : js.Array[js.Any]            = js.native
-  val requestInProgress     : Boolean                     = js.native
-  val dialogs               : js.Dictionary[js.Dynamic]   = js.native
-  var lastDialogZIndex      : Int                         = js.native
+  var loadingOtherPage           : Boolean                     = js.native
+  val eventQueue                 : js.Array[js.Any]            = js.native
+  val requestInProgress          : Boolean                     = js.native
+  val dialogs                    : js.Dictionary[js.Dynamic]   = js.native
+  var lastDialogZIndex           : Int                         = js.native
+  var topLevelListenerRegistered : Boolean                     = js.native
 }
 
 @js.native
@@ -193,6 +194,17 @@ object Events extends js.Object {
   val ajaxResponseProcessedEvent  : YUICustomEvent = js.native
   val orbeonLoadedEvent           : YUICustomEvent = js.native
   val componentChangedLayoutEvent : YUICustomEvent = js.native
+
+  val focus                       : js.Function    = js.native
+  val blur                        : js.Function    = js.native
+  val change                      : js.Function    = js.native
+  val keypress                    : js.Function    = js.native
+  val keydown                     : js.Function    = js.native
+  val keyup                       : js.Function    = js.native
+  val mouseover                   : js.Function    = js.native
+  val mouseout                    : js.Function    = js.native
+  val click                       : js.Function    = js.native
+  val scrollOrResize              : js.Function    = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")
@@ -219,10 +231,10 @@ trait InitData extends js.Object {
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
-  def appendToEffectiveId(effectiveId: String, ending: String) : String =           js.native
-  def getRepeatIndexes(effectiveId: String)                    : js.Array[String] = js.native
-  def findRepeatDelimiter(repeatId: String, iteration: Int)    : raw.Element =      js.native
-  def overlayUseDisplayHidden(o: js.Object): Unit = js.native
+  def appendToEffectiveId(effectiveId: String, ending: String)              : String =           js.native
+  def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
+  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element =      js.native
+  def overlayUseDisplayHidden(o: js.Object)                                 : Unit = js.native
 }
 
 @JSGlobal("ORBEON.xforms.control.Control")

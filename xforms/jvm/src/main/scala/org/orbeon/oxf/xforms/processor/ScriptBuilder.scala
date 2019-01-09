@@ -216,7 +216,16 @@ object ScriptBuilder {
           for {
             delayedEvent ← containingDocument.delayedEvents
           } yield
-            delayedEvent.toServerEvent(currentTime)
+            delayedEvent.toServerEvent(currentTime),
+        userScripts =
+          for (script ← containingDocument.getScriptsToRun.asScala.to[List])
+            yield
+              rpc.UserScript(
+                functionName = script.script.shared.clientName,
+                targetId     = namespaceId(containingDocument, script.targetEffectiveId),
+                observerId   = namespaceId(containingDocument, script.observerEffectiveId),
+                paramValues  = script.paramValues
+              )
       ).asJson.noSpaces
 
     sb.append(quoteString(jsonString))
@@ -229,7 +238,6 @@ object ScriptBuilder {
   def findScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
-    val scriptInvocations = containingDocument.getScriptsToRun.asScala
     val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
     val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.level == "modal")
 
@@ -245,7 +253,6 @@ object ScriptBuilder {
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||
-      scriptInvocations.nonEmpty  ||
       focusElementIdOpt.isDefined ||
       messagesToRun.nonEmpty      ||
       dialogsToOpen.nonEmpty      ||
@@ -260,21 +267,6 @@ object ScriptBuilder {
         sb append "\nfunction xformsPageLoadedServer() { "
 
         // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
-
-        // Initial script actions executions if present
-        for (script ← scriptInvocations) {
-          val name     = script.script.shared.clientName
-          val target   = namespaceId(containingDocument, script.targetEffectiveId)
-          val observer = namespaceId(containingDocument, script.observerEffectiveId)
-
-          val paramsString =
-          if (script.paramValues.nonEmpty)
-            script.paramValues map ('"' + escapeJavaScript(_) + '"') mkString (",", ",", "")
-          else
-            ""
-
-          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer"$paramsString);"""
-        }
 
         // javascript: loads
         for (load ← javascriptLoads) {

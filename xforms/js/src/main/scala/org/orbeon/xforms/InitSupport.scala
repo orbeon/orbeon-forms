@@ -166,6 +166,35 @@ object InitSupport {
     initializeKeyListeners(initializations.listeners, formElem)
 
     runInitialServerEvents(initializations.events, formElem)
+
+    // Special registration for `focus`, `blur`, and `change` events
+    $(dom.document).on("focusin",  Events.focus)
+    $(dom.document).on("focusout", Events.blur)
+    $(dom.document).on("change",   Events.change)
+
+    // Register events that bubble on document for all browsers
+    if (! Globals.topLevelListenerRegistered) {
+      g.YAHOO.util.Event.addListener(dom.document, "keypress",  Events.keypress)
+      g.YAHOO.util.Event.addListener(dom.document, "keydown",   Events.keydown)
+      g.YAHOO.util.Event.addListener(dom.document, "keyup",     Events.keyup)
+      g.YAHOO.util.Event.addListener(dom.document, "mouseover", Events.mouseover)
+      g.YAHOO.util.Event.addListener(dom.document, "mouseout",  Events.mouseout)
+      g.YAHOO.util.Event.addListener(dom.document, "click",     Events.click)
+      g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)
+      g.YAHOO.widget.Overlay.windowResizeEvent.subscribe(Events.scrollOrResize)
+    }
+
+    // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
+    val hasOtherScripts = ! js.isUndefined(g.xformsPageLoadedServer)
+
+    // Run user scripts
+    initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) ⇒
+      ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues map (_.asInstanceOf[js.Any]): _*)
+    }
+
+    // Run other code sent by server
+    if (hasOtherScripts)
+      g.xformsPageLoadedServer()
   }
 
   // Used by AjaxServer.js

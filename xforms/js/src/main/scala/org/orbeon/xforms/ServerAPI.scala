@@ -20,15 +20,20 @@ import org.scalajs.dom
 import org.scalajs.dom.raw
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-
 import scala.scalajs.js.Dynamic.global
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.xforms.server.Server")
-@JSExportAll
 object ServerAPI {
 
-  def callUserScript(functionName: String, targetId: String, observerId: String, rest: js.Any*): Unit = {
+  @JSExport
+  def callUserScript(
+    formId       : String,
+    functionName : String,
+    targetId     : String,
+    observerId   : String,
+    rest         : js.Any*
+  ): Unit = {
 
     def getElementOrNull(id: String): raw.Element = {
 
@@ -46,6 +51,7 @@ object ServerAPI {
 
           Option(
             Utils.findRepeatDelimiter(
+              formId    = formId,
               repeatId  = id.substring(0, separatorPosition),
               iteration = id.substring(separatorPosition + 1).toInt
             )

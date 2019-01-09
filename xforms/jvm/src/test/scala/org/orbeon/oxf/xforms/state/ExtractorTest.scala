@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.junit.Test
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.WhitespaceMatching
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
@@ -22,11 +21,16 @@ import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def issue1897namespacesWithXIncludes(): Unit = {
+
+class ExtractorTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
+
+  describe("Undeclared prefix after state deserialization #1897") {
 
     val url = "oxf:/org/orbeon/oxf/xforms/state/form-with-include.xhtml"
 
@@ -71,9 +75,8 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
       false
     )
 
-    import javax.xml.namespace.{QName ⇒ JQName}
-
     import JXQName._
+    import javax.xml.namespace.{QName ⇒ JQName}
 
     val XMLURI    = "http://www.w3.org/XML/1998/namespace"
     val XFormsURI = "http://www.w3.org/2002/xforms"
@@ -131,6 +134,8 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
       EndDocument
     )
 
-    assert(ExpectedEvents === extractorCollector.events)
+    it("must match the expected SAX result") {
+      assert(ExpectedEvents === extractorCollector.events)
+    }
   }
 }

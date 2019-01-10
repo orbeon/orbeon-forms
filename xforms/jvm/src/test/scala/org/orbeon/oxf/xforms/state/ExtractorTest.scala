@@ -127,9 +127,6 @@ class ExtractorTest
             EndPrefixMapping("xf"),
             EndPrefixMapping("xi"),
           EndElement("root"),
-          // This is output by the extractor around properties
-          StartPrefixMapping("xxf", "http://orbeon.org/oxf/xml/xforms"),
-          EndPrefixMapping("xxf"),
         EndElement("static-state"),
       EndDocument
     )

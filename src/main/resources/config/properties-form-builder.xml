@@ -31,7 +31,6 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.js.uri.orbeon.builder">
-        /js/bowser/bowser.min.js
         /forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
     </property>
 

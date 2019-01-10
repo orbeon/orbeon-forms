@@ -15,22 +15,13 @@ package org.orbeon.builder
 
 import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.facades.Bowser
 import org.orbeon.xforms.rpc.RpcClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.timers
 
-@js.native
-@JSGlobal("bowser")
-object Bowser extends js.Object {
-  val msie    : js.UndefOr[Boolean] = js.native
-  val msedge  : js.UndefOr[Boolean] = js.native
-  val version : String  = js.native
-  val name    : String  = js.native
-}
 
 object BrowserCheck {
 
@@ -41,5 +32,4 @@ object BrowserCheck {
         RpcClient[FormBuilderRpcApi].unsupportedBrowser(Bowser.name, Bowser.version.toDouble).call()
       }
   }
-
 }

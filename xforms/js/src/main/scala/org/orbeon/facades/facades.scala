@@ -29,3 +29,12 @@ trait Mousetrap extends js.Object {
 object Mousetrap extends Mousetrap {
   def apply(elem: html.Element): Mousetrap = js.native
 }
+
+@js.native
+@JSGlobal("bowser")
+object Bowser extends js.Object {
+  val msie    : js.UndefOr[Boolean] = js.native
+  val msedge  : js.UndefOr[Boolean] = js.native
+  val version : String  = js.native
+  val name    : String  = js.native
+}

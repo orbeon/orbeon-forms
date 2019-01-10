@@ -13,26 +13,41 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
+import java.sql.Connection
+
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.oxf.util.StringUtils._
 
 object commonPart  {
 
-  def apply(request: Request, versionNumber: Int) =
+  def apply(request: Request, connection: Connection, versionNumber: Int) =
     StatementPart(
       sql = {
 
-        val rowNumCol =
-          if (request.provider == MySQL)
-            // MySQL lacks row_number, see http://stackoverflow.com/a/1895127/5295
-            "@rownum := @rownum + 1 row_number"
-          else
-            "row_number() over (order by c.last_modified_time desc) row_number"
+        val mySQLMajorVersion =
+          (request.provider == MySQL).option {
+            // MySQL < 8 lacks row_number, see http://stackoverflow.com/a/1895127/5295
+            val mySQLVersion = {
+              val sql = "SHOW VARIABLES LIKE \"version\""
+              useAndClose(connection.prepareStatement(sql)) { ps ⇒
+                useAndClose(ps.executeQuery()) { rs ⇒
+                  rs.next()
+                  rs.getString("value")
+                }
+              }
+            }
+            mySQLVersion.splitTo(".").head.toInt
+          }
+        val isMySQLBefore8 = mySQLMajorVersion.exists(_ < 8)
 
-        val mySqlRowNumTable =
-          (request.provider == MySQL).string(", (select @rownum := 0) r")
+        val rowNumCol =
+          if (isMySQLBefore8) "@rownum := @rownum + 1 row_num"
+          else                "row_number() over (order by c.last_modified_time desc) row_num"
+        val mySqlRowNumTable = isMySQLBefore8.string(", (select @rownum := 0) r")
         val columnFilterTables =
           request.columns
             .filter(_.filterWith.nonEmpty)

@@ -82,7 +82,7 @@ trait SearchLogic extends SearchRequest {
         val version = requestedFormVersion(connection, request)
 
         val commonParts = List(
-          commonPart         (request, version),
+          commonPart         (request, connection, version),
           draftsPart         (request),
           permissionsPart    (permissions),
           columnFilterPart   (request),
@@ -121,7 +121,7 @@ trait SearchLogic extends SearchRequest {
              |           ) c
              | LEFT JOIN orbeon_i_control_text t
              |           ON c.data_id = t.data_id
-             |     WHERE row_number
+             |     WHERE row_num
              |           BETWEEN ${startOffsetZeroBased + 1}
              |           AND     ${startOffsetZeroBased + request.pageSize}
              |""".stripMargin

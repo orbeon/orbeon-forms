@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.xforms.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -41,7 +42,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
     private static Attributes prepareAttributes(Attributes attributes, HandlerContext xformsHandlerContext) {
         // Add class for YUI skin
-        Attributes newAttributes = SAXUtils.appendToClassAttribute(attributes, "yui-skin-sam");
+        Attributes newAttributes = SAXUtils.appendToClassAttribute(attributes, Constants.YuiSkinSamClass());
 
         // Handle AVTs
         return handleAVTsAndIDs(newAttributes, XHTMLElementHandler.REF_ID_ATTRIBUTE_NAMES(), xformsHandlerContext);

@@ -35,6 +35,8 @@ object Mousetrap extends Mousetrap {
 object Bowser extends js.Object {
   val msie    : js.UndefOr[Boolean] = js.native
   val msedge  : js.UndefOr[Boolean] = js.native
+  val ios     : js.UndefOr[Boolean] = js.native
+  val mobile  : js.UndefOr[Boolean] = js.native
   val version : String  = js.native
   val name    : String  = js.native
 }

@@ -15,7 +15,7 @@ package org.orbeon.xforms
 
 import io.circe.generic.auto._
 import io.circe.parser.decode
-import org.orbeon.facades.Mousetrap
+import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.Constants._
@@ -40,10 +40,42 @@ object InitSupport {
   import Private._
 
   @JSExport
-  def initialize(): Unit =
+  def initialize(): Unit = {
+
+    val jBody = $(dom.document.body)
+
+    // For embedding as we don't have control over the generation of the `<body>` element
+    // Remove once we no longer depend on YUI widgets at all anymore.
+    jBody.addClass(Constants.YuiSkinSamClass)
+
+    if (Bowser.ios.contains(true))
+        jBody.addClass(Constants.XFormsIosClass)
+
+    if (Bowser.mobile.contains(true))
+        jBody.addClass(Constants.XFormsMobileClass)
+
+    // Initialize each form
     dom.document.forms                      filter
       (_.classList.contains("xforms-form")) foreach
       (e ⇒ initialize(e.asInstanceOf[html.Form]))
+
+    // Setup heartbeat event
+    if (Properties.sessionHeartbeat.get()) {
+      // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
+      val heartBeatDelay = Properties.sessionHeartbeatDelay.get()
+      if (heartBeatDelay > 0)
+        js.timers.setInterval(heartBeatDelay / 10) {
+          Events.sendHeartBeatIfNeeded(heartBeatDelay)
+        }
+    }
+
+    // 2019-01-10: There was an old comment about how the call to `this.subscribers.length` in the `fire()`
+    // method could hang with IE. That is likely no longer a relevant comment but it might still be
+    // better to fire the event asynchronously, although we could maybe use a `0` delay.
+    js.timers.setTimeout(Properties.internalShortDelay.get()) {
+      Events.orbeonLoadedEvent.fire()
+    }
+  }
 
   private def initialize(formElem: html.Form): Unit = {
 
@@ -170,6 +202,8 @@ object InitSupport {
       g.YAHOO.util.Event.addListener(dom.document, "click",     Events.click)
       g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)
       g.YAHOO.widget.Overlay.windowResizeEvent.subscribe(Events.scrollOrResize)
+
+      Globals.topLevelListenerRegistered = true
     }
 
     // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
@@ -182,6 +216,8 @@ object InitSupport {
 
     // Run other code sent by server
     // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
+    // TODO: Handle `javascript:` loads as well.
+    // TODO: `xformsPageLoadedServer` must be per form too! Currently, it is global.
     if (hasOtherScripts)
       g.xformsPageLoadedServer()
   }

@@ -205,6 +205,8 @@ object Events extends js.Object {
   val mouseout                    : js.Function    = js.native
   val click                       : js.Function    = js.native
   val scrollOrResize              : js.Function    = js.native
+
+  val sendHeartBeatIfNeeded       : js.Function1[Double, Unit] = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")
@@ -221,6 +223,8 @@ object Properties extends js.Object {
   val delayBeforeDisplayLoading        : Property[Int]     = js.native
   val internalShortDelay               : Property[Double]  = js.native
   val revisitHandling                  : Property[String]  = js.native
+  val sessionHeartbeat                 : Property[Boolean] = js.native
+  val sessionHeartbeatDelay            : Property[Double]  = js.native
 }
 
 @js.native

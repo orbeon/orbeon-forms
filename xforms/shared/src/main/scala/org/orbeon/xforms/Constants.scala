@@ -24,4 +24,8 @@ object Constants {
   val ComponentSeparator       : Char   = '\u2261' // ≡ IDENTICAL TO
   val ComponentSeparatorString : String = ComponentSeparator.toString
   val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
+
+  val YuiSkinSamClass          : String = "yui-skin-sam"
+  val XFormsIosClass           : String = "xforms-ios"
+  val XFormsMobileClass        : String = "xforms-mobile"
 }

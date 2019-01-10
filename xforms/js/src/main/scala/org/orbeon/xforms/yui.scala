@@ -69,6 +69,7 @@ trait YUICallback extends js.Object {
 trait YUICustomEvent extends js.Object {
   def subscribe(fn: js.Function)   : Unit = js.native
   def unsubscribe(fn: js.Function) : Unit = js.native
+  def fire()                       : Unit = js.native
 }
 
 @JSGlobal("YAHOO.widget.ProgressBar")

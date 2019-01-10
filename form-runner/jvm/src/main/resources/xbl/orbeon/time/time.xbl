@@ -107,15 +107,40 @@
         </xbl:resources>
 
         <xbl:template>
+
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-time')"/>
+            <xf:var
+                name="view"
+                value="
+                    property('xxf:readonly-appearance') = 'static' or
+                    fr:mode() = 'pdf'
+                "/>
             <xf:var
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>
-            <xh:div class="input-append fr-field-width-{$field-width}">
-                <xf:input ref="xxf:binding('fr-time')"/>
-                <xh:span class="add-on">
-                    <xh:i class="fa fa-fw fa-clock-o"/>
-                </xh:span>
-            </xh:div>
+
+            <xf:group ref=".[not($view)]">
+                <xh:div class="input-append fr-field-width-{$field-width}">
+                    <xf:input ref="xxf:binding('fr-time')"/>
+                    <xh:span class="add-on">
+                        <xh:i class="fa fa-fw fa-clock-o"/>
+                    </xh:span>
+                </xh:div>
+            </xf:group>
+
+            <xf:input
+                ref="$binding[$view]"
+                xxf:format="
+                    format-time(
+                        xs:time($binding),
+                        xxf:property('oxf.xforms.format.input.time'),
+                        fr:lang(),
+                        (), ()
+                    )
+                "/>
+
         </xbl:template>
     </xbl:binding>
 

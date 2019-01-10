@@ -28,6 +28,10 @@ object Constants {
   val YuiSkinSamClass          : String = "yui-skin-sam"
   val XFormsIosClass           : String = "xforms-ios"
   val XFormsMobileClass        : String = "xforms-mobile"
+  val FormClass                : String = "xforms-form"
+  val InitiallyHiddenClass     : String = "xforms-initially-hidden"
 
   val HtmlLangAttr             : String = "lang"
+
+  val DocumentId               : String = "#document"
 }

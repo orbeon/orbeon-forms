@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLBindings}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{Constants, XFormsId}
 
 import scala.collection.mutable
 
@@ -34,7 +34,7 @@ trait PartXBLAnalysis extends TransientState {
   protected def initializeScopes(): Unit = {
     // Add existing ids to scope map
     val prefix = startScope.fullPrefix
-    metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
+    metadata.idGenerator.add(Constants.DocumentId) // top-level is not added to the id generator until now
     for {
       staticId   ← metadata.idGenerator.ids
       prefixedId = prefix + staticId

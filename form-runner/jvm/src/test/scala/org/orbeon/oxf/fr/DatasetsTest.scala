@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl}
+import org.orbeon.xforms.Constants
 import org.scalatest.FunSpecLike
 
 class DatasetsTest
@@ -42,7 +43,7 @@ class DatasetsTest
             sectionTemplate.nestedContainer → sectionTemplate.innerRootControl.effectiveId
           }
 
-          for ((container, sourceEffectiveId) ← List(document → DocId, sectionTemplateResolver("main-section-section-template-control"))) {
+          for ((container, sourceEffectiveId) ← List(document → Constants.DocumentId, sectionTemplateResolver("main-section-section-template-control"))) {
 
             val weatherControl             = resolveObject[XFormsValueControl]("weather-control",               sourceEffectiveId = sourceEffectiveId, container = container).get
             val activityControl            = resolveObject[XFormsValueControl]("activity-control",              sourceEffectiveId = sourceEffectiveId, container = container).get
@@ -56,7 +57,7 @@ class DatasetsTest
           }
 
           // TODO: Uncomment once #3132 is fixed.
-          for ((container, sourceEffectiveId) ← List(document → DocId/*, sectionTemplateResolver("initial-values-section-section-template-control")*/)) {
+          for ((container, sourceEffectiveId) ← List(document → Constants.DocumentId/*, sectionTemplateResolver("initial-values-section-section-template-control")*/)) {
 
             val initialValueFromDatasetControl                   = resolveObject[XFormsValueControl]("initial-value-from-dataset-control"                     , container = container).get
             val staticInitialValueNotOverwrittenByDatasetControl = resolveObject[XFormsValueControl]("static-initial-value-not-overwritten-by-dataset-control", container = container).get

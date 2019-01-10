@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.xforms.Constants
 import org.scalatest.mockito.MockitoSugar
 
 import scala.reflect.ClassTag
@@ -83,7 +84,7 @@ trait XFormsSupport extends MockitoSugar {
     Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString) thenAnswer new Answer[XFormsObject] {
       def answer(invocation: InvocationOnMock) = {
         val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
-        doc.resolveObjectById("#document", targetStaticOrAbsoluteId, None)
+        doc.resolveObjectById(Constants.DocumentId, targetStaticOrAbsoluteId, None)
       }
     }
 
@@ -156,12 +157,10 @@ trait XFormsSupport extends MockitoSugar {
     case _                         ⇒ None
   }
 
-  val DocId = "#document"
-
   def resolveObject[T: ClassTag](
     staticOrAbsoluteId : String,
-    sourceEffectiveId  : String = DocId,
-    indexes            : List[Int] = Nil,
+    sourceEffectiveId  : String       = Constants.DocumentId,
+    indexes            : List[Int]    = Nil,
     container          : XBLContainer = document
   ): Option[T] = {
 

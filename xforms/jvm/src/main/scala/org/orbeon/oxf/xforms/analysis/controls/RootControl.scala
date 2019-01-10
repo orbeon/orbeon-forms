@@ -15,13 +15,14 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.{LangRef, ChildrenBuilderTrait}
+import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, LangRef}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.xforms.Constants
 
 /**
  * Single root container for a part, whether top-level or a nested part.
@@ -30,7 +31,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
   extends ContainerControl(staticStateContext, element, None, None, scope)
   with ChildrenBuilderTrait {
 
-  override val staticId       = "#document"
+  override val staticId       = Constants.DocumentId
   override val prefixedId     = part.startScope.fullPrefix + staticId
   override def containerScope = part.startScope
 

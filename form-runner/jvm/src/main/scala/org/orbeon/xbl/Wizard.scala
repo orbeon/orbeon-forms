@@ -28,6 +28,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.value.{AtomicValue, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
 
 object Wizard {
@@ -99,7 +100,7 @@ object Wizard {
   //@XPathFunction
   def caseIdsForTopLevelSection(topLevelSectionId: String): SequenceIterator =
     for {
-      control               ← inScopeContainingDocument.resolveObjectByIdInScope("#document", s"$topLevelSectionId-switch", None).toList
+      control               ← inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, s"$topLevelSectionId-switch", None).toList
       switchControl         ← control.cast[XFormsSwitchControl].toList
       subsectionCaseControl ← switchControl.getChildrenCases
     } yield

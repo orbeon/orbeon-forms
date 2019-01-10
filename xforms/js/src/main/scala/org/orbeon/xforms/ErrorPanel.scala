@@ -68,7 +68,7 @@ object ErrorPanel {
 
       val jPanelElem = $(panelElem)
 
-      jPanelElem.removeClass("xforms-initially-hidden")
+      jPanelElem.removeClass(Constants.InitiallyHiddenClass)
 
       val panel = newInstance(g.YAHOO.widget.Panel)(panelElem, new js.Object {
         val modal               = true

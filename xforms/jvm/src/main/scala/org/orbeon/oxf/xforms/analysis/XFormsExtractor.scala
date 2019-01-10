@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.xforms.Constants
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
@@ -163,7 +164,7 @@ class XFormsExtractor(
       if (mustOutputFirstElement && ! outputSingleTemplate) {
 
         openElement(localName = "static-state", atts = List("is-html" → isHTMLDocument.toString))
-        openElement(localName = "root",         atts = List("id"      → "#document"))
+        openElement(localName = "root",         atts = List("id"      → Constants.DocumentId))
 
         mustOutputFirstElement = false
       }

@@ -46,7 +46,7 @@ import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
-import org.orbeon.xforms.rpc
+import org.orbeon.xforms.{Constants, rpc}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -55,8 +55,6 @@ import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
 
 object XFormsContainingDocumentSupport {
-
-  private val ContainingDocumentPseudoId = "#document"
 
   def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument ⇒ T): T = {
     withLock(RequestParameters(uuid, None, None, None), timeout) {
@@ -122,8 +120,8 @@ case class Load(resource: String, target: Option[String], urlType: String, isRep
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
   extends XBLContainer(
-    _effectiveId         = ContainingDocumentPseudoId,
-    prefixedId           = ContainingDocumentPseudoId,
+    _effectiveId         = Constants.DocumentId,
+    prefixedId           = Constants.DocumentId,
     fullPrefix           = "",
     parentXBLContainer   = None,
     associatedControlOpt = None,

@@ -54,7 +54,7 @@ object InitSupport {
 
     // Initialize each form
     dom.document.forms                      filter
-      (_.classList.contains("xforms-form")) foreach
+      (_.classList.contains(Constants.FormClass)) foreach
       (e ⇒ initializeForm(e.asInstanceOf[html.Form]))
 
     // Setup heartbeat event
@@ -93,7 +93,7 @@ object InitSupport {
       }
 
     // Q: Do this later?
-    $(formElem).removeClass("xforms-initially-hidden")
+    $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
     val uuid = {
 
@@ -164,7 +164,7 @@ object InitSupport {
         elem                          = formElem,
         uuidInput                     = uuidInput,
         serverEventInput              = serverEventInput,
-        ns                            = formId.substring(0, formId.indexOf("xforms-form")),
+        ns                            = formId.substring(0, formId.indexOf(Constants.FormClass)),
         xformsServerPath              = initializations.xformsServerPath,
         xformsServerUploadPath        = initializations.xformsServerUploadPath,
         calendarImagePath             = initializations.calendarImagePath,
@@ -334,7 +334,7 @@ object InitSupport {
         //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
 
         val mousetrap =
-          if (observer == "#document")
+          if (observer == Constants.DocumentId)
             Mousetrap
           else
             Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])

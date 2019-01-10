@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+import org.orbeon.xforms.Constants
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -268,7 +269,7 @@ class PartAnalysisImpl(
   }
 
   def toXML(helper: XMLReceiverHelper) =
-    controlAnalysisMap(startScope.prefixedIdForStaticId("#document")).toXML(helper)
+    controlAnalysisMap(startScope.prefixedIdForStaticId(Constants.DocumentId)).toXML(helper)
 
   def dumpAnalysis() =
     println(Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this)))

@@ -20,7 +20,7 @@ import org.orbeon.fr.DockerSupport._
 import org.orbeon.node
 import org.orbeon.oxf.util.FutureUtils._
 import org.orbeon.oxf.util.StringUtils
-import org.orbeon.xforms.facade
+import org.orbeon.xforms.{Constants, facade}
 import org.orbeon.xforms.facade.AjaxServerOps._
 import org.scalajs.dom.raw.Window
 import org.scalatest.AsyncFunSpec
@@ -252,7 +252,7 @@ class OrbeonClientTest extends AsyncFunSpec {
         assert(
           documentResult.toOption map
             StringUtils.stringToSet exists
-            (s ⇒ s.contains("xforms-form") && ! s.contains("xforms-initially-hidden"))
+            (s ⇒ s.contains(Constants.FormClass) && ! s.contains(Constants.InitiallyHiddenClass))
         )
       }
     }

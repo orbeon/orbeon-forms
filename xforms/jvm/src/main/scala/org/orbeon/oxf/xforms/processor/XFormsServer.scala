@@ -43,6 +43,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
+import org.orbeon.xforms.Constants
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -107,7 +108,7 @@ object XFormsServer {
               val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
 
               // Dispatch to #document
-              eventElement.addAttribute("source-control-id", "#document")
+              eventElement.addAttribute("source-control-id", Constants.DocumentId)
               eventElement.addAttribute("resource", load.resource)
 
               // NOTE: don't care about the target for portlets

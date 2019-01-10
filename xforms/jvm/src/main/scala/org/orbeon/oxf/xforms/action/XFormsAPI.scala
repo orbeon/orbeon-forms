@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.Constants
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
 import scala.collection.JavaConverters._
@@ -320,7 +321,7 @@ object XFormsAPI {
 
   // NOTE: There is no source id passed so we resolve relative to the document
   def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
-    inScopeContainingDocument.resolveObjectByIdInScope("#document", staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
   def toggle(caseId: String, deferred: Boolean = true): Unit =

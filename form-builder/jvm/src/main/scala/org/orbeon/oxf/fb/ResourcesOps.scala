@@ -47,7 +47,7 @@ trait ResourcesOps extends BaseOps {
     ctx          : FormBuilderDocContext
   ): String =
     findCurrentResourceHolder(controlName) flatMap
-      (n ⇒ n / resourceName map (_.stringValue) headOption) getOrElse ""
+      (_ elemValueOpt resourceName) getOrElse ""
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
   def getControlResources(
@@ -283,7 +283,7 @@ trait ResourcesOps extends BaseOps {
   ): Boolean = {
 
     val hasParams =
-      FormBuilder.lhhaChildrenParams(FormBuilder.getControlLHHAT(controlName, lhha.entryName)).nonEmpty
+      FormBuilder.lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhha.entryName)).nonEmpty
 
     ! hasParams && {
       findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall

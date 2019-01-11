@@ -94,11 +94,11 @@
 
                     <xf:setvalue
                         ref="@isHTML"
-                        value="if (fbf:isControlLHHAHTMLMediatype($i/control-name, $lhh)) then 'true' else ''"/>
+                        value="if (fbf:isControlLhhatHtmlMediatype($i/control-name, $lhh)) then 'true' else ''"/>
 
                     <xf:insert
                         ref="value"
-                        origin="fbf:getControlLhhParams($i/control-name, $lhh)"/>
+                        origin="fbf:getControlLhhtParams($i/control-name, $lhh)"/>
 
                 </xf:action>
 

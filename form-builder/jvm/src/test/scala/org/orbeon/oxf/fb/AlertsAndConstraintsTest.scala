@@ -233,7 +233,7 @@ class AlertsAndConstraintsTest
         val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
         writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Nil)
-        assert("$form-resources/control-1/alert" === (getControlLHHAT(Control1, "alert") att "ref" stringValue))
+        assert("$form-resources/control-1/alert" === (getControlLhhat(Control1, "alert") att "ref" stringValue))
       }
     }
 
@@ -243,7 +243,7 @@ class AlertsAndConstraintsTest
         val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Nil)
-        assert("$fr-resources/detail/labels/alert" === (getControlLHHAT(Control1, "alert") att "ref" stringValue))
+        assert("$fr-resources/detail/labels/alert" === (getControlLhhat(Control1, "alert") att "ref" stringValue))
       }
     }
   }

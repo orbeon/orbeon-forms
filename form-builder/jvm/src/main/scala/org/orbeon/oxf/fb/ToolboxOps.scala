@@ -103,7 +103,7 @@ object ToolboxOps {
               }
 
               // Resource holders from XBL metadata
-              val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
+              val xblResourceEls = binding / FBMetadataTest / FBTemplatesTest / FBResourcesTest / *
 
               // Template items, if needed
               val itemsResourceEls =

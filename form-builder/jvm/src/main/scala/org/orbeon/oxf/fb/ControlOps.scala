@@ -541,14 +541,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx         : FormBuilderDocContext
   ): Boolean = {
     val resourceChanged  = setControlResource(controlName, lhht, value.trimAllToEmpty)
-    val mediatypeChanged = setControlLHHATMediatype(controlName, lhht, isHTML)
+    val mediatypeChanged = setControlLhhatMediatype(controlName, lhht, isHTML)
     val paramsChanged    = params exists (setControlLHHATParams(controlName, lhht, _))
 
     resourceChanged || mediatypeChanged || paramsChanged
   }
 
-  def lhhaChildrenParams(lhhaNodes: Seq[NodeInfo]): Seq[NodeInfo] =
-    lhhaNodes child (FR → "param")
+  def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
+    lhhatNodes child (FR → "param")
 
   private def setControlLHHATParams(
     controlName : String,
@@ -557,8 +557,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ctx         : FormBuilderDocContext
   ): Boolean = {
 
-    val lhhaNodes      = getControlLHHAT(controlName, lhha)
-    val existingParams = lhhaChildrenParams(lhhaNodes)
+    val lhhaNodes      = getControlLhhat(controlName, lhha)
+    val existingParams = lhhatChildrenParams(lhhaNodes)
 
     val changed = {
 
@@ -591,21 +591,21 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     changed
   }
 
-  // Find a control's LHHA (there can be more than one for alerts)
-  def getControlLHHAT(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+  // Find a control's LHHAT (there can be more than one for alerts)
+  def getControlLhhat(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
     findControlByName(ctx.formDefinitionRootElem, controlName).toList child ((if (lhha == "text") FR else XF) → lhha)
 
-  // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
-  def isControlLHHATHTMLMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    hasHTMLMediatype(getControlLHHAT(controlName, lhha))
+  // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
+  def isControlLhhatHtmlMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
+    hasHTMLMediatype(getControlLhhat(controlName, lhha))
 
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
-  def setControlLHHATMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Boolean = {
+  def setControlLhhatMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Boolean = {
 
-    val changed = isHTML != isControlLHHATHTMLMediatype(controlName, lhha)
+    val changed = isHTML != isControlLhhatHtmlMediatype(controlName, lhha)
 
     if (changed)
-      setHTMLMediatype(getControlLHHAT(controlName, lhha), isHTML)
+      setHTMLMediatype(getControlLhhat(controlName, lhha), isHTML)
 
     changed
   }
@@ -635,8 +635,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val lhhaName = lhha.entryName
 
     val control  = findControlByName(inDoc, controlName).get
-    val existing = getControlLHHAT(controlName, lhhaName)
-    val params   = lhhaChildrenParams(existing)
+    val existing = getControlLhhat(controlName, lhhaName)
+    val params   = lhhatChildrenParams(existing)
 
     val lhhaQName = LHHA.QNameForValue(lhha)
 

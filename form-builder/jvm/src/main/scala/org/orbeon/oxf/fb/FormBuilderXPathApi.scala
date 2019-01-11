@@ -128,7 +128,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean): Unit =
-    FormBuilder.setControlLHHATMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
+    FormBuilder.setControlLhhatMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
   //@XPathFunction
   def setControlLabelHintHelpOrText(
@@ -338,12 +338,12 @@ object FormBuilderXPathApi {
     FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
 
   //@XPathFunction
-  def getControlLhhParams(controlName: String, lhh: String): Seq[NodeInfo] =
-    lhhaChildrenParams(FormBuilder.getControlLHHAT(controlName, lhh)(FormBuilderDocContext()))
+  def getControlLhhtParams(controlName: String, lhh: String): Seq[NodeInfo] =
+    lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhh)(FormBuilderDocContext()))
 
   //@XPathFunction
-  def isControlLHHAHTMLMediatype(controlName: String, lhha: String): Boolean =
-    FormBuilder.isControlLHHATHTMLMediatype(controlName, lhha)(FormBuilderDocContext())
+  def isControlLhhatHtmlMediatype(controlName: String, lhha: String): Boolean =
+    FormBuilder.isControlLhhatHtmlMediatype(controlName, lhha)(FormBuilderDocContext())
 
   //@XPathFunction
   def findNextControlId(controlName: String, previousOrNext: String): Option[String] = {

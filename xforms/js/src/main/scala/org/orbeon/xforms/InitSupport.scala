@@ -182,7 +182,7 @@ object InitSupport {
     initializeJavaScriptControls(initializations.controls)
     initializeKeyListeners(initializations.listeners, formElem)
 
-    runInitialServerEvents(initializations.events, formId)
+    dispatchInitialServerEvents(initializations.events, formId)
 
     // Special registration for `focus`, `blur`, and `change` events
     $(dom.document).on("focusin",  Events.focus)
@@ -371,7 +371,7 @@ object InitSupport {
         }
       }
 
-    def runInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
+    def dispatchInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
       events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
         AjaxServer.createDelayedServerEvent(
           serverEvents = event,

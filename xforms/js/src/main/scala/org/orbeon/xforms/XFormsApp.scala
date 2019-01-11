@@ -17,8 +17,7 @@ package org.orbeon.xforms
 object XFormsApp extends App {
 
   def load(): Unit = {
-    InitSupport
-    StateHandling
+    // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     Upload
   }
 }

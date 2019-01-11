@@ -26,7 +26,8 @@ trait App {
 
     def loadAndInit(): Unit = {
       load()
-      Init.document()
+      Init.initializeGlobals()
+      InitSupport.initializeAllForms()
     }
 
     $(() ⇒ {

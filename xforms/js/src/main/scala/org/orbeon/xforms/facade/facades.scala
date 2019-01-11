@@ -51,8 +51,7 @@ object Document extends DocumentTrait
 
 @js.native
 trait InitTrait extends js.Object {
-  def document()                            : Unit = js.native
-
+  def initializeGlobals()                   : Unit = js.native
   def _range(control: html.Element)         : Unit = js.native
   def _compactSelect(control: html.Element) : Unit = js.native
   def _dialog(control: html.Element)        : Unit = js.native

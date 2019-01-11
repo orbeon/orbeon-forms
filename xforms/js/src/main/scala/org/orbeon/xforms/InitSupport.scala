@@ -33,14 +33,12 @@ import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-// Move to `Init` once `ORBEON.xforms.Init` is moved entirely to Scala.js
 @JSExportTopLevel("ORBEON.xforms.InitSupport")
 object InitSupport {
 
   import Private._
 
-  @JSExport
-  def initialize(): Unit = {
+  def initializeAllForms(): Unit = {
 
     val jBody = $(dom.document.body)
 
@@ -57,7 +55,7 @@ object InitSupport {
     // Initialize each form
     dom.document.forms                      filter
       (_.classList.contains("xforms-form")) foreach
-      (e ⇒ initialize(e.asInstanceOf[html.Form]))
+      (e ⇒ initializeForm(e.asInstanceOf[html.Form]))
 
     // Setup heartbeat event
     if (Properties.sessionHeartbeat.get()) {
@@ -77,7 +75,7 @@ object InitSupport {
     }
   }
 
-  private def initialize(formElem: html.Form): Unit = {
+  private def initializeForm(formElem: html.Form): Unit = {
 
     val formId = formElem.id
 

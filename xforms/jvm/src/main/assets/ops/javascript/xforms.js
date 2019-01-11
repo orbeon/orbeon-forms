@@ -3286,9 +3286,8 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
     ORBEON.xforms.Init = {
 
-        document: function () {
+        initializeGlobals: function () {
 
-            // TODO: Move all globals which are per form to Page/Form
             _.extend(ORBEON.xforms.Globals, {
                 // Browser detection
                 renderingEngineTridentOrZero: YAHOO.env.ua.ie, // One usage left to check as of 2019-01-04.
@@ -3330,9 +3329,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
                         ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
             });
-
-            // Done in Scala.js
-            ORBEON.xforms.InitSupport.initialize();
         },
 
         // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.

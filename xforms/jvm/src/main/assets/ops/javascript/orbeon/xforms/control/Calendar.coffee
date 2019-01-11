@@ -14,7 +14,6 @@ $ = ORBEON.jQuery
 Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
-Init = ORBEON.xforms.Init
 Properties = ORBEON.util.Properties
 Page = -> ORBEON.xforms.Page
 CalendarGroup = YAHOO.widget.CalendarGroup

@@ -1056,7 +1056,8 @@
             xf:label[exists(fr:param)] |
             xf:help [exists(fr:param)] |
             xf:hint [exists(fr:param)] |
-            xf:alert[exists(fr:param)]">
+            xf:alert[exists(fr:param)] |
+            fr:text [exists(fr:param)]">
 
         <xsl:copy>
             <xsl:apply-templates select="@*"/>

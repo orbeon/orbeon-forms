@@ -617,6 +617,10 @@
                 <label>Help Message</label>
                 <hint>Displayed when help is activated</hint>
             </control-help>
+            <control-text>
+                <label>Explanation Text</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Alert Message</label>
                 <hint>Displayed when the alert is active</hint>
@@ -1799,6 +1803,10 @@
                 <label>Message d'aide</label>
                 <hint>Affiché lorsque l'aide est activée</hint>
             </control-help>
+            <control-text>
+                <label>Text explicatif</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Message d'alerte</label>
                 <hint>Affiché lorsque l'alerte est active</hint>
@@ -2965,6 +2973,10 @@
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label todo="true">[Feilmelding]</label>
                 <hint todo="true">[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
@@ -4157,6 +4169,10 @@
                 <label todo="true">[Help Message]</label>
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label todo="true">[Сообщение об ошибке]</label>
                 <hint todo="true">[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
@@ -5350,6 +5366,10 @@
                 <label>Messaggio d'aiuto</label>
                 <hint>Visualizzato quando l'aiuto viene attivato</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Messaggio di avviso</label>
                 <hint>Visualizzato quando l'avviso é attivo</hint>
@@ -6535,6 +6555,10 @@
                 <label>Hilfsnachricht</label>
                 <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Warnmeldung</label>
                 <hint>Wird angezeigt, falls die Warnungen aktiviert wurden</hint>
@@ -7723,6 +7747,10 @@
                 <label>Ohjeviesti</label>
                 <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Virheviesti</label>
                 <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
@@ -8908,6 +8936,10 @@
                 <label>Mensaje de Ayuda</label>
                 <hint>Se muestra cuando se activa la ayuda</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Mensaje de Alerta</label>
                 <hint>Se muestra cuando se activa la alerta</hint>
@@ -10094,6 +10126,10 @@
                 <label>Help melding</label>
                 <hint>Wordt getoond wanneer hulp wordt geactiveerd</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Waarschuwingsmelding</label>
                 <hint>Wordt getoond zolang de waarschuwing actief is</hint>
@@ -11259,6 +11295,10 @@
                 <label>Mensagem de Ajuda</label>
                 <hint>É mostrada quando a ajuda é activada</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Mensagem de Alerta</label>
                 <hint>DÉ mostrada quando o alerta está activo</hint>
@@ -12451,6 +12491,10 @@
                 <label>Hjälpmeddelande</label>
                 <hint>Visas när hjälp är aktivt</hint>
             </control-help>
+            <control-text>
+                <label todo="true">[Explanation Text]</label>
+                <hint/>
+            </control-text>
             <alert>
                 <label>Avisering</label>
                 <hint>Visas när avisering är aktiv</hint>

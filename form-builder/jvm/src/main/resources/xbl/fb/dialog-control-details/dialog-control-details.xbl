@@ -36,7 +36,7 @@
 
                 <!-- Clear all local values -->
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
-                <xf:delete ref="$i/(label, hint, help)/fr:param"/>
+                <xf:delete ref="$i/(label, hint, help, text)/fr:param"/>
 
                 <xf:setvalue ref="$i/original-control-name" value="frf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
@@ -53,6 +53,22 @@
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
+                <xf:var
+                    name="xbl-binding"
+                    value="fbf:bindingForControlElementOrEmpty($control)"/>
+
+                <!-- For now, always supported, but in the future should be smarter about it -->
+                <xf:setvalue
+                    iterate="$i/(label, hint, help)/@supported"
+                    ref="."
+                    value="'true'"/>
+
+                <!-- For `text`, we look at the template -->
+                <xf:setvalue
+                    iterate="$i/text/@supported"
+                    ref="."
+                    value="fbf:hasResourcesTemplateFor($xbl-binding, 'text')"/>
+
                 <!-- Process `fb:control-details` -->
                 <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->
                 <xf:action>
@@ -62,7 +78,7 @@
 
                     <xf:var
                         name="control-details"
-                        value="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
+                        value="$xbl-binding/fb:metadata/fb:control-details"/>
 
                     <xf:action if="exists($control-details)">
 
@@ -163,7 +179,7 @@
                 <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'whitespace')"/>
 
                 <!-- Read Label/Hint/Help -->
-                <xf:action iterate="$i/(label, hint, help)">
+                <xf:action iterate="$i/(label, hint, help, text)[@supported = 'true']">
 
                     <xf:var name="lhh" value="local-name()"/>
 
@@ -290,7 +306,7 @@
                             (: Write MIPs :)
                             for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
                                 fbf:updateMipAsAttributeOnly($i/control-name, $mip, $i/*[name() = $mip]),
-                            for $lh in $i/(label, hint, help) return
+                            for $lh in $i/(label, hint, help, text)[@supported = 'true'] return
                                 fbf:setControlLabelHintHelpOrText(
                                     $i/control-name,
                                     local-name($lh),
@@ -412,18 +428,22 @@
                         <default/>
                         <whitespace/>
 
-                        <label isHTML="">
+                        <label isHTML="" supported="">
                             <value/>
                             <!--<fr:param/>-->
                         </label>
-                        <hint  isHTML="">
+                        <hint  isHTML="" supported="">
                             <value/>
                             <!--<fr:param/>-->
                         </hint>
-                        <help  isHTML="">
+                        <help  isHTML="" supported="">
                             <value/>
                             <!--<fr:param/>-->
                         </help>
+                        <text  isHTML="" supported="">
+                            <value/>
+                            <!--<fr:param/>-->
+                        </text>
 
                         <prev-control-id/>
                         <next-control-id/>
@@ -629,7 +649,7 @@
                     readonly="xxf:is-blank()"/>
 
                 <xf:bind
-                    ref="(label | hint | help)/value"
+                    ref="(label | hint | help | text)/value"
                     xxf:whitespace="trim"/>
 
             </xf:model>
@@ -1056,7 +1076,7 @@
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>
-                        <fr:tab id="label-hint-help-tab" ref="label, hint, help">
+                        <fr:tab id="label-hint-help-tab" ref="(text, label, hint, help)[@supported = 'true']">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-details/*[

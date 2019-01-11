@@ -309,6 +309,10 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def hasResourcesTemplateFor(binding: NodeInfo, name: String): Boolean =
+    FormBuilder.hasResourcesTemplateFor(binding, name)
+
+  //@XPathFunction
   def containerById(containerId: String): NodeInfo =
     FormBuilder.containerById(containerId)(FormBuilderDocContext())
 

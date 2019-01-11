@@ -27,6 +27,7 @@ object XMLNames {
   val FBTemplatesTest   : Test  = FB → "templates"
   val FBInstanceTest    : Test  = FB → "instance"
   val FBViewTest        : Test  = FB → "view"
+  val FBResourcesTest   : Test  = FB → "resources"
   val FBDatatypeTest    : Test  = FB → "datatype"
   val FBBindTest        : Test  = FB → "bind"
   val FBConstraintTest  : Test  = FB → "constraint"

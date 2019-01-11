@@ -13,32 +13,25 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.Control
-import org.scalajs.dom
-import org.scalajs.dom.html
-import org.scalajs.dom.raw.{Attr, MutationObserver, MutationRecord}
-
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.facade.Control
+import org.scalajs.dom.html
 
-@JSExportTopLevel("ORBEON.xforms.Page") // used by `xforms.js`, `AjaxServer.js`, `Calendar.coffee`
-@JSExportAll
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+
+@JSExportTopLevel("ORBEON.xforms.Page")
 object Page {
 
-  case class ConstructorPredicate(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean)
-
-  private var forms = Map[String, Form]()
-
-  private var controlConstructors: List[ConstructorPredicate] = Nil
-  private var idToControl = Map[String, Control]()
+  import Private._
 
   def setForm(id: String, form: Form): Unit =
     forms += id → form
 
+  @JSExport
   def getForm(id: String): Form =
     forms.getOrElse(id, throw new IllegalArgumentException(s"form `$id` not found"))
 
+  @JSExport
   def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
     getForm(formId).serverEventInput.value = if (serverEventsValue ne null) serverEventsValue else ""
 
@@ -46,6 +39,7 @@ object Page {
   // whether the control starts with a short namespace, e.g. `o0`, `o1`, etc. Short namespaces are
   // disabled by default which mitigates this problem. As of 2019-01-09 this can be a problem only
   // for one caller of this API.
+  @JSExport
   def namespaceIdIfNeeded(formId: String, id: String): String = {
     val ns = getForm(formId).ns
     if (id.startsWith(ns))
@@ -55,6 +49,7 @@ object Page {
   }
 
   // See comment for `namespaceIdIfNeeded`
+  @JSExport
   def deNamespaceIdIfNeeded(formId: String, id: String): String = {
     val ns = getForm(formId).ns
     if (id.startsWith(ns))
@@ -63,47 +58,13 @@ object Page {
       id
   }
 
-
-  private val LangAttr = "lang"
-
-  private def langElement: Option[dom.Element] = {
-
-    val langElements = Iterator(
-      () ⇒ dom.document.documentElement,
-      () ⇒ dom.document.querySelector(".orbeon-portlet-div[lang]")
-    )
-    langElements
-      .map(_.apply())
-      .find(_.hasAttribute(LangAttr))
-  }
-
-  // noinspection AccessorLikeMethodIsEmptyParen
-  // Return the language for the page, defaulting to English if none is found
-  // See also https://github.com/orbeon/orbeon-forms/issues/3787
-  def getLang(): String = {
-    langElement
-      .map(_.getAttribute(LangAttr).substring(0, 2))
-      .getOrElse("en")
-  }
-
-  def onLangChange(listener: String ⇒ Unit): Unit = {
-    langElement.foreach { element ⇒
-      val callback = (a: js.Array[MutationRecord], b: MutationObserver) ⇒
-        listener(getLang())
-      new MutationObserver(callback).observe(
-        target   = element,
-        options = dom.MutationObserverInit(
-          attributes      = true,
-          attributeFilter = js.Array("lang")
-        )
-      )
-    }
-  }
-
+  // Used for upload controls only:
+  //
   // Create or return a control object corresponding to the provided container. Each control is inside a given
   // form, so getControl() could be a method of a form, but since we can given a container or control id determine
   // the control object without knowing the form, this method is defined at the Page level which makes it easier
   // to use for a caller who doesn't necessarily have a reference to the form object.
+  @JSExport
   def getControl(container: html.Element): Control = {
 
     def getControlConstructor(container: html.Element): () ⇒ Control =
@@ -129,4 +90,14 @@ object Page {
   // Register a control constructor (such as tree, input...). This is expected to be called by the control itself when loaded.
   def registerControlConstructor(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean): Unit =
     controlConstructors ::= ConstructorPredicate(controlConstructor, predicate)
+
+  private object Private {
+
+    case class ConstructorPredicate(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean)
+
+    var forms = Map[String, Form]()
+
+    var controlConstructors: List[ConstructorPredicate] = Nil
+    var idToControl = Map[String, Control]()
+  }
 }

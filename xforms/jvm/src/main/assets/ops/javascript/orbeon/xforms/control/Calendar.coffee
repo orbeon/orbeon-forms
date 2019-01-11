@@ -15,7 +15,7 @@ Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
 Properties = ORBEON.util.Properties
-Page = -> ORBEON.xforms.Page
+Language = -> ORBEON.xforms.Language
 CalendarGroup = YAHOO.widget.CalendarGroup
 Calendar = YAHOO.widget.Calendar
 YD = YAHOO.util.Dom
@@ -198,7 +198,7 @@ Event.onDOMReady ->
                 YD.setStyle calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex
 
                 # Find resource for selected language
-                lang = Page().getLang()
+                lang = Language().getLang()
                 resources = CalendarResources[lang]
                 # Default to English if resources are not found
                 resources = CalendarResources["en"] unless resources?

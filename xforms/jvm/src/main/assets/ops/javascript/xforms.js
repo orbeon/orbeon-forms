@@ -691,7 +691,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             },
 
             _calendarResources: function() {
-                var lang = ORBEON.xforms.Page.getLang();
+                var lang = ORBEON.xforms.Language.getLang();
                 return ORBEON.xforms.control.CalendarResources[lang];
             },
 

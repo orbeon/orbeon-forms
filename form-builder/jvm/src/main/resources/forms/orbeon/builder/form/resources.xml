@@ -618,7 +618,7 @@
                 <hint>Displayed when help is activated</hint>
             </control-help>
             <control-text>
-                <label>Explanation Text</label>
+                <label>Explanatory Text</label>
                 <hint/>
             </control-text>
             <alert>
@@ -2974,7 +2974,7 @@
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -4170,7 +4170,7 @@
                 <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -5367,7 +5367,7 @@
                 <hint>Visualizzato quando l'aiuto viene attivato</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -6556,7 +6556,7 @@
                 <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -7748,7 +7748,7 @@
                 <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -8937,7 +8937,7 @@
                 <hint>Se muestra cuando se activa la ayuda</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -10127,7 +10127,7 @@
                 <hint>Wordt getoond wanneer hulp wordt geactiveerd</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -11296,7 +11296,7 @@
                 <hint>É mostrada quando a ajuda é activada</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>
@@ -12492,7 +12492,7 @@
                 <hint>Visas när hjälp är aktivt</hint>
             </control-help>
             <control-text>
-                <label todo="true">[Explanation Text]</label>
+                <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
             <alert>

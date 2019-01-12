@@ -109,7 +109,7 @@ object InitSupport {
       StateHandling.findClientState(formId) match {
         case None ⇒
 
-          StateHandling.log("no state found, setting initial state")
+          StateHandling.debug("no state found, setting initial state")
 
           val uuid = initializations.uuid
           setInitialState(uuid)
@@ -117,7 +117,7 @@ object InitSupport {
 
         case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
 
-          StateHandling.log("state found upon reload, setting initial state")
+          StateHandling.debug("state found upon reload, setting initial state")
 
           val uuid = initializations.uuid
           setInitialState(uuid)
@@ -125,7 +125,7 @@ object InitSupport {
 
         case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
 
-          StateHandling.log("state found with `revisitHandling` set to `reload`, reloading page")
+          StateHandling.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
           StateHandling.clearClientState(formId)
           dom.window.location.reload(flag = true)
@@ -135,7 +135,7 @@ object InitSupport {
 
         case Some(state) ⇒
 
-          StateHandling.log("state found, assuming back/forward/navigate, requesting all events")
+          StateHandling.debug("state found, assuming back/forward/navigate, requesting all events")
 
           AjaxServer.fireEvents(
             events      = js.Array(new AjaxServer.Event(formElem, null, null, EventNames.XXFormsAllEventsRequired)),

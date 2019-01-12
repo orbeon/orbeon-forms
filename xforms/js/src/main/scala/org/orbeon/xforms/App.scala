@@ -16,15 +16,33 @@ package org.orbeon.xforms
 import org.orbeon.liferay._
 import org.orbeon.xforms.facade.Init
 import org.scalajs.dom
+import scribe.Level
+import scribe.format._
+
+import scala.scalajs.LinkingInfo
 
 
 trait App {
+
+  private val myFormatter: Formatter = formatter"$level $positionAbbreviated - $message$mdc$newLine"
+
+  private def debug(s: String): Unit = scribe.debug(s)
 
   def load(): Unit
 
   def main(args: Array[String]): Unit = {
 
+    val rootLevel = if (LinkingInfo.developmentMode) Level.Debug else Level.Error
+
+    scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
+      minimumLevel = Some(rootLevel),
+      formatter    = myFormatter
+    ).replace()
+
+    scribe.info("Starting XForms app")
+
     def loadAndInit(): Unit = {
+      debug("starting DOM ready initializations")
       load()
       Init.initializeGlobals()
       InitSupport.initializeAllForms()

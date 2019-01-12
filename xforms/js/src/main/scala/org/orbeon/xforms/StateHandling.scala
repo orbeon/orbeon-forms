@@ -32,6 +32,8 @@ object StateHandling {
     sequence : Int
   )
 
+  def debug(s: String): Unit = scribe.debug(s)
+
   @JSExport
   def getFormUuid(formId: String): String =
     getClientStateOrThrow(formId).uuid
@@ -54,10 +56,10 @@ object StateHandling {
     findRawState flatMap (_.get(formId)) flatMap { serialized ⇒
       decode[ClientState](serialized) match {
         case Left(_)  ⇒
-          log(s"error parsing state for form `$formId` and value `$serialized`")
+          debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
         case Right(state) ⇒
-          log(s"found state for form `$formId` and value `$state`")
+          debug(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
     }
@@ -67,7 +69,7 @@ object StateHandling {
     val dict       = findRawState getOrElse js.Dictionary[String]()
     val serialized = clientState.asJson.noSpaces
 
-    log(s"updating client state for form `$formId` with value `$serialized`")
+    debug(s"updating client state for form `$formId` with value `$serialized`")
 
     dict(formId) = serialized
 
@@ -86,9 +88,6 @@ object StateHandling {
         url       = null
       )
     }
-
-  def log(s: String): Unit = ()
-//    println(s"state handling: $s")
 
   private object Private {
 

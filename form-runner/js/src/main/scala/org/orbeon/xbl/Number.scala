@@ -25,6 +25,7 @@ import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers
 
+
 object Number {
 
   XBL.declareCompanion(
@@ -36,6 +37,8 @@ object Number {
     "fr|currency",
     newXBLCompanion
   )
+
+  private def debug(s: String): Unit = scribe.debug(s)
 
   private def newXBLCompanion: XBLCompanion =
     new XBLCompanion {
@@ -52,7 +55,7 @@ object Number {
 
       override def init(): Unit = {
 
-        log("init")
+        debug("init")
 
         companion.visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
 
@@ -60,7 +63,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.TouchStart}.number ${EventNames.FocusIn}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            log(EventNames.FocusIn)
+            debug(EventNames.FocusIn)
 
             // Don"t set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state ⇒
@@ -76,7 +79,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.FocusOut}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            log(EventNames.FocusOut)
+            debug(EventNames.FocusOut)
 
             setInputType("text")
             sendValueToServer()
@@ -104,7 +107,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.KeyPress}.number", {
           (_: html.Element, e: JQueryEventObject) ⇒ {
 
-            log(EventNames.KeyPress)
+            debug(EventNames.KeyPress)
 
             if (e.which == 13)
               sendValueToServer()
@@ -120,19 +123,19 @@ object Number {
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
-        log(s"xformsUpdateReadonly: $readonly")
+        debug(s"xformsUpdateReadonly: $readonly")
         companion.visibleInputElem.disabled = readonly
       }
 
       override def xformsFocus(): Unit = {
-        log(s"xformsFocus")
+        debug(s"xformsFocus")
         companion.visibleInputElem.focus()
       }
 
       // Callback from `number.xbl`
       def updateWithServerValues(serverValue: String, editValue: String, decimalSeparator: String): Unit = {
 
-        log(s"updateWithServerValues: `$serverValue`, `$editValue`, `$decimalSeparator`")
+        debug(s"updateWithServerValues: `$serverValue`, `$editValue`, `$decimalSeparator`")
 
         stateOpt = Some(State(serverValue, editValue, decimalSeparator.headOption getOrElse '.'))
         updateVisibleValue()
@@ -149,11 +152,9 @@ object Number {
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
-        def log(s: String) = () //println(s"fr:number: $s")
-
         // TODO: Can we not send if unchanged?
         def sendValueToServer(): Unit = {
-          log(s"sendValueToServer: `${companion.visibleInputElem.value}`")
+          debug(s"sendValueToServer: `${companion.visibleInputElem.value}`")
           DocumentAPI.dispatchEvent(
             targetId   = containerElem.id,
             eventName  = "fr-set-client-value",

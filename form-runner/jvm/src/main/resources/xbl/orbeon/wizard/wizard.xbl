@@ -792,7 +792,7 @@
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-available" appearance="xxf:internal">
                                             <xxf:setvisited
-                                                event="fr-wizard-visit-all-to-last-available"
+                                                event="fr-wizard-visit-all-available"
 
                                                 iterate="
                                                     for $s in xxf:split(xxf:instance('available-top-level-sections'))

@@ -3031,7 +3031,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             }
         },
 
-        orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded"),
+        orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded", window, false, YAHOO.util.CustomEvent.LIST, true),
         ajaxResponseProcessedEvent  : new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
         errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),
         yuiCalendarCreated          : new YAHOO.util.CustomEvent("yuiCalendarCreated"),

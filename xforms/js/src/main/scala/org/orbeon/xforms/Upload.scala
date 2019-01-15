@@ -22,9 +22,7 @@ import scala.scalajs.js
 
 object Upload {
 
-  def debug(s: String): Unit = scribe.debug(s)
-
-  debug("init object")
+  scribe.debug("init object")
 
   Page.registerControlConstructor(() ⇒ new Upload, (e: html.Element) ⇒ $(e).hasClass("xforms-upload"))
 }
@@ -34,8 +32,6 @@ class Upload extends Control {
 
   self ⇒
 
-  import Upload._
-
   private var yuiProgressBar: ProgressBar = null
 
   // Creates markup for loading progress indicator element, if necessary
@@ -43,7 +39,7 @@ class Upload extends Control {
 
     super.init(container)
 
-    debug("init class")
+    scribe.debug("init class")
 
     if (getElementByClassName(UploadProgressClass).isEmpty) {
 
@@ -62,7 +58,7 @@ class Upload extends Control {
   // The change event corresponds to a file being selected. This will queue an event to submit this file in the
   // background  as soon as possible (pseudo-Ajax request).
   override def change(): Unit = {
-    debug("change → queueing")
+    scribe.debug("change → queueing")
     UploaderClient.uploadEventQueue.add(
       UploadEvent(self.getForm(), self),
       Properties.delayBeforeIncrementalRequest.get(),
@@ -75,18 +71,18 @@ class Upload extends Control {
   // server.
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
-      case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); debug("cancel")
-      case _ if self.yuiProgressBar ne null ⇒ self.yuiProgressBar.set("value", 10 + 110 * received / expected); debug(s"update progress ${100 * received / expected}")
+      case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); scribe.debug("cancel")
+      case _ if self.yuiProgressBar ne null ⇒ self.yuiProgressBar.set("value", 10 + 110 * received / expected); scribe.debug(s"update progress ${100 * received / expected}")
       case _ ⇒
     }
 
   // Called by UploadServer when the upload for this control is finished.
   def uploadDone(): Unit = {
 
-    debug("done")
+    scribe.debug("done")
 
     lazy val ajaxResponseProcessed: js.Function = () ⇒ {
-      debug("removing listener for ajaxResponseProcessed")
+      scribe.debug("removing listener for ajaxResponseProcessed")
         Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
         // If progress indicator is still shown, this means some XForms reset the file name
         // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
@@ -97,12 +93,12 @@ class Upload extends Control {
     // After the file is uploaded, in general at the next Ajax response, we get the file name
     // NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
     Events.ajaxResponseProcessedEvent.subscribe(ajaxResponseProcessed)
-    debug("adding listener for ajaxResponseProcessed")
+    scribe.debug("adding listener for ajaxResponseProcessed")
   }
 
   // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
   def cancel(event: js.Object): Unit = {
-    debug("cancel")
+    scribe.debug("cancel")
     Event.preventDefault(event)
     UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
   }
@@ -111,7 +107,7 @@ class Upload extends Control {
   // (file is being uploaded), or "file" (a file has been uploaded).
   def setState(state: String): Unit = {
 
-    debug(s"setState $state")
+    scribe.debug(s"setState $state")
 
     require(States(state), throw new IllegalArgumentException(s"Invalid state: `$state`"))
 
@@ -146,7 +142,7 @@ class Upload extends Control {
   // Clears the upload field by recreating it.
   def clear(): Unit = {
 
-    debug("clear")
+    scribe.debug("clear")
 
     val oldInputElement = getElementByClassName(UploadSelectClass).get.asInstanceOf[html.Input]
 

@@ -16,17 +16,40 @@ package org.orbeon.xforms
 import org.orbeon.liferay._
 import org.orbeon.xforms.facade.Init
 import org.scalajs.dom
-import scribe.Level
 import scribe.format._
+import scribe.output.{LogOutput, TextOutput}
+import scribe.{Level, LogRecord}
 
 import scala.scalajs.LinkingInfo
 
 
 trait App {
 
-  private val myFormatter: Formatter = formatter"$level $positionAbbreviated - $message$mdc$newLine"
+  // Custom log formatter to output something that is readable
+  private object CustomPosition extends FormatBlock {
 
-  private def debug(s: String): Unit = scribe.debug(s)
+    import org.orbeon.oxf.util.StringUtils._
+    import perfolation._
+
+    def format[M](record: LogRecord[M]): LogOutput = {
+
+      val tokens    = record.className.splitTo[List](".").reverse
+      val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
+
+      record.methodName match {
+        case Some(name) ⇒ new TextOutput(p"$className.$name")
+        case None       ⇒ new TextOutput(p"$className")
+      }
+    }
+  }
+
+  private val customFormatter: Formatter = Formatter.fromBlocks(
+    FormatBlock.Level,
+    FormatBlock.RawString(" "),
+    CustomPosition,
+    FormatBlock.RawString(" - "),
+    FormatBlock.Message
+  )
 
   def load(): Unit
 
@@ -36,13 +59,13 @@ trait App {
 
     scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
       minimumLevel = Some(rootLevel),
-      formatter    = myFormatter
+      formatter    = customFormatter
     ).replace()
 
     scribe.info("Starting XForms app")
 
     def loadAndInit(): Unit = {
-      debug("starting DOM ready initializations")
+      scribe.debug("starting DOM ready initializations")
       load()
       Init.initializeGlobals()
       InitSupport.initializeAllForms()

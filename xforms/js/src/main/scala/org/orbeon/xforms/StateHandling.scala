@@ -60,7 +60,7 @@ object StateHandling {
     StateHandling.findClientState(formId) match {
       case None ⇒
 
-        debug("no state found, setting initial state")
+        scribe.debug("no state found, setting initial state")
 
         val uuid = initialUuid
         setInitialState(uuid)
@@ -68,7 +68,7 @@ object StateHandling {
 
       case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
 
-        debug("state found upon reload, setting initial state")
+        scribe.debug("state found upon reload, setting initial state")
 
         val uuid = initialUuid
         setInitialState(uuid)
@@ -76,20 +76,18 @@ object StateHandling {
 
       case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
 
-        debug("state found with `revisitHandling` set to `reload`, reloading page")
+        scribe.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
         StateHandling.clearClientState(formId)
         StateResult.Reload
 
       case Some(state) ⇒
 
-        debug("state found, assuming back/forward/navigate, requesting all events")
+        scribe.debug("state found, assuming back/forward/navigate, requesting all events")
 
         StateResult.Restore(state.uuid)
     }
   }
-
-  def debug(s: String): Unit = scribe.debug(s)
 
   @JSExport
   def getFormUuid(formId: String): String =
@@ -113,10 +111,10 @@ object StateHandling {
     findRawState flatMap (_.get(formId)) flatMap { serialized ⇒
       decode[ClientState](serialized) match {
         case Left(_)  ⇒
-          debug(s"error parsing state for form `$formId` and value `$serialized`")
+          scribe.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
         case Right(state) ⇒
-          debug(s"found state for form `$formId` and value `$state`")
+          scribe.debug(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
     }
@@ -126,7 +124,7 @@ object StateHandling {
     val dict       = findRawState getOrElse js.Dictionary[String]()
     val serialized = clientState.asJson.noSpaces
 
-    debug(s"updating client state for form `$formId` with value `$serialized`")
+    scribe.debug(s"updating client state for form `$formId` with value `$serialized`")
 
     dict(formId) = serialized
 

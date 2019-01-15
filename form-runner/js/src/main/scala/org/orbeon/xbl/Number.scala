@@ -38,8 +38,6 @@ object Number {
     newXBLCompanion
   )
 
-  private def debug(s: String): Unit = scribe.debug(s)
-
   private def newXBLCompanion: XBLCompanion =
     new XBLCompanion {
 
@@ -55,7 +53,7 @@ object Number {
 
       override def init(): Unit = {
 
-        debug("init")
+        scribe.debug("init")
 
         companion.visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
 
@@ -63,7 +61,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.TouchStart}.number ${EventNames.FocusIn}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            debug(EventNames.FocusIn)
+            scribe.debug(EventNames.FocusIn)
 
             // Don"t set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state ⇒
@@ -79,7 +77,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.FocusOut}.number", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            debug(EventNames.FocusOut)
+            scribe.debug(EventNames.FocusOut)
 
             setInputType("text")
             sendValueToServer()
@@ -107,7 +105,7 @@ object Number {
         $(companion.visibleInputElem).on(s"${EventNames.KeyPress}.number", {
           (_: html.Element, e: JQueryEventObject) ⇒ {
 
-            debug(EventNames.KeyPress)
+            scribe.debug(EventNames.KeyPress)
 
             if (e.which == 13)
               sendValueToServer()
@@ -123,19 +121,19 @@ object Number {
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
-        debug(s"xformsUpdateReadonly: $readonly")
+        scribe.debug(s"xformsUpdateReadonly: $readonly")
         companion.visibleInputElem.disabled = readonly
       }
 
       override def xformsFocus(): Unit = {
-        debug(s"xformsFocus")
+        scribe.debug(s"xformsFocus")
         companion.visibleInputElem.focus()
       }
 
       // Callback from `number.xbl`
       def updateWithServerValues(serverValue: String, editValue: String, decimalSeparator: String): Unit = {
 
-        debug(s"updateWithServerValues: `$serverValue`, `$editValue`, `$decimalSeparator`")
+        scribe.debug(s"updateWithServerValues: `$serverValue`, `$editValue`, `$decimalSeparator`")
 
         stateOpt = Some(State(serverValue, editValue, decimalSeparator.headOption getOrElse '.'))
         updateVisibleValue()
@@ -154,7 +152,7 @@ object Number {
 
         // TODO: Can we not send if unchanged?
         def sendValueToServer(): Unit = {
-          debug(s"sendValueToServer: `${companion.visibleInputElem.value}`")
+          scribe.debug(s"sendValueToServer: `${companion.visibleInputElem.value}`")
           DocumentAPI.dispatchEvent(
             targetId   = containerElem.id,
             eventName  = "fr-set-client-value",

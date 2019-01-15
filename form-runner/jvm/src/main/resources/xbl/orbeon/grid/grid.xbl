@@ -788,7 +788,7 @@
 
                                                         <!-- Make sure we have stable references -->
                                                         <xf:var name="context"  value="$repeat-context"/>
-                                                        <xf:var name="items"    value="xxf:repeat-items()"/>
+                                                        <xf:var name="items"    value="$repeat-sequence"/>
                                                         <xf:var name="p"        value="xxf:repeat-position()"/>
                                                         <xf:var name="source"   value="$items[$p]"/>
                                                         <xf:var name="instance" value="$source/root()"/>

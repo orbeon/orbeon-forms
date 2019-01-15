@@ -67,10 +67,13 @@ object InitSupport {
         }
     }
 
+    // See https://doc.orbeon.com/xforms/core/client-side-javascript-api#custom-events
+    // See https://github.com/orbeon/orbeon-forms/issues/3729
     // 2019-01-10: There was an old comment about how the call to `this.subscribers.length` in the `fire()`
     // method could hang with IE. That is likely no longer a relevant comment but it might still be
     // better to fire the event asynchronously, although we could maybe use a `0` delay.
     js.timers.setTimeout(Properties.internalShortDelay.get()) {
+      scribe.debug("dispatching `orbeonLoadedEvent`");
       Events.orbeonLoadedEvent.fire()
     }
   }

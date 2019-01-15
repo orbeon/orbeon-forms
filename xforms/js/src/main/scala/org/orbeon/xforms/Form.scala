@@ -19,6 +19,7 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 
 class Form(
+  val uuid                          : String,
   val elem                          : html.Element,
   val uuidInput                     : html.Input,
   val serverEventInput              : html.Input,

@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
+import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -31,6 +32,62 @@ object StateHandling {
     uuid     : String,
     sequence : Int
   )
+
+  import enumeratum._
+
+  sealed abstract class StateResult extends EnumEntry
+
+  object StateResult extends Enum[StateResult] {
+
+    val values = findValues
+
+    case class  Uuid(uuid: String)    extends StateResult
+    case class  Restore(uuid: String) extends StateResult
+    case object Reload                extends StateResult
+  }
+
+  def initializeState(formId: String, initialUuid: String): StateResult = {
+
+    def setInitialState(uuid: String): Unit =
+      StateHandling.updateClientState(
+        formId,
+        ClientState(
+          uuid     = uuid,
+          sequence = 1
+        )
+      )
+
+    StateHandling.findClientState(formId) match {
+      case None ⇒
+
+        debug("no state found, setting initial state")
+
+        val uuid = initialUuid
+        setInitialState(uuid)
+        StateResult.Uuid(uuid)
+
+      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
+
+        debug("state found upon reload, setting initial state")
+
+        val uuid = initialUuid
+        setInitialState(uuid)
+        StateResult.Uuid(uuid)
+
+      case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
+
+        debug("state found with `revisitHandling` set to `reload`, reloading page")
+
+        StateHandling.clearClientState(formId)
+        StateResult.Reload
+
+      case Some(state) ⇒
+
+        debug("state found, assuming back/forward/navigate, requesting all events")
+
+        StateResult.Restore(state.uuid)
+    }
+  }
 
   def debug(s: String): Unit = scribe.debug(s)
 

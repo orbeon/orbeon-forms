@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.Constants._
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
-import org.orbeon.xforms.StateHandling.ClientState
+import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
@@ -53,7 +53,7 @@ object InitSupport {
         jBody.addClass(Constants.XFormsMobileClass)
 
     // Initialize each form
-    dom.document.forms                      filter
+    dom.document.forms                            filter
       (_.classList.contains(Constants.FormClass)) foreach
       (e ⇒ initializeForm(e.asInstanceOf[html.Form]))
 
@@ -95,56 +95,20 @@ object InitSupport {
     // Q: Do this later?
     $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
-    val uuid = {
-
-      def setInitialState(uuid: String): Unit =
-        StateHandling.updateClientState(
-          formId,
-          ClientState(
-            uuid     = uuid,
-            sequence = 1
-          )
-        )
-
-      StateHandling.findClientState(formId) match {
-        case None ⇒
-
-          StateHandling.debug("no state found, setting initial state")
-
-          val uuid = initializations.uuid
-          setInitialState(uuid)
+    val uuid =
+      StateHandling.initializeState(formId, initializations.uuid) match {
+        case StateResult.Uuid(uuid) ⇒
           uuid
-
-        case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
-
-          StateHandling.debug("state found upon reload, setting initial state")
-
-          val uuid = initializations.uuid
-          setInitialState(uuid)
-          uuid
-
-        case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
-
-          StateHandling.debug("state found with `revisitHandling` set to `reload`, reloading page")
-
-          StateHandling.clearClientState(formId)
-          dom.window.location.reload(flag = true)
-
-          // No need to continue the initialization
-          return
-
-        case Some(state) ⇒
-
-          StateHandling.debug("state found, assuming back/forward/navigate, requesting all events")
-
+        case StateResult.Restore(uuid) ⇒
           AjaxServer.fireEvents(
             events      = js.Array(new AjaxServer.Event(formElem, null, null, EventNames.XXFormsAllEventsRequired)),
             incremental = false
           )
-
-          state.uuid // should be the same as `getInitDataForAllForms(formId).uuid`!
+          uuid
+        case StateResult.Reload ⇒
+          dom.window.location.reload(flag = true)
+          return
       }
-    }
 
     val uuidInput        = getTwoPassSubmissionField(formElem, UuidFieldName)
     val serverEventInput = getTwoPassSubmissionField(formElem, ServerEventsFieldName)
@@ -161,6 +125,7 @@ object InitSupport {
     Page.setForm(
       formId,
       new Form(
+        uuid                          = uuid,
         elem                          = formElem,
         uuidInput                     = uuidInput,
         serverEventInput              = serverEventInput,

@@ -60,11 +60,14 @@ object InitSupport {
     // Setup heartbeat event
     if (Properties.sessionHeartbeat.get()) {
       // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-      val heartBeatDelay = Properties.sessionHeartbeatDelay.get()
-      if (heartBeatDelay > 0)
-        js.timers.setInterval(heartBeatDelay / 10) {
+      val heartBeatDelay      = Properties.sessionHeartbeatDelay.get()
+      val heartBeatCheckDelay = heartBeatDelay / 10
+      if (heartBeatCheckDelay > 0) {
+        scribe.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
+        js.timers.setInterval(heartBeatCheckDelay) {
           Events.sendHeartBeatIfNeeded(heartBeatDelay)
         }
+      }
     }
 
     // See https://doc.orbeon.com/xforms/core/client-side-javascript-api#custom-events
@@ -73,7 +76,7 @@ object InitSupport {
     // method could hang with IE. That is likely no longer a relevant comment but it might still be
     // better to fire the event asynchronously, although we could maybe use a `0` delay.
     js.timers.setTimeout(Properties.internalShortDelay.get()) {
-      scribe.debug("dispatching `orbeonLoadedEvent`");
+      scribe.debug("dispatching `orbeonLoadedEvent`")
       Events.orbeonLoadedEvent.fire()
     }
   }
@@ -273,24 +276,24 @@ object InitSupport {
           val jControl = $(control)
           // Exclude controls in repeat templates
           if (jControl.parents(".xforms-repeat-template").length == 0) {
-              if (XBL.isComponent(control)) {
-                // Custom XBL component initialization
-                val instance = XBL.instanceForControl(control)
-                if (instance ne null) {
-                  valueOpt foreach { value ⇒
-                    Controls.setCurrentValue(control, value)
-                  }
-                }
-              } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
-                  // Initialized visible dialogs
-                  Init._dialog(control)
-              } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
-                  // Legacy JavaScript initialization
-                  Init._compactSelect(control)
-              } else if (jControl.is(".xforms-range")) {
-                  // Legacy JavaScript initialization
-                  Init._range(control)
+            if (XBL.isComponent(control)) {
+              // Custom XBL component initialization
+              for {
+                _     ← Option(XBL.instanceForControl(control))
+                value ← valueOpt
+              } locally {
+                Controls.setCurrentValue(control, value)
               }
+            } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+                // Initialized visible dialogs
+                Init._dialog(control)
+            } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+                // Legacy JavaScript initialization
+                Init._compactSelect(control)
+            } else if (jControl.is(".xforms-range")) {
+                // Legacy JavaScript initialization
+                Init._range(control)
+            }
           }
         }
       }

@@ -223,7 +223,7 @@ object Properties extends js.Object {
   val internalShortDelay               : Property[Double]  = js.native
   val revisitHandling                  : Property[String]  = js.native
   val sessionHeartbeat                 : Property[Boolean] = js.native
-  val sessionHeartbeatDelay            : Property[Double]  = js.native
+  val sessionHeartbeatDelay            : Property[Int]     = js.native
 }
 
 @js.native

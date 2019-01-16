@@ -15,6 +15,7 @@ package org.orbeon
 
 import org.scalajs.dom
 
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 
 package object liferay {
@@ -30,5 +31,14 @@ package object liferay {
   @js.native
   trait Liferay extends js.Object {
     def on(event: String, listener: js.Function): Unit = js.native
+  }
+
+  implicit class LiferayOps(val liferay : Liferay) extends AnyVal {
+
+    def allPortletsReadyF: Future[Unit] = {
+      val result = Promise[Unit]()
+      liferay.on("allPortletsReady", () ⇒ result.success(()))
+      result.future
+    }
   }
 }

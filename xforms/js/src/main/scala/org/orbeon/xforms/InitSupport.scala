@@ -38,7 +38,7 @@ object InitSupport {
 
   import Private._
 
-  def initializeAllForms(): Unit = {
+  def initializeAllForms(initData: js.Dictionary[InitData]): Unit = {
 
     val jBody = $(dom.document.body)
 
@@ -55,7 +55,7 @@ object InitSupport {
     // Initialize each form
     dom.document.forms                            filter
       (_.classList.contains(Constants.FormClass)) foreach
-      (e ⇒ initializeForm(e.asInstanceOf[html.Form]))
+      (e ⇒ initializeForm(e.asInstanceOf[html.Form], initData))
 
     // Setup heartbeat event
     if (Properties.sessionHeartbeat.get()) {
@@ -81,7 +81,7 @@ object InitSupport {
     }
   }
 
-  private def initializeForm(formElem: html.Form): Unit = {
+  private def initializeForm(formElem: html.Form, initData: js.Dictionary[InitData]): Unit = {
 
     val formId = formElem.id
 
@@ -90,7 +90,7 @@ object InitSupport {
       (throw new IllegalStateException(s"missing error panel element for form `$formId`"))
 
     val initializations =
-      decode[rpc.Initializations](getInitDataForAllForms(formId).initializations) match {
+      decode[rpc.Initializations](initData(formId).initializations) match {
         case Left(e) ⇒
           ErrorPanel.showError(formId, e.getMessage)
           return
@@ -214,9 +214,6 @@ object InitSupport {
   }
 
   private object Private {
-
-    def getInitDataForAllForms: js.Dictionary[InitData] =
-      g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]]
 
     def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =
       formElem.elements.iterator                          collectFirst

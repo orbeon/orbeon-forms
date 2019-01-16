@@ -13,95 +13,121 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.jquery._
 import org.orbeon.liferay._
 import org.orbeon.oxf.util.FutureUtils
-import org.orbeon.xforms.facade.Init
+import org.orbeon.xforms.facade.{Init, InitData}
 import org.scalajs.dom
 import scribe.format._
 import scribe.output.{LogOutput, TextOutput}
 import scribe.{Level, LogRecord}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.scalajs.js.Dictionary
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.{LinkingInfo, js}
+import scala.util.control.ControlThrowable
+import scala.util.{Failure, Success}
 
 
 trait App {
 
-  // Custom log formatter to output something that is readable
-  private object CustomPosition extends FormatBlock {
-
-    import org.orbeon.oxf.util.StringUtils._
-    import perfolation._
-
-    def format[M](record: LogRecord[M]): LogOutput = {
-
-      val tokens    = record.className.splitTo[List](".").reverse
-      val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
-
-      record.methodName match {
-        case Some(name) ⇒ new TextOutput(p"$className.$name")
-        case None       ⇒ new TextOutput(p"$className")
-      }
-    }
-  }
-
-  private val customFormatter: Formatter = Formatter.fromBlocks(
-    FormatBlock.Level,
-    FormatBlock.RawString(" "),
-    CustomPosition,
-    FormatBlock.RawString(" - "),
-    FormatBlock.Message
-  )
+  import Private._
 
   def load(): Unit
 
   def main(args: Array[String]): Unit = {
 
-    val rootLevel = if (LinkingInfo.developmentMode) Level.Debug else Level.Error
-
-    scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
-      minimumLevel = Some(rootLevel),
-      formatter    = customFormatter
-    ).replace()
+    Logging.initialize()
 
     scribe.info("Starting XForms app")
 
-    def loadAndInit(): Unit = {
-      scribe.debug("running initializations")
-      load()
-      Init.initializeGlobals()
-      InitSupport.initializeAllForms()
+    $.readyF                flatMap
+      (_ ⇒ liferayF)        flatMap
+      (_ ⇒ orbeonInitDataF) onComplete {
+
+      case Success(initData) ⇒
+        scribe.debug("running initializations")
+        load()
+        Init.initializeGlobals()
+        InitSupport.initializeAllForms(initData)
+      case Failure(t) ⇒
+        throw t
+    }
+  }
+
+  private object Private {
+
+    import scala.concurrent.duration._
+
+    private val Interval = 100.milliseconds
+    private val Timeout  = 2.minutes
+
+    private var waitLogged = false
+
+    private val dummyException = new ControlThrowable {}
+
+    def liferayF: Future[Unit] = {
+      scribe.debug("checking for Liferay object")
+      dom.window.Liferay.toOption match {
+        case None          ⇒ Future.successful(())
+        case Some(liferay) ⇒ liferay.allPortletsReadyF
+      }
     }
 
-    var waitLogged = false
-
     // https://github.com/orbeon/orbeon-forms/issues/3893
-    lazy val waitForOrbeonInitData: js.Function0[js.Any] =
-      () ⇒ {
+    def orbeonInitDataF: Future[Dictionary[InitData]] =
+      FutureUtils.eventually(Interval, Timeout) {
         if (js.isUndefined(g.orbeonInitData)) {
           if (! waitLogged)
             scribe.debug("waiting for `orbeonInitData` to be available")
           else
             scribe.trace("waiting for `orbeonInitData` to be available")
           waitLogged = true
-          js.timers.RawTimers.setTimeout(
-            waitForOrbeonInitData,
-            100
-          )
+          Future.failed(dummyException)
         } else {
-          loadAndInit(): js.Any
+          Future.successful(g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]])
         }
       }
-
-    $.apply({
-      () ⇒ {
-        scribe.debug("starting DOM ready initializations")
-        dom.window.Liferay.toOption match {
-          case None          ⇒ waitForOrbeonInitData()
-          case Some(liferay) ⇒ liferay.on("allPortletsReady", waitForOrbeonInitData)
-        }
-      }
-    }: js.Function)
   }
 
+  private object Logging {
+
+    // Custom log formatter to output something that is readable
+    private object CustomPosition extends FormatBlock {
+
+      import org.orbeon.oxf.util.StringUtils._
+      import perfolation._
+
+      def format[M](record: LogRecord[M]): LogOutput = {
+
+        val tokens    = record.className.splitTo[List](".").reverse
+        val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
+
+        record.methodName match {
+          case Some(name) ⇒ new TextOutput(p"$className.$name")
+          case None       ⇒ new TextOutput(p"$className")
+        }
+      }
+    }
+
+    private val customFormatter: Formatter = Formatter.fromBlocks(
+      FormatBlock.Level,
+      FormatBlock.RawString(" "),
+      CustomPosition,
+      FormatBlock.RawString(" - "),
+      FormatBlock.Message
+    )
+
+    def initialize(): Unit = {
+
+      val rootLevel = if (LinkingInfo.developmentMode) Level.Debug else Level.Error
+
+      scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
+        minimumLevel = Some(rootLevel),
+        formatter    = customFormatter
+      ).replace()
+    }
+  }
 }

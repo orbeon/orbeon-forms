@@ -13,14 +13,15 @@
  */
 package org.orbeon
 
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import org.scalajs.jquery.{JQuery, JQueryEventObject, JQueryStatic}
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 
 
 package object jquery {
 
-  implicit class JqueryOpsOps[T](val j: JQuery) extends AnyVal {
+  implicit class JqueryOps(val j: JQuery) extends AnyVal {
 
     @inline private def asJsAny(body: ⇒ Any): js.Any = { body; () }
 
@@ -30,6 +31,14 @@ package object jquery {
         selector = selector,
         handler  = ((e: JQueryEventObject) ⇒ asJsAny(handler(e))): js.Function1[JQueryEventObject, js.Any]
       )
+  }
+
+  implicit class JqueryStaticOps(val j: JQueryStatic) extends AnyVal {
+
+    // Expose jQuery's `$(function)` as a `Future`
+    def readyF(implicit executor: ExecutionContext): Future[Unit] =
+      j.when(j.asInstanceOf[js.Dynamic].ready).asInstanceOf[js.Thenable[js.Any]].toFuture map (_ ⇒ ())
+
   }
 
 }

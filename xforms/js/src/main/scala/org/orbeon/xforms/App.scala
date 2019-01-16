@@ -14,20 +14,9 @@
 package org.orbeon.xforms
 
 import org.orbeon.jquery._
-import org.orbeon.liferay._
-import org.orbeon.oxf.util.FutureUtils
-import org.orbeon.xforms.facade.{Init, InitData}
-import org.scalajs.dom
-import scribe.format._
-import scribe.output.{LogOutput, TextOutput}
-import scribe.{Level, LogRecord}
+import org.orbeon.xforms.facade.Init
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.scalajs.js.Dictionary
-import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.{LinkingInfo, js}
-import scala.util.control.ControlThrowable
 import scala.util.{Failure, Success}
 
 
@@ -59,7 +48,18 @@ trait App {
 
   private object Private {
 
+    import org.orbeon.liferay._
+    import org.orbeon.oxf.util.FutureUtils
+    import org.orbeon.xforms.facade.InitData
+    import org.scalajs.dom
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+    import scala.concurrent.Future
     import scala.concurrent.duration._
+    import scala.scalajs.js
+    import scala.scalajs.js.Dictionary
+    import scala.scalajs.js.Dynamic.{global ⇒ g}
+    import scala.util.control.ControlThrowable
 
     private val Interval = 100.milliseconds
     private val Timeout  = 2.minutes
@@ -92,6 +92,12 @@ trait App {
   }
 
   private object Logging {
+
+    import scribe.format._
+    import scribe.output.{LogOutput, TextOutput}
+    import scribe.{Level, LogRecord}
+
+    import scala.scalajs.LinkingInfo
 
     // Custom log formatter to output something that is readable
     private object CustomPosition extends FormatBlock {

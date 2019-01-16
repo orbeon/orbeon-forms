@@ -13,10 +13,13 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.liferay._
 import org.orbeon.xforms.facade.Init
 import org.scalajs.dom
-import org.orbeon.liferay._
 
+import scala.concurrent.duration._
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 trait App {
 
@@ -29,10 +32,20 @@ trait App {
       Init.document()
     }
 
+    def waitForInitDataAndThenInitialize(): Unit = {
+
+      if (js.isUndefined(g.orbeonInitData))
+        js.timers.setTimeout(100.milliseconds) {
+          waitForInitDataAndThenInitialize()
+        }
+      else
+        loadAndInit()
+    }
+
     $(() ⇒ {
       dom.window.Liferay.toOption match {
-        case None          ⇒ $(loadAndInit _)
-        case Some(liferay) ⇒ liferay.on("allPortletsReady", loadAndInit _)
+        case None          ⇒ waitForInitDataAndThenInitialize()
+        case Some(liferay) ⇒ liferay.on("allPortletsReady", waitForInitDataAndThenInitialize _)
       }
     })
   }

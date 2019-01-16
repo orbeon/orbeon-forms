@@ -14,13 +14,15 @@
 package org.orbeon.xforms
 
 import org.orbeon.liferay._
+import org.orbeon.oxf.util.FutureUtils
 import org.orbeon.xforms.facade.Init
 import org.scalajs.dom
 import scribe.format._
 import scribe.output.{LogOutput, TextOutput}
 import scribe.{Level, LogRecord}
 
-import scala.scalajs.LinkingInfo
+import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.{LinkingInfo, js}
 
 
 trait App {
@@ -65,18 +67,41 @@ trait App {
     scribe.info("Starting XForms app")
 
     def loadAndInit(): Unit = {
-      scribe.debug("starting DOM ready initializations")
+      scribe.debug("running initializations")
       load()
       Init.initializeGlobals()
       InitSupport.initializeAllForms()
     }
 
-    $(() ⇒ {
-      dom.window.Liferay.toOption match {
-        case None          ⇒ $(loadAndInit _)
-        case Some(liferay) ⇒ liferay.on("allPortletsReady", loadAndInit _)
+    var waitLogged = false
+
+    // https://github.com/orbeon/orbeon-forms/issues/3893
+    lazy val waitForOrbeonInitData: js.Function0[js.Any] =
+      () ⇒ {
+        if (js.isUndefined(g.orbeonInitData)) {
+          if (! waitLogged)
+            scribe.debug("waiting for `orbeonInitData` to be available")
+          else
+            scribe.trace("waiting for `orbeonInitData` to be available")
+          waitLogged = true
+          js.timers.RawTimers.setTimeout(
+            waitForOrbeonInitData,
+            100
+          )
+        } else {
+          loadAndInit(): js.Any
+        }
       }
-    })
+
+    $.apply({
+      () ⇒ {
+        scribe.debug("starting DOM ready initializations")
+        dom.window.Liferay.toOption match {
+          case None          ⇒ waitForOrbeonInitData()
+          case Some(liferay) ⇒ liferay.on("allPortletsReady", waitForOrbeonInitData)
+        }
+      }
+    }: js.Function)
   }
 
 }

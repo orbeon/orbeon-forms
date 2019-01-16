@@ -114,7 +114,7 @@ object StateHandling {
           scribe.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
         case Right(state) ⇒
-          scribe.debug(s"found state for form `$formId` and value `$state`")
+          scribe.trace(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
     }

@@ -30,6 +30,7 @@ object FutureUtils {
     p.future
   }
 
+  // TODO: Should just return a `Future[T]`!
   def eventually[T](
     interval    : FiniteDuration,
     timeout     : FiniteDuration)(
@@ -44,7 +45,7 @@ object FutureUtils {
     var done = false
     while(! done) {
       await(block.toTry) match {
-        case v @ Success(value) ⇒
+        case v @ Success(_) ⇒
           result = v
           done = true
         case v @ Failure(_) ⇒

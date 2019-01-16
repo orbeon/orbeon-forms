@@ -20,8 +20,8 @@ import org.orbeon.fr.DockerSupport._
 import org.orbeon.node
 import org.orbeon.oxf.util.FutureUtils._
 import org.orbeon.oxf.util.StringUtils
-import org.orbeon.xforms.{Constants, facade}
 import org.orbeon.xforms.facade.AjaxServerOps._
+import org.orbeon.xforms.{Constants, facade}
 import org.scalajs.dom.raw.Window
 import org.scalatest.AsyncFunSpec
 
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.|
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 class OrbeonClientTest extends AsyncFunSpec {
 
@@ -189,7 +189,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   // NOTE: While we retry new server sessions may be created if we hit another server
   def waitForServerCookie(serverPrefix: String): Future[Try[String]] =
-    eventually(interval = 5.seconds, timeout = 120.seconds) {
+    eventuallyAsTry(interval = 5.seconds, timeout = 120.seconds) {
       simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res ⇒
 
         // https://github.com/hmil/RosHTTP/issues/68
@@ -234,17 +234,17 @@ class OrbeonClientTest extends AsyncFunSpec {
           )
         }
 
-        val documentResult =
-          await {
-            eventually(interval = 5.seconds, timeout = 120.seconds) {
-              loadDocumentViaJSDOM(s"$OrbeonServer1Url/xforms-espresso/")
+        val documentResult = {
+
+          val window =
+            await {
+              eventually(interval = 5.seconds, timeout = 120.seconds) {
+                loadDocumentViaJSDOM(s"$OrbeonServer1Url/xforms-espresso/")
+              }
             }
-          } match {
-            case Success(window) ⇒
-              val e = window.document.querySelector(".xforms-form")
-              Success(e.getAttribute("class"))
-            case Failure(t) ⇒
-              Failure(t)
+
+            val e = window.document.querySelector(".xforms-form")
+            Success(e.getAttribute("class"))
           }
 
         await(removeContainerByImage(TomcatImageName))

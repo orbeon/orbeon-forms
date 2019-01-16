@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise, TimeoutException}
 import scala.scalajs.js.timers.setTimeout
 import scala.util.{Failure, Success, Try}
 import scala.async.Async._
@@ -30,8 +30,16 @@ object FutureUtils {
     p.future
   }
 
-  // TODO: Should just return a `Future[T]`!
   def eventually[T](
+    interval    : FiniteDuration,
+    timeout     : FiniteDuration)(
+    block       : ⇒ Future[T])(implicit
+    execContext : ExecutionContext
+  ): Future[T] =
+    eventuallyAsTry(interval, timeout)(block) flatMap
+      Future.fromTry
+
+  def eventuallyAsTry[T](
     interval    : FiniteDuration,
     timeout     : FiniteDuration)(
     block       : ⇒ Future[T])(implicit

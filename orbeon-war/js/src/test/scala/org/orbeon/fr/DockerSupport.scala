@@ -19,10 +19,10 @@ import org.orbeon.oxf.util.FutureUtils.eventually
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js.JSStringOps._
-import scala.util.{Failure, Success, Try}
+import scala.util.Success
 
 object DockerSupport {
 
@@ -70,7 +70,7 @@ object DockerSupport {
     }
   }
 
-  def waitUntilImageAvailable(image: String): Future[Try[String]] = {
+  def waitUntilImageAvailable(image: String): Future[String] = {
     withInfo(s"wait for image `$image` to be available") {
       eventually(interval = ImageWaitDelay, timeout = ImageWaitTimeout) {
         runProcessSyncF("docker", s"images -q $image") map (_.trim) filter (_.nonEmpty)
@@ -80,25 +80,21 @@ object DockerSupport {
 
   // Return existing container ids or new container id
   def runContainer(image: String, params: String, checkImageRunning: Boolean) = async {
-    await(waitUntilImageAvailable(image)) match {
-      case Success(id) ⇒
 
-        val existingContainerIdsOpt =
-          if (! checkImageRunning)
-            None
-          else
-            await(runProcessSyncF("docker", s"ps -q --filter ancestor=$image")).trimAllToOpt
+    await(waitUntilImageAvailable(image))
 
-        Success(
-          existingContainerIdsOpt match {
-            case Some(containerIds) ⇒ containerIds.splitTo[List]()
-            case None               ⇒ List(await(runProcessSyncF("docker", s"run -d ${params.trim} $image")))
-          }
-        )
+    val existingContainerIdsOpt =
+      if (! checkImageRunning)
+        None
+      else
+        await(runProcessSyncF("docker", s"ps -q --filter ancestor=$image")).trimAllToOpt
 
-      case Failure(t) ⇒
-        Failure(t)
-    }
+    Success(
+      existingContainerIdsOpt match {
+        case Some(containerIds) ⇒ containerIds.splitTo[List]()
+        case None               ⇒ List(await(runProcessSyncF("docker", s"run -d ${params.trim} $image")))
+      }
+    )
   }
 
   def removeContainerByImage(image: String): Future[Unit] = async {

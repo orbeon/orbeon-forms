@@ -81,12 +81,11 @@ trait App {
       FutureUtils.eventually(Interval, Timeout) {
         if (js.isUndefined(g.orbeonInitData)) {
           if (! waitLogged)
-            scribe.debug("waiting for `orbeonInitData` to be available")
-          else
-            scribe.trace("waiting for `orbeonInitData` to be available")
+            scribe.debug("`orbeonInitData` not found, waiting")
           waitLogged = true
           Future.failed(dummyException)
         } else {
+          scribe.debug("`orbeonInitData` found")
           Future.successful(g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]])
         }
       }

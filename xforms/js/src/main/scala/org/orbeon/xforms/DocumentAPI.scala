@@ -67,7 +67,7 @@ object DocumentAPI {
 
     val (resolvedForm, adjustedTargetId) =
       adjustIdNamespace(
-        eventDynamic.form.asInstanceOf[html.Element],
+        eventDynamic.form.asInstanceOf[html.Form],
         eventDynamic.targetId.asInstanceOf[String]
       )
 
@@ -83,7 +83,7 @@ object DocumentAPI {
   // Return the value of an XForms control
   def getValue(
     controlIdOrElem : String | html.Element,
-    formElem        : js.UndefOr[html.Element] = js.undefined
+    formElem        : js.UndefOr[html.Form] = js.undefined
   ): js.UndefOr[String] =
       Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
@@ -91,7 +91,7 @@ object DocumentAPI {
   def setValue(
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
-    formElem        : js.UndefOr[html.Element] = js.undefined
+    formElem        : js.UndefOr[html.Form] = js.undefined
   ): Unit = {
 
     val newStringValue = newValue.toString
@@ -120,7 +120,7 @@ object DocumentAPI {
 
   def focus(
     controlIdOrElem : String | html.Element,
-    formElem        : js.UndefOr[html.Element] = js.undefined
+    formElem        : js.UndefOr[html.Form] = js.undefined
   ): Unit = {
 
     val control = findControlOrThrow(controlIdOrElem, formElem)
@@ -132,7 +132,7 @@ object DocumentAPI {
   private object Private {
 
     def adjustIdNamespace(
-      formElem : js.UndefOr[html.Element],
+      formElem : js.UndefOr[html.Form],
       targetId : String
     ): (html.Element, String) = {
 
@@ -145,7 +145,7 @@ object DocumentAPI {
 
     def findControlOrThrow(
       controlIdOrElem : String | html.Element,
-      formElem        : js.UndefOr[html.Element]
+      formElem        : js.UndefOr[html.Form]
     ): html.Element = {
 
       val (resolvedControlId, resolvedControlOpt) =

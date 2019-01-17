@@ -27,7 +27,7 @@ object FormRunnerAPI {
 
   def findControlsByName(
     controlName : String,
-    formElem    : js.UndefOr[html.Element] = js.undefined
+    formElem    : js.UndefOr[html.Form] = js.undefined
   ): js.Array[html.Element] = {
 
     $(Support.formElemOrDefaultForm(formElem))

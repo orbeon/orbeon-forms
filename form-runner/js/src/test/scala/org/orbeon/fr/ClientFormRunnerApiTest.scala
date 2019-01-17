@@ -15,6 +15,7 @@ package org.orbeon.fr
 
 import org.orbeon.xforms.{$, XFormsId}
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalatest.FunSpec
 
 
@@ -184,8 +185,8 @@ class ClientFormRunnerApiTest extends FunSpec {
     for (control ← controls)
       it(s"must find the `$control` control in the first form but not the second form") {
         assert(FormRunnerAPI.findControlsByName(control).nonEmpty)
-        assert(FormRunnerAPI.findControlsByName(control, form1).nonEmpty)
-        assert(FormRunnerAPI.findControlsByName(control, form2).isEmpty)
+        assert(FormRunnerAPI.findControlsByName(control, form1.asInstanceOf[html.Form]).nonEmpty)
+        assert(FormRunnerAPI.findControlsByName(control, form2.asInstanceOf[html.Form]).isEmpty)
       }
 
     it("must find the correct iterations for the `name` controls") {

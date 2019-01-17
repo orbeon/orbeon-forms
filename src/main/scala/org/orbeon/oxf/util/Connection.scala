@@ -71,7 +71,7 @@ class Connection(
     try {
       UriScheme.withName(url.getScheme) match {
         case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(url) ⇒
-          throw new OXFException(s"URL scheme `$scheme` not allowed")
+          throw new OXFException(s"URL scheme `${scheme.entryName}` not allowed")
         case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) ⇒
 
           // Create URL connection object

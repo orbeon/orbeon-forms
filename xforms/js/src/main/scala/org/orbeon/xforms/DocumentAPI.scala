@@ -14,16 +14,15 @@
 package org.orbeon.xforms
 
 import io.circe.generic.auto._
-import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals}
+import org.orbeon.xforms.facade.{AjaxServer, Controls}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
 
 @JSExportTopLevel("ORBEON.xforms.Document")
-@JSExportAll
 object DocumentAPI {
 
   import Private._
@@ -31,6 +30,7 @@ object DocumentAPI {
   // Dispatch an event
   // NOTE: This doesn't support all parameters.
   // Which should be deprecated, this or the other `dispatchEvent()`?
+  @JSExport
   def dispatchEvent(
     targetId     : String,
     eventName    : String,
@@ -61,6 +61,7 @@ object DocumentAPI {
   // Dispatch an event defined by an object
   // NOTE: Use the first XForms form on the page when no form is provided.
   // TODO: Can we type `eventObject`?
+  @JSExport
   def dispatchEvent(eventObject: js.Object): Unit = {
 
     val eventDynamic = eventObject.asInstanceOf[js.Dynamic]
@@ -81,6 +82,7 @@ object DocumentAPI {
   }
 
   // Return the value of an XForms control
+  @JSExport
   def getValue(
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Form] = js.undefined
@@ -88,6 +90,7 @@ object DocumentAPI {
       Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
   // Set the value of an XForms control
+  @JSExport
   def setValue(
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
@@ -118,6 +121,7 @@ object DocumentAPI {
     AjaxServer.fireEvents(js.Array(event), incremental = false)
   }
 
+  @JSExport
   def focus(
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Form] = js.undefined

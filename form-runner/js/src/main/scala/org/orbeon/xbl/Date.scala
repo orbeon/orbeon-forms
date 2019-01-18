@@ -48,6 +48,7 @@ private class DateCompanion extends XBLCompanion {
       options.autoclose        = true
       options.enableOnReadonly = false
       options.assumeNearbyYear = true
+      options.showOnFocus      = false
       options.language         = Page.getLang()
       datePicker = inputEl.parent().datepicker(options)
       datePicker.onChangeDate(() ⇒ onChangeDate())
@@ -145,6 +146,7 @@ private object DatePickerFacade {
     var autoclose        : Boolean           = false
     var enableOnReadonly : Boolean           = true
     var assumeNearbyYear : Boolean           = false
+    var showOnFocus      : Boolean           = true
     var datesDisabled    : js.Array[js.Date] = null
     var language         : String            = "en"
   }

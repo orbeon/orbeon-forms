@@ -13,8 +13,6 @@
   */
 package org.orbeon.oxf.xforms.processor
 
-import java.{lang ⇒ jl}
-
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.oxf.util.CoreUtils._
@@ -179,12 +177,6 @@ object ScriptBuilder {
 
     val currentTime = System.currentTimeMillis
 
-    val sb = new jl.StringBuilder("""var orbeonInitData = orbeonInitData || {}; orbeonInitData["""")
-    sb.append(XFormsUtils.getFormId(containingDocument))
-    sb.append(""""] = {""")
-
-    sb.append(""""initializations": """)
-
     // NOTE: `calendarImage` is to handle the minimal date picker. Because the client must re-generate markup
     // when the control becomes relevant or changes type, it needs the image URL, and that URL must be
     // rewritten for use in portlets. This should ideally be handled by a template and/or the server should
@@ -193,6 +185,7 @@ object ScriptBuilder {
     val jsonString =
       rpc.Initializations(
         uuid                   = containingDocument.getUUID,
+        namespacedFormId       = XFormsUtils.getNamespacedFormId(containingDocument),
         repeatTree             = containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
         repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
         xformsServerPath       = rewriteResource("/xforms-server"),
@@ -228,11 +221,7 @@ object ScriptBuilder {
               )
       ).asJson.noSpaces
 
-    sb.append(quoteString(jsonString))
-
-    sb.append("};")
-
-    sb.toString
+    s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData(${quoteString(jsonString)})}).call(this);"""
   }
 
   def findScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
@@ -305,7 +294,7 @@ object ScriptBuilder {
 
           val title   = "Non-fatal error"
           val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
-          val formId  = XFormsUtils.getFormId(containingDocument)
+          val formId  = XFormsUtils.getNamespacedFormId(containingDocument)
 
           sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
         }

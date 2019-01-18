@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
@@ -118,7 +117,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isEmbeddedClient;
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
-                "id", XFormsUtils.getFormId(containingDocument),
+                "id", XFormsUtils.getNamespacedFormId(containingDocument),
                 // Regular classes
                 "class", sb.toString(),
                 // Submission parameters

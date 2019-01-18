@@ -19,19 +19,30 @@ import org.orbeon.xforms.App
 // Scala.js starting point for Form Builder
 object FormBuilderApp extends App {
 
-  def load(): Unit = {
-    FormRunnerApp.load()
+  def onOrbeonApiLoaded(): Unit = {
+
+    FormRunnerApp.onOrbeonApiLoaded()
+
+    BlockCache
+
+    // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
+    //FormBuilderPrivateAPI
+  }
+
+  def onPageContainsFormsMarkup(): Unit = {
+
+    FormRunnerApp.onPageContainsFormsMarkup()
+
     StaticUpload
     DialogItemset
     ControlDnD
-    BlockCache
     SectionGridEditor
     RowEditor
     LabelEditor
     ControlEditor
     ControlLabelHintTextEditor
     GridWallDnD
-    FormBuilderPrivateAPI
+
     BrowserCheck.checkSupportedBrowser()
   }
 }

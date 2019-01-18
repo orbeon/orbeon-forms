@@ -30,9 +30,12 @@ object EventNames {
   val TouchStart               = "touchstart"
   val FocusIn                  = "focusin"
   val FocusOut                 = "focusout"
+  val DOMContentLoaded         = "DOMContentLoaded"
 
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
 
   val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
+
+  val InteractiveReadyState    = "interactive"
 }

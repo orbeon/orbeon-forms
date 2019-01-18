@@ -19,17 +19,27 @@ import org.orbeon.xforms.{App, XFormsApp}
 // Scala.js starting point for Form Runner
 object FormRunnerApp extends App {
 
-  def load(): Unit = {
-    XFormsApp.load()
+  def onOrbeonApiLoaded(): Unit = {
+
+    XFormsApp.onOrbeonApiLoaded()
+
     xbl.DndRepeat
     xbl.Tabbable
     xbl.Number
     xbl.TreeSelect1
     xbl.WPaint
     xbl.HrefButton
+    xbl.Date
+
+    // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
+    //FormRunnerPrivateAPI
+  }
+
+  def onPageContainsFormsMarkup(): Unit = {
+
+    XFormsApp.onPageContainsFormsMarkup()
+
     xbl.Grid
     xbl.Repeater
-    xbl.Date
-    FormRunnerPrivateAPI
   }
 }

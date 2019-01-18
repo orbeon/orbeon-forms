@@ -13,82 +13,32 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.jquery._
-import org.orbeon.xforms.facade.Init
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
 
 trait App {
 
-  import Private._
-
-  def load(): Unit
+  def onOrbeonApiLoaded(): Unit
+  def onPageContainsFormsMarkup(): Unit
 
   def main(args: Array[String]): Unit = {
 
     Logging.initialize()
 
-    scribe.info("Starting XForms app")
+    scribe.info("Starting Orbeon app")
 
-    $.readyF                flatMap
-      (_ ⇒ liferayF)        flatMap
-      (_ ⇒ orbeonInitDataF) onComplete {
+    scribe.debug("running initializations after Orbeon API is available")
+    onOrbeonApiLoaded()
 
-      case Success(initData) ⇒
-        scribe.debug("running initializations")
-        load()
-        Init.initializeGlobals()
-        InitSupport.initializeAllForms(initData)
+    InitSupport.readyStateF flatMap (_ ⇒ InitSupport.liferayF) onComplete {
+      case Success(_) ⇒
+        scribe.debug("running initializations after form markup is available")
+        onPageContainsFormsMarkup()
+        InitSupport.pageContainsFormsMarkup()
       case Failure(t) ⇒
         throw t
     }
-  }
-
-  private object Private {
-
-    import org.orbeon.liferay._
-    import org.orbeon.oxf.util.FutureUtils
-    import org.orbeon.xforms.facade.InitData
-    import org.scalajs.dom
-
-    import scala.concurrent.ExecutionContext.Implicits.global
-    import scala.concurrent.Future
-    import scala.concurrent.duration._
-    import scala.scalajs.js
-    import scala.scalajs.js.Dictionary
-    import scala.scalajs.js.Dynamic.{global ⇒ g}
-    import scala.util.control.ControlThrowable
-
-    private val Interval = 100.milliseconds
-    private val Timeout  = 2.minutes
-
-    private var waitLogged = false
-
-    private val dummyException = new ControlThrowable {}
-
-    def liferayF: Future[Unit] = {
-      scribe.debug("checking for Liferay object")
-      dom.window.Liferay.toOption match {
-        case None          ⇒ Future.successful(())
-        case Some(liferay) ⇒ liferay.allPortletsReadyF
-      }
-    }
-
-    // https://github.com/orbeon/orbeon-forms/issues/3893
-    def orbeonInitDataF: Future[Dictionary[InitData]] =
-      FutureUtils.eventually(Interval, Timeout) {
-        if (js.isUndefined(g.orbeonInitData)) {
-          if (! waitLogged)
-            scribe.debug("`orbeonInitData` not found, waiting")
-          waitLogged = true
-          Future.failed(dummyException)
-        } else {
-          scribe.debug("`orbeonInitData` found")
-          Future.successful(g.orbeonInitData.asInstanceOf[js.Dictionary[InitData]])
-        }
-      }
   }
 
   private object Logging {

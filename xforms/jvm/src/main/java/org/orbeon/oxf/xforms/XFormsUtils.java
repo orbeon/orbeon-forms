@@ -773,7 +773,7 @@ public class XFormsUtils {
      * @param containingDocument    containing document
      * @return                      id, possibly namespaced
      */
-    public static String getFormId(XFormsContainingDocument containingDocument) {
+    public static String getNamespacedFormId(XFormsContainingDocument containingDocument) {
         return namespaceId(containingDocument, "xforms-form");
     }
 

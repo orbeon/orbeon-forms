@@ -13,11 +13,19 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
+import org.orbeon.xforms.facade.Init
+
 // Scala.js starting point for XForms
 object XFormsApp extends App {
 
-  def load(): Unit = {
-    // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
+  // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
+  def onOrbeonApiLoaded(): Unit = {
+    Init.initializeGlobals() // should go away in the future.
     Upload
+  }
+
+  def onPageContainsFormsMarkup(): Unit = {
+    setupGlobalClassesIfNeeded()
   }
 }

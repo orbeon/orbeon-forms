@@ -27,6 +27,8 @@ object Page {
   def setForm(id: String, form: Form): Unit =
     forms += id → form
 
+  def countInitializedForms: Int = forms.size
+
   @JSExport
   def getForm(id: String): Form =
     forms.getOrElse(id, throw new IllegalArgumentException(s"form `$id` not found"))

@@ -24,6 +24,7 @@ case class UserScript(functionName: String, targetId: String, observerId: String
 
 case class Initializations(
   uuid                   : String,
+  namespacedFormId       : String,
   repeatTree             : String,
   repeatIndexes          : String,
   xformsServerPath       : String,

@@ -74,7 +74,7 @@ object InitSupport {
 
   def atLeastDomInteractiveF: Future[Unit] = {
 
-    scribe.debug(s"document state is ${dom.document.readyState}")
+    scribe.debug(s"document state is `${dom.document.readyState}`")
 
     val promise = Promise[Unit]()
 
@@ -82,6 +82,7 @@ object InitSupport {
 
       // Because yes, the document is interactive, but JavaScript placed after us might not have run yet.
       // Although if we do everything in an async way, that should be changed.
+      // TODO: Review once full order of JavaScript is determined in `App` doc.
       js.timers.setTimeout(0) {
         promise.success(())
       }
@@ -289,7 +290,7 @@ object InitSupport {
       pageContainsFormsMarkupPromise.future
 
     def allFormElems: Seq[html.Form] =
-      dom.document.forms filter (_.classList.contains(Constants.FormClass)) map (_.asInstanceOf[html.Form])
+      dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form ⇒ f }
 
     def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =
       formElem.elements.iterator                          collectFirst

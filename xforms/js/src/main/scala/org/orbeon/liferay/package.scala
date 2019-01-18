@@ -36,9 +36,9 @@ package object liferay {
   implicit class LiferayOps(val liferay : Liferay) extends AnyVal {
 
     def allPortletsReadyF: Future[Unit] = {
-      val result = Promise[Unit]()
-      liferay.on("allPortletsReady", () ⇒ result.success(()))
-      result.future
+      val promise = Promise[Unit]()
+      liferay.on("allPortletsReady", () ⇒ promise.success(()))
+      promise.future
     }
   }
 }

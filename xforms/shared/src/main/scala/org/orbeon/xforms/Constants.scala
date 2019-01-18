@@ -16,22 +16,22 @@ package org.orbeon.xforms
 
 object Constants {
 
-  val UuidFieldName            : String = "$uuid"
-  val ServerEventsFieldName    : String = "$server-events"
+  val UuidFieldName                     = "$uuid"
+  val ServerEventsFieldName             = "$server-events"
 
-  val RepeatSeparator          : String = "\u2299" // ⊙ CIRCLED DOT OPERATOR
-  val RepeatIndexSeparator     : String = "-"      // - (just has to not be a digit)
+  val RepeatSeparator                   = "\u2299" // ⊙ CIRCLED DOT OPERATOR
+  val RepeatIndexSeparator              = "-"      // - (just has to not be a digit)
   val ComponentSeparator       : Char   = '\u2261' // ≡ IDENTICAL TO
   val ComponentSeparatorString : String = ComponentSeparator.toString
   val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
 
-  val YuiSkinSamClass          : String = "yui-skin-sam"
-  val XFormsIosClass           : String = "xforms-ios"
-  val XFormsMobileClass        : String = "xforms-mobile"
-  val FormClass                : String = "xforms-form"
-  val InitiallyHiddenClass     : String = "xforms-initially-hidden"
+  val YuiSkinSamClass                   = "yui-skin-sam"
+  val XFormsIosClass                    = "xforms-ios"
+  val XFormsMobileClass                 = "xforms-mobile"
+  val FormClass                         = "xforms-form"
+  val InitiallyHiddenClass              = "xforms-initially-hidden"
 
-  val HtmlLangAttr             : String = "lang"
+  val HtmlLangAttr                      = "lang"
 
-  val DocumentId               : String = "#document"
+  val DocumentId                        = "#document"
 }

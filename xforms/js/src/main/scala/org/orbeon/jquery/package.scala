@@ -38,7 +38,5 @@ package object jquery {
     // Expose jQuery's `$(function)` as a `Future`
     def readyF(implicit executor: ExecutionContext): Future[Unit] =
       j.when(j.asInstanceOf[js.Dynamic].ready).asInstanceOf[js.Thenable[js.Any]].toFuture map (_ ⇒ ())
-
   }
-
 }

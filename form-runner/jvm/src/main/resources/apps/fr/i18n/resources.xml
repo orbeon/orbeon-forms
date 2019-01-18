@@ -59,8 +59,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Next</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Prev</wizard-prev>
             <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Content</wizard-toc>
 
             <!-- Submit dialog -->
@@ -522,8 +522,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Suivant</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Précédent</wizard-prev>
             <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenu</wizard-toc>
 
             <!-- Submit dialog -->
@@ -989,8 +989,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Siguiente</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Previo</wizard-prev>
             <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenido</wizard-toc>
 
             <!-- Submit dialog -->
@@ -1442,8 +1442,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Neste</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Tilbake</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -1894,8 +1894,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Обновить"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Вперед</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Назад</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -2344,8 +2344,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aggiorna"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Prossimo</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Precedente</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -2807,8 +2807,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Nächstes</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Vorheriges</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -3270,8 +3270,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Seuraava</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Edellinen</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -3733,8 +3733,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Nästa</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Föreg</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -4196,8 +4196,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Volgende</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Vorige</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
@@ -4658,8 +4658,8 @@
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refrescar"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Próximo</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Anterior</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->

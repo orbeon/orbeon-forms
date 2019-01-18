@@ -38,4 +38,5 @@ object EventNames {
   val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 
   val InteractiveReadyState    = "interactive"
+  val CompleteReadyState       = "complete"
 }

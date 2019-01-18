@@ -72,13 +72,13 @@ object InitSupport {
     }
   }
 
-  def readyStateF: Future[Unit] = {
+  def atLeastDomInteractiveF: Future[Unit] = {
 
     scribe.debug(s"document state is ${dom.document.readyState}")
 
     val promise = Promise[Unit]()
 
-    if (dom.document.readyState == EventNames.InteractiveReadyState) {
+    if (dom.document.readyState == EventNames.InteractiveReadyState || dom.document.readyState == EventNames.CompleteReadyState) {
 
       // Because yes, the document is interactive, but JavaScript placed after us might not have run yet.
       // Although if we do everything in an async way, that should be changed.

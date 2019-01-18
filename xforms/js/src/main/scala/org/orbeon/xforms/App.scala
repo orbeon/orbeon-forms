@@ -31,11 +31,10 @@ trait App {
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    InitSupport.readyStateF flatMap (_ ⇒ InitSupport.liferayF) onComplete {
+    InitSupport.atLeastDomInteractiveF flatMap (_ ⇒ InitSupport.liferayF) onComplete {
       case Success(_) ⇒
         scribe.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()
-        InitSupport.pageContainsFormsMarkup()
       case Failure(t) ⇒
         throw t
     }

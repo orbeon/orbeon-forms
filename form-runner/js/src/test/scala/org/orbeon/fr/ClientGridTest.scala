@@ -24,7 +24,7 @@ class ClientGridTest extends FunSpec {
 
   describe("The `spaceToExtendCell()` function") {
 
-    $(dom.window.document).find("body").append(
+    $(dom.document).find("body").append(
       """
         |<div id="fb≡section-1-control≡grid-1-control" class="xbl-component xbl-fr-grid">
         |    <div class="fr-grid fr-grid-12 fr-grid-css fr-norepeat fr-editable">

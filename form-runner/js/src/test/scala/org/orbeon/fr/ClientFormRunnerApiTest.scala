@@ -24,7 +24,7 @@ class ClientFormRunnerApiTest extends FunSpec {
   describe("the `findControlsByName` function") {
 
     // NOTE: Ideally, the HTML markup would be produced by running the XForms engine. Change this when we can.
-    $(dom.window.document).find("body").append(
+    $(dom.document).find("body").append(
       """
         | <form class="xforms-form" id="xforms-form-1">
         |    <span id="fr-view-component≡text-controls-section≡xf-796≡input-control"

@@ -42,6 +42,10 @@
                 name="restrict-to-latest-version"
                 value="xxf:property(string-join(('oxf.fr.import.restrict-to-latest-version', $app, $form), '.')) = true()"/>
 
+            <xf:var
+                name="show-start-over-button"
+                value="xxf:property(string-join(('oxf.fr.import.show-start-over-button', $app, $form), '.')) = true()"/>
+
             <xf:action event="xforms-model-construct-done">
 
                 <xf:action if="not(fr:is-pe())" type="xpath">
@@ -997,7 +1001,7 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:trigger>
+                                        <xf:trigger ref=".[$show-start-over-button]">
                                             <xf:label ref="xxf:r('import.start-over.label', '|fr-fr-resources|')"/>
                                             <xf:action event="DOMActivate">
                                                 <xf:load resource="import"/>
@@ -1007,7 +1011,6 @@
                                 </xh:tr>
                             </fr:grid>
                         </xf:group>
-                        <!-- Case where validation was canceled -->
                         <xf:group ref=".[$import-canceled]">
                             <fr:grid>
                                 <xh:tr>
@@ -1015,7 +1018,7 @@
                                         <xh:span class="alert alert-warning">
                                             <xf:output value="xxf:r('import.import-canceled', '|fr-fr-resources|')"/>
                                         </xh:span>
-                                        <xf:trigger>
+                                        <xf:trigger ref=".[$show-start-over-button]">
                                             <xf:label ref="xxf:r('import.start-over.label', '|fr-fr-resources|')"/>
                                             <xf:action event="DOMActivate">
                                                 <xf:load resource="import"/>

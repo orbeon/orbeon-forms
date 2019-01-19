@@ -904,19 +904,50 @@
                                     </xf:select1>
                                 </xh:td>
                             </xh:tr>
+                        </fr:grid>
+                    </xf:group>
+
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger ref=".[not($importing) and not($import-done) or $import-canceled]">
+                                    <xf:label ref="xxf:r('import.start-import.label', '|fr-fr-resources|')"/>
+                                    <xf:action event="DOMActivate">
+
+                                        <xf:dispatch
+                                            name="fr-import-clear-import"
+                                            targetid="fr-form-model"/>
+
+                                        <xf:send
+                                            if="bind('fr-keep-existing-records-bind') = true()"
+                                            submission="fr-import-import-submission"/>
+                                        <xf:send
+                                            if="bind('fr-keep-existing-records-bind') = false()"
+                                            submission="fr-import-delete-data-submission"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+
+                    <xf:group ref="stats[$importing or $import-done]">
+                        <fr:grid>
                             <xh:tr>
                                 <xh:td>
-                                    <xf:trigger>
-                                        <xf:label ref="xxf:r('import.start-import.label', '|fr-fr-resources|')"/>
-                                        <xf:action event="DOMActivate">
-                                            <xf:send
-                                                if="bind('fr-keep-existing-records-bind') = true()"
-                                                submission="fr-import-import-submission"/>
-                                            <xf:send
-                                                if="bind('fr-keep-existing-records-bind') = false()"
-                                                submission="fr-import-delete-data-submission"/>
-                                        </xf:action>
-                                    </xf:trigger>
+                                    <fr:number ref="total" suffix="rows">
+                                        <xf:label ref="xxf:r('import.total', '|fr-fr-resources|')"/>
+                                        <xf:alert/>
+                                    </fr:number>
+                                </xh:td>
+                                <xh:td>
+                                    <fr:number ref="succeeded" suffix="rows">
+                                        <xf:label ref="xxf:r('import.valid', '|fr-fr-resources|')"/>
+                                    </fr:number>
+                                </xh:td>
+                                <xh:td>
+                                    <fr:number ref="bind('fr-import-invalid-count-bind')" suffix="rows">
+                                        <xf:label ref="xxf:r('import.invalid', '|fr-fr-resources|')"/>
+                                    </fr:number>
                                 </xh:td>
                             </xh:tr>
                         </fr:grid>

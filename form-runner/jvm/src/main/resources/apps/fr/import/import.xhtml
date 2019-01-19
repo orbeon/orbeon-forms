@@ -79,12 +79,11 @@
 
             </xf:action>
 
-            <xf:action event="xforms-ready" type="xpath">
-                xxf:set-session-attribute('org.orbeon.fr.import.total',     ()),
-                xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
-                xxf:set-session-attribute('org.orbeon.fr.import.skipped',   ()),
-                xxf:set-session-attribute('org.orbeon.fr.import.cancel',    ())
-            </xf:action>
+            <xf:dispatch
+                event="xforms-ready"
+
+                name="fr-import-clear-validation-and-import"
+                targetid="fr-form-model"/>
 
             <!-- Main data -->
             <xf:instance id="fr-form-instance" xxf:expose-xpath-types="true">
@@ -160,10 +159,26 @@
             <xf:var name="import-canceled"      context="instance('fr-form-instance')/import/stats"        value="$import-done and not($import-completed)"/>
 
             <xf:action event="fr-import-clear-validation-and-import">
+
+                <xf:dispatch
+                    name="fr-import-clear-import"
+                    targetid="fr-form-model"/>
+
                 <xf:action context="validate">
                     <xf:setvalue ref="validating">not-started</xf:setvalue>
                     <xf:setvalue iterate="stats/*" ref="."/>
                 </xf:action>
+            </xf:action>
+
+            <xf:action event="fr-import-clear-import">
+
+                <xf:action type="xpath">
+                    xxf:set-session-attribute('org.orbeon.fr.import.total',     ()),
+                    xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
+                    xxf:set-session-attribute('org.orbeon.fr.import.skipped',   ()),
+                    xxf:set-session-attribute('org.orbeon.fr.import.cancel',    ())
+                </xf:action>
+
                 <xf:action context="import">
                     <xf:setvalue ref="importing">not-started</xf:setvalue>
                     <xf:setvalue iterate="stats/*" ref="."/>
@@ -668,6 +683,14 @@
 
                     <xf:var name="validating" value="validating = 'started'"/>
 
+                    <!-- Start validation immediately-->
+                    <xf:send
+                        observer="validate-section-case"
+                        event="xforms-select"
+                        if="not($validating) and not($validation-done)"
+
+                        submission="fr-import-validate-submission"/>
+
                     <fr:grid>
                         <xh:tr>
                             <xh:td colspan="2">
@@ -697,16 +720,19 @@
                     <fr:grid>
                         <xh:tr>
                             <xh:td>
-                                <xf:trigger ref=".[not($validating) and not($validation-done)]">
+                                <xf:trigger ref=".[$validation-canceled]">
                                     <xf:label ref="xxf:r('import.start-validation.label', '|fr-fr-resources|')"/>
                                     <xf:action event="DOMActivate">
-                                        <xf:send submission="fr-import-validate-submission"/>
+                                        <xf:dispatch
+                                            name="fr-import-clear-validation-and-import"
+                                            targetid="fr-form-model"/>
+                                        <xf:send
+                                            submission="fr-import-validate-submission"/>
                                     </xf:action>
                                 </xf:trigger>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>
-
                     <xf:group ref="stats[$validating or $validation-done]">
                         <fr:grid>
                             <xh:tr>

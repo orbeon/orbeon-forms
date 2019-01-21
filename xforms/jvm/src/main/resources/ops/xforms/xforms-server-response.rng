@@ -212,6 +212,9 @@
                                                 </zeroOrMore>
                                             </interleave>
                                         </element>
+                                        <element name="xxf:init">
+                                            <attribute name="id"/>
+                                        </element>
                                         <element name="xxf:dialog">
                                             <attribute name="id"/>
                                             <attribute name="visibility">

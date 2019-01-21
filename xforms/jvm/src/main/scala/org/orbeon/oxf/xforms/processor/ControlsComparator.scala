@@ -138,6 +138,21 @@ class ControlsComparator(
 
         if (! specificProcessingTookPlace)
           outputDescendantControlsDiffs(control1Opt, control2, fullUpdateBuffer)
+
+        // Tell the client to initialize the control within a new iteration
+        // See https://github.com/orbeon/orbeon-forms/issues/3888
+        control2 match {
+          case c: XFormsComponentControl ⇒
+            if (control1Opt.isEmpty && c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle) {
+              element(
+                "init",
+                prefix = "xxf",
+                uri    = XXFORMS_NAMESPACE_URI,
+                atts   = List("id" → c.effectiveId)
+              )
+            }
+          case _ ⇒
+        }
       }
     } else
       assert(left.isEmpty, "illegal state when comparing controls")

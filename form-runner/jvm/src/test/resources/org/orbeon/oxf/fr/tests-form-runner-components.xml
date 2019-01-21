@@ -758,13 +758,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date" init="true">
+                        <xxf:control id="my-date">
                             <xxf:value>2010-01-13</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-date≡xf-8" readonly="true"/>
                         <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-13"/>
                         <xxf:attribute for="my-date≡xf-16" name="placeholder"/>
                         <xxf:control id="my-date≡xf-18" relevant="false"/>
+                        <xxf:init id="my-date"/>
                     </xxf:control-values>
                     <xxf:script name="xf_a46d07e9482de772ed31f906f2af5a479e143a2e" target-id="my-date" observer-id="my-date">
                         <xxf:param>[M]/[D]/[Y]</xxf:param>
@@ -812,7 +813,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency" init="true"/>
                         <xxf:control class="input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
                         <xxf:control id="my-currency≡xf-13" class="add-on"/>
                         <xxf:control id="my-currency≡xf-14">
@@ -822,6 +822,7 @@
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
                         <xxf:control id="my-currency≡xf-18" relevant="false"/>
+                        <xxf:init id="my-currency"/>
                     </xxf:control-values>
                     <xxf:script name="xf_7bf49dfcd4150b25a37261147c7786f0d4a8da41" target-id="my-currency" observer-id="my-currency">
                         <xxf:param>12.34</xxf:param>

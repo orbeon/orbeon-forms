@@ -1211,6 +1211,12 @@
                             ORBEON.xforms.Controls.toggleCase(id, visible);
                         }
 
+                        function handleInit(elem) {
+                            var controlId        = ORBEON.util.Dom.getAttribute(elem, "id");
+                            var documentElement  = document.getElementById(controlId);
+                            ORBEON.xforms.XBL.instanceForControl(documentElement);
+                        }
+
                         function handleControl(elem) {
                             var controlId        = ORBEON.util.Dom.getAttribute(elem, "id");
                             var staticReadonly   = ORBEON.util.Dom.getAttribute(elem, "static");
@@ -1223,7 +1229,6 @@
                             var progressReceived = ORBEON.util.Dom.getAttribute(elem, "progress-received");
                             var progressExpected = ORBEON.util.Dom.getAttribute(elem, "progress-expected");
                             var newSchemaType    = ORBEON.util.Dom.getAttribute(elem, "type");
-                            var mustInitialize   = ORBEON.util.Dom.getAttribute(elem, "init") == "true";
 
                             var documentElement = document.getElementById(controlId);
 
@@ -1653,10 +1658,6 @@
                                 }
                             });
 
-                            // XBL controls in a new iteration must be initialized
-                            if (mustInitialize)
-                                ORBEON.xforms.XBL.instanceForControl(documentElement);
-
                             // Handle becoming non-relevant after everything so that XBL companion class instances
                             // are nulled and can be garbage-collected
                             if (relevant == "false")
@@ -1796,6 +1797,9 @@
                                 switch (ORBEON.util.Utils.getLocalName(childNode)) {
                                     case 'control':
                                         handleControl(childNode);
+                                        break;
+                                    case 'init':
+                                        handleInit(childNode);
                                         break;
                                     case 'inner-html':
                                         handleInnerHtml(childNode);

@@ -379,18 +379,6 @@ class XFormsComponentControl(
   private lazy val handleLHHA =
     staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
 
-
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
-
-    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
-
-    // Whether to tell the client to initialize the control within a new iteration
-    if (previousControlOpt.isEmpty && isRelevant && staticControl.abstractBinding.modeJavaScriptLifecycle)
-      added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, "init", "true", isNewRepeatIteration = false, isDefaultValue = false)
-
-    added
-  }
-
   // Don't add Ajax LHHA for custom-lhha mode
   override def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) =
     handleLHHA && super.addAjaxLHHA(attributesImpl, previousControlOpt)

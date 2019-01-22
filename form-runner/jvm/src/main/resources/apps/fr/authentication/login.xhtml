@@ -54,10 +54,11 @@
                         <xf:trigger appearance="xxf:primary">
                             <xf:label ref="$fr-resources/authentication/login/login"/>
                             <xf:action type="javascript" event="DOMActivate">
-                                <xf:param name="username" value="username"/>
-                                <xf:param name="password" value="password"/>
+                                <xf:param name="username"    value="username"/>
+                                <xf:param name="password"    value="password"/>
+                                <xf:param name="loginAction" value="concat(xxf:get-request-context-path(), '/j_security_check')"/>
                                 <xf:body>
-                                    ORBEON.fr.private.API.submitLogin(username, password);
+                                    ORBEON.fr.private.API.submitLogin(username, password, loginAction);
                                 </xf:body>
                             </xf:action>
                         </xf:trigger>

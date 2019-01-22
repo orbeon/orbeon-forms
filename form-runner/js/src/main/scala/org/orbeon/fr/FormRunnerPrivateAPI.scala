@@ -49,12 +49,13 @@ object FormRunnerPrivateAPI {
       )
 
   def submitLogin(
-    username: String,
-    password: String
+    username    : String,
+    password    : String,
+    loginAction : String
   ): Unit = {
 
     val formElem =
-      <form action="/orbeon/j_security_check" method="post">
+      <form action={loginAction} method="post">
         <input type="hidden" name="j_username" value={username}/>
         <input type="hidden" name="j_password" value={password}/>
       </form>

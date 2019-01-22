@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
@@ -37,7 +36,6 @@ class GetRequestHeaderTryXFormsDocument extends RequestFunction {
       encoding = stringArgumentOpt(1),
       getter   = containingDocument.getRequestHeaders.get
     )
-
 }
 
 trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
@@ -57,4 +55,9 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 class GetRequestPathTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     getContainingDocument(xpathContext).getRequestPath
+}
+
+class GetRequestContextPathTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    getContainingDocument(xpathContext).getRequestContextPath
 }

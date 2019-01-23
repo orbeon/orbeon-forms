@@ -273,11 +273,11 @@ object XFormsUploadControl {
   }
 
   // Get the MAC for a given string
-  def hmac(value: String) =
+  def hmac(value: String): String =
     SecureUtils.hmacString(value, "hex")
 
   // Remove the MAC from the URL
-  def removeMAC(url: String) = {
+  def removeMAC(url: String): String = {
     val uri = new URI(url)
     // NOTE: Use getRawQuery, as the query might encode & and =, and we should not decode them before decoding the query
     val query = Option(uri.getRawQuery) map decodeSimpleQuery getOrElse Seq()
@@ -287,7 +287,7 @@ object XFormsUploadControl {
   }
 
   // For Java callers
-  def getParameterOrNull(url: String, name: String) = getFirstQueryParameter(url, name).orNull
+  def getParameterOrNull(url: String, name: String): String = getFirstQueryParameter(url, name).orNull
 
   // Get the MAC from the URL
   def getMAC(url: String) = getFirstQueryParameter(url, "mac")

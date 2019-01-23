@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerParams
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
@@ -30,6 +30,8 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
+
+import org.orbeon.oxf.util.CoreUtils._
 
 object Wizard {
 
@@ -59,9 +61,6 @@ object Wizard {
   def isWizardValidatedMode: Boolean =
     getWizardValidatedMode != "free"
 
-  def wizardCurrentCaseIdOpt: Option[String] =
-    findWizardState map (_ elemValue "current-case-id") flatMap (_.trimAllToOpt)
-
   def wizardAvailableSections: Set[String] = {
 
     val resultOpt =
@@ -80,6 +79,17 @@ object Wizard {
 
   def isWizardFirstPage: Boolean =
     findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
+
+  def wizardCurrentCaseIdOpt: Option[String] =
+    findWizardState map (_ elemValue "current-case-id") flatMap (_.trimAllToOpt)
+
+  def sectionIdFromCaseIdOpt(id: String): Option[String] =
+    id.endsWith("-case") option id.substring(0, id.length - "-case".length)
+
+  def wizardCurrentPageNameOpt: Option[String] =
+    wizardCurrentCaseIdOpt            flatMap
+      sectionIdFromCaseIdOpt          flatMap
+      FormRunner.controlNameFromIdOpt
 
   //@XPathFunction
   def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =

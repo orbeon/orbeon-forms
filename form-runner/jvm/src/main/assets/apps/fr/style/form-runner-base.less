@@ -347,7 +347,7 @@
     // Allow wrapping of input fields content in view/pdf modes
     // https://github.com/orbeon/orbeon-forms/issues/1822
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xforms-field, .xforms-output output[role=textbox] {
+        .xforms-control .xforms-field {
             white-space: normal;
             word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
             min-height: @controlsHeight;

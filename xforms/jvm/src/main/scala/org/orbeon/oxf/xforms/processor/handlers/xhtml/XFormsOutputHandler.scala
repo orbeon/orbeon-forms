@@ -32,11 +32,13 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
     localname     : String,
     attributes    : Attributes,
     effectiveId   : String,
-    outputControl : XFormsSingleNodeControl
+    outputControl : XFormsSingleNodeControl,
+    isField       : Boolean
   ) = {
     // Add custom class
     val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(effectiveId, outputControl, addId = true)
-    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
+    val nestedCssClass = if (isField) "xforms-field" else "xforms-output-output"
+    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, nestedCssClass)
     containerAttributes
   }
 }
@@ -58,14 +60,15 @@ class XFormsOutputDefaultHandler(
 
     val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
+    val isField = (isConcreteControl || isTemplate) && staticControlOpt.exists(_.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label))
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
     handleAriaByAtts(containerAttributes)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
-    if ((isConcreteControl || isTemplate) && staticControlOpt.exists(_.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label))) {
+    if (isField) {
       containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
       containerAttributes.addAttribute("", "aria-readonly", "aria-readonly", XMLReceiverHelper.CDATA, "true")
       containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")
@@ -103,7 +106,7 @@ class XFormsOutputHTMLHandler(
     val isConcreteControl = outputControl ne null
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField = false)
 
     // Handle accessibility attributes on <div>
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
@@ -142,7 +145,7 @@ class XFormsOutputImageHandler(
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val mediatypeValue = attributes.getValue("mediatype")
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField = false)
 
     // @src="..."
     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
@@ -208,7 +211,7 @@ class XFormsOutputDownloadHandler(
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl        = currentControlOrNull.asInstanceOf[XFormsOutputControl]
-    val containerAttributes  = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
+    val containerAttributes  = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField = false)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
 
     // For f:url-type="resource"

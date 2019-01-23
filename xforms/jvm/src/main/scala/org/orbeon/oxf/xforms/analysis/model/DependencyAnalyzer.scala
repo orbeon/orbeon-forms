@@ -31,7 +31,11 @@ object DependencyAnalyzer {
 
   val Logger = LoggerFactory.getLogger("org.orbeon.xforms.analysis.calculate")
 
-  private case class BindDetails(staticBind: StaticBind, name: Option[String], refs: Set[String])
+  private case class BindDetails(
+    staticBind : StaticBind,
+    name       : Option[String],
+    refs       : Set[String]
+  )
 
   private object BindDetails {
 

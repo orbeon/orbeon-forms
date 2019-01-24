@@ -49,6 +49,7 @@ private class DateCompanion extends XBLCompanion {
       options.enableOnReadonly = false
       options.assumeNearbyYear = true
       options.showOnFocus      = false
+      options.forceParse       = false
       options.language         = Language.getLang()
       datePicker = inputEl.parent().datepicker(options)
       datePicker.onChangeDate(() ⇒ onChangeDate())
@@ -121,8 +122,10 @@ private class DateCompanion extends XBLCompanion {
     datePicker.update()
   }
 
-  def onChangeDate(): Unit =
-    DocumentAPI.setValue(containerElem.id, xformsGetValue())
+  def onChangeDate(): Unit = {
+    val newValue = xformsGetValue()
+    DocumentAPI.setValue(containerElem.id, newValue )
+  }
 }
 
 private object DatePickerFacade {
@@ -147,6 +150,7 @@ private object DatePickerFacade {
     var enableOnReadonly : Boolean           = true
     var assumeNearbyYear : Boolean           = false
     var showOnFocus      : Boolean           = true
+    var forceParse       : Boolean           = true
     var datesDisabled    : js.Array[js.Date] = null
     var language         : String            = "en"
   }

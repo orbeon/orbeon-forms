@@ -1645,10 +1645,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
          */
         getControlLHHA: function (control, lhhaType) {
 
-            // If this is a help control
-            if (control.classList.contains("xforms-" + lhhaType))
-                return control;
-
             // Search by id first
             // See https://github.com/orbeon/orbeon-forms/issues/793
             var lhhaElementId = ORBEON.util.Utils.appendToEffectiveId(control.id, ORBEON.xforms.Controls._classNameToId[lhhaType]);
@@ -1662,7 +1658,15 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             var lhhaElements = $(control).children('.xforms-' + lhhaType).filter(function () {
                 return this.id.indexOf(XF_LHHAI_SEPARATOR) == -1
             });
-            return (lhhaElements.length > 0) ? lhhaElements.get(0) : null;
+            if (lhhaElements.length > 0)
+                return lhhaElements.get(0);
+
+            // If the control an LHHA, which happens for LHHA outside of the control, when the control is in a repeat
+            if (control.classList.contains("xforms-" + lhhaType))
+                return control;
+
+            // Nothing found
+            return null;
         },
 
         /**

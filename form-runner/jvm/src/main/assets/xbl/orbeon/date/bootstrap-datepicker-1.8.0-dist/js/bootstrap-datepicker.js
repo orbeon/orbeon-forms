@@ -40,6 +40,12 @@
 		return d && !isNaN(d.getTime());
 	}
 
+	var filterInt = function(value) {
+        if (/^(-|\+)?(\d+|Infinity)$/.test(value))
+            return Number(value);
+        return NaN;
+    }
+
 	var DateArray = (function(){
 		var extras = {
 			get: function(i){
@@ -1872,37 +1878,56 @@
 					p = parts[i].slice(0, m.length);
 				return m.toLowerCase() === p.toLowerCase();
 			}
-			if (parts.length <= fparts.length){
-				var cnt;
-				for (i=0, cnt = parts.length; i < cnt; i++){
-					val = parseInt(parts[i], 10);
-					part = fparts[i];
-					if (isNaN(val)){
-						switch (part){
-							case 'MM':
-								filtered = $(dates[language].months).filter(match_part);
-								val = $.inArray(filtered[0], dates[language].months) + 1;
-								break;
-							case 'M':
-								filtered = $(dates[language].monthsShort).filter(match_part);
-								val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
-								break;
-						}
-					}
-					parsed[part] = val;
-				}
-				var _date, s;
-				for (i=0; i < setters_order.length; i++){
-					s = setters_order[i];
-					if (s in parsed && !isNaN(parsed[s])){
-						_date = new Date(date);
-						setters_map[s](_date, parsed[s]);
-						if (!isNaN(_date))
-							date = _date;
-					}
-				}
-			}
-			return date;
+
+			// Give up if we have too many parts
+			if (parts.length > fparts.length)
+			    return undefined;
+
+            var cnt;
+            for (i=0, cnt = parts.length; i < cnt; i++){
+                val = filterInt(parts[i], 10);
+                part = fparts[i];
+                if (isNaN(val)){
+                    switch (part){
+                        case 'MM':
+                            filtered = $(dates[language].months).filter(match_part);
+                            val = $.inArray(filtered[0], dates[language].months) + 1;
+                            break;
+                        case 'M':
+                            filtered = $(dates[language].monthsShort).filter(match_part);
+                            val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
+                            break;
+                    }
+                }
+                parsed[part] = val;
+            }
+
+            var used_setters  = [];
+            var _date, s;
+            for (i=0; i < setters_order.length; i++){
+                s = setters_order[i];
+                if (s in parsed && !isNaN(parsed[s])) {
+                    if (isNaN(parsed[s])) {
+                        return undefined;
+                    } else {
+                        used_setters.push(s);
+                        _date = new Date(date);
+                        setters_map[s](_date, parsed[s]);
+                        if (!isNaN(_date))
+                            date = _date;
+                    }
+                }
+            }
+
+            // Make sure at least the month and day were set to consider this a valid date
+            var month_setters = ['M', 'MM', 'm', 'mm'];
+            var day_setters   = ['d', 'dd'];
+            var month_set = _.intersection(used_setters, month_setters).length != 0;
+            var day_set   = _.intersection(used_setters, day_setters).length   != 0;
+            if (! month_set || ! day_set)
+                return undefined;
+
+            return date;
 		},
 		formatDate: function(date, format, language){
 			if (!date)

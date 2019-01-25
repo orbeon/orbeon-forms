@@ -36,7 +36,7 @@ private class DateCompanion extends XBLCompanion {
 
     // Add `readonly` attribute on the input if the control is readonly
     val isReadonly = $(containerElem).is(".xforms-readonly")
-    inputEl.prop("readonly", isReadonly)
+    xformsUpdateReadonly(isReadonly)
 
     if (iOS) {
       // On iOS, use native date picker

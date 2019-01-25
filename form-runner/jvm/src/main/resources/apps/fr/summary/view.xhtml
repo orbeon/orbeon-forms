@@ -272,10 +272,15 @@
             <xf:action event="xforms-model-construct-done">
                 <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
                     <xf:property name="restrict-to-latest-version" value="false()"/>
+                    <xf:property name="app"  value="fr:app-name()"/>
+                    <xf:property name="form" value="fr:form-name()"/>
                 </xf:dispatch>
             </xf:action>
 
             <!-- 2. Load source form -->
+            <xf:action event="fr-versions-empty" observer="fr-versioning-model" type="xpath">
+                frf:sendError(404)
+            </xf:action>
             <xf:action event="fr-versions-read" observer="fr-versioning-model">
 
                 <xf:var

@@ -23,18 +23,14 @@
     id="fr-versioning-model"
     xxf:xpath-analysis="true">
 
-    <xf:var name="app"  value="fr:app-name()"/>
-    <xf:var name="form" value="fr:form-name()"/>
-
-    <xf:var
-        name="versioning-supported-on-data-side"
-        value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
-
     <!--
         Usage:
 
         <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
+            <xf:property name="app"                        value="fr:app-name()"/>
+            <xf:property name="form"                       value="fr:form-name()"/>
             <xf:property name="restrict-to-latest-version" value="false()"/>
+            <xf:property name="callback-id"                value="'fr-versioning-model'"/>
         </xf:dispatch>
 
         - `restrict-to-latest-version as xs:boolean?`
@@ -43,6 +39,10 @@
 
         Dispatches `fr-versions-read` upon success, with:
 
+        - `app as xs:string`:
+            - app name passed originally
+        - `form as xs:string`:
+            - app name passed originally
         - `versions as xs:integer+*`:
             - all available versions
         - `latest-version as xs:integer`
@@ -50,25 +50,60 @@
         - `default-selected-version as xs:integer?`
             - non-empty if there is only one version available
 
+        Dispatches `fr-versions-empty` upon failure, with:
+
+        - `app as xs:string`:
+            - app name passed originally
+        - `form as xs:string`:
+            - app name passed originally
+
         Sends a 404 if no form metadata was found.
     -->
     <xf:action event="fr-read-versions">
+
+        <xf:var name="app"  value="event('app')"/>
+        <xf:var name="form" value="event('form')"/>
+
+        <xf:var
+            name="versioning-supported-on-data-side"
+            value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
 
         <xf:var
             name="is-resource-provider"
             value="frp:findProvider($app, $form, 'form') = 'resource'"/>
 
+        <xf:var
+            name="callback-id"
+            value="(event('callback-id'), 'fr-versioning-model')[1]"/>
+
         <xf:action if="not($is-resource-provider)">
 
-            <xf:send submission="fb-read-form-metadata">
+            <xf:send submission="fb-read-form-metadata-submission">
                 <xf:property name="restrict-to-latest-version" value="event('restrict-to-latest-version')"/>
+                <xf:property name="app"                        value="$app"/>
+                <xf:property name="form"                       value="$form"/>
             </xf:send>
 
-            <xf:action if="empty(instance('fr-versioning-form-metadata')/*)" type="xpath">
-                frf:sendError(404)
-            </xf:action>
+            <xf:var
+                name="success"
+                value="exists(instance('fr-versioning-form-metadata')/*)"/>
 
-            <xf:dispatch name="fr-versions-read" targetid="fr-versioning-model">
+            <xf:dispatch if="not($success)" name="fr-versions-empty" targetid="{$callback-id}">
+                <xf:property
+                    name="app"
+                    value="$app"/>
+                <xf:property
+                    name="form"
+                    value="$form"/>
+            </xf:dispatch>
+
+            <xf:dispatch if="$success" name="fr-versions-read" targetid="{$callback-id}">
+                <xf:property
+                    name="app"
+                    value="$app"/>
+                <xf:property
+                    name="form"
+                    value="$form"/>
                 <xf:property
                     name="versions"
                     value="
@@ -93,7 +128,13 @@
         </xf:action>
         <xf:action if="$is-resource-provider">
             <!-- The `resource` provider doesn't implement the form metadata API, so just assume version 1. -->
-            <xf:dispatch name="fr-versions-read" targetid="fr-versioning-model">
+            <xf:dispatch name="fr-versions-read" targetid="{$callback-id}">
+                <xf:property
+                    name="app"
+                    value="$app"/>
+                <xf:property
+                    name="form"
+                    value="$form"/>
                 <xf:property
                     name="versions"
                     value="1"/>
@@ -109,10 +150,10 @@
     </xf:action>
 
     <xf:submission
-        id="fb-read-form-metadata"
+        id="fb-read-form-metadata-submission"
         method="get"
         serialization="none"
-        resource="{frf:createFormMetadataPath($app, $form)}?all-versions={not(event('restrict-to-latest-version') = true())}"
+        resource="{frf:createFormMetadataPath(event('app'), event('form'))}?all-versions={not(event('restrict-to-latest-version') = true())}"
         replace="instance"
         instance="fr-versioning-form-metadata">
 
@@ -156,7 +197,7 @@
 
     <xf:instance id="fr-versioning-instance" xxf:expose-xpath-types="true">
         <publish>
-            <latest-version>-1</latest-version> <!-- set by `fb-read-form-metadata` -->
+            <latest-version>-1</latest-version> <!-- set by `fb-read-form-metadata-submission` -->
         </publish>
     </xf:instance>
 

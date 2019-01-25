@@ -272,6 +272,12 @@ div.orbeon.orbeon-portlet-div {
             display: grid;
             grid-template-rows: auto 1fr;
 
+            // For section template version selection
+            .xforms-select1-appearance-minimal select {
+                width: @fbToolbarWidth - 2 * @fbGutter - 4px; // would like to use 100%, but fails in `fieldset` if content is too wide
+                margin: 4px 0;
+            }
+
             .xforms-trigger a {
                 text-decoration: none;
                 color: @frHeaderColor;

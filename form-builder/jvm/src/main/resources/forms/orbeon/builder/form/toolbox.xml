@@ -194,13 +194,65 @@
                         </xh:div>
                     </xf:group>
                 </xh:div>
+
                 <!-- Controls and components -->
                 <xf:repeat ref="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
+
+                    <xf:var
+                        name="has-section-component"
+                        as="xs:boolean"
+                        value="
+                            exists(
+                                xbl:binding[
+                                    not(
+                                        fb:metadata/fb:toolbox[@show = 'false']
+                                    ) and
+                                        xxf:has-class('fr-section-component', .)
+                                ]
+                            )"/>
+
                     <xh:div class="fb-tools">
                         <xf:group>
                             <!-- Display localized name -->
                             <xf:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
 
+                            <xf:group ref=".[$has-section-component]">
+
+                                <xf:var
+                                    name="is-orbeon-library"
+                                    value="
+                                        frf:findAppFromSectionTemplateUri(
+                                            namespace-uri-for-prefix('component', .)
+                                        ) = 'orbeon'
+                                "/>
+
+                                <xf:var
+                                    name="context"
+                                    value="
+                                        if ($is-orbeon-library) then
+                                            bind('fb-toolbox-orbeon-library-bind')
+                                        else
+                                            bind('fb-toolbox-app-library-bind')"/>
+
+                                <xf:select1 appearance="minimal" ref="$context/@selected">
+                                    <xf:label class="xforms-hidden" ref="$form-resources/library-version/label"/>
+                                    <xf:itemset ref="$context/version">
+                                        <xf:label ref="xxf:format-message($form-resources/library-version/item/label, xs:integer(.))"/>
+                                        <xf:value ref="."/>
+                                    </xf:itemset>
+
+                                    <xf:action event="xforms-value-changed">
+                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                            <xf:property name="app"        value="bind('application-name-bind')"/>
+                                            <xf:property name="form"       value="bind('form-name-bind')"/>
+                                            <xf:property name="deannotate" value="true()"/>
+                                        </xf:dispatch>
+                                    </xf:action>
+
+                                </xf:select1>
+                            </xf:group>
+
+                            <!-- TODO: See also BindingOps. Can we reduce duplication of the logic? -->
                             <xf:repeat ref="xbl:binding[not(fb:metadata/fb:toolbox[@show = 'false'])]" id="fb-components-template-repeat">
 
                                 <xf:var name="binding" value="." as="element(xbl:binding)"/>

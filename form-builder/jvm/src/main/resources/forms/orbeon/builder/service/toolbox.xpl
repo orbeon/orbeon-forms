@@ -36,6 +36,7 @@
             <request xsl:version="2.0">
                 <app><xsl:value-of select="/request/parameters/parameter[name = 'application']/value"/></app>
                 <form>library</form>
+                <form-version><xsl:value-of select="/request/parameters/parameter[name = 'app-library-version']/value"/></form-version>
                 <document/>
                 <mode/>
             </request>
@@ -48,6 +49,7 @@
             <request>
                 <app>orbeon</app>
                 <form>library</form>
+                <form-version><xsl:value-of select="/request/parameters/parameter[name = 'orbeon-library-version']/value"/></form-version>
                 <document/>
                 <mode/>
             </request>

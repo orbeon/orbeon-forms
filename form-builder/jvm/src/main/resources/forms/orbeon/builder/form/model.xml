@@ -745,6 +745,19 @@
     <!-- "Reload toolbox" action -->
     <xf:action event="fb-load-toolbox-action">
 
+        <!-- Clear and store versions -->
+        <xf:delete
+            ref="bind('fb-toolbox-orbeon-library-bind')/* | bind('fb-toolbox-app-library-bind')/*"/>
+
+        <xf:action iterate="'orbeon', event('app')">
+            <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
+                <xf:property name="app"                        value="."/>
+                <xf:property name="form"                       value="'library'"/>
+                <xf:property name="restrict-to-latest-version" value="false()"/>
+                <xf:property name="callback-id"                value="'fr-form-model'"/>
+            </xf:dispatch>
+        </xf:action>
+
         <xf:dispatch
             if="event('deannotate')"
             name="fb-deannotate"
@@ -754,11 +767,52 @@
             name="xxforms-instance-invalidate"
             targetid="fb-components-instance"/>
 
-            <xf:property name="app"  value="event('app')"/>
-            <xf:property name="form" value="event('form')"/>
         <xf:send submission="fb-load-toolbox-submission">
+            <xf:property name="app"                    value="event('app')"/>
+            <xf:property name="form"                   value="event('form')"/>
+            <xf:property name="orbeon-library-version" value="bind('fb-toolbox-orbeon-library-bind')/@selected/string()"/>
+            <xf:property name="app-library-version"    value="bind('fb-toolbox-app-library-bind')/@selected/string()"/>
         </xf:send>
 
+    </xf:action>
+
+    <!-- Store all available `orbeon` and app library form versions -->
+    <xf:action event="fr-versions-read">
+
+        <xf:var
+            name="context"
+            value="
+                if (event('app') = 'orbeon') then
+                    bind('fb-toolbox-orbeon-library-bind')
+                else
+                    bind('fb-toolbox-app-library-bind')"/>
+
+        <xf:insert
+            context="$context"
+            origin="
+                for $v in event('versions')
+                return xf:element('version', $v)"/>
+
+        <!-- Select a default version if needed -->
+        <xf:setvalue
+            if="xxf:is-blank($context/@selected) or not($context/version = $context/@selected)"
+            ref="$context/@selected"
+            value="max($context/version/string())"/>
+
+    </xf:action>
+
+    <!-- This is called if no library form was found (either because one does not exist, or because
+         there was another error while looking it up). -->
+    <xf:action event="fr-versions-empty">
+
+        <xf:setvalue
+            ref="
+                if (event('app') = 'orbeon') then
+                    bind('fb-toolbox-orbeon-library-bind')/@selected
+                else
+                    bind('fb-toolbox-app-library-bind')/@selected"/>
+
+        <!--<xf:message>Failed to load versions when reloading toolbox for `<xf:output value="event('app')"/>`</xf:message>-->
     </xf:action>
 
     <!-- Submission to load the components library (see also home.xhtml) -->
@@ -766,7 +820,15 @@
         id="fb-load-toolbox-submission"
         serialization="none"
         method="get"
-        resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
+        resource="/fr/service/custom/orbeon/builder/toolbox?application={
+            event('app')
+        }&amp;form={
+            event('form')
+        }&amp;orbeon-library-version={
+            event('orbeon-library-version')
+        }&amp;app-library-version={
+            event('app-library-version')
+        }"
         replace="instance"
         instance="fb-components-instance"
         xxf:readonly="true"
@@ -806,6 +868,10 @@
                     <database/>
                 </services>
                 <actions/>
+                <libraries>
+                    <orbeon selected=""/>
+                    <app selected=""/>
+                </libraries>
             </toolbox>
         </metadata>
     </xf:instance>
@@ -819,6 +885,18 @@
         <xf:bind ref="toolbox/services/http"     relevant="xxf:property('oxf.fb.menu.services.http')"/>
         <xf:bind ref="toolbox/services/database" relevant="xxf:property('oxf.fb.menu.services.database')"/>
         <xf:bind ref="toolbox/actions"           relevant="xxf:property('oxf.fb.menu.actions')"/>
+
+        <xf:bind ref="toolbox/libraries" id="fb-toolbox-libraries-bind">
+            <xf:bind ref="orbeon" id="fb-toolbox-orbeon-library-bind"/>
+            <xf:bind ref="app"    id="fb-toolbox-app-library-bind"/>
+
+            <xf:bind
+                ref="(orbeon | app)/@selected"
+                relevant="not(count(../version) = 1 and ../version = '1')"
+                readonly="count(../version) = 1"
+            />
+
+        </xf:bind>
     </xf:bind>
 
     <!-- Cut/copy/paste instance -->

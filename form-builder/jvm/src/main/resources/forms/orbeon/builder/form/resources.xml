@@ -164,6 +164,12 @@
         <reload-components>
             <label>Reload Toolbox</label>
         </reload-components>
+        <library-version>
+            <label>Library Version</label>
+            <item>
+                <label>Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Click to enter a section title</label>
         </enter-section-title>
@@ -1350,6 +1356,12 @@
         <reload-components>
             <label>Recharger la boîte à outils</label>
         </reload-components>
+        <library-version>
+            <label>Version de la bibliothèque</label>
+            <item>
+                <label>Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Cliquez pour entrer un titre de section</label>
         </enter-section-title>
@@ -2519,6 +2531,12 @@
         <reload-components>
             <label>Last skjemakomponenter på nytt</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label todo="true">[Click to enter a section title]</label>
         </enter-section-title>
@@ -3716,6 +3734,12 @@
         <reload-components>
             <label>Перезагрузить элементы</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label todo="true">[Click to enter a section title]</label>
         </enter-section-title>
@@ -4913,6 +4937,12 @@
         <reload-components>
             <label>Ricarica Toolbox</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Clicca per inserire un titolo</label>
         </enter-section-title>
@@ -6102,6 +6132,12 @@
         <reload-components>
             <label>Toolbox neu laden</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Klicken, um einen Abschnittstitel einzugeben</label>
         </enter-section-title>
@@ -7294,6 +7330,12 @@
         <reload-components>
             <label>Lataa työkalupakki uudelleen</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Klikkaa syöttääksesi lohkon otsikko</label>
         </enter-section-title>
@@ -8483,6 +8525,12 @@
         <reload-components>
             <label>Recargar Herramientas</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Hacer Click para ingresar el nombre de la Sección</label>
         </enter-section-title>
@@ -9673,6 +9721,12 @@
         <reload-components>
             <label>Laad toolbox opnieuw</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Klik om een sectietitel toe te voegen</label>
         </enter-section-title>
@@ -10842,6 +10896,12 @@
         <reload-components>
             <label>Recarregar as Ferramentas</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Clique aqui para adicionar um título à secção</label>
 		</enter-section-title>
@@ -12038,6 +12098,12 @@
         <reload-components>
             <label>Ladda om verktygslådan</label>
         </reload-components>
+        <library-version>
+            <label todo="true">Library Version</label>
+            <item>
+                <label todo="true">Version {0,number,integer}</label>
+            </item>
+        </library-version>
         <enter-section-title>
             <label>Klicka för att ange sektionens titel</label>
 		</enter-section-title>

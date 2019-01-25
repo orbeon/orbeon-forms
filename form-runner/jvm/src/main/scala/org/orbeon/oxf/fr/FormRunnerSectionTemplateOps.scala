@@ -40,6 +40,12 @@ trait FormRunnerSectionTemplateOps {
     } toMap
   }
 
+  //@XPathFunction
+  def findAppFromSectionTemplateUri(uri: String): Option[String] = uri match {
+    case MatchesComponentUriLibraryRegex(app) ⇒ Option(app)
+    case _ ⇒ None
+  }
+
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
 
     // Find the concrete section template component (component:foo)
@@ -106,7 +112,7 @@ trait FormRunnerSectionTemplateOps {
 
   def isSectionTemplateContent(containerElem: NodeInfo): Boolean =
     (containerElem parent * exists FormRunner.IsSection) &&
-      FormRunner.MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
+      MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption

@@ -319,14 +319,12 @@
                                 <xf:output value="$form-resources/reload-components/label"/>
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
-                                <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                                <xf:dispatch name="fb-deannotate" targetid="fr-form-model"/>
-                                <!-- Invalidate and reload the toolbox -->
-                                <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
-                                <xf:send submission="fb-load-toolbox">
-                                    <xf:property name="app"  value="bind('application-name-bind')"/>
-                                    <xf:property name="form" value="bind('form-name-bind')"/>
-                                </xf:send>
+                                <!-- Refresh components -->
+                                <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                    <xf:property name="app"        value="bind('application-name-bind')"/>
+                                    <xf:property name="form"       value="bind('form-name-bind')"/>
+                                    <xf:property name="deannotate" value="true()"/>
+                                </xf:dispatch>
                             </xf:action>
                         </xf:trigger>
 

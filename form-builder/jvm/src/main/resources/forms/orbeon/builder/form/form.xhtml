@@ -578,13 +578,13 @@
                                         <!-- Copy data to main instance -->
                                         <xf:setvalue ref="bind('application-name-bind')" value="event('app')"/>
                                         <xf:setvalue ref="bind('form-name-bind')"        value="event('form')"/>
+
                                         <!-- Refresh components -->
-                                        <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                                        <xf:dispatch targetid="fr-form-model" name="fb-deannotate"/>
-                                        <xf:send submission="fb-load-toolbox">
-                                            <xf:property name="app"  value="event('app')"/>
-                                            <xf:property name="form" value="event('form')"/>
-                                        </xf:send>
+                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                            <xf:property name="app"        value="event('app')"/>
+                                            <xf:property name="form"       value="event('form')"/>
+                                            <xf:property name="deannotate" value="true()"/>
+                                        </xf:dispatch>
                                     </xf:action>
                                     <!-- "Save as" -->
                                     <xf:action

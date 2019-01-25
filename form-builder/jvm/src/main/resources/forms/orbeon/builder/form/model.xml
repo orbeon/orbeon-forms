@@ -154,10 +154,12 @@
                            xf:model[@id = 'fr-form-model']/
                                xf:instance[@id = 'fr-form-metadata']/
                                    *"/>
-        <xf:send submission="fb-load-toolbox">
-            <xf:property name="app"  value="$metadata/application-name"/>
-            <xf:property name="form" value="$metadata/form-name"/>
-        </xf:send>
+
+        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+            <xf:property name="app"        value="$metadata/application-name"/>
+            <xf:property name="form"       value="$metadata/form-name"/>
+            <xf:property name="deannotate" value="false()"/>
+        </xf:dispatch>
 
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
         <xf:rebuild/>
@@ -740,9 +742,28 @@
         <xf:bind ref="temp-type" readonly="true()"/>
     </xf:bind>
 
+    <!-- "Reload toolbox" action -->
+    <xf:action event="fb-load-toolbox-action">
+
+        <xf:dispatch
+            if="event('deannotate')"
+            name="fb-deannotate"
+            targetid="fr-form-model"/>
+
+        <xf:dispatch
+            name="xxforms-instance-invalidate"
+            targetid="fb-components-instance"/>
+
+            <xf:property name="app"  value="event('app')"/>
+            <xf:property name="form" value="event('form')"/>
+        <xf:send submission="fb-load-toolbox-submission">
+        </xf:send>
+
+    </xf:action>
+
     <!-- Submission to load the components library (see also home.xhtml) -->
     <xf:submission
-        id="fb-load-toolbox"
+        id="fb-load-toolbox-submission"
         serialization="none"
         method="get"
         resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
@@ -753,12 +774,12 @@
 
         <xf:action ev:event="xforms-submit-done">
             <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
-                 NOTE: The data in fr-form-instance must be up to date! -->
+                 NOTE: The data in `fr-form-instance` must be up to date! -->
             <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
                 <xf:property name="data" value="instance('fr-form-instance')"/>
             </xf:dispatch>
 
-            <!-- Free fr-form-instance. Leave data as unsafe. -->
+            <!-- Free `fr-form-instance`. Leave data as unsafe. -->
             <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
         </xf:action>
 

@@ -166,7 +166,7 @@ class XFormsInstance(
 
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
-      case ev: XXFormsInstanceInvalidate ⇒
+      case _: XXFormsInstanceInvalidate ⇒
         implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
         _instanceCaching match {
           case Some(instanceCaching) ⇒

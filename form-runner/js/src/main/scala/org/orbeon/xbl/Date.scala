@@ -52,6 +52,8 @@ private class DateCompanion extends XBLCompanion {
       options.forceParse       = false
       options.language         = Page.getLang()
       datePicker = inputEl.parent().datepicker(options)
+      // Register listeners
+      inputEl.on("blur", () ⇒ onBlur())
       datePicker.onChangeDate(() ⇒ onChangeDate())
       Page.onLangChange { newLang ⇒
         datePicker.options.language = newLang
@@ -66,7 +68,7 @@ private class DateCompanion extends XBLCompanion {
     } else {
       Option(datePicker.getDate) match {
         case Some(date) ⇒ date.toISOString.substring(0, 10)
-        case None       ⇒ ""
+        case None       ⇒ inputEl.prop("value").asInstanceOf[String]
       }
     }
   }
@@ -124,8 +126,12 @@ private class DateCompanion extends XBLCompanion {
 
   def onChangeDate(): Unit = {
     val newValue = xformsGetValue()
-    DocumentAPI.setValue(containerElem.id, newValue )
+    DocumentAPI.setValue(containerElem.id, newValue)
   }
+
+  // On blur, update the field value if we have a valid date, say so the value goes from `1/2` to `1/2/2019`
+  def onBlur(): Unit =
+    Option(datePicker.getDate).foreach(datePicker.setDate(_))
 }
 
 private object DatePickerFacade {

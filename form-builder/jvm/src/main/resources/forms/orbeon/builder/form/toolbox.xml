@@ -258,7 +258,10 @@
                                 <xf:var name="binding" value="." as="element(xbl:binding)"/>
 
                                 <!-- Whether the component is a section component or not -->
-                                <xf:var name="is-section-component" value="xxf:has-class('fr-section-component', $binding)" as="xs:boolean"/>
+                                <xf:var
+                                    name="is-section-component"
+                                    as="xs:boolean"
+                                    value="xxf:has-class('fr-section-component', $binding)"/>
 
                                 <xf:var name="metadata" value="$binding/fb:metadata"/>
 
@@ -371,7 +374,6 @@
                                 <xf:output value="$form-resources/reload-components/label"/>
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
-                                <!-- Refresh components -->
                                 <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
                                     <xf:property name="app"        value="bind('application-name-bind')"/>
                                     <xf:property name="form"       value="bind('form-name-bind')"/>

@@ -24,7 +24,7 @@ import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 trait FormRunnerSectionTemplateOps {
 
   private val MatchesComponentUriLibraryRegex = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
-  val MatchesSectionTemplateUriRegex          = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
+  private val MatchesSectionTemplateUriRegex  = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 

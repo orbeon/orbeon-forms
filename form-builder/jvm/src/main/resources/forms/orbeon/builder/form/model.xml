@@ -146,18 +146,7 @@
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
     <xf:action ev:event="fb-data-ready" if="not($mode = 'new')">
 
-        <!-- Load toolbox if mode is not new. This also annotates the form when loading is done via fr-annotate-data. -->
-        <xf:var
-            name="metadata"
-            value="instance('fr-form-instance')/
-                       xh:head/
-                           xf:model[@id = 'fr-form-model']/
-                               xf:instance[@id = 'fr-form-metadata']/
-                                   *"/>
-
         <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
-            <xf:property name="app"        value="$metadata/application-name"/>
-            <xf:property name="form"       value="$metadata/form-name"/>
             <xf:property name="deannotate" value="false()"/>
         </xf:dispatch>
 
@@ -743,13 +732,39 @@
     </xf:bind>
 
     <!-- "Reload toolbox" action -->
+    <!-- PRECONDITION: the form, whether in `fr-form-instance` or `fb-form-instance`, must have up to date app/form names -->
     <xf:action event="fb-load-toolbox-action">
 
-        <!-- Clear and store versions -->
+        <!-- Clear list of versions only -->
         <xf:delete
             ref="bind('fb-toolbox-orbeon-library-bind')/* | bind('fb-toolbox-app-library-bind')/*"/>
 
-        <xf:action iterate="'orbeon', event('app')">
+        <!-- After this we are sure the form is up to date and de-annotated in `fr-form-instance` -->
+        <xf:dispatch
+            if="event('deannotate')"
+            name="fb-deannotate"
+            targetid="fr-form-model"/>
+
+        <!-- TODO: Use Scala code for finding metadata instance. -->
+        <xf:var
+            name="metadata"
+            value="
+                instance('fr-form-instance')/
+                   xh:head/
+                       xf:model[@id = 'fr-form-model']/
+                           xf:instance[@id = 'fr-form-metadata']/
+                               *"/>
+
+        <xf:var
+            name="app"
+            value="$metadata/application-name/string()"/>
+
+        <xf:var
+            name="form"
+            value="$metadata/form-name/string()"/>
+
+        <!-- Store versions -->
+        <xf:action iterate="'orbeon', $app">
             <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
                 <xf:property name="app"                        value="."/>
                 <xf:property name="form"                       value="'library'"/>
@@ -759,17 +774,12 @@
         </xf:action>
 
         <xf:dispatch
-            if="event('deannotate')"
-            name="fb-deannotate"
-            targetid="fr-form-model"/>
-
-        <xf:dispatch
             name="xxforms-instance-invalidate"
             targetid="fb-components-instance"/>
 
         <xf:send submission="fb-load-toolbox-submission">
-            <xf:property name="app"                    value="event('app')"/>
-            <xf:property name="form"                   value="event('form')"/>
+            <xf:property name="app"                    value="$app"/>
+            <xf:property name="form"                   value="$form"/>
             <xf:property name="orbeon-library-version" value="bind('fb-toolbox-orbeon-library-bind')/@selected/string()"/>
             <xf:property name="app-library-version"    value="bind('fb-toolbox-app-library-bind')/@selected/string()"/>
         </xf:send>

@@ -242,7 +242,7 @@
                                     </xf:itemset>
 
                                     <xf:action event="xforms-value-changed">
-                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
                                             <xf:property name="deannotate" value="true()"/>
                                         </xf:dispatch>
                                     </xf:action>
@@ -321,7 +321,7 @@
                     <xh:div class="fb-tool">
 
                         <!-- Workflow and permissions -->
-                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/workflow">
+                        <xf:trigger bind="fb-toolbox-workflow-bind">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-workflow/label"/>
@@ -331,7 +331,7 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/permissions">
+                        <xf:trigger bind="fb-toolbox-permissions-bind">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>
@@ -341,7 +341,7 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger ref="instance('fb-metadata-instance')/toolbox/email">
+                        <xf:trigger bind="fb-toolbox-email-bind">
                             <xf:label>
                                 <xh:i class="fa fa-envelope fa-fw"/>
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
@@ -357,7 +357,7 @@
                         </xf:trigger>
 
                         <!-- Edit Source -->
-                        <xf:trigger class="fb-edit-source-button" ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                        <xf:trigger class="fb-edit-source-button" bind="fb-toolbox-edit-bind">
                             <xf:label>
                                 <xh:i class="fa fa-code fa-fw"/>
                                 <xf:output value="$form-resources/edit-source/label"/>
@@ -372,7 +372,7 @@
                                 <xf:output value="$form-resources/reload-components/label"/>
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
-                                <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
                                     <xf:property name="deannotate" value="true()"/>
                                 </xf:dispatch>
                             </xf:action>
@@ -384,13 +384,13 @@
                 <xf:group
                     xxf:element="div"
                     class="fb-tools"
-                    ref="instance('fb-metadata-instance')/toolbox/(schema | pdf)[xxf:relevant()]">
+                    ref="(bind('fb-toolbox-schema-bind'), bind('fb-toolbox-pdf-bind'))[xxf:relevant()]">
 
                     <!-- Attachments -->
                     <xf:group>
                         <xf:label value="$form-resources/attachments/label"/>
                         <xh:div class="fb-tool">
-                            <xf:group ref="instance('fb-metadata-instance')/toolbox/schema">
+                            <xf:group bind="fb-toolbox-schema-bind">
                                 <!-- Upload XML Schema -->
                                 <xf:trigger>
                                     <xf:label>
@@ -403,7 +403,7 @@
                                     <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xf:group>
-                            <xf:group ref="instance('fb-metadata-instance')/toolbox/pdf">
+                            <xf:group bind="fb-toolbox-pdf-bind">
                                 <!-- Upload PDF Template -->
                                 <xf:trigger>
                                     <xf:label>
@@ -425,7 +425,7 @@
                 </xf:group>
 
                 <!-- Actions -->
-                <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/actions">
+                <xf:group xxf:element="div" class="fb-tools" bind="fb-toolbox-actions-bind">
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/actions/label"/>
                         <!-- Repeat over existing bindings -->
@@ -458,7 +458,7 @@
                 </xf:group>
 
                 <!-- Services -->
-                <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/http">
+                <xf:group xxf:element="div" class="fb-tools" bind="fb-toolbox-services-http-bind">
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/http-services/label"/>
                         <!-- Repeat over existing services -->
@@ -494,7 +494,7 @@
                 </xf:group>
 
                 <!-- Database services -->
-                <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/database">
+                <xf:group xxf:element="div" class="fb-tools" bind="fb-toolbox-services-database-bind">
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/database-services/label"/>
                         <!-- Repeat over existing services -->

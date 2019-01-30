@@ -11,28 +11,24 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xf:model xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:saxon="http://saxon.sf.net/"
-      xmlns:xbl="http://www.w3.org/ns/xbl"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-      xmlns:xformsid="java:org.orbeon.xforms.XFormsId"
-      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
+<xf:model
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+    xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
-      xxf:external-events="fb-show-test-dialog xxforms-rpc-request"
-      xxf:xpath-analysis="false"
-      xxf:expose-xpath-types="true"
+    xxf:external-events="fb-show-test-dialog xxforms-rpc-request"
+    xxf:xpath-analysis="false"
+    xxf:expose-xpath-types="true"
 
-      id="fr-form-model">
+    id="fr-form-model">
 
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
     <xf:var name="app"        value="$parameters/app/string()"/>
@@ -146,7 +142,7 @@
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
     <xf:action ev:event="fb-data-ready" if="not($mode = 'new')">
 
-        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+        <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
             <xf:property name="deannotate" value="false()"/>
         </xf:dispatch>
 
@@ -745,240 +741,10 @@
         <xf:bind ref="temp-type" readonly="true()"/>
     </xf:bind>
 
-    <!-- "Reload toolbox" action -->
-    <!-- PRECONDITION: the form, whether in `fr-form-instance` or `fb-form-instance`, must have up to date app/form names -->
-    <xf:action event="fb-load-toolbox-action">
-
-        <!-- Clear list of versions only -->
-        <xf:delete
-            ref="bind('fb-toolbox-libraries-bind')/*/*"/>
-
-        <!-- After this we are sure the form is up to date and de-annotated in `fr-form-instance` -->
-        <xf:dispatch
-            if="event('deannotate')"
-            name="fb-deannotate"
-            targetid="fr-form-model"/>
-
-        <!-- TODO: Use Scala code for finding metadata instance. -->
-        <xf:var
-            name="metadata"
-            value="
-                instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
-
-        <xf:var
-            name="app"
-            value="$metadata/application-name/string()"/>
-
-        <xf:var
-            name="form"
-            value="$metadata/form-name/string()"/>
-
-        <!-- Store versions -->
-        <xf:action iterate="'orbeon', $app">
-            <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
-                <xf:property name="app"                        value="."/>
-                <xf:property name="form"                       value="'library'"/>
-                <xf:property name="restrict-to-latest-version" value="false()"/>
-                <xf:property name="callback-id"                value="'fr-form-model'"/>
-            </xf:dispatch>
-        </xf:action>
-
-        <xf:dispatch
-            name="xxforms-instance-invalidate"
-            targetid="fb-components-instance"/>
-
-        <xf:send submission="fb-load-toolbox-submission">
-            <xf:property name="app"                    value="$app"/>
-            <xf:property name="form"                   value="$form"/>
-            <xf:property name="orbeon-library-version" value="$metadata/library-versions/orbeon/string()"/>
-            <xf:property name="app-library-version"    value="$metadata/library-versions/app/string()"/>
-        </xf:send>
-
-    </xf:action>
-
-    <!-- Store all available `orbeon` and app library form versions -->
-    <xf:action event="fr-versions-read">
-
-        <xf:var
-            name="elem-name"
-            value="
-                if (event('app') = 'orbeon') then
-                    'orbeon'
-                else
-                    'app'"/>
-
-        <!-- Keep list of available versions for the dropdown (assuming it has been cleared before) -->
-        <xf:insert
-            context="bind('fb-toolbox-libraries-bind')/*[name() = $elem-name]"
-            origin="
-                for $v in event('versions')
-                return xf:element('version', $v)"/>
-
-        <!-- TODO: Use Scala code for finding metadata instance. -->
-        <xf:var
-            name="metadata"
-            value="
-                instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
-
-        <!--
-            Keep or update the current version available in the form metadata:
-
-            <metadata>
-                <library-versions>
-                    <orbeon>2</orbeon>
-                    <app>1</app>
-                </library-versions>
-            </metadata>
-        -->
-
-        <xf:var
-            name="current-version-opt"
-            as="xs:integer?"
-            value="
-                $metadata/library-versions/*[
-                    name() = $elem-name and
-                    . castable as xs:integer
-                ]/xs:integer(.)"/>
-
-        <xf:action if="empty($current-version-opt) or not(event('versions') = $current-version-opt)">
-
-            <xf:insert
-                context="$metadata"
-                if="empty(library-versions)"
-                ref="*"
-                origin="xf:element('library-versions')"/>
-
-            <xf:delete
-                ref="$metadata/library-versions/*[name() = $elem-name]"/>
-
-            <xf:insert
-                context="$metadata/library-versions"
-                ref="*"
-                origin="
-                    xf:element(
-                        $elem-name,
-                        max(
-                            for $v in event('versions')
-                            return xs:integer($v)
-                        )
-                    )"/>
-
-        </xf:action>
-
-    </xf:action>
-
-    <!-- This is called if no library form was found (either because one does not exist, or because
-         there was another error while looking it up). -->
-    <xf:action event="fr-versions-empty">
-
-        <xf:var
-            name="elem-name"
-            value="
-                if (event('app') = 'orbeon') then
-                    'orbeon'
-                else
-                    'app'"/>
-
-        <!-- TODO: Use Scala code for finding metadata instance. -->
-        <xf:var
-            name="metadata"
-            value="
-                instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
-
-        <xf:delete
-            ref="$metadata/library-versions/*[name() = $elem-name]"/>
-
-        <xf:delete
-            if="empty($metadata/library-versions/*)"
-            ref="$metadata/library-versions"/>
-
-    </xf:action>
-
-    <!-- Submission to load the components library (see also home.xhtml) -->
-    <xf:submission
-        id="fb-load-toolbox-submission"
-        serialization="none"
-        method="get"
-        resource="/fr/service/custom/orbeon/builder/toolbox?application={
-            event('app')
-        }&amp;form={
-            event('form')
-        }&amp;orbeon-library-version={
-            event('orbeon-library-version')
-        }&amp;app-library-version={
-            event('app-library-version')
-        }"
-        replace="instance"
-        instance="fb-components-instance"
-        xxf:readonly="true"
-        xxf:cache="true">
-
-        <xf:action ev:event="xforms-submit-done">
-            <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
-                 NOTE: The data in `fr-form-instance` must be up to date! -->
-            <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
-                <xf:property name="data" value="instance('fr-form-instance')"/>
-            </xf:dispatch>
-
-            <!-- Free `fr-form-instance`. Leave data as unsafe. -->
-            <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
-        </xf:action>
-
-    </xf:submission>
-
     <xf:instance id="fb-components-instance">
         <!-- This contains the components available for the currently edited form -->
         <components/>
     </xf:instance>
-
-    <!-- Instance for metadata editor -->
-    <xf:instance id="fb-metadata-instance">
-        <metadata valid="true">
-            <mode/> <!-- edit | save-as -->
-            <toolbox>
-                <schema/>
-                <css/>
-                <pdf/>
-                <edit-source/>
-                <permissions/>
-                <email/>
-                <services>
-                    <http/>
-                    <database/>
-                </services>
-                <actions/>
-                <libraries>
-                    <orbeon/>
-                    <app/>
-                </libraries>
-            </toolbox>
-        </metadata>
-    </xf:instance>
-
-    <xf:bind ref="instance('fb-metadata-instance')">
-        <xf:bind ref="toolbox/schema"            relevant="xxf:property('oxf.fb.menu.schema')"/>
-        <xf:bind ref="toolbox/pdf"               relevant="xxf:property('oxf.fb.menu.pdf')"/>
-        <xf:bind ref="toolbox/edit-source"       relevant="xxf:property('oxf.fb.menu.edit-source')"/>
-        <xf:bind ref="toolbox/permissions"       relevant="xxf:property('oxf.fb.menu.permissions')"/>
-        <xf:bind ref="toolbox/email"             relevant="xxf:property('oxf.fb.menu.email')"/>
-        <xf:bind ref="toolbox/services/http"     relevant="xxf:property('oxf.fb.menu.services.http')"/>
-        <xf:bind ref="toolbox/services/database" relevant="xxf:property('oxf.fb.menu.services.database')"/>
-        <xf:bind ref="toolbox/actions"           relevant="xxf:property('oxf.fb.menu.actions')"/>
-
-        <xf:bind ref="toolbox/libraries"         id="fb-toolbox-libraries-bind"/>
-    </xf:bind>
 
     <!-- Cut/copy/paste instance -->
     <xf:instance id="fb-xcv-instance" xxf:index="id">

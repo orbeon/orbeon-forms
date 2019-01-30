@@ -23,9 +23,10 @@
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
     <xh:head>
-        <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"    xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/versioning-model.xml"  xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/permissions-model.xml"      xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"         xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/forms/orbeon/builder/form/toolbox-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/versioning-model.xml"       xxi:omit-xml-base="true"/>
     </xh:head>
     <xh:body>
 
@@ -581,7 +582,7 @@
                                         <xf:setvalue ref="bind('form-name-bind')"        value="event('form')"/>
 
                                         <!-- Refresh components -->
-                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fr-form-model">
+                                        <xf:dispatch name="fb-load-toolbox-action" targetid="fb-toolbox-model">
                                             <xf:property name="deannotate" value="true()"/>
                                         </xf:dispatch>
                                     </xf:action>
@@ -642,14 +643,18 @@
                                     </xf:action>
                                 </fb:dialog-pdf>
 
-                                <xf:group ref="instance('fb-metadata-instance')/toolbox/workflow">
+                                <xf:group bind="fb-toolbox-workflow-bind">
+                                    <!-- TODO: use Scala code to refer to metadata -->
                                     <fb:workflow
                                         id="fb-workflow-dialog"
                                         resources-ref="$form-resources"
                                         ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
                                 </xf:group>
-                                <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
-                                    <fb:permissions id="fb-permissions-dialog" resources-ref="$form-resources"
+                                <xf:group bind="fb-toolbox-permissions-bind">
+                                    <!-- TODO: use Scala code to refer to metadata -->
+                                    <fb:permissions
+                                        id="fb-permissions-dialog"
+                                        resources-ref="$form-resources"
                                         metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
                                 </xf:group>
 

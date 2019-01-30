@@ -28,6 +28,8 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 
+import scala.util.control.NonFatal
+
 case class SerializationParameters(
   messageBody            : Array[Byte],
   queryString            : String,
@@ -107,7 +109,7 @@ object SerializationParameters {
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
           } catch {
-            case e: Exception ⇒
+            case NonFatal(e) ⇒
               throw new XFormsSubmissionException(
                 submission,
                 e,
@@ -177,9 +179,10 @@ object SerializationParameters {
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
             } catch {
-              case e: Exception ⇒
+              case NonFatal(e) ⇒
                 throw new XFormsSubmissionException(
                   submission,
+                  e,
                   "xf:submission: binary serialization with anyURI type failed reading URL.",
                   "serializing instance"
                 )
@@ -213,7 +216,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case e: Exception ⇒
+            case NonFatal(e) ⇒
               throw new XFormsSubmissionException(
                 submission,
                 e,
@@ -246,7 +249,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case e: Exception ⇒
+            case NonFatal(e) ⇒
               throw new XFormsSubmissionException(
                 submission,
                 e,

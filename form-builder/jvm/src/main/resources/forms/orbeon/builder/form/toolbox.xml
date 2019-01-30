@@ -227,16 +227,16 @@
                                 "/>
 
                                 <xf:var
-                                    name="context"
+                                    name="elem-name"
                                     value="
                                         if ($is-orbeon-library) then
-                                            bind('fb-toolbox-orbeon-library-bind')
+                                            'orbeon'
                                         else
-                                            bind('fb-toolbox-app-library-bind')"/>
+                                            'app'"/>
 
-                                <xf:select1 appearance="minimal" ref="$context/@selected">
+                                <xf:select1 appearance="minimal" ref="bind('library-versions-bind')/*[name() = $elem-name]">
                                     <xf:label class="xforms-hidden" ref="$form-resources/library-version/label"/>
-                                    <xf:itemset ref="$context/version">
+                                    <xf:itemset ref="bind('fb-toolbox-libraries-bind')/*[name() = $elem-name]/version">
                                         <xf:label ref="xxf:format-message($form-resources/library-version/item/label, xs:integer(.))"/>
                                         <xf:value ref="."/>
                                     </xf:itemset>

@@ -271,7 +271,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-output⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-output≡≡c⊙1">My label</xh:label>
-                    <xh:output id="my-new-output≡≡c⊙1" class="xforms-output-output" tabindex="0" aria-readonly="true" role="textbox">Hello!</xh:output>
+                    <xh:output id="my-new-output≡≡c⊙1" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox">Hello!</xh:output>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
@@ -288,7 +288,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-output" class="xforms-control xforms-output xforms-repeat-template">
                     <xh:label class="xforms-label" for="my-new-output≡≡c"/>
-                    <xh:output id="my-new-output≡≡c" class="xforms-output-output" tabindex="0" aria-readonly="true" role="textbox"/>
+                    <xh:output id="my-new-output≡≡c" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox"/>
                     <xh:span class="xforms-disabled xforms-help"/>
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
@@ -2182,7 +2182,7 @@
                             </xh:span>
                         </xh:span>
                     </xh:label>
-                    <xh:output id="my-output≡≡c" class="xforms-output-output" tabindex="0" aria-readonly="true" role="textbox"/>
+                    <xh:output id="my-output≡≡c" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox"/>
                 </xh:span>
             </controls>
         </output>

@@ -11,21 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xh:div xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:saxon="http://saxon.sf.net/"
-      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-      xmlns:xbl="http://www.w3.org/ns/xbl"
+<xh:div
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
 
-      class="fb-toolbox">
+    class="fb-toolbox">
 
     <xf:var name="lang" value="xxf:instance('fr-language-instance')"/>
 
@@ -196,7 +194,7 @@
                 </xh:div>
 
                 <!-- Controls and components -->
-                <xf:repeat ref="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
+                <xf:repeat ref="xxf:instance('fb-components-instance')/xbl:xbl[xbl:binding]">
 
                     <xf:var
                         name="has-section-component"

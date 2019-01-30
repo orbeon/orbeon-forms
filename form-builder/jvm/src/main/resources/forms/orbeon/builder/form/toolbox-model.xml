@@ -67,7 +67,6 @@
         <xf:dispatch
             name="xxforms-instance-invalidate"
             targetid="fb-components-instance"/>
-        <!-- TODO check fb-components-instance should be in this model? also check tests -->
 
         <xf:send submission="fb-load-toolbox-submission">
             <xf:property name="app"                    value="$app"/>
@@ -199,7 +198,7 @@
             event('app-library-version')
         }"
         replace="instance"
-        xxf:instance="fb-components-instance"
+        instance="fb-components-instance"
         xxf:readonly="true"
         xxf:cache="true">
 
@@ -252,5 +251,10 @@
 
         <xf:bind ref="libraries"         id="fb-toolbox-libraries-bind"/>
     </xf:bind>
+
+    <!-- This contains the components available for the currently edited form -->
+    <xf:instance id="fb-components-instance">
+        <components/>
+    </xf:instance>
 
 </xf:model>

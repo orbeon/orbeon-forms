@@ -93,16 +93,14 @@ trait FormBuilderSupport extends XFormsSupport {
             </xf:instance>
             <xf:var name="undo" value="instance('fb-undo-instance')"/>
 
-            <xf:instance id="fb-components-instance">
-              <components/>
-            </xf:instance>
-
-            <xf:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding"/>
+            <xf:var
+              name="component-bindings"
+              value="xxf:instance('fb-components-instance')//xbl:binding"/>
 
             <xf:action ev:event="xforms-model-construct-done">
               <!-- Load components -->
               <xf:insert
-                ref="instance('fb-components-instance')"
+                ref="xxf:instance('fb-components-instance')"
                 origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
 
               <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
@@ -126,11 +124,11 @@ trait FormBuilderSupport extends XFormsSupport {
                         ),
                         (
                           instance('fr-form-instance'),
-                          instance('fb-components-instance')
+                          xxf:instance('fb-components-instance')
                         ),
                         'data'
                       ),
-                      instance('fb-components-instance')
+                      xxf:instance('fb-components-instance')
                     ),
                     'data'
                   )"
@@ -142,6 +140,11 @@ trait FormBuilderSupport extends XFormsSupport {
 
               <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
             </xf:action>
+          </xf:model>
+          <xf:model id="fb-toolbox-model">
+            <xf:instance id="fb-components-instance">
+              <components/>
+            </xf:instance>
           </xf:model>
           <xf:model id="fr-resources-model">
             <xf:var name="fr-form-resources" value="xxf:instance('fr-form-resources')/resource[@xml:lang = 'en']"/>

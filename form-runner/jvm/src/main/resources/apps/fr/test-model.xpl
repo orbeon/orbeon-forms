@@ -11,15 +11,13 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>

@@ -53,11 +53,12 @@ trait FormBuilderSupport extends XFormsSupport {
 
   private def formBuilderDoc(url: String): Document =
     NodeConversions.elemToDom4j(
-      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-           xmlns:ev="http://www.w3.org/2001/xml-events"
-           xmlns:xbl="http://www.w3.org/ns/xbl">
+      <xh:html
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
         <xh:head>
           <xf:model id="fr-form-model">
             <xf:instance id="fb-form-instance"  xxf:index="id"><dummy/></xf:instance>
@@ -66,8 +67,8 @@ trait FormBuilderSupport extends XFormsSupport {
                    xxf:readonly="true" xxf:cache="true"/>
 
             <xf:var name="model"             value="xh:head/xf:model[@id = 'fr-form-model']"/>
-            <xf:var name="metadata-instance" value="$model/xf:instance[@id = 'fr-form-metadata']/*"/>
-            <xf:var name="resources"         value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
+            <xf:var name="metadata-instance" value="frf:metadataInstanceRootOpt(instance('fb-form-instance'))"/>
+            <xf:var name="resources"         value="frf:resourcesInstanceRootOpt(instance('fb-form-instance'))"/>
             <xf:var name="current-resources" value="$resources/resource[1]"/>
 
             <xf:instance id="fb-variables">
@@ -97,7 +98,7 @@ trait FormBuilderSupport extends XFormsSupport {
               name="component-bindings"
               value="xxf:instance('fb-components-instance')//xbl:binding"/>
 
-            <xf:action ev:event="xforms-model-construct-done">
+            <xf:action event="xforms-model-construct-done">
               <!-- Load components -->
               <xf:insert
                 ref="xxf:instance('fb-components-instance')"

@@ -45,8 +45,8 @@
     <!-- Other variables -->
     <!-- TODO: don't duplicate logic with what's in FormBuilderFunctions -->
     <xf:var name="model" value="xh:head/xf:model[@id = 'fr-form-model']"/>
-    <xf:var name="metadata-instance" value="$model/xf:instance[@id = 'fr-form-metadata']/*"/>
-    <xf:var name="resources" value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
+    <xf:var name="metadata-instance" value="frf:metadataInstanceRootOpt(instance('fb-form-instance'))"/>
+    <xf:var name="resources"         value="frf:resourcesInstanceRootOpt(instance('fb-form-instance'))"/>
     <xf:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
     <!-- Was: xh:body//xf:group[xxf:has-class('fb-body')]"/> -->
     <!-- There *should* not be an id conflict as we add fb-body in annotate.xpl. Can we really make sure? -->

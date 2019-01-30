@@ -21,7 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
     <xh:head>
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml"      xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"         xxi:omit-xml-base="true"/>
@@ -644,18 +644,16 @@
                                 </fb:dialog-pdf>
 
                                 <xf:group bind="fb-toolbox-workflow-bind">
-                                    <!-- TODO: use Scala code to refer to metadata -->
                                     <fb:workflow
                                         id="fb-workflow-dialog"
                                         resources-ref="$form-resources"
-                                        ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                                        ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
                                 </xf:group>
                                 <xf:group bind="fb-toolbox-permissions-bind">
-                                    <!-- TODO: use Scala code to refer to metadata -->
                                     <fb:permissions
                                         id="fb-permissions-dialog"
                                         resources-ref="$form-resources"
-                                        metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                                        metadata-ref="frf:metadataInstanceRootOpt(xxf:instance('fb-form-instance'))"/>
                                 </xf:group>
 
                                 <xf:action event="fr-save" observer="dialog-edit-source">

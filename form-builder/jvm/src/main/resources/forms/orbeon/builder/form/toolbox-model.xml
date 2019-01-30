@@ -12,10 +12,10 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xf:model
-    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
 
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
@@ -36,15 +36,9 @@
             name="fb-deannotate"
             targetid="fr-form-model"/>
 
-        <!-- TODO: Use Scala code for finding metadata instance. -->
         <xf:var
             name="metadata"
-            value="
-                xxf:instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
+            value="frf:metadataInstanceRootOpt(xxf:instance('fr-form-instance'))"/>
 
         <xf:var
             name="app"
@@ -95,15 +89,9 @@
                 for $v in event('versions')
                 return xf:element('version', $v)"/>
 
-        <!-- TODO: Use Scala code for finding metadata instance. -->
         <xf:var
             name="metadata"
-            value="
-                xxf:instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
+            value="frf:metadataInstanceRootOpt(xxf:instance('fr-form-instance'))"/>
 
         <!--
             Keep or update the current version available in the form metadata:
@@ -164,15 +152,9 @@
                 else
                     'app'"/>
 
-        <!-- TODO: Use Scala code for finding metadata instance. -->
         <xf:var
             name="metadata"
-            value="
-                xxf:instance('fr-form-instance')/
-                   xh:head/
-                       xf:model[@id = 'fr-form-model']/
-                           xf:instance[@id = 'fr-form-metadata']/
-                               *"/>
+            value="frf:metadataInstanceRootOpt(xxf:instance('fr-form-instance'))"/>
 
         <xf:delete
             ref="$metadata/library-versions/*[name() = $elem-name]"/>

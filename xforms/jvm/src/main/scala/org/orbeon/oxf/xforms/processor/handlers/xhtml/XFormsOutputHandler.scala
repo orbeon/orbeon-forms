@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
@@ -68,7 +69,7 @@ class XFormsOutputDefaultHandler(
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
     handleAriaByAtts(containerAttributes)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
-    if (isField) {
+    if (isField && ! isStaticReadonly(outputControl)) {
       containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
       containerAttributes.addAttribute("", "aria-readonly", "aria-readonly", XMLReceiverHelper.CDATA, "true")
       containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")

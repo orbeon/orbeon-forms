@@ -32,6 +32,8 @@
     <xf:action event="xxforms-dialog-open">
         <xf:setvalue ref="instance()/app"                   value="event('app')"/>
         <xf:setvalue ref="instance()/form"                  value="event('form')"/>
+        <xf:setvalue ref="instance()/versioning-supported"/>
+        <xf:delete   ref="instance()/versions/*"/>
         <xf:setvalue ref="instance()/published-attachments" value="-1"/>
         <xf:setvalue ref="instance()/published-version"     value="-1"/>
         <xf:setvalue ref="instance()/existing-version"      value="-1"/>
@@ -40,7 +42,14 @@
         <xf:setvalue ref="instance()/selected-version"      value="'next'"/>
         <xf:setvalue ref="instance()/selected-comment"/>
 
-        <xf:send submission="fb-read-form-metadata"/>
+        <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
+            <xf:property name="app"                        value="event('app')"/>
+            <xf:property name="form"                       value="event('form')"/>
+            <xf:property name="restrict-to-latest-version" value="false()"/>
+            <xf:property name="all-forms"                  value="true()"/>
+            <xf:property name="callback-id"                value="'fb-publish-model'"/>
+        </xf:dispatch>
+
         <xf:setfocus control="fb-publish-publish"/>
     </xf:action>
 
@@ -101,15 +110,8 @@
                                         <xf:value>next</xf:value>
                                     </xf:item>
                                     <!-- All existing versions sorted from newest to oldest -->
-                                    <xf:itemset
-                                        ref="
-                                            xxf:sort(
-                                                instance('fb-publish-form-metadata')/form/form-version[. castable as xs:integer]/xs:integer(.),
-                                                .,
-                                                'number',
-                                                'descending'
-                                            )">
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, .)"/>
+                                    <xf:itemset ref="$versions">
+                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, xs:integer(.))"/>
                                         <xf:value value="."/>
                                     </xf:itemset>
 
@@ -268,14 +270,35 @@
     <!-- Local model -->
     <xf:model id="fb-publish-model">
 
+        <xf:action event="fr-versions-read fr-versions-empty">
+            <xf:setvalue
+                ref="instance()/versioning-supported"
+                value="event('is-form-definition-versioning-supported')"/>
+        </xf:action>
+
+        <xf:action event="fr-versions-read">
+            <xf:setvalue
+                ref="instance()/latest-version"
+                value="event('latest-version')"/>
+            <xf:insert
+                context="instance()/versions"
+                ref="*"
+                origin="
+                    for $v in
+                        xxf:sort(
+                            event('versions'),
+                            .,
+                            'number',
+                            'descending'
+                        )
+                    return xf:element('version', $v)"/>
+        </xf:action>
+
         <!-- Clean-up upon close -->
         <!-- NOTE: Put in model here because of https://github.com/orbeon/orbeon-forms/issues/134 -->
         <xf:action event="xxforms-dialog-close" observer="fb-publish-dialog">
             <xf:setvalue
                 ref="xxf:instance('fr-create-update-submission-response')"/>
-            <xf:insert
-                ref="instance('fb-publish-form-metadata')"
-                origin="xf:element('dummy')"/>
         </xf:action>
 
         <xf:instance id="fb-publish-instance" xxf:expose-xpath-types="true">
@@ -283,13 +306,15 @@
                 <app/>
                 <form/>
 
+                <versioning-supported/>
+                <latest-version>-1</latest-version>
+                <versions/>
+
                 <published-attachments>-1</published-attachments> <!-- set by `fb-publish-submission` -->
                 <published-version>-1</published-version>         <!-- set by `fb-publish-submission` -->
 
                 <existing-version>-1</existing-version>           <!-- set by `fb-read-form-definition` -->
                 <existing-comment/>                               <!-- set by `fb-read-form-definition` -->
-
-                <latest-version>-1</latest-version>               <!-- set on dialog open by `fb-read-form-metadata` -->
 
                 <available>true</available>
                 <selected-version>next</selected-version>
@@ -301,47 +326,11 @@
             ref="published-attachments | published-version | existing-version | latest-version"
             type="xs:integer"/>
 
-        <xf:var name="app"            value="instance()/app/string()"/>
-        <xf:var name="form"           value="instance()/form/string()"/>
-        <xf:var name="latest-version" value="instance()/latest-version/data(.)"/>
-
-        <xf:var
-            name="versioning-supported"
-            value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
-
-        <xf:instance id="fb-publish-form-metadata">
-            <dummy/>
-        </xf:instance>
-
-        <xf:submission
-            id="fb-read-form-metadata"
-            method="get"
-            serialization="none"
-            resource="{frf:createFormMetadataPath($app, $form)}?all-versions=true&amp;all-forms=true"
-            replace="instance"
-            instance="fb-publish-form-metadata">
-
-            <xf:action event="xforms-submit-done">
-                <xf:setvalue
-                    ref="instance()/latest-version"
-                    value="
-                        (
-                            max(
-                                instance('fb-publish-form-metadata')/form/form-version[. castable as xs:integer]/xs:integer(.)
-                            ),
-                            -1
-                        )[1]"/>
-            </xf:action>
-
-            <xf:action event="xforms-submit-error">
-                <xf:toggle case="fb-publish-dialog-error"/>
-                <!-- Mark the version number as -1 -->
-                <xf:setvalue
-                    ref="instance()/latest-version"
-                    value="-1"/>
-            </xf:action>
-
-        </xf:submission>
+        <xf:var name="app"                  value="instance()/app/string()"/>
+        <xf:var name="form"                 value="instance()/form/string()"/>
+        <xf:var name="versioning-supported" value="instance()/versioning-supported = 'true'"/>
+        <xf:var name="latest-version"       value="instance()/latest-version/data(.)"/>
+        <xf:var name="versions"             value="instance()/versions/version"/>
 
         <xf:submission
             id="fb-read-form-definition"

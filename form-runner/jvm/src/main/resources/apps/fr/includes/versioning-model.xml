@@ -15,8 +15,6 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:saxon="http://saxon.sf.net/"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava"
 
@@ -73,14 +71,14 @@
             value="frf:isFormDefinitionVersioningSupported($app, $form)"/>
 
         <xf:var
-            name="is-resource-provider"
+            name="is-resource-provider-for-form"
             value="frp:findProvider($app, $form, 'form') = 'resource'"/>
 
         <xf:var
             name="callback-id"
             value="(event('callback-id'), 'fr-versioning-model')[1]"/>
 
-        <xf:action if="not($is-resource-provider)">
+        <xf:action if="not($is-resource-provider-for-form)">
 
             <xf:send submission="fb-read-form-metadata-submission">
                 <xf:property name="app"                        value="$app"/>
@@ -100,6 +98,9 @@
                 <xf:property
                     name="form"
                     value="$form"/>
+                <xf:property
+                    name="is-form-definition-versioning-supported"
+                    value="$is-form-definition-versioning-supported"/>
             </xf:dispatch>
 
             <xf:dispatch if="$success" name="fr-versions-read" targetid="{$callback-id}">
@@ -109,6 +110,9 @@
                 <xf:property
                     name="form"
                     value="$form"/>
+                <xf:property
+                    name="is-form-definition-versioning-supported"
+                    value="$is-form-definition-versioning-supported"/>
                 <xf:property
                     name="versions"
                     value="
@@ -131,7 +135,7 @@
                             xs:integer(instance('fr-versioning-form-metadata')/form/form-version)"/>
             </xf:dispatch>
         </xf:action>
-        <xf:action if="$is-resource-provider">
+        <xf:action if="$is-resource-provider-for-form">
             <!-- The `resource` provider doesn't implement the form metadata API, so just assume version 1. -->
             <xf:dispatch name="fr-versions-read" targetid="{$callback-id}">
                 <xf:property
@@ -140,6 +144,9 @@
                 <xf:property
                     name="form"
                     value="$form"/>
+                <xf:property
+                    name="is-form-definition-versioning-supported"
+                    value="false()"/>
                 <xf:property
                     name="versions"
                     value="1"/>

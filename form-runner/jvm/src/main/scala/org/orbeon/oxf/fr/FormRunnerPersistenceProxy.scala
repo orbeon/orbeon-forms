@@ -334,8 +334,15 @@ private object FormRunnerPersistenceProxy {
         }
       }
 
-    val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements.flatten, request.getFirstParamAsString("all-forms") contains "true")
-    returnAggregatedDocument(root = "forms", filteredFormElements, response)
+    returnAggregatedDocument(
+      root     = "forms",
+      content  =
+        FormRunner.filterFormsAndAnnotateWithOperations(
+          formsEls = allFormElements.flatten,
+          allForms = request.getFirstParamAsString("all-forms") contains "true"
+        ),
+      response = response
+    )
   }
 
   def proxyReindex(
@@ -354,6 +361,17 @@ private object FormRunnerPersistenceProxy {
         proxyRequest(request, None, serviceURI, headers, response, Nil)
       }
     )
+  }
+
+  private def returnAggregatedDocument(
+    root     : String,
+    content  : List[NodeInfo],
+    response : Response
+  ): Unit = {
+    val documentElement = elementInfo(root)
+    XFormsAPI.insert(into = documentElement, origin = content)
+    response.setContentType("application/xml")
+    TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }
 
   // Get all providers that can be used either for form data or for form definitions

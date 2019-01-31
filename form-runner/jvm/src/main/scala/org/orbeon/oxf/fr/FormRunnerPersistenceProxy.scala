@@ -334,14 +334,8 @@ private object FormRunnerPersistenceProxy {
         }
       }
 
-    val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements.flatten)
-
-    // Aggregate and serialize
-    val documentElement = elementInfo("forms")
-    XFormsAPI.insert(into = documentElement, origin = filteredFormElements)
-
-    response.setContentType("application/xml")
-    TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
+    val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements.flatten, request.getFirstParamAsString("all-forms") contains "true")
+    returnAggregatedDocument(root = "forms", filteredFormElements, response)
   }
 
   def proxyReindex(

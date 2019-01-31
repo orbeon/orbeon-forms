@@ -271,9 +271,10 @@
             <!-- 1. Load form metadata -->
             <xf:action event="xforms-model-construct-done">
                 <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
+                    <xf:property name="app"                        value="fr:app-name()"/>
+                    <xf:property name="form"                       value="fr:form-name()"/>
                     <xf:property name="restrict-to-latest-version" value="false()"/>
-                    <xf:property name="app"  value="fr:app-name()"/>
-                    <xf:property name="form" value="fr:form-name()"/>
+                    <xf:property name="all-forms"                  value="false()"/>
                 </xf:dispatch>
             </xf:action>
 

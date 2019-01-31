@@ -132,7 +132,7 @@ trait FormRunnerPermissionsOps {
    *  - annotates the `<form>` with an `operations="…"` attribute,
    *  - filters out forms the current user can perform no operation on.
    */
-  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo]): List[NodeInfo] = {
+  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo], allForms: Boolean): List[NodeInfo] = {
 
     // We only need one wrapper; create it when we encounter the first <form>
     var wrapperOpt: Option[DocumentWrapper] = None
@@ -173,7 +173,8 @@ trait FormRunnerPermissionsOps {
 
       // Is this form metadata returned by the API?
       val keepForm =
-        isAdmin ||                                 // admins can see everything, otherwise:
+        allForms ||                                // all forms are explicitly requested
+        isAdmin  ||                                // admins can see everything
         ! (
           formName == Names.LibraryFormName ||     // filter libraries
           operations.isEmpty                ||     // filter forms on which user can't possibly do anything

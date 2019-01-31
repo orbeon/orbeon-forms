@@ -30,12 +30,16 @@
             <xf:property name="app"                        value="fr:app-name()"/>
             <xf:property name="form"                       value="fr:form-name()"/>
             <xf:property name="restrict-to-latest-version" value="false()"/>
+            <xf:property name="all-forms"                  value="true()"/>
             <xf:property name="callback-id"                value="'fr-versioning-model'"/>
         </xf:dispatch>
 
         - `restrict-to-latest-version as xs:boolean?`
             - default: `false()`
             - whether to load only the latest version or all versions
+        - `all-forms as xs:boolean?`
+            - default: `false()`
+            - whether to request all forms as per the form metadata API
 
         Dispatches `fr-versions-read` upon success, with:
 
@@ -79,9 +83,10 @@
         <xf:action if="not($is-resource-provider)">
 
             <xf:send submission="fb-read-form-metadata-submission">
-                <xf:property name="restrict-to-latest-version" value="event('restrict-to-latest-version')"/>
                 <xf:property name="app"                        value="$app"/>
                 <xf:property name="form"                       value="$form"/>
+                <xf:property name="restrict-to-latest-version" value="event('restrict-to-latest-version')"/>
+                <xf:property name="all-forms"                  value="event('all-forms')"/>
             </xf:send>
 
             <xf:var
@@ -153,7 +158,16 @@
         id="fb-read-form-metadata-submission"
         method="get"
         serialization="none"
-        resource="{frf:createFormMetadataPath(event('app'), event('form'))}?all-versions={not(event('restrict-to-latest-version') = true())}"
+        resource="{
+                frf:createFormMetadataPath(
+                    event('app'),
+                    event('form')
+                )
+            }?all-versions={
+                not(event('restrict-to-latest-version') = true())
+            }&amp;all-forms={
+                event('all-forms') = true()
+            }"
         replace="instance"
         instance="fr-versioning-form-metadata">
 

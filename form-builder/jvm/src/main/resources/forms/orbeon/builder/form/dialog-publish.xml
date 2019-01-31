@@ -317,7 +317,7 @@
             id="fb-read-form-metadata"
             method="get"
             serialization="none"
-            resource="{frf:createFormMetadataPath($app, $form)}?all-versions=true"
+            resource="{frf:createFormMetadataPath($app, $form)}?all-versions=true&amp;all-forms=true"
             replace="instance"
             instance="fb-publish-form-metadata">
 

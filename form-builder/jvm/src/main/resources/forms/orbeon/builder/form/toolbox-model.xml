@@ -54,6 +54,7 @@
                 <xf:property name="app"                        value="."/>
                 <xf:property name="form"                       value="'library'"/>
                 <xf:property name="restrict-to-latest-version" value="false()"/>
+                <xf:property name="all-forms"                  value="true()"/>
                 <xf:property name="callback-id"                value="'fb-toolbox-model'"/>
             </xf:dispatch>
         </xf:action>

@@ -120,7 +120,7 @@
                         return xs:integer($v)"/>
                 <xf:property
                     name="latest-version"
-                    value="instance('fr-versioning-form-metadata')/latest-version/data(.)"/>
+                    value="instance('fr-versioning-instance')/latest-version/data(.)"/>
                 <xf:property
                     name="default-selected-version"
                     value="

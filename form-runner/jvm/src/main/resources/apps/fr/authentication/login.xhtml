@@ -40,6 +40,14 @@
             <fr:navbar/>
             <fr:body>
                 <fr:grid>
+                    <xf:action type="javascript" event="DOMActivate">
+                        <xf:param name="username"    value="username"/>
+                        <xf:param name="password"    value="password"/>
+                        <xf:param name="loginAction" value="concat(xxf:get-request-context-path(), '/j_security_check')"/>
+                        <xf:body>
+                            ORBEON.fr.private.API.submitLogin(username, password, loginAction);
+                        </xf:body>
+                    </xf:action>
                     <fr:c x="5" y="1" w="4">
                         <xf:input ref="username">
                             <xf:label ref="$fr-resources/authentication/login/username"/>
@@ -53,14 +61,6 @@
                     <fr:c x="5" y="3" w="4">
                         <xf:trigger appearance="xxf:primary">
                             <xf:label ref="$fr-resources/authentication/login/login"/>
-                            <xf:action type="javascript" event="DOMActivate">
-                                <xf:param name="username"    value="username"/>
-                                <xf:param name="password"    value="password"/>
-                                <xf:param name="loginAction" value="concat(xxf:get-request-context-path(), '/j_security_check')"/>
-                                <xf:body>
-                                    ORBEON.fr.private.API.submitLogin(username, password, loginAction);
-                                </xf:body>
-                            </xf:action>
                         </xf:trigger>
                     </fr:c>
                 </fr:grid>

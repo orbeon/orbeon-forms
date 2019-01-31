@@ -80,7 +80,7 @@
 
         <xf:action if="not($is-resource-provider-for-form)">
 
-            <xf:send submission="fb-read-form-metadata-submission">
+            <xf:send submission="fr-read-form-metadata-submission">
                 <xf:property name="app"                        value="$app"/>
                 <xf:property name="form"                       value="$form"/>
                 <xf:property name="restrict-to-latest-version" value="event('restrict-to-latest-version')"/>
@@ -162,7 +162,7 @@
     </xf:action>
 
     <xf:submission
-        id="fb-read-form-metadata-submission"
+        id="fr-read-form-metadata-submission"
         method="get"
         serialization="none"
         resource="{
@@ -216,7 +216,7 @@
 
     <xf:instance id="fr-versioning-instance" xxf:expose-xpath-types="true">
         <publish>
-            <latest-version>-1</latest-version> <!-- set by `fb-read-form-metadata-submission` -->
+            <latest-version>-1</latest-version> <!-- set by `fr-read-form-metadata-submission` -->
         </publish>
     </xf:instance>
 

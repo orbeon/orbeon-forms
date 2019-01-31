@@ -213,7 +213,7 @@ trait FormRunnerPersistence {
 
   //@XPathFunction
   def versioningSupported(app: String, form: String) =
-    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "versioning", default = false)
+    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Form).get, "versioning", default = false)
 
   //@XPathFunction
   def leaseSupported(app: String, form: String) =

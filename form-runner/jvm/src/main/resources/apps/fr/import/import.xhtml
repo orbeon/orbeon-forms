@@ -699,7 +699,7 @@
                     <xf:send
                         observer="validate-section-case"
                         event="xforms-select"
-                        if="not($validating) and not($validation-done)"
+                        if="not(validating = 'started') and not($validation-done)"
 
                         submission="fr-import-validate-submission"/>
 

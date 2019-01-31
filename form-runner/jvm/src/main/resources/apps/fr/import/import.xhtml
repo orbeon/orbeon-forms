@@ -453,7 +453,14 @@
                 id="fb-read-form-metadata"
                 method="get"
                 serialization="none"
-                resource="{frf:createFormMetadataPath($app, $form)}?all-versions={not($restrict-to-latest-version)}"
+                resource="{
+                    frf:createFormMetadataPathAndQuery(
+                        $app,
+                        $form,
+                        not($restrict-to-latest-version),
+                        false()
+                    )
+                }"
                 replace="instance"
                 instance="fb-publish-form-metadata">
 

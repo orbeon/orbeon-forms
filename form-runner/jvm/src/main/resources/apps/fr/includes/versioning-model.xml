@@ -166,15 +166,13 @@
         method="get"
         serialization="none"
         resource="{
-                frf:createFormMetadataPath(
-                    event('app'),
-                    event('form')
-                )
-            }?all-versions={
-                not(event('restrict-to-latest-version') = true())
-            }&amp;all-forms={
+            frf:createFormMetadataPathAndQuery(
+                event('app'),
+                event('form'),
+                not(event('restrict-to-latest-version') = true()),
                 event('all-forms') = true()
-            }"
+            )
+        }"
         replace="instance"
         instance="fr-versioning-form-metadata">
 

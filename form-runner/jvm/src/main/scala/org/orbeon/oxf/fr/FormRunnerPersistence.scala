@@ -190,8 +190,15 @@ trait FormRunnerPersistence {
   def createFormDefinitionBasePath(app: String, form: String): String =
     CRUDBasePath :: app :: form :: FormOrData.Form.entryName :: "" :: Nil mkString "/"
 
-  def createFormMetadataPath(app: String, form: String): String =
-    FormMetadataBasePath :: app :: form :: Nil mkString "/"
+  //@XPathFunction
+  def createFormMetadataPathAndQuery(app: String, form: String, allVersions: Boolean, allForms: Boolean): String =
+    PathUtils.recombineQuery(
+      FormMetadataBasePath :: app :: form :: Nil mkString "/",
+      List(
+        "all-versions" → allVersions.toString,
+        "all-forms"    → allForms.toString
+      )
+    )
 
   // Whether the given path is an attachment path (ignoring an optional query string)
   def isAttachmentURLFor(basePath: String, url: String): Boolean =
@@ -274,7 +281,15 @@ trait FormRunnerPersistence {
 
   // Retrieves the metadata for a form from the persistence layer
   def readFormMetadata(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] =
-    readDocument(createFormMetadataPath(appName, formName))
+    readDocument(
+      createFormMetadataPathAndQuery(
+        app         = appName,
+        form        = formName,
+        allVersions = false,
+        allForms    = true
+      ),
+      Map.empty
+    )
 
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be

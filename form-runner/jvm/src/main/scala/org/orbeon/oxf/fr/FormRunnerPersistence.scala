@@ -187,28 +187,29 @@ trait FormRunnerPersistence {
     CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
 
   //@XPathFunction
-  def createFormDefinitionBasePath(app: String, form: String) =
+  def createFormDefinitionBasePath(app: String, form: String): String =
     CRUDBasePath :: app :: form :: FormOrData.Form.entryName :: "" :: Nil mkString "/"
 
-  def createFormMetadataPath(app: String, form: String) =
+  def createFormMetadataPath(app: String, form: String): String =
     FormMetadataBasePath :: app :: form :: Nil mkString "/"
 
   // Whether the given path is an attachment path (ignoring an optional query string)
-  def isAttachmentURLFor(basePath: String, url: String) =
+  def isAttachmentURLFor(basePath: String, url: String): Boolean =
     url.startsWith(basePath) && (splitQuery(url)._1.splitTo[List](".").lastOption exists RecognizedAttachmentExtensions)
 
   // For a given attachment path, return the filename
-  def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
+  def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
+    splitQuery(pathQuery)._1.split('/').last
 
-  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean) =
+  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean): Boolean =
     properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
   //@XPathFunction
-  def autosaveSupported(app: String, form: String) =
+  def isAutosaveSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "autosave", default = false)
 
   //@XPathFunction
-  def ownerGroupPermissionsSupported(app: String, form: String) =
+  def isOwnerGroupPermissionsSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "permissions", default = false)
 
   //@XPathFunction
@@ -216,10 +217,10 @@ trait FormRunnerPersistence {
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Form).get, "versioning", default = false)
 
   //@XPathFunction
-  def leaseSupported(app: String, form: String) =
+  def isLeaseSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "lease", default = false)
 
-  def isActiveProvider(provider: String) =
+  def isActiveProvider(provider: String): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
 
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
@@ -278,15 +279,15 @@ trait FormRunnerPersistence {
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
   // reflected with the use of XBL components.
-  def dataValid =
+  def dataValid: Boolean =
     errorSummaryInstance.rootElement / "valid" === "true"
 
   // Return the number of failed validations captured by the error summary for the given level
-  def countValidationsByLevel(level: ValidationLevel) =
+  def countValidationsByLevel(level: ValidationLevel): Int =
     (errorSummaryInstance.rootElement / "counts" /@ level.entryName stringValue).toInt
 
   // Return whether the data is saved
-  def isFormDataSaved =
+  def isFormDataSaved: Boolean =
     persistenceInstance.rootElement / "data-status" === "clean"
 
   // Return all nodes which refer to data attachments

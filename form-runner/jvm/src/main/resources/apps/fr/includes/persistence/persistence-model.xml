@@ -48,7 +48,7 @@
     <xf:var
         name="autosave-enabled"
         value="
-            frf:autosaveSupported($app, $form)                  and
+            frf:isAutosaveSupported($app, $form)                and
             $autosave-delay gt 0                                and
             xxf:non-blank(xxf:username())                       and
             frf:xpathAllAuthorizedOperations(
@@ -202,7 +202,7 @@
                     name="lease-enabled"
                     value="
                         xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.')) and
-                        frf:leaseSupported($app, $form) and
+                        frf:isLeaseSupported($app, $form) and
                         $mode != 'pdf' and
                         not($is-background)
                     "/>

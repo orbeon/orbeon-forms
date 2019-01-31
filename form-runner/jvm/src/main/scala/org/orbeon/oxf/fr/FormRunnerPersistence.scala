@@ -212,7 +212,7 @@ trait FormRunnerPersistence {
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "permissions", default = false)
 
   //@XPathFunction
-  def versioningSupported(app: String, form: String) =
+  def isFormDefinitionVersioningSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(app, form, FormOrData.Form).get, "versioning", default = false)
 
   //@XPathFunction

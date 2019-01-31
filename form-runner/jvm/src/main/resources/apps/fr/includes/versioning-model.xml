@@ -69,8 +69,8 @@
         <xf:var name="form" value="event('form')"/>
 
         <xf:var
-            name="versioning-supported-on-data-side"
-            value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
+            name="is-form-definition-versioning-supported"
+            value="frf:isFormDefinitionVersioningSupported($app, $form)"/>
 
         <xf:var
             name="is-resource-provider"
@@ -120,8 +120,8 @@
                 <xf:property
                     name="default-selected-version"
                     value="
-                        if (not($versioning-supported-on-data-side)) then
-                            (: No support on the data side so we always pass 1 as version :)
+                        if (not($is-form-definition-versioning-supported)) then
+                            (: No support so we always pass 1 as version :)
                             1
                         else if (count(instance('fr-versioning-form-metadata')/form/form-version) gt 1) then
                             (: Support on the data side and multiple possible versions so leave blank :)

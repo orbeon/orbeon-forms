@@ -664,6 +664,7 @@
 				visualPadding = 10,
 				container = $(this.o.container),
 				windowWidth = container.width(),
+				windowHeight = $(window).height(),
 				scrollTop = this.o.container === 'body' ? $(document).scrollTop() : container.scrollTop(),
 				appendOffset = container.offset();
 
@@ -718,10 +719,11 @@
 			// auto y orientation is best-situation: top or bottom, no fudging,
 			// decision based on which shows more of the calendar
 			var yorient = this.o.orientation.y,
-				top_overflow;
+				overflows_top, overflows_bottom;
 			if (yorient === 'auto'){
-				top_overflow = -scrollTop + top - calendarHeight;
-				yorient = top_overflow < 0 ? 'bottom' : 'top';
+				overflows_top    = -scrollTop + top - calendarHeight < 0;
+				overflows_bottom = windowHeight - (top - scrollTop + height + calendarHeight) < 0;
+				yorient = overflows_bottom && ! overflows_top ? 'top' : 'bottom';
 			}
 
 			this.picker.addClass('datepicker-orient-' + yorient);

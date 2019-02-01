@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
@@ -61,6 +61,22 @@ class XFormsValueComponentControl(
 
   // TODO
   override def findAriaByControlEffectiveId = None
+
+  override def outputAjaxDiffUseClientValue(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl],
+    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch              : XMLReceiverHelper
+  ): Unit = {
+    // NOTE: Don't output any nested content. The value is handled separately, see:
+    // https://github.com/orbeon/orbeon-forms/issues/3909
+    super.outputAjaxDiff(
+      previousControl,
+      None
+    )
+
+    outputAriaByAtts(previousValue, previousControl, ch)
+  }
 }
 
 // A component control with or without a value

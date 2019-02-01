@@ -1161,7 +1161,43 @@
                         function handleInit(elem) {
                             var controlId        = ORBEON.util.Dom.getAttribute(elem, "id");
                             var documentElement  = document.getElementById(controlId);
-                            ORBEON.xforms.XBL.instanceForControl(documentElement);
+                            var relevant         = ORBEON.util.Dom.getAttribute(elem, "relevant");
+                            var readonly         = ORBEON.util.Dom.getAttribute(elem, "readonly");
+
+                            var instance = ORBEON.xforms.XBL.instanceForControl(documentElement);
+
+                            if (_.isObject(instance)) {
+                                if (relevant != null) {
+                                    if (relevant) {
+                                        // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
+                                        // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
+                                        // bit confusing.
+                                        // if (_.isFunction(instance.init))
+                                        //     instance.init();
+                                    } else {
+
+                                        if (_.isFunction(instance.destroy))
+                                            instance.destroy();
+
+                                        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
+                                        // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
+                                        // take place here as well.
+                                        $(documentElement).data("xforms-xbl-object", null);
+                                    }
+                                }
+
+                                if (readonly != null && _.isFunction(instance.xformsUpdateReadonly)) {
+                                    instance.xformsUpdateReadonly(readonly);
+                                }
+
+                                _.each(elem.childNodes, function(childNode) {
+                                    switch (ORBEON.util.Utils.getLocalName(childNode)) {
+                                        case 'value':
+                                            handleValue(childNode, controlId, false);
+                                            break;
+                                    }
+                                });
+                            }
                         }
 
                         function handleControl(elem) {

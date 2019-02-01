@@ -264,6 +264,14 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       new XMLReceiverHelper(receiver)
     )
 
+  def mustOutputAjaxValueChange(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
+    previousControl.nonEmpty && ! (previousValue contains getExternalValue)                  ||
+    (previousControl exists (! _.isReadonly)) && isReadonly // https://github.com/orbeon/orbeon-forms/issues/3130
+
   def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
@@ -272,11 +280,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   ): Unit = {
 
     val hasNestedValueContent =
-      handleExternalValue && (
-        previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
-        previousControl.nonEmpty && ! (previousValue contains getExternalValue) ||
-        (previousControl exists (! _.isReadonly)) && isReadonly // https://github.com/orbeon/orbeon-forms/issues/3130
-      )
+      handleExternalValue && mustOutputAjaxValueChange(previousValue, previousControl)
 
     val hasNestedContent =
       content.isDefined || hasNestedValueContent

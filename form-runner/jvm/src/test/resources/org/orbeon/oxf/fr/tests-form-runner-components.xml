@@ -760,9 +760,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date">
-                            <xxf:value>2010-01-13</xxf:value>
-                        </xxf:control>
                         <xxf:control id="my-date≡xf-8" readonly="true"/>
                         <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-13"/>
                         <xxf:attribute for="my-date≡xf-16" name="placeholder"/>

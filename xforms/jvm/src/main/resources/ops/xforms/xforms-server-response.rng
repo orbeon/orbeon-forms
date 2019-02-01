@@ -214,6 +214,28 @@
                                         </element>
                                         <element name="xxf:init">
                                             <attribute name="id"/>
+                                            <optional>
+                                                <attribute name="relevant">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
+                                            <optional>
+                                                <attribute name="readonly">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
+                                            <!-- For value controls only -->
+                                            <optional>
+                                                <element name="xxf:value">
+                                                    <data type="string"/>
+                                                </element>
+                                            </optional>
                                         </element>
                                         <element name="xxf:dialog">
                                             <attribute name="id"/>

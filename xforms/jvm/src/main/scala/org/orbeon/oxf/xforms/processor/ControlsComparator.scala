@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.control.Breaks
+import org.orbeon.oxf.util.CoreUtils._
 
 class ControlsComparator(
   document                       : XFormsContainingDocument,
@@ -74,7 +75,7 @@ class ControlsComparator(
           def unapply(c: XFormsControl) = if (fullUpdateBuffer.isEmpty) getMark(c) else None
         }
 
-        // Some controls require special processing, as well as xxf:update="full"
+        // Some controls require special processing, as well as `xxf:update="full"`
         val specificProcessingTookPlace =
           control2 match {
             case c: XXFormsDynamicControl ⇒
@@ -139,18 +140,94 @@ class ControlsComparator(
         if (! specificProcessingTookPlace)
           outputDescendantControlsDiffs(control1Opt, control2, fullUpdateBuffer)
 
-        // Tell the client to initialize the control within a new iteration
-        // See https://github.com/orbeon/orbeon-forms/issues/3888
-        control2 match {
-          case c: XFormsComponentControl ⇒
-            if (control1Opt.isEmpty && c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle) {
+        def outputInit(
+          effectiveId    : String,
+          relevant       : Option[Boolean],
+          readonly       : Option[Boolean],
+          valueChangeOpt : Option[String]
+        ): Unit = {
+
+          val atts =
+            relevant.map("relevant" → _.toString) ++:
+            readonly.map("readonly" → _.toString) ++:
+            List("id" → effectiveId)
+
+          withElement(
+            "init",
+            prefix = "xxf",
+            uri    = XXFORMS_NAMESPACE_URI,
+            atts   = atts
+          ) {
+            valueChangeOpt foreach { value ⇒
               element(
-                "init",
+                "value",
                 prefix = "xxf",
                 uri    = XXFORMS_NAMESPACE_URI,
-                atts   = List("id" → c.effectiveId)
+                text   = value
               )
             }
+          }
+        }
+
+        def findValueChange(vcc1: XFormsValueComponentControl, vcc2: XFormsValueComponentControl): Option[String] = {
+
+          val mustOutputValueChange =
+            vcc2.mustOutputAjaxValueChange(
+              previousValue   = valueChangeControlIdsAndValues.get(vcc2.effectiveId) orElse Some(vcc1.getExternalValue),
+              previousControl = Some(vcc1)
+            )
+
+          mustOutputValueChange option vcc2.getEscapedExternalValue
+        }
+
+        // Tell the client to make lifecycle changes after the nested markup is handled
+        // See https://github.com/orbeon/orbeon-forms/issues/3888
+        // See https://github.com/orbeon/orbeon-forms/issues/3909
+        control2 match {
+          case cc2: XFormsComponentControl if cc2.staticControl.abstractBinding.modeJavaScriptLifecycle ⇒
+
+            control1Opt.asInstanceOf[Option[XFormsComponentControl]] match {
+              case None ⇒
+                if (cc2.isRelevant)
+                  outputInit(cc2.effectiveId, None, None, None)
+              case Some(cc1) ⇒
+
+                val relevantChanged = cc1.isRelevant != cc2.isRelevant
+                val readonlyChanged = cc1.isReadonly != cc2.isReadonly
+
+                val valueChangeOpt =
+                  cc2 match {
+                    case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
+                      findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
+                    case _ ⇒
+                      None
+                  }
+
+                if (relevantChanged || readonlyChanged || valueChangeOpt.isDefined)
+                  outputInit(
+                    cc2.effectiveId,
+                    relevantChanged option cc2.isRelevant,
+                    readonlyChanged option cc2.isReadonly,
+                    valueChangeOpt
+                  )
+            }
+
+          case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
+
+            // NOTE: `modeExternalValue` can be used without `modeJavaScriptLifecycle`, although that is an uncommon use case.
+
+            val valueChangeOpt =
+              control1Opt flatMap
+                (c1 ⇒ findValueChange(c1.asInstanceOf[XFormsValueComponentControl], vcc2))
+
+            if (valueChangeOpt.isDefined)
+              outputInit(
+                vcc2.effectiveId,
+                None,
+                None,
+                valueChangeOpt
+              )
+
           case _ ⇒
         }
       }

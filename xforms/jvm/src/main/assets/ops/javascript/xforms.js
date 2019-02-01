@@ -1882,20 +1882,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         }
                     }
                 });
-
-                if (ORBEON.xforms.XBL.isJavaScriptLifecycle(control)) {
-                    var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                    if (! isRelevant && _.isObject(instance)) {
-
-                        if (_.isFunction(instance.destroy))
-                            instance.destroy();
-
-                        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
-                        // `destroy()` should only be called from there, and so the nulling of `xforms-xbl-object` should
-                        // take place here as well.
-                        jControl.data('xforms-xbl-object', null);
-                    }
-                }
             }
         },
 
@@ -1964,11 +1950,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 // Button
                 var button = ORBEON.util.Dom.getElementByTagName(control, "button");
                 ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
-            } else if (ORBEON.xforms.XBL.isJavaScriptLifecycle(control)) {
-                var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                if (_.isObject(instance) && _.isFunction(instance.xformsUpdateReadonly)) {
-                    instance.xformsUpdateReadonly(isReadonly);
-                }
             }
         },
 

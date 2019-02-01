@@ -309,8 +309,8 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def hasResourcesTemplateFor(binding: NodeInfo, name: String): Boolean =
-    FormBuilder.hasResourcesTemplateFor(binding, name)
+  def hasViewTemplateSupportElementFor(binding: NodeInfo, name: String): Boolean =
+    FormBuilder.hasViewTemplateSupportElementFor(binding, name)
 
   //@XPathFunction
   def containerById(containerId: String): NodeInfo =

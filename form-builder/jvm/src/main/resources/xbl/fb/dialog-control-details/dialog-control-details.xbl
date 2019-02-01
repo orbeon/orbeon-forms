@@ -57,17 +57,15 @@
                     name="xbl-binding"
                     value="fbf:bindingForControlElementOrEmpty($control)"/>
 
-                <!-- For now, always supported, but in the future should be smarter about it -->
-                <xf:setvalue
-                    iterate="$i/(label, hint, help)/@supported"
-                    ref="."
-                    value="'true'"/>
-
-                <!-- For `text`, we look at the template -->
-                <xf:setvalue
-                    iterate="$i/text/@supported"
-                    ref="."
-                    value="fbf:hasResourcesTemplateFor($xbl-binding, 'text')"/>
+                <!-- Figure which one of label, hint, help, or text the control supports -->
+                <xf:action iterate="$i/(label, hint, help, text)">
+                    <xf:var
+                        name="support-element-name"
+                        value="local-name()"/>
+                    <xf:setvalue
+                        ref="@supported"
+                        value="fbf:hasViewTemplateSupportElementFor($xbl-binding, $support-element-name)"/>
+                </xf:action>
 
                 <!-- Process `fb:control-details` -->
                 <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->

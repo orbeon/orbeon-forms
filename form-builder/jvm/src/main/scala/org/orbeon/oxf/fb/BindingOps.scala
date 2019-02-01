@@ -152,8 +152,8 @@ trait BindingOps {
     (((metadata / FBTemplateTest) ++ (metadata / FBTemplatesTest / FBViewTest)) / *).headOption
   }
 
-  def hasResourcesTemplateFor(binding: NodeInfo, name: String): Boolean =
-    bindingMetadata(binding) / FBTemplatesTest / FBResourcesTest / name nonEmpty
+  def hasViewTemplateSupportElementFor(binding: NodeInfo, name: String): Boolean =
+    bindingMetadata(binding) / FBTemplatesTest / FBViewTest / * / name nonEmpty
 
   // In other words we leave Type and Required and custom MIPs as they are
   // This must match what is done in annotate.xpl

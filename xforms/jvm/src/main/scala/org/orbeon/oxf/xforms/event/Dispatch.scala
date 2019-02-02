@@ -141,7 +141,8 @@ object Dispatch extends Logging {
           if (! event.cancelable || performDefaultAction)
             target.performDefaultAction(event)
 
-          debug("optimized dispatching", eventLogging ++ Seq("native handlers called" → statNativeHandlers.toString))
+          // Don't log this as there are too many
+          //debug("optimized dispatching", eventLogging ++ Seq("native handlers called" → statNativeHandlers.toString))
         }
       }
     } catch {

@@ -287,8 +287,7 @@ trait FormRunnerPersistence {
         form        = formName,
         allVersions = false,
         allForms    = true
-      ),
-      Map.empty
+      )
     )
 
   // Whether the form data is valid as per the error summary

@@ -166,7 +166,6 @@
         /apps/fr/style/form-runner-responsive.css
     </property>
     <property as="xs:string"  name="oxf.fr.detail.js.uri.*.*">
-        /apps/fr/script/form-runner.min.js
     </property>
 
     <!-- Additional CSS/JavaScript for the summary page -->

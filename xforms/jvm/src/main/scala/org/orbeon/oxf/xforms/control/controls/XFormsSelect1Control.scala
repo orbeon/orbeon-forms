@@ -241,7 +241,7 @@ class XFormsSelect1Control(
     previousControl : Option[XFormsValueControl],
     content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
     ch              : XMLReceiverHelper
-  ) = {
+  ): Unit = {
 
     val hasNestedContent =
       mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)

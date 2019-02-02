@@ -55,11 +55,6 @@
                                                 </attribute>
                                             </optional>
                                             <optional>
-                                                <attribute name="init">
-                                                    <value>true</value>
-                                                </attribute>
-                                            </optional>
-                                            <optional>
                                                 <attribute name="hint"/>
                                             </optional>
                                             <optional>

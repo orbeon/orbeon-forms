@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam.findSourceComponent
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.{PartAnalysis, function}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
@@ -38,6 +39,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
@@ -362,7 +364,16 @@ private object FormRunnerFunctions {
 
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue = {
-      val metadataVersionOpt = FormRunner.metadataElemValueOpt(Names.CreatedWithVersion)
+
+      val metadataVersionOpt =
+        for {
+          sourceControl      ← XFormsFunction.context.container.associatedControlOpt
+          part               = sourceControl.staticControl.part
+          metadata           ← FRComponentParam.findConstantMetadataRootElem(part)
+          createdWithVersion ← metadata elemValueOpt Names.CreatedWithVersion
+        } yield
+          createdWithVersion
+
       metadataVersionOpt match {
         case None ⇒
           // If no version info the metadata, or no metadata, do as if the form was created with an old version

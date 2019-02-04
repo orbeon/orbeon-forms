@@ -107,7 +107,8 @@ object Provider {
       case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
       case _          ⇒ throw new UnsupportedOperationException
     }
-    useAndClose(connection.prepareStatement(lockSQL))(_.execute())
+    // See https://github.com/orbeon/orbeon-forms/issues/3866
+    useAndClose(connection.createStatement())(_.execute(lockSQL))
     try {
       thunk()
     } finally {
@@ -115,8 +116,9 @@ object Provider {
         case MySQL ⇒ Some(s"UNLOCK TABLES")
         case _     ⇒ None
       }
-      unlockSQLOpt.foreach((unlockSQL) ⇒
-        useAndClose(connection.prepareStatement(unlockSQL))(_.execute()))
+      unlockSQLOpt.foreach(unlockSQL ⇒
+        // See https://github.com/orbeon/orbeon-forms/issues/3866
+        useAndClose(connection.createStatement())(_.execute(unlockSQL)))
     }
   }
 

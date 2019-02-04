@@ -1187,7 +1187,7 @@
                                 }
 
                                 if (readonly != null && _.isFunction(instance.xformsUpdateReadonly)) {
-                                    instance.xformsUpdateReadonly(readonly);
+                                    instance.xformsUpdateReadonly(readonly == "true");
                                 }
 
                                 _.each(elem.childNodes, function(childNode) {

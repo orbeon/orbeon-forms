@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.xml.TransformerUtils;
 
 import javax.xml.transform.stream.StreamResult;
@@ -25,7 +26,7 @@ import java.io.Writer;
 
 public class XMLSerializer extends HttpTextSerializer {
 
-    public static final String DEFAULT_CONTENT_TYPE = "application/xml";
+    public static final String DEFAULT_CONTENT_TYPE = ContentTypes.XmlContentType();
     public static final String DEFAULT_METHOD = "xml";
     public static final String DEFAULT_VERSION = "1.0";
 

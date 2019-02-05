@@ -16,13 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.sql.Connection
 
 import enumeratum._
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 
 import scala.util.Try
 
@@ -71,7 +71,7 @@ trait LockUnlock extends RequestResponse {
 
     def issueLockedResponse(existingLease: LockSql.Lease): Unit = {
       httpResponse.setStatus(StatusCode.Locked)
-      httpResponse.setHeader(Headers.ContentType, "application/xml")
+      httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
       httpResponse.getOutputStream.pipe(useAndClose(_)(os ⇒
         LockInfo.serialize(LockInfo(existingLease.lockInfo.username, existingLease.lockInfo.groupname), os)
       ))

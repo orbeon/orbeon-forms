@@ -142,7 +142,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 case PostgreSQL ⇒ new StringReader(resultSet.getString("xml"))
                 case _          ⇒ resultSet.getClob("xml").getCharacterStream
               }
-              httpResponse.setHeader(Headers.ContentType, "application/xml")
+              httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
 
               // Date headers
               httpResponse.setHeader(Headers.Created,      DateUtils.RFC1123Date.print(new DateTime(createdDateTime)))

@@ -14,7 +14,8 @@ object FieldEncryption {
     request            : Request,
     requestInputStream : InputStream,
     app                : String,
-    form               : String)(
+    form               : String,
+    filename           : Option[String])(
     implicit logger    : IndentedLogger
   ): Option[(InputStream, Option[Long])] = None
 

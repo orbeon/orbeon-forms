@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2019 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,8 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
-
+package org.orbeon.oxf.fr.persistence.proxy
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
@@ -26,7 +25,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.fr.FormRunner.ControlBindPathHoldersResources
 import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{HttpMethod, _}
@@ -59,9 +58,9 @@ import scala.collection.JavaConverters._
  * - sets persistence implementation headers
  * - calls all active persistence implementations to aggregate form metadata
  */
-class FormRunnerPersistenceProxy extends ProcessorImpl {
+class PersistenceProxyProcessor extends ProcessorImpl {
 
-  import FormRunnerPersistenceProxy._
+  import PersistenceProxyProcessor._
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
@@ -70,7 +69,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   }
 }
 
-private object FormRunnerPersistenceProxy {
+private object PersistenceProxyProcessor {
 
   val FormPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
   val DataPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
@@ -91,10 +90,10 @@ private object FormRunnerPersistenceProxy {
   def proxyRequest(request: Request, response: Response): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
-      case FormPath(path, app, form, _)                ⇒ proxyRequest    (request, response, app, form, FormOrData.Form, path)
-      case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
-      case DataCollectionPath(path, app, form)         ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
-      case SearchPath(path, app, form)                 ⇒ proxyRequest    (request, response, app, form, FormOrData.Data, path)
+      case FormPath(path, app, form, _)                ⇒ proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
+      case DataPath(path, app, form, _, _, filename)   ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, Some(filename), path)
+      case DataCollectionPath(path, app, form)         ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
+      case SearchPath(path, app, form)                 ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
       case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                 ⇒ proxyReindex(request, response)
       case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
@@ -108,6 +107,7 @@ private object FormRunnerPersistenceProxy {
     app            : String,
     form           : String,
     formOrData     : FormOrData,
+    filename       : Option[String],
     path           : String
   ): Unit = {
 
@@ -123,7 +123,7 @@ private object FormRunnerPersistenceProxy {
 
       implicit val logger = new IndentedLogger(ProcessorImpl.logger)
       val (bodyInputStream, bodyContentLength) =
-        FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form)
+        FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
           .getOrElse(requestInputStream → request.contentLengthOpt)
 
       StreamedContent(

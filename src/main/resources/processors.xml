@@ -700,7 +700,7 @@
 
     <!-- Form Runner / Form Builder processors -->
     <processor name="fr:persistence-proxy">
-        <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
+        <class name="org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor"/>
     </processor>
     <processor name="fr:relational-persistence-reindex">
         <class name="org.orbeon.oxf.fr.persistence.relational.index.ReindexProcessor"/>

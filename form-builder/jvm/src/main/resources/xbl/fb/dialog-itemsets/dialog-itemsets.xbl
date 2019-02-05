@@ -82,9 +82,7 @@
 
             <!-- Add line when users press enter -->
             <xbl:handler event="DOMActivate" observer="fb-itemset-label-input fb-itemset-value-input fb-itemset-hint-input">
-                <xf:var name="index" value="index('fb-itemset-repeat-repeat')"/>
-                <xf:insert context="$i/items" ref="item" at="$index" origin="$i/template/item"/>
-                <xf:setfocus control="fb-itemset-label-input"/>
+                <xf:dispatch targetid="fb-itemset-repeat" name="fr-insert-below"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>

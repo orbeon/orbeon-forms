@@ -2649,6 +2649,9 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 if (($(control).is('.xforms-input') && ! $(control).is('.xforms-type-boolean'))
                         || $(control).is('.xforms-secret')) {
                     if (event.keyCode == 10 || event.keyCode == 13) {
+                        // Force a change event if the value has changed, creating a new "change point", which the
+                        // browser will use to dispatch a `change` event in the future. Also see issue #1207.
+                        $(target).blur().focus();
                         // Send a value change and DOM activate
                         var events = [
                             new ORBEON.xforms.server.AjaxServer.Event(null, control.id, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value"),
@@ -2658,9 +2661,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         // This prevents Chrome/Firefox from dispatching a 'change' event on event, making them more
                         // like IE, which in this case is more compliant to the spec.
                         YAHOO.util.Event.preventDefault(event);
-                        // Force a change event if the value has changed, creating a new "change point", which the
-                        // browser will use to dispatch a `change` event in the future. Also see issue #1207.
-                        $(target).blur().focus();
                     }
                 }
             }

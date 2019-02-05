@@ -13,12 +13,11 @@
   */
 package org.orbeon.builder
 
+import org.orbeon.jquery._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
+import org.scalajs.dom
 import org.scalajs.jquery.JQueryEventObject
-
-import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.js.timers._
 
 object DialogItemset {
 
@@ -29,10 +28,10 @@ object DialogItemset {
       label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
 
     // Automatically set a corresponding value when the user changes a label
-    $(g.window.document).on(
-      "change.orbeon",
-      LabelInputSelector,
-      (event: JQueryEventObject) ⇒ {
+    $(dom.window.document).onWithSelector(
+      events   = "change.orbeon",
+      selector = LabelInputSelector,
+      handler  = (event: JQueryEventObject) ⇒ {
 
         val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
         val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)

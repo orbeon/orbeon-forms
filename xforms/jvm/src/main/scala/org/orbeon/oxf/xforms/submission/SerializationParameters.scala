@@ -59,7 +59,7 @@ object SerializationParameters {
             SerializationParameters(
               messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8),
               queryString            = null,
-              actualRequestMediatype = actualRequestMediatype("application/xml")
+              actualRequestMediatype = actualRequestMediatype(ContentTypes.XmlContentType)
             )
           } else {
             SerializationParameters(
@@ -82,7 +82,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }
-        case serialization @ "application/xml" ⇒
+        case serialization @ ContentTypes.XmlContentType ⇒
           try {
             val identity = TransformerUtils.getIdentityTransformer
             TransformerUtils.applyOutputProperties(

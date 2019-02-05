@@ -18,7 +18,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
@@ -414,7 +414,7 @@ object XFormsModelSubmissionBase {
         case "form-data-post"                                                      ⇒ "multipart/form-data"
         case "urlencoded-post"                                                     ⇒ "application/x-www-form-urlencoded"
         case _ if httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT ||
-                  httpMethod == HttpMethod.LOCK || httpMethod == HttpMethod.UNLOCK ⇒ "application/xml"
+                  httpMethod == HttpMethod.LOCK || httpMethod == HttpMethod.UNLOCK ⇒ ContentTypes.XmlContentType
         case _ if httpMethod == HttpMethod.GET  || httpMethod == HttpMethod.DELETE ⇒ "application/x-www-form-urlencoded"
       }
 

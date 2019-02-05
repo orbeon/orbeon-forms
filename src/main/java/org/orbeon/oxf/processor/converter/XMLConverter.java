@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.converter;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -26,7 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
  */
 public class XMLConverter extends TextConverterBase {
 
-    public static final String DEFAULT_CONTENT_TYPE = "application/xml";
+    public static final String DEFAULT_CONTENT_TYPE = ContentTypes.XmlContentType();
     public static final QName DEFAULT_METHOD = QName.apply("xml");
     public static final String DEFAULT_VERSION = "1.0";
 

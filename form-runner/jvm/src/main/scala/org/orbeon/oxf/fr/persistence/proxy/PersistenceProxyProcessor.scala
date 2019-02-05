@@ -19,12 +19,11 @@ import java.net.URI
 import javax.xml.transform.stream.StreamResult
 import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
-import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.fr.FormRunner.ControlBindPathHoldersResources
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
@@ -35,17 +34,14 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.oxf.xforms.submission.RelevanceHandling._
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -377,7 +373,7 @@ private object PersistenceProxyProcessor {
   ): Unit = {
     val documentElement = elementInfo(root)
     XFormsAPI.insert(into = documentElement, origin = content)
-    response.setContentType("application/xml")
+    response.setContentType(ContentTypes.XmlContentType)
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }
 

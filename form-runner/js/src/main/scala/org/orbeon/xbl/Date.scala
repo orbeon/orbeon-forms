@@ -13,6 +13,7 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
@@ -21,6 +22,7 @@ import org.scalajs.dom
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
+import scala.util.control.NonFatal
 
 object Date {
   XBL.declareCompanion("fr|date", new DateCompanion())
@@ -62,18 +64,17 @@ private class DateCompanion extends XBLCompanion {
     }
   }
 
-  override def xformsGetValue(): String = {
+  override def xformsGetValue(): String =
     if (iOS) {
       inputEl.prop("value").asInstanceOf[String]
     } else {
       Option(datePicker.getDate) match {
-        case Some(date) ⇒ date.toISOString.substring(0, 10)
+        case Some(date) ⇒ JSDateUtils.dateToISOStringUsingLocalTimezone(date) // https://github.com/orbeon/orbeon-forms/issues/3907
         case None       ⇒ inputEl.prop("value").asInstanceOf[String]
       }
     }
-  }
 
-  override def xformsUpdateValue(newValue: String): Unit = {
+  override def xformsUpdateValue(newValue: String): Unit =
     if (xformsGetValue() != newValue) {
       if (iOS) {
         inputEl.prop("value", newValue)
@@ -82,21 +83,13 @@ private class DateCompanion extends XBLCompanion {
           datePicker.clearDates()
         } else {
           try {
-            val dateParts = newValue.splitTo[List]("-")
-            // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-            val jsDate = new js.Date(
-              year  = dateParts(0).toInt,
-              month = dateParts(1).toInt - 1,
-              date  = dateParts(2).toInt,
-              0, 0, 0, 0)
-            datePicker.setDate(jsDate)
+            datePicker.setDate(JSDateUtils.isoDateToStringUsingLocalTimezone(newValue))
           } catch {
-            case _: Exception ⇒ // Ignore values we can't parse as dates
+            case NonFatal(_) ⇒ // Ignore values we can't parse as dates
           }
         }
       }
     }
-  }
 
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
     inputEl.prop("disabled", readonly)

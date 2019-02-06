@@ -857,184 +857,191 @@
                                 origin="instance('validation-constraint-template')"
                                 repeat="true"
                                 freeze="2">
-                                <xh:tr>
-                                    <xh:td>
+
+                                <fr:c y="1" x="1" w="3">
+
+                                    <xf:var
+                                        name="validation-type"
+                                        value="@type"/>
+
+                                    <xf:var
+                                        name="allowed-constraints"
+                                        value="
+                                            'formula',
+                                            (
+                                                if ($builtin-type = ('string', 'email')) then
+                                                    $string-constraints
+                                                else if ($builtin-type = 'integer') then
+                                                    $integer-constraints
+                                                else if ($builtin-type = 'decimal') then
+                                                    $decimal-constraints
+                                                else if ($builtin-type = 'anyURI') then
+                                                    $attachment-constraints
+                                                else if ($builtin-type = 'date') then
+                                                    $date-constraints
+                                                else
+                                                    ()
+                                            ),
+                                            $validation-type/string()
+                                    "/>
+
+                                    <xf:select1 ref="$validation-type" appearance="minimal" id="fb-validation-type-control">
+                                        <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
+                                        <xf:itemset ref=".[. = 'required']">
+                                            <xf:label ref="$resources/dialog-control-details/required/label"/>
+                                            <xf:value>required</xf:value>
+                                        </xf:itemset>
+                                        <xf:itemset ref=".[. = 'datatype']">
+                                            <xf:label ref="$resources/dialog-control-details/types/label"/>
+                                            <xf:value>datatype</xf:value>
+                                        </xf:itemset>
+                                        <xf:itemset ref="$resources/dialog-control-details/constraint/item[@id = $allowed-constraints]">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
+
+                                        <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:rebuild/>
+                                            <xf:recalculate/>
+                                        </xf:action>
+
+                                    </xf:select1>
+                                </fr:c>
+                                <fr:c y="1" x="4" w="3">
+                                    <xf:group appearance="xxf:internal" id="fb-validation-details-control">
+                                        <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
 
                                         <xf:var
                                             name="validation-type"
                                             value="@type"/>
 
-                                        <xf:var
-                                            name="allowed-constraints"
-                                            value="
-                                                'formula',
-                                                (
-                                                    if ($builtin-type = ('string', 'email')) then
-                                                        $string-constraints
-                                                    else if ($builtin-type = 'integer') then
-                                                        $integer-constraints
-                                                    else if ($builtin-type = 'decimal') then
-                                                        $decimal-constraints
-                                                    else if ($builtin-type = 'anyURI') then
-                                                        $attachment-constraints
-                                                    else if ($builtin-type = 'date') then
-                                                        $date-constraints
-                                                    else
-                                                        ()
-                                                ),
-                                                $validation-type/string()
-                                        "/>
-
-                                        <xf:select1 ref="$validation-type" appearance="minimal">
-                                            <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
-                                            <xf:itemset ref=".[. = 'required']">
-                                                <xf:label ref="$resources/dialog-control-details/required/label"/>
-                                                <xf:value>required</xf:value>
-                                            </xf:itemset>
-                                            <xf:itemset ref=".[. = 'datatype']">
-                                                <xf:label ref="$resources/dialog-control-details/types/label"/>
-                                                <xf:value>datatype</xf:value>
-                                            </xf:itemset>
-                                            <xf:itemset ref="$resources/dialog-control-details/constraint/item[@id = $allowed-constraints]">
-                                                <xf:label ref="."/>
-                                                <xf:value ref="@id"/>
-                                            </xf:itemset>
-
-                                            <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:rebuild/>
-                                                <xf:recalculate/>
-                                            </xf:action>
-
-                                        </xf:select1>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:group appearance="xxf:internal">
-
-                                            <xf:var
-                                                name="validation-type"
-                                                value="@type"/>
-
-                                            <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
-                                            <xf:group ref=".[$validation-type = 'required']/required">
-                                                <fb:boolean-or-formula ref="." resources-ref="$resources"/>
-                                            </xf:group>
-
-                                            <!-- Built-in type -->
-                                            <xf:group ref=".[$validation-type = 'datatype']">
-                                                <!--
-                                                    - only keep "reasonable" types
-                                                    - add supported type only if already present in the data
-                                                -->
-                                                <xf:var
-                                                    name="supported"
-                                                    value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
-
-                                                <xf:select1 ref="builtin-type">
-                                                    <!-- Only show label if there is a schema -->
-                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
-                                                    <!-- Add placeholder if there is a schema type -->
-                                                    <xf:itemset ref=".[../schema-type != '']">
-                                                        <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
-                                                        <xf:value/>
-                                                    </xf:itemset>
-                                                    <xf:itemset
-                                                        ref="
-                                                            $resources/dialog-control-details/builtin-type/choices//(
-                                                                choices[
-                                                                    exists(type[. = $supported])
-                                                                ]
-                                                                |
-                                                                type[. = $supported]
-                                                            )">
-                                                        <xf:label ref="if (self::choices) then label else if (xxf:non-blank(@label)) then @label else ."/>
-                                                        <xf:value ref="if (self::choices) then () else ."/>
-                                                    </xf:itemset>
-                                                    <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                                    <!--  Update available appearances -->
-                                                    <xf:dispatch
-                                                        event="xforms-value-changed"
-                                                        name="reload-appearances"
-                                                        targetid="model">
-                                                        <xf:property name="is-initial-load" value="false()"/>
-                                                    </xf:dispatch>
-                                                </xf:select1>
-                                                <!-- Schema type selection if applicable -->
-                                                <fr:dropdown-select1 ref="schema-type[exists($schema)]">
-                                                    <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
-                                                    <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                                    <xf:itemset ref="$schema/xs:simpleType">
-                                                        <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
-                                                        <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
-                                                    </xf:itemset>
-                                                    <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                                                </fr:dropdown-select1>
-                                            </xf:group>
-
-                                            <!-- Formula or common constraint argument -->
-                                            <xf:group ref=".[not($validation-type = ('required', 'datatype'))]">
-                                                <xf:textarea ref="constraint/@argument[$validation-type = 'excluded-dates'], constraint/@expression">
-                                                    <xf:label
-                                                        class="xforms-hidden"
-                                                        appearance="minimal"
-                                                        ref="$resources/dialog-control-details/formula/label"/>
-                                                    <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
-                                                </xf:textarea>
-                                                <fr:number
-                                                    ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
-                                                    suffix="{{'bytes'[$validation-type = 'upload-max-size']}}">
-                                                    <xf:label
-                                                        appearance="minimal"
-                                                        ref="
-                                                            if ($validation-type = 'upload-max-size') then
-                                                                $resources/dialog-form-settings/attachment-max-size/label
-                                                            else
-                                                                $resources/dialog-control-details/integer-argument/label"/>
-                                                    <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
-                                                </fr:number>
-                                                <!-- NOTE: Later label/hint can be different depending on specific constraint -->
-                                                <xf:input ref="constraint/@argument[$validation-type = 'upload-mediatypes']">
-                                                    <xf:label
-                                                        appearance="minimal"
-                                                        ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
-                                                    <xf:hint ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
-                                                    <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
-                                                </xf:input>
-                                            </xf:group>
+                                        <xf:group ref=".[$validation-type = 'required']/required">
+                                            <fb:boolean-or-formula ref="." resources-ref="$resources"/>
                                         </xf:group>
 
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:select1 ref="@level">
-                                            <xf:label ref="$resources/dialog-control-details/level/label"/>
-                                            <xf:item>
-                                                <xf:label>Error</xf:label>
-                                                <xf:value>error</xf:value>
-                                            </xf:item>
-                                            <xf:item>
-                                                <xf:label>Warning</xf:label>
-                                                <xf:value>warning</xf:value>
-                                            </xf:item>
-                                            <xf:item>
-                                                <xf:label>Info</xf:label>
-                                                <xf:value>info</xf:value>
-                                            </xf:item>
-                                        </xf:select1>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input
-                                            ref="
-                                                if (@default-alert = false() or @level != 'error') then
-                                                    alert/@message
-                                                else
-                                                    $i/default-alert/@readonly-alert-message">
-                                            <xf:label ref="$resources/dialog-control-details/alert/label"/>
-                                        </xf:input>
-                                        <xf:input ref=".[@level = 'error']/@default-alert">
-                                            <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
-                                        </xf:input>
-                                    </xh:td>
-                                </xh:tr>
+                                        <!-- Built-in type -->
+                                        <xf:group ref=".[$validation-type = 'datatype']">
+                                            <!--
+                                                - only keep "reasonable" types
+                                                - add supported type only if already present in the data
+                                            -->
+                                            <xf:var
+                                                name="supported"
+                                                value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
+
+                                            <xf:select1 ref="builtin-type">
+                                                <!-- Only show label if there is a schema -->
+                                                <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
+                                                <!-- Add placeholder if there is a schema type -->
+                                                <xf:itemset ref=".[../schema-type != '']">
+                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
+                                                    <xf:value/>
+                                                </xf:itemset>
+                                                <xf:itemset
+                                                    ref="
+                                                        $resources/dialog-control-details/builtin-type/choices//(
+                                                            choices[
+                                                                exists(type[. = $supported])
+                                                            ]
+                                                            |
+                                                            type[. = $supported]
+                                                        )">
+                                                    <xf:label ref="if (self::choices) then label else if (xxf:non-blank(@label)) then @label else ."/>
+                                                    <xf:value ref="if (self::choices) then () else ."/>
+                                                </xf:itemset>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                                <!--  Update available appearances -->
+                                                <xf:dispatch
+                                                    event="xforms-value-changed"
+                                                    name="reload-appearances"
+                                                    targetid="model">
+                                                    <xf:property name="is-initial-load" value="false()"/>
+                                                </xf:dispatch>
+                                            </xf:select1>
+                                            <!-- Schema type selection if applicable -->
+                                            <fr:dropdown-select1 ref="schema-type[exists($schema)]">
+                                                <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
+                                                <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                                                <xf:itemset ref="$schema/xs:simpleType">
+                                                    <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
+                                                    <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
+                                                </xf:itemset>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                            </fr:dropdown-select1>
+                                        </xf:group>
+
+                                        <!-- Formula or common constraint argument -->
+                                        <xf:group ref=".[not($validation-type = ('required', 'datatype'))]">
+                                            <xf:textarea ref="constraint/@argument[$validation-type = 'excluded-dates'], constraint/@expression">
+                                                <xf:label
+                                                    class="xforms-hidden"
+                                                    appearance="minimal"
+                                                    ref="$resources/dialog-control-details/formula/label"/>
+                                                <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
+                                            </xf:textarea>
+                                            <fr:number
+                                                ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
+                                                suffix="{{'bytes'[$validation-type = 'upload-max-size']}}">
+                                                <xf:label
+                                                    appearance="minimal"
+                                                    ref="
+                                                        if ($validation-type = 'upload-max-size') then
+                                                            $resources/dialog-form-settings/attachment-max-size/label
+                                                        else
+                                                            $resources/dialog-control-details/integer-argument/label"/>
+                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                            </fr:number>
+                                            <!-- NOTE: Later label/hint can be different depending on specific constraint -->
+                                            <xf:input ref="constraint/@argument[$validation-type = 'upload-mediatypes']">
+                                                <xf:label
+                                                    appearance="minimal"
+                                                    ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
+                                                <xf:hint ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
+                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                            </xf:input>
+                                        </xf:group>
+                                    </xf:group>
+
+                                </fr:c>
+                                <fr:c y="1" x="7" w="2">
+                                    <xf:select1 ref="@level" id="fb-validation-level-control">
+                                        <xf:label ref="$resources/dialog-control-details/level/label"/>
+                                        <xf:item>
+                                            <xf:label>Error</xf:label>
+                                            <xf:value>error</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Warning</xf:label>
+                                            <xf:value>warning</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Info</xf:label>
+                                            <xf:value>info</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+                                </fr:c>
+                                <fr:c y="1" x="9" w="4">
+                                    <!-- HACK: Internal group with label will not show as `fieldset`, which we have trouble styling
+                                         with CSS. However, `fr:grid` will obtain the label and place it in the grid header. -->
+                                    <xf:group id="fb-validation-alert-control" appearance="xxf:internal">
+                                        <xf:label ref="$resources/dialog-control-details/alert/label"/>
+                                        <!-- Since the group above is internal, we need an additional span so we can style with CSS. -->
+                                        <xh:span class="fb-control-settings-alert-block">
+                                            <xf:input
+                                                ref="
+                                                    if (@default-alert = false() or @level != 'error') then
+                                                        alert/@message
+                                                    else
+                                                        $i/default-alert/@readonly-alert-message">
+                                                <xf:label ref="$resources/dialog-control-details/alert/label"/>
+                                            </xf:input>
+                                            <xf:input ref=".[@level = 'error']/@default-alert">
+                                                <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
+                                            </xf:input>
+                                        </xh:span>
+                                    </xf:group>
+                                </fr:c>
                             </fr:grid>
                         </fr:tab>
                         <fr:tab id="formulas-tab">

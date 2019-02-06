@@ -856,7 +856,7 @@ div.orbeon.orbeon-portlet-div {
     }
 
     .fb-dialog-control-details {
-        width: 940px;
+        width: 1000px;
         max-width: none;
         .xforms-label { margin-top: 5px; }
 
@@ -884,6 +884,22 @@ div.orbeon.orbeon-portlet-div {
         .fb-control-settings-required-formula {
             display: block;
             margin-top: 5px;
+        }
+
+        .fb-control-settings-alert-block {
+            display: flex;
+            margin: 4px 0;
+
+            .xforms-label {
+                display: none;
+            }
+            .xforms-input {
+                flex-grow: 1;
+            }
+            .xforms-input.xforms-type-boolean {
+                flex-grow: 0;
+                margin: 0 4px;
+            }
         }
     }
 

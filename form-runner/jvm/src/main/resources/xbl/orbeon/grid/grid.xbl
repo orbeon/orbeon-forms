@@ -417,7 +417,19 @@
                                             <xsl:variable name="x" select="map:get($map, 'x')"/>
                                             <xsl:variable name="w" select="map:get($map, 'w')"/>
 
-                                            <xsl:variable name="control" select="$c/*[1]"/>
+                                            <!-- Take the first control which has a label and an id. In Form Runner, there must only
+                                                 be a single control in a cell anyway, but for Form Builder, we provide more
+                                                 flexibility, such as having `xf:var` within a cell. Also explicitly exclude
+                                                 triggers. -->
+                                            <xsl:variable
+                                                name="control"
+                                                select="
+                                                    $c/*[
+                                                        exists(xf:label) and
+                                                        exists(@id)      and
+                                                        empty(self::xf:trigger | self::xf:submit)
+                                                    ][1]"/>
+
                                             <xsl:copy-of select="fr:scope-outer-avt-class($c/@class)"/>
                                             <xsl:element name="{$th-elem}">
                                                 <xsl:copy-of select="fr:th-td-classes-attr('th', $c/@class, $c/@id)"/>
@@ -431,8 +443,8 @@
                                                 <xsl:if test="$is-editable">
                                                     <xsl:attribute name="xxf:control" select="'true'"/>
                                                 </xsl:if>
-                                                <!-- Control is not a trigger, exists and has an id -->
-                                                <xsl:if test="empty($control/self::xf:trigger) and exists($control/@id)">
+
+                                                <xsl:if test="exists($control)">
 
                                                     <!-- Evaluate to the binding of the control in the first iteration, assuming
                                                          only `bind` is supported. We could avoid that if we had a `bind()` function

@@ -705,8 +705,7 @@
         separator="&amp;"
         ref="instance('fr-service-parameters')"
         resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
-        replace="instance"
-        xxf:instance="fr-form-instance"/>
+        replace="none"/>
 
     <!-- Migrate data if needed when loading instance from the persistence layer or a service.
 
@@ -738,14 +737,48 @@
                         $format-migrated
                 "/>
     </xf:action>
-    <xf:action event="xforms-submit-done" observer="fr-get-instance-from-service">
-        <xf:insert
-            context="xxf:instance('fr-form-instance')/root()"
-            origin="grid-migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>
 
-        <!-- Be consistent with `fr-get-document-submission` -->
-        <xf:delete
-            ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
+    <xf:action
+        event="xforms-submit-done"
+        observer="fr-get-instance-from-service">
+
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/3935 -->
+        <xf:var
+            name="body"
+            value="event('response-body')"/>
+
+        <xf:var
+            name="is-xml"
+            value="($body instance of element()) or ($body instance of document-node())"/>
+
+        <xf:action if="$is-xml">
+
+            <xf:var
+                name="maybe-migrated"
+                value="grid-migration:dataMaybeMigratedTo($body/root(), xxf:instance('fr-form-metadata')/root())"/>
+
+            <!-- Be consistent with `fr-get-document-submission` -->
+            <xf:delete
+                ref="$maybe-migrated//(@xxf:relevant, @fr:relevant)"/>
+
+            <xf:insert
+                context="xxf:instance('fr-form-instance')/root()"
+                origin="$maybe-migrated"/>
+
+        </xf:action>
+        <xf:action if="not($is-xml)">
+            <!-- Ignore for compatibility, see https://github.com/orbeon/orbeon-forms/issues/3935. -->
+        </xf:action>
+    </xf:action>
+
+    <xf:action
+        event="xforms-submit-error"
+        observer="fr-get-instance-from-service">
+
+        <xf:action type="xpath">
+            frf:sendError(500)
+        </xf:action>
+
     </xf:action>
 
     <!-- Initial instance (to support clear) -->

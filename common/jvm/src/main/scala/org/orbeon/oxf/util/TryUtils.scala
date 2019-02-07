@@ -35,7 +35,7 @@ object TryUtils {
 
   implicit class TryOps[U](val t: Try[U]) extends AnyVal {
 
-    def onFailure(f: PartialFunction[Throwable, Any]) =
+    def onFailure(f: PartialFunction[Throwable, Any]): Try[U] =
       t recoverWith new OnFailurePF(f)
 
     def rootFailure: Try[U] = {

@@ -81,7 +81,7 @@ private object SubmitResponseEvent {
   def body(e: SubmitResponseEvent): Option[AnyRef] = {
     implicit val logger = e.indentedLogger
 
-    def readOrReturn(cxr: ConnectionResult) =
+    def readOrReturn(cxr: ConnectionResult): Option[String Either DocumentInfo] =
       e.cachedBody getOrElse {
         val result = tryToReadBody(cxr)
         e.cachedBody = Some(result)

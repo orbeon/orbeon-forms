@@ -81,20 +81,6 @@
         event="xforms-model-construct-done"
         if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
-        <!-- Initialize parameters to pass to "new" service -->
-        <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
-        <xf:action iterate="xxf:split($pass-request-parameters)">
-            <xf:var
-                name="parameter-name"
-                value="."/>
-            <xf:var
-                name="parameter-value"
-                value="xxf:get-request-parameter($parameter-name)"/>
-            <xf:insert
-                context="instance('fr-service-parameters')"
-                origin="xf:element($parameter-name, $parameter-value)"/>
-        </xf:action>
-
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
         <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email', 'controls')">
 
@@ -127,7 +113,9 @@
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
                 `/new` below. Here seems to be a good start. -->
             <!-- Q: What about `fr-get-instance-from-service` above? -->
-            <xf:insert ref="instance('fr-initial-instance')" origin="xxf:instance('fr-form-instance')"/>
+            <xf:insert
+                ref="instance('fr-initial-instance')"
+                origin="xxf:instance('fr-form-instance')"/>
 
             <!-- NOTE: We used to do a sort of permission check here for submits. Since #75 is implemented and there is
                  a proper authorization mechanism, this check is no longer required. -->
@@ -695,16 +683,11 @@
         </xf:action>
     </xf:submission>
 
-    <xf:instance id="fr-service-parameters">
-        <parameters/>
-    </xf:instance>
-
     <!-- Calls a service to get the initial instance -->
     <xf:submission id="fr-get-instance-from-service"
         method="get"
-        separator="&amp;"
-        ref="instance('fr-service-parameters')"
-        resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
+        serialization="none"
+        resource="{frf:createNewFromServiceUrlOrEmpty($app, $form)}"
         replace="none"/>
 
     <!-- Migrate data if needed when loading instance from the persistence layer or a service.

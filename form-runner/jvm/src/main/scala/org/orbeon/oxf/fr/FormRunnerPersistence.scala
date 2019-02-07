@@ -83,6 +83,10 @@ object FormRunnerPersistence {
   val PersistencePropertyPrefix                  = "oxf.fr.persistence"
   val PersistenceProviderPropertyPrefix          = PersistencePropertyPrefix + ".provider"
 
+  val NewFromServiceUriPropertyPrefix            = "oxf.fr.detail.new.service"
+  val NewFromServiceUriProperty                  = NewFromServiceUriPropertyPrefix + ".uri"
+  val NewFromServiceParamsProperty               = NewFromServiceUriPropertyPrefix + ".passing-request-parameters"
+
   val StandardProviderProperties                 = Set("uri", "autosave", "active", "permissions")
   val AttachmentAttributeNames                   = List("filename", "mediatype", "size")
 
@@ -199,6 +203,32 @@ trait FormRunnerPersistence {
         "all-forms"    → allForms.toString
       )
     )
+
+  //@XPathFunction
+  def createNewFromServiceUrlOrEmpty(app: String, form: String): String =
+    properties.getStringOrURIAsStringOpt(NewFromServiceUriProperty :: app :: form :: Nil mkString ".") match {
+      case Some(serviceUrl) ⇒
+
+        val requestedParams =
+          properties.getString(NewFromServiceParamsProperty :: app :: form :: Nil mkString ".", "").splitTo[List]()
+
+        val docParams = inScopeContainingDocument.getRequestParameters
+
+        val nameValueIt =
+          for {
+            name   ← requestedParams.iterator
+            values ← docParams.get(name).iterator
+            value  ← values.iterator
+          } yield
+            name → value
+
+        PathUtils.recombineQuery(
+          pathQuery = serviceUrl,
+          params    = nameValueIt
+        )
+
+      case None ⇒ null
+    }
 
   // Whether the given path is an attachment path (ignoring an optional query string)
   def isAttachmentURLFor(basePath: String, url: String): Boolean =

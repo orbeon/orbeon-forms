@@ -77,7 +77,7 @@ object FormRunnerMetadata {
     def iterationString(it: Int) =
       ProcessTemplate.processTemplateWithNames(iterationResource, List(("iteration", it)), Configuration.getLocale(currentLang))
 
-    val controlDetails = createFormMetadataDocument2(XFormsAPI.inScopeContainingDocument)
+    val controlDetails = gatherRelevantControls(XFormsAPI.inScopeContainingDocument)
 
     def createLine(control: ControlDetails, isFirst: Boolean): Option[String] =
       control match { case ControlDetails(name, typ, level, _, _, _, lhhaAndItems, value, _) ⇒
@@ -289,7 +289,7 @@ object FormRunnerMetadata {
     <metadata>{groupedMetadata}</metadata>
   }
 
-  def createFormMetadataDocument2(doc: XFormsContainingDocument): List[ControlDetails] = {
+  def gatherRelevantControls(doc: XFormsContainingDocument): List[ControlDetails] = {
 
     val controls = doc.getControls.getCurrentControlTree.effectiveIdsToControls
 

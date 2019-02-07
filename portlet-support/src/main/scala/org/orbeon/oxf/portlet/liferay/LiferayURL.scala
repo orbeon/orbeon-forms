@@ -14,10 +14,9 @@
 package org.orbeon.oxf.portlet.liferay
 
 import java.{util ⇒ ju}
-import javax.portlet._
 
+import javax.portlet._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
 // Liferay-specific portlet support
@@ -42,7 +41,7 @@ object LiferayURL {
             case Some(resourceId) ⇒
               val updated =
                 (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
-              NetUtils.appendQueryString(path, encodeSimpleQuery(updated))
+              appendQueryString(path, encodeSimpleQuery(updated))
             case None ⇒
               encodedURL
           }

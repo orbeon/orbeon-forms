@@ -20,7 +20,7 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{DateUtils, NetUtils}
+import org.orbeon.oxf.util.{DateUtils, NetUtils, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.NamespaceMapping
@@ -221,9 +221,6 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def sendError(code: Int) = throw HttpStatusCodeException(code)
   def sendError(code: Int, resource: String) = throw HttpStatusCodeException(code, Option(resource))
-
-  // Append a query string to a URL
-  def appendQueryString(urlString: String, queryString: String): String = NetUtils.appendQueryString(urlString, queryString)
 
   // Return specific Form Runner instances
   def formInstance                : XFormsInstance         = topLevelInstance(FormModel,        FormInstance)                 get

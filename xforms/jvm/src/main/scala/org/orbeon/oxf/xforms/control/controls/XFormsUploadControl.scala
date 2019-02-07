@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{NetUtils, SecureUtils}
+import org.orbeon.oxf.util.{NetUtils, PathUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
@@ -267,9 +267,9 @@ object XFormsUploadControl {
     )
 
     val query = candidates collect { case (name, Some(value)) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
-    val urlWithQuery = NetUtils.appendQueryString(url, query)
+    val urlWithQuery = PathUtils.appendQueryString(url, query)
 
-    NetUtils.appendQueryString(urlWithQuery, "mac=" + hmac(urlWithQuery))
+    PathUtils.appendQueryString(urlWithQuery, "mac=" + hmac(urlWithQuery))
   }
 
   // Get the MAC for a given string
@@ -283,7 +283,7 @@ object XFormsUploadControl {
     val query = Option(uri.getRawQuery) map decodeSimpleQuery getOrElse Seq()
     val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
 
-    NetUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
+    PathUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
   }
 
   // For Java callers

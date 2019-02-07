@@ -137,7 +137,7 @@ private object PersistenceProxyProcessor {
     // Get persistence implementation target URL and configuration headers
     val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
-    val serviceURI = NetUtils.appendQueryString(
+    val serviceURI = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
       NetUtils.encodeQueryString(request.getParameterMap)
     )
@@ -325,7 +325,7 @@ private object PersistenceProxyProcessor {
         (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
       } yield {
         // Read all the forms for the current service
-        val serviceURI = NetUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
+        val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
         val cxr        = proxyEstablishConnection(request, None, serviceURI, headers)
 
         ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒

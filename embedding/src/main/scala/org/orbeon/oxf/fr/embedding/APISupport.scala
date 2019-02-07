@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.ContentTypes
+import org.orbeon.oxf.util.{ContentTypes, PathUtils}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils._
@@ -174,13 +174,13 @@ object APISupport {
   }
 
   def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
-    appendQueryString(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query getOrElse "")
+    PathUtils.appendQueryString(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query getOrElse "")
 
   def formRunnerHomePath(query: Option[String]) =
-    appendQueryString("/fr/", query getOrElse "")
+    PathUtils.appendQueryString("/fr/", query getOrElse "")
 
   def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-    appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) "orbeon-embeddable=true" else "")
+    PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) "orbeon-embeddable=true" else "")
 
   def requestHeaders(req: HttpServletRequest) =
     for {

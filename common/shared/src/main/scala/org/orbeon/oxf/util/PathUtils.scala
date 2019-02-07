@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import StringUtils._
 
 object PathUtils {
 
@@ -81,4 +82,19 @@ object PathUtils {
       case -1    ⇒ None
       case index ⇒ Some(path.substring(index + 1))
     }
+
+  // Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
+  // The given query string is appended without further encoding.
+  def appendQueryString(pathQuery: String, queryString: String): String =
+    pathQuery + (if (queryString.isBlank) "" else (if (pathQuery.contains("?")) "&" else "?") + queryString)
+
+  def removeQueryString(pathQuery: String): String = {
+    val questionIndex = pathQuery.indexOf('?')
+    if (questionIndex == -1)
+      pathQuery
+    else
+      pathQuery.substring(0, questionIndex)
+  }
+
+  // TODO: See "Move to PathUtils" in NetUtils.
 }

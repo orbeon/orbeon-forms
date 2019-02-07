@@ -240,6 +240,7 @@ public class NetUtils {
      *
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
+    // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
 
         final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
@@ -274,6 +275,7 @@ public class NetUtils {
     }
 
     // This is a modified copy of decodeQueryString() above. Not sure why we need 2 versions! Try to avoid duplication!
+    // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryStringPortlet(final CharSequence queryString) {
 
         final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
@@ -312,6 +314,7 @@ public class NetUtils {
     /**
      * Encode a query string. The input Map contains names indexing Object[].
      */
+    // TODO: Move to PathUtils.
     public static String encodeQueryString(Map<String, Object[]> parameters) {
         final StringBuilder sb = new StringBuilder(100);
         boolean first = true;
@@ -337,6 +340,7 @@ public class NetUtils {
         return sb.toString();
     }
 
+    // TODO: Move to PathUtils.
     public static String encodeQueryString2(Map<String, String[]> parameters) {
         final StringBuilder sb = new StringBuilder(100);
         boolean first = true;
@@ -363,6 +367,7 @@ public class NetUtils {
     /**
      * Combine a path (possibly with parameters) and a parameters map to form a path info with a query string.
      */
+    // TODO: Move to PathUtils.
     public static String pathInfoParametersToPathInfoQueryString(String path, Map<String, String[]> parameters) throws IOException {
         final StringBuilder redirectURL = new StringBuilder(path);
         if (parameters != null) {
@@ -382,41 +387,17 @@ public class NetUtils {
     }
 
     /**
-     * Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
-     *
-     * @param urlString     existing URL string
-     * @param queryString   query string, or null
-     * @return              resulting URL
-     */
-    public static String appendQueryString(String urlString, String queryString) {
-        if (org.apache.commons.lang3.StringUtils.isBlank(queryString)) {
-            return urlString;
-        } else {
-            final StringBuilder updatedActionStringBuilder = new StringBuilder(urlString);
-            updatedActionStringBuilder.append((urlString.indexOf('?') == -1) ? '?' : '&');
-            updatedActionStringBuilder.append(queryString);
-            return updatedActionStringBuilder.toString();
-        }
-    }
-
-    public static String removeQueryString(String urlString) {
-        final int questionIndex = urlString.indexOf('?');
-        if (questionIndex == -1)
-            return urlString;
-        else
-            return urlString.substring(0, questionIndex);
-    }
-
-    /**
      * Check whether a URL starts with a protocol.
      *
      * We consider that a protocol consists only of ASCII letters and must be at least two
      * characters long, to avoid confusion with Windows drive letters.
      */
+    // TODO: Move to PathUtils.
     public static boolean urlHasProtocol(String urlString) {
         return getProtocol(urlString) != null;
     }
 
+    // TODO: Move to PathUtils.
     public static String getProtocol(String urlString) {
         int colonIndex = urlString.indexOf(":");
 
@@ -686,6 +667,7 @@ public class NetUtils {
      * @param path  path to modify
      * @return      modified path or null
      */
+    // TODO: Move to PathUtils.
     public static String removeFirstPathElement(String path) {
         final int secondSlashIndex = path.indexOf('/', 1);
         if (secondSlashIndex == -1)
@@ -702,6 +684,7 @@ public class NetUtils {
      * @param path  path to analyze
      * @return      first path element
      */
+    // TODO: Move to PathUtils.
     public static String getFirstPathElement(String path) {
         final int secondSlashIndex = path.indexOf('/', 1);
         if (secondSlashIndex == -1)

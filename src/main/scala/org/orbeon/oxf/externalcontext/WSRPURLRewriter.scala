@@ -19,7 +19,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.util.{NetUtils, StringConversions, URLRewriterUtils}
+import org.orbeon.oxf.util.{NetUtils, PathUtils, StringConversions, URLRewriterUtils}
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
@@ -256,7 +256,7 @@ object WSRPURLRewriter {
       val resourcePath = navigationParameters.get(PathParameterName)(0)
       navigationParameters.remove(PathParameterName)
       val resourceQuery = NetUtils.encodeQueryString2(navigationParameters)
-      val resourceId = NetUtils.appendQueryString(resourcePath, resourceQuery)
+      val resourceId = PathUtils.appendQueryString(resourcePath, resourceQuery)
 
       createResourceURL(resourceId)
     } else {

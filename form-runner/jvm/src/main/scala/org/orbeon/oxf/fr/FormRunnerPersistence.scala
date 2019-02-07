@@ -24,6 +24,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.resources.URLFactory
@@ -398,7 +399,7 @@ trait FormRunnerPersistence {
       uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
         sendThrowOnError("fr-create-update-attachment-submission", Map(
           "holder"       → Some(holder),
-          "resource"     → Some(appendQueryString(toBaseURI + resource, commonQueryString)),
+          "resource"     → Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
           "username"     → username,
           "password"     → password,
           "form-version" → formVersion)
@@ -418,7 +419,7 @@ trait FormRunnerPersistence {
     def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
         "holder"       → Some(migratedData.rootElement),
-        "resource"     → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
+        "resource"     → Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
         "username"     → username,
         "password"     → password,
         "form-version" → formVersion)

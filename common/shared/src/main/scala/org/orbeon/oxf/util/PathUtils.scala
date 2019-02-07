@@ -73,8 +73,12 @@ object PathUtils {
   }
 
   // Encode a sequence of pairs to a query string
-  def encodeSimpleQuery(parameters: TraversableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
-    parameters map { case (name, value) ⇒ ed.encode(name) + '=' + ed.encode(value) } mkString "&"
+  def encodeSimpleQuery(
+    parameters : TraversableOnce[(String, String)],
+    separator  : String = "&")(implicit
+    ed         : UrlEncoderDecoder
+  ): String =
+    parameters map { case (name, value) ⇒ ed.encode(name) + '=' + ed.encode(value) } mkString separator
 
   // Find a path extension
   def findExtension(path: String): Option[String] =

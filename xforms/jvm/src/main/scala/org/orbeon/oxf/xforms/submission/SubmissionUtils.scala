@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.InputStream
 import java.net.URI
 
+import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -28,8 +29,35 @@ import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
+import scala.collection.mutable
+
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
+
+  // Create an `application/x-www-form-urlencoded` string, encoded in UTF-8, based on the elements and text content
+  // present in an XML document.
+  //
+  // TODO:
+  //
+  // - "ignoring or treating as empty non-relevant elements according to the `nonrelevant` attribute or the deprecated
+  //   `relevant` attribute"
+  // - skipping empty text is not per the spec
+  // - check if line breaks will be correctly encoded as "%0D%0A"
+  //
+  def createWwwFormUrlEncoded(document: Document, separator: String): String = {
+
+    val builder = mutable.ListBuffer[(String, String)]()
+
+    document.accept(
+      new VisitorSupport {
+        override def visit(element: Element): Unit =
+          if (element.elements.isEmpty)
+            builder += element.getName → element.getText
+      }
+    )
+
+    PathUtils.encodeSimpleQuery(builder, separator)
+  }
 
   // Result of `resolveAttributeValueTemplates` can be `None` if, e.g. you have an AVT like `resource="{()}"`!
   def stringAvtTrimmedOpt(

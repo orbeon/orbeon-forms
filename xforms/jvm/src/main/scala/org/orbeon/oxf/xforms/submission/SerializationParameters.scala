@@ -71,14 +71,14 @@ object SerializationParameters {
         case serialization @ "application/x-www-form-urlencoded" ⇒
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
-              messageBody            = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8),
+              messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8),
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } else {
             SerializationParameters(
               messageBody            = null,
-              queryString            = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator),
+              queryString            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator),
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }

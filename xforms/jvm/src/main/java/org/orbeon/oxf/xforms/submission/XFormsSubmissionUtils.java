@@ -36,8 +36,6 @@ import org.orbeon.saxon.om.NodeInfo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -45,49 +43,6 @@ import java.util.List;
  * Utilities for XForms submission processing.
  */
 public class XFormsSubmissionUtils {
-
-    /**
-     * Create an application/x-www-form-urlencoded string, encoded in UTF-8, based on the elements and text content
-     * present in an XML document.
-     *
-     * @param document      document to analyze
-     * @param separator     separator character
-     * @return              application/x-www-form-urlencoded string
-     */
-    public static String createWwwFormUrlEncoded(final Document document, final String separator) {
-
-        final StringBuilder sb = new StringBuilder(100);
-        document.accept(new VisitorSupport() {
-            public final void visit(Element element) {
-                // We only care about elements
-
-                final List children = element.elements();
-                if (children == null || children.size() == 0) {
-                    // Only consider leaves
-                    final String text = element.getText();
-                    if (text != null && text.length() > 0) {
-                        // Got one!
-                        final String localName = element.getName();
-
-                        if (sb.length() > 0)
-                            sb.append(separator);
-
-                        try {
-                            sb.append(URLEncoder.encode(localName, CharsetNames.Utf8()));
-                            sb.append('=');
-                            sb.append(URLEncoder.encode(text, CharsetNames.Utf8()));
-                            // TODO: check if line breaks will be correcly encoded as "%0D%0A"
-                        } catch (UnsupportedEncodingException e) {
-                            // Should not happen: UTF-8 must be supported
-                            throw new OXFException(e);
-                        }
-                    }
-                }
-            }
-        });
-
-        return sb.toString();
-    }
 
     /**
      * Implement support for XForms 1.1 section "11.9.7 Serialization as multipart/form-data".

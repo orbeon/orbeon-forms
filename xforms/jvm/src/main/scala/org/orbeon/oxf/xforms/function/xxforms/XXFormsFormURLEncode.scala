@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.submission.XFormsSubmissionUtils
+import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xml.{FunctionSupport, TransformerUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.NodeInfo
@@ -28,7 +28,7 @@ class XXFormsFormURLEncode extends FunctionSupport {
     itemArgument(0) match {
       case node: NodeInfo ⇒
         val document = TransformerUtils.tinyTreeToDom4j(node)
-        XFormsSubmissionUtils.createWwwFormUrlEncoded(document, "&")
+        SubmissionUtils.createWwwFormUrlEncoded(document, "&")
       case _ ⇒
         null
     }

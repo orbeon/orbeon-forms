@@ -615,7 +615,7 @@
                                                     instance('fr-import-search-response')/@search-total/data(.),
                                                     $app,
                                                     $form,
-                                                    selected-version/string()
+                                                    instance('fr-form-instance')/version/selected-version/string()
                                                 )
                                             )
                                         else
@@ -658,11 +658,12 @@
                                                 (
                                                     instance('fr-import-search-response')/@search-total/data(.),
                                                     $app,
-                                                    $form
+                                                    $form,
+                                                    instance('fr-form-instance')/version/selected-version/string()
                                                 )
                                             )
                                         else
-                                            'N/A'">
+                                            xxf:r('import.na', '|fr-fr-resources|')">
                                 </xf:output>
                             </xh:td>
                         </xh:tr>

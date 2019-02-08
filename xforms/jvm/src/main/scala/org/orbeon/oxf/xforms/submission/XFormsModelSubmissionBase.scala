@@ -183,9 +183,9 @@ object XFormsModelSubmissionBase {
           (annotateWithHashes(copy, _))
 
         processRelevant(
-          doc = copy,
-          relevanceHandling = relevanceHandling,
-          relevantAttOpt = relevantAttOpt,
+          doc                           = copy,
+          relevanceHandling             = relevanceHandling,
+          relevantAttOpt                = relevantAttOpt,
           relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
         )
 

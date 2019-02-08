@@ -35,15 +35,7 @@ import scala.collection.mutable
 object SubmissionUtils {
 
   // Create an `application/x-www-form-urlencoded` string, encoded in UTF-8, based on the elements and text content
-  // present in an XML document.
-  //
-  // TODO:
-  //
-  // - "ignoring or treating as empty non-relevant elements according to the `nonrelevant` attribute or the deprecated
-  //   `relevant` attribute"
-  // - skipping empty text is not per the spec
-  // - check if line breaks will be correctly encoded as "%0D%0A"
-  //
+  // present in an XML document. This assumes that non-relevant elements are already pruned or blanked if needed.
   def createWwwFormUrlEncoded(document: Document, separator: String): String = {
 
     val builder = mutable.ListBuffer[(String, String)]()

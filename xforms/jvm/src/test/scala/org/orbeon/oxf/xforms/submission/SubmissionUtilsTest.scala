@@ -60,5 +60,16 @@ class SubmissionUtilsTest extends FunSpec {
 
       assert("GivenName=Ren%C3%A9&LastName=&i=great%21" === SubmissionUtils.createWwwFormUrlEncoded(doc, "&"))
     }
+
+    it("must encode line breaks") {
+
+      val doc: Document =
+        elemToDom4j(
+          <Comment>This will be
+a new line</Comment>
+        )
+
+      assert("Comment=This+will+be%0Aa+new+line" === SubmissionUtils.createWwwFormUrlEncoded(doc, "&"))
+    }
   }
 }

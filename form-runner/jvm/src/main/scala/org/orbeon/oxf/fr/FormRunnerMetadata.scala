@@ -60,7 +60,7 @@ object FormRunnerMetadata {
   private val Debug            = false
 
   val FrExcludeFromEmailBody   = "fr-exclude-from-email-body"
-  val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature")
+  val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature", "explanation")
 
   val SelectedCheckboxString   = "☒"
   val DeselectedCheckboxString = "☐"
@@ -79,55 +79,56 @@ object FormRunnerMetadata {
 
     val controlDetails = gatherRelevantControls(XFormsAPI.inScopeContainingDocument)
 
-    def createLine(control: ControlDetails, isFirst: Boolean): Option[String] =
-      control match { case ControlDetails(name, typ, level, _, _, _, lhhaAndItems, value, _) ⇒
+    def createLine(
+      name     : String,
+      typ      : String,
+      labelOpt : Option[String],
+      value    : Option[ControlValue],
+      isFirst  : Boolean
+    ): Option[String] = {
 
-        val (lhhas, _) = lhhaAndItems.head._2 // TODO: use current/requested lang
+      // TODO: escape values when in HTML
 
-        // TODO: escape values when in HTML
-
-        val lhhasMap = lhhas.toMap
-
-        val valueOpt =
-          value flatMap {
-            case SingleControlValue  (_, formattedValue)  ⇒
-              formattedValue
-            case MultipleControlValue(_, formattedValues) ⇒
-              formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
-          }
-
-        def combineLabelAndValue(label: String, value: Option[String]): Option[String] = {
-
-          val normalizedLabel =
-            label.trimAllToOpt map { l ⇒
-              if (l.endsWith(":")) l.init else l
-            }
-
-          val normalizedValue =
-            value map (_.trimAllToOpt getOrElse naString)
-
-          val list = normalizedLabel.toList ::: normalizedValue.toList
-
-          list.nonEmpty option (list mkString ": ")
+      val valueOpt =
+        value flatMap {
+          case SingleControlValue  (_, formattedValue)  ⇒
+            formattedValue
+          case MultipleControlValue(_, formattedValues) ⇒
+            formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
         }
 
-        val r =
-          typ match {
-            case "section" ⇒ lhhasMap.get(LHHA.Label)
-            case _         ⇒ combineLabelAndValue(lhhasMap(LHHA.Label), valueOpt)
+      def combineLabelAndValue(label: String, value: Option[String]): Option[String] = {
+
+        val normalizedLabel =
+          label.trimAllToOpt map { l ⇒
+            if (l.endsWith(":")) l.init else l
           }
 
-          r map (_ + (if (Debug) s" [$name/$typ]" else ""))
+        val normalizedValue =
+          value map (_.trimAllToOpt getOrElse naString)
+
+        val list = normalizedLabel.toList ::: normalizedValue.toList
+
+        list.nonEmpty option (list mkString ": ")
       }
+
+      val r =
+        typ match {
+          case "section" ⇒ labelOpt
+          case _         ⇒ labelOpt flatMap (combineLabelAndValue(_, valueOpt))
+        }
+
+        r map (_ + (if (Debug) s" [$name/$typ]" else ""))
+    }
 
     val sb = new StringBuilder
 
     def processNext(controlDetails: List[ControlDetails], level: Int): Unit =
       controlDetails match {
         case Nil ⇒
-        case gridControl :: rest if gridControl.typ == "grid" && gridControl.repeated ⇒
 
-          val gridLevel = gridControl.level
+        case ControlDetails(_, "grid", gridLevel, _, _, _, _, _, _) :: rest ⇒
+
           val nextLevel = gridLevel + 1
 
           def f(c: ControlDetails) = c.level > gridLevel
@@ -147,12 +148,12 @@ object FormRunnerMetadata {
 
           processNext(rest.dropWhile(f), level)
 
-        case sectionControl :: rest if sectionControl.typ == "section" ⇒
+        case ControlDetails(name, typ @ "section", sectionLevel, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest ⇒
 
-          val sectionLevel = sectionControl.level
           val nextLevel    = sectionLevel + 1
 
-          createLine(sectionControl, isFirst = false) foreach { line ⇒
+          // TODO: use current/requested lang
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line ⇒
             sb ++= s"<h$nextLevel>"
             sb ++= line
             sb ++= s"</h$nextLevel>"
@@ -164,14 +165,19 @@ object FormRunnerMetadata {
           processNext(rest.takeWhile(f), nextLevel)
           sb ++= "</ul>"
           processNext(rest.dropWhile(f), level)
-        case ignoredControl :: rest if ControlsToIgnore(ignoredControl.typ) ⇒
-          processNext(rest, level)
-        case control :: rest ⇒
-          createLine(control, isFirst = false) foreach { line ⇒
+
+        case ControlDetails(name, typ, _, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest if ! ControlsToIgnore(typ) ⇒
+
+          // TODO: use current/requested lang
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line ⇒
             sb ++= "<li>"
             sb ++= line
             sb ++= "</li>"
           }
+          processNext(rest, level)
+
+        case _ :: rest  ⇒
+
           processNext(rest, level)
       }
 

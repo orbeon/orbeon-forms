@@ -41,8 +41,6 @@ abstract class AbstractNode extends Node with Serializable { // TODO: `Serializa
   }
 
   def getName: String = null
-  def setName(name: String): Unit =
-    throw new UnsupportedOperationException("This node cannot be modified")
 
   def getText: String = null
   def setText(text: String): Unit =

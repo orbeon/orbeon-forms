@@ -2,6 +2,8 @@ package org.orbeon.dom
 
 trait Document extends Branch {
 
+  def setSystemId(name: String): Unit
+
   def getRootElement: Element
   def setRootElement(rootElement: Element): Unit
 

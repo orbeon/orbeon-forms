@@ -110,10 +110,6 @@ class ConcreteElement(var qname: QName)
     false
   }
 
-  override def setName(name: String): Unit = {
-    setQName(QName(name))
-  }
-
   def setNamespace(namespace: Namespace): Unit = {
     setQName(QName(getName, namespace))
   }

@@ -180,7 +180,7 @@ class SAXContentHandler(
 
   private def createDocument: Document = {
     val doc = DocumentFactory.createDocument
-    systemIdOpt foreach doc.setName
+    systemIdOpt foreach doc.setSystemId
     doc
   }
 

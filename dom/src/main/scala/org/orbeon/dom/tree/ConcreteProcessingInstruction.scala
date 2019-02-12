@@ -8,7 +8,6 @@ class ConcreteProcessingInstruction(var target: String, var text: String)
   extends AbstractNode with ProcessingInstruction with WithParent {
 
   override def getName: String = getTarget
-  override def setName(name: String): Unit = setTarget(name)
 
   def getTarget: String         = target
   def setTarget(target: String) = this.target = target

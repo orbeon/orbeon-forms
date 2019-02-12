@@ -14,10 +14,10 @@ object ConcreteDocument {
 
 class ConcreteDocument extends AbstractBranch with Document {
 
-  // ORBEON TODO: review: why would a document expose `name`?
-  private var _name: String = _
-  override def getName = _name
-  override def setName(name: String) = _name = name
+  private var _systemId: Option[String] = None
+
+  def getSystemId: Option[String] = _systemId
+  def setSystemId(name: String): Unit = _systemId = Option(name)
 
   override def getDocument: Document = this
 

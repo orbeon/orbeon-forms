@@ -134,12 +134,6 @@ class Document extends AbstractBranch {
     }
   }
 
-  def addProcessingInstruction(target: String, data: String): Document = {
-    val node = DocumentFactory.createProcessingInstruction(target, data)
-    add(node)
-    this
-  }
-
   def setRootElement(rootElement: Element): Unit = {
     // TODO ORBEON review: what if we have text and comment nodes at the top?
     clearContent()

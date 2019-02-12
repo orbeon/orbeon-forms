@@ -41,9 +41,9 @@ class SAXContentHandler(
       completeCurrentTextNode()
 
     if (currentElement ne null)
-      currentElement.addProcessingInstruction(target, data)
+      currentElement.add(ProcessingInstruction(target, data))
     else
-      getDocument.addProcessingInstruction(target, data)
+      getDocument.add(ProcessingInstruction(target, data))
   }
 
   override def startPrefixMapping(prefix: String, uri: String): Unit =

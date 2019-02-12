@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml
 
 import java.util.{List ⇒ JList}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils
@@ -102,11 +103,60 @@ object Dom4j {
       case (t1: Text, t2: Text) ⇒
         normalizeText(t1.getText) == normalizeText(t2.getText)
       case (p1: ProcessingInstruction, p2: ProcessingInstruction) ⇒
-        p1.getTarget == p2.getTarget &&
-          p1.getValues.asScala == p2.getValues.asScala
+        p1.getTarget == p2.getTarget && compareProcessingInstruction(p1, p2)
       case _ ⇒
         false
     }
+
+  private def compareProcessingInstruction(p1: ProcessingInstruction, p2: ProcessingInstruction): Boolean = {
+
+    def parseValues(text: String): ju.Map[String, String] = {
+      val result = new ju.HashMap[String, String]()
+      val st = new ju.StringTokenizer(text, " =\'\"", true)
+      while (st.hasMoreTokens) {
+        val name = getName(st)
+        if (st.hasMoreTokens) {
+          val value = getValue(st)
+          result.put(name, value)
+        }
+      }
+      result
+    }
+
+    def getName(st: ju.StringTokenizer): String = {
+      var token = st.nextToken()
+      val sb = new jl.StringBuilder(token)
+      while (st.hasMoreTokens) {
+        token = st.nextToken()
+        if (token != "=") {
+          sb.append(token)
+        } else {
+          return sb.toString.trim
+        }
+      }
+      sb.toString.trim
+    }
+
+    def getValue(st: ju.StringTokenizer): String = {
+      var token = st.nextToken()
+      val sb = new jl.StringBuilder
+      while (st.hasMoreTokens && token != "\'" && token != "\"") {
+        token = st.nextToken()
+      }
+      val quote = token
+      while (st.hasMoreTokens) {
+        token = st.nextToken()
+        if (quote != token) {
+          sb.append(token)
+        } else {
+          return sb.toString
+        }
+      }
+      sb.toString
+    }
+
+    parseValues(p1.getText) == parseValues(p2.getText)
+  }
 
   // Return an element's directly nested elements
   def elements(e: Element): Seq[Element] = e.elements.asScala

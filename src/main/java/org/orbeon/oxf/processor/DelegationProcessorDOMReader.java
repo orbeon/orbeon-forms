@@ -64,12 +64,10 @@ public class DelegationProcessorDOMReader {
 
                 if (current instanceof Element) {
                     Element currentEl = (Element) current;
-                    currentEl.addProcessingInstruction(node.getNodeName(), node
-                            .getNodeValue());
+                    currentEl.add(ProcessingInstruction.apply(node.getNodeName(), node.getNodeValue()));
                 } else {
                     Document currentDoc = (Document) current;
-                    currentDoc.addProcessingInstruction(node.getNodeName(),
-                            node.getNodeValue());
+                    currentDoc.add(ProcessingInstruction.apply(node.getNodeName(), node.getNodeValue()));
                 }
 
                 break;

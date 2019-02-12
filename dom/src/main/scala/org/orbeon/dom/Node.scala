@@ -70,3 +70,19 @@ object ProcessingInstruction {
   def apply(target: String, data: String): ProcessingInstruction =
     new ProcessingInstruction(target, data)
 }
+
+class ProcessingInstruction(var target: String, var text: String)
+  extends AbstractNode with WithParent {
+
+  override def getName: String = getTarget
+
+  def getTarget: String = target
+  def setTarget(target: String): Unit = this.target = target
+
+  override def getText: String = text
+  override def setText(text: String): Unit = this.text = text
+
+  def accept(visitor: Visitor): Unit = visitor.visit(this)
+
+  override def toString = s"""ProcessingInstruction("$target", "$text")"""
+}

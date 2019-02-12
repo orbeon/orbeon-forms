@@ -46,7 +46,6 @@ trait Element extends Branch {
   def removeAttribute(qName: QName): Element
 
   def addNamespace(prefix: String, uri: String): Element
-  def addProcessingInstruction(target: String, text: String): Element
   def addText(text: String): Element
 
   def add(att: Attribute): Unit

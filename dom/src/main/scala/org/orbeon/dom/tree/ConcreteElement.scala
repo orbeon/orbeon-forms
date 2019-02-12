@@ -475,12 +475,6 @@ class ConcreteElement(var qname: QName)
     this
   }
 
-  def addProcessingInstruction(target: String, data: String): Element = {
-    val node = DocumentFactory.createProcessingInstruction(target, data)
-    addNewNode(node)
-    this
-  }
-
   def addText(text: String): Element = {
     val node = Text(text)
     addNewNode(node)

@@ -15,105 +15,117 @@ package org.orbeon.oxf.common
 
 import java.security.SignatureException
 
-import junit.framework.Assert._
-import org.junit.Test
 import org.orbeon.dom.Document
 import org.orbeon.oxf.common.PEVersion._
 import org.orbeon.oxf.processor.validation.SchemaValidationException
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
 import scala.util.Try
 
-class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class VersionTest
+  extends ResourceManagerTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
-  @Test def productConfiguration(): Unit = {
-    if (Version.isPE) {
-      assertEquals("PE", Version.Edition)
-      assertTrue(Version.isPE)
-      assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
-      assertTrue(Version.instance.isPEFeatureEnabled(featureRequested = true, "foobar"))
-    } else {
-      assertEquals("CE", Version.Edition)
-      assertFalse(Version.isPE)
-      assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
-      assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = true, "foobar"))
+  describe("Product configuration") {
+    it(s"must pass for edition `${Version.Edition}`") {
+      if (Version.isPE) {
+        assert("PE" === Version.Edition)
+        assert(  Version.isPE)
+        assert(! Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
+        assert(  Version.instance.isPEFeatureEnabled(featureRequested = true,  "foobar"))
+      } else {
+        assert("CE" === Version.Edition)
+        assert(! Version.isPE)
+        assert(! Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
+        assert(! Version.instance.isPEFeatureEnabled(featureRequested = true,  "foobar"))
+      }
     }
   }
 
-  @Test def versionExpired(): Unit =  {
-    assertFalse(PEVersion.isVersionExpired("3.8", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.8.1", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.8.0", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.8.2", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.8.10", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.8.foo.bar", "3.8"))
+  describe("Version expired") {
 
-    assertFalse(PEVersion.isVersionExpired("3.7", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.7.1", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.7.0", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.7.2", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.7.10", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("3.7.foo.bar", "3.8"))
+    val LicenseVersion = "3.8"
 
-    assertFalse(PEVersion.isVersionExpired("2.0", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("2.0.1", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("2.0.0", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("2.0.2", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("2.0.10", "3.8"))
-    assertFalse(PEVersion.isVersionExpired("2.0.foo.bar", "3.8"))
+    val Suffixes = List(
+      "",
+      ".1",
+      ".0",
+      ".2",
+      ".10",
+      ".foo.bar"
+    )
 
-    assertTrue(PEVersion.isVersionExpired("3.9", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("3.9.1", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("3.9.0", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("3.9.2", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("3.9.10", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("3.9.foo.bar", "3.8"))
+    val Expectations = List(
+      ("3.8", false),
+      ("3.7", false),
+      ("2.0", false),
+      ("3.9", true),
+      ("4.0", true)
+    )
 
-    assertTrue(PEVersion.isVersionExpired("4.0", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("4.0.1", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("4.0.0", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("4.0.2", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("4.0.10", "3.8"))
-    assertTrue(PEVersion.isVersionExpired("4.0.foo.bar", "3.8"))
+    for {
+      (version, expected) ← Expectations
+      suffix              ← Suffixes
+      versionWithSuffix   = version + suffix
+    } locally {
+      it(s"must pass for `$versionWithSuffix") {
+        assert(expected === PEVersion.isVersionExpired(versionWithSuffix, LicenseVersion))
+      }
+    }
   }
 
-  @Test def dateFromVersionNumber(): Unit = {
+  private def currentBuildIsSnapshot: Boolean =
+    Version.VersionNumber.contains("SNAPSHOT")
 
-    // Make sure the current build has a timestamp
-    assert(PEVersion.dateFromVersionNumber(Version.VersionNumber).isDefined)
+  describe("Date from version number") {
+
+    assert(PEVersion.dateFromVersionNumber(Version.VersionNumber).isDefined || currentBuildIsSnapshot)
 
     val TimeStamp = Some(DateUtils.parseISODateOrDateTime("2013-01-28"))
 
-    val expected = Seq(
-      "201301281947"                → TimeStamp,
-      "4.1.0.201301281947"          → TimeStamp,
-      "4.1.0.201301281947.42"       → TimeStamp,
-      "prefix.201301281947.suffix"  → TimeStamp,
-      "prefix201301281947suffix"    → TimeStamp,
-      "2013012819478"               → None,
-      "20130128"                    → None
+    val BuildTimeStamp = "201301281947"
+
+    val Expectations = List(
+      s"$BuildTimeStamp"               → TimeStamp,
+      s"4.1.0.$BuildTimeStamp"         → TimeStamp,
+      s"4.1.0.$BuildTimeStamp.42"      → TimeStamp,
+      s"prefix.$BuildTimeStamp.suffix" → TimeStamp,
+      s"prefix${BuildTimeStamp}suffix" → TimeStamp,
+      s"${BuildTimeStamp}8"            → None,
+      s"20130128"                      → None
     )
 
-    expected foreach { case (in, out) ⇒
-      assert(out === PEVersion.dateFromVersionNumber(in))
-    }
+    for ((in, expected) ← Expectations)
+      it(s"must pass for `$in`") {
+        assert(expected === PEVersion.dateFromVersionNumber(in))
+      }
   }
 
-  @Test def licenseInfo(): Unit = {
+  describe("LicenseInfo") {
 
     def create(version: Option[String], expiration: Option[Long], subscriptionEnd: Option[Long]) =
-      LicenseInfo("4.1.0.201301281947", "Orbeon", "Daffy Duck", "Acme", "daffy@orbeon.com", "2013-03-29", version, expiration, subscriptionEnd)
+      LicenseInfo(
+        versionNumber   = "4.1.0.201301281947",
+        licensor        = "Orbeon",
+        licensee        = "Daffy Duck",
+        organization    = "Acme",
+        email           = "daffy@orbeon.com",
+        issued          = "2013-03-29",
+        version         = version,
+        expiration      = expiration,
+        subscriptionEnd = subscriptionEnd
+      )
 
     def parse(s: String) = Some(DateUtils.parseISODateOrDateTime(s))
 
     case class Booleans(badVersion: Boolean, expired: Boolean, buildAfterSubscriptionEnd: Boolean)
 
-    val expected = Seq(
+    val Expectations = List(
       (Some("4.0"), None, None)         → Booleans(badVersion = true,  expired = false, buildAfterSubscriptionEnd = false),
       (None, parse("3000-01-01"), None) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
       (None, parse("1000-01-01"), None) → Booleans(badVersion = false, expired = true,  buildAfterSubscriptionEnd = false),
@@ -122,85 +134,104 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
       (None, None, parse("2013-01-27")) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = true)
     )
 
-    expected foreach { case (in, out) ⇒
-      val license = (create _).tupled(in)
-
-      assert(out.badVersion                === license.isBadVersion)
-      assert(out.expired                   === license.isExpired)
-      assert(out.buildAfterSubscriptionEnd === license.isBuildAfterSubscriptionEnd)
+    for {
+      (in, expected) ← Expectations
+      license        = (create _).tupled(in)
+    } locally {
+      it(s"must pass for `$in`") {
+        assert(expected.badVersion                === license.isBadVersion)
+        assert(expected.expired                   === license.isExpired)
+        assert(expected.buildAfterSubscriptionEnd === license.isBuildAfterSubscriptionEnd)
+      }
     }
   }
 
-  private def tryLicenseInfo(license: Document) = (
+  private def tryLicenseInfo(license: Document): Try[LicenseInfo] = (
     Try(license)
     flatMap tryGetSignedData
     flatMap LicenseInfo.tryApply
   )
 
-  @Test def invalidSignature(): Unit = {
+  describe("Invalid signature") {
 
-    // A few licenses with invalid signatures
-    val licenses: Seq[(Document, Class[_])] = Seq(
-      // Document contains the signature of some random value hopefully forever lost
-      elemToDocument(
-        <signed-data>
-          <data>
-            <license>
-              <licensor>Orbeon, Inc.</licensor>
-              <licensee>Wile E. Coyote</licensee>
-              <organization>Acme, Corp.</organization>
-              <email>info@orbeon.com</email>
-              <issued>2013-04-01</issued>
-              <expiration/>
-            </license>
-          </data>
-          <signature>MCwCFDp6Ee9MYRjJnBcDA4RS2SjPjJ8PAhQ1zYrSudg9e7ZheQlnPGDSDiFiKQ==</signature>
-        </signed-data>) → classOf[SignatureException],
-      // Document contains empty signature
-      elemToDocument(
-        <signed-data>
-          <data>
-            <license>
-              <licensor>Orbeon, Inc.</licensor>
-              <licensee>Wile E. Coyote</licensee>
-              <organization>Acme, Corp.</organization>
-              <email>info@orbeon.com</email>
-              <issued>2013-04-01</issued>
-              <expiration/>
-            </license>
-          </data>
-          <signature/>
-        </signed-data>) → classOf[SignatureException],
-      // Document contains signature not in Base64
-      elemToDocument(
-        <signed-data>
-          <data>
-            <license>
-              <licensor>Orbeon, Inc.</licensor>
-              <licensee>Wile E. Coyote</licensee>
-              <organization>Acme, Corp.</organization>
-              <email>info@orbeon.com</email>
-              <issued>2013-04-01</issued>
-              <expiration/>
-            </license>
-          </data>
-          <signature>FUNKY STUFF</signature>
-        </signed-data>) → classOf[SchemaValidationException]
+    val Expectations = List(
+      (
+        "document contains the signature of some random value hopefully forever lost",
+        elemToDocument(
+          <signed-data>
+            <data>
+              <license>
+                <licensor>Orbeon, Inc.</licensor>
+                <licensee>Wile E. Coyote</licensee>
+                <organization>Acme, Corp.</organization>
+                <email>info@orbeon.com</email>
+                <issued>2013-04-01</issued>
+                <expiration/>
+              </license>
+            </data>
+            <signature>MCwCFDp6Ee9MYRjJnBcDA4RS2SjPjJ8PAhQ1zYrSudg9e7ZheQlnPGDSDiFiKQ==</signature>
+          </signed-data>
+        ),
+        classOf[SignatureException]
+      ),
+      (
+        "document contains empty signature",
+        elemToDocument(
+          <signed-data>
+            <data>
+              <license>
+                <licensor>Orbeon, Inc.</licensor>
+                <licensee>Wile E. Coyote</licensee>
+                <organization>Acme, Corp.</organization>
+                <email>info@orbeon.com</email>
+                <issued>2013-04-01</issued>
+                <expiration/>
+              </license>
+            </data>
+            <signature/>
+          </signed-data>
+        ),
+        classOf[SignatureException]
+      ),
+      (
+        "document contains signature not in Base64",
+        elemToDocument(
+          <signed-data>
+            <data>
+              <license>
+                <licensor>Orbeon, Inc.</licensor>
+                <licensee>Wile E. Coyote</licensee>
+                <organization>Acme, Corp.</organization>
+                <email>info@orbeon.com</email>
+                <issued>2013-04-01</issued>
+                <expiration/>
+              </license>
+            </data>
+            <signature>FUNKY STUFF</signature>
+          </signed-data>
+        ),
+        classOf[SchemaValidationException]
+      )
     )
 
-    licenses foreach { case (license, expectedClass) ⇒
+    for {
+      (description, license, expectedClass) ← Expectations
+    } locally {
+      it(description) {
 
-      val thrown = intercept[Exception] {
-        tryLicenseInfo(license).get
+        val thrown = intercept[Exception] {
+          tryLicenseInfo(license).get
+        }
+
+        val thrownCauses = Iterator.iterateFrom(thrown, (e: Throwable) ⇒ Option(e.getCause)).toList
+
+        assert(thrownCauses.map(_.getClass).contains(expectedClass))
       }
-      val thrownCauses = Iterator.iterateFrom(thrown, (e: Throwable) ⇒ Option(e.getCause)).toList
-      assert(thrownCauses.map(_.getClass).contains(expectedClass))
     }
   }
 
-  @Test def badVersion(): Unit = {
+  describe("License is for old version") {
 
-    // License is for old version
     val license: Document =
       <signed-data>
         <data>
@@ -221,10 +252,12 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         <signature>MCwCFCHbcWqtslECGXPIUuO6jcEfq0GSAhRU/X9TceCC36jTpkh7oHAHU/7vnw==</signature>
       </signed-data>
 
-    assert(tryLicenseInfo(license).get.isBadVersion)
+    it("must succeed") {
+      assert(tryLicenseInfo(license).get.isBadVersion)
+    }
   }
 
-  @Test def buildAfterSubscriptionEnd(): Unit = {
+  describe("Build after subscription end") {
 
     // License has subscription ending way in the past
     val license: Document =
@@ -247,12 +280,13 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         <signature>MCwCFANERfNHS+vLMFZGftW9Fa0TDUi3AhRYoUMYU0g/BfIgbmWo8LA4vRgK3Q==</signature>
       </signed-data>
 
-    assert(tryLicenseInfo(license).get.isBuildAfterSubscriptionEnd)
+    it("must succeed") {
+      assert(currentBuildIsSnapshot || tryLicenseInfo(license).get.isBuildAfterSubscriptionEnd)
+    }
   }
 
-  @Test def expired(): Unit = {
+  describe("License is expired") {
 
-    // License is expired
     val license: Document =
       <signed-data>
         <data>
@@ -273,6 +307,8 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         <signature>MCwCFEp9uGxNm2b+61mxKpgBnjxDUmE+AhRcV3FrqBjPGbDPM1kId2R0AGC/FQ==</signature>
       </signed-data>
 
-    assert(tryLicenseInfo(license).get.isExpired)
+    it("must succeed") {
+      assert(tryLicenseInfo(license).get.isExpired)
+    }
   }
 }

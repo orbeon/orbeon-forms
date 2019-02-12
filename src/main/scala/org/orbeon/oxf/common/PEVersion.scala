@@ -104,7 +104,7 @@ private object PEVersion {
 
   private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
 
-  def dateFromVersionNumber(currentVersion: String) = (
+  def dateFromVersionNumber(currentVersion: String): Option[Long] = (
     Some(currentVersion)
     collect { case MatchTimestamp(_, year, month, day, _) ⇒ year + '-' + month + '-' + day }
     map parseISODateOrDateTime

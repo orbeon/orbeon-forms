@@ -180,12 +180,6 @@ trait Element extends Branch {
   def elementIterator(name: String): ju.Iterator[Element]
 
   /**
-   * Returns an iterator over the elements contained in this element which
-   * match the given fully qualified name.
-   */
-  def elementIterator(qName: QName): ju.Iterator[Element]
-
-  /**
    * @return true if this element is the root element of a document and this
    *         element supports the parent relationship else false.
    */

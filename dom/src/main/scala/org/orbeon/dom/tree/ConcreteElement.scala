@@ -198,9 +198,6 @@ class ConcreteElement(var qname: QName)
     null
   }
 
-  def element(name: String, namespace: Namespace): Element =
-    element(QName(name, namespace))
-
   def elements: ju.List[Element] = {
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
@@ -263,7 +260,6 @@ class ConcreteElement(var qname: QName)
   //  FIXME: These all make copies of the content. But some callers rely on this to prevent concurrent changes.
   def elementIterator(): ju.Iterator[Element] = elements.iterator()
   def elementIterator(name: String): ju.Iterator[Element] = elements(name).iterator()
-  def elementIterator(qName: QName): ju.Iterator[Element] = elements(qName).iterator()
 
   def attributes: ju.List[Attribute] = {
     new ContentListFacade[Attribute](this, _attributes)

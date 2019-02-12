@@ -52,7 +52,7 @@ class Text(var text: String) extends AbstractNode with WithParent {
 }
 
 object Comment {
-  def apply(text: String): Text = new Text(text ensuring (_ ne null))
+  def apply(text: String): Comment = new Comment(text ensuring (_ ne null))
 }
 
 class Comment(var text: String) extends AbstractNode with WithParent {

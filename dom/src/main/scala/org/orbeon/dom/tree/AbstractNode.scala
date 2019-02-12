@@ -16,8 +16,6 @@ abstract class AbstractNode extends Node with Serializable { // TODO: `Serializa
   def getParent: Element = null
   def setParent(parent: Element) = ()
 
-  def hasContent: Boolean = false
-
   def deepCopy: Node = {
     val clone = super.clone().asInstanceOf[Node]
     clone.setParent(null)

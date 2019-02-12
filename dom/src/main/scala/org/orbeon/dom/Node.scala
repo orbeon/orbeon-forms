@@ -23,7 +23,6 @@ trait Node extends Cloneable {
   def getDocument: Document
   def setDocument(document: Document): Unit
 
-  def hasContent: Boolean
   def getName: String
   def getText: String
   def setText(text: String): Unit

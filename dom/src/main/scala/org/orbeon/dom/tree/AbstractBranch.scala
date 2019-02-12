@@ -8,8 +8,6 @@ abstract class AbstractBranch extends AbstractNode with Branch {
 
   protected def internalContent: ju.List[Node]
 
-  override def hasContent: Boolean = nodeCount > 0
-
   override def getText: String = {
     val list = internalContent
     if (list ne null) {

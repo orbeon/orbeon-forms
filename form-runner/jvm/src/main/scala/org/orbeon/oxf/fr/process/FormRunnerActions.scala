@@ -90,7 +90,6 @@ trait FormRunnerActions {
   def tryValidate(params: ActionParams): Try[Any] =
     Try {
 
-      // Q: We should do an `synchronizeAndRefresh()` later in all cases then, right?
       ensureDataCalculationsAreUpToDate()
 
       val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
@@ -101,9 +100,10 @@ trait FormRunnerActions {
         inScopeContainingDocument.synchronizeAndRefresh()
         XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control ⇒
           XXFormsUpdateValidityAction.updateValidity(control, recurse = true)
-          inScopeContainingDocument.synchronizeAndRefresh()
         }
       }
+
+      inScopeContainingDocument.synchronizeAndRefresh()
 
       if (countValidationsByLevel(level) > 0)
         throw new OXFException(s"Data has failed validations for level ${level.entryName}")

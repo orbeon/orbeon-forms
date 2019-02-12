@@ -121,10 +121,6 @@ class Document extends AbstractBranch {
     }
   }
 
-  override def toString: String = {
-    super.toString + " [Document]"
-  }
-
   def normalize(): Unit =
     rootElementOpt foreach
       (_.normalize())
@@ -177,4 +173,7 @@ class Document extends AbstractBranch {
       )
     }
   }
+
+  override def toString: String =
+    """Document()"""
 }

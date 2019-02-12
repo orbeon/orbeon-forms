@@ -305,7 +305,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                         // Convert the result to a text node
                         final String stringValue = ((Item) currentObject).getStringValue();
-                        final Text textNode = DocumentFactory.createText(stringValue);
+                        final Text textNode = Text.apply(stringValue);
 
                         sourceNodes.add(null); // there is no source node for this cloned node, it's a source item
                         clonedNodesTemp.add(textNode);

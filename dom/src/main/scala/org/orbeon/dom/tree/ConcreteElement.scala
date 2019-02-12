@@ -488,7 +488,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def addText(text: String): Element = {
-    val node = DocumentFactory.createText(text)
+    val node = Text(text)
     addNewNode(node)
     this
   }

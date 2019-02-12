@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.io.ByteArrayInputStream
 
 import org.junit.Test
-import org.orbeon.dom.{Document, DocumentFactory}
+import org.orbeon.dom.{Document, DocumentFactory, Text}
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
@@ -304,12 +304,17 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def largeXMLDocumentsTest(): Unit = {
     Connect.withOrbeonTables("large XML documents") { (connection, provider) ⇒
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
-        val string = new Array[Char](size)
-        for (i ← 0 until size) string(i) = Random.nextPrintableChar()
-        val text = DocumentFactory.createText(new String(string))
-        val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
-        val document = DocumentFactory.createDocument |!> (_.add(element)) |> HttpRequest.XML
+
+        val charArray = new Array[Char](size)
+        for (i ← 0 until size)
+          charArray(i) = Random.nextPrintableChar()
+
+        val text     = Text(new String(charArray))
+        val element  = DocumentFactory.createElement("gaga") |!> (_.add(text))
+        val document = DocumentFactory.createDocument        |!> (_.add(element)) |> HttpRequest.XML
+
         val url = HttpRequest.crudURLPrefix(provider) + s"data/$position/data.xml"
+
         HttpAssert.put(url, Specific(1), document, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))
       }

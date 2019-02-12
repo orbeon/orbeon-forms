@@ -1,5 +1,7 @@
 package org.orbeon.dom
 
+import org.orbeon.dom.tree.{AbstractNode, WithParent}
+
 object Node {
   def nodeTypeName(node: Node): String = node match {
     case _: Element               ⇒ "Element"
@@ -37,4 +39,17 @@ trait Node extends Cloneable {
 }
 
 trait Comment extends Node
-trait Text    extends Node
+
+object Text {
+  def apply(text: String): Text = new Text(text ensuring (_ ne null))
+}
+
+class Text(var text: String) extends AbstractNode with WithParent {
+
+  override def getText: String = text
+  override def setText(text: String): Unit = this.text = text
+
+  def accept(visitor: Visitor): Unit = visitor.visit(this)
+
+  override def toString = s"""Text("$text")"""
+}

@@ -13,7 +13,7 @@
   */
 package org.orbeon.dom.saxon
 
-import org.orbeon.dom.{DocumentFactory, Namespace}
+import org.orbeon.dom.{DocumentFactory, Namespace, Text}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.SiblingCountingNode
 import org.scalatest.FunSpec
@@ -34,11 +34,11 @@ class NodeWrapperTest extends FunSpec {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val text1  = DocumentFactory.createText("before")          |!> rootElem.add
+    val text1  = Text("before")                                |!> rootElem.add
     val child1 = DocumentFactory.createElement("elem1")        |!> rootElem.add
-    val text2  = DocumentFactory.createText("between")         |!> rootElem.add
+    val text2  = Text("between")                               |!> rootElem.add
     val child2 = DocumentFactory.createElement("elem2")        |!> rootElem.add
-    val text3  = DocumentFactory.createText("after")           |!> rootElem.add
+    val text3  = Text("after")                                 |!> rootElem.add
 
     val att1   = DocumentFactory.createAttribute("att1", "v1") |!> child1.add
     val att2   = DocumentFactory.createAttribute("att2", "v2") |!> child1.add

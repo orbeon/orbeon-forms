@@ -31,7 +31,8 @@ class Document extends AbstractBranch {
   override def getDocument: Document = this
 
   private var _rootElement: Element = _
-  def getRootElement = _rootElement
+  def rootElementOpt: Option[Element] = Option(_rootElement)
+  def getRootElement: Element = _rootElement
 
   private var _internalContent: ju.List[Node] = _
   protected def internalContent = {
@@ -108,11 +109,8 @@ class Document extends AbstractBranch {
     false
   }
 
-  override def getStringValue: String = {
-    val root = getRootElement
-    if (root ne null)
-      root.getStringValue else ""
-  }
+  override def getStringValue: String =
+    rootElementOpt map (_.getStringValue) getOrElse ""
 
   def accept(visitor: Visitor): Unit = {
     visitor.visit(this)
@@ -127,12 +125,9 @@ class Document extends AbstractBranch {
     super.toString + " [Document]"
   }
 
-  def normalize(): Unit = {
-    val element = getRootElement
-    if (element ne null) {
-      element.normalize()
-    }
-  }
+  def normalize(): Unit =
+    rootElementOpt foreach
+      (_.normalize())
 
   def setRootElement(rootElement: Element): Unit = {
     // TODO ORBEON review: what if we have text and comment nodes at the top?

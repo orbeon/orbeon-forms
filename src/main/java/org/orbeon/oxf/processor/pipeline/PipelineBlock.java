@@ -122,7 +122,7 @@ public class PipelineBlock {
 
             // Connect aggregator to config
             final Processor aggregator = new AggregatorProcessor();
-            final Document aggregatorConfig = DocumentFactory.createDocument();
+            final Document aggregatorConfig = Document.apply();
             final Element configElement = aggregatorConfig.addElement("config");
             configElement.addElement("root").addText(hrefAggregate.getRoot());
             addNamespaces(configElement, node, false);
@@ -164,7 +164,7 @@ public class PipelineBlock {
             final ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
 
             // Create config for XPath processor
-            final Document xpathConfig = DocumentFactory.createDocument();
+            final Document xpathConfig = Document.apply();
             final Element configElement = xpathConfig.addElement("config");
             configElement.addElement("xpath").addText(hrefXPointer.getXpath());
             addNamespaces(configElement, node, true);

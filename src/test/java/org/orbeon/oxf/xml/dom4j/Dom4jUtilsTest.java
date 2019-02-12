@@ -23,7 +23,7 @@ public class Dom4jUtilsTest extends TestCase {
     @Test
     public void testDomToString() {
 
-        final Document document = DocumentFactory.createDocument();
+        final Document document = Document.apply();
         final Element rootElement = DocumentFactory.createElement("div");
         document.setRootElement(rootElement);
 

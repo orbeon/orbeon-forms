@@ -338,7 +338,7 @@ public class RequestGenerator extends ProcessorImpl {
 
     public static Document readWholeRequestAsDOM4J(final ExternalContext.Request request, final Context context) {
 
-        final Document document = DocumentFactory.createDocument();
+        final Document document = Document.apply();
         final Element requestElement = document.addElement("request");
 
         addTextElement(requestElement, "container-type", request.getContainerType());

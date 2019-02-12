@@ -22,6 +22,7 @@ import javax.mail._
 import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -288,7 +289,7 @@ class EmailProcessor extends ProcessorImpl {
 
             // Create Document and convert it into a String
             val rootElement = if (hasRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
-            val partDocument = DocumentFactory.createDocument
+            val partDocument = dom.Document()
             partDocument.setRootElement(rootElement.deepCopy.asInstanceOf[Element])
             Right(handleInlinePartContent(partDocument, mediatype, hasRootElement))
         }

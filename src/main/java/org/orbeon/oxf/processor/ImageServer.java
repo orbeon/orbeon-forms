@@ -463,7 +463,7 @@ public class ImageServer extends ProcessorImpl {
 
     private String computeCacheFileName(String type, String path, List<Element> nodes) {
         // Create digest document and digest
-        Document document = DocumentFactory.createDocument();
+        Document document = Document.apply();
         Element rootElement = document.addElement("image");
         for (Element element: nodes) {
             rootElement.add(element.createCopy());

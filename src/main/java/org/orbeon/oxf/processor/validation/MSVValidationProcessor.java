@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.validation;
 
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.msv.iso_relax.verifier.*;
 import org.orbeon.msv.verifier.jarv.Const;
 import org.orbeon.msv.verifier.jarv.TheFactoryImpl;
@@ -64,14 +63,14 @@ public class MSVValidationProcessor extends ProcessorImpl {
     static {
 
         {
-            final Document configDoc = DocumentFactory.createDocument("config");
+            final Document configDoc = Document.apply("config");
             configDoc.getRootElement().addElement("decorate").setText("false");
 
             NO_DECORATION_CONFIG = new DOMGenerator(configDoc, "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
         }
 
         {
-            final Document configDoc = DocumentFactory.createDocument("config");
+            final Document configDoc = Document.apply("config");
             configDoc.getRootElement().addElement("decorate").setText("true");
 
             DECORATION_CONFIG = new DOMGenerator(configDoc, "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);

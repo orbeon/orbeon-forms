@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{DocumentFactory, Namespace, QName}
 import org.orbeon.oxf.util.XPath
@@ -27,7 +28,7 @@ object NodeInfoFactory {
   // This should ideally not be global. Tried 2013-11-14 to use DocumentWrapper.makeWrapper instead, see
   // 2263a3f7b9565fa2102a7cc56ecb007a5c881312 and 0d7bc1fda0a121b2c107adc15a92cba67a09984f, but this is not good
   // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
-  private val Wrapper = new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
+  private val Wrapper = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
 
   def elementInfo(qName: QName, content: Seq[Item] = Nil): NodeInfo = {
     val newElement = Wrapper.wrap(DocumentFactory.createElement(qName))

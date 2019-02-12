@@ -2,9 +2,17 @@ package org.orbeon.dom
 
 import java.{util ⇒ ju}
 
+import org.orbeon.dom.DocumentFactory.createElement
 import org.orbeon.dom.tree.AbstractBranch
 
 object Document {
+
+  def apply(): Document =
+    new Document
+
+  def apply(rootElementName: String): Document =
+    apply(createElement(QName(rootElementName)))
+
   def apply(rootElement: Element): Document = {
     val newDoc = new Document
     newDoc.setRootElement(rootElement)
@@ -16,7 +24,8 @@ class Document extends AbstractBranch {
 
   private var _systemId: Option[String] = None
 
-  def getSystemId: Option[String] = _systemId
+  def systemIdOpt: Option[String] = _systemId
+  def systemId: String = _systemId.orNull
   def systemId_=(name: String): Unit = _systemId = Option(name)
 
   override def getDocument: Document = this

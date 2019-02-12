@@ -21,7 +21,7 @@ import java.util.*;
 
 public class ASTDocumentHandler implements ASTHandler {
 
-    private Document document = DocumentFactory.createDocument();
+    private Document document = Document.apply();
     private Element currentElement;
     private Stack href;
 

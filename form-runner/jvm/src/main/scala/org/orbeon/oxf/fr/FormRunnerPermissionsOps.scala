@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
@@ -147,7 +148,7 @@ trait FormRunnerPermissionsOps {
 
       val wrapper = wrapperOpt.getOrElse(
         // Create wrapper we don't have one already
-        new DocumentWrapper(DocumentFactory.createDocument, null, formEl.getConfiguration)
+        new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
         // Save wrapper for following iterations
         |!> (w ⇒ wrapperOpt = Some(w))
       )

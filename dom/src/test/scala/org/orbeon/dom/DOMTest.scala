@@ -23,7 +23,7 @@ class DOMTest extends FunSpec {
   val XF = Namespace("xf", "http://www.w3.org/2002/xforms")
 
   private def newRootElem = {
-    val doc = DocumentFactory.createDocument("root")
+    val doc = Document("root")
 
     val rootElem = doc.getRootElement
 

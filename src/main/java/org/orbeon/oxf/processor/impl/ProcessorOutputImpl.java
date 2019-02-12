@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.impl;
 
+import org.orbeon.dom.Document;
 import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
@@ -291,7 +292,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                     // Create config document for Debug processor
                     final org.orbeon.dom.Document debugConfigDocument;
                     {
-                        debugConfigDocument = DocumentFactory.createDocument();
+                        debugConfigDocument = Document.apply();
                         Element configElement = debugConfigDocument.addElement("config");
                         configElement.addElement("message").addText(debugMessage);
                         if (debugLocationData != null) {

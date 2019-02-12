@@ -132,7 +132,7 @@ public final class DOMGenerator extends ProcessorImpl {
 
     private static org.orbeon.dom.Document makeCopyDoc(final org.orbeon.dom.Element e) {
         final org.orbeon.dom.Element cpy = e.createCopy();
-        final Document ret = DocumentFactory.createDocument();
+        final Document ret = Document.apply();
         ret.setRootElement(cpy);
         return ret;
     }

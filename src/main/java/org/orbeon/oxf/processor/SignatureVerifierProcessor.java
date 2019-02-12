@@ -67,7 +67,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final String sig = StringUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();
-                    final Document sigData = DocumentFactory.createDocument();
+                    final Document sigData = Document.apply();
                     sigData.add(sigDataNode);
 
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes(CharsetNames.Utf8()));

@@ -45,7 +45,7 @@ public class Dom4jUtils {
     public static final Document NULL_DOCUMENT;
 
     static {
-        NULL_DOCUMENT = DocumentFactory.createDocument();
+        NULL_DOCUMENT = Document.apply();
         Element nullElement = DocumentFactory.createElement("null");
         nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
@@ -481,7 +481,7 @@ public class Dom4jUtils {
      * Return a new document with a copy of newRoot as its root.
      */
     public static Document createDocumentCopyElement(final Element newRoot) {
-        return DocumentFactory.createDocument(newRoot.createCopy());
+        return Document.apply(newRoot.createCopy());
     }
 
     /**
@@ -509,7 +509,7 @@ public class Dom4jUtils {
         final Document document; {
             if (detach) {
                 // Detach
-                document = DocumentFactory.createDocument();
+                document = Document.apply();
                 document.setRootElement((Element) newRoot.detach());
             } else {
                 // Copy

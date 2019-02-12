@@ -20,6 +20,7 @@ import XFormsProtocols._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.xforms._
 import control.Controls.ControlsIterator
+import org.orbeon.dom
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
@@ -78,7 +79,7 @@ case class DynamicState(
   // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
   def toXML = {
 
-    val document = DocumentFactory.createDocument
+    val document = dom.Document()
     val rootElement = document.addElement("dynamic-state")
 
     // Add UUIDs

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
@@ -593,7 +594,7 @@ object XFormsInstance extends Logging {
 
   def createDebugMipsDocument(doc: Document): Document = {
 
-    val result      = DocumentFactory.createDocument
+    val result      = dom.Document()
     val rootElement = result.addElement("mips")
 
     doc.accept(new VisitorSupport {

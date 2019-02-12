@@ -34,7 +34,7 @@ public class DelegationProcessorDOMReader {
             return (Document) domDocument;
         }
 
-        Document document = createDocument();
+        Document document = Document.apply();
 
         clearNamespaceStack();
 
@@ -171,10 +171,6 @@ public class DelegationProcessorDOMReader {
         while (namespaceStack.size() > previouslyDeclaredNamespaces) {
             namespaceStack.pop();
         }
-    }
-
-    protected Document createDocument() {
-        return DocumentFactory.createDocument();
     }
 
     protected void clearNamespaceStack() {

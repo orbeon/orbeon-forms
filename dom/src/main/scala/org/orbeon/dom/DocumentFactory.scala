@@ -5,9 +5,6 @@ import org.orbeon.dom.tree._
 // NOTE: Should move this as `apply` functions to companion objects of `Document`, `Element`, etc.
 object DocumentFactory {
 
-  def createDocument                                            : Document              = new Document
-  def createDocument             (rootElementName: String)      : Document              = Document(createElement(QName(rootElementName)))
-  def createDocument             (rootElement: Element)         : Document              = Document(rootElement)
   def createElement              (qName: QName)                 : Element               = new ConcreteElement(qName)
   def createElement              (name: String)                 : Element               = createElement(QName(name))
   def createAttribute            (name: String, value: String)  : Attribute             = createAttribute(QName(name), value)

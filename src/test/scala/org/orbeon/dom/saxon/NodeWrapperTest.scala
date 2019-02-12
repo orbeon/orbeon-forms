@@ -13,6 +13,7 @@
   */
 package org.orbeon.dom.saxon
 
+import org.orbeon.dom
 import org.orbeon.dom.{DocumentFactory, Namespace, Text}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.SiblingCountingNode
@@ -25,7 +26,7 @@ class NodeWrapperTest extends FunSpec {
 
   describe("Sibling position") {
 
-    val doc = DocumentFactory.createDocument("root")
+    val doc = dom.Document("root")
 
     val rootElem = doc.getRootElement
 

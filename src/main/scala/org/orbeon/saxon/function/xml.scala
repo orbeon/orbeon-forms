@@ -13,6 +13,7 @@
  */
 package org.orbeon.saxon.function
 
+import org.orbeon.dom
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils.stringToSet
@@ -55,5 +56,5 @@ protected trait ClassSupport extends DefaultFunctionSupport {
 class CreateDocument extends DefaultFunctionSupport  {
   // Create a new DocumentWrapper. If we use a global one, the first document ever created is wrongly returned!
   override def evaluateItem(xpathContext: XPathContext): DocumentWrapper =
-    new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
+    new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
 }

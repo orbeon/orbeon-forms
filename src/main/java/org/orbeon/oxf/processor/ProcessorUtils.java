@@ -111,7 +111,7 @@ public class ProcessorUtils {
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
-            result = DocumentFactory.createDocument();
+            result = Document.apply();
             result.add(copiedElement);
         } else {
             // External URI

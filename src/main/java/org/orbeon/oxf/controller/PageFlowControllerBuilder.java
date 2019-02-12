@@ -63,7 +63,7 @@ public class PageFlowControllerBuilder {
                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                     // The epilogue did not do the serialization
                     addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
-                        Document config = DocumentFactory.createDocument("config");
+                        Document config = Document.apply("config");
                         Element rootElement = config.getRootElement();
                         rootElement.addElement("version").addText("5.0");
                         rootElement.addElement("encoding").addText(CharsetNames.Utf8());
@@ -95,7 +95,7 @@ public class PageFlowControllerBuilder {
         final Document setvaluesDocument;
         if (!setValueElements.isEmpty()) {
             // Create document with setvalues
-            setvaluesDocument = DocumentFactory.createDocument("params");
+            setvaluesDocument = Document.apply("params");
             // New <setvalue> elements
             if (!setValueElements.isEmpty()) {
                 for (Object setValueElement1: setValueElements) {
@@ -137,7 +137,7 @@ public class PageFlowControllerBuilder {
             statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
                 final String url = URLFactory.createURL(urlBase, defaultSubmissionAttribute).toExternalForm();
 
-                final Document configDocument = DocumentFactory.createDocument("config");
+                final Document configDocument = Document.apply("config");
                 configDocument.getRootElement().addText(url);
 
                 addInput(new ASTInput("config", configDocument));
@@ -197,7 +197,7 @@ public class PageFlowControllerBuilder {
                     addOutput(new ASTOutput("data", xupdatedInstance));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    final Document config = DocumentFactory.createDocument("is-redirect");
+                    final Document config = Document.apply("is-redirect");
                     config.getRootElement().addText("true");
                     addInput(new ASTInput("data", config));
                     addOutput(new ASTOutput("data", isRedirect));
@@ -313,7 +313,7 @@ public class PageFlowControllerBuilder {
                             // Continue when all results fail
                             addWhen(new ASTWhen() {{
                                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                    addInput(new ASTInput("data", DocumentFactory.createDocument(DocumentFactory.createElementWithText("is-redirect", "false"))));
+                                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", "false"))));
                                     addOutput(new ASTOutput("data", isRedirect));
                                 }});
                                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -340,7 +340,7 @@ public class PageFlowControllerBuilder {
                         addOutput(new ASTOutput("data", xupdatedInstance));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        final Document config = DocumentFactory.createDocument("is-redirect");
+                        final Document config = Document.apply("is-redirect");
                         config.getRootElement().addText("false");
                         addInput(new ASTInput("data", config));
                         addOutput(new ASTOutput("data", isRedirect));
@@ -549,18 +549,18 @@ public class PageFlowControllerBuilder {
                 // Handle path info
                 final ASTOutput forwardPathInfoOutput = new ASTOutput(null, "forward-path-info");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", DocumentFactory.createDocument(DocumentFactory.createElementWithText("path-info", forwardPathInfo))));
+                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("path-info", forwardPathInfo))));
                     addOutput(new ASTOutput("data", forwardPathInfoOutput));
                 }});
                 // Handle server-side redirect and exit portal redirect
                 final ASTOutput isServerSideRedirectOutput = new ASTOutput(null, "is-server-side-redirect");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", DocumentFactory.createDocument(DocumentFactory.createElementWithText("server-side", Boolean.toString(doServerSideRedirect)))));
+                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("server-side", Boolean.toString(doServerSideRedirect)))));
                     addOutput(new ASTOutput("data", isServerSideRedirectOutput));
                 }});
                 final ASTOutput isRedirectExitPortal = new ASTOutput(null, "is-redirect-exit-portal");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", DocumentFactory.createDocument(DocumentFactory.createElementWithText("exit-portal", Boolean.toString(doRedirectExitPortal)))));
+                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("exit-portal", Boolean.toString(doRedirectExitPortal)))));
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
                 // Aggregate redirect-url config
@@ -602,7 +602,7 @@ public class PageFlowControllerBuilder {
 
         // Signal if we did a redirect
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", DocumentFactory.createDocument(DocumentFactory.createElementWithText("is-redirect", Boolean.toString(resultPageId != null)))));
+            addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", Boolean.toString(resultPageId != null)))));
             addOutput(new ASTOutput("data", redirect));
         }});
 
@@ -684,7 +684,7 @@ public class PageFlowControllerBuilder {
                                 "and count(/*/*[local-name() = 'param' and @type = 'output' and @name = 'data']) = 0") {{
                                 // The XPL has not data output
                                 addStatement(new ASTProcessorCall(XMLConstants.ERROR_PROCESSOR_QNAME) {{
-                                    final Document errorDocument = DocumentFactory.createDocument("error");
+                                    final Document errorDocument = Document.apply("error");
                                     errorDocument.getRootElement().addText("XPL view must have a 'data' output");
                                     addInput(new ASTInput("config", errorDocument));
                                 }});
@@ -890,7 +890,7 @@ public class PageFlowControllerBuilder {
             final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
             final Document configDocument;
             {
-                configDocument = DocumentFactory.createDocument("config");
+                configDocument = Document.apply("config");
                 final Element urlElement = configDocument.getRootElement().addElement("url");
                 urlElement.addText(url);
                 final Element handleXIncludeElement = configDocument.getRootElement().addElement("handle-xinclude");
@@ -902,7 +902,7 @@ public class PageFlowControllerBuilder {
 
             addInput(new ASTInput("step-url", configDocument));
             // Create document and input for step type
-            final Document stepTypeDocument = DocumentFactory.createDocument("step-type");
+            final Document stepTypeDocument = Document.apply("step-type");
             stepTypeDocument.getRootElement().addText(stepType);
             addInput(new ASTInput("step-type", stepTypeDocument));
         }

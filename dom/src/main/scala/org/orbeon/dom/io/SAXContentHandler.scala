@@ -2,6 +2,7 @@ package org.orbeon.dom.io
 
 import java.{lang ⇒ jl, util ⇒ ju}
 
+import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.tree.{ConcreteElement, NamespaceStack}
 import org.xml.sax._
@@ -179,8 +180,8 @@ class SAXContentHandler(
   }
 
   private def createDocument: Document = {
-    val doc = DocumentFactory.createDocument
-    systemIdOpt foreach doc.setSystemId
+    val doc = dom.Document()
+    systemIdOpt foreach (doc.systemId = _)
     doc
   }
 

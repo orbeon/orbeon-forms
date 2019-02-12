@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor
 import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
+import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
@@ -91,8 +92,8 @@ object XFormsServer {
           val loads = containingDocument.getLoadsToRun.asScala
 
           if (activeSubmissionOpt.isDefined || loads.nonEmpty) {
-            val eventsDocument = DocumentFactory.createDocument
-            val eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
+            val eventsDocument = dom.Document()
+            val eventsElement  = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
 
             // Check for xxforms-submit event
             activeSubmissionOpt foreach { activeSubmission ⇒

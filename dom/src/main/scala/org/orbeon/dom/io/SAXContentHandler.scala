@@ -141,9 +141,9 @@ class SAXContentHandler(
       val text = new String(ch, start, end)
       if (text.length > 0) {
         if (currentElement ne null) {
-          currentElement.addComment(text)
+          currentElement.add(Comment(text))
         } else {
-          getDocument.addComment(text)
+          getDocument.add(Comment(text))
         }
       }
     }

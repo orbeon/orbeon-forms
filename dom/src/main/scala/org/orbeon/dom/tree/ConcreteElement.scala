@@ -440,12 +440,6 @@ class ConcreteElement(var qname: QName)
     this
   }
 
-  def addComment(comment: String): Element = {
-    val node = DocumentFactory.createComment(comment)
-    addNewNode(node)
-    this
-  }
-
   override def addElement(name: String): Element = {
     val index = name.indexOf(":")
     var prefix = ""

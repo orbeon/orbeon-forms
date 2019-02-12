@@ -77,9 +77,9 @@ public class DelegationProcessorDOMReader {
             case org.w3c.dom.Node.COMMENT_NODE:
 
                 if (current instanceof Element) {
-                    ((Element) current).addComment(node.getNodeValue());
+                    ((Element) current).add(Comment.apply(node.getNodeValue()));
                 } else {
-                    ((Document) current).addComment(node.getNodeValue());
+                    ((Document) current).add(Comment.apply(node.getNodeValue()));
                 }
 
                 break;

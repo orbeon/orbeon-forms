@@ -134,12 +134,6 @@ class Document extends AbstractBranch {
     }
   }
 
-  def addComment(comment: String): Document = {
-    val node = DocumentFactory.createComment(comment)
-    add(node)
-    this
-  }
-
   def addProcessingInstruction(target: String, data: String): Document = {
     val node = DocumentFactory.createProcessingInstruction(target, data)
     add(node)

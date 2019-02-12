@@ -38,8 +38,6 @@ trait Node extends Cloneable {
   def deepCopy: Node
 }
 
-trait Comment extends Node
-
 object Text {
   def apply(text: String): Text = new Text(text ensuring (_ ne null))
 }
@@ -52,4 +50,23 @@ class Text(var text: String) extends AbstractNode with WithParent {
   def accept(visitor: Visitor): Unit = visitor.visit(this)
 
   override def toString = s"""Text("$text")"""
+}
+
+object Comment {
+  def apply(text: String): Text = new Text(text ensuring (_ ne null))
+}
+
+class Comment(var text: String) extends AbstractNode with WithParent {
+
+  override def getText: String = text
+  override def setText(text: String): Unit = this.text = text
+
+  def accept(visitor: Visitor): Unit = visitor.visit(this)
+
+  override def toString = s"""Comment("$text")"""
+}
+
+object ProcessingInstruction {
+  def apply(target: String, data: String): ProcessingInstruction =
+    new ProcessingInstruction(target, data)
 }

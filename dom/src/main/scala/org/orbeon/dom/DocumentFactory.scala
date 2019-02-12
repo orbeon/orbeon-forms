@@ -9,7 +9,6 @@ object DocumentFactory {
   def createElement              (name: String)                 : Element               = createElement(QName(name))
   def createAttribute            (name: String, value: String)  : Attribute             = createAttribute(QName(name), value)
   def createAttribute            (qName: QName, value: String)  : Attribute             = new ConcreteAttribute(qName, value)
-  def createComment              (text: String)                 : Comment               = new ConcreteComment(text)
   def createProcessingInstruction(target: String, data: String) : ProcessingInstruction = new ConcreteProcessingInstruction(target, data)
 
   def createElementWithText(name: String, text: String): Element = {

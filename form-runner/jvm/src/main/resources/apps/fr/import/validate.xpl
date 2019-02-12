@@ -48,7 +48,12 @@
                     </stats>
                 </xf:instance>
 
-                <xf:submission id="fr-send-stats" ref="instance('fr-import-stats')" method="post" action="echo:" replace="all"/>
+                <xf:submission
+                    id="fr-send-stats"
+                    ref="instance('fr-import-stats')"
+                    method="post"
+                    action="echo:"
+                    replace="all"/>
 
                 <xf:action ev:event="xforms-ready" xxf:xpath-analysis="true">
                     <!-- Remember original empty data -->
@@ -100,11 +105,17 @@
                             <xf:insert ref="xxf:instance('fr-form-instance')" origin="$new"/>
                             <xf:refresh/>
                             <!-- Remember validity -->
-                            <xf:setvalue ref="instance('fr-import-stats')/processed" value="xs:integer(.) + 1"/>
-                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid = true()"
-                                         ref="instance('fr-import-stats')/succeeded" value="xs:integer(.) + 1"/>
-                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid != true()"
-                                         ref="instance('fr-import-stats')/invalid-rows" value="if (. != '') then concat(., ' ', $p) else $p"/>
+                            <xf:setvalue
+                                ref="instance('fr-import-stats')/processed"
+                                value="xs:integer(.) + 1"/>
+                            <xf:setvalue
+                                if="xxf:instance('fr-error-summary-instance')/valid = true()"
+                                ref="instance('fr-import-stats')/succeeded"
+                                value="xs:integer(.) + 1"/>
+                            <xf:setvalue
+                                if="xxf:instance('fr-error-summary-instance')/valid != true()"
+                                ref="instance('fr-import-stats')/invalid-rows"
+                                value="if (. != '') then concat(., ' ', $p) else $p"/>
 
                             <xf:action type="xpath">
                                 xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed),

@@ -48,7 +48,12 @@
                     </stats>
                 </xf:instance>
 
-                <xf:submission id="fr-send-stats" ref="instance('fr-import-stats')" method="post" action="echo:" replace="all"/>
+                <xf:submission
+                    id="fr-send-stats"
+                    ref="instance('fr-import-stats')"
+                    method="post"
+                    action="echo:"
+                    replace="all"/>
 
                 <xf:action event="xforms-ready">
 

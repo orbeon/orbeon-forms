@@ -171,9 +171,9 @@ object Tabbable {
       // Called from XBL component
       def selectTabForPane(targetElem: html.Element): Unit = {
 
-        val allTabPanes      = findAllTabPanes
-        val ancestorTabPanes = $(targetElem).parents(TabPaneSelector)
-        val intersectionPane = allTabPanes.filter(ancestorTabPanes)
+        val allTabPanes            = findAllTabPanes
+        val ancestorOrSelfTabPanes = $(targetElem).parents(TabPaneSelector).add(targetElem) // exact order doesn't matter
+        val intersectionPane       = allTabPanes.filter(ancestorOrSelfTabPanes)
 
         val index = allTabPanes.index(intersectionPane)
         if (index < 0)

@@ -184,6 +184,8 @@
                                                 'active'[$pos = 1],
                                             @class
                                         }">
+                                        <!-- Make the id of the tab the id of the group -->
+                                        <xsl:copy-of select="@id"/>
                                         <xsl:if test="@visible">
                                             <xsl:attribute name="ref" select="concat('.[boolean(', @visible, ')]')"/>
                                         </xsl:if>

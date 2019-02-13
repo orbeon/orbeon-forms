@@ -404,7 +404,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 } else {
                     // Replacer provided, perform replacement
                     assert submissionResult.getReplacer() != null;
-                    submitDoneOrErrorRunnable = submissionResult.getReplacer().replace(submissionResult.getConnectionResult(), updatedP, p2);
+                    submitDoneOrErrorRunnable = submissionResult.getReplacer().replace(submissionResult.connectionResult(), updatedP, p2);
                 }
             } finally {
                 if (indentedLogger.isDebugEnabled())
@@ -448,9 +448,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     if (result.getReplacer() != null) {
                         // Replacer provided, perform replacement
                         if (result.getReplacer() instanceof AllReplacer)
-                            AllReplacer.forwardResultToResponse(result.getConnectionResult(), response);
+                            AllReplacer.forwardResultToResponse(result.connectionResult(), response);
                         else if (result.getReplacer() instanceof RedirectReplacer)
-                            RedirectReplacer.replace(result.getConnectionResult(), response);
+                            RedirectReplacer.replace(result.connectionResult(), response);
                         else
                             assert result.getReplacer() instanceof NoneReplacer;
                     } else if (result.getThrowable() != null) {

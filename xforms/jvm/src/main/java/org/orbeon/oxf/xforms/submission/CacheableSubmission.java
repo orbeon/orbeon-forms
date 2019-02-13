@@ -156,7 +156,7 @@ public class CacheableSubmission extends BaseSubmission {
                                             final Throwable throwable = submissionResult.getThrowable();
                                             if (throwable != null) {
                                                 // Propagate
-                                                throw new ThrowableWrapper(throwable, submissionResult.getConnectionResult());
+                                                throw new ThrowableWrapper(throwable, submissionResult.connectionResult());
                                             } else {
                                                 // There was no throwable
                                                 // We know that RegularSubmission returns a Replacer with an instance document
@@ -178,7 +178,7 @@ public class CacheableSubmission extends BaseSubmission {
                                             throw throwableWrapper;
                                         } catch (Throwable throwable) {
                                             // Exceptions are handled further down
-                                            throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.getConnectionResult() : null);
+                                            throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.connectionResult() : null);
                                         }
                                     }
                                 },

@@ -132,7 +132,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
 
             // Process response by dispatching an event to the submission
             val submission =
-              containingDocument.getObjectByEffectiveId(result.getSubmissionEffectiveId).asInstanceOf[XFormsModelSubmission]
+              containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
             submission.doSubmitReplace(result)
 
@@ -169,7 +169,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val result = future.get.get()
 
             val submission =
-              containingDocument.getObjectByEffectiveId(result.getSubmissionEffectiveId).asInstanceOf[XFormsModelSubmission]
+              containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
             submission.doSubmitReplace(result)
 

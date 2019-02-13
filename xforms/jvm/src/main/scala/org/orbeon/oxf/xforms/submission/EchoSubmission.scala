@@ -30,7 +30,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ) = {
+  ): Boolean = {
     p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:")
   }
 
@@ -38,7 +38,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ) = {
+  ): SubmissionResult = {
 
     if (sp.messageBody == null) {
       // Not sure when this can happen, but it can't be good

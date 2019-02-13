@@ -50,7 +50,7 @@ abstract class XFormsModelSubmissionBase
   protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
     sendSubmitErrorWithDefault(
       throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.getConnectionResult)
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.connectionResult)
     )
 
   protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =

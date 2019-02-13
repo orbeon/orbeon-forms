@@ -123,6 +123,7 @@
                 </xf:action>
 
                 <xxf:show dialog="dialog"/>
+                <xf:setfocus control="fb-http-service-definition-tab"/>
 
                 <xf:setvalue
                     ref="instance('modified')"
@@ -150,26 +151,39 @@
                 observer="fb-test-service-submission">
                 <xf:action context="$response">
 
+                    <xf:setvalue ref="error-type"/>
                     <xf:setvalue ref="resource-uri" value="event('resource-uri')"/>
                     <xf:setvalue ref="status-code"  value="event('response-status-code')"/>
 
-                    <xf:delete ref="headers/header"/>
-
+                    <xf:delete
+                        ref="headers/header"/>
                     <xf:insert
                         context="headers"
                         origin="event('response-headers')"/>
 
-                    <!-- Handle response body -->
-                    <xf:var name="error-body" value="event('response-body')"/>
+                    <xf:setvalue iterate="body/*" ref="."/>
+
+                    <xf:var
+                        name="body"
+                        value="event('response-body')"/>
+
                     <xf:setvalue
-                        if="$error-body"
-                        ref="body"
+                        if="exists($body)"
+                        ref="body/original"
                         value="
-                            if ($error-body castable as xs:string) then
-                                $error-body
+                            if ($body instance of node()) then
+                                saxon:serialize($body, xxf:instance('fr-xsl-output-instance'))
                             else
-                                saxon:serialize($error-body, xxf:instance('fr-xsl-output-instance'))
-                    "/>
+                                $body"/>
+
+                    <xf:setvalue
+                        xmlns:ct="java:org.orbeon.oxf.util.ContentTypes"
+                        if="ct:isJSONContentType(event('response-headers')[lower-case(name) = 'content-type']/value)"
+                        ref="body/transformed"
+                        value="saxon:serialize(xxf:json-to-xml($body), xxf:instance('fr-xsl-output-instance'))"/>
+
+                    <xf:setfocus control="fb-submission-response-headers-tab"/>
+
                 </xf:action>
             </xbl:handler>
 
@@ -308,12 +322,13 @@
                         </request>
                         <response>
                             <error-type/>
-                            <body/>
                             <resource-uri/>
                             <status-code/>
-                            <reason-phrase/>
                             <headers/>
-                            <body/>
+                            <body>
+                                <original/>
+                                <transformed/>
+                            </body>
                         </response>
                         <delete-trigger/>
                         <save-test-trigger/>
@@ -484,8 +499,7 @@
                     serialization="{if ($has-body) then $request/serialization else 'application/x-www-form-urlencoded'}"
                     resource="{xxf:evaluate-avt($request/resource)}"
                     mediatype="{$request/mediatype}"
-                    replace="text"
-                    target="$response/body"
+                    replace="none"
                     xxf:username="{$request/username}"
                     xxf:password="{$request/password}"/>
 
@@ -508,7 +522,7 @@
                     <xf:label ref="$resources/dialog-http-services/label"/>
 
                     <fr:tabbable>
-                        <fr:tab>
+                        <fr:tab id="fb-http-service-definition-tab">
                             <fr:label value="xxf:r('dialog-http-services.tab-definition.label', '|fr-form-resources|')"/>
 
                             <fr:grid>
@@ -685,43 +699,56 @@
                                     </xh:tr>
                                 </fr:grid>
 
-                                <xf:group ref=".[empty($response/headers/header)]">
-                                    <xf:output
-                                        class="fb-submission-response-noheaders"
-                                        value="xxf:r('dialog-http-services.no-headers', '|fr-form-resources|')"/>
-                                </xf:group>
-                                <xf:group ref=".[exists($response/headers/header)]">
-                                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
-                                         decide to remove support for legacy mode. -->
-                                    <fr:grid
-                                        ref="$response/headers/header"
-                                        readonly="true"
-                                        repeat="true"
-                                        class="fb-submission-response-headers">
-                                        <xh:tr>
-                                            <xh:td class="fb-nowrap">
-                                                <xf:output value="name">
-                                                    <xf:label ref="$resources/dialog-http-services/header-name/label"/>
-                                                </xf:output>
-                                            </xh:td>
-                                            <xh:td>
-                                                <xf:output value="string-join(value, ', ')">
-                                                    <xf:label ref="$resources/dialog-http-services/header-value/label"/>
-                                                </xf:output>
-                                            </xh:td>
-                                        </xh:tr>
-                                    </fr:grid>
-                                </xf:group>
-
-                                <fr:grid>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:textarea ref="$response/body[xxf:non-blank()]" class="fb-submission-response-body">
-                                                <xf:label ref="$resources/dialog-http-services/response-body/label"/>
-                                            </xf:textarea>
-                                        </xh:td>
-                                    </xh:tr>
-                                </fr:grid>
+                                <fr:tabbable>
+                                    <fr:tab id="fb-submission-response-headers-tab">
+                                        <fr:label ref="$resources/dialog-http-services/headers/label"/>
+                                        <xf:group ref=".[empty($response/headers/header)]">
+                                            <xf:output
+                                                class="fb-submission-response-noheaders"
+                                                value="xxf:r('dialog-http-services.no-headers', '|fr-form-resources|')"/>
+                                        </xf:group>
+                                        <xf:group ref=".[exists($response/headers/header)]">
+                                            <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                                                 decide to remove support for legacy mode. -->
+                                            <fr:grid
+                                                ref="$response/headers/header"
+                                                readonly="true"
+                                                repeat="true"
+                                                class="fb-submission-response-headers">
+                                                <xh:tr>
+                                                    <xh:td class="fb-nowrap">
+                                                        <xf:output
+                                                            value="name">
+                                                            <xf:label ref="$resources/dialog-http-services/header-name/label"/>
+                                                        </xf:output>
+                                                    </xh:td>
+                                                    <xh:td>
+                                                        <xf:output value="string-join(value, ', ')">
+                                                            <xf:label ref="$resources/dialog-http-services/header-value/label"/>
+                                                        </xf:output>
+                                                    </xh:td>
+                                                </xh:tr>
+                                            </fr:grid>
+                                        </xf:group>
+                                    </fr:tab>
+                                    <fr:tab ref="$response/body/*[xxf:non-blank()]">
+                                        <fr:label
+                                            ref="
+                                                if (local-name(.) = 'original') then
+                                                    $resources/dialog-http-services/response-body/label
+                                                else
+                                                    $resources/dialog-http-services/xml-response-body/label"/>
+                                        <fr:grid>
+                                            <xh:tr>
+                                                <xh:td>
+                                                    <xf:textarea ref="." class="fb-submission-response-body">
+                                                        <xf:label class="xforms-hidden" ref="$resources/dialog-http-services/response-body/label"/>
+                                                    </xf:textarea>
+                                                </xh:td>
+                                            </xh:tr>
+                                        </fr:grid>
+                                    </fr:tab>
+                                </fr:tabbable>
 
                             </xh:div>
                         </fr:tab>

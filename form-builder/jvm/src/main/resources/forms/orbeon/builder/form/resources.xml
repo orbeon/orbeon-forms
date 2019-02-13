@@ -935,7 +935,7 @@
                 <label>Status Code</label>
             </status-code>
             <headers>
-                <label>Headers</label>
+                <label>HTTP Headers</label>
             </headers>
             <header-name>
                 <label>Header Name</label>
@@ -944,8 +944,11 @@
                 <label>Header Value(s)</label>
             </header-value>
             <response-body>
-                <label>Response Body</label>
+                <label>Original Response Body</label>
             </response-body>
+            <xml-response-body>
+                <label>XML Response Body</label>
+            </xml-response-body>
             <save>
                 <label>Save</label>
             </save>
@@ -2128,7 +2131,7 @@
                 <label>Code de status</label>
             </status-code>
             <headers>
-                <label>Headers</label>
+                <label>En-têtes HTTP</label>
             </headers>
             <header-name>
                 <label>Nom</label>
@@ -2137,8 +2140,11 @@
                 <label>Valeur(s)</label>
             </header-value>
             <response-body>
-                <label>Corps de la réponse</label>
+                <label>Corps de la réponse original</label>
             </response-body>
+            <xml-response-body>
+                <label>Corps de la réponse en XML</label>
+            </xml-response-body>
             <save>
                 <label>Sauvegarder</label>
             </save>
@@ -3314,6 +3320,9 @@
             <response-body>
                 <label>Responsbody</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Lagre</label>
             </save>
@@ -4516,6 +4525,9 @@
             <response-body>
                 <label>Тело ответа</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Сохранить</label>
             </save>
@@ -5711,6 +5723,9 @@
             <response-body>
                 <label>Corpo della risposta</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Salva</label>
             </save>
@@ -6907,6 +6922,9 @@
             <response-body>
                 <label>Haupteil der Antwort</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Speichern</label>
             </save>
@@ -8105,6 +8123,9 @@
             <response-body>
                 <label>Ohjelmakoodin vastaus</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Tallenna</label>
             </save>
@@ -9300,6 +9321,9 @@
             <response-body>
                 <label>Cuerpo de la Respuesta</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Guardar</label>
             </save>
@@ -10503,6 +10527,9 @@
             <response-body>
                 <label>Response body</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Bewaar</label>
             </save>
@@ -11677,6 +11704,9 @@
             <response-body>
                 <label>Corpo da Resposta</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Guardar</label>
             </save>
@@ -12880,6 +12910,9 @@
             <response-body>
                 <label>Svar</label>
             </response-body>
+            <xml-response-body>
+                <label todo="true">[XML Response Body]</label>
+            </xml-response-body>
             <save>
                 <label>Spara</label>
             </save>

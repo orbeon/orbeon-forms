@@ -55,6 +55,7 @@ object ContentTypes {
       trimmed == JsonContentType || trimmed.endsWith(JsonContentTypeSuffix)
     }
 
+  //@XPathFunction
   def isJSONContentType(contentTypeOrNull: String): Boolean =
     getContentTypeMediaType(contentTypeOrNull) exists isJSONMediatype
 

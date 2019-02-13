@@ -53,7 +53,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     p2               : SecondPassParameters
   ): Unit = {
     // Deserialize here so it can run in parallel
-    val contentType = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
+    val contentType = connectionResult.mediatypeOrDefault(ContentTypes.XmlContentType)
     val isJSON = ContentTypes.isJSONContentType(contentType)
     if (ContentTypes.isXMLContentType(contentType) || isJSON) {
       implicit val detailsLogger = getDetailsLogger(p, p2)

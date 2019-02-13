@@ -149,7 +149,7 @@ class ControlsComparator(
           val atts =
             relevant.map("relevant" → _.toString) ++:
             readonly.map("readonly" → _.toString) ++:
-            List("id" → effectiveId)
+            List("id" → namespaceId(document, effectiveId))
 
           withElement(
             "init",

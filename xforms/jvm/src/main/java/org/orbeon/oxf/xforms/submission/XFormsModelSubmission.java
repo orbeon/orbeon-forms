@@ -36,7 +36,6 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.xforms.XFormsId;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -450,7 +449,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         if (result.getReplacer() instanceof AllReplacer)
                             AllReplacer.forwardResultToResponse(result.connectionResult(), response);
                         else if (result.getReplacer() instanceof RedirectReplacer)
-                            RedirectReplacer.replace(result.connectionResult(), response);
+                            RedirectReplacer.doReplace(result.connectionResult(), response);
                         else
                             assert result.getReplacer() instanceof NoneReplacer;
                     } else if (result.getThrowable() != null) {
@@ -480,7 +479,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         };
     }
 
-    public Replacer getReplacer(ConnectionResult connectionResult, SubmissionParameters p) throws IOException {
+    public Replacer getReplacer(ConnectionResult connectionResult, SubmissionParameters p) {
 
         // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
 

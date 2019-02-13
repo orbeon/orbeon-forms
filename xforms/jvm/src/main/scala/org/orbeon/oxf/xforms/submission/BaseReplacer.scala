@@ -13,13 +13,9 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 
-trait Replacer {
-
-  def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters)
-
-  // NOTE: replace() is allowed to throw exceptions, including `XFormsSubmissionException`
-  // TODO: Can return null. Ouch!
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable
+abstract class BaseReplacer(val submission: XFormsModelSubmission, val containingDocument: XFormsContainingDocument) extends Replacer {
+  protected def getDetailsLogger(p: SubmissionParameters, p2: SecondPassParameters): IndentedLogger = submission.getDetailsLogger(p, p2)
 }

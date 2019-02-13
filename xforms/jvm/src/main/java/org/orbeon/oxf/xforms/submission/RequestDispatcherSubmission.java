@@ -120,7 +120,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     }
 
     public SubmissionResult connect(final SubmissionParameters p,
-                                    final SecondPassParameters p2, final SerializationParameters sp) throws Exception {
+                                    final SecondPassParameters p2, final SerializationParameters sp) {
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -148,7 +148,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // - now and asynchronously
         // - later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
-            public SubmissionResult call() throws Exception {
+            public SubmissionResult call() {
 
                 // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. Ok because async disabled for now.
 
@@ -194,18 +194,18 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     /**
      * Perform a local connection using the Servlet API.
      */
-    public ConnectionResult openRequestDispatcherConnection(
-        ExternalContext externalContext,
-        XFormsContainingDocument containingDocument,
-        IndentedLogger indentedLogger,
-        final String resource,
-        final SubmissionParameters p,
-        boolean isNorewrite,
-        String actualRequestMediatype,
-        String encoding,
-        byte[] messageBody,
-        String queryString,
-        scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues
+    private ConnectionResult openRequestDispatcherConnection(
+            ExternalContext externalContext,
+            XFormsContainingDocument containingDocument,
+            IndentedLogger indentedLogger,
+            final String resource,
+            final SubmissionParameters p,
+            boolean isNorewrite,
+            String actualRequestMediatype,
+            String encoding,
+            byte[] messageBody,
+            String queryString,
+            scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues
     ) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether

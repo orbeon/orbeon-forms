@@ -53,7 +53,7 @@ public class CacheableSubmission extends BaseSubmission {
     }
 
     public SubmissionResult connect(final SubmissionParameters p,
-                                    final SecondPassParameters p2, final SerializationParameters sp) throws Exception {
+                                    final SecondPassParameters p2, final SerializationParameters sp) {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 

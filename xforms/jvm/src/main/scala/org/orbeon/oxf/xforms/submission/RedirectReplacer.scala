@@ -13,25 +13,28 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
-/**
-  * Handle replace="none".
-  */
-class NoneReplacer(
-  submission         : XFormsModelSubmission,
-  containingDocument : XFormsContainingDocument
-) extends BaseReplacer(submission, containingDocument) {
+object RedirectReplacer {
+
+  def doReplace(connectionResult: ConnectionResult, response: ExternalContext.Response): Unit = {
+    SubmissionUtils.forwardResponseHeaders(connectionResult, response)
+    response.setStatus(connectionResult.statusCode)
+  }
+}
+
+class RedirectReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
+  extends BaseReplacer(submission, containingDocument) {
 
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  // Just notify that processing is terminated by dispatching xforms-submit-done
-  def replace(
-    connectionResult: ConnectionResult,
-    p: SubmissionParameters,
-    p2: SecondPassParameters
-  ): Runnable =
-    submission.sendSubmitDone(connectionResult)
+  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable = {
+    val response = NetUtils.getExternalContext.getResponse
+    containingDocument.setGotSubmissionRedirect()
+    RedirectReplacer.doReplace(connectionResult, response)
+    null
+  }
 }

@@ -1,5 +1,5 @@
 /**
-  * Copyright (C) 2010 Orbeon, Inc.
+  * Copyright (C) 2009 Orbeon, Inc.
   *
   * This program is free software; you can redistribute it and/or modify it under the terms of the
   * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,13 +13,8 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.ConnectionResult
-
-trait Replacer {
-
-  def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters)
-
-  // NOTE: replace() is allowed to throw exceptions, including `XFormsSubmissionException`
-  // TODO: Can return null. Ouch!
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable
+trait Submission {
+  def getType: String
+  def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean
+  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): SubmissionResult
 }

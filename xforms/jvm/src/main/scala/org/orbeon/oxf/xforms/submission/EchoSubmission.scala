@@ -42,7 +42,11 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     if (sp.messageBody == null) {
       // Not sure when this can happen, but it can't be good
-      throw new XFormsSubmissionException(submission, "Action 'test:': no message body.", "processing submission response")
+      throw XFormsSubmissionException(
+        submission  = submission,
+        message     = "Action 'test:': no message body.",
+        description = "processing submission response"
+      )
     }  else {
       // Log message body for debugging purposes
       val indentedLogger = getDetailsLogger(p, p2)

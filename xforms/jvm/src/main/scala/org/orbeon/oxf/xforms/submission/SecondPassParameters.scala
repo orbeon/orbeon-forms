@@ -54,10 +54,10 @@ object SecondPassParameters {
         case Some(resolved) ⇒
           NetUtils.encodeHRRI(resolved, true)
         case None ⇒
-          throw new XFormsSubmissionException(
-            dynamicSubmission,
-            s"xf:submission: mandatory `resource` or `action` evaluated to an empty sequence for attribute value: `${staticSubmission.avtActionOrResource}`",
-            "resolving resource URI"
+          throw XFormsSubmissionException(
+            submission  = dynamicSubmission,
+            message     = s"xf:submission: mandatory `resource` or `action` evaluated to an empty sequence for attribute value: `${staticSubmission.avtActionOrResource}`",
+            description = "resolving resource URI"
           )
       }
 
@@ -86,24 +86,24 @@ object SecondPassParameters {
     if (isCache) {
 
       if (! CacheableMethods(p.httpMethod))
-        throw new XFormsSubmissionException(
-          dynamicSubmission,
-          """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `method="get|post|put"`.""",
-          "checking read-only and shared hints"
+        throw XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `method="get|post|put"`.""",
+          description = "checking read-only and shared hints"
         )
 
       if (p.replaceType != ReplaceType.Instance)
-        throw new XFormsSubmissionException(
-          dynamicSubmission,
-          """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `replace="instance"`.""",
-          "checking read-only and shared hints"
+        throw XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `replace="instance"`.""",
+          description = "checking read-only and shared hints"
         )
 
     } else if (isReadonly && p.replaceType != ReplaceType.Instance)
-      throw new XFormsSubmissionException(
-        dynamicSubmission,
-        """xf:submission: `xxf:readonly="true"` can be `true` only with `replace="instance"`.""",
-        "checking read-only and shared hints"
+      throw XFormsSubmissionException(
+        submission  = dynamicSubmission,
+        message     = """xf:submission: `xxf:readonly="true"` can be `true` only with `replace="instance"`.""",
+        description = "checking read-only and shared hints"
       )
 
     // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
@@ -114,10 +114,10 @@ object SecondPassParameters {
 
       // For now we don't support replace="all"
       if (isRequestedAsynchronousMode && p.replaceType == ReplaceType.All)
-        throw new XFormsSubmissionException(
-          dynamicSubmission,
-          """xf:submission: `mode="asynchronous"` cannot be `true` with `replace="all"`.""",
-          "checking asynchronous mode"
+        throw XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `mode="asynchronous"` cannot be `true` with `replace="all"`.""",
+          description = "checking asynchronous mode"
         )
 
       p.replaceType != ReplaceType.All && isRequestedAsynchronousMode

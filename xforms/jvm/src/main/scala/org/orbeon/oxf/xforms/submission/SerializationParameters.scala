@@ -109,12 +109,12 @@ object SerializationParameters {
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
           } catch {
-            case NonFatal(e) ⇒
-              throw new XFormsSubmissionException(
-                submission,
-                e,
-                "xf:submission: exception while serializing instance to XML.",
-                "serializing instance"
+            case NonFatal(throwable) ⇒
+              throw XFormsSubmissionException(
+                submission  = submission,
+                message     = "xf:submission: exception while serializing instance to XML.",
+                description = "serializing instance",
+                throwable   = throwable
               )
           }
         case serialization @ "application/json" ⇒
@@ -132,10 +132,10 @@ object SerializationParameters {
 
         case serialization @ "multipart/related" ⇒
           // TODO
-          throw new XFormsSubmissionException(
-            submission,
-            s"xf:submission: submission serialization not yet implemented: $serialization",
-            "serializing instance"
+          throw XFormsSubmissionException(
+            submission  = submission,
+            message     = s"xf:submission: submission serialization not yet implemented: $serialization",
+            description = "serializing instance"
           )
         case "multipart/form-data" ⇒
           // Build multipart/form-data body
@@ -154,10 +154,10 @@ object SerializationParameters {
           val nodeType = InstanceData.getType(documentToSubmit.getRootElement)
           if (XMLConstants.XS_BASE64BINARY_QNAME == nodeType) {
             // TODO
-            throw new XFormsSubmissionException(
-              submission,
-              "xf:submission: binary serialization with base64Binary type is not yet implemented.",
-              "serializing instance"
+            throw XFormsSubmissionException(
+              submission  = submission,
+              message     = "xf:submission: binary serialization with base64Binary type is not yet implemented.",
+              description = "serializing instance"
             )
           } else {
             // Default to anyURI
@@ -179,12 +179,12 @@ object SerializationParameters {
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
             } catch {
-              case NonFatal(e) ⇒
-                throw new XFormsSubmissionException(
-                  submission,
-                  e,
-                  "xf:submission: binary serialization with anyURI type failed reading URL.",
-                  "serializing instance"
+              case NonFatal(throwable) ⇒
+                throw XFormsSubmissionException(
+                  submission  = submission,
+                  message     = "xf:submission: binary serialization with anyURI type failed reading URL.",
+                  description = "serializing instance",
+                  throwable   = throwable
                 )
             }
           }
@@ -216,12 +216,12 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case NonFatal(e) ⇒
-              throw new XFormsSubmissionException(
-                submission,
-                e,
-                "xf:submission: exception while serializing instance to HTML or XHTML.",
-                "serializing instance"
+            case NonFatal(throwable) ⇒
+              throw XFormsSubmissionException(
+                submission  = submission,
+                message     = "xf:submission: exception while serializing instance to HTML or XHTML.",
+                description = "serializing instance",
+                throwable   = throwable
               )
           }
         case serialization if ContentTypes.isTextOrJSONContentType(serialization) ⇒
@@ -249,19 +249,19 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case NonFatal(e) ⇒
-              throw new XFormsSubmissionException(
-                submission,
-                e,
-                "xf:submission: exception while serializing instance to text.",
-                "serializing instance"
+            case NonFatal(throwable) ⇒
+              throw XFormsSubmissionException(
+                submission  = submission,
+                message     = "xf:submission: exception while serializing instance to text.",
+                description = "serializing instance",
+                throwable   = throwable
               )
           }
         case serialization ⇒
-          throw new XFormsSubmissionException(
-            submission,
-            s"xf:submission: invalid submission serialization requested: $serialization",
-            "serializing instance"
+          throw XFormsSubmissionException(
+            submission  = submission,
+            message     = s"xf:submission: invalid submission serialization requested: $serialization",
+            description = "serializing instance"
           )
       }
     } else {

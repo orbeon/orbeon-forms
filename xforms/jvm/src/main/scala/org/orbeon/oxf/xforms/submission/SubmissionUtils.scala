@@ -134,7 +134,13 @@ object SubmissionUtils {
       )
 
     } catch {
-      case e: OXFException ⇒ throw new XFormsSubmissionException(submission, e, e.getMessage, "processing <header> elements")
+      case e: OXFException ⇒
+        throw XFormsSubmissionException(
+          submission  = submission,
+          message     = e.getMessage,
+          description = "processing <header> elements",
+          throwable = e
+        )
     }
   }
 

@@ -177,9 +177,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
                 if (p.serialize() && p.xxfUploads() && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext().refInstanceOpt())) {
-                    throw new XFormsSubmissionException(this, "xf:submission: instance to submit has at least one pending upload.",
+                    throw XFormsSubmissionException.apply(
+                        this,
+                        "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
-                        new XFormsSubmitErrorEvent(XFormsModelSubmission.this, ErrorType$.MODULE$.XXFORMS_PENDING_UPLOADS(), null));
+                        null,
+                        new XFormsSubmitErrorEvent(XFormsModelSubmission.this, ErrorType$.MODULE$.XXFORMS_PENDING_UPLOADS(), null)
+                    );
                 }
 
                 /* ***** Update data model ****************************************************************************** */
@@ -241,7 +245,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // Get serialization requested from @method and @serialization attributes
                 final String requestedSerialization = getRequestedSerializationOrNull(p.serializationOpt(), p.xformsMethod(), p.httpMethod());
                 if (requestedSerialization == null)
-                    throw new XFormsSubmissionException(this, "xf:submission: invalid submission method requested: " + p.xformsMethod(), "serializing instance");
+                    throw XFormsSubmissionException.apply(
+                        this,
+                        "xf:submission: invalid submission method requested: " + p.xformsMethod(),
+                        "serializing instance",
+                        null,
+                        null
+                    );
 
                 final Document documentToSubmit;
                 if (p.serialize()) {
@@ -332,7 +342,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     public void run() {
                         if (pVal != null && pVal.isDeferredSubmissionSecondPass() && containingDocument.isLocalSubmissionForward()) {
                             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                            throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xf:submission", "processing submission");
+                            throw XFormsSubmissionException.apply(
+                                XFormsModelSubmission.this,
+                                "Error while processing xf:submission",
+                                "processing submission",
+                                throwable,
+                                null
+                            );
                         } else {
                             // Any exception will cause an error event to be dispatched
                             sendSubmitError(throwable, resolvedActionOrResourceVal);
@@ -504,8 +520,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     } else if (ReplaceType.isReplaceNone(p.replaceType())) {
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
-                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + p.replaceType(), "processing instance replacement",
-                                new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.XXFORMS_INTERNAL_ERROR(), connectionResult));
+                        throw XFormsSubmissionException.apply(
+                            this,
+                            "xf:submission: invalid replace attribute: " + p.replaceType(),
+                            "processing instance replacement",
+                            null,
+                            new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.XXFORMS_INTERNAL_ERROR(), connectionResult)
+                        );
                     }
                 } else {
                     // There is no body, notify that processing is terminated
@@ -526,15 +547,25 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // Currently we don't know how to handle a redirect for replace != "all"
                 if (! ReplaceType.isReplaceAll(p.replaceType()))
-                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + getId() + ", redirect code received with replace=\"" + p.replaceType() + "\"", "processing submission response",
-                            new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
+                    throw XFormsSubmissionException.apply(
+                        this,
+                        "xf:submission for submission id: " + getId() + ", redirect code received with replace=\"" + p.replaceType() + "\"",
+                        "processing submission response",
+                        null,
+                        new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult)
+                    );
 
                 replacer = new RedirectReplacer(this, containingDocument);
 
             } else {
                 // Error code received
-                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + getId() + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
-                        new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
+                throw XFormsSubmissionException.apply(
+                    this,
+                    "xf:submission for submission id: " + getId() + ", error code received when submitting instance: " + connectionResult.statusCode(),
+                    "processing submission response",
+                    null,
+                    new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult)
+                );
             }
 
             return replacer;

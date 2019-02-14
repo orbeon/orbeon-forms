@@ -246,7 +246,7 @@ public class IDConstraintChecker implements ValidationContext {
         final String suffix = elt == null ? "" : " at " + elt.getQualifiedName();
         final String msg = localizeMessage(propKey,args) + suffix;
         if ( errorInfo == null ) errorInfo = new java.util.LinkedList();
-        final ErrorInfo errInf = new ErrorInfo( elt, msg );
+        final ErrorInfo errInf = ErrorInfo.apply( elt, msg );
         errorInfo.addLast( errInf );
     }
 

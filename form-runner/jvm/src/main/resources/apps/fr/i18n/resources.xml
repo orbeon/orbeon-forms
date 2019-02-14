@@ -422,7 +422,7 @@
             <invalid-data>
                 <label>Invalid data</label>
                 <item id="0">Skip</item>
-                <item id="1">Keep</item>
+                <item id="1">Import</item>
             </invalid-data>
             <start-import>
                 <label>Start Import</label>
@@ -889,7 +889,7 @@
             <invalid-data>
                 <label>Données invalides</label>
                 <item id="0">Ignorer</item>
-                <item id="1">Conserver</item>
+                <item id="1">Importer</item>
             </invalid-data>
             <start-import>
                 <label>Démarrer l'import</label>
@@ -1342,7 +1342,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -1794,7 +1794,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -2244,7 +2244,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -2707,7 +2707,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -3170,7 +3170,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -3633,7 +3633,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -4096,7 +4096,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -4558,7 +4558,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>
@@ -5020,7 +5020,7 @@
             <invalid-data>
                 <label todo="true">Invalid data</label>
                 <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Keep</item>
+                <item id="1" todo="true">Import</item>
             </invalid-data>
             <start-import>
                 <label todo="true">Start Import</label>

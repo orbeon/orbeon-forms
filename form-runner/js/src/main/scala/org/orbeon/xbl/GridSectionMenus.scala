@@ -27,6 +27,8 @@ import scala.scalajs.js
 
 trait GridSectionMenus {
 
+  import Util._
+
   def componentName: String
 
   // Keep pointing to menu so we can move it around as needed
@@ -47,6 +49,8 @@ trait GridSectionMenus {
 
   case class CurrentComponent(currentComponentId: String, currentIteration: Int)
 
+  // This transiently holds information between a click on the menu and a subsequent action in the menu.
+  // Not nice but we don't have FRP at this point.
   private var currentComponentOpt: Option[CurrentComponent] = None
 
   // Initialization
@@ -58,7 +62,9 @@ trait GridSectionMenus {
 
     // Listeners for all menu actions
     Operation.values foreach { op ⇒
-      $(document).on(s"click$ListenerSuffix", s".fr-$componentName-dropdown-menu .fr-${op.entryName}", actionFunction(op))
+      $(document).on(s"click$ListenerSuffix", s".fr-$componentName-dropdown-menu .fr-${op.entryName}", actionHandler(op))
+    }
+  }
 
   def removeIterationHandler(e: JQueryEventObject): Unit = {
 
@@ -67,7 +73,7 @@ trait GridSectionMenus {
     val jButton = jTarget.closest(s".fr-$componentName-remove-button")
     val button  = jButton(0)
 
-    componentId(e).zip(findIterationsForElemWithId(button.asInstanceOf[html.Element])) foreach {
+    componentId(e).zip(findIterationForElemWithId(button.asInstanceOf[html.Element])) foreach {
       case (currentComponentId, currentIteration) ⇒
         dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
     }
@@ -112,45 +118,37 @@ trait GridSectionMenus {
       )
     }
 
-    componentId(e).zip(findIterationsForElemWithId(button)) foreach {
+    componentId(e).zip(findIterationForElemWithId(button)) foreach {
       case (currentComponentId, currentIteration) ⇒ currentComponentOpt = Some(CurrentComponent(currentComponentId, currentIteration))
     }
   }
 
   // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
   def delegateKeyEventToBootstrapButtonHandler(e: JQueryEventObject): Unit = {
+
     moveMenu(e)
+
+    val keyboardEvent = e.asInstanceOf[KeyboardEvent]
+
     $(globalMenuElem).find(".dropdown-toggle").trigger(
       $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade
-        e.`type`,
+        keyboardEvent.`type`,
         new js.Object {
-          val charCode = e.asInstanceOf[KeyboardEvent].charCode
+          val charCode = keyboardEvent.charCode
 
           // Putting these to be complete, but `charCode` above does the trick for the menu
-          val keyCode  = e.asInstanceOf[KeyboardEvent].keyCode
-          val which    = e.asInstanceOf[KeyboardEvent].asInstanceOf[js.Dynamic].which
-          val ctrlKey  = e.asInstanceOf[KeyboardEvent].ctrlKey
-          val shiftKey = e.asInstanceOf[KeyboardEvent].shiftKey
-          val altKey   = e.asInstanceOf[KeyboardEvent].altKey
-          val metaKey  = e.asInstanceOf[KeyboardEvent].metaKey
+          val keyCode  = keyboardEvent.keyCode
+          val which    = keyboardEvent.asInstanceOf[js.Dynamic].which
+          val ctrlKey  = keyboardEvent.ctrlKey
+          val shiftKey = keyboardEvent.shiftKey
+          val altKey   = keyboardEvent.altKey
+          val metaKey  = keyboardEvent.metaKey
         }
       ).asInstanceOf[JQueryEventObject]
     )
   }
 
-  def iteration(e: JQueryEventObject): js.UndefOr[html.Element] =
-    $(e.target).closest(s".fr-$componentName-repeat-iteration")(0)
-
-  def findIterationsForElemWithId(elemWithId: html.Element): Option[Int] =
-    $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
-
-  def componentElem(e: JQueryEventObject): js.UndefOr[html.Element] =
-    $(e.target).closest(s".xbl-fr-$componentName")(0)
-
-  def componentId(e: JQueryEventObject): Option[String] =
-      $(componentElem(e)).attr("id").toOption
-
-  def actionFunction(op: Operation): JQueryEventObject ⇒ js.Any = e ⇒ asUnit {
+  def actionHandler(op: Operation): JQueryEventObject ⇒ js.Any = e ⇒ asUnit {
     currentComponentOpt foreach {
       case CurrentComponent(currentComponentId, currentIteration) ⇒
         dispatchActionEvent(op, currentComponentId, currentIteration)
@@ -164,4 +162,19 @@ trait GridSectionMenus {
       eventName  = s"fr-${op.entryName}",
       properties = js.Dictionary("row" → currentIteration.toString)
     )
+
+  private object Util {
+
+    def iteration(e: JQueryEventObject): js.UndefOr[html.Element] =
+      $(e.target).closest(s".fr-$componentName-repeat-iteration")(0)
+
+    def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =
+      $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
+
+    def componentElem(e: JQueryEventObject): js.UndefOr[html.Element] =
+      $(e.target).closest(s".xbl-fr-$componentName")(0)
+
+    def componentId(e: JQueryEventObject): Option[String] =
+      $(componentElem(e)).attr("id").toOption
+  }
 }

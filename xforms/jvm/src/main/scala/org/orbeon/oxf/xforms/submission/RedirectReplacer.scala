@@ -26,7 +26,7 @@ object RedirectReplacer {
 }
 
 class RedirectReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
-  extends BaseReplacer(submission, containingDocument) {
+  extends Replacer {
 
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()

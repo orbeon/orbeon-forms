@@ -64,7 +64,7 @@ object AllReplacer {
 }
 
 class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
-  extends BaseReplacer(submission, containingDocument) {
+  extends Replacer {
 
   // NOP
   def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 class NoneReplacer(
   submission         : XFormsModelSubmission,
   containingDocument : XFormsContainingDocument
-) extends BaseReplacer(submission, containingDocument) {
+) extends Replacer {
 
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()

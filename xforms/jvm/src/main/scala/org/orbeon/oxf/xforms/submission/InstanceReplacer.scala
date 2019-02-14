@@ -17,7 +17,6 @@ import java.util.Collections
 
 import org.orbeon.dom.{Document, Node}
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
@@ -31,7 +30,7 @@ import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
   * Handle replace="instance".
   */
 class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
-  extends BaseReplacer(submission, containingDocument) {
+  extends Replacer {
 
   // Unwrapped document set by `deserialize()`
   private var _resultingDocumentOpt: Option[Document Either DocumentInfo] = None
@@ -56,7 +55,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     val contentType = connectionResult.mediatypeOrDefault(ContentTypes.XmlContentType)
     val isJSON = ContentTypes.isJSONContentType(contentType)
     if (ContentTypes.isXMLContentType(contentType) || isJSON) {
-      implicit val detailsLogger = getDetailsLogger(p, p2)
+      implicit val detailsLogger = submission.getDetailsLogger(p, p2)
       _resultingDocumentOpt = Some(
         deserializeInstance(
           isReadonly       = p2.isReadonly,
@@ -225,7 +224,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         )
       }
 
-      implicit val detailsLogger  = getDetailsLogger(p, p2)
+      implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
 
       // Obtain root element to insert
       if (detailsLogger.isDebugEnabled)

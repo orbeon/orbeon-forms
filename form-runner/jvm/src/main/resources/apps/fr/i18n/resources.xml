@@ -406,6 +406,8 @@
             <total>Total</total>
             <valid>Valid</valid>
             <invalid>Invalid</invalid>
+            <imported>Imported</imported>
+            <skipped>Skipped</skipped>
             <eta>ETA</eta>
             <cancel-validation>
                 <label>Cancel Validation</label>
@@ -873,6 +875,8 @@
             <total>Total</total>
             <valid>Valides</valid>
             <invalid>Invalides</invalid>
+            <imported>Importés</imported>
+            <skipped>Ignorés</skipped>
             <eta>Temps restant</eta>
             <cancel-validation>
                 <label>Annuler la validation</label>
@@ -1326,6 +1330,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -1778,6 +1784,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -2228,6 +2236,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -2691,6 +2701,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -3154,6 +3166,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -3617,6 +3631,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -4080,6 +4096,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -4542,6 +4560,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>
@@ -5004,6 +5024,8 @@
             <total todo="true">Total</total>
             <valid todo="true">Valid</valid>
             <invalid todo="true">Invalid</invalid>
+            <imported todo="true">[Imported]</imported>
+            <skipped todo="true">[Skipped]</skipped>
             <eta todo="true">ETA</eta>
             <cancel-validation>
                 <label todo="true">Cancel Validation</label>

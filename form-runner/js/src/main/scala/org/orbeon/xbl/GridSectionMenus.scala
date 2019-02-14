@@ -54,10 +54,22 @@ trait GridSectionMenus {
     // Click on our own button moves and shows the menu
     $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-dropdown-button", moveAndShowMenuHandler _)
     $(document).on(s"keydown$ListenerSuffix", s".fr-$componentName-dropdown-button", delegateKeyEventToBootstrapButtonHandler _)
+    $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-remove-button",   removeIterationHandler _)
 
     // Listeners for all menu actions
     Operation.values foreach { op ⇒
       $(document).on(s"click$ListenerSuffix", s".fr-$componentName-dropdown-menu .fr-${op.entryName}", actionFunction(op))
+
+  def removeIterationHandler(e: JQueryEventObject): Unit = {
+
+    val jTarget = $(e.target)
+
+    val jButton = jTarget.closest(s".fr-$componentName-remove-button")
+    val button  = jButton(0)
+
+    componentId(e).zip(findIterationsForElemWithId(button.asInstanceOf[html.Element])) foreach {
+      case (currentComponentId, currentIteration) ⇒
+        dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
     }
   }
 
@@ -141,12 +153,15 @@ trait GridSectionMenus {
   def actionFunction(op: Operation): JQueryEventObject ⇒ js.Any = e ⇒ asUnit {
     currentComponentOpt foreach {
       case CurrentComponent(currentComponentId, currentIteration) ⇒
-        DocumentAPI.dispatchEvent(
-          targetId   = currentComponentId,
-          eventName  = s"fr-${op.entryName}",
-          properties = js.Dictionary("row" → currentIteration.toString)
-        )
+        dispatchActionEvent(op, currentComponentId, currentIteration)
     }
     e.preventDefault()
   }
+
+  def dispatchActionEvent(op: Operation, currentComponentId: String, currentIteration: Int): Unit =
+    DocumentAPI.dispatchEvent(
+      targetId   = currentComponentId,
+      eventName  = s"fr-${op.entryName}",
+      properties = js.Dictionary("row" → currentIteration.toString)
+    )
 }

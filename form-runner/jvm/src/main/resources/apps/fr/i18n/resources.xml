@@ -420,7 +420,7 @@
                 <item id="1">Delete</item>
             </existing-records>
             <invalid-data>
-                <label>Invalid data</label>
+                <label>Records with invalid data</label>
                 <item id="0">Skip</item>
                 <item id="1">Import</item>
             </invalid-data>
@@ -887,7 +887,7 @@
                 <item id="1">Supprimer</item>
             </existing-records>
             <invalid-data>
-                <label>Données invalides</label>
+                <label>Enregistrements avec données invalides</label>
                 <item id="0">Ignorer</item>
                 <item id="1">Importer</item>
             </invalid-data>
@@ -1340,7 +1340,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -1792,7 +1792,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -2242,7 +2242,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -2705,7 +2705,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -3168,7 +3168,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -3631,7 +3631,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -4094,7 +4094,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -4556,7 +4556,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>
@@ -5018,7 +5018,7 @@
                 <item id="1" todo="true">Delete</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Invalid data</label>
+                <label todo="true">Records with invalid data</label>
                 <item id="0" todo="true">Skip</item>
                 <item id="1" todo="true">Import</item>
             </invalid-data>

@@ -36,31 +36,32 @@ case class ConnectionResult(
 
   import ConnectionResult._
 
-  val lastModified     = HttpHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
-  def lastModifiedJava = lastModified map (_.asInstanceOf[JLong]) orNull
+  val lastModified: Option[Long] = HttpHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
 
-  def close() = content.close()
+  def lastModifiedJava: JLong = lastModified map (_.asInstanceOf[JLong]) orNull
 
-  def isSuccessResponse = NetUtils.isSuccessCode(statusCode)
+  def close(): Unit = content.close()
 
-  val mediatype =
+  def isSuccessResponse: Boolean = NetUtils.isSuccessCode(statusCode)
+
+  val mediatype: Option[String] =
     content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeMediaType(ct))
 
-  val charset =
+  val charset: Option[String] =
     content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeCharset(ct))
 
-  def mediatypeOrDefault(default: String) =
+  def mediatypeOrDefault(default: String): String =
     mediatype getOrElse default
 
-  def charsetJava =
+  def charsetJava: String =
     charset.orNull
 
-  def getHeaderIgnoreCase(name: String) = {
+  def getHeaderIgnoreCase(name: String): List[String] = {
     val nameLowercase = name.toLowerCase
     headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase ⇒ v } getOrElse Nil
   }
 
-  def readTextResponseBody = mediatype collect {
+  def readTextResponseBody: Option[String] = mediatype collect {
     case mediatype if ContentTypes.isXMLMediatype(mediatype) ⇒
       // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
       //

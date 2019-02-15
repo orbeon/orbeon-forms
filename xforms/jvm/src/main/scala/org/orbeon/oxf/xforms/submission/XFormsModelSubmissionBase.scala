@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
@@ -32,10 +31,10 @@ import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFor
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
-import scala.collection.breakOut
+import scala.collection.{breakOut, mutable}
 
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait
@@ -66,7 +65,7 @@ abstract class XFormsModelSubmissionBase
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
-      (throwable collect { case se: XFormsSubmissionException ⇒ se.submitErrorEventOpt } flatten) getOrElse default
+      throwable.cast[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
 
     // Dispatch event
     submitErrorEvent.logMessage(throwable)

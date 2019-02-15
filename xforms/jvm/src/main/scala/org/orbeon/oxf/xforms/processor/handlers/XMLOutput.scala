@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml._
+import shapeless.syntax.typeable._
 
 //
 // TODO:
@@ -60,8 +60,8 @@ object XMLOutput extends XMLReceiverSupport {
     else
       element(name, text = value)
 
-  def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsControl ⇒
+  def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsControl] foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       for {
         lhhaType ← LHHA.values
@@ -70,19 +70,19 @@ object XMLOutput extends XMLReceiverSupport {
       } locally {
         writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)
       }
-  }
+    }
 
-  def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c.staticControl collect {
-    case c: AppearanceTrait ⇒
+  def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.staticControl.cast[AppearanceTrait] foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
 
       c.appearances.iterator map
       (AppearanceTrait.encodeAppearanceValue(new jl.StringBuilder, _).toString) foreach
       (appearance ⇒ element("appearance", text = appearance))
-  }
+    }
 
-  def matchSingleNode(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsSingleNodeControl ⇒
+  def matchSingleNode(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsSingleNodeControl] foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       element(
         "mips",
@@ -94,10 +94,11 @@ object XMLOutput extends XMLReceiverSupport {
           (c.valueTypeOpt.toList map (t ⇒ "datatype" → t.uriQualifiedName)) ++
           c.customMIPs // TODO
       )
-  }
+    }
 
-  def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsValueControl if c.isRelevant ⇒
+  def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsValueControl] filter (_.isRelevant) foreach { c ⇒
+
       implicit val _xmlReceiver = xmlReceiver
 
       // XBL: Should probably do via xforms:htmlFragment and/or possibly the XBL control exposing a mediatype in
@@ -108,17 +109,16 @@ object XMLOutput extends XMLReceiverSupport {
 
       writeTextOrHTML("value", c.getValue, isHTML)
       c.externalValueOpt filter (_ != c.getValue) foreach (writeTextOrHTML("external-value", _, isHTML))
-  }
+    }
 
-  def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: VisitableTrait if c.isRelevant ⇒
+  def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[VisitableTrait] filter (c ⇒ c.isRelevant && c.visited) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
-      if (c.visited)
-        element("visited", text = c.visited.toString)
-  }
+      element("visited", text = c.visited.toString)
+    }
 
-  def matchItemset(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsSelect1Control if c.isRelevant ⇒
+  def matchItemset(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsSelect1Control] filter (_.isRelevant) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       withElement("items") {
         c.getItemset.allItemsIterator foreach {
@@ -131,41 +131,41 @@ object XMLOutput extends XMLReceiverSupport {
             }
         }
       }
-  }
+    }
 
-  def matchContainer(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsContainerControl ⇒
+  def matchContainer(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsContainerControl] foreach { c ⇒
       c.children foreach (applyMatchers(_, xmlReceiver))
-  }
+    }
 
-  def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsRepeatControl if c.isRelevant ⇒
+  def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsRepeatControl] filter (_.isRelevant) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       element("repeat", atts = List("index" → c.getIndex.toString))
-  }
+    }
 
-  def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XFormsSwitchControl if c.isRelevant ⇒
+  def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XFormsSwitchControl] filter (_.isRelevant) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       element("switch", atts = List("selected" → (c.selectedCaseIfRelevantOpt map (_.getId) orNull)))
-  }
+    }
 
-  def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: FileMetadata ⇒
+  def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[FileMetadata] foreach { c ⇒
+
       implicit val _xmlReceiver = xmlReceiver
 
       val properties = c.iterateProperties collect { case (k, Some(v)) ⇒ k → v } toList
 
       if (properties.nonEmpty)
         element("file-metadata", atts = properties)
-  }
+    }
 
-  def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
-    case c: XXFormsDialogControl ⇒
+  def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
+    c.cast[XXFormsDialogControl] filter (_.isVisible) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
-      if(c.isVisible)
-        element("visible", text = "true")
-  }
+      element("visible", text = "true")
+    }
 
   val Matchers =
     List[(XFormsControl, XMLReceiver) ⇒ Unit](

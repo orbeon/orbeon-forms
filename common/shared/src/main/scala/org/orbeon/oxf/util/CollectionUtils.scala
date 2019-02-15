@@ -135,11 +135,6 @@ object CollectionUtils {
     }
   }
 
-  implicit class anyToCollectable[A](val a: A) extends AnyVal {
-    def collect[B](pf: PartialFunction[A, B]): Option[B] =
-      pf.isDefinedAt(a) option pf(a)
-  }
-
   implicit class IntArrayOps(val a: Array[Int]) extends AnyVal {
     def codePointsToString = new String(a, 0, a.length)
   }

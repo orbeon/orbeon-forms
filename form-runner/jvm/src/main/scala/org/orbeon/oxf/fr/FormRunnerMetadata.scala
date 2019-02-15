@@ -407,7 +407,7 @@ object FormRunnerMetadata {
           val lhhaAndItemsList = lhhaAndItemsIt.to[List]
 
           val valueOpt =
-            control collect {
+            Option(control) collect {
               case c: XFormsSelectControl  ⇒
 
                 val selectedLabels = c.findSelectedItems map (_.label.label) // TODO: HTML

@@ -61,8 +61,8 @@
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/freeze"                         value="fbf:getNormalizedFreeze($form, $i/control-name)"/>
 
-                <xf:setvalue ref="$i/relevant"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant'), 'true()' )[1]"/>
-                <xf:setvalue ref="$i/readonly"                       value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly'), 'false()')[1]"/>
+                <xf:setvalue ref="$i/relevant"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'readonly')"/>
 
                 <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
@@ -169,8 +169,8 @@
                         else
                             (),
                         fbf:renameControlIfNeeded($old-name, $new-name, false()),
-                        fbf:updateMipAsAttributeOnly($new-name, 'relevant', $i/relevant),
-                        fbf:updateMipAsAttributeOnly($new-name, 'readonly', $i/readonly),
+                        fbf:writeAndNormalizeCalculatedMip($new-name, 'relevant', $i/relevant),
+                        fbf:writeAndNormalizeCalculatedMip($new-name, 'readonly', $i/readonly),
                         fbf:setRepeatProperties(
                             $new-name,
                             $i/is-repeat = true(),

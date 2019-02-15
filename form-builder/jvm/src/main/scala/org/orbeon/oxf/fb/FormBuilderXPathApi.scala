@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
@@ -73,14 +74,35 @@ object FormBuilderXPathApi {
       Undo.pushUserUndoAction
   }
 
-  // Find the value of a MIP or null (the empty sequence)
+  // Get the normalized value of a computed MIP for the given control name and computed MIP name
   //@XPathFunction
-  def readMipAsAttributeOnlyOrEmpty(controlName: String, mipName: String): String =
-    FormBuilder.readMipAsAttributeOnly(controlName, mipName)(FormBuilderDocContext()).orNull
+  def readDenormalizedCalculatedMip(controlName: String, mipName: String): String = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    val resultOpt =
+      for {
+        mip      ← Model.AllComputedMipsByName.get(mipName)
+        bindElem ← FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+      } yield
+        FormBuilder.readDenormalizedCalculatedMip(bindElem, mip)
+
+    resultOpt getOrElse (throw new IllegalArgumentException)
+  }
 
   //@XPathFunction
-  def updateMipAsAttributeOnly(controlName: String, mipName: String, mipValue: String): Unit =
-    FormBuilder.updateMipAsAttributeOnly(controlName, mipName, mipValue)(FormBuilderDocContext())
+  def writeAndNormalizeCalculatedMip(controlName: String, mipName: String, mipValue: String): Unit = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    val resultOpt =
+      for {
+        mip ← Model.AllComputedMipsByName.get(mipName)
+      } yield
+        FormBuilder.writeAndNormalizeMip(controlName, mip, mipValue)
+
+    resultOpt getOrElse (throw new IllegalArgumentException)
+  }
 
   //@XPathFunction
   def setRepeatProperties(

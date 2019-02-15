@@ -123,7 +123,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   private def writeValidations(
     controlName : String,
-    mip         : MIP,
+    mip         : ValidateMIP,
     validations : List[Validation])(implicit
     ctx         : FormBuilderDocContext
   ): Unit = {
@@ -145,7 +145,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
         // NOTE: We could optimize further by taking this branch if there is no type or required validation.
-        updateMipAsAttributeOnly(controlName, mip.name, value)
+        writeAndNormalizeMip(controlName, mip, value)
         delete(existingElementValidations)
       case _ ⇒
         val nestedValidations =

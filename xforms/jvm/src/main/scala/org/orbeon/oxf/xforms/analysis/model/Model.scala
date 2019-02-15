@@ -318,14 +318,14 @@ object Model {
 
   // MIP enumeration
   sealed trait MIP         { def name: String; val aName: QName;                                 val eName: QName }
-  trait StdMIP extends MIP { val name: String; val aName = QName(name);                          val eName = QName(name, XFORMS_NAMESPACE_SHORT) }
-  trait ExtMIP extends MIP { val name: String; val aName = QName(name, XXFORMS_NAMESPACE_SHORT); val eName = QName(name, XXFORMS_NAMESPACE_SHORT) }
+  sealed trait StdMIP extends MIP { val name: String; val aName = QName(name);                          val eName = QName(name, XFORMS_NAMESPACE_SHORT) }
+  sealed trait ExtMIP extends MIP { val name: String; val aName = QName(name, XXFORMS_NAMESPACE_SHORT); val eName = QName(name, XXFORMS_NAMESPACE_SHORT) }
 
-  trait ComputedMIP extends MIP
-  trait ValidateMIP extends MIP
-  trait XPathMIP    extends MIP
-  trait BooleanMIP  extends XPathMIP
-  trait StringMIP   extends XPathMIP
+  sealed trait ComputedMIP extends MIP
+  sealed trait ValidateMIP extends MIP
+  sealed trait XPathMIP    extends MIP
+  sealed trait BooleanMIP  extends XPathMIP
+  sealed trait StringMIP   extends XPathMIP
 
   // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
   // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
@@ -345,9 +345,11 @@ object Model {
   val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
   val AllMIPsInOrder           = AllMIPs.toList.sortBy(_.name)
   val AllMIPNamesInOrder       = AllMIPsInOrder map (_.name)
-  val AllMIPsByName            = AllMIPs map (mip ⇒ mip.name → mip) toMap
+  val AllMIPsByName            = AllMIPs map (m ⇒ m.name → m) toMap
   val AllMIPNames              = AllMIPs map (_.name)
   val MIPNameToAttributeQName  = AllMIPs map (m ⇒ m.name → m.aName) toMap
+
+  val AllComputedMipsByName    = AllMIPs collect { case m: ComputedMIP ⇒ m.name -> m } toMap
 
   val QNameToXPathComputedMIP  = AllMIPs collect { case m: XPathMIP with ComputedMIP ⇒ m.aName → m } toMap
   val QNameToXPathValidateMIP  = AllMIPs collect { case m: XPathMIP with ValidateMIP ⇒ m.aName → m } toMap

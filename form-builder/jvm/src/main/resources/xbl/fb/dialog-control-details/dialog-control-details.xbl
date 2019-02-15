@@ -170,11 +170,11 @@
                     value="'true()'"/>
 
                 <!-- Read MIPs -->
-                <xf:setvalue ref="$i/relevant"   value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'relevant'), 'true()' )[1]"/>
-                <xf:setvalue ref="$i/readonly"   value="(fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'readonly'), 'false()')[1]"/>
-                <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'calculate')"/>
-                <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'default')"/>
-                <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($i/control-name, 'whitespace')"/>
+                <xf:setvalue ref="$i/relevant"   value="fbf:readDenormalizedCalculatedMip($i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"   value="fbf:readDenormalizedCalculatedMip($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/calculate"  value="fbf:readDenormalizedCalculatedMip($i/control-name, 'calculate')"/>
+                <xf:setvalue ref="$i/default"    value="fbf:readDenormalizedCalculatedMip($i/control-name, 'default')"/>
+                <xf:setvalue ref="$i/whitespace" value="fbf:readDenormalizedCalculatedMip($i/control-name, 'whitespace')"/>
 
                 <!-- Read Label/Hint/Help -->
                 <xf:action iterate="$i/(label, hint, help, text)[@supported = 'true']">
@@ -302,8 +302,8 @@
                                 $i/validations/validation
                             ),
                             (: Write MIPs :)
-                            for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
-                                fbf:updateMipAsAttributeOnly($i/control-name, $mip, $i/*[name() = $mip]),
+                            for $mip in ('default', 'calculate', 'relevant', 'readonly', 'whitespace') return
+                                fbf:writeAndNormalizeCalculatedMip($i/control-name, $mip, $i/*[name() = $mip]),
                             for $lh in $i/(label, hint, help, text)[@supported = 'true'] return
                                 fbf:setControlLabelHintHelpOrText(
                                     $i/control-name,

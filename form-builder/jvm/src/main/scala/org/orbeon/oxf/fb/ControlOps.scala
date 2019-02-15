@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -397,55 +398,109 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
   }
 
+  private val TrueExpr  = "true()"
+  private val FalseExpr = "false()"
+
+  // When *writing* a value to the form definition, return the attribute value if the value doesn't
+  // match its default value, otherwise return `None`.
+  //
+  // This depends on context, as the default for `readonly` depends on whether there is a `calculate`.
+  //
+  private def normalizeMipValue(
+    mip          : MIP,
+    mipValue     : String,
+    hasCalculate : ⇒ Boolean,
+    isTypeString : String ⇒ Boolean
+  ): Option[String] =
+    mipValue.trimAllToOpt flatMap { trimmed ⇒
+
+     // See also https://github.com/orbeon/orbeon-forms/issues/3950
+
+      val isDefault =
+        mip match {
+          case Model.Relevant   ⇒ trimmed == TrueExpr
+          case Model.Readonly   ⇒ trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
+          case Model.Required   ⇒ trimmed == FalseExpr
+          case Model.Constraint ⇒ trimmed.isEmpty
+          case Model.Calculate  ⇒ trimmed.isEmpty
+          case Model.Default    ⇒ trimmed.isEmpty
+          case Model.Type       ⇒ isTypeString(trimmed)
+          case Model.Whitespace ⇒ trimmed == Whitespace.Policy.Preserve.entryName
+        }
+
+      ! isDefault option trimmed
+    }
+
+  // When *reading* a value from the form definition, return the denormalized or explicit value since the
+  // user interface is not and should not be aware of defaults.
+  private def denormalizeMipValue(
+    mip          : ComputedMIP,
+    mipValue     : Option[String],
+    hasCalculate : ⇒ Boolean,
+    isTypeString : String ⇒ Boolean
+  ): String = {
+
+    // Start by normalizing
+    val normalizedValueOpt =
+      mipValue flatMap (_.trimAllToOpt) flatMap { rawMipValue ⇒
+        normalizeMipValue(
+          mip,
+          rawMipValue,
+          hasCalculate,
+          isTypeString
+        )
+      }
+
+      normalizedValueOpt match {
+        case Some(value) ⇒
+          value
+        case None ⇒
+          mip match {
+            case Model.Relevant   ⇒ TrueExpr
+            case Model.Readonly   ⇒ if (hasCalculate) TrueExpr else FalseExpr
+            case Model.Required   ⇒ FalseExpr
+            case Model.Calculate  ⇒ ""
+            case Model.Default    ⇒ ""
+            case Model.Whitespace ⇒ Whitespace.Policy.Preserve.entryName
+          }
+      }
+    }
+
+  private def hasCalculate(bindElem: NodeInfo): Boolean =
+    bindElem.attValueOpt(Model.Calculate.name).isDefined
+
+  // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
+  // expressions and types could use it. So for now the mapping is never garbage collected.
+  private def isTypeStringUpdateNsIfNeeded(
+    bindElem : NodeInfo,
+    value    : String)(implicit
+    ctx      : FormBuilderDocContext
+  ): Boolean =
+    valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
+      Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bindElem.resolveQName(value))
+
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
-  def updateMipAsAttributeOnly(
+  def writeAndNormalizeMip(
     controlName : String,
-    mipName     : String,
+    mip         : MIP, // `CalculateMIP | ValidateMIP` depending on caller
     mipValue    : String)(implicit
     ctx         : FormBuilderDocContext
   ): Unit = {
-
-    require(Model.AllMIPNames(mipName))
-    val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
-
     findControlByName(ctx.formDefinitionRootElem, controlName) foreach { control ⇒
 
       // Get or create the bind element
-      val bind = ensureBinds(findContainerNamesForModel(control) :+ controlName)
+      val bindElem = ensureBinds(findContainerNamesForModel(control) :+ controlName)
 
-      // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
-      // expressions and types could use it. So for now the mapping is never garbage collected.
-      def isTypeString(value: String) =
-        mipName == Model.Type.name &&
-        valueNamespaceMappingScopeIfNeeded(bind, value).isDefined &&
-        Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(value))
+      val valueOpt =
+        normalizeMipValue(
+          mip          = mip,
+          mipValue     = mipValue,
+          hasCalculate = hasCalculate(bindElem),
+          isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
+        )
 
-      def isRelevantTrue(value: String) =
-        mipName == Model.Relevant.name && value == "true()"
-
-      def isReadonlyFalse(value: String) =
-        mipName == Model.Readonly.name && value == "false()"
-
-      def isRequiredFalse(value: String) =
-        mipName == Model.Required.name && value == "false()"
-
-      def isWhitespacePreserve(value: String) =
-        mipName == Model.Whitespace.name && value == Whitespace.Policy.Preserve.entryName
-
-      def mustRemoveAttribute(value: String) =
-        isTypeString(value)      ||
-          isRelevantTrue(value)  ||
-          isReadonlyFalse(value) ||
-          isRequiredFalse(value) ||
-          isWhitespacePreserve(value)
-
-      mipValue.trimAllToOpt match {
-        case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒
-          ensureAttribute(bind, mipAttQName, normalizedMipValue)
-        case _ ⇒
-          delete(bind /@ mipAttQName)
-      }
+      toggleAttribute(bindElem, mipToFBMIPQNames(mip)._1, valueOpt)
     }
   }
 
@@ -483,15 +538,19 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       existingNSMapping orElse newNSMapping
   }
 
-  // Get the value of a MIP attribute if present
-  def readMipAsAttributeOnly(controlName: String, mipName: String)(implicit ctx: FormBuilderDocContext): Option[String] = {
-    require(Model.AllMIPNames(mipName))
-    val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
+  def readDenormalizedCalculatedMip(
+    bindElem : NodeInfo,
+    mip      : ComputedMIP)(implicit
+    ctx      : FormBuilderDocContext
+  ): String =
+    denormalizeMipValue(
+      mip          = mip,
+      mipValue     = bindElem attValueOpt mipToFBMIPQNames(mip)._1,
+      hasCalculate = hasCalculate(bindElem),
+      isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
+    )
 
-    findBindByName(ctx.formDefinitionRootElem, controlName) flatMap (_ attValueOpt mipAttQName)
-  }
-
-  // Return (attQName, elemQName)
+  // Return `(attQName, elemQName)`
   def mipToFBMIPQNames(mip: Model.MIP): (QName, QName) =
     RewrittenMIPs.get(mip) match {
       case Some(qn) ⇒ qn        → qn

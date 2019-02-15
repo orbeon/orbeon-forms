@@ -84,9 +84,13 @@ object SubmissionParameters {
         )
       )
 
+    def filterQualifiedName(s: String) =
+      Dom4jUtils.extractTextValueQName(staticSubmission.element, s, true).localName
+
     val resolvedReplace =
       staticSubmission.avtReplaceOpt    flatMap
         stringAvtTrimmedOpt             map
+        filterQualifiedName             map // so that `xxf:binary` becomes `binary`
         ReplaceType.withNameInsensitive getOrElse
         ReplaceType.All
 

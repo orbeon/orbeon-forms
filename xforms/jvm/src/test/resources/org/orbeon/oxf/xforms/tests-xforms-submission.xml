@@ -2165,4 +2165,55 @@ az4K</document>
         </output>
     </test>
 
+    <test description="#3945: xf:submission: support binary response" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+
+                        <xf:instance id="result-instance">
+                            <file mediatype="" size=""/>
+                        </xf:instance>
+
+                        <xf:submission
+                            id="submission"
+                            method="get"
+                            serialization="none"
+                            resource="https://httpbin.org/image/png"
+                            replace="xxf:binary"
+                            targetref="instance('result-instance')"/>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="submission"/>
+
+                        <xf:action event="xforms-submit-done">
+                            <xf:setvalue ref="instance('result-instance')/@mediatype" value="uri-param-values(.., 'mediatype')[1]"/>
+                            <xf:setvalue ref="instance('result-instance')/@size"      value="uri-param-values(.., 'size')[1]"/>
+                            <!-- Remove temp URL as it changes every time -->
+                            <xf:setvalue ref="instance('result-instance')"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="result-instance" model-id="model">
+                                <file mediatype="image/png" size="8090"/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

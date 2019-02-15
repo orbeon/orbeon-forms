@@ -13,12 +13,13 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
-sealed abstract class ReplaceType extends EnumEntry
+sealed abstract class ReplaceType extends EnumEntry with Lowercase
 
 object ReplaceType extends Enum[ReplaceType] {
 
@@ -28,12 +29,14 @@ object ReplaceType extends Enum[ReplaceType] {
   case object Instance extends ReplaceType
   case object Text     extends ReplaceType
   case object None     extends ReplaceType
+  case object Binary   extends ReplaceType
 
   // For Java callers
   def isReplaceAll     (replaceType: ReplaceType) = replaceType == All
   def isReplaceInstance(replaceType: ReplaceType) = replaceType == Instance
   def isReplaceText    (replaceType: ReplaceType) = replaceType == Text
   def isReplaceNone    (replaceType: ReplaceType) = replaceType == None
+  def isReplaceBinary  (replaceType: ReplaceType) = replaceType == Binary
 }
 
 sealed abstract class RelevanceHandling extends EnumEntry

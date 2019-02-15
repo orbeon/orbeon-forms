@@ -15,14 +15,16 @@ package org.orbeon.io
 
 import java.io.File
 import java.net.URI
+import org.orbeon.oxf.util.CoreUtils._
 
 object FileUtils {
 
   def isTemporaryFileUri(uri: URI): Boolean =
-    uri.getScheme == "file" && {
-      val uriPath = uri.normalize.getPath
+    findFileUriPath(uri) exists { uriPath ⇒
       val tmpPath = new File(System.getProperty("java.io.tmpdir")).toURI.normalize.getPath
-
       uriPath.startsWith(tmpPath)
     }
+
+  def findFileUriPath(uri: URI): Option[String] =
+    uri.getScheme == "file" option uri.normalize.getPath
 }

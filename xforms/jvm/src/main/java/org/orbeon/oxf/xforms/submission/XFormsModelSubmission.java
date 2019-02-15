@@ -519,6 +519,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         replacer = new TextReplacer(this, containingDocument);
                     } else if (ReplaceType.isReplaceNone(p.replaceType())) {
                         replacer = new NoneReplacer(this, containingDocument);
+                    } else if (ReplaceType.isReplaceBinary(p.replaceType())) {
+                        replacer = new BinaryReplacer(this, containingDocument);
                     } else {
                         throw new XFormsSubmissionException(
                             this,

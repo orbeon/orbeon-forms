@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.NodeInfo
 class TextReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
   extends Replacer {
 
-  private var responseBody: String = _
+  private var responseBodyOpt: Option[String] = None
 
   def deserialize(
     connectionResult : ConnectionResult,
@@ -36,8 +36,8 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     p2               : SecondPassParameters
   ): Unit =
     connectionResult.readTextResponseBody match {
-      case Some(responseBody) ⇒
-        this.responseBody = responseBody
+      case s @ Some(_) ⇒
+        this.responseBodyOpt = s
       case None ⇒
         // Non-text/non-XML result
 
@@ -72,22 +72,32 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     p                : SubmissionParameters,
     p2               : SecondPassParameters
   ): Runnable = {
-    // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
-    // XML mediatype (as defined by the content type specifiers in [RFC 3023]) or a text media type (as defined by
-    // a content type specifier of text/*), then the response data is encoded as text and replaces the content of
-    // the replacement target node."
+    responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, connectionResult, p, _))
+    submission.sendSubmitDone(connectionResult)
+  }
+}
 
-    // XForms 1.1: "If the processing of the targetref attribute fails, then submission processing ends after
-    // dispatching the event xforms-submit-error with an error-type of target-error."
+
+object TextReplacer {
+
+  def replaceText (
+    submission         : XFormsModelSubmission,
+    containingDocument : XFormsContainingDocument,
+    connectionResult   : ConnectionResult,
+    p                  : SubmissionParameters,
+    value              : String
+  ): Unit = {
+    // XForms 1.1: "If the processing of the `targetref` attribute fails, then submission processing ends after
+    // dispatching the event `xforms-submit-error` with an `error-type` of `target-error`."
     def throwSubmissionException(message: String) =
       throw new XFormsSubmissionException(
         submission       = submission,
         message          = message,
-        description      = "processing targetref attribute",
+        description      = "processing `targetref` attribute",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          submission,
-          ErrorType.TargetError,
-          connectionResult
+          target           = submission,
+          errorType        = ErrorType.TargetError,
+          connectionResult = connectionResult
         )
       )
 
@@ -103,20 +113,21 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
             reporter     = containingDocument.getRequestStats.addXPathStat
           ) match {
             case n: NodeInfo ⇒ n
-            case _           ⇒ throwSubmissionException("""targetref attribute doesn't point to a node for replace="text".""")
+            case _           ⇒ throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
           }
         case None ⇒
           // Use default destination
           submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).rootElement
       }
 
-    def handleSetValueSuccess(oldValue: String) =
+
+    def handleSetValueSuccess(oldValue: String): Unit =
       DataModel.logAndNotifyValueChange(
         containingDocument = containingDocument,
         source             = "submission",
         nodeInfo           = destinationNodeInfo,
         oldValue           = oldValue,
-        newValue           = responseBody,
+        newValue           = value,
         isCalculate        = false,
         collector          = Dispatch.dispatchEvent)(
         containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
@@ -126,9 +137,9 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
       throwSubmissionException(
         reason match {
           case DisallowedNodeReason ⇒
-            """targetref attribute doesn't point to an element without children or to an attribute for replace="text"."""
+            s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${p.replaceType}"`."""
           case ReadonlyNodeReason   ⇒
-            """targetref attribute points to a readonly node for replace="text"."""
+            s"""`targetref` attribute points to a readonly node for `replace="${p.replaceType}"`."""
         }
       )
 
@@ -137,12 +148,10 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     // to log in "submission" mode?
     DataModel.setValueIfChanged(
       nodeInfo  = destinationNodeInfo,
-      newValue  = responseBody,
+      newValue  = value,
       onSuccess = handleSetValueSuccess,
       onError   = handleSetValueError
     )
-
-    // Dispatch xforms-submit-done
-    submission.sendSubmitDone(connectionResult)
   }
+
 }

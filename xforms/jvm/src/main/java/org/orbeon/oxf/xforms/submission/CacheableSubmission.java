@@ -239,7 +239,7 @@ public class CacheableSubmission extends BaseSubmission {
             // then submission processing ends after dispatching the event
             // xforms-submit-error with an error-type of target-error."
 
-            throw XFormsSubmissionException.apply(
+            throw new XFormsSubmissionException(
                 submission(),
                 "targetref attribute doesn't point to an element for replace=\"instance\".",
                 "processing targetref attribute",
@@ -252,7 +252,7 @@ public class CacheableSubmission extends BaseSubmission {
         if (updatedInstance == null || !updatedInstance.rootElement().isSameNodeInfo(destinationNodeInfo)) {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
-            throw XFormsSubmissionException.apply(
+            throw new XFormsSubmissionException(
                 submission(),
                 "targetref attribute must point to an instance root element when using cached/shared instance replacement.",
                 "processing targetref attribute",

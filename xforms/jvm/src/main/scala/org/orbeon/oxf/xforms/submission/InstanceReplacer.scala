@@ -66,7 +66,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       )
     } else {
       // Other media type is not allowed
-      throw XFormsSubmissionException(
+      throw new XFormsSubmissionException(
         submission       = submission,
         message          = s"""Body received with non-XML media type for `replace="instance"`: $contentType""",
         description      = "processing instance replacement",
@@ -123,7 +123,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       }
     } catch {
       case e: Exception ⇒
-        throw XFormsSubmissionException(
+        throw new XFormsSubmissionException(
           submission       = submission,
           message          = "xf:submission: exception while reading XML response.",
           description      = "processing instance replacement",
@@ -157,7 +157,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         // Another option would be to dispatch, at runtime, an xxforms-binding-error event. xforms-submit-error is
         // consistent with targetref, so might be better.
 
-        throw XFormsSubmissionException(
+        throw new XFormsSubmissionException(
           submission       = submission,
           message          = """`instance` attribute doesn't point to an existing instance for `replace="instance"`.""",
           description      = "processing `instance` attribute",
@@ -183,7 +183,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // XForms 1.1: "If the processing of the targetref attribute fails,
           // then submission processing ends after dispatching the event
           // xforms-submit-error with an error-type of target-error."
-          throw XFormsSubmissionException(
+          throw new XFormsSubmissionException(
             submission       = submission,
             message          = """targetref attribute doesn't point to an element for `replace="instance"`.""",
             description      = "processing targetref attribute",
@@ -197,7 +197,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
         // This is the instance which is effectively going to be updated
         val instanceToUpdate = containingDocument.instanceForNodeOpt(destinationNodeInfo) getOrElse {
-          throw XFormsSubmissionException(
+          throw new XFormsSubmissionException(
             submission       = submission,
             message          = """targetref attribute doesn't point to an element in an existing instance for `replace="instance"`.""",
             description      = "processing targetref attribute",
@@ -213,7 +213,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         val isDestinationRootElement = instanceToUpdate.rootElement.isSameNodeInfo(destinationNodeInfo)
         if (p2.isReadonly && !isDestinationRootElement) {
           // Only support replacing the root element of an instance when using a shared instance
-          throw XFormsSubmissionException(
+          throw new XFormsSubmissionException(
             submission       = submission,
             message          = "targetref attribute must point to instance root element when using read-only instance replacement.",
             description      = "processing targetref attribute",

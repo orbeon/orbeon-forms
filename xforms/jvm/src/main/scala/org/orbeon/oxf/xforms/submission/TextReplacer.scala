@@ -55,7 +55,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
             case None            ⇒ s"""No mediatype received for replace="text""""
           }
 
-        throw XFormsSubmissionException(
+        throw new XFormsSubmissionException(
           submission       = submission,
           message          = message,
           description      = "reading response body",
@@ -80,7 +80,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     // XForms 1.1: "If the processing of the targetref attribute fails, then submission processing ends after
     // dispatching the event xforms-submit-error with an error-type of target-error."
     def throwSubmissionException(message: String) =
-      throw XFormsSubmissionException(
+      throw new XFormsSubmissionException(
         submission       = submission,
         message          = message,
         description      = "processing targetref attribute",

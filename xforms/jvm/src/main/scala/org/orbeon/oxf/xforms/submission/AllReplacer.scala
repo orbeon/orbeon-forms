@@ -91,7 +91,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
         // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
         // already been written out. This gives the form author a chance to do something in cases the response is
         // buffered, for example do a sendError().
-        throw XFormsSubmissionException(
+        throw new XFormsSubmissionException(
           submission       = submission,
           message          = "xf:submission for submission id: " + submission.getId + ", error code received when submitting instance: " + cxr.statusCode,
           description      = "processing submission response",

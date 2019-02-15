@@ -177,7 +177,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
                 if (p.serialize() && p.xxfUploads() && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext().refInstanceOpt())) {
-                    throw XFormsSubmissionException.apply(
+                    throw new XFormsSubmissionException(
                         this,
                         "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
@@ -245,7 +245,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // Get serialization requested from @method and @serialization attributes
                 final String requestedSerialization = getRequestedSerializationOrNull(p.serializationOpt(), p.xformsMethod(), p.httpMethod());
                 if (requestedSerialization == null)
-                    throw XFormsSubmissionException.apply(
+                    throw new XFormsSubmissionException(
                         this,
                         "xf:submission: invalid submission method requested: " + p.xformsMethod(),
                         "serializing instance",
@@ -342,7 +342,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     public void run() {
                         if (pVal != null && pVal.isDeferredSubmissionSecondPass() && containingDocument.isLocalSubmissionForward()) {
                             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                            throw XFormsSubmissionException.apply(
+                            throw new XFormsSubmissionException(
                                 XFormsModelSubmission.this,
                                 "Error while processing xf:submission",
                                 "processing submission",
@@ -520,7 +520,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     } else if (ReplaceType.isReplaceNone(p.replaceType())) {
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
-                        throw XFormsSubmissionException.apply(
+                        throw new XFormsSubmissionException(
                             this,
                             "xf:submission: invalid replace attribute: " + p.replaceType(),
                             "processing instance replacement",
@@ -547,7 +547,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // Currently we don't know how to handle a redirect for replace != "all"
                 if (! ReplaceType.isReplaceAll(p.replaceType()))
-                    throw XFormsSubmissionException.apply(
+                    throw new XFormsSubmissionException(
                         this,
                         "xf:submission for submission id: " + getId() + ", redirect code received with replace=\"" + p.replaceType() + "\"",
                         "processing submission response",
@@ -559,7 +559,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
             } else {
                 // Error code received
-                throw XFormsSubmissionException.apply(
+                throw new XFormsSubmissionException(
                     this,
                     "xf:submission for submission id: " + getId() + ", error code received when submitting instance: " + connectionResult.statusCode(),
                     "processing submission response",

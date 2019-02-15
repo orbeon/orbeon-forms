@@ -42,7 +42,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     if (sp.messageBody == null) {
       // Not sure when this can happen, but it can't be good
-      throw XFormsSubmissionException(
+      throw new XFormsSubmissionException(
         submission  = submission,
         message     = "Action 'test:': no message body.",
         description = "processing submission response"

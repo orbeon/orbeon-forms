@@ -66,7 +66,7 @@ abstract class XFormsModelSubmissionBase
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
-      (throwable collect { case se: XFormsSubmissionException ⇒ se.submitErrorEvent } flatten) getOrElse default
+      (throwable collect { case se: XFormsSubmissionException ⇒ se.submitErrorEventOpt } flatten) getOrElse default
 
     // Dispatch event
     submitErrorEvent.logMessage(throwable)
@@ -118,7 +118,7 @@ abstract class XFormsModelSubmissionBase
         val documentString = TransformerUtils.tinyTreeToString(currentNodeInfo)
         indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted", "document", documentString)
       }
-      throw XFormsSubmissionException(
+      throw new XFormsSubmissionException(
         submission       = thisSubmission,
         message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
         description      = "checking instance validity",

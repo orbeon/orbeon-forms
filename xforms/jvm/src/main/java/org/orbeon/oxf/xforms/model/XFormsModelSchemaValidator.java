@@ -48,13 +48,17 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.ErrorInfo;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
 import org.orbeon.oxf.xforms.schema.SchemaDependencies;
 import org.orbeon.oxf.xforms.schema.SchemaInfo;
 import org.orbeon.oxf.xforms.schema.SchemaKey;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -171,8 +175,8 @@ public class XFormsModelSchemaValidator {
         boolean isValid = true;
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
             if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("schema", "validation error", "error", errorInfo.message);
-            addSchemaError(errorInfo.element, errorInfo.message);
+                indentedLogger.logDebug("schema", "validation error", "error", errorInfo.message());
+            addSchemaError(errorInfo.element(), errorInfo.message());
             isValid = false;
         }
         return isValid;

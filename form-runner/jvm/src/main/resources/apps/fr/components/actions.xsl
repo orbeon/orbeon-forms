@@ -492,12 +492,14 @@
         <!-- NOTE: There is a lot of logic duplication here with `fr:grid` and `fr:repeater`. We need
              to consolidate this code. -->
         <!-- Propagate inserts, moves, and remove -->
-        <xf:action event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove" observer="{$left-name}-grid {$left-name}-section">
+        <xf:action
+            event="fr-move-up fr-move-down fr-remove fr-iteration-added"
+            observer="{$left-name}-grid {$left-name}-section">
 
             <xf:var name="repeat-template" value="instance(frf:templateId('{$right-name}'))"/>
             <xf:var name="context"         value="bind(frf:bindId('{$right-name}'))"/>
             <xf:var name="items"           value="$context/*"/>
-            <xf:var name="p"               value="xs:integer(event('row'))"/>
+            <xf:var name="p"               value="xs:integer(event(if (event('xxf:type') = 'fr-iteration-added') then 'index' else 'row'))"/>
             <xf:var name="source"          value="$items[$p]"/>
             <xf:var name="instance"        value="$source/root()"/>
 
@@ -531,22 +533,12 @@
 
             </xf:action>
 
-            <xf:action if="event('xxf:type') = 'fr-insert-above'">
+            <!-- This handles inserting above, below, and the "+" button -->
+            <xf:action if="event('xxf:type') = 'fr-iteration-added'">
 
                 <xf:insert
                     context="$context"
-                    ref="$items[$p]"
-                    origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
-                    position="before"
-                    xxf:defaults="{$apply-defaults}"/>
-
-            </xf:action>
-
-            <xf:action if="event('xxf:type') = 'fr-insert-below'">
-
-                <xf:insert
-                    context="$context"
-                    ref="$items[$p]"
+                    ref="$items[$p - 1]"
                     origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
                     position="after"
                     xxf:defaults="{$apply-defaults}"/>
@@ -554,12 +546,14 @@
             </xf:action>
 
             <xsl:if test="exists(fr:map)">
-                <xf:action if="event('xxf:type') = ('fr-insert-above', 'fr-insert-below')">
+                <xf:action if="event('xxf:type') = 'fr-iteration-added'">
 
                     <xf:rebuild/>
                     <xf:revalidate/>
 
-                    <xf:var name="new-p" value="if (event('xxf:type') = 'fr-insert-above') then $p else $p + 1"/>
+                    <xf:var
+                        name="new-p"
+                        value="$p"/>
 
                     <xf:var
                         name="left-container"

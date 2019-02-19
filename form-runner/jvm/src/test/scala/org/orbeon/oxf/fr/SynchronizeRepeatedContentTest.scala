@@ -37,7 +37,8 @@ class SynchronizeRepeatedContentTest
       withTestExternalContext { _ ⇒
         withFormRunnerDocument(processorService, doc) {
 
-          val masterGridGrid = resolveObject[XFormsControl]("master-grid-grid").get
+          val masterGridGrid     = resolveObject[XFormsControl]("master-grid-grid").get
+          val gridAddEffectiveId = "fr-view-component≡master-section-section≡master-grid-grid≡fr-grid-add"
 
           def travelerControl(index: Int) =
             resolveObject[XFormsControl]("traveler-name-control", indexes = List(index)).get
@@ -85,6 +86,13 @@ class SynchronizeRepeatedContentTest
 
           assertBothValues(index = 1, BobValue)
           assertBothValues(index = 2, AliceValue)
+
+          // NOTE: Index must be 1 now.
+          dispatch(name = "DOMActivate", effectiveId = gridAddEffectiveId)
+          doc.synchronizeAndRefresh()
+
+          assertBothValues(index = 1, BobValue)
+          assertBothValues(index = 3, AliceValue)
         }
       }
     }

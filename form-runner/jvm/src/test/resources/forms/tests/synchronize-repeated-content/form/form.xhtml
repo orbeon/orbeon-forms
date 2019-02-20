@@ -32,11 +32,12 @@
                         <detail-section-iteration>
                             <traveler-name-readonly/>
                             <traveler-birth-date-readonly/>
-                            <control-1/>
-                            <control-3>male</control-3>
-                            <control-4/>
-                            <control-2/>
+                            <frequent-traveler-number/>
+                            <gender>male</gender>
+                            <meal/>
+                            <comment/>
                         </detail-section-iteration>
+
                     </detail-section>
                 </form>
             </xf:instance>
@@ -48,17 +49,19 @@
                         <xf:bind id="master-grid-iteration-bind" ref="master-grid-iteration"
                                  name="master-grid-iteration">
                             <xf:bind id="traveler-name-bind" ref="traveler-name" name="traveler-name"
-                                     xxf:whitespace="trim"/>
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
                             <xf:bind id="traveler-birth-date-bind" ref="traveler-birth-date"
                                      name="traveler-birth-date"
-                                     type="xf:date"/>
+                                     type="xs:date"
+                                     required="true()"/>
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="detail-section-bind" ref="detail-section" name="detail-section">
                     <xf:bind id="detail-section-iteration-bind" ref="detail-section-iteration"
                              name="detail-section-iteration">
-                        <xf:bind id="control-2-bind" ref="control-2" name="control-2"/>
+                        <xf:bind id="comment-bind" ref="comment" name="comment"/>
                         <xf:bind id="traveler-name-readonly-bind" ref="traveler-name-readonly"
                                  name="traveler-name-readonly"
                                  xxf:whitespace="trim"
@@ -67,9 +70,11 @@
                                  name="traveler-birth-date-readonly"
                                  type="xf:date"
                                  readonly="true()"/>
-                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"/>
-                        <xf:bind id="control-3-bind" ref="control-3" name="control-3"/>
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                        <xf:bind id="frequent-traveler-number-bind" ref="frequent-traveler-number"
+                                 name="frequent-traveler-number"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="gender-bind" ref="gender" name="gender"/>
+                        <xf:bind id="meal-bind" ref="meal" name="meal"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -81,7 +86,12 @@
                     <form-name>3833</form-name>
                     <title xml:lang="en">Travel Form</title>
                     <description xml:lang="en"/>
+
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
                     <wizard>true</wizard>
+                    <wizard-mode>strict</wizard-mode>
                     <data-migration>enabled</data-migration>
                 </metadata>
             </xf:instance>
@@ -106,11 +116,11 @@
                             <label>Traveler Birth Date</label>
                             <hint/>
                         </traveler-birth-date-readonly>
-                        <control-1>
+                        <frequent-traveler-number>
                             <label>Frequent Traveler Number</label>
                             <hint/>
-                        </control-1>
-                        <control-3>
+                        </frequent-traveler-number>
+                        <gender>
                             <label>Gender</label>
                             <hint/>
                             <item>
@@ -123,8 +133,8 @@
                                 <hint/>
                                 <value>female</value>
                             </item>
-                        </control-3>
-                        <control-4>
+                        </gender>
+                        <meal>
                             <label>Meal Preference</label>
                             <hint/>
                             <item>
@@ -167,7 +177,7 @@
                                 <label>Muslim</label>
                                 <value>muslim</value>
                             </item>
-                        </control-4>
+                        </meal>
                         <traveler-name>
                             <label>Full Name</label>
                             <hint/>
@@ -176,10 +186,10 @@
                             <label>Birth Date</label>
                             <hint/>
                         </traveler-birth-date>
-                        <control-2>
+                        <comment>
                             <label>Comment</label>
                             <hint/>
-                        </control-2>
+                        </comment>
                         <master-section>
                             <label>Travelers</label>
                         </master-section>
@@ -199,12 +209,12 @@
             <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all"
                          id="detail-section-template">
                 <detail-section-iteration>
-                    <control-2/>
+                    <comment/>
                     <traveler-name-readonly/>
                     <traveler-birth-date-readonly/>
-                    <control-1/>
-                    <control-3/>
-                    <control-4/>
+                    <frequent-traveler-number/>
+                    <gender/>
+                    <meal/>
                 </detail-section-iteration>
             </xf:instance>
             <fr:synchronize-repeated-content left="master-grid" right="detail-section" version="2018.2">
@@ -228,6 +238,7 @@
                                 <xf:label ref="$form-resources/traveler-name/label"/>
                                 <xf:hint ref="$form-resources/traveler-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
                             </xf:input>
                         </fr:c>
                         <fr:c x="10" y="1" w="3">
@@ -236,6 +247,7 @@
                                 <xf:label ref="$form-resources/traveler-birth-date/label"/>
                                 <xf:hint ref="$form-resources/traveler-birth-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
                             </fr:date>
                         </fr:c>
                     </fr:grid>
@@ -263,19 +275,20 @@
                             </fr:date>
                         </fr:c>
                         <fr:c x="1" y="2" w="3">
-                            <xf:input id="control-1-control" bind="control-1-bind">
-                                <xf:label ref="$form-resources/control-1/label"/>
-                                <xf:hint ref="$form-resources/control-1/hint"/>
+                            <xf:input id="frequent-traveler-number-control" bind="frequent-traveler-number-bind">
+                                <xf:label ref="$form-resources/frequent-traveler-number/label"/>
+                                <xf:hint ref="$form-resources/frequent-traveler-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
                             </xf:input>
                         </fr:c>
                         <fr:c x="4" y="2" w="3">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-3-control"
-                                             bind="control-3-bind">
-                                <xf:label ref="$form-resources/control-3/label"/>
-                                <xf:hint ref="$form-resources/control-3/hint"/>
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="gender-control" bind="gender-bind">
+                                <xf:label ref="$form-resources/gender/label"/>
+                                <xf:hint ref="$form-resources/gender/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                <xf:itemset ref="$form-resources/control-3/item">
+
+                                <xf:itemset ref="$form-resources/gender/item">
                                     <xf:label ref="label"/>
                                     <xf:value ref="value"/>
                                     <xf:hint ref="hint"/>
@@ -283,22 +296,23 @@
                             </fr:open-select1>
                         </fr:c>
                         <fr:c x="7" y="2" w="6" h="1">
-                            <fr:dropdown-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control"
-                                                 bind="control-4-bind">
-                                <xf:label ref="$form-resources/control-4/label"/>
-                                <xf:hint ref="$form-resources/control-4/hint"/>
+                            <xf:select1 id="meal-control" bind="meal-bind" appearance="dropdown">
+                                <xf:label ref="$form-resources/meal/label"/>
+                                <xf:hint ref="$form-resources/meal/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                <xf:itemset ref="$form-resources/control-4/item">
+
+                                <xf:itemset ref="$form-resources/meal/item">
                                     <xf:label ref="label"/>
                                     <xf:value ref="value"/>
                                 </xf:itemset>
-                            </fr:dropdown-select1>
+                            </xf:select1>
                         </fr:c>
                         <fr:c x="1" y="3" w="12">
-                            <xf:textarea id="control-2-control" bind="control-2-bind">
-                                <xf:label ref="$form-resources/control-2/label"/>
-                                <xf:hint ref="$form-resources/control-2/hint"/>
+                            <xf:textarea id="comment-control" bind="comment-bind">
+                                <xf:label ref="$form-resources/comment/label"/>
+                                <xf:hint ref="$form-resources/comment/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
                             </xf:textarea>
                         </fr:c>
                     </fr:grid>

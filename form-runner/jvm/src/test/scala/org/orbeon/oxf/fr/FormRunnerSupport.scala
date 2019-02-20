@@ -48,11 +48,11 @@ trait FormRunnerSupport extends DocumentTestBase {
           case c: XFormsComponentControl if c.localName == "repeater" ⇒  c
         } get
 
-      dispatch(action, repeater.effectiveId)
+      dispatch(name = action, effectiveId = repeater.effectiveId)
   }
 
   def performGridAction(gridControl: XFormsControl, action: String): Unit =
-      dispatch(action, gridControl.effectiveId)
+      dispatch(name = action, effectiveId = gridControl.effectiveId)
 
   def setFormRunnerLanguage(lang: String): Unit =
     setControlValueWithEventSearchNested("fr-language-selector-select", lang)

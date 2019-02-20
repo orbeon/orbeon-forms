@@ -121,7 +121,7 @@ class InstanceMirrorTest
 
         expected.zipWithIndex foreach {
           case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
-            dispatch("update" + (index + 1), "model")
+            dispatch(name = "update" + (index + 1), effectiveId = "model")
 
             assert(instanceToString(innerInstance) === expectedInnerInstanceValue)
             assert(nonInstanceChanges === expectedNonInstanceChanges)
@@ -215,7 +215,7 @@ class InstanceMirrorTest
         for ((targetPrefixedId, mirroredInstance) ← List(OuterModelId → innerInstance, NestedModelId → outerInstance))
           expected.zipWithIndex foreach {
             case (expectedInstanceValue, index) ⇒
-              dispatch(s"update${index + 1}", targetPrefixedId)
+              dispatch(name = s"update${index + 1}", effectiveId = targetPrefixedId)
               assert(instanceToString(mirroredInstance) === expectedInstanceValue)
               updates += 1
           }

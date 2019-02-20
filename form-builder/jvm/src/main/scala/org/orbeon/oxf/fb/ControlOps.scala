@@ -431,7 +431,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         mipName == Model.Required.name && value == "false()"
 
       def isWhitespacePreserve(value: String) =
-        mipName == Model.Whitespace.name && value == Whitespace.Preserve.name
+        mipName == Model.Whitespace.name && value == Whitespace.Policy.Preserve.entryName
 
       def mustRemoveAttribute(value: String) =
         isTypeString(value)      ||

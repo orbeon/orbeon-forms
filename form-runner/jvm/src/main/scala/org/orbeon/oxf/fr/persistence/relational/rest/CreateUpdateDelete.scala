@@ -111,8 +111,8 @@ object RequestReader {
               newIdentityReceiver(metadataWriter),
               (level, uri, localname, _) ⇒ level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
             ),
-            Whitespace.Normalize,
-            (_, _, _, _) ⇒ Whitespace.Normalize
+            Whitespace.Policy.Normalize,
+            (_, _, _, _) ⇒ Whitespace.Policy.Normalize
           ),
           isMetadataElement
         )

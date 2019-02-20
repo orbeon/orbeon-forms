@@ -13,27 +13,33 @@
  */
 package org.orbeon.oxf.util
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon
 
 object Whitespace  {
 
-  sealed trait Policy { val name: String }
-  case object Preserve  extends Policy { val name = "preserve"  }
-  case object Normalize extends Policy { val name = "normalize" } // like XML Schema's collapse and XPath's normalize-space()
-  case object Collapse  extends Policy { val name = "collapse"  } // collapse sequences of multiple whitespace characters to a single space
-  case object Trim      extends Policy { val name = "trim"      } // trim leading and trailing whitespace
+  sealed trait Policy extends EnumEntry with Lowercase
+  object Policy extends Enum[Policy] {
 
-  val AllPolicies = List(Preserve, Normalize, Collapse, Trim)
+    val values     = findValues
+    val valuesList = values.to[List]
+
+    case object Preserve  extends Policy
+    case object Normalize extends Policy // like XML Schema's collapse and XPath's normalize-space()
+    case object Collapse  extends Policy // collapse sequences of multiple whitespace characters to a single space
+    case object Trim      extends Policy // trim leading and trailing whitespace
+  }
 
   def applyPolicy(s: CharSequence, policy: Policy): String = {
 
     val resultCS =
       policy match {
-        case Preserve  ⇒ s
-        case Normalize ⇒ saxon.value.Whitespace.collapseWhitespace(s)
-        case Collapse  ⇒ collapseWhitespaceNoTrim(s)
-        case Trim      ⇒ s.toString.trimAllToEmpty
+        case Policy.Preserve  ⇒ s
+        case Policy.Normalize ⇒ saxon.value.Whitespace.collapseWhitespace(s)
+        case Policy.Collapse  ⇒ collapseWhitespaceNoTrim(s)
+        case Policy.Trim      ⇒ s.toString.trimAllToEmpty
       }
 
     if (resultCS.length > 0) resultCS.toString else ""
@@ -65,7 +71,4 @@ object Whitespace  {
       sb
     }
   }
-
-  def findPolicyByName(name: String, default: Policy) =
-    AllPolicies find (_.name == name) getOrElse default
 }

@@ -33,11 +33,11 @@ object WhitespaceMatching  {
 
   type PolicyMatcher = (Policy, (String, String), Attributes, Option[(String, String)]) ⇒ Policy
 
-  def defaultBasePolicy =
-    defaultPolicy(BaseScope, Preserve)
+  def defaultBasePolicy: Policy =
+    defaultPolicy(BaseScope, Policy.Preserve)
 
-  def defaultHTMLPolicy =
-    defaultPolicy(HTMLScope, Preserve)
+  def defaultHTMLPolicy: Policy =
+    defaultPolicy(HTMLScope, Policy.Preserve)
 
   def basePolicyMatcher: PolicyMatcher =
     policyMatcherFromProperties(None, BaseScope)
@@ -63,7 +63,7 @@ object WhitespaceMatching  {
       (selfMap.toMap, parentMap.toMap)
     }
 
-    def apply(current: Policy, name: (String, String), attrs: Attributes, parentName: Option[(String, String)]) = {
+    def apply(current: Policy, name: (String, String), attrs: Attributes, parentName: Option[(String, String)]): Policy = {
 
       def fromCurrentElement =
         selfElementIndex.get(name) collect {
@@ -86,8 +86,8 @@ object WhitespaceMatching  {
   private val HTMLScope = "oxf.xforms.whitespace.html"
 
   private def defaultPolicy(scope: String, default: Policy) = {
-    val name = Properties.instance.getPropertySet.getString(scope + ".default", default.name)
-    findPolicyByName(name, default)
+    val name = Properties.instance.getPropertySet.getString(scope + ".default", default.entryName)
+    Policy.withNameOption(name) getOrElse default
   }
 
   private def policyMatcherFromProperties(base: Option[PolicyMatcherImpl], scope: String): PolicyMatcherImpl = {
@@ -108,7 +108,7 @@ object WhitespaceMatching  {
     )
 
     def matchersForPolicy(policy: Policy): List[Matcher] =
-      whitespacePropertyDontAssociate(scope, policy.name) map {
+      whitespacePropertyDontAssociate(scope, policy.entryName) map {
         case (ns, value) ⇒
           CSSSelectorParser.parseSelectors(value) collect {
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), Nil) ⇒
@@ -132,7 +132,7 @@ object WhitespaceMatching  {
       base.toList flatMap (_.matchers)
 
     def newMatchers =
-      AllPolicies flatMap (p ⇒ matchersForPolicy(p) map (_ → p))
+      Policy.valuesList flatMap (p ⇒ matchersForPolicy(p) map (_ → p))
 
     def createPolicyMatcher =
       new PolicyMatcherImpl(baseMatchers ::: newMatchers)

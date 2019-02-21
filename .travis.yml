@@ -49,11 +49,12 @@ install:
 - npm install
 before_script:
 - mkdir /home/travis/.orbeon
-# Create `orbeon` user for MySQL and PostgreSQL, and grant privileges
-- mysql --protocol=TCP --host=localhost --user root -e "CREATE USER 'orbeon'@'localhost' IDENTIFIED BY '$RDS_PASSWORD'"
-- mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'localhost' WITH GRANT OPTION"
-- createuser --superuser orbeon
-- createdb --owner=orbeon orbeon
+# MySQL: create `orbeon` user on pre-installed MySQL
+- if [ "$TARGET" == "test-unit" ]; then mysql --protocol=TCP --host=localhost --user root -e "CREATE USER 'orbeon'@'%' IDENTIFIED BY 'password'"; fi
+- if [ "$TARGET" == "test-unit" ]; then mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'%' WITH GRANT OPTION"; fi
+# PostgreSQL: create `orbeon` user and database on pre-installed PostgreSQL
+- if [ "$TARGET" == "test-unit" ]; then createuser --superuser orbeon; fi
+- if [ "$TARGET" == "test-unit" ]; then createdb --owner=orbeon orbeon; fi
 # Download other Docker images
 - if [ "$TARGET" == "test-unit" ]; then docker pull tomcat:8.0; fi
 - if [ "$TARGET" == "test-unit" ]; then docker pull haproxy:1.7; fi

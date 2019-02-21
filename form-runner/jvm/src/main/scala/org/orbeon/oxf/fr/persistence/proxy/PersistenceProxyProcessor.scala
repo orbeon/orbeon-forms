@@ -244,7 +244,7 @@ private object PersistenceProxyProcessor {
       }
 
       val doTransforms =
-        connectionResult.statusCode == HttpStatus.SC_OK
+        cxr.statusCode == HttpStatus.SC_OK
       applyTransforms(
         cxr.content.inputStream,
         response.getOutputStream,

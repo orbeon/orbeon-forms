@@ -17,6 +17,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, Output
 import java.net.URI
 
 import javax.xml.transform.stream.StreamResult
+import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.UriScheme
@@ -242,7 +243,13 @@ private object PersistenceProxyProcessor {
         }
       }
 
-      applyTransforms(cxr.content.inputStream, response.getOutputStream, transforms)
+      val doTransforms =
+        connectionResult.statusCode == HttpStatus.SC_OK
+      applyTransforms(
+        cxr.content.inputStream,
+        response.getOutputStream,
+        if (doTransforms) transforms else Nil
+      )
     }
 
   def proxyEstablishConnection(

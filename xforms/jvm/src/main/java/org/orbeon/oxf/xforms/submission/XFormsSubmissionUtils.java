@@ -158,7 +158,6 @@ public class XFormsSubmissionUtils {
 
         final ContentBody contentBody = new InputStreamBody(inputStream, mediatype, filename);
         multipartEntity.addPart(element.getName(), contentBody);
-
     }
 
     /**

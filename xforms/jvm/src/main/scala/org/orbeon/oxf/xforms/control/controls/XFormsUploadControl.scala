@@ -20,7 +20,6 @@ import org.orbeon.dom.Element
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, PathUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -136,16 +135,16 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     def deleteFileIfPossible(url: String): Unit =
       if (isFileURL(url))
         try {
-          val file = new File(new URI(splitQuery(url)._1))
+          val file = new File(new URI(PathUtils.splitQuery(url)._1))
           if (file.exists) {
             if (file.delete())
-              debug("deleted temporary file upon upload", Seq("path" → file.getCanonicalPath))
+              debug("deleted temporary file upon upload", List("path" → file.getCanonicalPath))
             else
-              warn("could not delete temporary file upon upload", Seq("path" → file.getCanonicalPath))
+              warn("could not delete temporary file upon upload", List("path" → file.getCanonicalPath))
           }
         } catch {
           case NonFatal(_) ⇒
-            error("could not delete temporary file upon upload", Seq("path" → url))
+            error("could not delete temporary file upon upload", List("path" → url))
         }
 
     // Clean values
@@ -223,7 +222,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _ ⇒ false
     }
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
+  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
     added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
     added
@@ -246,6 +245,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
 object XFormsUploadControl {
 
+  private val MacParamName = "mac"
+
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
   def mediatypeToAccept(s: String): String = s.splitTo() mkString ","
 
@@ -260,16 +261,20 @@ object XFormsUploadControl {
   // The MAC includes the URL protocol, path and metadata
   def hmacURL(url: String, filename: Option[String], mediatype: Option[String], size: Option[String]): String = {
 
-    val candidates = Seq(
+    val candidates = List(
       "filename"  → filename,
       "mediatype" → mediatype,
       "size"      → size
     )
 
-    val query = candidates collect { case (name, Some(value)) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
+    val query = candidates collect {
+      case (name, Some(value)) ⇒
+        name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
+    } mkString "&"
+
     val urlWithQuery = PathUtils.appendQueryString(url, query)
 
-    PathUtils.appendQueryString(urlWithQuery, "mac=" + hmac(urlWithQuery))
+    PathUtils.appendQueryString(urlWithQuery, MacParamName + '=' + hmac(urlWithQuery))
   }
 
   // Get the MAC for a given string
@@ -278,19 +283,26 @@ object XFormsUploadControl {
 
   // Remove the MAC from the URL
   def removeMAC(url: String): String = {
+
     val uri = new URI(url)
+
     // NOTE: Use getRawQuery, as the query might encode & and =, and we should not decode them before decoding the query
-    val query = Option(uri.getRawQuery) map decodeSimpleQuery getOrElse Seq()
-    val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, CharsetNames.Utf8) } mkString "&"
+    val query = Option(uri.getRawQuery) map PathUtils.decodeSimpleQuery getOrElse Nil
+
+    val filteredQuery =
+      query filterNot (_._1 == MacParamName) map {
+        case (name, value) ⇒
+          name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
+      } mkString "&"
 
     PathUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
   }
 
   // For Java callers
-  def getParameterOrNull(url: String, name: String): String = getFirstQueryParameter(url, name).orNull
+  def getParameterOrNull(url: String, name: String): String = PathUtils.getFirstQueryParameter(url, name).orNull
 
   // Get the MAC from the URL
-  def getMAC(url: String) = getFirstQueryParameter(url, "mac")
+  def getMAC(url: String): Option[String] = PathUtils.getFirstQueryParameter(url, "mac")
 
   // Check that the given URL as a correct MAC
   def verifyMAC(url: String): Boolean =

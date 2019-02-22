@@ -35,6 +35,7 @@ object XFormsFunctionLibrary extends {
   val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
   val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
   val CryptoFunctionsNS             = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+  val PureUriFunctionsNS            = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
   val IndependentFunctionsNS        = Seq(XXFORMS_NAMESPACE_URI)
   val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
   val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
@@ -46,6 +47,7 @@ object XFormsFunctionLibrary extends {
   with XFormsFunnyFunctions
   with XFormsDeprecatedFunctions
   with CryptoFunctions
+  with PureUriFunctions
   with IndependentFunctions
   with XXFormsEnvFunctions
   with MapFunctions

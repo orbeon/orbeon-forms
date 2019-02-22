@@ -38,11 +38,13 @@ class PipelineFunctionLibrary extends {
   // http://docs.scala-lang.org/sips/pending/trait-parameters.html
   val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
   val CryptoFunctionsNS             = Seq(PIPELINE_NAMESPACE_URI)
+  val PureUriFunctionsNS            = Seq(PIPELINE_NAMESPACE_URI)
   val IndependentFunctionsNS        = Seq(PIPELINE_NAMESPACE_URI)
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
 }
   with OrbeonFunctionLibrary
   with CryptoFunctions
+  with PureUriFunctions
   with IndependentFunctions
   with IndependentRequestFunctions
   with MapFunctions

@@ -14,13 +14,14 @@
 package org.orbeon.saxon
 
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.`type`.Type._
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.function._
-import org.orbeon.saxon.functions.{Evaluate, Serialize}
 
+// TODO: Separate pure functions from this
 trait IndependentFunctions extends OrbeonFunctionLibrary {
 
   // Define in early definition of subclass
@@ -45,42 +46,52 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
       Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("get-request-method", classOf[GetRequestMethod], op = 0, min = 0, STRING, ALLOWS_ONE)
 
+    // TODO: Split this out into separate trait
     Fun("get-portlet-mode", classOf[GetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
 
+    // TODO: Split this out into separate trait
     Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 
+    // TODO: Split this out into separate trait
     Fun("get-session-attribute", classOf[GetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("set-session-attribute", classOf[SetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
       Arg(STRING, EXACTLY_ONE),
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("get-request-attribute", classOf[GetRequestAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("set-request-attribute", classOf[SetRequestAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
       Arg(STRING, EXACTLY_ONE),
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("username"                   , classOf[Username],              op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
     Fun("get-remote-user"            , classOf[Username],              op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
     Fun("user-group"                 , classOf[UserGroup],             op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
     Fun("user-roles"                 , classOf[UserRoles],             op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
     Fun("user-organizations"         , classOf[UserOrganizations],     op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
 
+    // TODO: Split this out into separate trait
     Fun("user-ancestor-organizations", classOf[AncestorOrganizations], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE)
     )
 
+    // TODO: Split this out into separate trait
     Fun("is-user-in-role", classOf[IsUserInRole], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
@@ -92,11 +103,11 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("evaluate", classOf[Evaluate], op = Evaluate.EVALUATE, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+    Fun("evaluate", classOf[saxon.functions.Evaluate], op = saxon.functions.Evaluate.EVALUATE, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("serialize", classOf[Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
+    Fun("serialize", classOf[saxon.functions.Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
       Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(ITEM_TYPE, EXACTLY_ONE)
     )

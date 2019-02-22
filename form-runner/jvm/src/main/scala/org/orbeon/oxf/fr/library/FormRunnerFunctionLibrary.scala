@@ -398,7 +398,7 @@ object FRComponentParam {
 
     for {
       elementAnalysis ← part.findControlAnalysis(instancePrefixedId)
-      instance        ← elementAnalysis.cast[model.Instance]
+      instance        ← elementAnalysis.narrowTo[model.Instance]
       constantContent ← instance.constantContent
     } yield
       constantContent.rootElement

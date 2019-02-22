@@ -333,7 +333,7 @@ object XFormsUploadControl {
       // In case of `xf:repeat`, the name of the template will not match an existing control.
       // In addition, only set value on forControl control if specified.
       control       ← containingDocument.findControlByEffectiveId(name)
-      uploadControl ← control.cast[XFormsUploadControl]
+      uploadControl ← control.narrowTo[XFormsUploadControl]
     } locally {
       uploadControl.handleUploadedFile(value, filename, mediatype, size)
     }

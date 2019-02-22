@@ -30,7 +30,7 @@ class XXFormsItemset extends XFormsFunction {
     val jsonOrXMLOpt =
       for {
         control        ← relevantControl(0)
-        valueControl   ← control.cast[XFormsValueControl]
+        valueControl   ← control.narrowTo[XFormsValueControl]
         select1Control ← XXFormsItemset.findSelectionControl(valueControl)
         itemset        = select1Control.getItemset
       } yield {

@@ -61,7 +61,7 @@ object XMLOutput extends XMLReceiverSupport {
       element(name, text = value)
 
   def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsControl] foreach { c ⇒
+    c.narrowTo[XFormsControl] foreach { c ⇒
       for {
         lhhaType ← LHHA.values
         lhhaProp = c.lhhaProperty(lhhaType)
@@ -72,14 +72,14 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.staticControl.cast[AppearanceTrait] foreach { c ⇒
+    c.staticControl.cast[AppearanceTrait] foreach { c ⇒ // NOTE: `narrowTo` fails
       c.appearances.iterator map
       (AppearanceTrait.encodeAppearanceValue(new jl.StringBuilder, _).toString) foreach
       (appearance ⇒ element("appearance", text = appearance)(xmlReceiver))
     }
 
   def matchSingleNode(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsSingleNodeControl] foreach { c ⇒
+    c.narrowTo[XFormsSingleNodeControl] foreach { c ⇒
       element(
         "mips",
         atts = List(
@@ -93,7 +93,7 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsValueControl] filter (_.isRelevant) foreach { c ⇒
+    c.narrowTo[XFormsValueControl] filter (_.isRelevant) foreach { c ⇒
 
       // XBL: Should probably do via xforms:htmlFragment and/or possibly the XBL control exposing a mediatype in
       // its definition.
@@ -108,12 +108,12 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[VisitableTrait] filter (c ⇒ c.isRelevant && c.visited) foreach { c ⇒
+    c.narrowTo[VisitableTrait] filter (c ⇒ c.isRelevant && c.visited) foreach { c ⇒
       element("visited", text = c.visited.toString)(xmlReceiver)
     }
 
   def matchItemset(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsSelect1Control] filter (_.isRelevant) foreach { c ⇒
+    c.narrowTo[XFormsSelect1Control] filter (_.isRelevant) foreach { c ⇒
       implicit val _xmlReceiver = xmlReceiver
       withElement("items") {
         c.getItemset.allItemsIterator foreach {
@@ -129,22 +129,22 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchContainer(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsContainerControl] foreach { c ⇒
+    c.narrowTo[XFormsContainerControl] foreach { c ⇒
       c.children foreach (applyMatchers(_)(xmlReceiver))
     }
 
   def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsRepeatControl] filter (_.isRelevant) foreach { c ⇒
+    c.narrowTo[XFormsRepeatControl] filter (_.isRelevant) foreach { c ⇒
       element("repeat", atts = List("index" → c.getIndex.toString))(xmlReceiver)
     }
 
   def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XFormsSwitchControl] filter (_.isRelevant) foreach { c ⇒
+    c.narrowTo[XFormsSwitchControl] filter (_.isRelevant) foreach { c ⇒
       element("switch", atts = List("selected" → (c.selectedCaseIfRelevantOpt map (_.getId) orNull)))(xmlReceiver)
     }
 
   def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[FileMetadata] foreach { c ⇒
+    c.narrowTo[FileMetadata] foreach { c ⇒
 
       val properties = c.iterateProperties collect { case (k, Some(v)) ⇒ k → v } toList
 
@@ -153,7 +153,7 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.cast[XXFormsDialogControl] filter (_.isVisible) foreach { _ ⇒
+    c.narrowTo[XXFormsDialogControl] filter (_.isVisible) foreach { _ ⇒
       element("visible", text = "true")(xmlReceiver)
     }
 

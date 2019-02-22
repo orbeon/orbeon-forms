@@ -96,7 +96,7 @@ class XXFormsComponentHandler(
       for {
         currentControl                    ← currentControlOpt // `None` if in template
         staticControl                     ← staticControlOpt
-        staticLhhaSupport                 ← staticControl.cast[StaticLHHASupport]
+        staticLhhaSupport                 ← staticControl.narrowTo[StaticLHHASupport]
         staticLabel                       ← staticLhhaSupport.lhh(Label)
         effectiveTargetControlOrPrefixedI ← staticLabel.effectiveTargetControlOrPrefixedIdOpt
         currentControlSuffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)

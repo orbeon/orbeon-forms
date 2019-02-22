@@ -67,7 +67,7 @@ object XXFormsComponentParam {
     val prefixedId              = XFormsId.getPrefixedId(xformsFunctionContext.sourceEffectiveId)
     val containerForSourceScope = xformsFunctionContext.container.findScopeRoot(prefixedId)
 
-    containerForSourceScope.associatedControlOpt flatMap (_.cast[XFormsComponentControl])
+    containerForSourceScope.associatedControlOpt flatMap (_.narrowTo[XFormsComponentControl])
   }
 
   // NOTE: In the future, we would like constant values to be available right away, and

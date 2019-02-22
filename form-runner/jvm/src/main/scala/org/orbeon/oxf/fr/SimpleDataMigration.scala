@@ -172,7 +172,7 @@ object SimpleDataMigration {
 
     def findEnclosingModel(enclosingModelAbsoluteId: String)(implicit doc: XFormsContainingDocument): XFormsModel =
       doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
-        (_.cast[XFormsModel])                                                                 getOrElse
+        (_.narrowTo[XFormsModel])                                                             getOrElse
         (throw new IllegalStateException)
 
     def findFormBindsRoot(enclosingModel: XFormsModel)(implicit doc: XFormsContainingDocument): Option[StaticBind] =

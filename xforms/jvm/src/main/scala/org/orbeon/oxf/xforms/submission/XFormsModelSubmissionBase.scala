@@ -65,7 +65,7 @@ abstract class XFormsModelSubmissionBase
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
-      throwable.cast[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
+      throwable.narrowTo[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
 
     // Dispatch event
     submitErrorEvent.logMessage(throwable)

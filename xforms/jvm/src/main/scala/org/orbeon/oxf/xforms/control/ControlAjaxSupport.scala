@@ -76,7 +76,7 @@ trait ControlAjaxSupport {
     var added = false
 
     for {
-      staticLhhaSupport ← staticControl.cast[StaticLHHASupport].toList
+      staticLhhaSupport ← staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
       lhha              ← LHHA.values
       // https://github.com/orbeon/orbeon-forms/issues/3836
       // Q: Could we just check `isLocal` instead of `isForRepeat`?
@@ -251,7 +251,7 @@ object ControlAjaxSupport {
 
     for {
       currentControl    ← controlOpt
-      staticLhhaSupport ← staticControl.cast[StaticLHHASupport]
+      staticLhhaSupport ← staticControl.narrowTo[StaticLHHASupport]
       staticLhha        ← staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
       if condition(staticLhha)
     } yield

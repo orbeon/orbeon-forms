@@ -111,7 +111,7 @@ object Wizard {
   def caseIdsForTopLevelSection(topLevelSectionId: String): SequenceIterator =
     for {
       control               ← inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, s"$topLevelSectionId-switch", None).toList
-      switchControl         ← control.cast[XFormsSwitchControl].toList
+      switchControl         ← control.narrowTo[XFormsSwitchControl].toList
       subsectionCaseControl ← switchControl.getChildrenCases
     } yield
       subsectionCaseControl.getId

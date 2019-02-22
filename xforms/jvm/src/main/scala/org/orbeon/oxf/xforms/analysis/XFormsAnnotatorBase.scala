@@ -31,7 +31,7 @@ abstract class XFormsAnnotatorBase(
   private var _documentLocator: Locator = null
   def documentLocator = _documentLocator
 
-  protected val templateSAXStoreOpt = templateReceiver.cast[SAXStore]
+  protected val templateSAXStoreOpt = templateReceiver.narrowTo[SAXStore]
 
   def isInXBLBinding: Boolean
   def isInPreserve: Boolean

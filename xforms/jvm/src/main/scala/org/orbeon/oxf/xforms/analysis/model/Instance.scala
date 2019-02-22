@@ -68,7 +68,7 @@ class Instance(
 
       // An instance within `xf:implementation` has a `ComponentControl` grandparent
       val componentOpt =
-        parent flatMap (_.parent) flatMap (_.cast[ComponentControl])
+        parent flatMap (_.parent) flatMap ( _.narrowTo[ComponentControl])
 
       componentOpt match {
         case Some(component) ⇒

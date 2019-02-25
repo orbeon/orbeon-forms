@@ -101,10 +101,14 @@ private class DateCompanion extends XBLCompanion {
     // On iOS, ignore the format as the native widget uses its own format
     if (! iOS) {
       val jsDate = datePicker.getDate
+      // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
+      // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
       datePicker.options.format = format
-        .replaceAllLiterally("[D]", "d")
-        .replaceAllLiterally("[M]", "m")
-        .replaceAllLiterally("[Y]", "yyyy")
+        .replaceAllLiterally("[D]"  , "d"   )
+        .replaceAllLiterally("[D01]", "dd"  )
+        .replaceAllLiterally("[M]"  , "m"   )
+        .replaceAllLiterally("[M01]", "mm"  )
+        .replaceAllLiterally("[Y]"  , "yyyy")
       datePicker.setDate(jsDate)
     }
   }

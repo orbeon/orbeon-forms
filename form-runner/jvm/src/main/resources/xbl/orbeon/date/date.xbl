@@ -170,11 +170,13 @@
                 </xf:var>
 
                 <xh:div class="input-append date fr-field-width-{$field-width}">
+                    <!-- Create placeholder from Orbeon Forms input format
+                         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
                     <xf:var
                         name="placeholder"
                         value="
                             let $format      := xxf:property('oxf.xforms.format.input.date'),
-                                $cleaned     := translate($format, '[]', ''),
+                                $cleaned     := translate($format, '[01]', ''),
                                 $duplicate   := replace(replace(replace($cleaned,
                                                 'M', 'MM'),
                                                 'D', 'DD'),

@@ -564,8 +564,9 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(
     name := "orbeon-xforms",
 
-    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
-    libraryDependencies += "com.outr"    %%% "scribe"   % "2.7.1",
+    libraryDependencies += "com.lihaoyi" %%% "autowire"    % AutowireVersion,
+    libraryDependencies += "com.outr"    %%% "scribe"      % "2.7.1",
+    libraryDependencies += "com.outr"    %%% "perfolation" % "1.1.0", // to avoid dependency on `scala-java-locales`
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

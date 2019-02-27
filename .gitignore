@@ -3,11 +3,7 @@ builder/target/
 tmp/
 target/
 build-local.properties
-.idea/shelf/
-.idea/modules/
-.idea/kotlinc.xml
-.idea/workspace.xml
-.idea/libraries
+.idea/
 # SBT command history
 .target/.history
 src/resources-packaged-target/

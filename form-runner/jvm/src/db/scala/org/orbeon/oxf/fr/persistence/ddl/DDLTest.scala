@@ -59,7 +59,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
             |    WHERE table_name = ?
             | ORDER BY ordinal_position"""
         case provider ⇒
-          throw new IllegalArgumentException(s"unsupported provider `${provider.pathToken}`")
+          throw new IllegalArgumentException(s"unsupported provider `${provider.entryName}`")
       }
       Connect.getTableNames(provider, connection).map { tableName ⇒
         useAndClose(connection.prepareStatement(query.stripMargin)) { ps ⇒
@@ -82,7 +82,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
-    val name = provider.pathToken
+    val name = provider.entryName
     withDebug("comparing upgrade to straight", List("provider" → name, "from" → from, "to" → to)) {
       val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
       val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))

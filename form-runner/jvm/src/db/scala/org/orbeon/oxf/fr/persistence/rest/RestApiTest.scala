@@ -174,7 +174,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         <xf:model id="fr-form-model">
           <xf:instance id="fr-form-metadata">
             <metadata>
-              <application-name>{provider.pathToken}</application-name>
+              <application-name>{provider.entryName}</application-name>
               <form-name>{FormName}</form-name>
               <title xml:lang="en">{title.getOrElse("")}</title>
               { PermissionsXML.serialize(permissions).getOrElse("") }
@@ -348,7 +348,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val expectedBody: Document =
         <forms>
             <form operations="read create">
-                <application-name>{provider.pathToken}</application-name>
+                <application-name>{provider.entryName}</application-name>
                 <form-name>my-form</form-name>
                 <form-version>1</form-version>
                 <title xml:lang="en"/>

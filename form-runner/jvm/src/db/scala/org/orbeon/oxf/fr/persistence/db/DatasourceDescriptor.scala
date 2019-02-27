@@ -32,7 +32,7 @@ object DatasourceDescriptor {
     provider match {
       case MySQL ⇒
         DatasourceDescriptor(
-          name      = provider.pathToken,
+          name      = provider.entryName,
           driver    = "com.mysql.jdbc.Driver",
           url       = "jdbc:mysql://localhost:3306/",
           username  = "orbeon",
@@ -41,7 +41,7 @@ object DatasourceDescriptor {
         )
       case PostgreSQL ⇒
         DatasourceDescriptor(
-          name      = provider.pathToken,
+          name      = provider.entryName,
           driver    = "org.postgresql.Driver",
           url       = "jdbc:postgresql://localhost:5432/",
           username  = "orbeon",

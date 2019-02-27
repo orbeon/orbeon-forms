@@ -104,8 +104,8 @@ private object HttpRequest {
   }
 
   private val FormName = "my-form"
-  def crudURLPrefix(provider: Provider) = s"crud/${provider.pathToken}/$FormName/"
-  def metadataURL  (provider: Provider) = s"form/${provider.pathToken}/$FormName"
+  def crudURLPrefix(provider: Provider) = s"crud/${provider.entryName}/$FormName/"
+  def metadataURL  (provider: Provider) = s"form/${provider.entryName}/$FormName"
 
   def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
     useAndClose(request(url, PUT, version, Some(body), credentials))(_.httpResponse.statusCode)

@@ -14,39 +14,40 @@
 package org.orbeon.oxf.fr.persistence.db
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{Oracle, MySQL, PostgreSQL, DB2, SQLServer}
 
 case class DatasourceDescriptor(
-  name     : String,
-  driver   : String,
-  url      : String,
-  username : String,
-  password : String
+  name      : String,
+  driver    : String,
+  url       : String,
+  username  : String,
+  password  : String,
+  switchDB  : String
 )
 
 object DatasourceDescriptor {
 
-  def apply(provider: Provider, user: Option[String]): DatasourceDescriptor = {
+  def apply(provider: Provider): DatasourceDescriptor = {
 
-    val url = provider match {
-      case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
-      case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
+    provider match {
+      case MySQL ⇒
+        DatasourceDescriptor(
+          name      = provider.pathToken,
+          driver    = "com.mysql.jdbc.Driver",
+          url       = "jdbc:mysql://localhost:3306/",
+          username  = "orbeon",
+          password  = "password",
+          switchDB  = "USE orbeon"
+        )
+      case PostgreSQL ⇒
+        DatasourceDescriptor(
+          name      = provider.pathToken,
+          driver    = "org.postgresql.Driver",
+          url       = "jdbc:postgresql://localhost:5432/",
+          username  = "orbeon",
+          password  = "",
+          switchDB  = "SET search_path TO orbeon"
+        )
     }
-
-    val username = "orbeon"
-    val password = System.getenv("RDS_PASSWORD")
-
-    DatasourceDescriptor(
-      name     = provider.pathToken,
-      driver   = DriverClassNames(provider),
-      url      = url,
-      username = username,
-      password = password
-    )
   }
-
-  private val DriverClassNames = Map(
-    MySQL      → "com.mysql.jdbc.Driver",
-    PostgreSQL → "org.postgresql.Driver"
-  )
 }

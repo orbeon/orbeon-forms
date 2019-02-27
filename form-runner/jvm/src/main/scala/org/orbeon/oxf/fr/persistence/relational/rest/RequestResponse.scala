@@ -68,11 +68,11 @@ trait RequestResponse extends Common {
     requestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(Provider.providerFromPathToken(provider), app, form, version, file, None)
+        Request(Provider.withName(provider), app, form, version, file, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId)
-        Request(Provider.providerFromPathToken(provider), app, form, version, file, Some(dataPart))
+        Request(Provider.withName(provider), app, form, version, file, Some(dataPart))
     }
   }
 

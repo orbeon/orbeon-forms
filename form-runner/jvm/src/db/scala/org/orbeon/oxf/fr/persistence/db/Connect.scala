@@ -17,15 +17,15 @@ import java.sql.{Connection, DriverManager}
 
 import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
+
+import scala.sys.process._
+import scala.util.Try
 
 private[persistence] object Connect {
-
-  import DataSourceSupport._
 
   def withOrbeonTables[T]
     (message: String)
@@ -51,28 +51,82 @@ private[persistence] object Connect {
     }
   }
 
-  def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
-    val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
-    val schema = s"orbeon_$buildNumber"
-    val createUserAndDatabase = Seq(s"CREATE DATABASE $schema")
-    val dropUserAndDatabase   = Seq(s"DROP DATABASE $schema")
+  def withNewDatabase[T]
+    (provider: Provider)
+    (block: Connection ⇒ T)
+    (implicit logger: IndentedLogger)
+  : T = {
+
+    val datasourceDescriptor = DatasourceDescriptor(provider)
+
     try {
-      Connect.asRoot  (provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
-      Connect.asOrbeon(provider)(block)
+
+      withConnection(datasourceDescriptor) { connection ⇒
+
+        val createUser: PartialFunction[Provider, Unit] = {
+          case MySQL      ⇒ runStatements(connection, List("CREATE DATABASE orbeon"))
+          case PostgreSQL ⇒ runStatements(connection, List("CREATE SCHEMA   orbeon"))
+        }
+
+        if (createUser.isDefinedAt(provider)) {
+          Logging.withDebug("create `orbeon` schema") {
+            createUser(provider)
+          }
+        }
+        // Run block
+        runStatements(connection, List(datasourceDescriptor.switchDB))
+        block(connection)
+      }
+
     } finally {
-      Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
+      Logging.withDebug("drop `orbeon` objects") {
+        provider match {
+          case MySQL      ⇒ runStatements(datasourceDescriptor, List("DROP DATABASE orbeon"))
+          case PostgreSQL ⇒ runStatements(datasourceDescriptor, List("DROP SCHEMA   orbeon    CASCADE"))
+        }
+      }
     }
   }
 
-  private def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T =
-    asUser(provider, None, block)
-  private def asOrbeon[T](provider: Provider)(block: Connection ⇒ T): T =
-    asUser(provider, Some(orbeonUserWithBuildNumber), block)
+  // TODO: No callers?
+  def rmContainer(image: String): Unit = {
+    val db2ContainerId = s"docker ps -q --filter ancestor=$image".!!
+    s"docker rm -f $db2ContainerId".!!
+  }
 
-  private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
-    val descriptor = DatasourceDescriptor(provider, user)
-    DataSourceSupport.withDatasources(List(descriptor)) {
-      val connection = DriverManager.getConnection(descriptor.url, descriptor.username, descriptor.password)
+  private def waitUntilCanConnect(datasourceDescriptor: DatasourceDescriptor): Unit = {
+    def tryConnecting() = Try(withConnection(datasourceDescriptor)(_ ⇒ Unit))
+    while (tryConnecting().isFailure) Thread.sleep(100)
+  }
+
+  private def runStatements(
+    datasourceDescriptor: DatasourceDescriptor,
+    statements: List[String])
+  : Unit = {
+    withConnection(datasourceDescriptor) { connection ⇒
+      statements.foreach(connection.createStatement.executeUpdate)
+    }
+  }
+
+  private def runStatements(
+    connection: Connection,
+    statements: List[String])
+  : Unit = {
+    val jdbcStatement = connection.createStatement()
+    statements.foreach(jdbcStatement.executeUpdate)
+  }
+
+  private def withConnection[T](
+    datasourceDescriptor : DatasourceDescriptor)(
+    block                : Connection ⇒ T)
+  : T =
+  {
+    DataSourceSupport.withDatasources(List(datasourceDescriptor)) {
+      val connection = DriverManager.getConnection(
+        datasourceDescriptor.url,
+        datasourceDescriptor.username,
+        datasourceDescriptor.password
+      )
       useAndClose(connection)(block)
     }
   }
@@ -88,8 +142,6 @@ private[persistence] object Connect {
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
-      case provider ⇒
-        throw new IllegalArgumentException(s"unsupported provider `${provider.pathToken}`")
     }
     useAndClose(connection.createStatement.executeQuery(query.stripMargin)) { tableNameResultSet ⇒
       val tableNamesList = Iterator

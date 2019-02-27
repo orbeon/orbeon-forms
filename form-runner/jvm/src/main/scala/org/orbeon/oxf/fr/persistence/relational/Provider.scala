@@ -14,29 +14,24 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.{Connection, ResultSet}
-import javax.xml.transform.stream.StreamSource
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
+import javax.xml.transform.stream.StreamSource
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 
-sealed trait Provider    extends Product with Serializable {
-  val pathToken: String
-  def uri : String = "/fr/service/" + pathToken
-}
+sealed abstract class Provider extends EnumEntry with Lowercase
 
-object Provider {
+object Provider extends Enum[Provider] {
 
-  case object  MySQL       extends Provider { val pathToken = "mysql"      }
-  case object  PostgreSQL  extends Provider { val pathToken = "postgresql" }
+  val values = findValues
 
-  def providerFromPathToken(token: String): Provider = {
-    val AllProviders = List(MySQL, PostgreSQL)
-    val providerOpt = AllProviders.find(_.pathToken == token)
-    providerOpt.getOrElse(throw new IllegalStateException)
-  }
+  case object MySQL      extends Provider
+  case object PostgreSQL extends Provider
 
   def xmlCol(provider: Provider, tableName: String) =
     provider match {

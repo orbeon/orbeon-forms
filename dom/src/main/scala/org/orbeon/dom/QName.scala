@@ -4,9 +4,6 @@ import java.{util ⇒ ju}
 
 object QName {
 
-  private val noNamespaceCache: ju.Map[String, QName]                    = ju.Collections.synchronizedMap(new ju.WeakHashMap[String, QName]())
-  private val namespaceCache  : ju.Map[Namespace, ju.Map[String, QName]] = ju.Collections.synchronizedMap(new ju.WeakHashMap[Namespace, ju.Map[String, QName]]())
-
   // 2017-10-27: 84 usages
   def apply(localName: String): QName = apply(localName, Namespace.EmptyNamespace, localName)
 
@@ -18,12 +15,14 @@ object QName {
 
     require((localName ne null) && localName.nonEmpty)
 
-    val cache = getOrCreateNamespaceCache(namespaceOrNull)
+    val namespace = if (namespaceOrNull eq null) Namespace.EmptyNamespace else namespaceOrNull
+
+    val cache = getOrCreateNamespaceCache(namespace)
 
     var answer = cache.get(localName)
 
     if (answer eq null) {
-      answer = applyNormalize(localName, namespaceOrNull, qualifiedNameOrNull)
+      answer = applyNormalize(localName, namespace, qualifiedNameOrNull)
       cache.put(localName, answer)
     }
 
@@ -34,31 +33,24 @@ object QName {
   def apply(localName: String, prefix: String, uri: String): QName =
     applyNormalize(localName, Namespace(prefix, uri), null)
 
-  private def getOrCreateNamespaceCache(namespaceOrNull: Namespace): ju.Map[String, QName] = {
-    if (namespaceOrNull eq Namespace.EmptyNamespace) { // only one instance of the empty namespace due to cache
-      noNamespaceCache
-    } else {
-      var answer: ju.Map[String, QName] = null
-      if (namespaceOrNull ne null) {
-        answer = namespaceCache.get(namespaceOrNull)
-      }
-      if (answer eq null) {
-        answer = ju.Collections.synchronizedMap(new ju.HashMap[String, QName]())
-        namespaceCache.put(namespaceOrNull, answer)
-      }
-      answer
+  private val namespaceCache = new ju.concurrent.ConcurrentHashMap[Namespace, ju.concurrent.ConcurrentHashMap[String, QName]]()
+
+  private def getOrCreateNamespaceCache(namespace: Namespace): ju.Map[String, QName] = {
+    var answer = namespaceCache.get(namespace)
+    if (answer eq null) {
+      answer = new ju.concurrent.ConcurrentHashMap[String, QName]()
+      namespaceCache.put(namespace, answer)
     }
+    answer
   }
 
   private def applyNormalize(
     localName           : String,
-    namespaceOrNull     : Namespace, // defaults to `EmptyNamespace`
+    namespace           : Namespace,
     qualifiedNameOrNull : String     // if not provided, try to use prefix from namespace to build
   ): QName = {
 
-    require((localName ne null) && localName.nonEmpty)
-
-    val namespace = if (namespaceOrNull eq null) Namespace.EmptyNamespace else namespaceOrNull
+    require((localName ne null) && localName.nonEmpty && (namespace ne null))
 
     new QName(
       localName,

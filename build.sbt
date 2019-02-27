@@ -393,11 +393,14 @@ lazy val xupdate = (project in file("xupdate"))
     ) map (_.exclude("commons-logging", "commons-logging"))
   )
 
-lazy val dom = (project in file("dom"))
+lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-dom"
   )
+
+lazy val domJVM = dom.jvm
+lazy val domJS  = dom.js
 
 lazy val embedding = (project in file("embedding"))
   .dependsOn(core)
@@ -651,7 +654,7 @@ lazy val nodeFacades = (project in file("node-facades"))
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtCoffeeScript, SbtWeb)
-  .dependsOn(commonJVM, dom, xupdate)
+  .dependsOn(commonJVM, dom.jvm, xupdate)
   .configs(DebugTest)
   .settings(commonSettings: _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
@@ -684,7 +687,7 @@ lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.
 lazy val orbeonWarJVM = orbeonWar.jvm
   .dependsOn(
     commonJVM,
-    dom,
+    dom.jvm,
     xupdate,
     core,
     xformsJVM,
@@ -740,7 +743,7 @@ lazy val root = (project in file("."))
   .aggregate(
     commonJVM,
     commonJS,
-    dom,
+    dom.jvm,
     xupdate,
     core,
     xformsJVM,

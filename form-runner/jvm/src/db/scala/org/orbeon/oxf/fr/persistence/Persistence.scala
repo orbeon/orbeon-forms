@@ -18,8 +18,8 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 object Persistence {
 
   val ProvidersTestedAutomatically: List[Provider] = List(
-    Provider.MySQL//,
-//    Provider.PostgreSQL
+    Provider.MySQL,
+    Provider.PostgreSQL
   )
 
 }

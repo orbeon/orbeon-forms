@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
+import java.sql.Connection
+import java.util.logging.Logger
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
-import org.apache.commons.dbcp.BasicDataSource
+import org.apache.commons.dbcp2.BasicDataSource
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.immutable
@@ -34,10 +36,6 @@ object DataSourceSupport {
     clearInitialContextForJDBC(originalProperties)
     result
   }
-
-  private val BuildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
-
-  def orbeonUserWithBuildNumber    = s"orbeon_$BuildNumber"
 
   private val NamingPrefix = "java:comp/env/jdbc/"
 
@@ -72,21 +70,29 @@ object DataSourceSupport {
       case (name, None)        ⇒ System.clearProperty(name)
     }
 
+  class TestDataSource(dsd: DatasourceDescriptor) extends BasicDataSource {
+    override def getConnection(): Connection = {
+      val connection = super.getConnection()
+      connection.createStatement.execute(dsd.switchDB)
+      connection
+    }
+  }
+
   private def bindDatasource(dsd: DatasourceDescriptor): BasicDataSource = {
 
-    val basicDataSource =
-      new BasicDataSource                   |!>
-        (_.setDriverClassName(dsd.driver  )) |!>
-        (_.setUrl            (dsd.url     )) |!>
-        (_.setUsername       (dsd.username)) |!>
-        (_.setPassword       (dsd.password))
+    val dataSource =
+      new TestDataSource(dsd)                 |!>
+        (_.setDriverClassName(dsd.driver   )) |!>
+        (_.setUrl            (dsd.url      )) |!>
+        (_.setUsername       (dsd.username )) |!>
+        (_.setPassword       (dsd.password ))
 
     (new InitialContext).rebind(
       NamingPrefix + dsd.name,
-      basicDataSource
+      dataSource
     )
 
-    basicDataSource
+    dataSource
   }
 
   private  def unbindDatasource(dsd: DatasourceDescriptor, ds: BasicDataSource): Unit = {

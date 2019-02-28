@@ -73,7 +73,7 @@ private object HttpRequest {
     }
 
     val contentType = body.map {
-      case XML   (_) ⇒ "application/xml"
+      case XML   (_) ⇒ ContentTypes.XmlContentType
       case Binary(_) ⇒ "application/octet-stream"
     }
 

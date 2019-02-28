@@ -14,10 +14,12 @@
 package org.orbeon.oxf.fr.persistence
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 
 object Persistence {
 
-  val ProvidersTestedAutomatically: List[Provider] = List(MySQL)
+  val ProvidersTestedAutomatically: List[Provider] = List(
+    Provider.MySQL//,
+//    Provider.PostgreSQL
+  )
 
 }

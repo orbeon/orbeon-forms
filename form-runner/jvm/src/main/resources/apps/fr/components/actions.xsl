@@ -378,10 +378,18 @@
                     generate-id() = $service-submissions-ids
                 ]">
         <xsl:copy>
-            <xsl:copy-of select="@* except (@ref | @instance | @replace)"/>
-            <xsl:attribute name="ref"         >xxf:instance('fr-service-request-instance')</xsl:attribute>
-            <xsl:attribute name="replace"     >instance</xsl:attribute>
-            <xsl:attribute name="xxf:instance">fr-service-response-instance</xsl:attribute>
+            <xsl:copy-of select="@* except (@ref | @replace | @instance | @xxf:instance)"/>
+            <xsl:attribute name="ref"      >xxf:instance('fr-service-request-instance')</xsl:attribute>
+            <xsl:attribute name="targetref">xxf:instance('fr-service-response-instance')</xsl:attribute>
+            <xsl:choose>
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/3945 -->
+                <xsl:when test="@replace = 'xxf:binary'">
+                    <xsl:copy-of select="@replace"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="replace">instance</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:copy>
     </xsl:template>
 

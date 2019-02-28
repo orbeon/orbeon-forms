@@ -17,16 +17,55 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
     <xsl:variable name="continuation-key">fr-service-continuation-id</xsl:variable>
+
+    <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
+        <xsl:param name="model-id"        as="xs:string"/>
+        <xsl:param name="to-control-name" as="xs:string"/>
+        <xsl:param name="at"              as="xs:string?"/>
+
+        <xsl:choose>
+            <xsl:when test="exists($at)">
+                <xsl:attribute
+                    name="iterate"
+                    select="
+                        concat(
+                            'frf:resolveTargetRelativeToActionSourceFromBinds(''',
+                            $model-id,
+                            ''', ''',
+                            $to-control-name,
+                            ''')[',
+                            if ($at = 'end') then
+                                'last()'
+                            else if ($at = 'start') then
+                                '1'
+                            else if ($at castable as xs:integer) then
+                                xs:integer($at)
+                            else
+                                error(),
+                            ']'
+                        )"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:attribute
+                    name="iterate"
+                    select="
+                        concat(
+                            'frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute(''fr-action-source''), ''',
+                            $to-control-name,
+                            ''', true())'
+                        )"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:function>
 
     <!-- Match and modify `fr:action`s -->
     <xsl:template
@@ -356,28 +395,12 @@
             <xf:rebuild/>
             <xf:revalidate/>
 
-            <xsl:choose>
-                <xsl:when test="exists($at)">
-                    <xf:setvalue
-                        ref="frf:resolveTargetRelativeToActionSourceFromBinds('{$model-id}', '{$to-control-name}')[{
-                            if ($at = 'end') then
-                                'last()'
-                            else if ($at = 'start') then
-                                '1'
-                            else if ($at castable as xs:integer) then
-                                xs:integer($at)
-                            else
-                                error()
-                        }]"
-                        value="$value"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xf:setvalue
-                        iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$to-control-name}', true())"
-                        ref="."
-                        value="$value"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xf:setvalue
+                    ref="."
+                    value="$value"/>
+            </xf:action>
         </xf:action>
 
     </xsl:template>
@@ -492,6 +515,87 @@
 
         <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
             process:runProcess('navigate(uri = ''<xsl:value-of select="$location"/>''<xsl:if test="exists($target)">, target = ''<xsl:value-of select="$target"/>''</xsl:if>)')
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-setattachment" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xf:action>
+            <xf:var name="value"     value="xxf:instance('fr-service-response-instance')/string()"/>
+            <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
+
+            <!-- Will run only if needed, right? -->
+            <xf:rebuild/>
+            <xf:revalidate/>
+
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xf:setvalue
+                    ref="."
+                    value="$value"/>
+                <xf:setvalue
+                    ref="@mediatype"
+                    value="$mediatype"/>
+            </xf:action>
+
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-setfilename" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+        <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xf:action>
+            <xf:var name="value" value="{$value-expr}"/>
+
+            <!-- Will run only if needed, right? -->
+            <xf:rebuild/>
+            <xf:revalidate/>
+
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xf:setvalue
+                    ref="@filename"
+                    value="$value"/>
+            </xf:action>
+
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-setmediatype" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+        <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xf:action>
+            <xf:var name="value" value="{$value-expr}"/>
+
+            <!-- Will run only if needed, right? -->
+            <xf:rebuild/>
+            <xf:revalidate/>
+
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xf:setvalue
+                    ref="@mediatype"
+                    value="$value"/>
+            </xf:action>
+
         </xf:action>
 
     </xsl:template>

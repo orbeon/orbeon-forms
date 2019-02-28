@@ -162,6 +162,10 @@ object SimplePath {
       case s     ⇒ Some(s.stringValue)
     }
 
+    def attValueOpt(attName: QName) = /@(attName) match {
+      case Seq() ⇒ None
+      case s     ⇒ Some(s.stringValue)
+    }
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
       case Seq() ⇒ None
       case s     ⇒ Some(s.stringValue) filter (_.nonBlank)
@@ -171,10 +175,6 @@ object SimplePath {
       attValueNonBlankOpt(attName) getOrElse
         (throw new IllegalArgumentException(s"attribute `$attName` is required on element `$name`"))
 
-    def attValueOpt(attName: QName) = /@(attName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
-    }
 
     def elemValue(elemName: String) = /(elemName).stringValue
     def elemValue(elemName: QName)  = /(elemName).stringValue

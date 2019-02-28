@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.db
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{Oracle, MySQL, PostgreSQL, DB2, SQLServer}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 
 case class DatasourceDescriptor(
   name      : String,

@@ -180,15 +180,26 @@ class ControlsComparator(
         }
 
         // Tell the client to make lifecycle changes after the nested markup is handled
-        // See https://github.com/orbeon/orbeon-forms/issues/3888
-        // See https://github.com/orbeon/orbeon-forms/issues/3909
+        // - https://github.com/orbeon/orbeon-forms/issues/3888
+        // - https://github.com/orbeon/orbeon-forms/issues/3909
+        // - https://github.com/orbeon/orbeon-forms/issues/3957
         control2 match {
           case cc2: XFormsComponentControl if cc2.staticControl.abstractBinding.modeJavaScriptLifecycle ⇒
 
             control1Opt.asInstanceOf[Option[XFormsComponentControl]] match {
               case None ⇒
-                if (cc2.isRelevant)
-                  outputInit(cc2.effectiveId, None, None, None)
+                if (cc2.isRelevant) {
+
+                  val valueChangeOpt =
+                    cc2 match {
+                      case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
+                        Option(vcc2.getEscapedExternalValue) // `getEscapedExternalValue` should never be null
+                      case _ ⇒
+                        None
+                    }
+
+                  outputInit(cc2.effectiveId, None, None, valueChangeOpt)
+                }
               case Some(cc1) ⇒
 
                 val relevantChanged = cc1.isRelevant != cc2.isRelevant

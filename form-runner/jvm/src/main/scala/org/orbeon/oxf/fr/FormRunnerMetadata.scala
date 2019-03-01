@@ -61,7 +61,7 @@ object FormRunnerMetadata {
   private val Debug            = false
 
   val FrExcludeFromEmailBody   = "fr-exclude-from-email-body"
-  val ControlsToIgnore         = Set("image", "image-attachment", "attachment", "trigger", "handwritten-signature", "explanation")
+  val ControlsToIgnore         = Set("image", "trigger", "handwritten-signature", "explanation")
 
   val SelectedCheckboxString   = "☒"
   val DeselectedCheckboxString = "☐"
@@ -451,6 +451,10 @@ object FormRunnerMetadata {
                     c.getFormattedValue orElse Option(c.getValue)
 
                 SingleControlValue(c.getValue, formattedValue)
+
+              case c: XFormsValueControl if Set("image-attachment", "attachment")(staticControl.localName) ⇒
+
+                SingleControlValue(c.getValue, c.boundNodeOpt flatMap (_.attValueOpt("filename")))
 
               case c: XFormsValueControl ⇒
 

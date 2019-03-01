@@ -28,7 +28,7 @@
     <xbl:binding
         id="fr-image-attachment"
         element="fr|image-attachment"
-        xxbl:mode="binding lhha"
+        xxbl:mode="binding lhha value"
         xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
@@ -24,10 +25,10 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLEl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.rpc
+import shapeless.syntax.typeable._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.control.Breaks
-import org.orbeon.oxf.util.CoreUtils._
 
 class ControlsComparator(
   document                       : XFormsContainingDocument,
@@ -190,15 +191,17 @@ class ControlsComparator(
               case None ⇒
                 if (cc2.isRelevant) {
 
-                  val valueChangeOpt =
-                    cc2 match {
-                      case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
-                        Option(vcc2.getEscapedExternalValue) // `getEscapedExternalValue` should never be null
-                      case _ ⇒
-                        None
-                    }
-
-                  outputInit(cc2.effectiveId, None, None, valueChangeOpt)
+                  outputInit(
+                    effectiveId    = cc2.effectiveId,
+                    relevant       = None,
+                    readonly       = None,
+                    valueChangeOpt =
+                      for {
+                        vcc2 ← cc2.narrowTo[XFormsValueComponentControl]
+                        if vcc2.staticControl.abstractBinding.modeExternalValue
+                      } yield
+                        vcc2.getEscapedExternalValue
+                  )
                 }
               case Some(cc1) ⇒
 
@@ -206,19 +209,19 @@ class ControlsComparator(
                 val readonlyChanged = cc1.isReadonly != cc2.isReadonly
 
                 val valueChangeOpt =
-                  cc2 match {
-                    case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
-                      findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
-                    case _ ⇒
-                      None
-                  }
+                  for {
+                    vcc2        ← cc2.narrowTo[XFormsValueComponentControl]
+                    if vcc2.staticControl.abstractBinding.modeExternalValue
+                    valueChange ← findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
+                  } yield
+                    valueChange
 
                 if (relevantChanged || readonlyChanged || valueChangeOpt.isDefined)
                   outputInit(
-                    cc2.effectiveId,
-                    relevantChanged option cc2.isRelevant,
-                    readonlyChanged option cc2.isReadonly,
-                    valueChangeOpt
+                    effectiveId    = cc2.effectiveId,
+                    relevant       = relevantChanged option cc2.isRelevant,
+                    readonly       = readonlyChanged option cc2.isReadonly,
+                    valueChangeOpt = valueChangeOpt
                   )
             }
 
@@ -227,15 +230,18 @@ class ControlsComparator(
             // NOTE: `modeExternalValue` can be used without `modeJavaScriptLifecycle`, although that is an uncommon use case.
 
             val valueChangeOpt =
-              control1Opt flatMap
-                (c1 ⇒ findValueChange(c1.asInstanceOf[XFormsValueComponentControl], vcc2))
+              for {
+                c1          ← control1Opt
+                valueChange ← findValueChange(c1.asInstanceOf[XFormsValueComponentControl], vcc2)
+              } yield
+                valueChange
 
             if (valueChangeOpt.isDefined)
               outputInit(
-                vcc2.effectiveId,
-                None,
-                None,
-                valueChangeOpt
+                effectiveId    = vcc2.effectiveId,
+                relevant       = None,
+                readonly       = None,
+                valueChangeOpt = valueChangeOpt
               )
 
           case _ ⇒

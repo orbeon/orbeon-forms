@@ -764,7 +764,9 @@
                         <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-13"/>
                         <xxf:attribute for="my-date≡xf-16" name="placeholder"/>
                         <xxf:control id="my-date≡xf-18" relevant="false"/>
-                        <xxf:init id="my-date"/>
+                        <xxf:init id="my-date">
+                            <xxf:value>2010-01-13</xxf:value>
+                        </xxf:init>
                     </xxf:control-values>
                     <xxf:script name="xf_a46d07e9482de772ed31f906f2af5a479e143a2e" target-id="my-date" observer-id="my-date">
                         <xxf:param>[M]/[D]/[Y]</xxf:param>

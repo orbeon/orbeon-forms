@@ -207,7 +207,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   def getRelevantEscapedExternalValue = getExternalValue
   def getNonRelevantEscapedExternalValue = ""
 
-  final def getEscapedExternalValue =
+  final def getEscapedExternalValue: String =
     if (isRelevant)
       // NOTE: Not sure if it is still possible to have a null value when the control is relevant
       Option(getRelevantEscapedExternalValue) getOrElse ""

@@ -25,7 +25,11 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         >
 
-    <xbl:binding id="fr-image-attachment" element="fr|image-attachment" xxbl:mode="binding lhha" xxbl:container="span">
+    <xbl:binding
+        id="fr-image-attachment"
+        element="fr|image-attachment"
+        xxbl:mode="binding lhha"
+        xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

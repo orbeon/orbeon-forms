@@ -34,6 +34,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
+import shapeless.syntax.typeable._
 
 import scala.xml.Elem
 
@@ -198,7 +199,7 @@ object FormRunnerMetadata {
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
-        collectByErasedType[XFormsInstance]
+        (_.narrowTo[XFormsInstance])
 
     def resourcesInstance(control: XFormsSingleNodeControl): Option[XFormsInstance] =
       instanceInScope(control, FormResources)
@@ -249,7 +250,7 @@ object FormRunnerMetadata {
     }
 
     val selectedControls =
-      (controls.values map collectByErasedType[XFormsSingleNodeControl] flatten) filter isBoundToFormDataInScope
+      controls.values flatMap (_.narrowTo[XFormsSingleNodeControl]) filter isBoundToFormDataInScope
 
     val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
 
@@ -262,7 +263,7 @@ object FormRunnerMetadata {
     val controlMetadata =
       for {
         control           ← sortedControls
-        staticControl     ← collectByErasedType[StaticLHHASupport](control.staticControl)
+        staticControl     ← control.staticControl.cast[StaticLHHASupport]
         resourcesInstance ← resourcesInstance(control)
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
         controlName       ← FormRunner.controlNameFromIdOpt(control.getId)
@@ -278,7 +279,7 @@ object FormRunnerMetadata {
             yield
               <resources lang={lang}>{resourcesForControl(staticControl, lang, resourcesRoot, controlName)}</resources>
           }{
-            for (valueControl ← collectByErasedType[XFormsValueControl](control).toList)
+            for (valueControl ← control.narrowTo[XFormsValueControl].toList)
             yield
               <value>{valueControl.getValue}</value>
           }</control>
@@ -301,7 +302,7 @@ object FormRunnerMetadata {
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
-        collectByErasedType[XFormsInstance]
+        (_.narrowTo[XFormsInstance])
 
     def resourcesInstance(control: XFormsSingleNodeControl): Option[XFormsInstance] =
       instanceInScope(control, FormResources)
@@ -388,7 +389,7 @@ object FormRunnerMetadata {
         controlName   ← FormRunner.controlNameFromIdOpt(control.getId)
       } yield {
 
-        val singleNodeControlOpt = collectByErasedType[XFormsSingleNodeControl](control)
+        val singleNodeControlOpt = control.narrowTo[XFormsSingleNodeControl]
 
         val resourcesInstanceOpt = singleNodeControlOpt flatMap resourcesInstance
         val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNodeOpt)
@@ -399,7 +400,7 @@ object FormRunnerMetadata {
           val lhhaAndItemsIt =
             for {
               resourcesInstance     ← resourcesInstanceOpt.iterator
-              lhhaStaticControl     ← collectByErasedType[StaticLHHASupport](staticControl).iterator
+              lhhaStaticControl     ← staticControl.cast[StaticLHHASupport].iterator
               (lang, resourcesRoot) ← iterateResources(resourcesInstance)
             } yield
               lang → resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
@@ -473,7 +474,7 @@ object FormRunnerMetadata {
             level        = ancestorLevelContainers(control).size,
             repeated     = isRepeat(control),
             iterations   = id.iterations drop (repeatDepth - 1),
-            datatype     = collectByErasedType[XFormsSelectControl](control) flatMap (_.getTypeLocalNameOpt),
+            datatype     = control.narrowTo[XFormsSelectControl] flatMap (_.getTypeLocalNameOpt),
             lhhaAndItems = lhhaAndItemsList,
             value        = valueOpt,
             forHashes    = Nil

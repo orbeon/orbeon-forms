@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom._
 import org.orbeon.oxf.fr.{AppForm, ResourcesPatcher}
-import org.orbeon.oxf.properties.PropertyStore
+import org.orbeon.oxf.properties.{Properties, PropertyStore}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CollectionUtils._
@@ -179,6 +179,89 @@ class ResourcesPatcherTest
           assert(compareElements(englishResource, resource, lang))
         }
       }
+    }
+  }
+
+  describe("Untranslated resources") {
+    it(s"must bracket as needed") {
+
+      def newDoc: Document =
+        <resources>
+          <resource xml:lang="en">
+            <authentication>
+              <menu>
+                  <logged-in-as>Logged in as {0}</logged-in-as>
+                  <logout>Logout</logout>
+                  <login>Login</login>
+                  <register>Register</register>
+              </menu>
+              <login>
+                  <title>Form Runner Login</title>
+                  <username>Username</username>
+                  <password>Password</password>
+                  <login>Login</login>
+              </login>
+          </authentication>
+          </resource>
+          <resource xml:lang="fr">
+            <authentication>
+              <menu>
+                  <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                  <logout todo="true">[Logout]</logout>
+                  <login todo="true">[Login]</login>
+                  <register todo="true">[Register]</register>
+              </menu>
+              <login>
+                  <title todo="true">Form Runner Login</title>
+                  <username todo="true">Username</username>
+                  <password todo="true">Password</password>
+                  <login todo="true">Login</login>
+              </login>
+            </authentication>
+          </resource>
+        </resources>
+
+      val expected: Document =
+        <resources>
+          <resource xml:lang="en">
+            <authentication>
+              <menu>
+                  <logged-in-as>Logged in as {0}</logged-in-as>
+                  <logout>Logout</logout>
+                  <login>Login</login>
+                  <register>Register</register>
+              </menu>
+              <login>
+                  <title>Form Runner Login</title>
+                  <username>Username</username>
+                  <password>Password</password>
+                  <login>Login</login>
+              </login>
+          </authentication>
+          </resource>
+          <resource xml:lang="fr">
+            <authentication>
+              <menu>
+                  <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                  <logout todo="true">[Logout]</logout>
+                  <login todo="true">[Login]</login>
+                  <register todo="true">[Register]</register>
+              </menu>
+              <login>
+                  <title>[Form Runner Login]</title>
+                  <username>[Username]</username>
+                  <password>[Password]</password>
+                  <login>[Login]</login>
+              </login>
+            </authentication>
+          </resource>
+        </resources>
+
+      val initial = newDoc
+
+      ResourcesPatcher.transform(initial, AppForm("*", "*"))(Properties.instance.getPropertySet)
+
+      assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }
   }
 }

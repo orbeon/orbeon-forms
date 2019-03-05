@@ -21,6 +21,7 @@ import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils, XMLReceiver}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
 
@@ -110,6 +111,21 @@ object ResourcesPatcher {
       rootForLang                   ← resourceElemsForLang(lang)
     } locally {
       Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply).setText(value)
+    }
+
+    def hasTodo(e: NodeInfo) =
+      e.attValueOpt("todo") contains "true"
+
+    def isBracketed(s: String) =
+      s.startsWith("[") && s.endsWith("]")
+
+    resourceElems descendant * filter
+      (e ⇒ ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)) foreach { e ⇒
+
+      val elem = unsafeUnwrapElement(e)
+
+      elem.remove(elem.attribute("todo"))
+      elem.setText(s"[${elem.getText}]")
     }
   }
 }

@@ -5095,4 +5095,456 @@
             </login-error>
         </authentication>
     </resource>
+	<resource xml:lang="da">
+		<common>
+			<formats>
+				<within-day>[H]:[m01]</within-day>
+				<day-this-year>[D]. [MNn]</day-this-year>
+				<short-date>[D01]-[M01]-[Y01]</short-date>
+			</formats>
+		</common>
+		<buttons>
+		    <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; Create</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; View</view>
+            <approve todo="true">&lt;i class="icon-ok-circle"/&gt; Approve</approve>
+            <reject todo="true">&lt;i class="icon-ban-circle"/&gt; Reject</reject>
+
+			<home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
+			<review>&lt;i class="icon-eye-open"/&gt; Opsummering</review>
+			<pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
+			<tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
+			<delete>&lt;i class="fa fa-fw fa-remove-sign"/&gt; Slet</delete>
+			<import>&lt;i class="icon-upload"/&gt; Importér</import>
+			<new>&lt;i class="fa fa-fw fa-plus"/&gt; Ny blanket</new>
+			<duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplikér</duplicate>
+
+			<!-- Standard process buttons -->
+			<save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save>
+			<save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save-final>
+			<save-draft>&lt;i class="icon-inbox"/&gt; Gem</save-draft>
+			<edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
+			<send>&lt;i class="icon-arrow-right"/&gt; Send</send>
+			<email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
+			<validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validér]</validate>
+
+			<!-- Legacy buttons -->
+			<submit>&lt;i class="icon-arrow-right"/&gt; Send ind</submit>
+			<workflow-review>&lt;i class="icon-arrow-right"/&gt; Opsummering</workflow-review>
+			<workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
+			<workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
+
+			<!-- Other standard buttons -->
+			<summary>&lt;i class="fa fa-fw fa-list"/&gt; Oversigt</summary>
+			<close>&lt;i class="fa fa-fw fa-times"/&gt; Luk</close>
+			<clear>&lt;i class="fa fa-fw fa-remove"/&gt; slet indhold</clear>
+			<cancel>Afbryd</cancel>
+			<save-locally>Gem lokalt</save-locally>
+			<collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+			<expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+			<refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Genindlæs"/&gt;</refresh>
+			<wizard-next>&lt;i class="icon-chevron-right"/&gt; Næste</wizard-next>
+			<wizard-prev>&lt;i class="icon-chevron-left"/&gt; Forrige</wizard-prev>
+			<wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Indhold</wizard-toc>
+
+			<!-- Submit dialog -->
+			<submit-dialog-clear>Slet og luk</submit-dialog-clear>
+			<submit-dialog-keep>Behold indhold og luk</submit-dialog-keep>
+			<submit-dialog-go>OK</submit-dialog-go>
+			<submit-dialog-close-window>Luk vindue</submit-dialog-close-window>
+
+			<!-- Warning dialog -->
+			<validation-dialog-review>Validér</validation-dialog-review>
+			<validation-dialog-continue>Fortsæt</validation-dialog-continue>
+
+			<test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
+			<publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør...</publish>
+			<save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør</save-publish>
+
+			<yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
+			<no>&lt;i class="fa fa-fw fa-times"/&gt; Nej</no>
+			<ok>OK</ok>
+			<previous>Forrige</previous>
+			<next>Næste</next>
+		</buttons>
+		<components>
+			<labels>
+				<open-section>Åben afsnit</open-section>
+				<close-section>Luk afsnit</close-section>
+				<section-name>Afsnitsnavn</section-name>
+				<yes>Ja</yes>
+				<no>Nej</no>
+				<other>Andet</other>
+			</labels>
+			<grid>
+				<menu>Menu</menu>
+				<insert-above>Indsæt over</insert-above>
+				<insert-below>Indsæt under</insert-below>
+				<move-up>Flyt op</move-up>
+				<move-down>Flyt ned</move-down>
+				<remove>
+					<label>Fjern</label>
+					<hint todo="true">[Remove Line from the Repeated Grid]</hint>
+				</remove>
+				<add-another>
+					<label>Tilføj endnu en</label>
+					<hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+				</add-another>
+			</grid>
+			<section>
+				<remove>
+					<label>Fjern</label>
+					<hint todo="true">[Remove Line from the Repeated Grid]</hint>
+				</remove>
+				<add-another>
+					<label>Tilføj endnu en</label>
+					<hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+				</add-another>
+			</section>
+			<date-time>
+				<year>År</year>
+				<month>Måned</month>
+				<day>Dag</day>
+			</date-time>
+			<wizard>
+				<errors>Fejl</errors>
+				<incomplete>Ikke færdig</incomplete>
+				<complete>Færdig</complete>
+				<not-started>Ikke startet</not-started>
+				<edit>Rediger</edit>
+			</wizard>
+			<error-summary>
+				<show-more>Vis flere</show-more>
+				<show-less>Vis færre</show-less>
+			</error-summary>
+		</components>
+		<untitled-form>Blanket uden navn</untitled-form>
+		<errors>
+			<summary-title>Din blanket {1,choice,0#indeholder ingen besked|1#indeholder følgende '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|1&lt;indeholder følgende '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}</summary-title>
+			<form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#fejl|1#advarsel|2#information|3#besked}' - |1&lt;{1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}' - }{2}</form-title>
+			<none>Ingen fejl i skema</none>
+			<unsaved>Ugemte ændringer</unsaved>
+			<canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+		</errors>
+		<email>
+			<subject>Orbeon blanketbekræftigelse</subject>
+			<body>Vedlagt er blanket i PDF- og XML-format.</body>
+			<na todo="true">[N/A]</na>
+			<iteration todo="true">[Iteration {$iteration}]</iteration>
+		</email>
+		<!-- Formats used for PDF template -->
+		<print>
+			<formats>
+				<date>[D]. [MNn] [Y]</date>
+				<time>[H01]:[m01]:[s01]</time>
+				<dateTime>[D]. [MNn] [Y], [H01]:[m01]:[s01]</dateTime>
+			</formats>
+		</print>
+		<summary>
+			<titles>
+				<summary-title>Resumé</summary-title>
+				<delete-confirmation>Bekræft sletning</delete-confirmation>
+				<created>Oprettet</created>
+				<last-modified>Senest ændret</last-modified>
+				<selected>Valgt</selected>
+				<refresh>Dette indlæser siden igen</refresh>
+				<toc>Indholdsfortegnelse</toc>
+				<description>Beskrivelse</description>
+				<help>Hjælp</help>
+				<error-count>ugyldigt eller manglende svar i blanket</error-count>
+				<errors-count>ugyldige eller manglende svar i blanket</errors-count>
+			</titles>
+			<search>
+				<search>Søg</search>
+				<search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Søg efter blanket</search-forms>
+				<show-options>Vis alternativer for søgning</show-options>
+				<close-options>Luk alternativer for søgnng</close-options>
+			</search>
+			<paging>
+				<to>til</to>
+				<of>af</of>
+			</paging>
+			<messages>
+				<no-form-found>Ingen blanketter fundet.</no-form-found>
+				<delete-confirmation>Vil du slette den markerede blanket? Bemærk at når et gemt dokument slettes, slettes også de tilhørende kladder.</delete-confirmation>
+				<version todo="true">Form Version {0,number,integer}</version>
+			</messages>
+			<labels>
+				<draft>Kladde</draft>
+				<read-only>Vises kun</read-only>
+				<language-choice>Vælg sprog</language-choice>
+				<form-choice>Vælg en blanket</form-choice>
+				<free-search>Fritekstsøgning</free-search>
+				<any>Vilkårlig</any>
+				<script>Fuld version</script>
+				<refresh>Opdatér</refresh>
+				<close-box>Luk</close-box>
+				<help-back>Tilbage</help-back>
+				<goto-content>Gå til indhold</goto-content>
+			</labels>
+			<formats>
+				<date>[D]. [MNn] [Y]</date>
+				<time>[H01]:[m01]:[s01]</time>
+				<dateTime>[D]. [MNn] [Y], [H01]:[m01]:[s01]</dateTime>
+				<save-datetime>[D]. [MNn] [Y], [H01]:[m01]:[s01]</save-datetime>
+			</formats>
+		</summary>
+		<detail>
+			<messages>
+				<save-success>Blanket er gemt!</save-success>
+				<save-draft-success>Kladde er gemt!</save-draft-success>
+				<email-success>Email er sendt!</email-success>
+				<form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
+				<database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
+				<process-error>Der var en fejl i afvikling af programmer. Kontakt systemadministrator.</process-error>
+				<clear-confirm-message>Er du sikker på at du vil slette indholdet i alle felter på siden? Indholdet vil forsvinde helt.</clear-confirm-message>
+				<error-dialog-title>Kunne ikke afslutte behandling</error-dialog-title>
+				<confirmation-dialog-title>Bekræftelse</confirmation-dialog-title>
+				<confirmation-dialog-message>Er du sikker på, at du vil fortsætte?</confirmation-dialog-message>
+				<submit-dialog-title>Blanket er sendt ind</submit-dialog-title>
+				<submit-dialog-message>Tak, informationen er sendt ind.</submit-dialog-message>
+				<validation-dialog-title>Check blanketvalideringer</validation-dialog-title>
+				<validation-dialog-message>Din blanket {1,choice,0#indeholder ingen beskeder|1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}. Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte.</validation-dialog-message>
+				<buttons-message/>
+				<saved-locally-open>Klik her for at åbne dokument. Informationer du har skrevet i blanketten vil blive vist som da den blev gemt.</saved-locally-open>
+				<upload-in-progress>Prøv igen når fil-indlæsningen er færdig eller blevet afbrudt.</upload-in-progress>
+				<upload-start>Indlæsning starter</upload-start>
+				<upload-cancel>Indlæsning afbrudt af bruger</upload-cancel>
+				<upload-done>Indlæsning færdig</upload-done>
+				<upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
+				<upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0,number,integer} bytes og der blev indlæst {1,number,integer} bytes.]</upload-error-size>
+				<upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype.</upload-error-mediatype>
+				<upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+				<lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
+			</messages>
+			<draft-singleton>
+				<found-draft>Fandt en kladde</found-draft>
+				<found-drafts>Fandt kladder</found-drafts>
+				<found-draft-for-document>Der blev fundet en automastisk gemt kladde af denne blanket. Vil du åbne kladden eller starte forfra?</found-draft-for-document>
+				<found-draft-for-never-saved>En kladde for denne blanket er gemt automatisk. Vil du bruge kladden eller starte forfra?</found-draft-for-never-saved>
+				<found-drafts-for-never-saved>Der er flere kladder til denne blanket gemt automatisk. Vil du starte helt forfra eller arbejde videre på en af de gemte kladder?</found-drafts-for-never-saved>
+				<open-saved>Åben kladde</open-saved>
+				<open-draft>Åben auto-gemt kladde</open-draft>
+				<view-drafts>Vis gemt kladde</view-drafts>
+				<start-new>Start forfra</start-new>
+				<multiple-docs-title>Eksisterende blanketdata fundet</multiple-docs-title>
+				<multiple-docs-explanation>Du kan ikke lave nye data for denne blanket definition, det burde dog være muligt at ændre eksisterende blanketdata.</multiple-docs-explanation>
+				<multiple-docs-view-data>Vis eksisterende blanketdata</multiple-docs-view-data>
+			</draft-singleton>
+			<labels>
+				<language-choice>Sprog</language-choice>
+				<errors>Opsummering af fejl</errors>
+				<check-errors-in-form>Blanketten indeholder fejl</check-errors-in-form>
+				<error-details>Vis fejlspecifikation</error-details>
+				<confirm>Bekræft</confirm>
+				<alert>Manglende eller ugyldig svar</alert>
+				<captcha-label>Captcha</captcha-label>
+				<captcha-alert>De tegn du indtastede passede ikke med billedet - prøv igen</captcha-alert>
+			</labels>
+			<view>
+				<explanation>
+					Dette er en skrivebeskyttet version af dine data.
+				</explanation>
+			</view>
+			<lease>
+				<renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
+				<renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
+				<current-user-left todo="true">[You own a lease on this document for another </current-user-left>
+				<current-user-right todo="true">.]</current-user-right>
+				<relinquished todo="true">[You don't own a lease on this document anymore.]</relinquished>
+				<other-user todo="true">[Another user, with username "{0}", currently owns a lease on this document.]</other-user>
+				<relinquish todo="true">[Relinquish lease]</relinquish>
+				<renew todo="true">[Renew lease]</renew>
+				<try-acquire todo="true">[Try to acquire lease]</try-acquire>
+			</lease>
+		</detail>
+		<save-locally>
+			<dialog-title>Gem lokalt</dialog-title>
+			<dialog-body>
+				<div>
+					<p>
+						For at gemme dine data, klik på henvisning herunder og gem på din maskine.
+					</p>
+					<p>
+						For at hente data tilbage, dobbelt-klik på den fil du har gemt på din maskine og
+						værktøjet vil automatisk sætte informationen du har skrevet ind i blanketten igen.
+					</p>
+					<p>
+						<b>Bemærk:</b> Disse data er ikke gemt på en server, så hvis du sletter din fil vil data være gået tabt.
+					</p>
+				</div>
+			</dialog-body>
+		</save-locally>
+		<home>
+			<title>Blanketbehandler start</title>
+			<buttons>
+				<unpublish>&lt;i class="icon-ban-circle"/&gt; Afpublisér</unpublish>
+				<publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør</publish>
+				<cancel>Afbryd</cancel>
+				<connect>Forbind</connect>
+				<select>Vælg</select>
+				<operation>Udfør</operation>
+				<reindex>Genindekser database(r)</reindex>
+				<stop-reindex>Stop genindeksering</stop-reindex>
+				<all>Alle</all>
+				<none>Ingen</none>
+				<unpublished-local>Afpubliserede lokale blanketter</unpublished-local>
+				<published-local>Offentliggjorte lokale blanketter</published-local>
+				<unpublished-remote>Afpubliserede centrale blanketter</unpublished-remote>
+				<published-remote>Offentliggjorte centrale blanketter</published-remote>
+				<newer-local>Lokale blanketter, der er nyere]</newer-local>
+				<newer-remote>Centrale blanketter, der er nyere</newer-remote>
+				<publish-local>Offentliggør lokale blanketter</publish-local>
+				<unpublish-local>Afpublisér lokale blanketter</unpublish-local>
+				<publish-remote>Offentliggør centrale blanketter</publish-remote>
+				<unpublish-remote>Afpublisér centrale blanketter</unpublish-remote>
+				<push-to-remote>Flyt til central</push-to-remote>
+				<pull-from-remote>Flyt fra central</pull-from-remote>
+				<navigate-summary>Gå til oversigt</navigate-summary>
+				<navigate-new>Gå til ny</navigate-new>
+				<upgrade-local>Opgrader lokal blanket-definitioner</upgrade-local>
+				<upgrade-remote>Opgrader remote blanket-definitioner</upgrade-remote>
+				<reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+			</buttons>
+			<titles>
+				<publish-confirmation>Bekræft blanket-offentliggørelse/afpublisering</publish-confirmation>
+				<credentials>Akkreditiver for Central Server</credentials>
+				<status>Status</status>
+				<app>App</app>
+				<form>Blanket</form>
+				<title>Titel</title>
+				<view>Visning</view>
+				<new>Ny</new>
+				<local>Lokal</local>
+				<remote>Central</remote>
+				<form-identification>Blanket-indentifikation</form-identification>
+				<last-modified>Ændret</last-modified>
+				<reindexing-confirmation>Bekræft genindeksering</reindexing-confirmation>
+				<reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+			</titles>
+			<messages>
+				<no-forms>Du har ikke adgang til nogen udsendte blanketter.</no-forms>
+				<publish-confirmation>Er du sikker på du vil {0,choice,0#offentliggøre|1#afpublisére} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}?</publish-confirmation>
+				<reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
+				<reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+			</messages>
+			<labels>
+				<available>Tilgængelig</available>
+				<unavailable>Utilgængelig</unavailable>
+				<library>Bibliotek</library>
+				<newer>Nyere</newer>
+				<remote-server>Fjernserver</remote-server>
+				<username>Brugernavn</username>
+				<password>Kodeord</password>
+				<reindexing-generic>Genindekserer &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+				<reindexing-provider>Genindekserer {0} ({1,number}/{2,number})</reindexing-provider>
+				<reindexing-stopping>Genindeksering stopper &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+				<reindexing-finished>Genindekseringen er færdig</reindexing-finished>
+				<reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+				<reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+				<reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+			</labels>
+		</home>
+        <import>
+            <form-version>
+                <label todo="true">Form Version</label>
+                <alert todo="true">Missing form version</alert>
+            </form-version>
+            <application-name>
+                <label todo="true">Application Name</label>
+            </application-name>
+            <form-name>
+                <label todo="true">Form Name</label>
+            </form-name>
+            <version-comment>
+                <label todo="true">Version comment</label>
+            </version-comment>
+            <upload>
+                <label todo="true">Upload</label>
+            </upload>
+            <file>
+                <label todo="true">Excel file to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <alert todo="true">Missing file</alert>
+            </file>
+            <validation>
+                <label todo="true">Validation</label>
+                <alert todo="true">Please start the validation before proceeding to the import</alert>
+            </validation>
+            <start-validation>
+                <label todo="true">Start Validation</label>
+            </start-validation>
+            <total todo="true">Total</total>
+            <valid todo="true">Valid</valid>
+            <invalid todo="true">Invalid</invalid>
+            <imported todo="true">Imported</imported>
+            <skipped todo="true">Skipped</skipped>
+            <eta todo="true">ETA</eta>
+            <cancel-validation>
+                <label todo="true">Cancel Validation</label>
+            </cancel-validation>
+            <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+            <import>
+                <label todo="true">Import</label>
+            </import>
+            <existing-records>
+                <label todo="true">Existing database records</label>
+                <item id="0" todo="true">Keep</item>
+                <item id="1" todo="true">Delete</item>
+            </existing-records>
+            <invalid-data>
+                <label todo="true">Records with invalid data</label>
+                <item id="0" todo="true">Skip</item>
+                <item id="1" todo="true">Import</item>
+            </invalid-data>
+            <start-import>
+                <label todo="true">Start Import</label>
+            </start-import>
+            <cancel-import>
+                <label todo="true">Cancel Import</label>
+            </cancel-import>
+            <import-canceled todo="true">Import was canceled.</import-canceled>
+            <start-over>
+                <label todo="true">Start Over</label>
+            </start-over>
+            <existing-records-message todo="true">
+                There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+            </existing-records-message>
+            <eta-message todo="true">
+                {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+            </eta-message>
+            <invalid-records-message todo="true">
+                {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+            </invalid-records-message>
+            <valid-records-message todo="true">
+                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+            </valid-records-message>
+            <import-complete-message todo="true">
+                Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+            </import-complete-message>
+            <na todo="true">N/A</na>
+        </import>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">Logged in as {0}</logged-in-as>
+                <logout todo="true">Logout</logout>
+                <login todo="true">Login</login>
+                <register todo="true">Register</register>
+            </menu>
+            <login>
+                <title todo="true">Form Runner Login</title>
+                <username todo="true">Username</username>
+                <password todo="true">Password</password>
+                <login todo="true">Login</login>
+            </login>
+            <logout-done>
+                <title todo="true">Form Runner Logout</title>
+                <message todo="true">You're logged out.</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">Form Runner Login Error</title>
+                <unrecognized todo="true">The username or password you entered wasn't recognized.</unrecognized>
+                <try-again todo="true">Please try again.</try-again>
+            </login-error>
+        </authentication>
+	</resource>
 </resources>

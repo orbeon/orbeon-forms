@@ -69,6 +69,7 @@
                         <resource xml:lang="nl"><download>Download</download></resource>
                         <resource xml:lang="pt"><download>Baixar</download></resource>
                         <resource xml:lang="lt"><download>Parsisiųsti</download></resource>
+                        <resource xml:lang="da"><download>Hent</download></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

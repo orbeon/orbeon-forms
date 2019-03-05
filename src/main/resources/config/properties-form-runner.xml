@@ -373,7 +373,7 @@
     <!--<property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>-->
 
     <!-- For global pages like the Form Runner Home page, restrict list of languages to those that have full support -->
-    <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en es fr it de pt sv fi nl"/>
+    <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en es fr it de pt sv fi nl da"/>
     <!-- For forms, don't restrict the list of languages by default: https://github.com/orbeon/orbeon-forms/issues/1223 -->
     <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="*"/>
 

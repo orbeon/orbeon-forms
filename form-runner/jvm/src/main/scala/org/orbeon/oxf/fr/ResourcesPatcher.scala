@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils, XMLReceiver}
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.scaxon.XPath._
 
 // Processor to replace or add resources based on properties
 //
@@ -38,68 +36,80 @@ class ResourcesPatcher extends SimpleProcessor  {
 
     // Read inputs
     val resourcesDocument = readInputAsOrbeonDom(pipelineContext, "data")
-    val instanceElement   = new DocumentWrapper(readInputAsOrbeonDom(pipelineContext, "instance"), null, XPath.GlobalConfiguration) / *
+    val instanceElem      = new DocumentWrapper(readInputAsOrbeonDom(pipelineContext, "instance"), null, XPath.GlobalConfiguration) / *
 
-    val app  = instanceElement / "app"  stringValue
-    val form = instanceElement / "form" stringValue
+    val appForm = AppForm(
+      instanceElem / "app"  stringValue,
+      instanceElem / "form" stringValue
+    )
 
     // Transform and write out the document
-    ResourcesPatcher.transform(resourcesDocument, app, form)(Properties.instance.getPropertySet)
+    ResourcesPatcher.transform(resourcesDocument, appForm)(Properties.instance.getPropertySet)
     TransformerUtils.writeDom4j(resourcesDocument, xmlReceiver)
   }
 }
 
 object ResourcesPatcher {
 
-  def transform(resourcesDocument: Document, app: String, form: String)(implicit properties: PropertySet): Unit = {
+  private val Prefix   = "oxf.fr.resource"
+  private val WildCard = "*"
 
-    val resourcesElement = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement
+  def transform(
+    resourcesDocument : dom.Document,
+    appForm           : AppForm)(implicit
+    properties        : PropertySet
+  ): Unit = {
 
-    val propertyNames = properties.propertiesStartsWith("oxf.fr.resource" :: app :: form :: Nil mkString ".")
+    val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
+    val propertyNames = properties.propertiesStartsWith(Prefix :: appForm.toList :: Nil mkString ".")
 
     // In 4.6 summary/detail buttons are at the top level
-    def filterPathForBackwardCompatibility(path: Seq[String]) = path take 2 match {
-      case Seq("detail" | "summary", "buttons") ⇒ path drop 1
-      case _                                    ⇒ path
+    def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
+      case ("detail" | "summary") :: "buttons" :: _ ⇒ path drop 1
+      case _                                        ⇒ path
     }
 
-    val langPathValue = propertyNames.flatMap { propertyName ⇒
-      val allTokens            = propertyName.splitTo[List](".")
-      val lang                 = allTokens(5)
-      val resourceTokens       = allTokens.drop(6)
-      val pathString           = filterPathForBackwardCompatibility(resourceTokens).mkString("/")
+    val langPathValue = propertyNames flatMap { propertyName ⇒
+
+      val _ :: _ :: _ :: _ :: _ :: lang :: resourceTokens = propertyName.splitTo[List](".")
+
+      val pathString = filterPathForBackwardCompatibility(resourceTokens) mkString "/"
+
       // Property name with possible `*` replaced by actual app/form name
-      val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ resourceTokens).mkString(".")
+      val expandedPropertyName = Prefix :: appForm.toList ::: lang :: resourceTokens mkString "."
+
       // Had a case where value was null (more details would be useful)
-      val value                = properties.getNonBlankString(expandedPropertyName)
+      val value = properties.getNonBlankString(expandedPropertyName)
+
       value.map((lang, pathString, _))
     }
 
     // Return all languages or the language specified if it exists
     // For now we don't support creating new top-level resource elements for new languages.
     def findConcreteLanguages(langOrWildcard: String) = {
+
       val allLanguages =
-        eval(resourcesElement, "resource/@xml:lang/string()").asInstanceOf[Seq[String]]
+        resourceElems attValue XMLNames.XMLLangQName
 
       val filtered =
-        if (langOrWildcard == "*")
+        if (langOrWildcard == WildCard)
           allLanguages
         else
           allLanguages filter (_ == langOrWildcard)
 
-      filtered.distinct // there *shouldn't* be duplicate languages in the source
+      filtered.distinct
     }
 
-    def resourceElementsForLang(lang: String) =
-      eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unsafeUnwrapElement
+    def resourceElemsForLang(lang: String) =
+      resourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement
 
     // Update or create elements and set values
     for {
       (langOrWildcard, path, value) ← langPathValue.distinct
       lang                          ← findConcreteLanguages(langOrWildcard)
-      rootForLang                   ← resourceElementsForLang(lang)
+      rootForLang                   ← resourceElemsForLang(lang)
     } locally {
-      Dom4j.ensurePath(rootForLang, path split "/" map QName.apply).setText(value)
+      Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply).setText(value)
     }
   }
 }

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom._
-import org.orbeon.oxf.fr.ResourcesPatcher
+import org.orbeon.oxf.fr.{AppForm, ResourcesPatcher}
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -99,7 +99,7 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-      ResourcesPatcher.transform(initial, "*", "*")(propertySet)
+      ResourcesPatcher.transform(initial, AppForm("*", "*"))(propertySet)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }

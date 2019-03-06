@@ -58,7 +58,10 @@ trait RequestResponse extends Common {
     import Version._
 
     val version =
-      Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
+      Version(
+        documentId = headerValue(OrbeonForDocumentIdLower),
+        version    = headerValue(OrbeonFormDefinitionVersionLower)
+      )
 
     val requestPath = httpRequest.getRequestPath
 

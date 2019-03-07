@@ -444,10 +444,10 @@ trait FormRunnerActions {
   //
   // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
   // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
-  private def prependCommonFormRunnerParameters(pathQuery: String, forNavigate: Boolean) =
-    if (! NetUtils.urlHasProtocol(pathQuery)) { // heuristic, which might not always be a right guess?
+  private def prependCommonFormRunnerParameters(pathQueryOrUrl: String, forNavigate: Boolean) =
+    if (! NetUtils.urlHasProtocol(pathQueryOrUrl)) { // heuristic, which might not always be a right guess?
 
-      val (path, params) = splitQueryDecodeParams(pathQuery)
+      val (path, params) = splitQueryDecodeParams(pathQueryOrUrl)
 
       val newParams =
         for {
@@ -460,7 +460,7 @@ trait FormRunnerActions {
 
       recombineQuery(path, newParams ::: (params filterNot (p ⇒ StateParamNames(p._1))))
     } else
-      pathQuery
+      pathQueryOrUrl
 
   private def prependUserParamsForModeChange(pathQuery: String) = {
 
@@ -477,8 +477,8 @@ trait FormRunnerActions {
     recombineQuery(path, newParams ::: params)
   }
 
-  private def tryNavigateTo(path: String): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(path, forNavigate = true), progress = false))
+  private def tryNavigateTo(pathOrUrl: String): Try[Any] =
+    Try(load(prependCommonFormRunnerParameters(pathOrUrl, forNavigate = true), progress = false))
 
   private def tryChangeMode(
     replace            : String,

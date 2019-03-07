@@ -487,9 +487,11 @@
 
     <xsl:template match="fr:navigate" mode="within-action-2018.2">
 
-        <xsl:variable name="resource" select="@resource/string()" as="xs:string"/>
+        <xsl:variable name="location" select="@location/string()" as="xs:string"/>
 
-        <xf:load resource="{$resource}"/>
+        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            process:runProcess('navigate(uri = ''<xsl:value-of select="$location"/>'')')
+        </xf:action>
 
     </xsl:template>
 

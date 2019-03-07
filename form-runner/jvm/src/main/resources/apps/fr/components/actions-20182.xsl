@@ -474,4 +474,23 @@
 
     </xsl:template>
 
+    <xsl:template match="fr:process-call" mode="within-action-2018.2">
+
+        <xsl:variable name="process-scope" select="@scope/string()" as="xs:string"/>
+        <xsl:variable name="process-name"  select="@name/string()" as="xs:string"/>
+
+        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            process:runProcessByName('<xsl:value-of select="$process-scope"/>', '<xsl:value-of select="$process-name"/>')
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:navigate" mode="within-action-2018.2">
+
+        <xsl:variable name="resource" select="@resource/string()" as="xs:string"/>
+
+        <xf:load resource="{$resource}"/>
+
+    </xsl:template>
+
 </xsl:stylesheet>

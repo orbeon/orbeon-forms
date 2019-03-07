@@ -95,6 +95,9 @@
 
                             <fr:repeat-remove-iteration repeat="my-grid" at="start"/>
 
+                            <fr:process-call scope="oxf.fr.detail.process" name="summary"/>
+                            <fr:navigate resource="https://www.bbc.com/news"/>
+
                         </fr:action>
                     </xf:model>
                 </xh:head>
@@ -360,6 +363,13 @@
                                 context="$container"
                                 ref="*[1]"/>
                         </xf:action>
+
+                        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                            process:runProcessByName('oxf.fr.detail.process', 'summary')
+                        </xf:action>
+
+                        <xf:load resource="https://www.bbc.com/news"/>
+
                     </xf:action>
                 </xf:action>
             </xf:model>

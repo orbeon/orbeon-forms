@@ -110,7 +110,7 @@
                             <canvas-not-supported>Voor annotaties op afbeeldingen, moet uw browser het HTML5 canvas ondersteunen</canvas-not-supported>
                             <annotated-image>Geannoteerde afbeelding</annotated-image>
                         </resource>
-						<resource xml:lang="da">
+                        <resource xml:lang="da">
                             <canvas-not-supported>For at annotere et billede, skal din browser understøtte HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annoteret billede</annotated-image>
                         </resource>

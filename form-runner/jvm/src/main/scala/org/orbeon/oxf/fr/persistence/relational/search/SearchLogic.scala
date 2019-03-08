@@ -18,7 +18,7 @@ import java.sql.Timestamp
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, PermissionsCheck}
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
@@ -89,9 +89,8 @@ trait SearchLogic extends SearchRequest {
           freeTextFilterPart (request)
         )
 
+        val innerSQL = buildQuery(commonParts)
         val searchCount = {
-
-          val innerSQL = buildQuery(commonParts)
           val sql =
             s"""SELECT count(*)
                |  FROM (
@@ -107,28 +106,47 @@ trait SearchLogic extends SearchRequest {
         }
 
         // Build SQL and create statement
-        val parts =
-          commonParts :+
-          mySqlOrderForRowNumPart(request)
         val sql = {
-          val innerSQL = buildQuery(parts)
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
+          val rowNumTableCol       = Provider.rowNumTableCol(request.provider, connection, tableAlias = "c")
+          val rowNumTable          = rowNumTableCol.table.getOrElse("")
+          val rowNumCol            = rowNumTableCol.col
+
           // Use LEFT JOIN instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in orbeon_i_control_text.
-          s"""    SELECT c.*, t.control, t.pos, t.val
-             |      FROM (
-             |           $innerSQL
-             |           ) c
-             | LEFT JOIN orbeon_i_control_text t
-             |           ON c.data_id = t.data_id
-             |     WHERE row_num
-             |           BETWEEN ${startOffsetZeroBased + 1}
-             |           AND     ${startOffsetZeroBased + request.pageSize}
+          s"""SELECT
+             |    c.*,
+             |    t.control,
+             |    t.pos,
+             |    t.val
+             |FROM
+             |    (
+             |        SELECT
+             |            c.*,
+             |            $rowNumCol
+             |        FROM
+             |            $rowNumTable
+             |            (
+             |                $innerSQL
+             |            ) s
+             |        INNER JOIN
+             |            orbeon_i_current c
+             |            ON c.data_id = s.data_id
+             |        ORDER BY
+             |            c.last_modified_time DESC
+             |    ) c
+             | LEFT JOIN
+             |    orbeon_i_control_text t
+             |    ON t.data_id = c.data_id
+             | WHERE
+             |    row_num
+             |        BETWEEN ${startOffsetZeroBased + 1}
+             |        AND     ${startOffsetZeroBased + request.pageSize}
              |""".stripMargin
         }
         Logger.logDebug("search items query", sql)
 
-        val documentsMetadataValues = executeQuery(connection, sql, parts) { documentsResultSet ⇒
+        val documentsMetadataValues = executeQuery(connection, sql, commonParts) { documentsResultSet ⇒
 
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),

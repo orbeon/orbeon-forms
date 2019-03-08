@@ -27,27 +27,6 @@ object commonPart  {
   def apply(request: Request, connection: Connection, versionNumber: Int) =
     StatementPart(
       sql = {
-
-        val mySQLMajorVersion =
-          (request.provider == MySQL).option {
-            // MySQL < 8 lacks row_number, see http://stackoverflow.com/a/1895127/5295
-            val mySQLVersion = {
-              val sql = "SHOW VARIABLES LIKE \"version\""
-              useAndClose(connection.prepareStatement(sql)) { ps ⇒
-                useAndClose(ps.executeQuery()) { rs ⇒
-                  rs.next()
-                  rs.getString("value")
-                }
-              }
-            }
-            mySQLVersion.splitTo(".").head.toInt
-          }
-        val isMySQLBefore8 = mySQLMajorVersion.exists(_ < 8)
-
-        val rowNumCol =
-          if (isMySQLBefore8) "@rownum := @rownum + 1 row_num"
-          else                "row_number() over (order by c.last_modified_time desc) row_num"
-        val mySqlRowNumTable = isMySQLBefore8.string(", (select @rownum := 0) r")
         val columnFilterTables =
           request.columns
             .filter(_.filterWith.nonEmpty)
@@ -57,23 +36,13 @@ object commonPart  {
         val freeTextTable =
           request.freeTextSearch.nonEmpty.string(", orbeon_form_data d")
 
-        s"""|    SELECT c.data_id,
-            |           c.document_id,
-            |           c.draft,
-            |           c.created,
-            |           c.last_modified_time,
-            |           c.last_modified_by,
-            |           c.username,
-            |           c.groupname,
-            |           c.organization_id,
-            |           $rowNumCol
-            |      FROM orbeon_i_current c
-            |           $mySqlRowNumTable
-            |           $columnFilterTables
-            |           $freeTextTable
-            |     WHERE c.app          = ?    AND
-            |           c.form         = ?    AND
-            |           c.form_version = ?
+        s"""|SELECT DISTINCT c.data_id
+            |           FROM orbeon_i_current c
+            |                $columnFilterTables
+            |                $freeTextTable
+            |          WHERE c.app          = ?    AND
+            |                c.form         = ?    AND
+            |                c.form_version = ?
             |""".stripMargin
       },
       setters = List(

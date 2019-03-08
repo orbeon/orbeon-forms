@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.oxf.util.CoreUtils._
 
 sealed abstract class Provider extends EnumEntry with Lowercase
 
@@ -130,4 +131,44 @@ object Provider extends Enum[Provider] {
       case PostgreSQL   ⇒ "CURRENT_TIMESTAMP + (interval '1' second * ?)"
       case _            ⇒ throw new UnsupportedOperationException
     }
+
+  case class RowNumTableCol(
+    table : Option[String],
+    col   : String
+  )
+
+  // MySQL < 8 lacks row_number, see http://stackoverflow.com/a/1895127/5295
+  def rowNumTableCol(
+    provider   : Provider,
+    connection : Connection,
+    tableAlias : String
+  ): RowNumTableCol = {
+
+    val mySQLMajorVersion =
+      (provider == MySQL).option {
+        val mySQLVersion = {
+          val sql = "SHOW VARIABLES LIKE \"version\""
+          useAndClose(connection.prepareStatement(sql)) { ps ⇒
+            useAndClose(ps.executeQuery()) { rs ⇒
+              rs.next()
+              rs.getString("value")
+            }
+          }
+        }
+        mySQLVersion.splitTo(".").head.toInt
+      }
+
+    mySQLMajorVersion match {
+      case Some(v) if v < 8 ⇒
+        RowNumTableCol(
+          table = Some(", (select @rownum := 0) r"),
+          col   = "@rownum := @rownum + 1 row_num"
+        )
+      case _ ⇒
+        RowNumTableCol(
+          table = None,
+          col   = s"row_number() over (order by $tableAlias.last_modified_time desc) row_num"
+        )
+    }
+  }
 }

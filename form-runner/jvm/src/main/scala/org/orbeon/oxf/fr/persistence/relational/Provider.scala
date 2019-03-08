@@ -161,7 +161,7 @@ object Provider extends Enum[Provider] {
     mySQLMajorVersion match {
       case Some(v) if v < 8 ⇒
         RowNumTableCol(
-          table = Some(", (select @rownum := 0) r"),
+          table = Some("(select @rownum := 0) r"),
           col   = "@rownum := @rownum + 1 row_num"
         )
       case _ ⇒

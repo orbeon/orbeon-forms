@@ -109,8 +109,11 @@ trait SearchLogic extends SearchRequest {
         val sql = {
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
           val rowNumTableCol       = Provider.rowNumTableCol(request.provider, connection, tableAlias = "c")
-          val rowNumTable          = rowNumTableCol.table.getOrElse("")
           val rowNumCol            = rowNumTableCol.col
+          val rowNumTable          = rowNumTableCol.table match {
+            case Some(table) ⇒ table + ","
+            case None        ⇒ ""
+          }
 
           // Use LEFT JOIN instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in orbeon_i_control_text.

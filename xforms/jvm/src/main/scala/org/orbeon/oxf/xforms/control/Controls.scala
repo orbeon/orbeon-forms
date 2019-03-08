@@ -431,6 +431,7 @@ object Controls {
             // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates
             // controls and dispatches events
             this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
+
           case componentControl: XFormsComponentControl ⇒
 
             val hadMissingLazyBinding = componentControl.staticControl.bindingOpt.isEmpty

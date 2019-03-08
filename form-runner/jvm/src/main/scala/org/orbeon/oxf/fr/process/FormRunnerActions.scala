@@ -584,8 +584,8 @@ trait FormRunnerActions {
   def tryUnvisitAll(params: ActionParams)        : Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
 
   // Collapse/expand sections
-  def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))
-  def tryExpandAllSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
+  def tryCollapseSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-collapse-all",         targetId = SectionsModel))
+  def tryExpandAllSections(params: ActionParams) : Try[Any] = Try(dispatch(name = "fr-expand-all",           targetId = SectionsModel))
 
   def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
     Try {

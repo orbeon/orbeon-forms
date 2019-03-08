@@ -477,8 +477,8 @@ trait FormRunnerActions {
     recombineQuery(path, newParams ::: params)
   }
 
-  private def tryNavigateTo(pathOrUrl: String): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(pathOrUrl, forNavigate = true), progress = false))
+  private def tryNavigateTo(location: String, target: Option[String]): Try[Any] =
+    Try(load(prependCommonFormRunnerParameters(location,  forNavigate = true), target, progress = false))
 
   private def tryChangeMode(
     replace            : String,
@@ -524,9 +524,13 @@ trait FormRunnerActions {
         formRunnerProperty(propertyName)
       }
 
-      fromParams orElse fromProperties map evaluateValueTemplate flatMap trimAllToOpt get
+      val location  = fromParams orElse fromProperties map evaluateValueTemplate flatMap trimAllToOpt get
+      val targetOpt = params.get(Some("target")) flatMap trimAllToOpt
+
+      (location, targetOpt)
+
     } flatMap
-      tryNavigateTo
+      (tryNavigateTo _).tupled
 
   def tryNavigateToReview(params: ActionParams): Try[Any] =
     Try {

@@ -380,11 +380,14 @@ object Controls {
 
     def startVisitControl(control: XFormsControl): Boolean = {
 
+      // Increment before the early return as `endVisitControl` always decrements.
+      // Caused https://github.com/orbeon/orbeon-forms/issues/3976
+      level += 1
+
       // If this is a new iteration, don't recurse into it
       if (newIterationsIds.nonEmpty && control.isInstanceOf[XFormsRepeatIterationControl] && newIterationsIds(control.effectiveId))
         return false
 
-      level += 1
       _visitedCount += 1
 
       // Value of relevance of content before messing with the binding

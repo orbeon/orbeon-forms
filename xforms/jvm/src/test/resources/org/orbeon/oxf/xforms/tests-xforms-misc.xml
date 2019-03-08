@@ -1574,4 +1574,71 @@
         </output>
     </test>
 
+    <test description="#3976: Newly-relevant controls after repeat fail to update" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="my-model" xxf:xpath-analysis="true">
+                        <xf:instance id="my-instance">
+                            <form>
+                                <show>false</show>
+                                <my-group>
+                                    <my-repeat/>
+                                </my-group>
+                            </form>
+                        </xf:instance>
+                        <xf:bind
+                            id="my-group-bind"
+                            ref="my-group"
+                            relevant="../show = 'true'"/>
+                        <xf:setvalue
+                            event="xforms-ready"
+                            ref="show"
+                            value="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group" ref="my-group">
+                        <xf:output id="my-output-41" value="41"/>
+                        <xf:repeat id="my-repeat" ref="my-repeat"/>
+                        <xf:output id="my-output-42" value="42"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <form>
+                                    <show>true</show>
+                                    <my-group>
+                                        <my-repeat/>
+                                    </my-group>
+                                </form>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output-41">
+                            <xxf:value>41</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output-42">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+           </xxf:event-response>
+        </output>
+    </test>
+
 </group>

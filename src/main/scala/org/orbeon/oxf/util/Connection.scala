@@ -147,7 +147,7 @@ class Connection(
           val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
           cookieStoreOpt = Some(cookieStore)
 
-          val (effectiveConnectionURL, client) =
+          val (effectiveConnectionUrlString, client) =
             findInternalURL(urlString) match {
               case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
               case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
@@ -155,7 +155,7 @@ class Connection(
 
           val response =
             client.connect(
-              effectiveConnectionURL,
+              effectiveConnectionUrlString,
               credentials,
               cookieStore,
               method,
@@ -173,21 +173,24 @@ class Connection(
                 s
             }
 
-            val connectionURI =
+            val effectiveConnectionUrl = new URI(effectiveConnectionUrlString)
+
+            val effectiveConnectionUriNoPassword =
               new URI(
-                url.getScheme,
-                Option(url.getUserInfo) map replacePassword orNull,
-                url.getHost,
-                url.getPort,
-                url.getPath,
-                url.getQuery,
-                url.getFragment
+                effectiveConnectionUrl.getScheme,
+                Option(effectiveConnectionUrl.getUserInfo) map replacePassword orNull,
+                effectiveConnectionUrl.getHost,
+                effectiveConnectionUrl.getPort,
+                effectiveConnectionUrl.getPath,
+                effectiveConnectionUrl.getQuery,
+                effectiveConnectionUrl.getFragment
               )
 
-            debug("opening URL connection",
+            debug("opened connection",
               List(
-                "method" → method.entryName,
-                "URL"    → connectionURI.toString
+                "client"        → (if (client == InternalHttpClient) "internal" else "Apache"),
+                "effective URL" → effectiveConnectionUriNoPassword.toString,
+                "method"        → method.entryName
               ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
           }
 

@@ -156,7 +156,7 @@ trait FormRunnerBaseOps {
 
   // Find an xf:instance element
   def instanceElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    instanceElemFromModelElem(getModelElem(inDoc), id)
+    findModelElem(inDoc) flatMap (instanceElemFromModelElem(_, id))
 
   def instanceElemFromModelElem(modelElem: NodeInfo, id: String): Option[NodeInfo] =
     modelElem / XFInstanceTest find (_.hasIdValue(id))

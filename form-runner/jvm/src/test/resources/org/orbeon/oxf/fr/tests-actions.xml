@@ -1,4 +1,4 @@
-    <!--
+<!--
   Copyright (C) 2018 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -97,6 +97,7 @@
 
                             <fr:process-call scope="oxf.fr.detail.process" name="summary"/>
                             <fr:navigate location="https://www.bbc.com/news"/>
+                            <fr:navigate location="https://www.bbc.com/news" target="_blank"/>
 
                         </fr:action>
                     </xf:model>
@@ -370,6 +371,10 @@
 
                         <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                             process:runProcess('navigate(uri = ''https://www.bbc.com/news'')')
+                        </xf:action>
+
+                        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                            process:runProcess('navigate(uri = ''https://www.bbc.com/news'', target = ''_blank'')')
                         </xf:action>
 
                     </xf:action>

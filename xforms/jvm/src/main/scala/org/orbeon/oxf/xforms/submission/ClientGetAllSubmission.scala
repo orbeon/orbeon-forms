@@ -29,14 +29,14 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
 
   def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): SubmissionResult = {
     XFormsLoadAction.resolveStoreLoadValue(
-      containingDocument,
-      submission.getSubmissionElement,
-      true,
-      PathUtils.appendQueryString(p2.actionOrResource, Option(sp.queryString) getOrElse ""),
-      null,
-      null,
-      p.urlNorewrite,
-      Option(submission.getActiveSubmissionParameters) map (_.xxfShowProgress) getOrElse true
+      containingDocument = containingDocument,
+      currentElem        = Option(submission.getSubmissionElement),
+      doReplace          = true,
+      value              = PathUtils.appendQueryString(p2.actionOrResource, Option(sp.queryString) getOrElse ""),
+      target             = None,
+      urlType            = UrlType.Render,
+      urlNorewrite       = p.urlNorewrite,
+      isShowProgress     = Option(submission.getActiveSubmissionParameters) map (_.xxfShowProgress) getOrElse true
     )
     null
   }

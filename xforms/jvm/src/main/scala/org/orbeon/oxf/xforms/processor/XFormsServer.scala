@@ -40,7 +40,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvents}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{SubmissionResult, UrlType, XFormsModelSubmission}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
@@ -340,7 +340,7 @@ object XFormsServer {
       containingDocument.isPortletContainer    &&
       load.isReplace                           &&
       ! NetUtils.urlHasProtocol(load.resource) &&
-      load.urlType != "resource"
+      load.urlType != UrlType.Resource
 
     def diffControls(
       containingDocument             : XFormsContainingDocument,

@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.submission.UrlType
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 
@@ -38,11 +39,17 @@ class XFormsLoadAction extends XFormsAction {
         LegacyShow.withNameLowercaseOnly                 getOrElse
         LegacyShow.Replace
 
-    val doReplace = show == LegacyShow.Replace
+    // NOTE: Will also be none if the XPath context item is missing (which is not great).
+    val targetOpt =
+      actionElem.attributeValueOpt(XFormsConstants.TARGET_QNAME)         orElse
+      actionElem.attributeValueOpt(XFormsConstants.XXFORMS_TARGET_QNAME) flatMap
+      (v ⇒ Option(interpreter.resolveAVTProvideValue(actionElem, v)))
 
-    val target = interpreter.resolveAVT(actionElem, XFormsConstants.XXFORMS_TARGET_QNAME)
+    val urlType =
+      Option(interpreter.resolveAVT(actionElem, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
+      UrlType.withNameLowercaseOnly getOrElse
+      UrlType.Render
 
-    val urlType        = interpreter.resolveAVT(actionElem, XMLConstants.FORMATTING_URL_TYPE_QNAME)
     val urlNorewrite   = XFormsUtils.resolveUrlNorewrite(actionElem)
     val isShowProgress = interpreter.resolveAVT(actionElem, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
 
@@ -56,10 +63,10 @@ class XFormsLoadAction extends XFormsAction {
       case Some(item) ⇒
         resolveStoreLoadValue(
           containingDocument = actionContext.containingDocument,
-          currentElement     = actionElem,
-          doReplace          = doReplace,
+          currentElem        = Some(actionElem),
+          doReplace          = show == LegacyShow.Replace,
           value              = NetUtils.encodeHRRI(DataModel.getValue(item), true),
-          target             = target,
+          target             = targetOpt,
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
           isShowProgress     = isShowProgress
@@ -72,18 +79,17 @@ class XFormsLoadAction extends XFormsAction {
               case Some(resolvedResource) ⇒
                 resolveStoreLoadValue(
                   containingDocument = actionContext.containingDocument,
-                  currentElement     = actionElem,
-                  doReplace          = doReplace,
+                  currentElem        = Some(actionElem),
+                  doReplace          = show == LegacyShow.Replace,
                   value              = NetUtils.encodeHRRI(resolvedResource, true),
-                  target             = target,
+                  target             = targetOpt,
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
                   isShowProgress     = isShowProgress
                 )
               case None ⇒
-                val indentedLogger = interpreter.indentedLogger
-                if (indentedLogger.isDebugEnabled)
-                  indentedLogger.logDebug(
+                if (interpreter.indentedLogger.isDebugEnabled)
+                  interpreter.indentedLogger.logDebug(
                     "xf:load",
                     "resource AVT returned an empty sequence, ignoring action",
                     "resource",
@@ -115,11 +121,11 @@ object XFormsLoadAction {
 
   def resolveStoreLoadValue(
     containingDocument : XFormsContainingDocument,
-    currentElement     : Element,
+    currentElem        : Option[Element],
     doReplace          : Boolean,
     value              : String,
-    target             : String,
-    urlType            : String,
+    target             : Option[String],
+    urlType            : UrlType,
     urlNorewrite       : Boolean,
     isShowProgress     : Boolean
   ): Unit = {
@@ -131,11 +137,11 @@ object XFormsLoadAction {
         value
       } else {
         // URL must be resolved
-        if (urlType == "resource") {
+        if (urlType == UrlType.Resource) {
           // Load as resource URL
           XFormsUtils.resolveResourceURL(
             containingDocument,
-            currentElement,
+            currentElem.orNull,
             value,
             URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
           )
@@ -198,7 +204,12 @@ object XFormsLoadAction {
               // NOTE: As of 2016-03-17, the initialization case will fail and the portlet will throw an exception.
               true
             }
-          XFormsUtils.resolveRenderURL(containingDocument, currentElement, value, skipRewrite)
+          XFormsUtils.resolveRenderURL(
+            containingDocument,
+            currentElem.orNull,
+            value,
+            skipRewrite
+          )
         }
       }
 
@@ -211,7 +222,7 @@ object XFormsLoadAction {
 
     containingDocument.addLoadToRun(
       externalURL,
-      target,
+      target.orNull,
       urlType,
       doReplace,
       effectiveIsShowProgress

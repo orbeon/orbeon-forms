@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
+import org.orbeon.oxf.xforms.submission.UrlType;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
@@ -521,7 +522,13 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoadToRun(String resource, String targetOrNull, String urlType, boolean isReplace, boolean isShowProgress) {
+    public void addLoadToRun(
+        String resource,
+        String targetOrNull,
+        UrlType urlType,
+        boolean isReplace,
+        boolean isShowProgress
+    ) {
 
         if (activeSubmissionFirstPass != null)
             throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());

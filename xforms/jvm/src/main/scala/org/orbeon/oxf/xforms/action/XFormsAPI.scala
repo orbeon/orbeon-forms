@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitEr
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
+import org.orbeon.oxf.xforms.submission.{UrlType, XFormsModelSubmission}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -355,7 +355,16 @@ object XFormsAPI {
 
   // xf:load
   def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
-    XFormsLoadAction.resolveStoreLoadValue(inScopeContainingDocument, null, true, NetUtils.encodeHRRI(url, true), target.orNull, null, false, false)
+    XFormsLoadAction.resolveStoreLoadValue(
+      containingDocument = inScopeContainingDocument,
+      currentElem        = None,
+      doReplace          = true,
+      value              = NetUtils.encodeHRRI(url, true),
+      target             = target,
+      urlType            = UrlType.Render,
+      urlNorewrite       = false,
+      isShowProgress     = false
+    )
 
   // xf:setfocus
   def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName]): Unit =

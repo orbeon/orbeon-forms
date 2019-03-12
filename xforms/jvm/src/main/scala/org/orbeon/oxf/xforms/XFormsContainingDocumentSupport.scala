@@ -42,6 +42,7 @@ import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMe
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
+import org.orbeon.oxf.xforms.submission.UrlType
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
@@ -115,7 +116,7 @@ object XFormsContainingDocumentSupport {
 
 case class Message(message: String, level: String)
 
-case class Load(resource: String, target: Option[String], urlType: String, isReplace: Boolean, isShowProgress: Boolean)
+case class Load(resource: String, target: Option[String], urlType: UrlType, isReplace: Boolean, isShowProgress: Boolean)
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
   extends XBLContainer(

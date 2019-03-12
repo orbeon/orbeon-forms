@@ -1,0 +1,220 @@
+/**
+  * Copyright (C) 2010 Orbeon, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify it under the terms of the
+  * GNU Lesser General Public License as published by the Free Software Foundation; either version
+  * 2.1 of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  * See the GNU Lesser General Public License for more details.
+  *
+  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  */
+package org.orbeon.oxf.xforms.action.actions
+
+import org.orbeon.dom.Element
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xml.XMLConstants
+
+
+class XFormsLoadAction extends XFormsAction {
+
+  import XFormsLoadAction._
+
+  override def execute(actionContext: DynamicActionContext): Unit = {
+
+    val interpreter = actionContext.interpreter
+    val actionElem  = actionContext.analysis.element
+
+    val show =
+      Option(interpreter.resolveAVT(actionElem, "show")) map
+        LegacyShow.withNameLowercaseOnly                 getOrElse
+        LegacyShow.Replace
+
+    val doReplace = show == LegacyShow.Replace
+
+    val target = interpreter.resolveAVT(actionElem, XFormsConstants.XXFORMS_TARGET_QNAME)
+
+    val urlType        = interpreter.resolveAVT(actionElem, XMLConstants.FORMATTING_URL_TYPE_QNAME)
+    val urlNorewrite   = XFormsUtils.resolveUrlNorewrite(actionElem)
+    val isShowProgress = interpreter.resolveAVT(actionElem, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+
+    // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
+
+    val bindingContext = interpreter.actionXPathContext.getCurrentBindingContext
+
+    bindingContext.newBind option bindingContext.getSingleItem match {
+      case Some(null) ⇒
+      // NOP if no URI obtained (2019-03-12 asked WG for confirmation)
+      case Some(item) ⇒
+        resolveStoreLoadValue(
+          containingDocument = actionContext.containingDocument,
+          currentElement     = actionElem,
+          doReplace          = doReplace,
+          value              = NetUtils.encodeHRRI(DataModel.getValue(item), true),
+          target             = target,
+          urlType            = urlType,
+          urlNorewrite       = urlNorewrite,
+          isShowProgress     = isShowProgress
+        )
+      case None ⇒
+        actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
+          case Some(resourceAttValue) ⇒
+
+            Option(interpreter.resolveAVTProvideValue(actionElem, resourceAttValue)) match {
+              case Some(resolvedResource) ⇒
+                resolveStoreLoadValue(
+                  containingDocument = actionContext.containingDocument,
+                  currentElement     = actionElem,
+                  doReplace          = doReplace,
+                  value              = NetUtils.encodeHRRI(resolvedResource, true),
+                  target             = target,
+                  urlType            = urlType,
+                  urlNorewrite       = urlNorewrite,
+                  isShowProgress     = isShowProgress
+                )
+              case None ⇒
+                val indentedLogger = interpreter.indentedLogger
+                if (indentedLogger.isDebugEnabled)
+                  indentedLogger.logDebug(
+                    "xf:load",
+                    "resource AVT returned an empty sequence, ignoring action",
+                    "resource",
+                    resourceAttValue
+                  )
+            }
+
+          case None ⇒
+            // "Either the single node binding attributes, pointing to a URI in the instance
+            // data, or the linking attributes are required."
+            throw new OXFException("Missing 'resource' attribute or single-item binding on the `xf:load` element.")
+        }
+    }
+  }
+}
+
+object XFormsLoadAction {
+
+  import enumeratum._
+
+  sealed trait LegacyShow extends EnumEntry
+  object LegacyShow extends Enum[LegacyShow] {
+
+    val values = findValues
+
+    case object New     extends LegacyShow
+    case object Replace extends LegacyShow
+  }
+
+  def resolveStoreLoadValue(
+    containingDocument : XFormsContainingDocument,
+    currentElement     : Element,
+    doReplace          : Boolean,
+    value              : String,
+    target             : String,
+    urlType            : String,
+    urlNorewrite       : Boolean,
+    isShowProgress     : Boolean
+  ): Unit = {
+
+    val externalURL =
+      if (value.startsWith("#") || urlNorewrite) {
+        // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
+        // TODO: Not clear what happens in portlet mode: does norewrite make any sense?
+        value
+      } else {
+        // URL must be resolved
+        if (urlType == "resource") {
+          // Load as resource URL
+          XFormsUtils.resolveResourceURL(
+            containingDocument,
+            currentElement,
+            value,
+            URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
+          )
+        } else {
+          // Load as render URL
+
+          // Cases for `show="replace"` and `render` URLs:
+          //
+          // 1. Servlet in non-embedded mode
+          //     1. Upon initialization
+          //         - URL is rewritten to absolute URL
+          //         - `XFormsToXHTML` calls `getResponse.sendRedirect()`
+          //             - just use the absolute `location` URL without any further processing
+          //     2. Upon Ajax request
+          //         - URL is rewritten to absolute URL
+          //         - `xxf:load` sent to client in Ajax response
+          //         - client does `window.location.href = ...` or `window.open()`
+          // 2. Servlet in embedded mode (with client proxy portlet or embedding API)
+          //     1. Upon initialization
+          //         - URL is first rewritten to a absolute path without context (resolving of `resolveXMLBase`)
+          //         - URL is not WSRP-encoded
+          //         - `XFormsToXHTML` calls `getResponse.sendRedirect()`
+          //         - `ServletExternalContext.getResponse.sendRedirect()`
+          //             - rewrite the path to an absolute path including context
+          //             - add `orbeon-embeddable=true`
+          //         - embedding client performs HTTP redirect
+          //     2. Upon Ajax request
+          //         - URL is WSRP-encoded
+          //         - `xxf:load` sent to client in Ajax response
+          //         - client does `window.location.href = ...` or `window.open()`
+          // 3. Portlet
+          //     1. Upon initialization
+          //         - not handled (https://github.com/orbeon/orbeon-forms/issues/2617)
+          //     2. Upon Ajax
+          //         - perform a "two-pass load"
+          //         - URL is first rewritten to a absolute path without context (resolving of `resolveXMLBase`)
+          //         - URL is not WSRP-encoded
+          //         - `XFormsServer` adds a server event with `xxforms-load` dispatched to `#document`
+          //         - client performs form submission (`action`) which includes server events
+          //         - server dispatches incoming `xxforms-load` to `XXFormsRootControl`
+          //         - `XXFormsRootControl` performs `getResponse.sendRedirect()`
+          //         - `OrbeonPortlet` creates `Redirect()` object
+          //         - `BufferedPortlet.bufferedProcessAction()` sets new render parameters
+          //         - portlet then renders with new path set by the redirection
+          //
+          // Questions/suggestions:
+          //
+          // - why do we handle the Ajax case differently in embedded vs. portlet modes?
+          // - it's unclear which parts of the rewriting must take place here vs. in `sendRedirect()`
+          // - make clearer what's stored with `addLoadToRun()` (`location` is not clear enough)
+          //
+          val skipRewrite =
+            if (! containingDocument.isPortletContainer) {
+              if (! containingDocument.isEmbedded)
+                false
+              else
+                containingDocument.isInitializing
+            } else {
+              // Portlet container
+              // NOTE: As of 2016-03-17, the initialization case will fail and the portlet will throw an exception.
+              true
+            }
+          XFormsUtils.resolveRenderURL(containingDocument, currentElement, value, skipRewrite)
+        }
+      }
+
+    // Force no progress indication if this is a JavaScript URL
+    val effectiveIsShowProgress =
+      if (externalURL.startsWith("javascript:"))
+        false
+      else
+        isShowProgress
+
+    containingDocument.addLoadToRun(
+      externalURL,
+      target,
+      urlType,
+      doReplace,
+      effectiveIsShowProgress
+    )
+  }
+}

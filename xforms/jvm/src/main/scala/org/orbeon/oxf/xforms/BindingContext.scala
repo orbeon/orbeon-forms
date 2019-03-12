@@ -51,11 +51,11 @@ case class BindingContext(
 
   // Location data associated with the XForms element (typically, a control) associated with the binding. If location
   // data was passed during construction, pass that, otherwise try to get location data from passed element.
-  val locationData =
+  val locationData: LocationData =
     Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
 
   private var _variable: Option[VariableNameValue] = None
-  def variable = _variable
+  def variable: Option[VariableNameValue] = _variable
 
   // Constructor for scoping a variable
   def this(
@@ -86,7 +86,7 @@ case class BindingContext(
   }
 
   // Create a copy with a new variable in scope
-  def pushVariable(variableElement: ElementAnalysis, name: String, value: ValueRepresentation, scope: Scope) = {
+  def pushVariable(variableElement: ElementAnalysis, name: String, value: ValueRepresentation, scope: Scope): BindingContext = {
 
     def ancestorOrSelfInScope(scope: Scope) =
       new AncestorIterator(includeSelf = true) find (_.scope == scope) getOrElse (throw new IllegalStateException)
@@ -180,10 +180,10 @@ case class BindingContext(
     }
 
   // We don't have a bound element, but the parent is bound to xf:repeat
-  def isRepeatIterationBindingContext =
+  def isRepeatIterationBindingContext: Boolean =
     (parent ne null) && (controlElement eq null) && parent.isRepeatBindingContext
 
-  def isRepeatBindingContext =
+  def isRepeatBindingContext: Boolean =
     (controlElement ne null) && controlElement.getName == "repeat"
 
   // Return the closest enclosing repeat id, throw if not found

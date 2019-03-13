@@ -17,11 +17,10 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import enumeratum._
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.immutable.Seq
+import scala.collection.{immutable ⇒ i}
 
 trait Content {
   def inputStream   : InputStream
@@ -39,10 +38,11 @@ case class StreamedContent(
   contentLength : Option[Long],
   title         : Option[String]
 ) extends StreamedContentOrRedirect with Content {
-  def close() = runQuietly(inputStream.close())
+  def close(): Unit = runQuietly(inputStream.close())
 }
 
 object StreamedContent {
+
   def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None) =
     StreamedContent(
       inputStream   = new ByteArrayInputStream(bytes),
@@ -51,7 +51,7 @@ object StreamedContent {
       title         = title
     )
 
-  def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, Seq[String]], title: Option[String] = None) =
+  def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, i.Seq[String]], title: Option[String] = None) =
     StreamedContent(
       inputStream   = inputStream,
       contentType   = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
@@ -175,8 +175,8 @@ object HttpClientSettings {
 }
 
 case class Credentials(username: String, password: Option[String], preemptiveAuth: Boolean, domain: Option[String]) {
-  require(StringUtils.isNotBlank(username))
-  def getPrefix = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
+  require(username.nonBlank)
+  def getPrefix: String = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
 }
 
 object Credentials {
@@ -231,6 +231,7 @@ object HttpMethod extends Enum[HttpMethod] {
 }
 
 trait HttpClient {
+
   def connect(
     url         : String,
     credentials : Option[Credentials],
@@ -244,5 +245,5 @@ trait HttpClient {
 }
 
 object EmptyInputStream extends InputStream {
-  def read = -1
+  def read: Int = -1
 }

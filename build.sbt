@@ -22,6 +22,7 @@ val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
 val AutowireVersion               = "0.2.6"
 val ScalaXmlVersion               = "1.1.1"
+val FlyingSaucerVersion           = "9.1.18"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -65,7 +66,9 @@ val CoreLibraryDependencies = Seq(
   "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
   "mysql"                       % "mysql-connector-java"            % "8.0.15"          % Test,
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,
-  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test  // 3.0.1
+  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test,  // 3.0.1
+  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
+  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion
 //  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
 //  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map

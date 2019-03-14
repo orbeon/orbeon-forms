@@ -28,6 +28,7 @@ val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumVersion,
   "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
+  "org.scala-sbt"               %% "sbinary"                        % "0.5.0",
   "io.spray"                    %% "spray-json"                     % "1.3.2",
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % "3.9.0",

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.rest
+package org.orbeon.oxf.fr.persistence.test
 
 import java.sql.Connection
 
@@ -19,20 +19,17 @@ import org.junit.Test
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.relational.rest
-import org.orbeon.oxf.fr.persistence.rest.OrganizationTest.{CA, SF}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
 
-object OrganizationTest {
+// Test organization-related code used by the REST API
+class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
+
   val CA = Organization(List("usa", "ca"))
   val SF = Organization(List("usa", "ca", "sf"))
   val PA = Organization(List("usa", "ca", "pa"))
-}
-
-// Test organization-related code used by the REST API
-class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
 

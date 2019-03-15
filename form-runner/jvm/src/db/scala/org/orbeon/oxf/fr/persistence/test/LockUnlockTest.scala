@@ -11,10 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.rest
+package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db.Connect
+import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -26,20 +27,20 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
 
   @Test def lockUnlockTest(): Unit = {
     Connect.withOrbeonTables("lease") { (_, provider) ⇒
-      val dataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+      val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val homerLockInfo = LockInfo("hsimpson", Some("simpsons"))
       val margeLockInfo = LockInfo("msimpson", Some("simpsons"))
 
       // Homer locks, Marge can't lock, and Homer can lock again
-      HttpAssert.lock(dataURL, homerLockInfo, 200)
-      HttpAssert.lock(dataURL, margeLockInfo, 423)
-      HttpAssert.lock(dataURL, homerLockInfo, 200)
+      HttpAssert.lock(dataURL, homerLockInfo, expectedCode = 200)
+      HttpAssert.lock(dataURL, margeLockInfo, expectedCode = 423)
+      HttpAssert.lock(dataURL, homerLockInfo, expectedCode = 200)
 
       // After Homer unlock, Marge can lock, and Homer can't lock
-      HttpAssert.unlock(dataURL, homerLockInfo, 200)
-      HttpAssert.lock(dataURL, margeLockInfo, 200)
-      HttpAssert.lock(dataURL, homerLockInfo, 423)
-      HttpAssert.unlock(dataURL, margeLockInfo, 200)
+      HttpAssert.unlock(dataURL, homerLockInfo, expectedCode = 200)
+      HttpAssert.lock  (dataURL, margeLockInfo, expectedCode = 200)
+      HttpAssert.lock  (dataURL, homerLockInfo, expectedCode = 423)
+      HttpAssert.unlock(dataURL, margeLockInfo, expectedCode = 200)
     }
   }
 

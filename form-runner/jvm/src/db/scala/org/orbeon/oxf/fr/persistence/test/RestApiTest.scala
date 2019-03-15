@@ -11,15 +11,16 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.rest
-import java.io.ByteArrayInputStream
+package org.orbeon.oxf.fr.persistence.test
 
+import java.io.ByteArrayInputStream
 import org.junit.Test
 import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory, Text}
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
@@ -60,10 +61,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def formDefinitionVersionTest(): Unit = {
     Connect.withOrbeonTables("form definition") { (connection, provider) ⇒
 
-      val FormURL = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
+      val FormURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
       // First time we put with "latest" (AKA unspecified)
-      val first = HttpRequest.XML(<gaga1/>)
+      val first = HttpCall.XML(<gaga1/>)
       HttpAssert.put(FormURL, Unspecified, first, 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
       HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
@@ -72,38 +73,38 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       // Put again with "latest" (AKA unspecified) updates the current version
       val second = <gaga2/>
-      HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(second), 201)
-      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(second), Operations.None, Some(1)))
-      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(second), Operations.None, Some(1)))
+      HttpAssert.put(FormURL, Unspecified, HttpCall.XML(second), 201)
+      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(404))
 
       // Put with "next" to get two versions
       val third = <gaga3/>
-      HttpAssert.put(FormURL, Next, HttpRequest.XML(third), 201)
-      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(second), Operations.None, Some(1)))
-      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpRequest.XML(third),  Operations.None, Some(2)))
-      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(third),  Operations.None, Some(2)))
+      HttpAssert.put(FormURL, Next, HttpCall.XML(third), 201)
+      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
+      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
       HttpAssert.get(FormURL, Specific(3), HttpAssert.ExpectedCode(404))
 
       // Put a specific version
       val fourth = <gaga4/>
-      HttpAssert.put(FormURL, Specific(1), HttpRequest.XML(fourth), 201)
-      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Operations.None, Some(1)))
-      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpRequest.XML(third),  Operations.None, Some(2)))
-      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(third),  Operations.None, Some(2)))
+      HttpAssert.put(FormURL, Specific(1), HttpCall.XML(fourth), 201)
+      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
+      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
       HttpAssert.get(FormURL, Specific(3), HttpAssert.ExpectedCode(404))
 
       // Delete the latest version
       HttpAssert.del(FormURL, Unspecified, 204)
-      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(410))
-      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
 
       // After a delete the version number is reused
       val fifth = <gaga5/>
-      HttpAssert.put(FormURL, Next, HttpRequest.XML(fifth), 201)
-      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Operations.None, Some(1)))
-      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpRequest.XML(fifth),  Operations.None, Some(2)))
+      HttpAssert.put(FormURL, Next, HttpCall.XML(fifth), 201)
+      HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
+      HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(fifth),  Operations.None, Some(2)))
       HttpAssert.get(FormURL, Specific(3), HttpAssert.ExpectedCode(404))
     }
   }
@@ -113,30 +114,30 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def formDataVersionTest(): Unit = {
     Connect.withOrbeonTables("form data version") { (connection, provider) ⇒
-      val FirstDataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+      val FirstDataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
       // Storing for specific form version
       val first = <gaga1/>
-      HttpAssert.put(FirstDataURL, Specific(1), HttpRequest.XML(first), 201)
-      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
-      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
+      HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
+      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
+      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
       HttpAssert.del(FirstDataURL, Unspecified, 204)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(410))
 
       // Don't allow unspecified version for create
-      HttpAssert.put(FirstDataURL, Unspecified       , HttpRequest.XML(first), 400)
-      HttpAssert.put(FirstDataURL, Specific(1)       , HttpRequest.XML(first), 201)
+      HttpAssert.put(FirstDataURL, Unspecified       , HttpCall.XML(first), 400)
+      HttpAssert.put(FirstDataURL, Specific(1)       , HttpCall.XML(first), 201)
 
       // Allow unspecified or correct version for update
-      HttpAssert.put(FirstDataURL, Unspecified      , HttpRequest.XML(first), 201)
-      HttpAssert.put(FirstDataURL, Specific(1)      , HttpRequest.XML(first), 201)
+      HttpAssert.put(FirstDataURL, Unspecified      , HttpCall.XML(first), 201)
+      HttpAssert.put(FirstDataURL, Specific(1)      , HttpCall.XML(first), 201)
 
       // But don't allow incorrect version for update
-      HttpAssert.put(FirstDataURL, Specific(2)      , HttpRequest.XML(first), 400)
+      HttpAssert.put(FirstDataURL, Specific(2)      , HttpCall.XML(first), 400)
 
       // Fail with next/for document
-      HttpAssert.put(FirstDataURL, Next              , HttpRequest.XML(first), 400)
-      HttpAssert.put(FirstDataURL, ForDocument("123"), HttpRequest.XML(first), 400)
+      HttpAssert.put(FirstDataURL, Next              , HttpCall.XML(first), 400)
+      HttpAssert.put(FirstDataURL, ForDocument("123"), HttpCall.XML(first), 400)
     }
   }
 
@@ -145,19 +146,19 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def formForDataTest(): Unit = {
     Connect.withOrbeonTables("form data") { (connection, provider) ⇒
-      val FormURL       = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
-      val FirstDataURL  = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
-      val SecondDataURL = HttpRequest.crudURLPrefix(provider) + "data/456/data.xml"
+      val FormURL       = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+      val FirstDataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+      val SecondDataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
       val first         = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first"))
       val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
       val data          = <gaga/>
 
-      HttpAssert.put(FormURL      , Unspecified, HttpRequest.XML(first) , 201)
-      HttpAssert.put(FormURL      , Next       , HttpRequest.XML(second), 201)
-      HttpAssert.put(FirstDataURL , Specific(1), HttpRequest.XML(data)  , 201)
-      HttpAssert.put(SecondDataURL, Specific(2), HttpRequest.XML(data)  , 201)
-      HttpAssert.get(FormURL, ForDocument("123"), HttpAssert.ExpectedBody(HttpRequest.XML(first) , Operations.None, Some(1)))
-      HttpAssert.get(FormURL, ForDocument("456"), HttpAssert.ExpectedBody(HttpRequest.XML(second), Operations.None, Some(2)))
+      HttpAssert.put(FormURL      , Unspecified, HttpCall.XML(first) , 201)
+      HttpAssert.put(FormURL      , Next       , HttpCall.XML(second), 201)
+      HttpAssert.put(FirstDataURL , Specific(1), HttpCall.XML(data)  , 201)
+      HttpAssert.put(SecondDataURL, Specific(2), HttpCall.XML(data)  , 201)
+      HttpAssert.get(FormURL, ForDocument("123"), HttpAssert.ExpectedBody(HttpCall.XML(first) , Operations.None, Some(1)))
+      HttpAssert.get(FormURL, ForDocument("456"), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(2)))
       HttpAssert.get(FormURL, ForDocument("789"), HttpAssert.ExpectedCode(404))
     }
   }
@@ -190,7 +191,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
     Connect.withOrbeonTables("permissions") { (connection, provider) ⇒
 
-      val formURL = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
+      val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
       val guest   = None
       val clerk   = Some(Credentials("tom", Some("clerk")  , List(SimpleRole("clerk"  )), Nil))
@@ -198,44 +199,44 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val admin   = Some(Credentials("tim", Some("admin")  , List(SimpleRole("admin"  )), Nil))
 
       {
-        val DataURL = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
+        val DataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
         // Anonymous: no permission defined
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
-        HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, Some(1)))
+        HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
+        HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), AllOperations, Some(1)))
 
         // Anonymous: create and read
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), 201)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), SpecificOperations(List(Create, Read)), Some(1)))
+        HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), 201)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read)), Some(1)))
 
         // Anonymous: just create, then can't read data
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, AnyoneCanCreate)), 201)
+        HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreate)), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
       }
       {
-        val DataURL = HttpRequest.crudURLPrefix(provider) + "data/456/data.xml"
+        val DataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
 
         // More complex permissions based on roles
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
+        HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
           Permission(Nil                              , SpecificOperations(List(Create))),
           Permission(List(RolesAnyOf(List("clerk"  ))), SpecificOperations(List(Read))),
           Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update))),
           Permission(List(RolesAnyOf(List("admin"  ))), SpecificOperations(List(Read, Update, Delete)))
         )))), 201)
-        HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
+        HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
 
         // Check who can read
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403)                                                                         , guest)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), SpecificOperations(List(Create, Read))                , Some(1)), clerk)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), SpecificOperations(List(Create, Read, Update))        , Some(1)), manager)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), SpecificOperations(List(Create, Read, Update, Delete)), Some(1)), admin)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read))                , Some(1)), clerk)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read, Update))        , Some(1)), manager)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read, Update, Delete)), Some(1)), admin)
 
         // Only managers and admins can update
-        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403, guest)
-        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403, clerk)
-        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 201, manager)
-        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 201, admin)
+        HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 403, guest)
+        HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 403, clerk)
+        HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 201, manager)
+        HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 201, admin)
 
         // Only admins can delete
         HttpAssert.del(DataURL, Unspecified, 403, guest)
@@ -255,7 +256,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def organizationPermissions(): Unit =
     Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) ⇒
 
-      val formURL   = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
+      val formURL   = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
       // Users
       val c1User   = Some(Credentials("c1User"  , None, Nil, List(Organization(List("a", "b", "c")))))
@@ -264,11 +265,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val bManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "b")), Nil))
       val dManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "d")), Nil))
 
-      val dataURL   = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
-      val dataBody  = HttpRequest.XML(<gaga/>)
+      val dataURL   = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+      val dataBody  = HttpCall.XML(<gaga/>)
 
       // User can read their own data, as well as their managers
-      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
+      HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
         Permission(Nil                              , SpecificOperations(List(Create))),
         Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
         Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
@@ -292,8 +293,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def attachmentsTest(): Unit = {
     Connect.withOrbeonTables("attachments") { (connection, provider) ⇒
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
-        val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
-        val url = HttpRequest.crudURLPrefix(provider) + "data/123/file" + position.toString
+        val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
+        val url = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
         HttpAssert.put(url, Specific(1), bytes, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
       }
@@ -311,9 +312,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
         val text    = Text(new String(charArray))
         val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
-        val xmlBody = dom.Document(element)                 |> HttpRequest.XML
+        val xmlBody = dom.Document(element)                 |> HttpCall.XML
 
-        val url = HttpRequest.crudURLPrefix(provider) + s"data/$position/data.xml"
+        val url = HttpCall.crudURLPrefix(provider) + s"data/$position/data.xml"
 
         HttpAssert.put(url, Specific(1), xmlBody, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(xmlBody, AllOperations, Some(1)))
@@ -324,10 +325,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def draftsTest(): Unit = {
     Connect.withOrbeonTables("drafts") { (connection, provider) ⇒
       // Draft and non-draft are different
-      val first  = HttpRequest.XML(<gaga1/>)
-      val second = HttpRequest.XML(<gaga2/>)
-      val DataURL  = HttpRequest.crudURLPrefix(provider) + "data/123/data.xml"
-      val DraftURL = HttpRequest.crudURLPrefix(provider) + "draft/123/data.xml"
+      val first  = HttpCall.XML(<gaga1/>)
+      val second = HttpCall.XML(<gaga2/>)
+      val DataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
+      val DraftURL = HttpCall.crudURLPrefix(provider) + "draft/123/data.xml"
       HttpAssert.put(DataURL,  Specific(1), first, 201)
       HttpAssert.put(DraftURL, Unspecified, second, 201)
       HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))
@@ -338,11 +339,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def extractMetadata(): Unit =
     Connect.withOrbeonTables("extract metadata") { (connection, provider) ⇒
 
-      val currentFormURL        = HttpRequest.crudURLPrefix(provider) + "form/form.xhtml"
-      val currentMetadataURL    = HttpRequest.metadataURL(provider)
+      val currentFormURL        = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+      val currentMetadataURL    = HttpCall.metadataURL(provider)
       val formDefinition        = buildFormDefinition(provider, AnyoneCanCreateAndRead)
 
-      HttpAssert.put(currentFormURL, Unspecified, HttpRequest.XML(formDefinition), 201)
+      HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), 201)
 
       val expectedBody: Document =
         <forms>
@@ -357,7 +358,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
             </form>
         </forms>
 
-      val (resultCode, _, resultBodyTry) = HttpRequest.get(currentMetadataURL, Unspecified, None)
+      val (resultCode, _, resultBodyTry) = HttpCall.get(currentMetadataURL, Unspecified, None)
 
       assert(resultCode === 200)
 

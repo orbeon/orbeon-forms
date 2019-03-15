@@ -27,13 +27,18 @@ import scala.util.Try
 
 private[persistence] object Connect {
 
+  val ProvidersTestedAutomatically: List[Provider] = List(
+    Provider.MySQL//,
+    //Provider.PostgreSQL
+  )
+
   def withOrbeonTables[T]
     (message: String)
     (block: (java.sql.Connection, Provider) ⇒ T)
     (implicit logger: IndentedLogger)
   : Unit = {
     Logging.withDebug(message) {
-      Persistence.ProvidersTestedAutomatically.foreach { provider ⇒
+      ProvidersTestedAutomatically.foreach { provider ⇒
         Logging.withDebug("on database", List("provider" → provider.entryName)) {
           Connect.withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
@@ -58,6 +63,9 @@ private[persistence] object Connect {
   : T = {
 
     val datasourceDescriptor = DatasourceDescriptor(provider)
+
+    def logRunDocker[U](body: ⇒ U): U =
+      Logging.withDebug("run Docker and wait for connection")(body)
 
     try {
 

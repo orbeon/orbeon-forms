@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2019 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,10 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.ddl
+package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence.Persistence
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider._
@@ -23,8 +22,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
-import org.orbeon.oxf.util.IOUtils._
 
 /**
  * Test the DDL we provide to create and update databases.
@@ -46,20 +43,16 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
       val statement = connection.createStatement
       SQL.executeStatements(provider, statement, sql)
       val query = provider match {
-        // On Oracle, column order is "non-relevant", so we order by column name instead of position
+        // On Oracle
+        // - Column order is "non-relevant", so we order by column name instead of position
+        // - We don't test on the owner with `= user` because the user is still `sys` after
+        //   `ALTER SESSION SET CURRENT_SCHEMA = c##orbeon`
         case MySQL ⇒
           """   SELECT *
             |     FROM information_schema.columns
             |    WHERE table_name = ?
             |          AND table_schema = DATABASE()
             | ORDER BY ordinal_position"""
-        case PostgreSQL ⇒
-          """   SELECT *
-            |     FROM information_schema.columns
-            |    WHERE table_name = ?
-            | ORDER BY ordinal_position"""
-        case provider ⇒
-          throw new IllegalArgumentException(s"unsupported provider `${provider.entryName}`")
       }
       Connect.getTableNames(provider, connection).map { tableName ⇒
         useAndClose(connection.prepareStatement(query.stripMargin)) { ps ⇒
@@ -91,16 +84,16 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   @Test def createAndUpgradeTest(): Unit = {
-    Persistence.ProvidersTestedAutomatically.foreach {
+    Connect.ProvidersTestedAutomatically.foreach {
       case provider @ MySQL ⇒
-        assertSameTable(provider, "4_3"   ,  "4_4")
-        assertSameTable(provider, "4_4"   ,  "4_5")
-        assertSameTable(provider, "4_5"   ,  "4_6")
-        assertSameTable(provider, "4_5"   ,  "4_6")
-        assertSameTable(provider, "4_6"   ,  "2016_2")
-        assertSameTable(provider, "2016_2",  "2016_3")
+        assertSameTable(provider, "4_3"    , "4_4")
+        assertSameTable(provider, "4_4"    , "4_5")
+        assertSameTable(provider, "4_5"    , "4_6")
+        assertSameTable(provider, "4_5"    , "4_6")
+        assertSameTable(provider, "4_6"    , "2016_2")
+        assertSameTable(provider, "2016_2" , "2016_3")
       case provider @ PostgreSQL ⇒
-        assertSameTable(provider, "4_8"   ,  "2016_2")
+        assertSameTable(provider, "4_8"    , "2016_2")
         assertSameTable(provider, "2016_2" , "2016_3")
     }
   }

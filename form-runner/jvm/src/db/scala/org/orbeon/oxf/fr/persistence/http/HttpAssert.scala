@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2019 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,8 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.rest
+package org.orbeon.oxf.fr.persistence.http
 
+import org.orbeon.oxf.util.StringUtils._
 import java.io.ByteArrayInputStream
 
 import org.orbeon.oxf.externalcontext.Credentials
@@ -21,11 +22,10 @@ import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalactic.Equality
 
-private object HttpAssert extends XMLSupport {
+private[persistence] object HttpAssert extends XMLSupport {
 
   implicit val operationsEquality = new Equality[Operations] {
     def areEqual(left: Operations, right: Any): Boolean =
@@ -39,7 +39,7 @@ private object HttpAssert extends XMLSupport {
 
   sealed trait Expected
   case   class ExpectedBody(
-    body        : HttpRequest.Body,
+    body        : HttpCall.Body,
     operations  : Operations,
     formVersion : Option[Int]
   ) extends Expected
@@ -54,7 +54,7 @@ private object HttpAssert extends XMLSupport {
   ): Unit = {
 
     val (resultCode, headers, resultBody) = {
-      val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
+      val (resultCode, headers, resultBody) = HttpCall.get(url, version, credentials)
       val lowerCaseHeaders = headers.map{case (header, value) ⇒ header.toLowerCase → value}
       (resultCode, lowerCaseHeaders, resultBody)
     }
@@ -64,10 +64,10 @@ private object HttpAssert extends XMLSupport {
         assert(resultCode === 200)
         // Check body
         body match {
-          case HttpRequest.XML(expectedDoc) ⇒
+          case HttpCall.XML(expectedDoc) ⇒
             val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
-          case HttpRequest.Binary(expectedFile) ⇒
+          case HttpCall.Binary(expectedFile) ⇒
             assert(resultBody.get === expectedFile)
         }
         // Check operations
@@ -83,15 +83,27 @@ private object HttpAssert extends XMLSupport {
     }
   }
 
-  def put(
+  def post(
     url          : String,
     version      : Version,
-    body         : HttpRequest.Body,
+    body         : HttpCall.Body,
     expectedCode : Int,
     credentials  : Option[Credentials] = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
-    val actualCode = HttpRequest.put(url, version, body, credentials)
+    val actualCode = HttpCall.post(url, version, body, credentials)
+    assert(actualCode === expectedCode)
+  }
+
+  def put(
+    url          : String,
+    version      : Version,
+    body         : HttpCall.Body,
+    expectedCode : Int,
+    credentials  : Option[Credentials] = None)(implicit
+    logger       : IndentedLogger
+  ): Unit = {
+    val actualCode = HttpCall.put(url, version, body, credentials)
     assert(actualCode === expectedCode)
   }
 
@@ -102,7 +114,7 @@ private object HttpAssert extends XMLSupport {
     credentials  : Option[Credentials] = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
-    val actualCode = HttpRequest.del(url, version, credentials)
+    val actualCode = HttpCall.del(url, version, credentials)
     assert(actualCode === expectedCode)
   }
 
@@ -112,7 +124,7 @@ private object HttpAssert extends XMLSupport {
     expectedCode : Int)(implicit
     logger       : IndentedLogger
   ): Unit = {
-    val actualCode = HttpRequest.lock(url, lockInfo, 60)
+    val actualCode = HttpCall.lock(url, lockInfo, 60)
     assert(actualCode === expectedCode)
   }
 
@@ -122,7 +134,7 @@ private object HttpAssert extends XMLSupport {
     expectedCode : Int)(implicit
     logger       : IndentedLogger
   ): Unit = {
-    val actualCode = HttpRequest.unlock(url, lockInfo)
+    val actualCode = HttpCall.unlock(url, lockInfo)
     assert(actualCode === expectedCode)
   }
 }

@@ -53,9 +53,13 @@ object Dom4j {
    * slightly different namespace layout. It is not clear, for the purpose of unit tests, whether we can realistically
    * compare namespace nodes in a much better way, without some kind of schema information.
    */
-  def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document) = {
+  def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document): Boolean = {
     val normalizeText = StringUtils.trimAllToEmpty _
-    compareTwoNodes(normalizeTextNodes(createCopy(left.getRootElement)), normalizeTextNodes(createCopy(right.getRootElement)))(normalizeText)
+    compareTwoNodes(
+      left          = normalizeTextNodes(createCopy(left.getRootElement)),
+      right         = normalizeTextNodes(createCopy(right.getRootElement)))(
+      normalizeText = normalizeText
+    )
   }
 
   /**

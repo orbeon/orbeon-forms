@@ -461,6 +461,18 @@
                     )
                 )
             }}"
+            xxf:static-readonly-alert="{{
+                xxf:property(
+                    string-join(
+                        (
+                            'oxf.fr.detail.static-readonly-alert',
+                            fr:app-name(),
+                            fr:form-name()
+                        ),
+                        '.'
+                    )
+                )
+            }}"
         >
 
             <!-- Don't enable client events filtering for FB -->

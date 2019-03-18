@@ -55,15 +55,30 @@
     // ***** XForms Controls *******************************************************************************************
 
     // Hide alerts by default
-    // NOTE: Include active alerts because Form Runner only shows active alerts for visited controls
+    // NOTE: Include active alerts because Form Runner only shows active alerts for visited controls.
     .xforms-alert, .xforms-alert.xforms-active {
         display: none;
     }
 
-    // Show active alerts for visited controls only
-    // Cover case of nested alert and case of external alert
-    .xforms-visited > .xforms-alert.xforms-active:not(:empty),
-    .xforms-visited.xforms-alert.xforms-active:not(:empty) {
+    // NOTE: Flying Saucer has an issue when using `:not(:empty)`. So we apply these rules with `:empty`
+    // first. These rules can be very strong as they won't apply when the content of the alert element
+    // is not empty. They must be stronger than the rules below that actually show the alerts.
+    .xforms-form .xforms-alert.xforms-active:empty {
+        display: none;
+    }
+
+    // Show active alerts for:
+    //
+    // - visited controls
+    // - `view`/`pdf` modes
+    //
+    // NOTE: For Flying Saucer, avoid the use of `:not:empty()` (see `:empty` rules above).
+    .xforms-visited > .xforms-alert.xforms-active, // inline alert
+    .xforms-visited.xforms-alert.xforms-active,    // external alert
+    .fr-mode-view  .xforms-alert.xforms-active,    // `view` mode
+    .fr-mode-pdf   .xforms-alert.xforms-active,    // `pdf` mode
+    .fr-mode-email .xforms-alert.xforms-active     // `email` mode
+    {
         display: block;
         clear: both;
         overflow: visible;
@@ -327,7 +342,9 @@
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
 
             .fr-body {                                          // Stronger rule for https://github.com/orbeon/orbeon-forms/issues/3705
-                .xforms-help, .xforms-alert {                   // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
+                // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
+                // 2019-03-18: removed `.xforms-alert` for https://github.com/orbeon/orbeon-forms/issues/3969
+                .xforms-help {
                     display: none;
                 }
             }

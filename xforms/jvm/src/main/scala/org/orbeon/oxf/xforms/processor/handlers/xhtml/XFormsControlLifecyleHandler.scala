@@ -136,7 +136,7 @@ abstract class XFormsControlLifecyleHandler(
 
   @throws[SAXException]
   protected def handleAlert(): Unit =
-    if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull))
+    if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Alert),
         getEffectiveId,

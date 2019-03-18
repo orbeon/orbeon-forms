@@ -344,9 +344,15 @@ trait ContainingDocumentProperties {
       LHHA.getBeforeAfterOrderTokens
     )
 
-  def staticReadonlyHint =
+  def staticReadonlyHint: Boolean =
     dynamicProperty(
       STATIC_READONLY_HINT_PROPERTY,
+      _.toBoolean
+    )
+
+  def staticReadonlyAlert: Boolean =
+    dynamicProperty(
+      STATIC_READONLY_ALERT_PROPERTY,
       _.toBoolean
     )
 

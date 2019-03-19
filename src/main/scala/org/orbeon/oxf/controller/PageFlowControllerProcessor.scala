@@ -107,7 +107,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       info("method not allowed", logParams)
 
     // For services: only log and set response code
-    def sendError(t: Throwable)                      = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
+    def sendError(t: Throwable, code: Option[Int])   = { logError(t);           ec.getResponse.setStatus(code.getOrElse(StatusCode.InternalServerError)) }
     def sendNotFound(t: Option[Throwable])           = { logNotFound(t);        ec.getResponse.setStatus(StatusCode.NotFound) }
     def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e);    ec.getResponse.setStatus(e.code) }
     def sendMethodNotAllowed()                       = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
@@ -184,14 +184,19 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
               ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
             // We don't have a "deleted" route at this point, and thus run the not found route when we
             // found a "resource" to be deleted
-            case e: HttpStatusCodeException if Set(StatusCode.NotFound, StatusCode.Gone)(e.code) ⇒
-              if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-            case e: HttpStatusCodeException if Set(StatusCode.Unauthorized, StatusCode.Forbidden)(e.code) ⇒
-              if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
+            case e: HttpStatusCodeException ⇒
+              e.code match {
+                case StatusCode.NotFound | StatusCode.Gone ⇒
+                  if (route.isPage) runNotFoundRoute(Some(t)) else  sendNotFound(Some(t))
+                case StatusCode.Unauthorized | StatusCode.Forbidden ⇒
+                  if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
+                case _ ⇒
+                  sendError(t, Some(e.code))
+              }
             case e: ResourceNotFoundException ⇒
-              if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+              if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
             case e ⇒
-              if (route.isPage) runErrorRoute(t)          else sendError(t)
+              if (route.isPage)     runErrorRoute(t)          else sendError(t, code = None)
           }
         }
       case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) ⇒

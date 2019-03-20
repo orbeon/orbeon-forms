@@ -132,17 +132,18 @@ object Provider extends Enum[Provider] {
       case _            ⇒ throw new UnsupportedOperationException
     }
 
-  case class RowNumTableCol(
-    table : Option[String],
-    col   : String
+  case class RowNumSQL(
+    table   : Option[String],
+    col     : String,
+    orderBy : String
   )
 
   // MySQL < 8 lacks row_number, see http://stackoverflow.com/a/1895127/5295
-  def rowNumTableCol(
+  def rowNumSQL(
     provider   : Provider,
     connection : Connection,
     tableAlias : String
-  ): RowNumTableCol = {
+  ): RowNumSQL = {
 
     val mySQLMajorVersion =
       (provider == MySQL).option {
@@ -160,14 +161,16 @@ object Provider extends Enum[Provider] {
 
     mySQLMajorVersion match {
       case Some(v) if v < 8 ⇒
-        RowNumTableCol(
-          table = Some("(select @rownum := 0) r"),
-          col   = "@rownum := @rownum + 1 row_num"
+        RowNumSQL(
+          table   = Some("(select @rownum := 0) r"),
+          col     = "@rownum := @rownum + 1 row_num",
+          orderBy = s"ORDER BY $tableAlias.last_modified_time DESC"
         )
       case _ ⇒
-        RowNumTableCol(
-          table = None,
-          col   = s"row_number() over (order by $tableAlias.last_modified_time desc) row_num"
+        RowNumSQL(
+          table   = None,
+          col     = s"row_number() over (order by $tableAlias.last_modified_time desc) row_num",
+          orderBy = ""
         )
     }
   }

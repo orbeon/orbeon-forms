@@ -100,17 +100,19 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       info("not found", logParams ++ (rootResource map ("resource" → _)))
     }
 
-    def logUnauthorized(e: HttpStatusCodeException) =
-      info("unauthorized", logParams :+ ("status-code" → e.code.toString))
+    def logHttpStatusCode(e: HttpStatusCodeException) = {
+      val code = e.code.toString
+      info(s"HTTP status code $code", logParams :+ ("status-code" → code))
+    }
 
     def logMethodNotAllowed() =
       info("method not allowed", logParams)
 
     // For services: only log and set response code
-    def sendError(t: Throwable, code: Option[Int])   = { logError(t);           ec.getResponse.setStatus(code.getOrElse(StatusCode.InternalServerError)) }
-    def sendNotFound(t: Option[Throwable])           = { logNotFound(t);        ec.getResponse.setStatus(StatusCode.NotFound) }
-    def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e);    ec.getResponse.setStatus(e.code) }
-    def sendMethodNotAllowed()                       = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
+    def sendError(t: Throwable)                       = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
+    def sendHttpStatusCode(e: HttpStatusCodeException)= { logHttpStatusCode(e);  ec.getResponse.setStatus(e.code); }
+    def sendNotFound(t: Option[Throwable])            = { logNotFound(t);        ec.getResponse.setStatus(StatusCode.NotFound) }
+    def sendMethodNotAllowed()                        = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
 
     // For pages: log and try to run routes
     def runErrorRoute(t: Throwable, log: Boolean = true): Unit = {
@@ -149,7 +151,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
     def runUnauthorizedRoute(e: HttpStatusCodeException): Unit = {
 
-      logUnauthorized(e)
+      logHttpStatusCode(e)
 
       pageFlow.unauthorizedRoute match {
         case Some(unauthorizedRoute) ⇒
@@ -187,16 +189,16 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             case e: HttpStatusCodeException ⇒
               e.code match {
                 case StatusCode.NotFound | StatusCode.Gone ⇒
-                  if (route.isPage) runNotFoundRoute(Some(t)) else  sendNotFound(Some(t))
+                  if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
                 case StatusCode.Unauthorized | StatusCode.Forbidden ⇒
-                  if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
+                  if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
                 case _ ⇒
-                  sendError(t, Some(e.code))
+                  sendHttpStatusCode(e)
               }
             case e: ResourceNotFoundException ⇒
               if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
             case e ⇒
-              if (route.isPage)     runErrorRoute(t)          else sendError(t, code = None)
+              if (route.isPage)     runErrorRoute(t)          else sendError(t)
           }
         }
       case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) ⇒

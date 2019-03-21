@@ -112,8 +112,7 @@ class ResourcesPatcherTest
 
       val urls = Seq(
         "oxf:/apps/fr/i18n/resources.xml",
-        "oxf:/forms/orbeon/builder/form/resources.xml",
-        "oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+        "oxf:/forms/orbeon/builder/form/resources.xml"
       )
 
       // - allow "item" and "choices" because we use this for itemsets

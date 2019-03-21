@@ -81,14 +81,10 @@ class PortletEmbeddingContextWithResponse(
 // This doesn't deal directly with HTTP proxying
 trait BufferedPortlet {
 
+  import StoredResponse._
+
   def findTitle(request: RenderRequest): Option[String]
   def portletContext: PortletContext
-
-  // Immutable response with parameters
-  case class ResponseWithParameters(
-    response   : BufferedContentOrRedirect,
-    parameters : Map[String, List[String]]
-  )
 
   def bufferedRender(
     request  : RenderRequest,
@@ -96,8 +92,8 @@ trait BufferedPortlet {
     render   : ⇒ StreamedContentOrRedirect)(implicit
     ctx      : EmbeddingContextWithResponse
   ): Unit =
-    getStoredResponseWithParameters match {
-      case Some(ResponseWithParameters(content: BufferedContent, parameters)) if toScalaMap(request.getParameterMap) == parameters ⇒
+    findStoredResponseWithParameters match {
+      case Some(ResponseWithParams(content: BufferedContent, params)) if matchesStoredResponse(request.getParameterMap, params) ⇒
         // The result of an action with the current parameters is available
         // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
         // situation where a second render request tries to load a deferred action response, and display an
@@ -105,7 +101,7 @@ trait BufferedPortlet {
         writeResponseWithParameters(request, response, content)
       case _ ⇒
         // No matching action result, call the render function
-        // NOTE: The Portlet API does not support sendRedirect() and setRenderParameters() upon render(). This
+        // NOTE: The Portlet API does not support `sendRedirect()` and `setRenderParameters()` upon `render()`. This
         // means we cannot easily simulate redirects upon render. For internal redirects, we could maybe
         // implement the redirect loop here. The issue would be what happens upon subsequent renders, as they
         // would again request the first path, not the redirected path. For now we throw.
@@ -151,15 +147,20 @@ trait BufferedPortlet {
           // or more, and anyway those don't make sense as subsequent render parameters. Instead, we just use
           // the path and a method indicator. Later we should either indicate an error, or handle XForms Ajax
           // updates properly.
-          val newRenderParameters = Map(
-            PathParameter   → Array(request.getParameter(PathParameter)),
-            MethodParameter → Array("post")
-          ).asJava
 
-          response.setRenderParameters(newRenderParameters)
+          val storedParams = StoredParams(HttpMethod.POST, request.getParameter(PathParameter))
+
+          response.setRenderParameters(
+            Map(
+              PathParameter   → Array(storedParams.path),
+              MethodParameter → Array(storedParams.method.entryName)
+            ).asJava
+          )
 
           // Store response
-          storeResponseWithParameters(ResponseWithParameters(BufferedContent(content), toScalaMap(newRenderParameters)))
+          storeResponseWithParameters(
+            ResponseWithParams(BufferedContent(content), storedParams)
+          )
         }
     }
   }
@@ -178,14 +179,52 @@ trait BufferedPortlet {
     APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(responseContent)
   }
 
-  private def getStoredResponseWithParameters(implicit ctx: EmbeddingContext): Option[ResponseWithParameters] =
-    ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParameters])
+  private object StoredResponse {
 
-  private def storeResponseWithParameters(responseWithParameters: ResponseWithParameters)(implicit ctx: EmbeddingContext): Unit =
-    ctx.setSessionAttribute(ResponseSessionKey, responseWithParameters)
+    case class StoredParams(
+      method : HttpMethod,
+      path   : String
+    )
 
-  private def clearResponseWithParameters()(implicit ctx: EmbeddingContext): Unit =
-    ctx.removeSessionAttribute(ResponseSessionKey)
+    object StoredParams {
+      def fromJavaMap(requestParamsJava: ju.Map[String, Array[String]]): Option[StoredParams] =
+        for {
+          methodString ← Headers.firstHeaderIgnoreCase(requestParamsJava.asScala, MethodParameter)
+          method       ← HttpMethod.withNameOption(methodString)
+          path         ← Headers.firstHeaderIgnoreCase(requestParamsJava.asScala, PathParameter)
+        } yield
+          StoredParams(method, path)
+    }
+
+    val StoredXFormsServerSubmitParams  = StoredParams(HttpMethod.POST, APISupport.XFormsServerSubmit)
+    val RequestXFormsServerSubmitParams = StoredParams(HttpMethod.GET,  APISupport.XFormsServerSubmit)
+
+    // Immutable response with parameters
+    case class ResponseWithParams(
+      response   : BufferedContentOrRedirect,
+      parameters : StoredParams
+    )
+
+    // https://github.com/orbeon/orbeon-forms/issues/3978
+    def matchesStoredResponse(
+      requestParamsJava : ju.Map[String, Array[String]],
+      storedParams      : StoredParams
+    ): Boolean =
+      StoredParams.fromJavaMap(requestParamsJava) exists { requestParams ⇒
+        requestParams == storedParams ||
+          (storedParams == StoredXFormsServerSubmitParams &&
+            requestParams == RequestXFormsServerSubmitParams)
+      }
+
+    def findStoredResponseWithParameters(implicit ctx: EmbeddingContext): Option[ResponseWithParams] =
+      ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParams])
+
+    def storeResponseWithParameters(responseWithParameters: ResponseWithParams)(implicit ctx: EmbeddingContext): Unit =
+      ctx.setSessionAttribute(ResponseSessionKey, responseWithParameters)
+
+    def clearResponseWithParameters()(implicit ctx: EmbeddingContext): Unit =
+      ctx.removeSessionAttribute(ResponseSessionKey)
+  }
 }
 
 object BufferedPortlet {
@@ -193,14 +232,6 @@ object BufferedPortlet {
   val PathParameter: String = PathParameterName
   val MethodParameter       = "orbeon.method"
   val ResponseSessionKey    = "org.orbeon.oxf.response"
-
-  // Convert to immutable String → List[String] so that map equality works as expected
-  def toScalaMap(m: ju.Map[String, Array[String]]): Map[String, List[String]] =
-    m.asScala map { case (k, v) ⇒ k → v.toList } toMap
-
-  // Convert back an immutable String → List[String] to a Java String → Array[String] map
-  def toJavaMap(m: Map[String, List[String]]): ju.Map[String, Array[String]] =
-    m map { case (k, v) ⇒ k → v.toArray } asJava
 
   // Immutable portletNamespace → idNamespace information stored in the portlet context
   private object NamespaceMappings {

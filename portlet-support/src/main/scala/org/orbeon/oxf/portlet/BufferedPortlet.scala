@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.portlet
 
+import java.io.{OutputStream, PrintWriter}
 import java.{util ⇒ ju}
 
 import javax.portlet._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
-import org.orbeon.oxf.fr.embedding.APISupport.mustRewriteForMediatype
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
@@ -38,17 +38,17 @@ class PortletEmbeddingContext(
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
 
-  val namespace =
+  val namespace: String =
     if (useShortNamespaces)
       BufferedPortlet.shortIdNamespace(response.getNamespace, context) ensuring (_ ne null)
     else
       response.getNamespace
 
-  def getSessionAttribute(name: String)                = Option(session.getAttribute(name))
-  def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
-  def removeSessionAttribute(name: String)             = session.removeAttribute(name)
+  def getSessionAttribute   (name: String)               : Option[AnyRef] = Option(session.getAttribute(name))
+  def setSessionAttribute   (name: String, value: AnyRef): Unit           = session.setAttribute(name, value)
+  def removeSessionAttribute(name: String)               : Unit           = session.removeAttribute(name)
 
-  val client = Headers.PortletClient
+  val client: String = Headers.PortletClient
 }
 
 class PortletEmbeddingContextWithResponse(
@@ -65,10 +65,10 @@ class PortletEmbeddingContextWithResponse(
   useShortNamespaces
 ) with EmbeddingContextWithResponse {
 
-  def writer                     = response.getWriter
-  def outputStream               = response.getPortletOutputStream
-  def decodeURL(encoded: String) = LiferayURL.wsrpToPortletURL(encoded, response)
-  def setStatusCode(code: Int)   = () // Q: Can we do anything meaningful for resource caching?
+  def writer                    : PrintWriter  = response.getWriter
+  def outputStream              : OutputStream = response.getPortletOutputStream
+  def decodeURL(encoded: String): String       = LiferayURL.wsrpToPortletURL(encoded, response)
+  def setStatusCode(code: Int)  : Unit         = () // Q: Can we do anything meaningful for resource caching?
 
   def setHeader(name: String, value: String): Unit =
     if (name equalsIgnoreCase Headers.ContentType)
@@ -78,14 +78,17 @@ class PortletEmbeddingContextWithResponse(
 }
 
 // Abstract portlet logic including buffering of portlet actions
-// This doesn't deal direct with ProcessorService or HTTP proxying
+// This doesn't deal directly with HTTP proxying
 trait BufferedPortlet {
 
   def findTitle(request: RenderRequest): Option[String]
   def portletContext: PortletContext
 
   // Immutable response with parameters
-  case class ResponseWithParameters(response: BufferedContentOrRedirect, parameters: Map[String, List[String]])
+  case class ResponseWithParameters(
+    response   : BufferedContentOrRedirect,
+    parameters : Map[String, List[String]]
+  )
 
   def bufferedRender(
     request  : RenderRequest,
@@ -108,7 +111,7 @@ trait BufferedPortlet {
         // would again request the first path, not the redirected path. For now we throw.
         render match {
           case content: StreamedContent ⇒ useAndClose(content)(writeResponseWithParameters(request, response, _))
-          case redirect: Redirect       ⇒ throw new IllegalStateException("Processor execution did not return content.")
+          case _: Redirect              ⇒ throw new IllegalStateException("Processor execution did not return content.")
         }
     }
 
@@ -175,28 +178,28 @@ trait BufferedPortlet {
     APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(responseContent)
   }
 
-  protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =
+  private def getStoredResponseWithParameters(implicit ctx: EmbeddingContext): Option[ResponseWithParameters] =
     ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParameters])
 
-  private def storeResponseWithParameters(responseWithParameters: ResponseWithParameters)(implicit ctx: EmbeddingContext) =
+  private def storeResponseWithParameters(responseWithParameters: ResponseWithParameters)(implicit ctx: EmbeddingContext): Unit =
     ctx.setSessionAttribute(ResponseSessionKey, responseWithParameters)
 
-  private def clearResponseWithParameters()(implicit ctx: EmbeddingContext) =
+  private def clearResponseWithParameters()(implicit ctx: EmbeddingContext): Unit =
     ctx.removeSessionAttribute(ResponseSessionKey)
 }
 
 object BufferedPortlet {
 
-  val PathParameter      = PathParameterName
-  val MethodParameter    = "orbeon.method"
-  val ResponseSessionKey = "org.orbeon.oxf.response"
+  val PathParameter: String = PathParameterName
+  val MethodParameter       = "orbeon.method"
+  val ResponseSessionKey    = "org.orbeon.oxf.response"
 
   // Convert to immutable String → List[String] so that map equality works as expected
-  def toScalaMap(m: ju.Map[String, Array[String]]) =
+  def toScalaMap(m: ju.Map[String, Array[String]]): Map[String, List[String]] =
     m.asScala map { case (k, v) ⇒ k → v.toList } toMap
 
   // Convert back an immutable String → List[String] to a Java String → Array[String] map
-  def toJavaMap(m: Map[String, List[String]]) =
+  def toJavaMap(m: Map[String, List[String]]): ju.Map[String, Array[String]] =
     m map { case (k, v) ⇒ k → v.toArray } asJava
 
   // Immutable portletNamespace → idNamespace information stored in the portlet context
@@ -213,7 +216,7 @@ object BufferedPortlet {
   // and since the XForms engine produces lots of ids, the DOM size increases a lot. All we want really are unique ids
   // in the DOM, so we make up our own short prefixes, hope they don't conflict within anything, and we map the portal
   // namespaces to our short ids.
-  def shortIdNamespace(portletNamespace: String, portletContext: PortletContext) =
+  def shortIdNamespace(portletNamespace: String, portletContext: PortletContext): String =
     // PLT.10.1: "There is one instance of the PortletContext interface associated with each portlet application
     // deployed into a portlet container." In order for multiple Orbeon portlets to not walk on each other, we
     // synchronize.

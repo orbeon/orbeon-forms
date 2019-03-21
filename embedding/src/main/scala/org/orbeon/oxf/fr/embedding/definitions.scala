@@ -19,6 +19,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
+import org.orbeon.oxf.util.PathUtils._
 
 import scala.collection.immutable
 import scala.util.matching.Regex
@@ -74,7 +75,7 @@ private case class EmbeddingSettings(
   resourcesRegex : String,
   httpClient     : HttpClient
 ) {
-  val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?xforms-server-submit".r
+  val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?${APISupport.XFormsServerSubmit.dropStartingSlash}".r
   val OrbeonResourcePathRegex     : Regex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
   val FormRunnerResourcePathRegex : Regex = resourcesRegex.r
 }

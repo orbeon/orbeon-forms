@@ -266,7 +266,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         if (getBooleanPreference(request, ReadOnly) && mode == FormRunnerMode.Edit.entryName) FormRunnerMode.View.entryName else mode
 
       pathParameterOpt getOrElse defaultPath match {
-        case path @ "/xforms-server-submit" ⇒
+        case path @ APISupport.XFormsServerSubmit ⇒
           path
         // Incoming path is Form Runner path without document id
         case FormRunnerPathRegex(appName, formName, mode, _, query) ⇒

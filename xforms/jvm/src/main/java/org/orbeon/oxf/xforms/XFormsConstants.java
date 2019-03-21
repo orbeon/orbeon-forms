@@ -390,6 +390,8 @@ public class XFormsConstants {
     // Use "$$" to minimize chances of conflict with user-defined ids
     public static final String LHHAC_SEPARATOR = "" + COMPONENT_SEPARATOR + COMPONENT_SEPARATOR;
 
+    public static final String XFORMS_SERVER_SUBMIT = "/xforms-server-submit";
+
     public static final String DUMMY_IMAGE_URI   = "/ops/images/xforms/spacer.gif";
     public static final String DUMMY_SCRIPT_URI  = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"; // empty self-calling function
     public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png";

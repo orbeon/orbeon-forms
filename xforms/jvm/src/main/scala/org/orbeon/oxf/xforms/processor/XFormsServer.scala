@@ -424,7 +424,7 @@ object XFormsServer {
       val actionAtt =
         isPortletContainer list {
 
-          val SubmitUrl = "/xforms-server-submit"
+          val SubmitUrl = XFormsConstants.XFORMS_SERVER_SUBMIT
 
           val actionUrl =
             if (activeSubmissionOpt exists (_.getActiveSubmissionParameters.resolvedIsResponseResourceType))

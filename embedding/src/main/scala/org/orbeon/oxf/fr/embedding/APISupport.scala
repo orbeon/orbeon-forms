@@ -43,6 +43,8 @@ object APISupport {
 
   val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
 
+  val XFormsServerSubmit = "/xforms-server-submit"
+
   def proxyPage(
     baseURL      : String,
     path         : String,
@@ -132,13 +134,11 @@ object APISupport {
           title         = None
         )
 
-      val path = "/xforms-server-submit"
-
       val (contentOrRedirect, httpResponse) =
         APISupport.callService(RequestDetails(
           content = Some(contentFromRequest),
-          url     = settings.formRunnerURL.dropTrailingSlash + path,
-          path    = path,
+          url     = settings.formRunnerURL.dropTrailingSlash + XFormsServerSubmit,
+          path    = XFormsServerSubmit,
           headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true).to[List],
           params  = Nil
         ))

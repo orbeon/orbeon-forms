@@ -113,7 +113,7 @@ object BindingIndex {
   def findMostSpecificBinding(
     index : BindingIndex[IndexableBinding],
     qName : QName,
-    atts  : Traversable[(QName, String)]
+    atts  : Iterable[(QName, String)]
   ): Option[(IndexableBinding, Boolean)] = {
 
     def attValueMatches(attDesc: BindingAttributeDescriptor, attValue: String) = attDesc.predicate match {

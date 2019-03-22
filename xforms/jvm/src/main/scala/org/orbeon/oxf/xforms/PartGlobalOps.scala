@@ -41,7 +41,7 @@ trait PartGlobalOps {
   def getControlAnalysis(prefixedId: String): ElementAnalysis
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
   def hasControlByName(controlName: String): Boolean
-  def controlsByName(controlName: String): Traversable[ElementAnalysis]
+  def controlsByName(controlName: String): Iterable[ElementAnalysis]
 
   // Events
   def hasHandlerForEvent(eventName: String): Boolean
@@ -58,7 +58,7 @@ trait PartGlobalOps {
   def scopeForPrefixedId(prefixedId: String): Scope
 
   // Repeats
-  def repeats: Traversable[RepeatControl]
+  def repeats: Iterable[RepeatControl]
   def getRepeatHierarchyString(ns: String): String
 
   // AVTs

@@ -226,6 +226,6 @@ object Dom4j {
   implicit def elementToElem(e: Element): Elem   = XML.loadString(Dom4jUtils.domToString(e))
 
   // TODO: There is probably a better way to write these conversions
-  implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[Element] = seq map elemToElement toList
-  implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]): Seq[Elem]  = seq map elementToElem toList
+  implicit def scalaElemSeqToDom4jElementSeq(seq: Iterable[Elem]): Seq[Element] = seq map elemToElement toList
+  implicit def dom4jElementSeqToScalaElemSeq(seq: Iterable[Element]): Seq[Elem] = seq map elementToElem toList
 }

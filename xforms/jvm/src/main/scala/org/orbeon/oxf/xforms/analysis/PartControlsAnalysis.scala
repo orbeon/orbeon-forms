@@ -109,7 +109,7 @@ trait PartControlsAnalysis extends TransientState {
   def hasControlByName(controlName: String) =
     controlTypes.get(controlName) exists (_.nonEmpty)
 
-  def controlsByName(controlName: String): Traversable[ElementAnalysis] =
+  def controlsByName(controlName: String): Iterable[ElementAnalysis] =
     controlTypes.get(controlName).toList flatMap (_.values)
 
   // Repeats

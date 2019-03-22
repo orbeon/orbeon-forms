@@ -47,12 +47,11 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   private def collectInPartsJ[T](get: PartAnalysis ⇒ java.util.Collection[T]) =
     parts flatMap (part ⇒ get(part).asScala)
 
-  private def collectInParts[T](get: PartAnalysis ⇒ Traversable[T]) =
+  private def collectInParts[T](get: PartAnalysis ⇒ Iterable[T]) =
     parts flatMap (part ⇒ get(part))
 
-  private def collectInPartsReverse[T](get: PartAnalysis ⇒ Traversable[T]) =
+  private def collectInPartsReverse[T](get: PartAnalysis ⇒ Iterable[T]) =
     parts.reverse flatMap (part ⇒ get(part))
-
 
   // Models
   def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))

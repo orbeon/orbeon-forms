@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.generic.CanBuildFrom
-import scala.collection.{AbstractIterator, TraversableLike, mutable}
+import scala.collection.{AbstractIterator, IterableLike, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
 
@@ -89,7 +89,7 @@ object CollectionUtils {
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
   def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T ⇒ t }
 
-  implicit class TraversableLikeOps[A, Repr](val t: TraversableLike[A, Repr]) extends AnyVal {
+  implicit class TraversableLikeOps[A, Repr](val t: IterableLike[A, Repr]) extends AnyVal {
 
     def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
@@ -158,7 +158,7 @@ object CollectionUtils {
         case InsertAfter  ⇒ (values.take(index + 1) :+ value) ++ values.drop(index + 1)
       }
 
-    def insertAt(index: Int, newValues: Traversable[T], position: InsertPosition): Vector[T] =
+    def insertAt(index: Int, newValues: Iterable[T], position: InsertPosition): Vector[T] =
       position match {
         case InsertBefore ⇒ values.take(index)     ++ newValues ++ values.drop(index)
         case InsertAfter  ⇒ values.take(index + 1) ++ newValues ++ values.drop(index + 1)

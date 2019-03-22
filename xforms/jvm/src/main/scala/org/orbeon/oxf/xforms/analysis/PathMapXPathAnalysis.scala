@@ -93,7 +93,7 @@ class PathMapXPathAnalysis(
 
     helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 
-    def toXML(traversable: Traversable[String], enclosingElementName: String, elementName: String): Unit = {
+    def toXML(traversable: Iterable[String], enclosingElementName: String, elementName: String): Unit = {
       if (traversable.nonEmpty) {
         helper.startElement(enclosingElementName)
         for (value ← traversable)

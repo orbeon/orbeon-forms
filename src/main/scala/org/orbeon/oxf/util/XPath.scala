@@ -83,7 +83,7 @@ object XPath {
     def getNodeListCreator(node: scala.Any) = null
     def unravel(source: Source, config: Configuration) = null
 
-    val SupportedScalaToSaxonClasses = List(classOf[Traversable[_]], classOf[Option[_]], classOf[Iterator[_]])
+    val SupportedScalaToSaxonClasses = List(classOf[Iterable[_]], classOf[Option[_]], classOf[Iterator[_]])
     val SupportedSaxonToScalaClasses = List(classOf[List[_]], classOf[Option[_]], classOf[Iterator[_]])
 
     val ScalaToSaxonConverter = new JPConverter {
@@ -92,9 +92,9 @@ object XPath {
         Option(Value.asItem(JPConverter.allocate(any.getClass, context.getConfiguration).convert(any, context)))
 
       def convert(any: Any, context: XPathContext): ValueRepresentation = any match {
-        case v: Traversable[_] ⇒ new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
-        case v: Option[_]      ⇒ convert(v.toList, context)
-        case v: Iterator[_]    ⇒ convert(v.toList, context) // we have to return a ValueRepresentation
+        case v: Iterable[_] ⇒ new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
+        case v: Option[_]   ⇒ convert(v.toList, context)
+        case v: Iterator[_] ⇒ convert(v.toList, context) // we have to return a ValueRepresentation
       }
 
       def getItemType = AnyItemType.getInstance

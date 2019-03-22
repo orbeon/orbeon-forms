@@ -16,20 +16,20 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.common.OXFException
 
 import scala.collection.generic.Growable
-import scala.collection.mutable.{LinkedHashMap, LinkedHashSet}
+import scala.collection.{mutable ⇒ m}
 
 /**
  * Collection containing a number of distinct sets indexed by a map.
  */
-class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
+class MapSet[A, B] extends Iterable[(A, B)] with Growable[(A, B)] {
 
-  val map = new LinkedHashMap[A, LinkedHashSet[B]]
+  val map = new m.LinkedHashMap[A, m.LinkedHashSet[B]]
 
   def put(a: A, b: B): Unit = {
     (map.get(a) match {
       case Some(set) ⇒ set
       case None ⇒
-        val newSet = new LinkedHashSet[B]
+        val newSet = new m.LinkedHashSet[B]
         map.put(a, newSet)
         newSet
     }) += b
@@ -43,20 +43,19 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
     result
   }
 
-  // TraversableLike
   // Iterate over all (A, B) tuples
-  def foreach[U](f: ((A, B)) ⇒ U) = map foreach (mapEntry ⇒ mapEntry._2 foreach (setEntry ⇒ f((mapEntry._1, setEntry))))
+  def iterator: Iterator[(A, B)] = map.iterator flatMap { case (key, values) ⇒ values.iterator map ((key, _)) }
 
   // Growable
-  def +=(elem: (A, B)) = {put(elem._1, elem._2); this}
+  def +=(elem: (A, B)): this.type = { put(elem._1, elem._2); this }
   def clear(): Unit = map.clear()
 }
 
 object MapSet {
   // TODO: This should be immutable instead of checking an exception at runtime!
   private object EmptyMapSet extends MapSet[Any, Any] {
-    override def put(a: Any, b: Any) = throw new OXFException("Can't add items to empty MapSet")
+    override def put(a: Any, b: Any): Unit = throw new OXFException("Can't add items to empty MapSet")
   }
 
-  def empty[A, B] = EmptyMapSet.asInstanceOf[MapSet[A, B]]
+  def empty[A, B]: MapSet[A, B] = EmptyMapSet.asInstanceOf[MapSet[A, B]]
 }

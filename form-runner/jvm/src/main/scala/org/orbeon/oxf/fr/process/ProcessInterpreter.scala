@@ -61,7 +61,7 @@ trait ProcessInterpreter extends Logging {
   implicit def logger: IndentedLogger
 
   // May be overridden by implementation
-  def extensionActions: Traversable[(String, Action)] = Nil
+  def extensionActions: Iterable[(String, Action)] = Nil
   def beforeProcess(): Try[Any] = Try(())
   def afterProcess():  Try[Any] = Try(())
 

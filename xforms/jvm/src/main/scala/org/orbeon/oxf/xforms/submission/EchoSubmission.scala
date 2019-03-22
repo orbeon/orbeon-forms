@@ -75,7 +75,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       headers             = headers,
       content             = StreamedContent(
         inputStream     = new ByteArrayInputStream(sp.messageBody),
-        contentType     = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
+        contentType     = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
         contentLength   = Some(sp.messageBody.length),
         title           = None
       )

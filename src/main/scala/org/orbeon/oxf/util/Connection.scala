@@ -355,7 +355,7 @@ object Connection extends Logging {
       if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
     val content = messageBody map
-      (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
+      (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
     apply(
       method      = httpMethod,
@@ -450,14 +450,14 @@ object Connection extends Logging {
       // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
       // mediatype attribute"
       val headersWithContentTypeIfNeeded =
-        if (firstHeaderIgnoreCase(customHeaders, ContentType).isEmpty && mediatype != null)
+        if (firstItemIgnoreCase(customHeaders, ContentType).isEmpty && mediatype != null)
           customHeaders + (ContentType → List(mediatype))
         else
           customHeaders
 
       // Also make sure that if a header element defines Content-Type, this overrides the mediatype attribute
       def soapMediatypeWithContentType =
-        firstHeaderIgnoreCase(headersWithContentTypeIfNeeded, ContentTypeLower) getOrElse mediatype
+        firstItemIgnoreCase(headersWithContentTypeIfNeeded, ContentTypeLower) getOrElse mediatype
 
       // NOTE: SOAP processing overrides Content-Type in the case of a POST
       // So we have: @serialization → @mediatype →  xf:header → SOAP

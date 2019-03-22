@@ -37,7 +37,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     val responseHeaders = capitalizedHeaders
     StreamedContent(
       inputStream   = getInputStream,
-      contentType   = Headers.firstHeaderIgnoreCase(responseHeaders, Headers.ContentType),
+      contentType   = Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType),
       contentLength = Headers.firstLongHeaderIgnoreCase(responseHeaders, Headers.ContentLength),
       title         = None
     )

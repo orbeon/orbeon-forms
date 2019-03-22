@@ -112,32 +112,30 @@ object Headers {
       name → values
 
   // Capitalize any header
-  def capitalizeCommonOrSplitHeader(name: String) =
+  def capitalizeCommonOrSplitHeader(name: String): String =
     capitalizeCommonHeader(name) getOrElse capitalizeSplitHeader(name)
 
   // Try to capitalize a common HTTP header
-  def capitalizeCommonHeader(name: String) =
+  def capitalizeCommonHeader(name: String): Option[String] =
     lowercaseToCommonCapitalization.get(name.toLowerCase)
 
   // Capitalize a header of the form foo-bar-baz to Foo-Bar-Baz
-  def capitalizeSplitHeader(name: String) =
+  def capitalizeSplitHeader(name: String): String =
     name split '-' map (_.toLowerCase.capitalize) mkString "-"
 
-  def nonEmptyHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[T] =
-    headers collectFirst {
-      case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value
-    }
-
-  def firstHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[String] =
-    headers collectFirst {
+  // NOTE: This logic is not restricted to headers. Pull it out from here.
+  // For an `Iterable` mapping names to values where each value is itself `Iterable`, find the first
+  // matching leaf value. Unicity of names is not enforced.
+  def firstItemIgnoreCase[T, V](coll: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[V]): Option[V] =
+    coll collectFirst {
       case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
     }
 
-  def firstLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[Long] =
-    firstHeaderIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
+  def firstLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
+    firstItemIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
 
-  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[Long] =
-    firstHeaderIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
+    firstItemIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
   // List of common HTTP headers
   val CommonHeaders = Seq(

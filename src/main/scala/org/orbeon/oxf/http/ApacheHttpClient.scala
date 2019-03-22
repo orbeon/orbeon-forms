@@ -128,7 +128,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
           content flatMap (_.contentType)
 
         def contentTypeFromRequest =
-          Headers.firstHeaderIgnoreCase(headers, Headers.ContentType)
+          Headers.firstItemIgnoreCase(headers, Headers.ContentType)
 
         val contentTypeHeader = (
           contentTypeFromContent

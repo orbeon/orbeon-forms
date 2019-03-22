@@ -318,7 +318,7 @@ class ServletExternalContext(
   private def isEmbedded: Boolean = {
     // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
     // the headers map is generated internally as in that case it might be lowercase already.
-    val clientHeaderOpt = Headers.firstHeaderIgnoreCase(requestImpl.headerValuesMap, Headers.OrbeonClient)
+    val clientHeaderOpt = Headers.firstItemIgnoreCase(requestImpl.headerValuesMap, Headers.OrbeonClient)
     clientHeaderOpt exists Headers.EmbeddedClientValues.contains
   }
 

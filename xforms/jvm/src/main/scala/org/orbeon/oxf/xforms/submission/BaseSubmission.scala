@@ -179,7 +179,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         if (Connection.requiresRequestBody(httpMethod) && indentedLogger.isDebugEnabled && isLogBody)
           Connection.logRequestBody(actualRequestMediatype, bytes)(indentedLogger)
 
-        StreamedContent.fromBytes(bytes, Headers.firstHeaderIgnoreCase(requestHeadersCapitalized, Headers.ContentType))
+        StreamedContent.fromBytes(bytes, Headers.firstItemIgnoreCase(requestHeadersCapitalized, Headers.ContentType))
       }
 
     val localRequest =

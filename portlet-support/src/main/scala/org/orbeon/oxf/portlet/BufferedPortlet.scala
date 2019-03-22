@@ -189,9 +189,9 @@ trait BufferedPortlet {
     object StoredParams {
       def fromJavaMap(requestParamsJava: ju.Map[String, Array[String]]): Option[StoredParams] =
         for {
-          methodString ← Headers.firstHeaderIgnoreCase(requestParamsJava.asScala, MethodParameter)
+          methodString ← Headers.firstItemIgnoreCase(requestParamsJava.asScala, MethodParameter)
           method       ← HttpMethod.withNameOption(methodString)
-          path         ← Headers.firstHeaderIgnoreCase(requestParamsJava.asScala, PathParameter)
+          path         ← Headers.firstItemIgnoreCase(requestParamsJava.asScala, PathParameter)
         } yield
           StoredParams(method, path)
     }

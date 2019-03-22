@@ -54,7 +54,7 @@ object StreamedContent {
   def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, i.Seq[String]], title: Option[String] = None) =
     StreamedContent(
       inputStream   = inputStream,
-      contentType   = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
+      contentType   = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
       contentLength = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
       title         = title
     )

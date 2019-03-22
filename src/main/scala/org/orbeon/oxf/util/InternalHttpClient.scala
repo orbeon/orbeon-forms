@@ -72,7 +72,7 @@ object InternalHttpClient extends HttpClient {
 
       // Honor `Orbeon-Client` header (see also ServletExternalContext)
       val urlRewriter =
-        Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
+        Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) match {
           case Some(client) if Headers.EmbeddedClientValues(client) ⇒
             new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, wsrpEncodeResources = true)
           case Some(_) ⇒

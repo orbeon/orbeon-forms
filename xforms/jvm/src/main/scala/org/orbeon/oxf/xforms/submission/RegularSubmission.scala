@@ -19,7 +19,7 @@ import java.net.URI
 import java.util.concurrent.Callable
 
 import org.orbeon.io.UriScheme
-import org.orbeon.oxf.http.Headers.{ContentType, firstHeaderIgnoreCase}
+import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
 
@@ -61,7 +61,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
       if (Connection.requiresRequestBody(p.httpMethod)) Option(sp.messageBody) orElse Some(Array()) else None
 
     val content = messageBody map
-      (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
+      (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
     // Prepare Connection in this thread as async submission can't access the request object
     val connection =

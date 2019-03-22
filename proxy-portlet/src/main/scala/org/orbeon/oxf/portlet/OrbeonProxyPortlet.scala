@@ -19,7 +19,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{ApacheHttpClient, HttpClient, HttpClientSettings, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -156,10 +156,16 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   // Portlet action
   override def processAction(request: ActionRequest, response: ActionResponse): Unit =
     settingsOpt foreach { _ ⇒
-      request.getPortletMode match {
-        case PortletMode.VIEW ⇒ doViewAction(request, response)
-        case PortletMode.EDIT ⇒ doEditAction(request, response)
-        case _ ⇒ // NOP
+      HttpMethod.withNameInsensitive(request.getMethod) match {
+        case HttpMethod.GET ⇒
+          // See https://github.com/orbeon/orbeon-forms/issues/3978
+          // NOP
+        case _ ⇒
+          request.getPortletMode match {
+            case PortletMode.VIEW ⇒ doViewAction(request, response)
+            case PortletMode.EDIT ⇒ doEditAction(request, response)
+            case _ ⇒ // NOP
+          }
       }
     }
 

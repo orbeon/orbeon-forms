@@ -196,9 +196,6 @@ trait BufferedPortlet {
           StoredParams(method, path)
     }
 
-    val StoredXFormsServerSubmitParams  = StoredParams(HttpMethod.POST, APISupport.XFormsServerSubmit)
-    val RequestXFormsServerSubmitParams = StoredParams(HttpMethod.GET,  APISupport.XFormsServerSubmit)
-
     // Immutable response with parameters
     case class ResponseWithParams(
       response   : BufferedContentOrRedirect,
@@ -210,11 +207,7 @@ trait BufferedPortlet {
       requestParamsJava : ju.Map[String, Array[String]],
       storedParams      : StoredParams
     ): Boolean =
-      StoredParams.fromJavaMap(requestParamsJava) exists { requestParams ⇒
-        requestParams == storedParams ||
-          (storedParams == StoredXFormsServerSubmitParams &&
-            requestParams == RequestXFormsServerSubmitParams)
-      }
+      StoredParams.fromJavaMap(requestParamsJava) contains storedParams
 
     def findStoredResponseWithParameters(implicit ctx: EmbeddingContext): Option[ResponseWithParams] =
       ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParams])

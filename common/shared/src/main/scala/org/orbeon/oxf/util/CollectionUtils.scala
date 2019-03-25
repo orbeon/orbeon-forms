@@ -89,7 +89,7 @@ object CollectionUtils {
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
   def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T ⇒ t }
 
-  implicit class TraversableLikeOps[A, Repr](val t: IterableLike[A, Repr]) extends AnyVal {
+  implicit class IterableLikeOps[A, Repr](val t: IterableLike[A, Repr]) extends AnyVal {
 
     def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]

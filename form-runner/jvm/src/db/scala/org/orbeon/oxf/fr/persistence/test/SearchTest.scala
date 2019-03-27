@@ -27,8 +27,7 @@ class SearchTest
     extends DocumentTestBase
      with XFormsSupport
      with ResourceManagerSupport
-     with FunSpecLike
-     with BeforeAndAfterAll {
+     with FunSpecLike {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
 

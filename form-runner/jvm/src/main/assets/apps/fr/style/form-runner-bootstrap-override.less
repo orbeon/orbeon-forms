@@ -59,44 +59,50 @@ body.orbeon {
         margin: 10px 0;                 // Space before and after the navbar
     }
 
-    margin: 0;
+    // For fields and wrapping, see also:
+    //
+    // - https://github.com/orbeon/orbeon-forms/issues/1822
+    // - https://github.com/orbeon/orbeon-forms/issues/3804
+    // - https://github.com/orbeon/orbeon-forms/issues/3583
+    // - https://github.com/orbeon/orbeon-forms/issues/4004
 
-    .xforms-field, .xforms-output output[role = textbox] {
-        // See what applies to .uneditable-input in forms.less
-        display: inline-block;
-        padding: 4px 6px;
-        line-height: @baseLineHeight;
-        .border-radius(@inputBorderRadius);
-
-        //width: 206px; // plus 12px padding and 2px border
-        width: 100%;
-
+    // For now `.xforms-field` means "show this as a field, meaning with a border". So we only
+    // cover field-ish aspects here.
+    // See https://github.com/orbeon/orbeon-forms/issues/4004
+    .xforms-field {
         border: 1px solid @inputBorder;
+        .border-radius(@inputBorderRadius);
         .transition(~"border linear .2s, box-shadow linear .2s");
-
-        // See overrides below
-        font-size: @frFontSize;         // Use our own preferred font size
-        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
-        color: black;                   // Make text inside the fields stand out, as this is the most important information
-        box-sizing: border-box;         // So width: 100% works with the padding added by Bootstrap
-        height: @controlsHeight;
-        background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
-
-        background-color: darken(@inputBackground, 5%);
         .box-shadow(inset 0 1px 2px rgba(0,0,0,.025));
+        background-color: darken(@inputBackground, 5%);
         cursor: not-allowed;
-
-        overflow: hidden; // prevent text from wrapping, but still cut it off like an input does
-        white-space: nowrap;
     }
 
-    .xforms-output.xforms-output-appearance-xxforms-multiline {
-        output[role = textbox] {
-            white-space: normal;
-            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
-            min-height: @controlsHeight;
-            height: auto;
-        }
+    // This applies to fields, but also to the minimal appearance which doesn't show a border but acts as a textbox
+    // See also `.uneditable-input`.
+    .xforms-field,
+    .xforms-output.xforms-output-appearance-minimal output[role = textbox],
+    .xforms-output.xforms-static output
+    {
+
+        display: inline-block;
+        box-sizing: border-box;         // So width: 100% works with the padding added by Bootstrap
+        width: 100%;
+
+        padding: 4px 6px;
+        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
+
+        line-height: @baseLineHeight;
+        font-size: @frFontSize;         // Use our own preferred font size
+
+        color: black;                   // Make text inside the fields stand out, as this is the most important information
+        background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
+
+        // Let content wrap otherwise the user has no option to see the content
+        white-space: normal;
+        word-wrap: break-word;          // Called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+        min-height: @controlsHeight;
+        height: auto;
     }
 
     select,

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPA
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSupport {
 
@@ -35,7 +36,7 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
     effectiveId   : String,
     outputControl : XFormsSingleNodeControl,
     isField       : Boolean
-  ) = {
+  ): AttributesImpl = {
     // Add custom class
     val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(effectiveId, outputControl, addId = true)
     val nestedCssClass = if (isField) "xforms-field" else "xforms-output-output"
@@ -61,15 +62,21 @@ class XFormsOutputDefaultHandler(
 
     val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val isField = (isConcreteControl || isTemplate) && staticControlOpt.exists(_.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label))
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField)
+    val hasLabel =
+      staticControlOpt exists (_.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label))
+
+    val isMinimal =
+      staticControlOpt exists (XFormsControl.appearances(_)(XFORMS_MINIMAL_APPEARANCE_QNAME))
+
+    val containerAttributes =
+      getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, hasLabel && ! isMinimal)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
     handleAriaByAtts(containerAttributes)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
-    if (isField && ! isStaticReadonly(outputControl)) {
+    if (hasLabel && ! isStaticReadonly(outputControl)) {
       containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
       containerAttributes.addAttribute("", "aria-readonly", "aria-readonly", XMLReceiverHelper.CDATA, "true")
       containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")

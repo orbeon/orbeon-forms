@@ -131,12 +131,6 @@
         white-space: nowrap;
     }
 
-    // Allow output to wrap (like .xforms-field)
-    .xforms-output output, .xforms-output .xforms-output-output {
-        word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
-        white-space: normal;
-    }
-
     // Updates to Bootstrap btn-link
     button.btn-link {
         text-decoration: underline;
@@ -361,15 +355,7 @@
         }
     }
 
-    // Allow wrapping of input fields content in view/pdf modes
-    // https://github.com/orbeon/orbeon-forms/issues/1822
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xforms-control .xforms-field {
-            white-space: normal;
-            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
-            min-height: @controlsHeight;
-            height: auto;
-        }
 
         .xforms-textarea.xforms-static > pre, .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
 

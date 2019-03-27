@@ -23,7 +23,8 @@ object JSDateUtils {
   // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
   def isoDateToStringUsingLocalTimezone(dateString: String): js.Date = {
 
-    val dateParts = dateString.splitTo[List]("-")
+    // Use `substring` to trim potential timezone
+    val dateParts = dateString.substring(0, 10).splitTo[List]("-")
 
     new js.Date(
       year    = dateParts(0).toInt,

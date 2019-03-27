@@ -16,11 +16,11 @@
 
     <xbl:binding id="fb-output" element="xf|output">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en" todo="true">Calculated Value</display-name>
+            <display-name lang="en">Calculated Value</display-name>
             <display-name lang="es">Valor Calculado</display-name>
-            <display-name lang="fr" todo="true">Valeur calculée</display-name>
+            <display-name lang="fr">Valeur calculée</display-name>
             <display-name lang="ru" todo="true">Неизменяемый текст</display-name>
-            <display-name lang="de">Textausgabe</display-name>
+            <display-name lang="de" todo="true">Textausgabe</display-name>
             <display-name lang="it" todo="true">Testo statico</display-name>
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
             <display-name lang="sv">Beräknat värde</display-name>
@@ -31,6 +31,34 @@
             <templates>
                 <view>
                     <xf:output id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:output>
+                </view>
+            </templates>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-output-minimal" element="xf|output[appearance ~= minimal]">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Calculated Value Without Border</display-name>
+            <display-name lang="es" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="fr">Valeur calculée sans bord</display-name>
+            <display-name lang="ru" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="de" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="it" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="nl" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="sv" todo="true">Calculated Value Without Border</display-name>
+            <display-name lang="pt" todo="true">Calculated Value Without Border</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-calculator</icon-class>
+            </icon>
+            <templates>
+                <view>
+                    <xf:output id="" appearance="minimal" ref="" xmlns="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>

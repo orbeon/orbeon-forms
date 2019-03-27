@@ -399,7 +399,7 @@ object XFormsControl {
   }
 
   // Return the set of appearances for the given element, if any
-  def appearances(elementAnalysis: ElementAnalysis) = elementAnalysis match {
+  def appearances(elementAnalysis: ElementAnalysis): Set[QName] = elementAnalysis match {
     case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.appearances
     case _                                ⇒ Set.empty[QName]
   }

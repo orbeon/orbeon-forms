@@ -285,6 +285,9 @@
             }"
         )
     </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.new.*.*">
+        navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/new")
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>

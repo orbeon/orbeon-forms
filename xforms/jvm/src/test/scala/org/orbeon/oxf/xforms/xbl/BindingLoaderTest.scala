@@ -39,7 +39,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
         </property>
       </properties>
 
-    new PropertyStore(properties).getGlobalPropertySet
+    PropertyStore.parse(properties).getGlobalPropertySet
   }
 
   class TestBindingLoader extends BindingLoader {

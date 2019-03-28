@@ -91,7 +91,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                 attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
                                     public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
                                         final Document preferencesDocument = readInputAsOrbeonDom(context, input);
-                                        final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                        final PropertyStore propertyStore = PropertyStore.parse(preferencesDocument);
                                         final PropertySet propertySet = propertyStore.getGlobalPropertySet();
                                         return propertySet.getBooleanProperties();
                                     }

@@ -36,7 +36,7 @@ public class PropertiesTest extends TestCase {
             "</properties>";
 
     protected void setUp() throws Exception {
-        propertyStore = new PropertyStore(Dom4jUtils.readDom4j(PROPERTIES));
+        propertyStore = PropertyStore.parse(Dom4jUtils.readDom4j(PROPERTIES));
     }
 
     public void testWildcardMatches() {

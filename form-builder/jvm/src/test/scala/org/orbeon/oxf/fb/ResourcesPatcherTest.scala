@@ -50,7 +50,7 @@ class ResourcesPatcherTest
             <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.labels.acme"       value="Acme Missing"/>
           </properties>
 
-        new PropertyStore(properties).getGlobalPropertySet
+        PropertyStore.parse(properties).getGlobalPropertySet
       }
 
       def newDoc: Document =

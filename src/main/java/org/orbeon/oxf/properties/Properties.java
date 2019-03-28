@@ -144,7 +144,7 @@ public class Properties {
                         throw new OXFException("Failure to initialize Orbeon Forms properties");
                     }
 
-                    propertyStore = new PropertyStore(document);
+                    propertyStore = PropertyStore.parse(document);
 
                     lastUpdate = current;
 

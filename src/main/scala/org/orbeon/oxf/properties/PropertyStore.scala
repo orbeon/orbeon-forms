@@ -30,15 +30,27 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-// Represent property sets grouped as global and per-processor properties.
-class PropertyStore(propertiesDocument: Document) {
+// TODO: Find way to get rid of `mutable.Map`. Check callers' expectations.
+class PropertyStore(globalPropertySet: PropertySet, processorPropertySets: mutable.Map[QName, PropertySet]) {
 
-  private val globalPropertySet = new PropertySet
-  private val processorPropertySets = mutable.HashMap[QName, PropertySet]()
+  def getGlobalPropertySet: PropertySet =
+    globalPropertySet
 
-  locally {
+  def getProcessorPropertySet(processorQName: QName): PropertySet =
+    processorPropertySets.getOrElseUpdate(processorQName, new PropertySet)
+}
 
-    val dw = new DocumentWrapper(propertiesDocument, null, XPath.GlobalConfiguration)
+object PropertyStore {
+
+  def parse(doc: Document): PropertyStore = {
+
+    val globalPropertySet = new PropertySet
+    val processorPropertySets = mutable.HashMap[QName, PropertySet]()
+
+    def getProcessorPropertySet(processorQName: QName): PropertySet =
+      processorPropertySets.getOrElseUpdate(processorQName, new PropertySet)
+
+    val dw = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
 
     // NOTE: The use of `attribute` is for special use of the property store by certain processors.
     // NOTE: Don't use XPathCache, because that depends on properties, which we are initializing here!
@@ -66,19 +78,13 @@ class PropertyStore(propertiesDocument: Document) {
             val processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name")
             getProcessorPropertySet(processorQName).setProperty(propertyElement, name, typeQName, value)
           case None ⇒
-            getGlobalPropertySet.setProperty(propertyElement, name, typeQName, value)
+            globalPropertySet.setProperty(propertyElement, name, typeQName, value)
         }
       }
     }
+
+    new PropertyStore(globalPropertySet, processorPropertySets)
   }
-
-  def getGlobalPropertySet: PropertySet = globalPropertySet
-
-  def getProcessorPropertySet(processorQName: QName): PropertySet =
-    processorPropertySets.getOrElseUpdate(processorQName, new PropertySet)
-}
-
-private object PropertyStore {
 
   private val SupportedTypes = Map[QName, (String, Element) ⇒ AnyRef](
     XS_STRING_QNAME             → convertString,
@@ -103,15 +109,15 @@ private object PropertyStore {
   def getObjectFromStringValue(stringValue: String, typ: QName, element: Element): AnyRef =
     SupportedTypes.get(typ) map (_(stringValue, element)) orNull
 
-  def convertString (value: String, element: Element) = value
-  def convertInteger(value: String, element: Element) = new jl.Integer(value)
-  def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
-  def convertDate   (value: String, element: Element) = new ju.Date(DateUtils.parseISODateOrDateTime(value))
+  private def convertString (value: String, element: Element) = value
+  private def convertInteger(value: String, element: Element) = new jl.Integer(value)
+  private def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
+  private def convertDate   (value: String, element: Element) = new ju.Date(DateUtils.parseISODateOrDateTime(value))
 
-  def convertQName(value: String, element: Element): QName =
+  private def convertQName(value: String, element: Element): QName =
     Dom4jUtils.extractAttributeValueQName(element, "value")
 
-  def convertURI(value: String, element: Element): URI =
+  private def convertURI(value: String, element: Element): URI =
     try {
       new URI(value)
     } catch {
@@ -119,19 +125,19 @@ private object PropertyStore {
         throw new ValidationException(e, null)
     }
 
-  def convertNCName(value: String, element: Element): String = {
+  private def convertNCName(value: String, element: Element): String = {
     if (! Name10Checker.getInstance.isValidNCName(value))
       throw new ValidationException("Not an NCName: " + value, null)
     value
   }
 
-  def convertNMTOKEN(value: String, element: Element): String = {
+  private def convertNMTOKEN(value: String, element: Element): String = {
     if (! Name10Checker.getInstance.isValidNmtoken(value))
       throw new ValidationException("Not an NMTOKEN: " + value, null)
     value
   }
 
-  def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
+  private def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
     val tokens = value.splitTo[Set]()
     for (token ← tokens) {
       if (! Name10Checker.getInstance.isValidNmtoken(token))
@@ -140,7 +146,7 @@ private object PropertyStore {
     tokens.asJava
   }
 
-  def convertNonNegativeInteger(value: String, element: Element): jl.Integer = {
+  private def convertNonNegativeInteger(value: String, element: Element): jl.Integer = {
     val ret = convertInteger(value, element)
     if (ret < 0)
       throw new ValidationException(s"Not a non-negative integer: $value", null)

@@ -51,7 +51,7 @@ class XIncludeProcessor extends ProcessorImpl {
             readCacheInputAsObject(pipelineContext, getInputByName(AttributesInput), new CacheableInputReader[Map[String, Boolean]] {
               def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
                 val preferencesDocument = readInputAsOrbeonDom(pipelineContext, input)
-                val propertyStore = new PropertyStore(preferencesDocument)
+                val propertyStore = PropertyStore.parse(preferencesDocument)
                 val propertySet = propertyStore.getGlobalPropertySet
 
                 propertySet.getBooleanProperties.asScala map { case (k, v) ⇒ k → v.booleanValue } toMap

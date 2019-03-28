@@ -379,6 +379,23 @@
             padding: 0; // reset padding added in form-runner-bootstrap-override.less
         }
     }
+
+    // In view mode, in case the fr:tinymce output contains `pre` elements, we enable horizontal scrolling like in the edit mode.
+    // https://github.com/orbeon/orbeon-forms/issues/3974
+    .fr-mode-view {
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+            overflow-x: scroll;
+        }
+    }
+
+    // In print modes, we obviously don't want a scrollbar. So we must wrap even the content of `pre` elements.
+    // https://github.com/orbeon/orbeon-forms/issues/3974
+    .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+    }
 }
 
 @media print {

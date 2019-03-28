@@ -21,10 +21,10 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -75,9 +75,6 @@ trait FormRunnerActions {
     "wizard-update-validity" → tryUpdateCurrentWizardPageValidity,
     "new-to-edit"            → tryNewToEdit
   )
-
-  private val SupportedRenderFormatsMediatypes = List("pdf" → "application/pdf", "tiff" → "image/tiff").toMap
-  private val SupportedRenderFormats = SupportedRenderFormatsMediatypes.keySet
 
   // Check whether there are pending uploads
   def tryPendingUploads(params: ActionParams): Try[Any] =
@@ -255,8 +252,8 @@ trait FormRunnerActions {
       ensureDataCalculationsAreUpToDate()
 
       val selectedRenderFormats =
-        SupportedRenderFormats filter { format ⇒
-          booleanFormRunnerProperty(s"oxf.fr.email.attach-$format")
+        RenderedFormat.values filter { format ⇒
+          booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
         }
 
       selectedRenderFormats foreach
@@ -266,7 +263,7 @@ trait FormRunnerActions {
 
       val pdfTiffParams =
         for {
-          format    ← SupportedRenderFormats.to[List]
+          format    ← RenderedFormat.values.to[List]
           (path, _) ← pdfOrTiffPathOpt(
               urlsInstanceRootElem = findUrlsInstanceRootElem.get,
               format               = format,
@@ -274,7 +271,7 @@ trait FormRunnerActions {
               defaultLang          = currentFormLang
             )
         } yield
-          format → path
+          format.entryName → path
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
@@ -356,19 +353,23 @@ trait FormRunnerActions {
         } toMap
       }
 
+      // The token can be `xml`, `metadata`, `pdf`, `tiff`, `pdf-url`, `tiff-url`
       val contentToken = evaluatedPropertiesAsMap("content").get.trimAllToEmpty
+      val renderedFormatContentToken = RenderedFormat.withNameOption(contentToken)
 
       // Handle defaults which depend on other properties
       val evaluatedSendProperties = {
 
         def findDefaultSerialization(method: String) = method match {
-          case "post" | "put" if SupportedRenderFormats(contentToken) ⇒ "application/octet-stream"
-          case "post" | "put"                                         ⇒ "application/xml"
+          case "post" | "put" if renderedFormatContentToken.isDefined ⇒ "application/octet-stream"
+          case "post" | "put"                                         ⇒ ContentTypes.XmlContentType
           case _                                                      ⇒ "none"
         }
 
         def findDefaultContentType =
-          SupportedRenderFormatsMediatypes.get(contentToken) orElse Some("application/xml")
+          renderedFormatContentToken                                      flatMap
+            FormRunnerRenderedFormat.SupportedRenderFormatsMediatypes.get orElse
+            Some(ContentTypes.XmlContentType)
 
         def findDefaultPruneMetadata(dataFormatVersion: String) = dataFormatVersion match {
           case "edge" ⇒ "false"
@@ -405,8 +406,9 @@ trait FormRunnerActions {
 
       // Create PDF and/or TIFF if needed
       val selectedRenderFormatOpt =
-        SupportedRenderFormats find { format ⇒
-          Set(format, s"$format-url")(contentToken)
+        RenderedFormat.values find { format ⇒
+          val formatString = format.entryName
+          Set(formatString, s"$formatString-url")(contentToken)
         }
 
       val formatKeyOpt =
@@ -552,27 +554,27 @@ trait FormRunnerActions {
 
       ensureDataCalculationsAreUpToDate()
 
-      val format = (
+      val renderedFormatString = (
         paramByName(params, "format")
         flatMap   trimAllToOpt
-        filter    SupportedRenderFormats
-        getOrElse "pdf"
-      )
+        flatMap   RenderedFormat.withNameOption
+        getOrElse RenderedFormat.Pdf
+      ).entryName
 
       // TODO: Use namespaces from appropriate scope.
       val fullFilename = {
-        val filenameProperty            = s"oxf.fr.detail.$format.filename"
+        val filenameProperty            = s"oxf.fr.detail.$renderedFormatString.filename"
         val filenamePropertyValue       = formRunnerProperty(filenameProperty)(FormRunnerParams()).flatMap(trimAllToOpt)
         val filenameFromProperty        = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
         val escapedFilenameFromProperty = filenameFromProperty.map(EscapeURI.escape(_, "-_.~").toString)
         val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
-        s"$filename.$format"
+        s"$filename.$renderedFormatString"
       }
 
       val currentFormLang = FormRunner.currentLang
 
       recombineQuery(
-        s"/fr/$app/$form/$format/$document",
+        s"/fr/$app/$form/$renderedFormatString/$document",
         ("fr-rendered-filename" → fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
@@ -606,7 +608,7 @@ trait FormRunnerActions {
     formAttachmentsInstance map (_.rootElement)
 
   // Create if needed and return the element key name
-  private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[String] =
+  private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: RenderedFormat): Try[String] =
     Try {
 
       val currentFormLang = FormRunner.currentLang
@@ -625,7 +627,7 @@ trait FormRunnerActions {
 
           val path =
             recombineQuery(
-              s"/fr/service/$app/$form/$format/$document",
+              s"/fr/service/$app/$form/${format.entryName}/$document",
               createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
             )
 

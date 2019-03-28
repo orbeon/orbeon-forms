@@ -23,10 +23,25 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 
 import scala.language.postfixOps
 
 object FormRunnerRenderedFormat {
+
+  sealed abstract class RenderedFormat extends EnumEntry with Lowercase
+
+  object RenderedFormat extends Enum[RenderedFormat] {
+
+    val values = findValues
+
+    case object Pdf  extends RenderedFormat
+    case object Tiff extends RenderedFormat
+  }
+
+  val SupportedRenderFormatsMediatypes: Map[RenderedFormat, String] =
+    Map(RenderedFormat.Pdf → "application/pdf", RenderedFormat.Tiff → "image/tiff")
 
   case class PdfTemplate(path: String, nameOpt: Option[String], langOpt: Option[String]) {
     require(path ne null)
@@ -65,7 +80,7 @@ object FormRunnerRenderedFormat {
 
   def getOrCreatePdfTiffPathElemOpt(
     urlsInstanceRootElem : NodeInfo,
-    format               : String,
+    format               : RenderedFormat,
     pdfTemplateOpt       : Option[PdfTemplate],
     defaultLang          : String,
     create               : Boolean
@@ -82,7 +97,7 @@ object FormRunnerRenderedFormat {
     val nameOpt = pdfTemplateOpt flatMap (_.nameOpt)
     val lang    = pdfTemplateOpt flatMap (_.langOpt) getOrElse defaultLang
 
-    val key = s"$format-${if (pdfTemplateOpt.isDefined) "template" else "automatic"}-$lang${nameOpt map ("-" +) getOrElse ""}"
+    val key = s"${format.entryName}-${if (pdfTemplateOpt.isDefined) "template" else "automatic"}-$lang${nameOpt map ("-" +) getOrElse ""}"
 
     List(urlsInstanceRootElem) child key headOption match {
       case None if create ⇒
@@ -98,7 +113,7 @@ object FormRunnerRenderedFormat {
 
   def pdfOrTiffPathOpt(
     urlsInstanceRootElem : NodeInfo,
-    format               : String,
+    format               : RenderedFormat,
     pdfTemplateOpt       : Option[PdfTemplate],
     defaultLang          : String
   ): Option[(String, String)] =

@@ -193,6 +193,8 @@
     </target>
 
     <target name="proxy-portlet-jar" depends="war-common">
+        <local name="temp.jar"/>
+        <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -202,7 +204,7 @@
             -forceprocessing
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,**.jar;)
-            -outjars     build/lib/orbeon-proxy-portlet.jar(**.class,!**)
+            -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
@@ -227,6 +229,18 @@
                 public *;
             }
         </proguard>
+        <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
+            <zipfileset src="${temp.jar}"/>
+            <rule pattern="org.orbeon.oxf.portlet.OrbeonProxyPortlet*"                  result="org.orbeon.oxf.portlet.OrbeonProxyPortlet@1"/>
+            <rule pattern="org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter*" result="org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter@1"/>
+            <rule pattern="org.orbeon.**"                                               result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**"                                               result="org.orbeon.private.apache.@1"/>
+            <rule pattern="scala.**"                                                    result="org.orbeon.private.scala.@1"/>
+            <rule pattern="jcifs.**"                                                    result="org.orbeon.private.jcifs.@1"/>
+            <rule pattern="spray.**"                                                    result="org.orbeon.private.spray.@1"/>
+            <rule pattern="enumeratum.**"                                               result="org.orbeon.private.enumeratum.@1"/>
+        </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <target name="xforms-filter-jar" depends="war-common">

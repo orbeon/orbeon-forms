@@ -74,6 +74,12 @@
                     <xf:group appearance="xxf:internal">
 
                         <xf:var name="binding" value="xxf:binding('fr-open-select1')"/>
+                        <xf:var
+                            name="view"
+                            value="
+                                property('xxf:readonly-appearance') = 'static' or
+                                fr:mode() = 'pdf'
+                            "/>
 
                         <xf:select1 id="hidden-select1" ref="$binding" appearance="xxf:internal">
                             <!-- Copy user items -->
@@ -116,7 +122,11 @@
                                         'xf:input'
                                 }">
                                 <xsl:attribute name="id">input</xsl:attribute>
-                                <xsl:attribute name="ref">if ($closed-value) then '' else $binding</xsl:attribute>
+                                <xsl:attribute name="ref">
+                                    if    ($closed-value)
+                                    then  if ($view) then () else ''
+                                    else  $binding
+                                </xsl:attribute>
                                 <xsl:if test="@type = ('integer', 'decimal')">
                                     <xsl:copy-of select="@prefix | @suffix"/>
                                 </xsl:if>

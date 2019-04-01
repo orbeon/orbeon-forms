@@ -13,6 +13,20 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
+
+    // Remove floats for Flying Saucer, which otherwise shows the input over the radio buttons
+    @media print {
+        .xbl-fr-open-select1 {
+            .xforms-select1-appearance-full .xforms-items {
+                float: none;
+                .xforms-selected,
+                .xforms-deselected {
+                    float: none;
+                }
+            }
+        }
+    }
+
     .xforms-open-select1-appearance-minimal {
 
         .fr-component-group {

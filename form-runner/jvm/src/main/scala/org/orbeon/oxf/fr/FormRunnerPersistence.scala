@@ -426,8 +426,10 @@ trait FormRunnerPersistence {
 
     def saveAllAttachments(): Unit =
       uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
+        // Copy holder, so we're not blocked in case there are other background uploads
+        val holderCopy = TransformerUtils.extractAsMutableDocument(holder).rootElement
         sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder"       → Some(holder),
+          "holder"       → Some(holderCopy),
           "resource"     → Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
           "username"     → username,
           "password"     → password,

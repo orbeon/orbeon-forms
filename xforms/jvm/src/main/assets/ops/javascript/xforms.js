@@ -2212,10 +2212,9 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                     if (doAnimate) {
                         if (visible) {
                             updateClasses();
-                            $(cursor).css('display', 'none');  // So jQuery's toggle knows the block is hidden
-                            $(cursor).animate({height: 'toggle'}, {duration: 200});
+                            $(cursor).animate({height: 'show'}, {duration: 200});
                         } else {
-                            $(cursor).animate({height: 'toggle'}, {duration: 200, complete: updateClasses});
+                            $(cursor).animate({height: 'hide'}, {duration: 200, complete: updateClasses});
                         }
                     } else {
                         updateClasses();

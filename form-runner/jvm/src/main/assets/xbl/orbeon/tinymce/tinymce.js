@@ -38,7 +38,7 @@
                 // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
                 // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
                 var baseURL = href.substr(0, href.length - '1b713b2e6d7fd45753f4b8a6270b776e.js'.length);
-                tinymce.baseURL = baseURL + "/"; // doc says base URL must end with "/"
+                tinymce.baseURL = baseURL;
 
                 baseUrlInitialized = true;
             }

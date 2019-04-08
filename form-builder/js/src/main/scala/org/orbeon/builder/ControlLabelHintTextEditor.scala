@@ -256,7 +256,7 @@ object ControlLabelHintTextEditor {
 
         TinyMceDefaultEditorManager.baseURL = {
           val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
-          href.substring(0, href.length - s"$URLBaseMagic.js".length).appendSlash
+          href.substring(0, href.length - s"$URLBaseMagic.js".length)
         }
 
         tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMceDefaultEditorManager)

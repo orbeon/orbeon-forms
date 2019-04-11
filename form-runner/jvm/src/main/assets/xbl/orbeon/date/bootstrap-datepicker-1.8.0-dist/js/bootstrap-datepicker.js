@@ -1824,6 +1824,29 @@
 			}
 
 			parts = date && date.match(this.nonpunctuation) || [];
+			if (parts.length == 1) {
+			    // Try splitting date without separators
+			    if (date.length == 4) {
+                    parts = [
+                        date.substring(0, 2),
+                        date.substring(2, 4)
+                    ];
+			    } else if (date.length == 8) {
+			        if (format.parts[0].startsWith("y")) {
+                        parts = [
+                            date.substring(0, 4),
+                            date.substring(4, 6),
+                            date.substring(6, 8)
+                        ];
+                    } else {
+                        parts = [
+                            date.substring(0, 2),
+                            date.substring(2, 4),
+                            date.substring(4, 8)
+                        ];
+                    }
+			    }
+			}
 
 			function applyNearbyYear(year, threshold){
 				if (threshold === true)

@@ -27,14 +27,14 @@ import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
 case class NumberConfig(
   decimalSeparator    : Char,
-  groupingSeparator   : Char,
+  groupingSeparator   : Option[Char],
   prefix              : String,
   digitsAfterDecimal  : Option[Int],
   roundWhenFormatting : Boolean,
   roundWhenStoring    : Boolean
 ) {
-  val decimalSeparatorString  = decimalSeparator.toString
-  val groupingSeparatorString = groupingSeparator.toString
+  val decimalSeparatorString  : String         = decimalSeparator.toString
+  val groupingSeparatorString : Option[String] = groupingSeparator map (_.toString)
 }
 
 // Trait abstracts over the binding type to help with unit tests
@@ -94,7 +94,7 @@ trait NumberSupport[Binding] {
         case (None,                _      ) ⇒ editValue(getStringValue(binding))
       }
 
-    formatted.translate(".,", params.decimalSeparatorString + params.groupingSeparator)
+    formatted.translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/3226
@@ -109,13 +109,13 @@ trait NumberSupport[Binding] {
   def storageValue(value: String, binding: Binding)(implicit params: NumberConfig): String = {
 
     val withPeriodEncoded =
-      if (params.groupingSeparator == '.' || params.decimalSeparator == '.')
+      if (params.groupingSeparator.contains('.') || params.decimalSeparator == '.')
         value
       else
         value.translate(".", PeriodEncodedString)
 
     val withSeparatorsReplaced =
-      withPeriodEncoded.translate(params.decimalSeparatorString + params.groupingSeparatorString, ".")
+      withPeriodEncoded.translate(params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""), ".")
 
     val precisionForRoundingOpt =
       if (params.roundWhenStoring) fractionDigitsFromValidationOrProp(binding) else None
@@ -207,8 +207,8 @@ object NumberSupportJava extends NumberSupport[Item] {
   ): Array[String] = {
 
     implicit val params = NumberConfig(
-      decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
-      groupingSeparator   = groupingSeparator.headOption getOrElse ',',
+      decimalSeparator    = decimalSeparator.headOption getOrElse '.',
+      groupingSeparator   = groupingSeparator.headOption,
       prefix              = prefix,
       digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
       roundWhenFormatting = roundWhenFormatting,
@@ -231,8 +231,8 @@ object NumberSupportJava extends NumberSupport[Item] {
   ): String = {
 
     implicit val params = NumberConfig(
-      decimalSeparator    = decimalSeparator.headOption  getOrElse '.',
-      groupingSeparator   = groupingSeparator.headOption getOrElse ',',
+      decimalSeparator    = decimalSeparator.headOption getOrElse '.',
+      groupingSeparator   = groupingSeparator.headOption,
       prefix              = prefix,
       digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
       roundWhenFormatting = roundWhenFormatting,

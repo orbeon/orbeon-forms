@@ -63,6 +63,12 @@
     };
 
     AjaxServer.fireEvents = function(events, incremental) {
+
+        // https://github.com/orbeon/orbeon-forms/issues/4023
+        if (! _.isUndefined(window.Liferay) && ! _.isUndefined(window.Liferay.Session) && _.isFunction(window.Liferay.Session.extend)) {
+            window.Liferay.Session.extend();
+        }
+
         // We do not filter events when the modal progress panel is shown.
         //      It is tempting to filter all the events that happen when the modal progress panel is shown.
         //      However, if we do so we would loose the delayed events that become mature when the modal

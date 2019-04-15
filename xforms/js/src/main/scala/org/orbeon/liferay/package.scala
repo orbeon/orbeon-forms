@@ -17,6 +17,7 @@ import org.scalajs.dom
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 package object liferay {
 
@@ -31,14 +32,30 @@ package object liferay {
   @js.native
   trait Liferay extends js.Object {
     def on(event: String, listener: js.Function): Unit = js.native
+    val Session: js.UndefOr[Session] = js.native // `Session` *might* not be present so let's be conservative and use `UndefOr`
   }
 
-  implicit class LiferayOps(val liferay : Liferay) extends AnyVal {
+  @js.native
+  trait Session extends js.Object {
+    def extend(): Unit = js.native
+  }
+
+  implicit class LiferayOps(val liferay: Liferay) extends AnyVal {
 
     def allPortletsReadyF: Future[Unit] = {
       val promise = Promise[Unit]()
       liferay.on("allPortletsReady", () ⇒ promise.success(()))
       promise.future
     }
+
+    def extendSession(): Unit =
+      liferay.Session.toOption foreach (_.extend())
+  }
+
+  @JSExportTopLevel("ORBEON.xforms.LiferaySupport")
+  object LiferaySupport {
+    @JSExport
+    def extendSession(): Unit =
+      dom.window.Liferay.toOption foreach (_.extendSession())
   }
 }

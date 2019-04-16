@@ -167,7 +167,11 @@
 
                         <xf:var
                             name="view-template"
-                            value="($control-details/../fb:templates/fb:view/*)[1]"/>
+                            value="
+                                (
+                                    $control-details/../fb:templates/fb:view/*,
+                                    $control-details/../fb:template/*
+                                )[1]"/>
 
                         <xf:var
                             name="existing-params"
@@ -896,7 +900,7 @@
 
                     </xh:div>
 
-                    <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+                    <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">

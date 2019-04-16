@@ -1831,6 +1831,12 @@
                         date.substring(0, 2),
                         date.substring(2, 4)
                     ];
+			    } else if (date.length == 6) {
+                    parts = [
+                        date.substring(0, 2),
+                        date.substring(2, 4),
+                        date.substring(4, 6)
+                    ];
 			    } else if (date.length == 8) {
 			        if (format.parts[0].startsWith("y")) {
                         parts = [

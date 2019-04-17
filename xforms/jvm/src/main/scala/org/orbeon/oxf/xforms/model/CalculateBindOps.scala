@@ -29,10 +29,9 @@ trait CalculateBindOps {
 
   import Private._
 
-  // Apply calculate binds
   def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit = {
     if (! staticModel.mustRecalculate) {
-        debug("skipping bind recalculate", List("model id" → model.getEffectiveId, "reason" → "no recalculation binds"))
+      debug("skipping bind recalculate", List("model id" → model.getEffectiveId, "reason" → "no recalculation binds"))
     } else {
       withDebug("performing bind recalculate", List("model id" → model.getEffectiveId)) {
 

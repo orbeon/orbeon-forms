@@ -338,8 +338,7 @@ private object FormRunnerFunctions {
             paramName                   = paramName
           )
 
-        val paramValueOpt = fromAttributes orElse fromMetadataAndProperties
-        paramValueOpt map {
+        fromAttributes orElse fromMetadataAndProperties map {
             case paramValue: StringValue ⇒ stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
             case paramValue              ⇒ paramValue
           }

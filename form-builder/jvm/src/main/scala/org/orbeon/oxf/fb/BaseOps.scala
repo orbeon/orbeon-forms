@@ -113,7 +113,7 @@ trait BaseOps extends Logging {
     }
   }
 
-  // We search ids y looking for `id` attributes in a document, whether via an index or XPath.
+  // We search ids looking for `id` attributes in a document, whether via an index or XPath.
   //
   // We used to check element names in a another, optional document as well, typically instance data.
   // But this should not be done:

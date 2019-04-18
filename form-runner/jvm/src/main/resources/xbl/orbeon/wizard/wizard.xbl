@@ -795,8 +795,11 @@
                                                 event="fr-wizard-visit-all-available"
 
                                                 iterate="
-                                                    for $s in xxf:split(xxf:instance('available-top-level-sections'))
-                                                    return concat($s, '-section-case')"
+                                                    for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
+                                                    return
+                                                        (: See https://github.com/orbeon/orbeon-forms/issues/4022 :)
+                                                        for $section-id in $nav-section-or-grid-ids[frf:controlNameFromId(.) = $section-name]
+                                                        return concat($section-id, '-case')"
                                                 control="{{.}}"
                                                 visited="true"
                                                 recurse="true"/>

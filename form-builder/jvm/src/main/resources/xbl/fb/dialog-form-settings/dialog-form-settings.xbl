@@ -183,7 +183,11 @@
                                 if (exists($existing-params)) then
                                     $existing-params
                                 else
-                                    xf:element(node-name($view-template))"/>
+                                    xf:element(
+                                        node-name($view-template),
+                                        (: Also copy attributes that are always there on the view template :)
+                                        $view-template/(@* except (@id, @appearance, @ref, @bind))
+                                    )"/>
 
                         <xf:insert
                             context="$inserted//xh:body"
@@ -233,6 +237,32 @@
                     <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
+
+                <!-- Remove attributes if their value is the same as the value of the attribute on the view template -->
+                <xf:action iterate="instance('dynamic')/*">
+                    <xf:var
+                        name="xbl"
+                        value="(.//xf:instance/*)[1]"/>
+                    <xf:var
+                        name="view-template"
+                        value="
+                            instance('control-details-metadata')/
+                            fb:metadata/
+                            (fb:template | fb:templates/fb:view)/
+                            *[name() = $xbl/name()]"/>
+                    <xf:action iterate="$xbl/@*">
+                        <xf:var name="xbl-attribute" value="."/>
+                        <xf:delete
+                            if="
+                                exists(
+                                    $view-template/@*[
+                                        name() = $xbl-attribute/name() and
+                                        .      = $xbl-attribute
+                                    ]
+                                )"
+                            ref="$xbl-attribute"/>
+                    </xf:action>
+                </xf:action>
 
                 <!-- Dispatch event with result -->
                 <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
@@ -899,8 +929,6 @@
                         </fr:tabbable>
 
                     </xh:div>
-
-                    <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">

@@ -58,8 +58,8 @@ class XFormsSelect1Control(
   def mustEncodeValues = XFormsSelect1Control.mustEncodeValues(containingDocument, staticControl)
   def isFullAppearance = staticControl.isFull
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
     // Evaluate itemsets only if restoring dynamic state
     // NOTE: This doesn't sound like it is the right place to do this, does it?
     if (restoreState)

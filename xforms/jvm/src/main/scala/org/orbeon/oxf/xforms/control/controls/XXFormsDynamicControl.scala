@@ -86,8 +86,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       contextStack.getCurrentBindingContext
     }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
     getBoundElement match {
       case Some(boundElem) ⇒
         updateSubTree(create = true, boundElem)
@@ -97,7 +97,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
   }
 
-  override def onDestroy(): Unit = {
+  override def onDestroy(update: Boolean): Unit = {
     // TODO: XXX remove child container from parent
     _nested = None
     fullUpdateChange = false

@@ -94,14 +94,14 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   def customMIPs: Map[String, String] = _customMIPs
   def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) ⇒ Model.buildExternalCustomMIPName(k) + '-' + v }
 
-  override def onDestroy(): Unit = {
-    super.onDestroy()
+  override def onDestroy(update: Boolean): Unit = {
+    super.onDestroy(update)
     // Set default MIPs so that diff picks up the right values
     setDefaultMIPs()
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
 
     readBinding()
 

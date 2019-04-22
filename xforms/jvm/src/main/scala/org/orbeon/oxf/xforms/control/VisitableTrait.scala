@@ -58,8 +58,8 @@ trait VisitableTrait extends XFormsControl {
     }
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]) = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean) = {
+    super.onCreate(restoreState, state, update)
     _visited = state match {
       case Some(state) ⇒ state.visited
       case None        ⇒ false

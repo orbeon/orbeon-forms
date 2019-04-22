@@ -74,8 +74,8 @@ class XFormsRepeatControl(
   override def supportsRefreshEvents = true
   override def children: Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
 
     // Ensure that the initial state is set, either from default value, or for state deserialization.
     state match {

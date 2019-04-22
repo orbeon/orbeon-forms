@@ -156,8 +156,9 @@ class XFormsComponentControl(
       contextStack.getCurrentBindingContext
     }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+
+    super.onCreate(restoreState, state, update)
 
     if (staticControl.bindingOpt.isEmpty) {
       // Only update the static tree. The dynamic tree is created later.
@@ -221,14 +222,15 @@ class XFormsComponentControl(
     _listeners = Nil
   }
 
-  override def onDestroy(): Unit = {
+  override def onDestroy(update: Boolean): Unit = {
 
     // NOTE: We do not *remove* the nested `XBLContainer` (see comments above). However, we should still destroy the container's
     // models. We should look into that!
 
     removeEnabledListener()
     destroyMirrorListenerIfNeeded()
-    super.onDestroy()
+
+    super.onDestroy(update)
 
     if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
       staticControl.part.clearShadowTree(staticControl)

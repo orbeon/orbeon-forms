@@ -48,8 +48,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
   private var _caserefBinding: Option[Item] = None
 
   // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
 
     _caserefBinding = evaluateCaseRefBinding
 

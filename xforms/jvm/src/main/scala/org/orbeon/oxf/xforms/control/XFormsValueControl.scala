@@ -49,8 +49,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   def handleExternalValue = true
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
-    super.onCreate(restoreState, state)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    super.onCreate(restoreState, state, update)
 
     _value = null
     _previousValue = null

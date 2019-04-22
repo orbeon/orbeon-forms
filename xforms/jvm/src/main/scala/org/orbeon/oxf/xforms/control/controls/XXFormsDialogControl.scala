@@ -60,9 +60,9 @@ class XXFormsDialogControl(
   // Initial local state
   setLocal(XXFormsDialogControlLocal(initiallyVisible, constrainToViewport = false, None))
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
 
-    super.onCreate(restoreState, state)
+    super.onCreate(restoreState, state, update)
 
     state match {
       case Some(ControlState(_, _, keyValues)) ⇒

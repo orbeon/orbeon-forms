@@ -132,13 +132,13 @@ trait ControlBindingSupport {
     if (! oldRelevant && newRelevant) {
       // Control becomes relevant
       this._isRelevant = true
-      onCreate(restoreState, state)
+      onCreate(restoreState, state, update)
       if (update)
         markDirtyImpl()
       evaluate()
     } else if (oldRelevant && ! newRelevant) {
       // Control becomes non-relevant
-      onDestroy()
+      onDestroy(update)
       this._isRelevant = false
       evaluateNonRelevant(parentRelevant)
     } else if (newRelevant) {
@@ -154,9 +154,14 @@ trait ControlBindingSupport {
   }
 
   // Control lifecycle
-  def onCreate(restoreState: Boolean, state: Option[ControlState]) = { _wasRelevant = false; _wasContentRelevant = false }
-  def onDestroy() = ()
-  def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) = ()
+  def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+    _wasRelevant = false
+    _wasContentRelevant = false
+  }
+
+  def onDestroy(update: Boolean): Unit = ()
+
+  def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = ()
 
   // Compute relevance in addition to the parentRelevant logic
   // For subclasses to call super.computeRelevant()

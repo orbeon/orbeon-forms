@@ -104,8 +104,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     }
   }
 
-  override def onDestroy(): Unit = {
-    super.onDestroy()
+  override def onDestroy(update: Boolean): Unit = {
+    super.onDestroy(update)
     // Make sure to consider any upload associated with this control as ended
     containingDocument.endUpload(getUploadUniqueId)
   }

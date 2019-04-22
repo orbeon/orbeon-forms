@@ -103,6 +103,7 @@ class XFormsComponentControl(
   // easily. Might want to revisit later. However, if we have a lazy `ConcreteBinding`, the container will still
   // not be created immediately because the container needs the inner scope, which is known only when the
   // `ConcreteBinding` is available.
+  // See also https://github.com/orbeon/orbeon-forms/issues/4018
   createNestedContainer()
 
   // React to external events only if we are relevant OR upon receiving xforms-disabled
@@ -160,10 +161,20 @@ class XFormsComponentControl(
 
     super.onCreate(restoreState, state, update)
 
-    if (staticControl.bindingOpt.isEmpty) {
+    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isEmpty) {
+
       // Only update the static tree. The dynamic tree is created later.
       XXFormsDynamicControl.createOrUpdateStaticShadowTree(this, None)
       assert(staticControl.bindingOpt.isDefined)
+
+      // See https://github.com/orbeon/orbeon-forms/issues/4018
+      //
+      // The nested `XBLContainer` needs to be created if the lazy static binding got just created. The reason is that upon control
+      // construction, if the static binding was missing, the nested `XBLContainer` was not created either.
+      recreateNestedContainer()
+
+      if (update)
+        XXFormsDynamicControl.updateDynamicShadowTree(this, recreateNestedContainer = false, dispatchEvents = false)
     }
 
     if (Controls.isRestoringDynamicState)
@@ -233,6 +244,13 @@ class XFormsComponentControl(
     super.onDestroy(update)
 
     if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
+
+      if (update) {
+        containingDocument.getControls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
+        clearChildren()
+        destroyNestedContainer()
+      }
+
       staticControl.part.clearShadowTree(staticControl)
       containingDocument.addControlStructuralChange(prefixedId)
     }

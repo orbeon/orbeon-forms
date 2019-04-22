@@ -134,8 +134,8 @@ object Controls {
     // TODO LATER: controls must take ElementAnalysis, not Element
 
     // NOTE: If we are unable to create a control (case of Model at least), this has no effect
-    XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map {
-      control ⇒
+    XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map { control ⇒
+
         // Index the new control
         // NOTE: We used to do this after evaluating the binding. In general it shouldn't hurt to do it here.
         // 2018-12-21: The probable reason to move indexing before is so that variables can resolve controls indexed so far.
@@ -148,17 +148,6 @@ object Controls {
           restoreState  = state.isDefined,
           state         = state flatMap (_.get(effectiveId))
         )
-
-        control match {
-          case componentControl: XFormsComponentControl ⇒
-
-            if (componentControl.isRelevant && componentControl.staticControl.hasLazyBinding && componentControl.staticControl.bindingOpt.isDefined) {
-              // Control got created relevant and, in the process, created the static `ConcreteBinding`.
-              componentControl.recreateNestedContainer()
-            }
-
-          case _ ⇒
-        }
 
         // Build the control's children if any
         control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
@@ -405,17 +394,22 @@ object Controls {
 
       // Only update the binding if needed
       if (mustReEvaluateBinding) {
+
+        def evaluateBindingAndValues(): Unit =
+          control.evaluateBindingAndValues(
+            parentContext = bindingContext,
+            update        = true,
+            restoreState  = false,
+            state         = None
+          )
+
         control match {
           case repeatControl: XFormsRepeatControl ⇒
+
             // Update iterations
             val oldRepeatSeq = control.bindingContext.nodeset.asScala
 
-            control.evaluateBindingAndValues(
-              parentContext = bindingContext,
-              update        = true,
-              restoreState  = false,
-              state         = None
-            )
+            evaluateBindingAndValues()
 
             val (newIterations, partialFocusRepeatOption) =
               repeatControl.updateIterations(oldRepeatSeq, None, isInsertDelete = false)
@@ -435,36 +429,10 @@ object Controls {
             // controls and dispatches events
             this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
 
-          case componentControl: XFormsComponentControl ⇒
+          case _ ⇒
 
-            val hadMissingLazyBinding = componentControl.staticControl.bindingOpt.isEmpty
-
-            componentControl.evaluateBindingAndValues(
-              parentContext = bindingContext,
-              update        = true,
-              restoreState  = false,
-              state         = None
-            )
-
-            if (hadMissingLazyBinding && componentControl.staticControl.bindingOpt.isDefined) {
-              // Control just got relevant and, in the process, created the static `ConcreteBinding`.
-              XXFormsDynamicControl.updateDynamicShadowTree(componentControl, recreateNestedContainer = true, dispatchEvents = false)
-            } else if (! hadMissingLazyBinding && componentControl.staticControl.bindingOpt.isEmpty) {
-              // Control just got non-relevant and, in the process, deleted the static `ConcreteBinding`.
-              containingDocument.getControls.getCurrentControlTree.deindexSubtree(componentControl, includeCurrent = false)
-              componentControl.clearChildren()
-              componentControl.destroyNestedContainer()
-              containingDocument.addControlStructuralChange(componentControl.prefixedId)
-            }
-
-          case control ⇒
-            // Simply set new binding
-            control.evaluateBindingAndValues(
-              parentContext = bindingContext,
-              update        = true,
-              restoreState  = false,
-              state         = None
-            )
+            // Simply set the new binding
+            evaluateBindingAndValues()
         }
         _updatedCount += 1
       } else {

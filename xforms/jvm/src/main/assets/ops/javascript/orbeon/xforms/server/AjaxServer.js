@@ -714,6 +714,24 @@
                         return result;
                     }
 
+                    function findRepeatInsertionPoint(repeatPrefixedId, parentIndexes) {
+                        if (parentIndexes == "") {
+                            // Top level repeat: contains a template
+                            // TODO: Change this once we remove templates!
+                            var repeatEnd = document.getElementById("repeat-end-" + repeatPrefixedId);
+                            var cursor = repeatEnd.previousSibling;
+                            while (! (cursor.nodeType == ELEMENT_TYPE
+                                    && $(cursor).is('.xforms-repeat-delimiter')
+                                    && ! $(cursor).is('.xforms-repeat-template'))) {
+                                cursor = cursor.previousSibling;
+                            }
+                            return cursor;
+                        } else {
+                            // Nested repeat: does not contain a template
+                            return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
+                        }
+                    }
+
                     if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
                         var dialogsToShowArray = findDialogsToShow();
                         if (dialogsToShowArray.length > 0) {
@@ -774,24 +792,7 @@
                             }
 
                             // Find element after insertion point
-                            var afterInsertionPoint;
-                            {
-                                if (parentIndexes == "") {
-                                    // Top level repeat: contains a template
-                                    var repeatEnd = document.getElementById("repeat-end-" + repeatId);
-                                    var cursor = repeatEnd.previousSibling;
-                                    while (! (cursor.nodeType == ELEMENT_TYPE
-                                            && $(cursor).is('.xforms-repeat-delimiter')
-                                            && ! $(cursor).is('.xforms-repeat-template'))) {
-                                        cursor = cursor.previousSibling;
-                                    }
-                                    afterInsertionPoint = cursor;
-                                } else {
-                                    // Nested repeat: does not contain a template
-                                    var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
-                                    afterInsertionPoint = repeatEnd;
-                                }
-                            }
+                            var afterInsertionPoint = findRepeatInsertionPoint(repeatId, parentIndexes);
 
                             // Insert copy of template nodes
                             for (var suffix = startSuffix; suffix <= endSuffix; suffix++) {
@@ -1657,54 +1658,83 @@
                             var initValue = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
                             var controlId = ORBEON.util.Dom.getAttribute(elem, "id");
 
-                            var documentElement = document.getElementById(controlId);
-                            if (documentElement != null) {
-                                // Found container
-                                // Detaching children to avoid nodes becoming disconnected
-                                // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
-                                $(documentElement).children().detach();
-                                documentElement.innerHTML = innerHTML;
-                                ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
-                                // Special case for https://github.com/orbeon/orbeon-forms/issues/3707
-                                Controls.fullUpdateEvent.fire({control: documentElement});
+                            var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(controlId);
+
+                            function endsWith(text, suffix) {
+                              var index = text.lastIndexOf(suffix);
+                              return index !== -1 && index + suffix.length === text.length;
+                            }
+
+                            if (endsWith(prefixedId, "~iteration")) {
+                                // The HTML is the content of a repeat iteration
+
+                                var repeatPrefixedId = prefixedId.substring(0, prefixedId.length - "~iteration".length);
+
+                                var parentRepeatIndexes = ORBEON.util.Utils.getRepeatIndexes(controlId);
+                                parentRepeatIndexes.pop();
+
+                                // NOTE: New iterations are added always at the end so we don't yet need the value of the current index.
+                                // This will be either the separator before the template, or the end element.
+                                var afterInsertionPoint = findRepeatInsertionPoint(repeatPrefixedId, parentRepeatIndexes.join("-"));
+
+                                var tagName = afterInsertionPoint.tagName;
+
+                                $(afterInsertionPoint).before(
+                                    '<' + tagName + ' class="xforms-repeat-delimiter"></' + tagName + '>',
+                                    innerHTML
+                                );
+
                             } else {
-                                // Insertion between delimiters
-                                function insertBetweenDelimiters(prefix) {
-                                    // Some elements don't support innerHTML on IE (table, tr...). So for those, we create a div, and
-                                    // complete the table with the missing parent elements.
-                                    var SPECIAL_ELEMENTS = {
-                                        "table": { opening: "<table>", closing: "</table>", level: 1 },
-                                        "thead": { opening: "<table><thead>", closing: "</thead></table>", level: 2 },
-                                        "tbody": { opening: "<table><tbody>", closing: "</tbody></table>", level: 2 },
-                                        "tr":    { opening: "<table><tr>", closing: "</tr></table>", level: 2 }
-                                    };
-                                    var delimiterBegin = document.getElementById(prefix + "-begin-" + controlId);
-                                    if (delimiterBegin != null) {
-                                        // Remove content between begin and end marker
-                                        while (delimiterBegin.nextSibling.nodeType != ELEMENT_TYPE || delimiterBegin.nextSibling.id != prefix + "-end-" + controlId)
-                                            delimiterBegin.parentNode.removeChild(delimiterBegin.nextSibling);
-                                        // Insert content
-                                        var delimiterEnd = delimiterBegin.nextSibling;
-                                        var specialElementSpec = SPECIAL_ELEMENTS[delimiterBegin.parentNode.tagName.toLowerCase()];
-                                        var dummyElement = document.createElement(specialElementSpec == null ? delimiterBegin.parentNode.tagName : "div");
-                                        dummyElement.innerHTML = specialElementSpec == null ? innerHTML : specialElementSpec.opening + innerHTML + specialElementSpec.closing;
-                                        // For special elements, the parent is nested inside the dummyElement
-                                        var dummyParent = specialElementSpec == null ? dummyElement
-                                            : specialElementSpec.level == 1 ? YAHOO.util.Dom.getFirstChild(dummyElement)
-                                            : specialElementSpec.level == 2 ? YAHOO.util.Dom.getFirstChild(YAHOO.util.Dom.getFirstChild(dummyElement))
-                                            : null;
-                                        // Move nodes to the real DOM
-                                        while (dummyParent.firstChild != null)
-                                            YAHOO.util.Dom.insertBefore(dummyParent.firstChild, delimiterEnd);
-                                        return true;
-                                    } else {
-                                        return false;
+
+                                var documentElement = document.getElementById(controlId);
+                                if (documentElement != null) {
+                                    // Found container
+                                    // Detaching children to avoid nodes becoming disconnected
+                                    // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
+                                    $(documentElement).children().detach();
+                                    documentElement.innerHTML = innerHTML;
+                                    ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
+                                    // Special case for https://github.com/orbeon/orbeon-forms/issues/3707
+                                    Controls.fullUpdateEvent.fire({control: documentElement});
+                                } else {
+                                    // Insertion between delimiters
+                                    function insertBetweenDelimiters(prefix) {
+                                        // Some elements don't support innerHTML on IE (table, tr...). So for those, we create a div, and
+                                        // complete the table with the missing parent elements.
+                                        var SPECIAL_ELEMENTS = {
+                                            "table": { opening: "<table>", closing: "</table>", level: 1 },
+                                            "thead": { opening: "<table><thead>", closing: "</thead></table>", level: 2 },
+                                            "tbody": { opening: "<table><tbody>", closing: "</tbody></table>", level: 2 },
+                                            "tr":    { opening: "<table><tr>", closing: "</tr></table>", level: 2 }
+                                        };
+                                        var delimiterBegin = document.getElementById(prefix + "-begin-" + controlId);
+                                        if (delimiterBegin != null) {
+                                            // Remove content between begin and end marker
+                                            while (delimiterBegin.nextSibling.nodeType != ELEMENT_TYPE || delimiterBegin.nextSibling.id != prefix + "-end-" + controlId)
+                                                delimiterBegin.parentNode.removeChild(delimiterBegin.nextSibling);
+                                            // Insert content
+                                            var delimiterEnd = delimiterBegin.nextSibling;
+                                            var specialElementSpec = SPECIAL_ELEMENTS[delimiterBegin.parentNode.tagName.toLowerCase()];
+                                            var dummyElement = document.createElement(specialElementSpec == null ? delimiterBegin.parentNode.tagName : "div");
+                                            dummyElement.innerHTML = specialElementSpec == null ? innerHTML : specialElementSpec.opening + innerHTML + specialElementSpec.closing;
+                                            // For special elements, the parent is nested inside the dummyElement
+                                            var dummyParent = specialElementSpec == null ? dummyElement
+                                                : specialElementSpec.level == 1 ? YAHOO.util.Dom.getFirstChild(dummyElement)
+                                                : specialElementSpec.level == 2 ? YAHOO.util.Dom.getFirstChild(YAHOO.util.Dom.getFirstChild(dummyElement))
+                                                : null;
+                                            // Move nodes to the real DOM
+                                            while (dummyParent.firstChild != null)
+                                                YAHOO.util.Dom.insertBefore(dummyParent.firstChild, delimiterEnd);
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
                                     }
+                                    // First try inserting between group delimiters, and if it doesn't work between repeat delimiters
+                                    if (! insertBetweenDelimiters("group"))
+                                        if (! insertBetweenDelimiters("repeat"))
+                                            insertBetweenDelimiters("xforms-case");
                                 }
-                                // First try inserting between group delimiters, and if it doesn't work between repeat delimiters
-                                if (! insertBetweenDelimiters("group"))
-                                    if (! insertBetweenDelimiters("repeat"))
-                                        insertBetweenDelimiters("xforms-case");
                             }
 
                             // Handle initializations

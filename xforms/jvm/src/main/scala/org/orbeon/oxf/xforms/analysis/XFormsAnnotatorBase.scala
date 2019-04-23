@@ -113,33 +113,37 @@ abstract class XFormsAnnotatorBase(
   ): Attributes =
     templateSAXStoreOpt map { templateSAXStore ⇒
 
-    def isSwitch =
-      stackElement.isXForms && stackElement.localname == "switch"
+      def isSwitch =
+        stackElement.isXForms && stackElement.localname == "switch"
 
-    def isCase =
-      stackElement.isXForms && stackElement.localname == "case"
+      def isCase =
+        stackElement.isXForms && stackElement.localname == "case"
 
-    def putMark(): Unit =
-      metadata.putMark(templateSAXStore.getMark(rewriteId(xformsElementId)))
+      // See https://github.com/orbeon/orbeon-forms/issues/4011
+      def isRepeat =
+        stackElement.isXForms && stackElement.localname == "repeat"
 
-    def attsWithNewClass =
-      SAXUtils.appendToClassAttribute(atts, "xforms-update-full")
+      def putMark(): Unit =
+        metadata.putMark(templateSAXStore.getMark(rewriteId(xformsElementId)))
 
-    if (isSwitch && stackElement.isFullUpdate) {
-      // Don't remember mark but produce class
-      attsWithNewClass
-    } else if (isCase && (stackElement.parent exists (_.isFullUpdate))) {
-      // Remember mark but don't produce class
-      putMark() // side effect: remember mark
+      def attsWithNewClass =
+        SAXUtils.appendToClassAttribute(atts, "xforms-update-full")
+
+      if (isSwitch && stackElement.isFullUpdate) {
+        // Don't remember mark but produce class
+        attsWithNewClass
+      } else if (isCase && (stackElement.parent exists (_.isFullUpdate))) {
+        // Remember mark but don't produce class
+        putMark() // side effect: remember mark
+        atts
+      } else if (isRepeat || stackElement.isFullUpdate) {
+        putMark() // side effect: remember mark
+        attsWithNewClass
+      } else {
+        atts
+      }
+    } getOrElse
       atts
-    } else if (stackElement.isFullUpdate) {
-      putMark() // side effect: remember mark
-      attsWithNewClass
-    } else {
-      atts
-    }
-  } getOrElse
-    atts
 
   protected def rewriteId(id: String): String = id
 

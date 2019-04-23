@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.{XFormsCaseControl, XFormsRepeatControl, XFormsSwitchControl, XXFormsDynamicControl}
+import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.processor.handlers._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
@@ -64,11 +64,6 @@ class ControlsComparator(
           break()
 
         // 2: Diffs for descendant controls if any
-        def getMark(control: XFormsControl) =
-          document.getStaticOps.getMark(control.getPrefixedId)
-
-        def getMarkOrThrow(control: XFormsControl) =
-          getMark(control).ensuring(_.isDefined, "missing mark").get
 
         // Custom extractor to make match below nicer
         object ControlWithMark {
@@ -277,6 +272,12 @@ class ControlsComparator(
             )
       }
 
+  private def getMark(control: XFormsControl): Option[SAXStore#Mark] =
+    document.getStaticOps.getMark(control.getPrefixedId)
+
+  private def getMarkOrThrow(control: XFormsControl): SAXStore#Mark =
+    getMark(control).ensuring(_.isDefined, "missing mark").get
+
   private def outputDescendantControlsDiffs(
     control1Opt      : Option[XFormsControl],
     control2         : XFormsControl,
@@ -350,6 +351,8 @@ class ControlsComparator(
     receiver : XMLReceiver
   ): Unit = {
 
+    val repeatIterationControlOpt = control.narrowTo[XFormsRepeatIterationControl]
+
     def setupController: ElementHandlerController = {
 
       implicit val controller = new ElementHandlerController
@@ -410,6 +413,16 @@ class ControlsComparator(
       }
 
       handlerContext.restoreContext(control)
+
+      // Special case for a repeat iteration
+      repeatIterationControlOpt foreach { c ⇒
+        handlerContext.pushRepeatContext(
+          false,
+          c.iterationIndex,
+          c.repeat.getIndex == c.iterationIndex
+        )
+      }
+
       controller.setElementHandlerContext(handlerContext)
     }
 
@@ -430,7 +443,13 @@ class ControlsComparator(
         setupOutputPipeline(controller)
 
         controller.startDocument()
+        repeatIterationControlOpt foreach { _ ⇒
+          controller.startElement("", "root", "root", SAXUtils.EMPTY_ATTRIBUTES)
+        }
         replay(controller)
+        repeatIterationControlOpt foreach { _ ⇒
+          controller.endElement("", "root", "root")
+        }
         controller.endDocument()
       }
 

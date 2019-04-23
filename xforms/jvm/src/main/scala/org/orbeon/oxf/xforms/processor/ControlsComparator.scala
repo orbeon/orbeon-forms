@@ -290,40 +290,51 @@ class ControlsComparator(
         val children1 = control1Opt collect { case c: XFormsContainerControl ⇒ c.children } getOrElse Nil
         val children2 = containerControl2.children
 
-        control2 match {
-          case repeatControl: XFormsRepeatControl if children1.nonEmpty ⇒
-            val size1 = children1.size
-            val size2 = children2.size
-            if (size1 == size2) {
-              diffChildren(children1, children2, fullUpdateBuffer)
-            } else if (size2 > size1) {
-              outputCopyRepeatTemplate(repeatControl, size1 + 1, size2)
-              diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
-              diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
-            } else if (size2 < size1) {
-              outputDeleteRepeatTemplate(control2, size1 - size2)
-              diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
-            }
-          case repeatControl: XFormsRepeatControl if control1Opt.isEmpty ⇒
-            // New nested xf:repeat
-            val size2 = children2.size
-            if (size2 > 1) {
-              // don't copy the first template, which is already copied when the parent is copied
-              outputCopyRepeatTemplate(repeatControl, 2, size2)
-            } else if (size2 == 1) {
-              // NOP, the client already has the template copied
-            } else if (size2 == 0) {
-              // Delete first template
-              outputDeleteRepeatTemplate(control2, 1)
-            }
-            diffChildren(Nil, children2, fullUpdateBuffer)
+        containerControl2 match {
+          case repeatControl2: XFormsRepeatControl ⇒
 
-          case repeatControl: XFormsRepeatControl if children1.isEmpty ⇒
-            val size2 = children2.size
-            if (size2 > 0) {
-              outputCopyRepeatTemplate(repeatControl, 1, size2)
+            // `xf:repeat` needs special treatment to handle adding and removing iterations
+
+            if (children1.nonEmpty) {
+
+              val size1 = children1.size
+              val size2 = children2.size
+              if (size1 == size2) {
+                diffChildren(children1, children2, fullUpdateBuffer)
+              } else if (size2 > size1) {
+                outputCopyRepeatTemplate(repeatControl2, size1 + 1, size2)
+                diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
+                diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
+              } else if (size2 < size1) {
+                outputDeleteRepeatElements(repeatControl2, size1 - size2)
+                diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
+              }
+
+            } else if (control1Opt.isEmpty) {
+
+              // Newly-relevant `xf:repeat`
+              // Q: Why is it "nested"?
+              val size2 = children2.size
+              if (size2 > 1) {
+                // don't copy the first template, which is already copied when the parent is copied
+                outputCopyRepeatTemplate(repeatControl2, 2, size2)
+              } else if (size2 == 1) {
+                // NOP, the client already has the template copied
+              } else if (size2 == 0) {
+                // Delete first template
+                outputDeleteRepeatElements(repeatControl2, 1)
+              }
               diffChildren(Nil, children2, fullUpdateBuffer)
+
+            } else { // `children1.isEmpty`
+
+              val size2 = children2.size
+              if (size2 > 0) {
+                outputCopyRepeatTemplate(repeatControl2, 1, size2)
+                diffChildren(Nil, children2, fullUpdateBuffer)
+              }
             }
+
           case _ ⇒
             // Other grouping control
             diffChildren(children1, children2, fullUpdateBuffer)
@@ -445,7 +456,7 @@ class ControlsComparator(
       case index ⇒ (id.substring(0, index), id.substring(index + 1))
     }
 
-  private def outputDeleteRepeatTemplate(
+  private def outputDeleteRepeatElements(
     control  : XFormsControl,
     count    : Int)(implicit
     receiver : XMLReceiver

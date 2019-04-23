@@ -109,6 +109,9 @@ class ControlsComparator(
                 true
               } else
                 false
+            case _: XFormsRepeatControl ⇒
+              // Repeat iterations are handled separately
+              false
             case c @ ControlWithMark(mark) ⇒
               tryBreakable {
                 // Output to buffer
@@ -296,43 +299,68 @@ class ControlsComparator(
 
             // `xf:repeat` needs special treatment to handle adding and removing iterations
 
-            if (children1.nonEmpty) {
+            // In a first phase, keep use of repeat templates for the top-level part
+            // See https://github.com/orbeon/orbeon-forms/issues/4011
+            if (repeatControl2.staticControl.part.isTopLevel) {
+              if (children1.nonEmpty) {
+
+                val size1 = children1.size
+                val size2 = children2.size
+                if (size1 == size2) {
+                  diffChildren(children1, children2, fullUpdateBuffer)
+                } else if (size2 > size1) {
+                  outputCopyRepeatTemplate(repeatControl2, size1 + 1, size2)
+                  diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
+                  diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
+                } else if (size2 < size1) {
+                  outputDeleteRepeatElements(repeatControl2, size1 - size2)
+                  diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
+                }
+
+              } else if (control1Opt.isEmpty) {
+
+                // Newly-relevant `xf:repeat`
+                // Q: Why is it "nested"?
+                val size2 = children2.size
+                if (size2 > 1) {
+                  // don't copy the first template, which is already copied when the parent is copied
+                  outputCopyRepeatTemplate(repeatControl2, 2, size2)
+                } else if (size2 == 1) {
+                  // NOP, the client already has the template copied
+                } else if (size2 == 0) {
+                  // Delete first template
+                  outputDeleteRepeatElements(repeatControl2, 1)
+                }
+                diffChildren(Nil, children2, fullUpdateBuffer)
+
+              } else { // `children1.isEmpty`
+
+                val size2 = children2.size
+                if (size2 > 0) {
+                  outputCopyRepeatTemplate(repeatControl2, 1, size2)
+                  diffChildren(Nil, children2, fullUpdateBuffer)
+                }
+              }
+            } else {
+              // For nested parts, switch to the new logic
 
               val size1 = children1.size
               val size2 = children2.size
-              if (size1 == size2) {
-                diffChildren(children1, children2, fullUpdateBuffer)
-              } else if (size2 > size1) {
-                outputCopyRepeatTemplate(repeatControl2, size1 + 1, size2)
-                diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
-                diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
+
+              val commonSize = size1 min size2
+
+              if (commonSize > 0)
+                diffChildren(children1.view(0, commonSize), children2.view(0, commonSize), fullUpdateBuffer)
+
+              if (size2 > size1) {
+
+                val mark = getMarkOrThrow(containerControl2)
+
+                for (newIteration ← children2.view(size1, size2))
+                  processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+
               } else if (size2 < size1) {
                 outputDeleteRepeatElements(repeatControl2, size1 - size2)
-                diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
-              }
-
-            } else if (control1Opt.isEmpty) {
-
-              // Newly-relevant `xf:repeat`
-              // Q: Why is it "nested"?
-              val size2 = children2.size
-              if (size2 > 1) {
-                // don't copy the first template, which is already copied when the parent is copied
-                outputCopyRepeatTemplate(repeatControl2, 2, size2)
-              } else if (size2 == 1) {
-                // NOP, the client already has the template copied
-              } else if (size2 == 0) {
-                // Delete first template
-                outputDeleteRepeatElements(repeatControl2, 1)
-              }
-              diffChildren(Nil, children2, fullUpdateBuffer)
-
-            } else { // `children1.isEmpty`
-
-              val size2 = children2.size
-              if (size2 > 0) {
-                outputCopyRepeatTemplate(repeatControl2, 1, size2)
-                diffChildren(Nil, children2, fullUpdateBuffer)
               }
             }
 

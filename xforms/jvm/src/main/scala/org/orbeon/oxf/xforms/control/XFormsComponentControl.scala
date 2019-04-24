@@ -91,6 +91,7 @@ class XFormsComponentControl(
 
   private var _nestedContainerOpt: Option[XBLContainer] = None
   def nestedContainer = _nestedContainerOpt.get
+  def nestedContainerOpt: Option[XBLContainer] = _nestedContainerOpt
 
   // If the component handles LHHA itself, they are considered under of the nested container
   override def lhhaContainer = nestedContainer
@@ -385,7 +386,7 @@ class XFormsComponentControl(
     super.updateEffectiveId()
 
     // Update container with new effective id
-    nestedContainer.updateEffectiveId(getEffectiveId)
+    nestedContainerOpt foreach (_.updateEffectiveId(getEffectiveId))
   }
 
   override def iterationRemoved(): Unit = {

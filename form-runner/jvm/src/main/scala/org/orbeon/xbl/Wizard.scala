@@ -129,7 +129,7 @@ object Wizard {
     )
 
     def findWizardContainer: Option[XBLContainer] =
-      XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") map (_.nestedContainer)
+      XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") flatMap (_.nestedContainerOpt)
 
     def findWizardModel: Option[XFormsModel] =
       for {

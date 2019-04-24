@@ -233,7 +233,7 @@ class EventHandlerImpl(
 
           if (componentControl.canRunEventHandlers(event)) {
 
-            val xblContainer = componentControl.nestedContainer
+            val xblContainer = componentControl.nestedContainerOpt.get // TODO: What if None?
             xblContainer.getContextStack.resetBindingContext()
             val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 

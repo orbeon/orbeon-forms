@@ -229,10 +229,10 @@ object DynamicState {
   // Create a DynamicState from a control
   def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {
 
-    val startContainer = startOpt match {
-      case Some(componentControl: XFormsComponentControl) ⇒ componentControl.nestedContainer
-      case Some(other)                                    ⇒ other.container
-      case None                                           ⇒ document
+    val startContainerOpt = startOpt match {
+      case Some(componentControl: XFormsComponentControl) ⇒ componentControl.nestedContainerOpt
+      case Some(other)                                    ⇒ Some(other.container)
+      case None                                           ⇒ Some(document)
     }
 
     // Serialize relevant controls that have data
@@ -276,7 +276,7 @@ object DynamicState {
       focusedControl      = document.getControls.getFocusedControl map (_.getEffectiveId),
       pendingUploads      = toByteSeq(document.getPendingUploads.asScala.toSet),
       lastAjaxResponse    = toByteSeq(Option(document.getLastAjaxResponse)),
-      instances           = toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+      instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.getInstances.asScala.iterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
       controls            = toByteSeq(controlsToSerialize),
       initialClientScript = document.initialClientScript
     )

@@ -40,7 +40,7 @@ class DatasetsTest
             val sectionControl  = resolveObject[XFormsComponentControl](sectionId)
             val sectionTemplate = FormRunner.sectionTemplateForSection(sectionControl.get).get
 
-            sectionTemplate.nestedContainer → sectionTemplate.innerRootControl.effectiveId
+            sectionTemplate.nestedContainerOpt.get → sectionTemplate.innerRootControl.effectiveId
           }
 
           for ((container, sourceEffectiveId) ← List(document → Constants.DocumentId, sectionTemplateResolver("main-section-section-template-control"))) {

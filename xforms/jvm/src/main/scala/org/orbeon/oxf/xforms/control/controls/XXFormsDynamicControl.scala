@@ -452,7 +452,7 @@ object XXFormsDynamicControl {
 
     templateTreeOpt foreach { templateTree ⇒
       doc.getControls.getCurrentControlTree.createAndInitializeDynamicSubTree(
-        container        = componentControl.nestedContainer,
+        container        = componentControl.nestedContainerOpt getOrElse (throw new IllegalStateException),
         containerControl = componentControl,
         elementAnalysis  = templateTree,
         state            = Controls.restoringControls,

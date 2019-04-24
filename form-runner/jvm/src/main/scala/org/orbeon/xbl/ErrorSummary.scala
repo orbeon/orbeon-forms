@@ -374,7 +374,7 @@ object ErrorSummary {
     )
 
     def findErrorSummaryModel =
-      findErrorSummaryControl flatMap (_.nestedContainer.models find (_.getId == "fr-error-summary-model"))
+      findErrorSummaryControl flatMap (_.nestedContainerOpt) flatMap (_.models find (_.getId == "fr-error-summary-model"))
 
     def findErrorsInstance =
       findErrorSummaryModel map (_.getInstance("fr-errors-instance"))

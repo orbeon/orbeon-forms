@@ -90,11 +90,10 @@ class XFormsComponentControl(
   override type Control <: ComponentControl
 
   private var _nestedContainerOpt: Option[XBLContainer] = None
-  def nestedContainer = _nestedContainerOpt.get
   def nestedContainerOpt: Option[XBLContainer] = _nestedContainerOpt
 
   // If the component handles LHHA itself, they are considered under of the nested container
-  override def lhhaContainer = nestedContainer
+  override def lhhaContainer: XBLContainer = nestedContainerOpt.get // TODO: What if the container is missing due to a lazy binding?
 
   private var _listeners: Seq[(XFormsInstance, EventListener)] = Nil
 
@@ -258,7 +257,7 @@ class XFormsComponentControl(
   }
 
   private def initializeModels(): Unit =
-    _nestedContainerOpt foreach { nestedContainer ⇒
+    nestedContainerOpt foreach { nestedContainer ⇒
 
       // `xforms-model-construct` without RRR
       for (model ← nestedContainer.models) {
@@ -280,22 +279,24 @@ class XFormsComponentControl(
         Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
     }
 
-  private def restoreModels(): Unit = {
-    nestedContainer.restoreModelsState(deferRRR = true)
-    initializeMirrorListenerIfNeeded(dispatch = false)
-    // Do RRR as isRestoringDynamicState() didn't do it
-    for (model ← nestedContainer.models) {
-      model.doRebuild()
-      model.doRecalculateRevalidate()
+  private def restoreModels(): Unit =
+    nestedContainerOpt foreach { nestedContainer ⇒
+      nestedContainer.restoreModelsState(deferRRR = true)
+      initializeMirrorListenerIfNeeded(dispatch = false)
+      // Do RRR as isRestoringDynamicState() didn't do it
+      for (model ← nestedContainer.models) {
+        model.doRebuild()
+        model.doRecalculateRevalidate()
+      }
     }
-  }
 
   private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Option[XFormsInstance] = {
 
     // NOTE: Must be called after xforms-model-construct so that instances are present
-    def findMirrorInstance = (
-      nestedContainer.models.iterator
-      flatMap (_.getInstances.asScala)
+    def findMirrorInstance: Option[XFormsInstance] = (
+      nestedContainerOpt.toIterator
+      flatMap (_.models.iterator)
+      flatMap (_.getInstances.asScala.iterator)
       find    (_.instance.element.attributeValue("mirror") == "true")
     )
 
@@ -406,7 +407,7 @@ class XFormsComponentControl(
       Controls.buildChildren(
         control   = this,
         children  = staticControl.children,
-        buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
+        buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainerOpt getOrElse (throw new IllegalStateException), bindingContext, staticElement, idSuffix),
         idSuffix  = idSuffix
       )
 

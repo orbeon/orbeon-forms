@@ -67,7 +67,7 @@ class ControlsComparator(
 
         // Custom extractor to make match below nicer
         object ControlWithMark {
-          def unapply(c: XFormsControl) = if (fullUpdateBuffer.isEmpty) getMark(c) else None
+          def unapply(c: XFormsControl): Option[SAXStore#Mark] = if (fullUpdateBuffer.isEmpty) getMark(c) else None
         }
 
         // Some controls require special processing, as well as `xxf:update="full"`

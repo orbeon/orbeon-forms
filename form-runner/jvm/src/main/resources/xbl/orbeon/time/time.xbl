@@ -106,6 +106,18 @@
             <xbl:style src="/xbl/orbeon/time/time.css"/>
         </xbl:resources>
 
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><format>HMS</format></resource>
+                        <resource xml:lang="fr"><format>HMS</format></resource>
+                        <resource xml:lang="de"><format>SMS</format></resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:template>
 
             <xf:var
@@ -120,10 +132,30 @@
             <xf:var
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>
+            <xf:var
+                name="placeholder"
+                value="
+                    let $format      := xxf:property('oxf.xforms.format.input.time'),
+                        $cleaned     := translate(upper-case($format), '[]', ''),
+                        $duplicate   := replace(replace(replace(replace(replace(replace($cleaned,
+                                        'P,2\-2', 'am'  ),
+                                        'P,\*\-2', 'am'  ),
+                                        'P'    , 'a.m.'),
+                                        'H'    , 'HH'  ),
+                                        'M'    , 'MM'  ),
+                                        'S'    , 'SS'  ),
+                        $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                        $format-lang := xxf:r('format'),
+                        $translated  := translate($duplicate, $format-en, $format-lang)
+                    return
+                        $translated
+                "/>
 
             <xf:group ref="$binding[not($view)]">
                 <xh:div class="input-append fr-field-width-{$field-width}">
-                    <xf:input ref="."/>
+                    <xf:input ref=".">
+                        <xf:hint value="$placeholder" appearance="minimal"/>
+                    </xf:input>
                     <xh:span class="add-on">
                         <xh:i class="fa fa-fw fa-clock-o"/>
                     </xh:span>

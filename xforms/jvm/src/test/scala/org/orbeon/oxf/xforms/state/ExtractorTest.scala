@@ -34,7 +34,7 @@ class ExtractorTest
 
     val url = "oxf:/org/orbeon/oxf/xforms/state/form-with-include.xhtml"
 
-    val metadata = new Metadata
+    val metadata = Metadata()
 
     val extractorCollector = new DocumentAndElementsCollector
 

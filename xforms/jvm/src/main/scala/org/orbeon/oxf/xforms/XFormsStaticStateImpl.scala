@@ -355,7 +355,7 @@ object XFormsStaticStateImpl {
     val documentResult = new LocationDocumentResult
     identity.setResult(documentResult)
 
-    val metadata             = new Metadata
+    val metadata             = Metadata(isTopLevelPart = startScope.isTopLevelScope)
     val digestContentHandler = new DigestContentHandler
     val template             = new SAXStore
     val prefix               = startScope.fullPrefix

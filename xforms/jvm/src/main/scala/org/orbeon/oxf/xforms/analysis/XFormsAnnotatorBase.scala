@@ -136,7 +136,7 @@ abstract class XFormsAnnotatorBase(
         // Remember mark but don't produce class
         putMark() // side effect: remember mark
         atts
-      } else if (isRepeat || stackElement.isFullUpdate) {
+      } else if (isRepeat && ! metadata.isTopLevelPart || stackElement.isFullUpdate) {
         putMark() // side effect: remember mark
         attsWithNewClass
       } else {

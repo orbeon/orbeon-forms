@@ -37,16 +37,22 @@ import scala.collection.mutable
  *
  * Split into traits for modularity.
  */
-class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with BindingMetadata with Marks {
-  def this() = this(new IdGenerator)
-}
+class Metadata(
+  val idGenerator    : IdGenerator,
+  val isTopLevelPart : Boolean
+) extends NamespaceMappings
+     with BindingMetadata
+     with Marks
 
 object Metadata {
-  // Restore a Metadata object from the given StaticStateDocument
+
+  def apply(idGenerator: IdGenerator = new IdGenerator, isTopLevelPart: Boolean = true): Metadata =
+    new Metadata(idGenerator, isTopLevelPart)
+
   def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
 
     // Restore generator with last id
-    val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
+    val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId), isTopLevelPart = true)
 
     // Restore namespace mappings and ids
     TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))

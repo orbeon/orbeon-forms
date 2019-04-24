@@ -40,7 +40,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
     @Test
     public void formNamespaceElements() {
 
-        final Metadata metadata = new Metadata();
+        final Metadata metadata = Metadata.apply(new IdGenerator(1), true);
         final XFormsAnnotator ch = new XFormsAnnotator(metadata);
         XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/xforms/forms/annotator-test.xhtml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
 
@@ -72,7 +72,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
     public void xxformsAttribute() {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/forms/annotator-test.xhtml", XMLParsing.ParserConfiguration.PLAIN);
-        final Metadata metadata = new Metadata();
+        final Metadata metadata = Metadata.apply(new IdGenerator(1), true);
         final Document annotatedDocument =
             new XBLBindings(new IndentedLogger(XFormsServer.logger), null, metadata).annotateShadowTree(document, "");
         final DocumentWrapper documentWrapper =

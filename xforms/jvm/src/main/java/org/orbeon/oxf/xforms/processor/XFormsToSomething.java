@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
+import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.Metadata;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotator;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor;
@@ -308,7 +309,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
         private final boolean isLogStaticStateInput = XFormsProperties.getDebugLogging().contains("html-static-state");
 
-        public final Metadata metadata = new Metadata();
+        public final Metadata metadata = Metadata.apply(new IdGenerator(1), true);
         public final Document staticStateDocument;
         public final AnnotatedTemplate template;
         public final String staticStateDigest;

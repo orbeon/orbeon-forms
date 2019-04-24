@@ -223,7 +223,7 @@ object XFormsStaticStateImpl {
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
-  def restore(digest: Option[String], encodedState: String, forceEncryption: Boolean) = {
+  def restore(digest: Option[String], encodedState: String, forceEncryption: Boolean): XFormsStaticStateImpl = {
 
     val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
 
@@ -282,9 +282,9 @@ object XFormsStaticStateImpl {
   }
 
   // Create template and analyzed part for the given XForms document.
-  // Used by xxf:dynamic.
+  // Used by `xxf:dynamic`.
   def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope): (SAXStore, PartAnalysisImpl) =
-    createFromDocument(formDocument, startScope, (staticStateDocument: Document, digest: String, metadata: Metadata, _) ⇒ {
+    createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) ⇒ {
       val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
       part.analyze()
       part

@@ -69,13 +69,14 @@ object Metadata {
 
 // Handling of template marks
 trait Marks {
+
   private val marks = new mutable.HashMap[String, SAXStore#Mark]
 
-  def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
-  def getMark(prefixedId: String) = marks.get(prefixedId)
+  def putMark(mark: SAXStore#Mark): Unit                  = marks += mark.id → mark
+  def getMark(prefixedId: String) : Option[SAXStore#Mark] = marks.get(prefixedId)
 
-  private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsId.isTopLevelId(prefixedId) ⇒ mark }
-  def hasTopLevelMarks = topLevelMarks.nonEmpty
+  def hasTopLevelMarks: Boolean =
+    marks exists { case (prefixedId, _) ⇒ XFormsId.isTopLevelId(prefixedId) }
 }
 
 // Handling of namespaces

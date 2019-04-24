@@ -293,6 +293,7 @@ object XFormsId {
   def effectiveIdToAbsoluteId(effectiveId: String): String =
     Constants.AbsoluteIdSeparator + effectiveId + Constants.AbsoluteIdSeparator
 
+  // Means "not under an XBL component or nested part"
   def isTopLevelId(id: String): Boolean =
     id == getStaticIdFromId(id)
 

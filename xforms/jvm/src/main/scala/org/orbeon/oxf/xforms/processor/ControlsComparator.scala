@@ -364,6 +364,17 @@ class ControlsComparator(
               }
             }
 
+          case componentControl2: XFormsComponentControl ⇒
+
+            // When iterations have moved and there is no structural change, the content of lazy binding components can be
+            // incompatible. This should happen only when relevance changes.
+            // NOTE: `control1Opt` must be defined, otherwise we would be in a new iteration.
+            // See https://github.com/orbeon/orbeon-forms/issues/4035
+            if (componentControl2.staticControl.hasLazyBinding && control1Opt.exists(_.isRelevant != componentControl2.isRelevant))
+              processFullUpdateForContent(componentControl2, getMarkOrThrow(componentControl2).replay)
+            else
+              diffChildren(children1, children2, fullUpdateBuffer)
+
           case _ ⇒
             // Other grouping control
             diffChildren(children1, children2, fullUpdateBuffer)

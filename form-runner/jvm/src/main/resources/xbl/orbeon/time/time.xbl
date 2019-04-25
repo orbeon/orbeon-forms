@@ -110,9 +110,9 @@
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
-                        <resource xml:lang="en"><format>HMS</format></resource>
-                        <resource xml:lang="fr"><format>HMS</format></resource>
-                        <resource xml:lang="de"><format>SMS</format></resource>
+                        <resource xml:lang="en"><format>hms</format></resource>
+                        <resource xml:lang="fr"><format>hms</format></resource>
+                        <resource xml:lang="de"><format>hms</format></resource> <!-- German also using "h" for hours -->
                     </resources>
                 </xf:instance>
             </xf:model>
@@ -136,14 +136,14 @@
                 name="placeholder"
                 value="
                     let $format      := xxf:property('oxf.xforms.format.input.time'),
-                        $cleaned     := translate(upper-case($format), '[]', ''),
+                        $cleaned     := translate(lower-case($format), '[]', ''),
                         $duplicate   := replace(replace(replace(replace(replace(replace($cleaned,
-                                        'P,2\-2', 'am'  ),
-                                        'P,\*\-2', 'am'  ),
-                                        'P'    , 'a.m.'),
-                                        'H'    , 'HH'  ),
-                                        'M'    , 'MM'  ),
-                                        'S'    , 'SS'  ),
+                                        'p,2\-2', 'am'  ),
+                                        'p,\*\-2', 'am'  ),
+                                        'p'    , 'a.m.'),
+                                        'h'    , 'hh'  ),
+                                        'm'    , 'mm'  ),
+                                        's'    , 'ss'  ),
                         $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
                         $format-lang := xxf:r('format'),
                         $translated  := translate($duplicate, $format-en, $format-lang)

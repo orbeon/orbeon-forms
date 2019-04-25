@@ -41,8 +41,6 @@ class OutputInterceptor(
 
   private val reusableAttributes = new AttributesImpl
 
-  def isMustGenerateFirstDelimiters = mustGenerateFirstDelimiters
-
   override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
     level += 1

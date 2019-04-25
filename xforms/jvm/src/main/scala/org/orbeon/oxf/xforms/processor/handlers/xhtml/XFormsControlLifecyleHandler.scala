@@ -60,7 +60,7 @@ abstract class XFormsControlLifecyleHandler(
   import Private._
 
   // By default, controls are enclosed with a <span>
-  protected def getContainingElementName = "span"
+  def getContainingElementName = "span"
 
   protected def getContainingElementQName: String =
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)

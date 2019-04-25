@@ -20,6 +20,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.{Attributes, Locator}
 
 import scala.collection.JavaConverters._
@@ -173,6 +174,32 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
     }
   }
 
+  def findFirstHandlerOrElem: Option[ElementHandler Either StructuredQName] = {
+
+    val breaks = new scala.util.control.Breaks
+    import breaks._
+
+    var result: Option[ElementHandler Either StructuredQName] = None
+
+    breakable {
+      currentHandlerInfoOpt flatMap (_.saxStore) foreach (_.replay(new XMLReceiverAdapter {
+
+        override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+          result =
+            Some(
+              findHandler(uri, localname, qName, attributes) match {
+                case Some(handlerInfo) ⇒ Left(handlerInfo.elementHandler)
+                case None              ⇒ Right(new StructuredQName(XMLUtils.prefixFromQName(qName), uri, localname))
+              }
+            )
+          break()
+        }
+      }))
+    }
+
+    result
+  }
+
   // A handler may call this to start providing new dynamic content to process
   // TODO: Not great: "just push null so that the content is not subject to the `isForwarding` test".
   def startBody(): Unit =
@@ -310,17 +337,14 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
         case Some(currentHandlerInfo) if ! currentHandlerInfo.elementHandler.isForwarding ⇒
           // NOP
         case _ ⇒
-          // Look for a new handler
           findHandler(uri, localname, qName, attributes) match {
             case Some(handlerInfo) ⇒
-              // New handler found
               pushHandler(handlerInfo)
               if (handlerInfo.elementHandler.isRepeating) {
                 // Repeating handler will process its body later
                 _isFillingUpSAXStore = true
               } else {
                 // Non-repeating handler processes its body immediately
-                // Signal init/start to current handler
                 handlerInfo.elementHandler.start()
               }
             case None ⇒

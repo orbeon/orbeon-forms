@@ -131,7 +131,7 @@ class XFormsOutputHTMLHandler(
   // Don't use @for as we are not pointing to an HTML control
   override def getForEffectiveId(effectiveId: String) = null
 
-  protected override def getContainingElementName: String = "div"
+  override def getContainingElementName: String = "div"
 }
 
 // xf:output[starts-with(@appearance, 'image/')]

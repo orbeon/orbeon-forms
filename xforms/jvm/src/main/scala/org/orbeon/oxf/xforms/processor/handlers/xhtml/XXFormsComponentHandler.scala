@@ -36,7 +36,7 @@ class XXFormsComponentHandler(
   private lazy val staticControl =
     xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
 
-  protected override def getContainingElementName =
+  override def getContainingElementName =
     staticControl.abstractBinding.containerElementName
 
   protected override def getContainingElementQName =

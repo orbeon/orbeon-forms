@@ -36,7 +36,17 @@ class XFormsCaseHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = true) {
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    attributes,
+    matched,
+    handlerContext,
+    repeating  = false,
+    forwarding = true
+  ) {
 
   private var currentSavedOutput: DeferredXMLReceiver = _
   private var currentOutputInterceptorOpt: Option[OutputInterceptor] = None
@@ -44,7 +54,7 @@ class XFormsCaseHandler(
   private var isMustGenerateBeginEndDelimiters = false
 
   // If we are the top-level of a full update, output a delimiter anyway
-  protected override def isMustOutputContainerElement =
+  protected override def isMustOutputContainerElement: Boolean =
     xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   override protected def handleControlStart(): Unit = {
@@ -119,10 +129,10 @@ class XFormsCaseHandler(
           new OutputInterceptor(
             currentSavedOutput,
             spanQName,
-            new OutputInterceptor.Listener {
+            outputInterceptor ⇒ {
 
               // Classes on first delimiter
-              private val firstDelimiterClasses = {
+              val firstDelimiterClasses = {
                 val classes = new jl.StringBuilder("xforms-case-begin-end " + selectedClasses)
                 if (elementClasses.nonEmpty) {
                   classes.append(' ')
@@ -132,14 +142,12 @@ class XFormsCaseHandler(
               }
 
               // Delimiter: begin case
-              def generateFirstDelimiter(outputInterceptor: OutputInterceptor): Unit =
-                if (isMustGenerateBeginEndDelimiters)
-                  outputInterceptor.outputDelimiter(
-                    currentSavedOutput,
-                    firstDelimiterClasses,
-                    "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
-                  )
-
+              if (isMustGenerateBeginEndDelimiters)
+                outputInterceptor.outputDelimiter(
+                  currentSavedOutput,
+                  firstDelimiterClasses,
+                  "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
+                )
             },
             XFormsControl.appearances(elementAnalysis.parent.get)(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
           )
@@ -168,7 +176,7 @@ class XFormsCaseHandler(
             currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
         }
       case Some(currentOutputInterceptor) ⇒
-        currentOutputInterceptor.flushCharacters(true, true)
+        currentOutputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
         if (isMustGenerateBeginEndDelimiters) {
           // Make sure first delimiter was output
           currentOutputInterceptor.generateFirstDelimitersIfNeeded()
@@ -182,8 +190,8 @@ class XFormsCaseHandler(
   }
 
   // Don't output any LHHA
-  override def handleLabel() = ()
-  override def handleHint()  = ()
-  override def handleHelp()  = ()
-  override def handleAlert() = ()
+  override def handleLabel(): Unit = ()
+  override def handleHint() : Unit = ()
+  override def handleHelp() : Unit = ()
+  override def handleAlert(): Unit = ()
 }

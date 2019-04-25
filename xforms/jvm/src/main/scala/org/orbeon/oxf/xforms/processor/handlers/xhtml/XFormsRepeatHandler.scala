@@ -37,7 +37,17 @@ class XFormsRepeatHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = true, forwarding = true) {
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    attributes,
+    matched,
+    handlerContext,
+    repeating  = true,
+    forwarding = true
+  ) {
 
   // Compute user classes only once for all iterations
   private val userClasses = {
@@ -46,15 +56,14 @@ class XFormsRepeatHandler(
     sb.toString
   }
 
-  override def isMustOutputContainerElement = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+  override def isMustOutputContainerElement: Boolean = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   override protected def handleControlStart(): Unit = {
 
     val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
     val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
     val isMustGenerateTemplate = isTemplate || isTopLevelRepeat
-    val isMustGenerateDelimiters = true
-    val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    val isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
 
     val repeatControl = if (isTemplate) null else containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
@@ -66,33 +75,28 @@ class XFormsRepeatHandler(
     // Place interceptor on output
     val savedOutput = xformsHandlerContext.getController.getOutput
 
-    var mustOutputFirstDelimiter = isMustGenerateDelimiters
+    var mustOutputFirstDelimiter = true
     var outputDelimiter: (String, String) ⇒ Unit = null // initialized further below
 
     val outputInterceptor =
-      if (! isMustGenerateDelimiters)
-        null
-      else
-        new OutputInterceptor(
-          savedOutput,
-          spanQName,
-          new OutputInterceptor.Listener {
-            def generateFirstDelimiter(outputInterceptor: OutputInterceptor): Unit = {
-              if (isMustGenerateBeginEndDelimiters) {
+      new OutputInterceptor(
+        savedOutput,
+        spanQName,
+        _ ⇒ {
+          if (isMustGenerateBeginEndDelimiters) {
 
-                def firstDelimiterClasses = "xforms-repeat-begin-end" + (if (userClasses.nonEmpty) " " + userClasses else "")
+            def firstDelimiterClasses = "xforms-repeat-begin-end" + (if (userClasses.nonEmpty) " " + userClasses else "")
 
-                // Delimiter: begin repeat
-                outputDelimiter(firstDelimiterClasses, "repeat-begin-" + namespacedId)
+            // Delimiter: begin repeat
+            outputDelimiter(firstDelimiterClasses, "repeat-begin-" + namespacedId)
 
-                // Delimiter: before repeat entries, unless disabled (disabled in case the repeat is completely empty)
-                if (mustOutputFirstDelimiter)
-                  outputDelimiter("xforms-repeat-delimiter", null)
-              }
-            }
-          },
-          elementAnalysis.asInstanceOf[RepeatControl].isAroundTableOrListElement
-        )
+            // Delimiter: before repeat entries, unless disabled (disabled in case the repeat is completely empty)
+            if (mustOutputFirstDelimiter)
+              outputDelimiter("xforms-repeat-delimiter", null)
+          }
+        },
+        elementAnalysis.asInstanceOf[RepeatControl].isAroundTableOrListElement
+      )
 
     // Shortcut function to output the delimiter
     outputDelimiter = outputInterceptor.outputDelimiter(savedOutput, _, _)
@@ -116,19 +120,16 @@ class XFormsRepeatHandler(
 
     def repeatBody(iteration: Int, generateTemplate: Boolean, repeatSelected: Boolean)(implicit sb: jl.StringBuilder): Unit = {
 
-      if (isMustGenerateDelimiters) {
-        // User and DnD classes
-        appendClasses(userClasses)
-        addDnDClasses()
+      // User and DnD classes
+      appendClasses(userClasses)
+      addDnDClasses()
 
-        outputInterceptor.setAddedClasses(sb.toString)
-      }
+      outputInterceptor.setAddedClasses(sb.toString)
 
       xformsHandlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
       try {
         xformsHandlerContext.getController.repeatBody()
-        if (isMustGenerateDelimiters)
-          outputInterceptor.flushCharacters(true, true)
+        outputInterceptor.flushCharacters(true, true)
       } catch {
         case NonFatal(t) ⇒
           throw OrbeonLocationException.wrapException(
@@ -141,8 +142,7 @@ class XFormsRepeatHandler(
       bodyRepeated = true
     }
 
-    if (isMustGenerateDelimiters)
-      xformsHandlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
+    xformsHandlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
 
     // 1. Unroll repeat if needed
     if (isConcreteControl) {
@@ -154,7 +154,7 @@ class XFormsRepeatHandler(
       implicit val addedClasses = new jl.StringBuilder(200)
       for (i ← 1 to repeatControl.getSize) {
         // Delimiter: before repeat entries, except the first one which is output by generateFirstDelimiter()
-        if (isMustGenerateDelimiters && i > 1)
+        if (i > 1)
           outputDelimiter("xforms-repeat-delimiter", null)
 
         // Determine classes to add on root elements and around root characters
@@ -179,7 +179,7 @@ class XFormsRepeatHandler(
     // 2. Generate template if needed
     if (isMustGenerateTemplate) {
       // Delimiter: before repeat template
-      if (isMustGenerateDelimiters && ! outputInterceptor.isMustGenerateFirstDelimiters)
+      if (! outputInterceptor.isMustGenerateFirstDelimiters)
         outputDelimiter("xforms-repeat-delimiter", null)
 
       // Determine classes to add on root elements and around root characters
@@ -190,7 +190,7 @@ class XFormsRepeatHandler(
     }
 
     // 3. Handle case where no delimiter was output by repeat iterations or template
-    if (isMustGenerateDelimiters && ! bodyRepeated) {
+    if (! bodyRepeated) {
       // What we do here is replay the body to /dev/null in order to find and output the begin delimiter (but not
       // the other delimiters)
       outputInterceptor.setForward(false)
@@ -207,8 +207,8 @@ class XFormsRepeatHandler(
   }
 
   // Don't output any LHHA
-  override def handleLabel() = ()
-  override def handleHint()  = ()
-  override def handleHelp()  = ()
-  override def handleAlert() = ()
+  override def handleLabel(): Unit = ()
+  override def handleHint() : Unit = ()
+  override def handleAlert(): Unit = ()
+  override def handleHelp() : Unit = ()
 }

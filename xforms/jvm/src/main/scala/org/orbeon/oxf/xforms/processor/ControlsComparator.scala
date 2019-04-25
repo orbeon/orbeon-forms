@@ -298,70 +298,25 @@ class ControlsComparator(
           case repeatControl2: XFormsRepeatControl ⇒
 
             // `xf:repeat` needs special treatment to handle adding and removing iterations
-
-            // In a first phase, keep use of repeat templates for the top-level part
             // See https://github.com/orbeon/orbeon-forms/issues/4011
-            if (repeatControl2.staticControl.part.isTopLevel) {
-              if (children1.nonEmpty) {
 
-                val size1 = children1.size
-                val size2 = children2.size
-                if (size1 == size2) {
-                  diffChildren(children1, children2, fullUpdateBuffer)
-                } else if (size2 > size1) {
-                  outputCopyRepeatTemplate(repeatControl2, size1 + 1, size2)
-                  diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
-                  diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
-                } else if (size2 < size1) {
-                  outputDeleteRepeatElements(repeatControl2, size1 - size2)
-                  diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
-                }
+            val size1 = children1.size
+            val size2 = children2.size
 
-              } else if (control1Opt.isEmpty) {
+            val commonSize = size1 min size2
 
-                // Newly-relevant `xf:repeat`
-                // Q: Why is it "nested"?
-                val size2 = children2.size
-                if (size2 > 1) {
-                  // don't copy the first template, which is already copied when the parent is copied
-                  outputCopyRepeatTemplate(repeatControl2, 2, size2)
-                } else if (size2 == 1) {
-                  // NOP, the client already has the template copied
-                } else if (size2 == 0) {
-                  // Delete first template
-                  outputDeleteRepeatElements(repeatControl2, 1)
-                }
-                diffChildren(Nil, children2, fullUpdateBuffer)
+            if (commonSize > 0)
+              diffChildren(children1.view(0, commonSize), children2.view(0, commonSize), fullUpdateBuffer)
 
-              } else { // `children1.isEmpty`
+            if (size2 > size1) {
 
-                val size2 = children2.size
-                if (size2 > 0) {
-                  outputCopyRepeatTemplate(repeatControl2, 1, size2)
-                  diffChildren(Nil, children2, fullUpdateBuffer)
-                }
-              }
-            } else {
-              // For nested parts, switch to the new logic
+              val mark = getMarkOrThrow(containerControl2)
 
-              val size1 = children1.size
-              val size2 = children2.size
+              for (newIteration ← children2.view(size1, size2))
+                processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
 
-              val commonSize = size1 min size2
-
-              if (commonSize > 0)
-                diffChildren(children1.view(0, commonSize), children2.view(0, commonSize), fullUpdateBuffer)
-
-              if (size2 > size1) {
-
-                val mark = getMarkOrThrow(containerControl2)
-
-                for (newIteration ← children2.view(size1, size2))
-                  processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
-
-              } else if (size2 < size1) {
-                outputDeleteRepeatElements(repeatControl2, size1 - size2)
-              }
+            } else if (size2 < size1) {
+              outputDeleteRepeatElements(repeatControl2, size1 - size2)
             }
 
           case componentControl2: XFormsComponentControl ⇒
@@ -531,29 +486,6 @@ class ControlsComparator(
           "id"             → namespaceId(document, templateId),
           "parent-indexes" → parentIndexes,
           "count"          → count.toString
-        )
-      )
-    }
-
-  private def outputCopyRepeatTemplate(
-    control     : XFormsControl,
-    startSuffix : Int,
-    endSuffix   : Int)(implicit
-    receiver    : XMLReceiver
-  ): Unit =
-    if (! isTestMode) {
-
-      val (_, parentIndexes) = repeatDetails(control.effectiveId)
-
-      element(
-        "copy-repeat-template",
-        prefix = "xxf",
-        uri    = XXFORMS_NAMESPACE_URI,
-        atts   = List(
-          "id"             → namespaceId(document, control.prefixedId), // templates are global
-          "parent-indexes" → parentIndexes,
-          "start-suffix"   → startSuffix.toString,
-          "end-suffix"     → endSuffix.toString
         )
       )
     }

@@ -268,27 +268,6 @@
                                                 <data type="string"/>
                                             </optional>
                                         </element>
-                                        <element name="xxf:copy-repeat-template">
-                                            <attribute name="id">
-                                                <data type="string"/>
-                                            </attribute>
-                                            <attribute name="parent-indexes">
-                                                <data type="string"/>
-                                            </attribute>
-                                            <choice>
-                                                <attribute name="id-suffix">
-                                                    <data type="string"/>
-                                                </attribute>
-                                                <group>
-                                                    <attribute name="start-suffix">
-                                                        <data type="string"/>
-                                                    </attribute>
-                                                    <attribute name="end-suffix">
-                                                        <data type="string"/>
-                                                    </attribute>
-                                                </group>
-                                            </choice>
-                                        </element>
                                         <element name="xxf:delete-repeat-elements">
                                             <attribute name="id">
                                                 <data type="string"/>

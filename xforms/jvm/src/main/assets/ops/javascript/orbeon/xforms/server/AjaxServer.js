@@ -715,21 +715,7 @@
                     }
 
                     function findRepeatInsertionPoint(repeatPrefixedId, parentIndexes) {
-                        if (parentIndexes == "") {
-                            // Top level repeat: contains a template
-                            // TODO: Change this once we remove templates!
-                            var repeatEnd = document.getElementById("repeat-end-" + repeatPrefixedId);
-                            var cursor = repeatEnd.previousSibling;
-                            while (! (cursor.nodeType == ELEMENT_TYPE
-                                    && $(cursor).is('.xforms-repeat-delimiter')
-                                    && ! $(cursor).is('.xforms-repeat-template'))) {
-                                cursor = cursor.previousSibling;
-                            }
-                            return cursor;
-                        } else {
-                            // Nested repeat: does not contain a template
-                            return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
-                        }
+                        return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
                     }
 
                     if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
@@ -743,86 +729,6 @@
                     // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
                     _.each(controlValuesElements, function(controlValuesElement) {
 
-                        // Copy repeat templates
-                        _.each(childrenWithLocalName(controlValuesElement, 'copy-repeat-template'), function(copyRepeatTemplateElement) {
-
-                            var repeatId = ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "id");
-                            var parentIndexes = ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "parent-indexes");
-                            var startSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "start-suffix"));
-                            var endSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "end-suffix"));
-
-                            // Put nodes of the template in an array
-                            var templateNodes = [];
-                            {
-                                // Locate end of the repeat
-                                var delimiterTagName = null;
-                                var templateRepeatEnd = document.getElementById("repeat-end-" + repeatId);
-                                var templateNode = templateRepeatEnd.previousSibling;
-                                var nestedRepeatLevel = 0;
-                                while (! (nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
-                                        && $(templateNode).is('.xforms-repeat-delimiter'))) {
-                                    var nodeCopy = templateNode.cloneNode(true);
-                                    if (templateNode.nodeType == ELEMENT_TYPE) {
-                                        // Save tag name to be used for delimiter
-                                        delimiterTagName = templateNode.tagName;
-                                        // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                        if ($(templateNode).is('.xforms-repeat-begin-end') && templateNode.id.indexOf("repeat-begin-") == 0)
-                                            nestedRepeatLevel--;
-                                        // Increment nestedRepeatLevel when we enter a nested repeat
-                                        if ($(templateNode).is('.xforms-repeat-begin-end') && templateNode.id.indexOf("repeat-end-") == 0)
-                                            nestedRepeatLevel++;
-                                        // Remove "xforms-repeat-template", "xforms-disabled" from classes on copy of element
-                                        var nodeCopyClasses = nodeCopy.className.split(" ");
-                                        var nodeCopyNewClasses =
-                                            _.filter(nodeCopyClasses, function(currentClass) {
-                                                return currentClass != "xforms-repeat-template" &&
-                                                       currentClass != "xforms-disabled";
-                                            });
-                                        nodeCopy.className = nodeCopyNewClasses.join(" ");
-                                    }
-                                    templateNodes.push(nodeCopy);
-                                    templateNode = templateNode.previousSibling;
-                                }
-                                // Add a delimiter
-                                var newDelimiter = document.createElement(delimiterTagName);
-                                newDelimiter.className = "xforms-repeat-delimiter";
-                                templateNodes.push(newDelimiter);
-                                // Reverse nodes as they were inserted in reverse order
-                                templateNodes = templateNodes.reverse();
-                            }
-
-                            // Find element after insertion point
-                            var afterInsertionPoint = findRepeatInsertionPoint(repeatId, parentIndexes);
-
-                            // Insert copy of template nodes
-                            for (var suffix = startSuffix; suffix <= endSuffix; suffix++) {
-                                var nestedRepeatLevel = 0;
-
-                                _.each(templateNodes, function(templateNode) {
-
-                                    // Add suffix to all the ids
-                                    var newTemplateNode;
-                                    if (startSuffix == endSuffix || suffix == endSuffix) {
-                                        // Just one template to copy, or we are at the end: do the work on the initial copy
-                                        newTemplateNode = templateNode;
-                                    } else {
-                                        // Clone again
-                                        newTemplateNode = templateNode.cloneNode(true);
-                                    }
-                                    if (newTemplateNode.nodeType == ELEMENT_TYPE) {
-                                        // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                        if ($(newTemplateNode).is('.xforms-repeat-begin-end') && templateNode.id.indexOf("repeat-end-") == 0)
-                                            nestedRepeatLevel--;
-                                        ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XF_REPEAT_INDEX_SEPARATOR + suffix, nestedRepeatLevel);
-                                        // Increment nestedRepeatLevel when we enter a nested repeat
-                                        if ($(newTemplateNode).is('.xforms-repeat-begin-end') && templateNode.id.indexOf("repeat-begin-") == 0)
-                                            nestedRepeatLevel++;
-                                    }
-                                    afterInsertionPoint.parentNode.insertBefore(newTemplateNode, afterInsertionPoint);
-                                });
-                            }
-                        });
-
                         _.each(childrenWithLocalName(controlValuesElement, 'delete-repeat-elements'), function(deleteElementElement) {
 
                             // Extract data from server response
@@ -834,22 +740,7 @@
                             var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
 
                             // Find last element to delete
-                            var lastElementToDelete;
-                            {
-                                lastElementToDelete = repeatEnd.previousSibling;
-                                if (parentIndexes == "") {
-                                    // Top-level repeat: need to go over template
-                                    while (true) {
-                                        // Look for delimiter that comes just before the template
-                                        if (lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                && $(lastElementToDelete).is('.xforms-repeat-delimiter')
-                                                && ! $(lastElementToDelete).is('.xforms-repeat-template'))
-                                            break;
-                                        lastElementToDelete = lastElementToDelete.previousSibling;
-                                    }
-                                    lastElementToDelete = lastElementToDelete.previousSibling;
-                                }
-                            }
+                            var lastElementToDelete = repeatEnd.previousSibling;
 
                             // Perform delete
                             for (var countIndex = 0; countIndex < count; countIndex++) {

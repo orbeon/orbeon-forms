@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.xbl.Scope
 
 class RepeatControl(
   staticStateContext : StaticStateContext,
@@ -27,15 +27,14 @@ class RepeatControl(
   scope              : Scope
 ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
    with ChildrenBuilderTrait
-   with AppearanceTrait {      // for separator appearance
+   with AppearanceTrait { // for separator appearance
 
-  val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
-  require(iterationElement ne null)
+  val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)
 
-  lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
+  lazy val iteration: Option[RepeatIterationControl] = children collectFirst { case i: RepeatIterationControl ⇒ i }
 
-  val isAroundTableOrListElement = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
+  val isAroundTableOrListElement: Boolean = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
-  override protected def externalEventsDef = super.externalEventsDef + XXFORMS_DND
-  override val externalEvents              = externalEventsDef
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef + XXFORMS_DND
+  override val externalEvents             : Set[String] = externalEventsDef
 }

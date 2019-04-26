@@ -6,11 +6,6 @@ package org.orbeon.oxf.fr.workflow.definitions20191
 // Also note that prickle supports that but has a more complex JSON serialization:
 // https://github.com/benhutchison/prickle#support-for-shared-objects
 
-object Definitions20191 {
-  val StartedStageName   = "started"
-  val SubmittedStageName = "submitted"
-}
-
 // NOTE: You can't use for example a `case class Lang(name: String)` type for the `Map` key without a
 // custom encoder/decoder. So We use `String for now.
 case class LocalizedString(values: Map[String, String])

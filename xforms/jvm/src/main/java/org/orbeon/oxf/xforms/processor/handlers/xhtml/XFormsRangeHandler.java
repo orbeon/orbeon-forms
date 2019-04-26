@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -52,7 +51,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             final String divName     = "div";
             final String divQName    = XMLUtils.buildQName(xhtmlPrefix, divName);
 
-            final AttributesImpl backgroundAttributes = getBackgroundAttributes(getUri(), getLocalname(), getAttributes(), getEffectiveId(), rangeControl);
+            final AttributesImpl backgroundAttributes = getBackgroundAttributes(getEffectiveId(), rangeControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, getThumbAttributes());
@@ -69,7 +68,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         return reusableAttributes;
     }
 
-    private AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
+    private AttributesImpl getBackgroundAttributes(String effectiveId, XFormsRangeControl xformsControl) {
         // Add custom class
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(effectiveId, xformsControl, true);
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_BACKGROUND_CLASS);

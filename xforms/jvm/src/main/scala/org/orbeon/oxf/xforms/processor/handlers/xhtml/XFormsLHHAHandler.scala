@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
@@ -23,7 +24,6 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
-import org.orbeon.oxf.util.CoreUtils._
 
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
@@ -143,9 +143,9 @@ object XFormsLHHAHandler {
     //
     // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
-    handlerContext.getController.getHandler(targetControl.element, handlerContext) match {
-      case handler: XFormsControlLifecyleHandler ⇒ Option(handler.getForEffectiveId(targetControlEffectiveId))
-      case _                                     ⇒ None
+    handlerContext.getController.findHandlerFromElem(targetControl.element, handlerContext) match {
+      case Some(handler: XFormsControlLifecyleHandler) ⇒ Option(handler.getForEffectiveId(targetControlEffectiveId))
+      case _                                           ⇒ None
     }
   }
 }

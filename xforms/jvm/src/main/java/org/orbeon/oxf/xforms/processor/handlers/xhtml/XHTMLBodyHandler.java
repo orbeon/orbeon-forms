@@ -23,11 +23,9 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.xforms.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -61,10 +59,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Start xhtml:body
         final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
-        xmlReceiver.startElement(uri, localname, qName, attributes);
+        xmlReceiver.startElement(uri(), localname(), qName(), attributes());
         helper = new XMLReceiverHelper(xmlReceiver);
 
-        final String htmlPrefix = XMLUtils.prefixFromQName(qName);
+        final String htmlPrefix = XMLUtils.prefixFromQName(qName());
 
         // Get formatting prefix and declare it if needed
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
@@ -177,19 +175,19 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
                 // xf:select[@appearance = 'full'], xf:input[@type = 'xs:boolean']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
-                        containingDocument, reusableAttributes, attributes,
+                        containingDocument, reusableAttributes, attributes(),
                         "xforms-select-full-template", "$xforms-item-name$", true, "checkbox");
 
                 // xf:select1[@appearance = 'full']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
-                        containingDocument, reusableAttributes, attributes,
+                        containingDocument, reusableAttributes, attributes(),
                         "xforms-select1-full-template", "$xforms-item-name$", false, "radio");
             }
 
         }
     }
 
-    private abstract static class Matcher implements ElementHandlerController.Matcher<ElementAnalysis> {
+    private abstract static class Matcher extends ElementHandlerController.Function2Base<Attributes, Object, ElementAnalysis> {
 
         public String getPrefixedId(Attributes attributes, Object handlerContext) {
             final HandlerContext hc = (HandlerContext) handlerContext;
@@ -210,7 +208,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             return XFormsControl$.MODULE$.appearances(elementAnalysis).contains(appearance);
         }
 
-        public final ElementAnalysis match(Attributes attributes, Object handlerContext) {
+        public ElementAnalysis apply(Attributes attributes, Object handlerContext) {
             return doesMatch(attributes, handlerContext) ? getElementAnalysis(attributes, handlerContext) : null;
         }
 
@@ -367,7 +365,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Close xhtml:body
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        contentHandler.endElement(uri, localname, qName);
+        contentHandler.endElement(uri(), localname(), qName());
     }
 
     public static String getIncludedResourcePath(String requestPath, String fileName) {

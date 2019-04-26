@@ -125,25 +125,25 @@ public class HandlerContext {
     }
 
     public String findXHTMLPrefix() {
-        final String prefix = controller.getNamespaceContext().getPrefix(XMLConstants.XHTML_NAMESPACE_URI);
+        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.XHTML_NAMESPACE_URI);
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.XHTML_NAMESPACE_URI.equals(controller.getNamespaceContext().getURI(""))) {
+        if (XMLConstants.XHTML_NAMESPACE_URI.equals(controller.namespaceContext().getURI(""))) {
             return "";
         }
 
         // TEMP: in this case, we should probably map our own prefix, or set
         // the default namespace and restore it on children elements
-        throw new ValidationException("No prefix found for HTML namespace", LocationData.createIfPresent(controller.getLocator()));
+        throw new ValidationException("No prefix found for HTML namespace", LocationData.createIfPresent(controller.locator()));
     }
 
     private String findFormattingPrefix() {
-        final String prefix = controller.getNamespaceContext().getPrefix(XMLConstants.OPS_FORMATTING_URI);
+        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.OPS_FORMATTING_URI);
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.OPS_FORMATTING_URI.equals(controller.getNamespaceContext().getURI(""))) {
+        if (XMLConstants.OPS_FORMATTING_URI.equals(controller.namespaceContext().getURI(""))) {
             return "";
         }
 
@@ -183,7 +183,7 @@ public class HandlerContext {
 
     public String findNewPrefix() {
         int i = 0;
-        while (controller.getNamespaceContext().getURI("p" + i) != null) {
+        while (controller.namespaceContext().getURI("p" + i) != null) {
             i++;
         }
         return "p" + i;
@@ -221,7 +221,7 @@ public class HandlerContext {
      * @return  LocationData, null if no Locator was found
      */
     public LocationData getLocationData() {
-        return LocationData.createIfPresent(getController().getLocator());
+        return LocationData.createIfPresent(getController().locator());
     }
 
     public String getIdPrefix() {

@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -42,17 +41,17 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    public void handleLabel() throws SAXException {
+    public void handleLabel() {
         // Label is handled differently
     }
 
     @Override
-    public void handleHint() throws SAXException {
+    public void handleHint() {
         // Hint is handled differently
     }
 
     @Override
-    public void handleAlert() throws SAXException {
+    public void handleAlert() {
         // Triggers don't need an alert (in theory, they could have one)
     }
 
@@ -69,7 +68,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
         }
 
         // Handle accessibility attributes on <a>, <input> or <button>
-        handleAccessibilityAttributes(getAttributes(), containerAttributes);
+        handleAccessibilityAttributes(attributes(), containerAttributes);
 
         return containerAttributes;
     }

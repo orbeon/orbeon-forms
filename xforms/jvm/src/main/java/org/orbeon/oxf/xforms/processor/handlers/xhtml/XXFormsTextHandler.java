@@ -27,7 +27,7 @@ public class XXFormsTextHandler extends XFormsBaseHandlerXHTML {
     @Override
     public void start() throws SAXException {
 
-        final String effectiveId = xformsHandlerContext.getEffectiveId(attributes);
+        final String effectiveId = xformsHandlerContext.getEffectiveId(attributes());
         final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getControlByEffectiveId(effectiveId);
 
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();

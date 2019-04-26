@@ -37,20 +37,20 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
     public void start() throws SAXException {
 
-        final String effectiveDialogId = xformsHandlerContext.getEffectiveId(attributes);
+        final String effectiveDialogId = xformsHandlerContext.getEffectiveId(attributes());
         final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getControlByEffectiveId(effectiveDialogId));
 
         // Find classes to add
 
         // NOTE: attributes logic duplicated in XXFormsDialogControl
         // Get values statically so we can handle the case of the repeat template
-        final StringBuilder classes = getInitialClasses(uri, localname, attributes, null, false);
+        final StringBuilder classes = getInitialClasses(uri(), localname(), attributes(), null, false);
         {
             classes.append(" xforms-initially-hidden");
             classes.append(" xforms-dialog-");
 
             final String level; {
-                final String explicitLevel = attributes.getValue("level");
+                final String explicitLevel = attributes().getValue("level");
                 if (explicitLevel == null) {
                     level = XFormsControl$.MODULE$.appearances(elementAnalysis).contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) ? "modeless" : "modal";
                 } else {
@@ -60,18 +60,18 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
             classes.append(level);
             classes.append(" xforms-dialog-close-");
-            classes.append(Boolean.toString(!"false".equals(attributes.getValue("close"))));
+            classes.append(Boolean.toString(!"false".equals(attributes().getValue("close"))));
             classes.append(" xforms-dialog-draggable-");
-            classes.append(Boolean.toString(!"false".equals(attributes.getValue("draggable"))));
+            classes.append(Boolean.toString(!"false".equals(attributes().getValue("draggable"))));
             classes.append(" xforms-dialog-visible-");
-            classes.append(Boolean.toString("true".equals(attributes.getValue("visible"))));
+            classes.append(Boolean.toString("true".equals(attributes().getValue("visible"))));
         }
 
         // Start main xhtml:div
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes, classes.toString(), effectiveDialogId));
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes(), classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
         reusableAttributes.clear();

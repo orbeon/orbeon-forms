@@ -81,9 +81,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         outputContent(
-            getUri(),
-            getLocalname(),
-            getAttributes(),
+            uri(),
+            localname(),
+            attributes(),
             getEffectiveId(),
             xformsSelect1Control,
             itemset,

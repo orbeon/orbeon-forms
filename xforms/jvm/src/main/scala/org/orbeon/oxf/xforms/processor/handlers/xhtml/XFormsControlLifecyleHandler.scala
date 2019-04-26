@@ -65,7 +65,6 @@ abstract class XFormsControlLifecyleHandler(
   protected def getContainingElementQName: String =
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)
 
-  @throws[SAXException]
   override final def start(): Unit =
     if (isMustOutputControl(currentControlOrNull)) {
 
@@ -93,7 +92,6 @@ abstract class XFormsControlLifecyleHandler(
         }
     }
 
-  @throws[SAXException]
   override final def end(): Unit =
     if (isMustOutputControl(currentControlOrNull)) {
 

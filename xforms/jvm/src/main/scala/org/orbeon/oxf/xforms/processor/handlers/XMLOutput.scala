@@ -61,14 +61,12 @@ object XMLOutput extends XMLReceiverSupport {
       element(name, text = value)
 
   def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.narrowTo[XFormsControl] foreach { c ⇒
-      for {
-        lhhaType ← LHHA.values
-        lhhaProp = c.lhhaProperty(lhhaType)
-        text     ← Option(lhhaProp.value())
-      } locally {
-        writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)
-      }
+    for {
+      lhhaType ← LHHA.values
+      lhhaProp = c.lhhaProperty(lhhaType)
+      text     ← Option(lhhaProp.value())
+    } locally {
+      writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)
     }
 
   def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =

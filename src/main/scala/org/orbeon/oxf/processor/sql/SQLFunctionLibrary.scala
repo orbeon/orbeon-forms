@@ -33,7 +33,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
 
   class SQLFunctionContext(val currentNode: dom.Node, val position: Int, val getColumn: (String, Int) ⇒ String) extends FunctionContext
 
-  abstract class Function2Base[V1, V2, R] extends Function2[V1, V2, R]
+  abstract class Function2Base[V1, V2, R] extends ((V1, V2) ⇒ R)
 
   private def functionContextOpt =
     XPath.functionContext flatMap CollectionUtils.collectByErasedType[SQLFunctionContext]

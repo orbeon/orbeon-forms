@@ -39,7 +39,7 @@ class XFormsTriggerFullHandler(
 
   override protected def handleControlStart(): Unit = {
 
-    val triggerControl = currentControlOrNull.asInstanceOf[XFormsTriggerControl]
+    val triggerControl = currentControl.asInstanceOf[XFormsTriggerControl]
     val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, true)
@@ -64,7 +64,7 @@ class XFormsTriggerFullHandler(
 
     // Output content of <button> element
     if ("button" == elementName)
-      outputLabelText(xmlReceiver, triggerControl, getTriggerLabel(triggerControl), xhtmlPrefix, isHTMLLabel)
+      outputLabelText(xmlReceiver, getTriggerLabel(triggerControl), xhtmlPrefix, isHTMLLabel, Option(triggerControl.getLocationData))
 
     xmlReceiver.endElement(XHTML_NAMESPACE_URI, elementName, spanQName)
   }

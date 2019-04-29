@@ -240,7 +240,7 @@ object ControlAjaxSupport {
 
   def findAriaBy(
     staticControl      : ElementAnalysis,
-    controlOpt         : Option[XFormsControl],
+    control            : XFormsControl,
     lhha               : LHHA,
     condition          : LHHAAnalysis ⇒ Boolean)(
     containingDocument : XFormsContainingDocument
@@ -250,15 +250,14 @@ object ControlAjaxSupport {
     import syntax.typeable._
 
     for {
-      currentControl    ← controlOpt
       staticLhhaSupport ← staticControl.narrowTo[StaticLHHASupport]
       staticLhha        ← staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
       if condition(staticLhha)
     } yield
       if (staticLhha.isLocal) {
-        XFormsBaseHandler.getLHHACId(containingDocument, currentControl.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+        XFormsBaseHandler.getLHHACId(containingDocument, control.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
       } else {
-        val suffix    = XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)
+        val suffix    = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
         val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting) map (_.toString: AnyRef)
 
         XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix)

@@ -36,37 +36,33 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
     @Override
     public void handleControlStart() throws SAXException {
 
-        final XFormsSecretControl secretControl = (XFormsSecretControl) currentControlOrNull();
+        final XFormsSecretControl secretControl = (XFormsSecretControl) currentControl();
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        final boolean isConcreteControl = secretControl != null;
 
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId(), secretControl, true);
 
         // Create xhtml:input
         {
             final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(secretControl)) {
+            if (! isStaticReadonly(secretControl)) {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
                 containerAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "password");
                 containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId());
                 containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA,
-                        xformsHandlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
+                    secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes(), containerAttributes);
                 handleAriaByAtts(containerAttributes);
 
                 // Output all extension attributes
-                if (isConcreteControl) {
-                    // Output xxf:* extension attributes
-                    secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
-                }
+                // Output xxf:* extension attributes
+                secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
 
                 if (isHTMLDisabled(secretControl))
                     outputDisabledAttribute(reusableAttributes);
 
-                if (isConcreteControl)
-                    handleAriaAttributes(secretControl.isRequired(), secretControl.isValid(), containerAttributes);
+                handleAriaAttributes(secretControl.isRequired(), secretControl.isValid(), containerAttributes);
 
                 // Output element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);

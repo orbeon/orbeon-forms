@@ -29,7 +29,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     protected String getTriggerLabel(XFormsSingleNodeControl xformsControl) {
-        return ! xformsHandlerContext.isTemplate() && xformsControl != null && xformsControl.getLabel() != null
+        return xformsControl.getLabel() != null
             ? xformsControl.getLabel()
             : "";
     }

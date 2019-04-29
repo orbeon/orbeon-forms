@@ -411,7 +411,6 @@ class ControlsComparator(
       // Special case for a repeat iteration
       repeatIterationControlOpt foreach { c ⇒
         handlerContext.pushRepeatContext(
-          false,
           c.iterationIndex,
           c.repeat.getIndex == c.iterationIndex
         )

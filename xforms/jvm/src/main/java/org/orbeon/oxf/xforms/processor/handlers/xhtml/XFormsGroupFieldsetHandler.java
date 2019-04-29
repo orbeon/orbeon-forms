@@ -38,7 +38,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     @Override
     public void handleControlStart() throws SAXException {
 
-        final XFormsGroupControl groupControl = (XFormsGroupControl) currentControlOrNull();
+        final XFormsGroupControl groupControl = (XFormsGroupControl) currentControl();
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final ElementHandlerController controller = xformsHandlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();

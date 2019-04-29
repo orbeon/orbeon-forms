@@ -53,7 +53,7 @@ class XFormsGroupDefaultHandler(
 
     val staticLabelOpt = Option(getStaticLHHA(getPrefixedId, LHHA.Label))
 
-    val groupControl = currentControlOrNull.asInstanceOf[XFormsSingleNodeControl]
+    val groupControl = currentControl.asInstanceOf[XFormsSingleNodeControl]
     val effectiveId = getEffectiveId
 
     val classes = getLabelClasses(groupControl)

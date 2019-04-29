@@ -36,7 +36,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     public void handleControlStart() throws SAXException {
 
-        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) currentControlOrNull();
+        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) currentControl();
         final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
 
         final AttributesImpl htmlAnchorAttributes =
@@ -45,10 +45,8 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0");
         htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "button");
 
-        if (triggerControl != null) {
-            // Output xxf:* extension attributes
-            triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
-        }
+        // Output xxf:* extension attributes
+        triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
 
         // xhtml:a
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
@@ -57,7 +55,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         {
             final String labelValue = getTriggerLabel(triggerControl);
             final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
-            outputLabelText(xmlReceiver, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+            outputLabelText(xmlReceiver, labelValue, xhtmlPrefix, mustOutputHTMLFragment, scala.Option.apply(triggerControl.getLocationData()));
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
     }

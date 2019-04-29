@@ -31,12 +31,9 @@ public class XXFormsTextHandler extends XFormsBaseHandlerXHTML {
         final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getControlByEffectiveId(effectiveId);
 
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        final boolean isConcreteControl = textControl != null;
 
-        if (isConcreteControl) {
-            final String externalValue = textControl.getExternalValue();
-            if (externalValue != null && externalValue.length() > 0)
-                contentHandler.characters(externalValue.toCharArray(), 0, externalValue.length());
-        }
+        final String externalValue = textControl.getExternalValue();
+        if (externalValue != null && externalValue.length() > 0)
+            contentHandler.characters(externalValue.toCharArray(), 0, externalValue.length());
     }
 }

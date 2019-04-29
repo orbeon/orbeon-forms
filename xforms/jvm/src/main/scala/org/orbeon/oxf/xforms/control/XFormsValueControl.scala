@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -315,7 +314,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (previousControl.isEmpty && ! isStaticReadonly) {
       for {
         (lhha, attName)          ← ControlAjaxSupport.LhhaWithAriaAttName
-        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, Some(this), lhha, condition = _.isForRepeat)(containingDocument)
+        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
         ariaByControlEffectiveId ← findAriaByControlEffectiveId
       } locally {
         ControlAjaxSupport.outputAttributeElement(

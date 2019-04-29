@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
+import shapeless.syntax.typeable._
 
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
@@ -35,7 +36,8 @@ class XFormsLHHAHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false) {
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false)
+     with WithOptionalControl {
 
   import XFormsLHHAHandler._
 
@@ -52,12 +54,14 @@ class XFormsLHHAHandler(
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
         // `aria-*` attributes to point to this element.
 
+        val currentControl = currentControlOpt getOrElse (throw new IllegalStateException)
+
         val containerAtts =
-          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
+          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
 
         withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
           for {
-            currentLHHAControl ← currentControlOpt collect { case c: XFormsLHHAControl ⇒ c }
+            currentLHHAControl ← currentControl.narrowTo[XFormsLHHAControl]
             externalValue      ← currentLHHAControl.externalValueOpt
             if externalValue.nonEmpty
           } locally {
@@ -75,12 +79,9 @@ class XFormsLHHAHandler(
         // Here we have a `for` attribute.
 
         def resolveControlOpt(staticControl: ElementAnalysis) =
-          if (! isTemplate) {
-            containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId) collect {
-              case control: XFormsControl ⇒ control
-            }
-          } else
-            None
+          containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId) collect {
+            case control: XFormsControl ⇒ control
+          }
 
         val effectiveTargetControlOpt =
           staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
@@ -116,7 +117,6 @@ class XFormsLHHAHandler(
           lhha                     = staticLhha.lhhaType,
           requestedElementNameOpt  = None,
           controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value
-          isTemplate               = isTemplate,
           isExternal               = true
         )
 

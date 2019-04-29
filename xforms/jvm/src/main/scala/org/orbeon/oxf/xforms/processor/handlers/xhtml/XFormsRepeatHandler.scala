@@ -53,7 +53,7 @@ class XFormsRepeatHandler(
   // Compute user classes only once for all iterations
   private val userClasses = {
     val sb = new jl.StringBuilder
-    appendControlUserClasses(attributes, currentControlOrNull)(sb)
+    appendControlUserClasses(attributes, currentControl)(sb)
     sb.toString
   }
 
@@ -64,7 +64,7 @@ class XFormsRepeatHandler(
     val isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
 
-    val repeatControl = if (isTemplate) null else containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
+    val repeatControl = containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
 
     if (repeatControl.getSize > 0) {
 
@@ -72,7 +72,6 @@ class XFormsRepeatHandler(
 
       val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
       val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
-      val isConcreteControl = repeatControl != null
 
       val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
       val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
@@ -119,7 +118,7 @@ class XFormsRepeatHandler(
         }
       }
 
-      def repeatBody(iteration: Int, generateTemplate: Boolean, repeatSelected: Boolean)(implicit sb: jl.StringBuilder): Unit = {
+      def repeatBody(iteration: Int, repeatSelected: Boolean)(implicit sb: jl.StringBuilder): Unit = {
 
         // User and DnD classes
         appendClasses(userClasses)
@@ -127,7 +126,7 @@ class XFormsRepeatHandler(
 
         outputInterceptor.setAddedClasses(sb.toString)
 
-        xformsHandlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
+        xformsHandlerContext.pushRepeatContext(iteration, repeatSelected)
         try {
           xformsHandlerContext.getController.repeatBody()
           outputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
@@ -143,35 +142,32 @@ class XFormsRepeatHandler(
 
       xformsHandlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
 
-      if (isConcreteControl) {
+      val repeatIndex = repeatControl.getIndex
+      val selectedClass = "xforms-repeat-selected-item-" + ((xformsHandlerContext.countParentRepeats % 4) + 1)
+      val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
-        val repeatIndex = repeatControl.getIndex
-        val selectedClass = "xforms-repeat-selected-item-" + ((xformsHandlerContext.countParentRepeats % 4) + 1)
-        val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
+      implicit val addedClasses = new jl.StringBuilder(200)
+      for (i ← 1 to repeatControl.getSize) {
+        // Delimiter: before repeat entries, except the first one which is output by `generateFirstDelimiter()`
+        if (i > 1)
+          outputDelimiter("xforms-repeat-delimiter", null)
 
-        implicit val addedClasses = new jl.StringBuilder(200)
-        for (i ← 1 to repeatControl.getSize) {
-          // Delimiter: before repeat entries, except the first one which is output by `generateFirstDelimiter()`
-          if (i > 1)
-            outputDelimiter("xforms-repeat-delimiter", null)
+        // Determine classes to add on root elements and around root characters
+        addedClasses.setLength(0)
 
-          // Determine classes to add on root elements and around root characters
-          addedClasses.setLength(0)
+        // Selected iteration
+        val selected = isRepeatSelected && i == repeatIndex && ! staticReadonly
+        if (selected)
+          addedClasses append selectedClass
 
-          // Selected iteration
-          val selected = isRepeatSelected && i == repeatIndex && ! staticReadonly
-          if (selected)
-            addedClasses append selectedClass
+        // MIP classes
+        // Q: Could use handleMIPClasses()?
+        val relevant = repeatControl.children(i - 1).isRelevant
+        if (! relevant)
+          appendClasses("xforms-disabled")
 
-          // MIP classes
-          // Q: Could use handleMIPClasses()?
-          val relevant = repeatControl.children(i - 1).isRelevant
-          if (! relevant)
-            appendClasses("xforms-disabled")
-
-          // Apply the content of the body for this iteration
-          repeatBody(i, generateTemplate = false, repeatSelected = selected)
-        }
+        // Apply the content of the body for this iteration
+        repeatBody(i, repeatSelected = selected)
       }
 
       // Restore output

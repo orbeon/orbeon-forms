@@ -44,13 +44,12 @@ class XFormsTextareaHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
   private val placeHolderInfo: Option[PlaceHolderInfo] =
-    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControlOpt))
+    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
   override protected def handleControlStart(): Unit = {
 
-    val textareaControl        = currentControlOrNull.asInstanceOf[XFormsTextareaControl]
+    val textareaControl        = currentControl.asInstanceOf[XFormsTextareaControl]
     val xmlReceiver            = xformsHandlerContext.getController.getOutput
-    val isConcreteControl      = textareaControl ne null
     val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, textareaControl, addId = true)
 
     // Create xhtml:textarea
@@ -65,16 +64,13 @@ class XFormsTextareaHandler(
       handleAriaByAtts(htmlTextareaAttributes)
 
       // Output all extension attributes
-      if (isConcreteControl) {
-        // Output xxf:* extension attributes
-        textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
-      }
+      // Output xxf:* extension attributes
+      textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
 
       if (isHTMLDisabled(textareaControl))
         XFormsBaseHandlerXHTML.outputDisabledAttribute(htmlTextareaAttributes)
 
-      if (isConcreteControl)
-        XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
+      XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
 
       // Add attribute even if the control is not concrete
       placeHolderInfo foreach { placeHolderInfo ⇒
@@ -83,11 +79,9 @@ class XFormsTextareaHandler(
       }
 
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes)
-      if (isConcreteControl) {
-        val value = textareaControl.getExternalValue
-        if (value ne null)
-          xmlReceiver.characters(value.toCharArray, 0, value.length)
-      }
+      val value = textareaControl.getExternalValue
+      if (value ne null)
+        xmlReceiver.characters(value.toCharArray, 0, value.length)
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName)
     } else {
       // Static readonly
@@ -99,12 +93,10 @@ class XFormsTextareaHandler(
       val containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName)
 
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, htmlTextareaAttributes)
-      if (isConcreteControl) {
-        // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
-        val value = textareaControl.getExternalValue
-        if (value ne null)
-          xmlReceiver.characters(value.toCharArray, 0, value.length)
-      }
+      // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
+      val value = textareaControl.getExternalValue
+      if (value ne null)
+        xmlReceiver.characters(value.toCharArray, 0, value.length)
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName)
     }
   }

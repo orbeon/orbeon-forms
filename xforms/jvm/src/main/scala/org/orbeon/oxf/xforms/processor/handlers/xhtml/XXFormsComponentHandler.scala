@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
@@ -75,9 +75,8 @@ class XXFormsComponentHandler(
         targetControlEffectiveId = getEffectiveId,
         forEffectiveId           = getForEffectiveId(getEffectiveId),
         lhha                     = LHHA.Label,
-        requestedElementNameOpt  = (staticControl.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) option "span",
-        controlOrNull            = currentControlOrNull,
-        isTemplate               = isTemplate,
+        requestedElementNameOpt  = (staticControl.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
+        controlOrNull            = currentControl,
         isExternal               = false
       )
 
@@ -94,7 +93,6 @@ class XXFormsComponentHandler(
 
     val result =
       for {
-        currentControl                    ← currentControlOpt // `None` if in template
         staticControl                     ← staticControlOpt
         staticLhhaSupport                 ← staticControl.narrowTo[StaticLHHASupport]
         staticLabel                       ← staticLhhaSupport.lhh(Label)

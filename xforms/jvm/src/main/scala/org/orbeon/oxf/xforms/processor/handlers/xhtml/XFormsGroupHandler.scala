@@ -47,7 +47,7 @@ abstract class XFormsGroupHandler(
     val labelClasses = new jl.StringBuilder("xforms-label")
 
     // Handle relevance on label
-    if ((xformsControl == null && ! isTemplate) || (xformsControl != null && ! xformsControl.isRelevant))
+    if ((xformsControl eq null) || ((xformsControl ne null) && ! xformsControl.isRelevant))
       labelClasses.append(" xforms-disabled")
 
     // Copy over existing label classes if any
@@ -63,7 +63,7 @@ abstract class XFormsGroupHandler(
   }
 
   protected def getLabelValue(xformsControl: XFormsSingleNodeControl): String =
-    if (isTemplate || xformsControl == null)
+    if (xformsControl eq null) // TODO: can happen?
       null
     else
       xformsControl.getLabel

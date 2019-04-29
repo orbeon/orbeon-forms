@@ -70,7 +70,7 @@ class XFormsCaseHandler(
 
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
-      if (! isTemplate && (caseControl ne null))
+      if (caseControl ne null)
         caseControl.isVisible
       else
         false
@@ -83,7 +83,7 @@ class XFormsCaseHandler(
     // Classes on top-level elements and characters and on the first delimiter
     val elementClasses = {
       implicit val classes = new jl.StringBuilder
-      appendControlUserClasses(attributes, currentControlOrNull)
+      appendControlUserClasses(attributes, currentControl)
       // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
       classes.toString
     }

@@ -55,7 +55,7 @@ abstract class XFormsControlLifecyleHandler(
     handlerContext,
     repeating,
     forwarding
-  ) {
+  ) with WithControl {
 
   import Private._
 
@@ -66,7 +66,7 @@ abstract class XFormsControlLifecyleHandler(
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)
 
   override final def start(): Unit =
-    if (isMustOutputControl(currentControlOrNull)) {
+    if (isMustOutputControl(currentControl)) {
 
       // Open control element, usually `<span>`
       if (isMustOutputContainerElement)
@@ -74,7 +74,7 @@ abstract class XFormsControlLifecyleHandler(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName,
-          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControlOrNull)
+          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
         )
 
       // 2012-12-17: Removed nested `<a name="effective-id">` because the enclosing `<span`> for the control has the
@@ -93,7 +93,7 @@ abstract class XFormsControlLifecyleHandler(
     }
 
   override final def end(): Unit =
-    if (isMustOutputControl(currentControlOrNull)) {
+    if (isMustOutputControl(currentControl)) {
 
       // Process everything after the control has been shown
       for (current ← beforeAfterTokens._2)
@@ -126,51 +126,47 @@ abstract class XFormsControlLifecyleHandler(
       getEffectiveId,
       getForEffectiveId(getEffectiveId),
       LHHA.Label,
-      XFormsBaseHandler.isStaticReadonly(currentControlOrNull) option "span",
-      currentControlOrNull,
-      isTemplate,
+      XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
+      currentControl,
       isExternal = false
     )
 
   @throws[SAXException]
   protected def handleAlert(): Unit =
-    if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull) || containingDocument.staticReadonlyAlert)
+    if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Alert),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Alert,
         None,
-        currentControlOrNull,
-        isTemplate,
+        currentControl,
         isExternal = false
       )
 
   @throws[SAXException]
   protected def handleHint(): Unit =
-    if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull) || containingDocument.staticReadonlyHint)
+    if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Hint),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Hint,
         None,
-        currentControlOrNull,
-        isTemplate,
+        currentControl,
         isExternal = false
       )
 
   @throws[SAXException]
   protected def handleHelp(): Unit =
-    if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull))
+    if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Help),
         getEffectiveId,
         getForEffectiveId(getEffectiveId),
         LHHA.Help,
         None,
-        currentControlOrNull,
-        isTemplate,
+        currentControl,
         isExternal = false
       )
 

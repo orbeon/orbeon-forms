@@ -117,7 +117,7 @@ class XFormsControl(
   def setEffectiveId(effectiveId: String) =
     this.effectiveId = effectiveId
 
-  final def getLocationData =
+  final def getLocationData: LocationData =
     if (staticControl ne null) staticControl.locationData else if (element ne null) element.getData.asInstanceOf[LocationData] else null
 
   // Semi-dynamic information (depends on the tree of controls, but does not change over time)

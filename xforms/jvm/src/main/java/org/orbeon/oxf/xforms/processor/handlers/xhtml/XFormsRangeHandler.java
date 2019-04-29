@@ -42,7 +42,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
     @Override
     public void handleControlStart() throws SAXException {
 
-        final XFormsRangeControl rangeControl = (XFormsRangeControl) currentControlOrNull();
+        final XFormsRangeControl rangeControl = (XFormsRangeControl) currentControl();
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
 
         // Create nested xhtml:div elements

@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.xforms.XFormsId;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -72,7 +73,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     @Override
     public void handleControlStart() throws SAXException {
         // Get items, dynamic or static, if possible
-        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) currentControlOrNull();
+        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) currentControl();
 
         // Get items if:
         // 1. The itemset is static
@@ -214,7 +215,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
-            if (!xformsHandlerContext.isTemplate()) {
+            {
                 final String value = (control == null || control.getValue() == null) ? "" : control.getValue();
                 if (itemset != null) {
                     boolean selectedFound = false;
@@ -252,7 +253,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final AttributesImpl containerAttributes =
             getEmptyNestedControlAttributesMaybeWithId(
-                    effectiveId,
+                effectiveId,
                 xformsControl,
                 !(appearanceTrait != null && appearanceTrait.isFull())
             );
@@ -442,7 +443,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode));
 
-                    if (!xformsHandlerContextForItem.isTemplate() && control != null) {
+                    if (control != null) {
 
                         if (isSelected)
                             reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked");
@@ -468,7 +469,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     if (showHint)
                         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint-region");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    outputLabelText(xformsHandlerContextForItem.getController().getOutput(), null, itemLabel.label(), xhtmlPrefix, itemLabel.isHTML());
+                    outputLabelText(xformsHandlerContextForItem.getController().getOutput(), itemLabel.label(), xhtmlPrefix, itemLabel.isHTML(), scala.Option.<LocationData>apply(null));
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                     // <span class="xforms-help">
@@ -506,7 +507,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     private static boolean isSelected(HandlerContext handlerContext, XFormsValueControl xformsControl, boolean isMultiple, Item item) {
         boolean isSelected;
-        if (!handlerContext.isTemplate() && xformsControl != null) {
+        if (xformsControl != null) {
             final String itemValue = (item.value() == null) ? "" : item.value();
             final String controlValue = (xformsControl.getValue() == null) ? "" : xformsControl.getValue();
             isSelected = XFormsItemUtils.isSelected(isMultiple, controlValue, itemValue);
@@ -602,8 +603,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 null,
                 LHHA$.MODULE$.jLabel(),
                 scala.Option.apply("span"), // Make element name a span, as a label would need a `for`
-                currentControlOrNull(),
-                isTemplate(),
+                currentControl(),
                 true                        // Pretend we're "external", so the element gets an id
             );
         } else {

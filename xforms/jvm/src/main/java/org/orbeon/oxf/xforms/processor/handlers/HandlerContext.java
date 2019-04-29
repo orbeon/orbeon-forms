@@ -252,25 +252,11 @@ public class HandlerContext {
         caseContextStack.pop();
     }
 
-    public boolean getCaseVisibility() {
-        if (caseContextStack == null || caseContextStack.size() == 0)
-            return true;
-        else
-            return caseContextStack.peek();
-    }
-
     public String getIdPostfix() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return "";
         else
             return (repeatContextStack.peek()).getIdPostfix();
-    }
-
-    public boolean isTemplate() {
-        if (repeatContextStack == null || repeatContextStack.size() == 0)
-            return false;
-        else
-            return (repeatContextStack.peek()).isGenerateTemplate();
     }
 
     public boolean isRepeatSelected() {
@@ -280,34 +266,22 @@ public class HandlerContext {
             return (repeatContextStack.peek()).isRepeatSelected();
     }
 
-    public int getCurrentIteration() {
-        if (repeatContextStack == null || repeatContextStack.size() == 0)
-            return 0;
-        else
-            return (repeatContextStack.peek()).getIteration();
-    }
-
     public int countParentRepeats() {
         return (repeatContextStack == null) ? 0 : repeatContextStack.size();
     }
 
-    public void pushRepeatContext(boolean generateTemplate, int iteration, boolean repeatSelected) {
+    public void pushRepeatContext(int iteration, boolean repeatSelected) {
 
         final String currentIdPostfix = getIdPostfix();
-        final String newIdPostfix;
-        if (generateTemplate) {
-            // No postfix is added for templates
-            newIdPostfix = "";
-        } else {
-            // Create postfix depending on whether we are appending to an existing postfix or not
-            newIdPostfix = (currentIdPostfix.length() == 0)
-                    ? "" + XFormsConstants.REPEAT_SEPARATOR + iteration
-                    : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iteration;
-        }
+
+        // Create postfix depending on whether we are appending to an existing postfix or not
+        final String newIdPostfix = (currentIdPostfix.length() == 0)
+                ? "" + XFormsConstants.REPEAT_SEPARATOR + iteration
+                : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iteration;
 
         if (repeatContextStack == null)
             repeatContextStack = new Stack<RepeatContext>();
-        repeatContextStack.push(new RepeatContext(generateTemplate, iteration, newIdPostfix, repeatSelected));
+        repeatContextStack.push(new RepeatContext(iteration, newIdPostfix, repeatSelected));
     }
 
     public void popRepeatContext() {
@@ -315,20 +289,14 @@ public class HandlerContext {
     }
 
     private static class RepeatContext {
-        private boolean generateTemplate;
         private int iteration;
         private String idPostfix;
         private boolean repeatSelected;
 
-        public RepeatContext(boolean generateTemplate, int iteration, String idPostfix, boolean repeatSelected) {
-            this.generateTemplate = generateTemplate;
+        public RepeatContext(int iteration, String idPostfix, boolean repeatSelected) {
             this.iteration = iteration;
             this.idPostfix = idPostfix;
             this.repeatSelected = repeatSelected;
-        }
-
-        public boolean isGenerateTemplate() {
-            return generateTemplate;
         }
 
         public int getIteration() {
@@ -377,7 +345,7 @@ public class HandlerContext {
                 final boolean isRepeatSelected = isRepeatSelected() || isTopLevelRepeat;
                 final int currentRepeatIteration = repeatIterationControl.iterationIndex();
 
-                pushRepeatContext(false, currentRepeatIteration, isRepeatSelected || currentRepeatIteration == repeatControl.getIndex());
+                pushRepeatContext(currentRepeatIteration, isRepeatSelected || currentRepeatIteration == repeatControl.getIndex());
             } else if (currentControl instanceof XFormsComponentControl) {
                 // Component
                 pushComponentContext(currentControl.getPrefixedId());

@@ -18,18 +18,13 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
-import org.orbeon.oxf.xforms.analysis.controls.LHHA;
-import org.orbeon.oxf.xforms.analysis.controls.LHHA$;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.xforms.XFormsId;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-import org.orbeon.xforms.XFormsId;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Base XForms handler used as base class in both the xml and xhtml handlers.
@@ -40,9 +35,15 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     private final boolean forwarding;
 
     protected HandlerContext xformsHandlerContext;
+    public HandlerContext getXFormsHandlerContext() {
+        return xformsHandlerContext;
+    }
 
     protected ElementAnalysis elementAnalysis;
     protected XFormsContainingDocument containingDocument;
+    public XFormsContainingDocument getContainingDocument() {
+        return containingDocument;
+    };
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
@@ -187,17 +188,10 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId = controlAnalysis.staticId();
 
-                        // Find concrete control if possible
-                        final XXFormsAttributeControl attributeControl;
-                        if (xformsHandlerContext.isTemplate()) {
-                            attributeControl = null;
-                        } else if (attributeControlStaticId != null) {
-                            final String attributeControlEffectiveId = XFormsId.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
-                            attributeControl = (XXFormsAttributeControl) containingDocument.getControlByEffectiveId(attributeControlEffectiveId);
-                        } else {
-                            // This should not happen
-                            attributeControl = null;
-                        }
+                        // Find concrete control
+                        final String attributeControlEffectiveId = XFormsId.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
+                        final XXFormsAttributeControl attributeControl =
+                            (XXFormsAttributeControl) containingDocument.getControlByEffectiveId(attributeControlEffectiveId);
 
                         // Determine attribute value
                         // NOTE: This also handles dummy images for the xhtml:img/@src case

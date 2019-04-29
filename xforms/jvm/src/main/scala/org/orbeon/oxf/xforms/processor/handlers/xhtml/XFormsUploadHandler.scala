@@ -49,15 +49,15 @@ class XFormsUploadHandler(
 
     implicit val receiver   = xformsHandlerContext.getController.getOutput
 
-    val uploadControl       = Option(currentControlOrNull.asInstanceOf[XFormsUploadControl])
-    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, currentControlOrNull, addId = true)
+    val uploadControl       = Option(currentControl.asInstanceOf[XFormsUploadControl])
+    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, currentControl, addId = true)
     val xhtmlPrefix         = xformsHandlerContext.findXHTMLPrefix
 
     // Enclosing xhtml:span
     withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
 
       // xhtml:input unless static readonly
-      if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) {
+      if (! XFormsBaseHandler.isStaticReadonly(currentControl)) {
         reusableAttributes.clear()
         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-select")
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")

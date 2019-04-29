@@ -17,14 +17,12 @@ import java.{lang ⇒ jl}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -58,18 +56,8 @@ abstract class XFormsBaseHandlerXHTML (
   // Used by `XFormsSelect1Handler` only
   def getHandlerContext: HandlerContext = this.xformsHandlerContext
 
-  final val isTemplate     = xformsHandlerContext.isTemplate
   final val getPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
   final val getEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
-
-  final def staticControlOpt: Option[ElementAnalysis] = xformsHandlerContext.getPartAnalysis.findControlAnalysis(getPrefixedId)
-
-  final val currentControlOpt =
-    ! isTemplate                                               option
-    containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
-    (! _.contains(null))
-
-  final def currentControlOrNull: XFormsControl = currentControlOpt.orNull // legacy
 
   // May be overridden by subclasses
   protected def isDefaultIncremental                                                = false
@@ -85,7 +73,7 @@ abstract class XFormsBaseHandlerXHTML (
     val isRelevant = control != null && control.isRelevant
 
     // don't output class within a template
-    if (! isRelevant && ! isTemplate)
+    if (! isRelevant)
       appendWithSpace("xforms-disabled")
 
     // MIP classes for a concrete control
@@ -229,7 +217,6 @@ abstract class XFormsBaseHandlerXHTML (
     lhha                     : LHHA,
     requestedElementNameOpt  : Option[String],
     controlOrNull            : XFormsControl,
-    isTemplate               : Boolean,
     isExternal               : Boolean
   ): Unit = {
 
@@ -306,7 +293,7 @@ abstract class XFormsBaseHandlerXHTML (
       if (controlOrNull != null) {
         if (! controlOrNull.isRelevant)
           appendWithSpace("xforms-disabled")
-      } else if (! isTemplate || lhha == LHHA.Help) {
+      } else if (lhha == LHHA.Help) {
         // Null control outside of template OR help within template
         appendWithSpace("xforms-disabled")
       }
@@ -369,32 +356,6 @@ abstract class XFormsBaseHandlerXHTML (
 
     newAttributes
   }
-
-  final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
-    for {
-      staticControl ← staticControlOpt
-      attValue      ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, LHHA.Label, condition = _ ⇒ true)(containingDocument)
-      attName       = ControlAjaxSupport.AriaLabelledby
-    } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
-    }
-
-  final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
-    for {
-      staticControl   ← staticControlOpt
-      (lhha, attName) ← ControlAjaxSupport.LhhaWithAriaAttName
-      attValue        ← ControlAjaxSupport.findAriaBy(staticControl, currentControlOpt, lhha, condition = _.isForRepeat)(containingDocument)
-    } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
-    }
-
-  final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {
-    val globalOps = xformsHandlerContext.getPartAnalysis
-    if (lhha == LHHA.Alert)
-      globalOps.getAlerts(controlPrefixedId).head
-    else // for alerts, take the first one, but does this make sense?
-      globalOps.getLHH(controlPrefixedId, lhha)
-  }
 }
 
 object XFormsBaseHandlerXHTML {
@@ -437,7 +398,7 @@ object XFormsBaseHandlerXHTML {
     addIds: Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
-    outputLabelText(handlerContext.getController.getOutput, null, labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment)
+    outputLabelText(handlerContext.getController.getOutput, labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)
     outputLabelForEnd(handlerContext, elementName)
   }
 
@@ -493,17 +454,17 @@ object XFormsBaseHandlerXHTML {
 
   def outputLabelText(
     xmlReceiver            : XMLReceiver,
-    xformsControl          : XFormsControl,
     value                  : String,
     xhtmlPrefix            : String,
-    mustOutputHTMLFragment : Boolean
+    mustOutputHTMLFragment : Boolean,
+    locationDataOpt        : Option[LocationData]
   ): Unit =
     if (StringUtils.isNotEmpty(value)) {
       if (mustOutputHTMLFragment)
         XFormsUtils.streamHTMLFragment(
           xmlReceiver,
           value,
-          if (xformsControl != null) xformsControl.getLocationData else null,
+          locationDataOpt.orNull,
           xhtmlPrefix
         )
       else

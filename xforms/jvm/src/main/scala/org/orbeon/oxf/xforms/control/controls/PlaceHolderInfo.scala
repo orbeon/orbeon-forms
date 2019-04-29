@@ -29,7 +29,7 @@ object PlaceHolderInfo {
   // - `Some(placeHolderValue)` otherwise
   def placeHolderValueOpt(
     staticControl : ElementAnalysis,
-    controlOpt    : Option[XFormsControl]
+    control       : XFormsControl
   ): Option[PlaceHolderInfo] = {
 
     staticControl match {
@@ -39,20 +39,16 @@ object PlaceHolderInfo {
         val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
 
         (isLabelPlaceholder || isHintPlaceholder) option {
-          val placeholderValue =
-            controlOpt match {
-              case Some(control) ⇒
-                if (control.isRelevant) {
-                  if (isLabelPlaceholder)
-                    control.getLabel
-                  else
-                    control.getHint
-                } else {
-                  ""
-                }
-              case None ⇒ ""
-            }
 
+          val placeholderValue =
+            if (control.isRelevant) {
+              if (isLabelPlaceholder)
+                control.getLabel
+              else
+                control.getHint
+            } else {
+              ""
+            }
 
           PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
         }

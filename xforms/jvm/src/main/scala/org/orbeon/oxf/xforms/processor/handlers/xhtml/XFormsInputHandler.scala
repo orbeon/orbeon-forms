@@ -54,20 +54,19 @@ class XFormsInputHandler(
   ) with HandlerSupport {
 
   private val placeHolderInfo: Option[PlaceHolderInfo] =
-    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControlOpt))
+    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
-    currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate
+    predicate(currentControl.asInstanceOf[XFormsInputControl])
 
   private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
   private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
   private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
 
   override protected def handleControlStart(): Unit = {
-    val inputControl = currentControlOrNull.asInstanceOf[XFormsInputControl]
+    val inputControl = currentControl.asInstanceOf[XFormsInputControl]
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
     val isRelevantControl = ! isNonRelevant(inputControl)
-    val isConcreteControl = inputControl ne null
     if (isBoolean) {
       // Produce a boolean output
 
@@ -150,8 +149,7 @@ class XFormsInputHandler(
           }
 
           // Output xxf:* extension attributes
-          if (isConcreteControl)
-            inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
+          inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
 
           // Add attribute even if the control is not concrete
           placeHolderInfo foreach { placeHolderInfo ⇒
@@ -174,8 +172,7 @@ class XFormsInputHandler(
             if (isHTMLDisabled(inputControl))
               outputDisabledAttribute(reusableAttributes)
 
-            if (isConcreteControl)
-              handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
+            handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
 
             xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
             xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)

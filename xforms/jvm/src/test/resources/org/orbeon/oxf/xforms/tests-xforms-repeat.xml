@@ -1145,9 +1145,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="condition-repeat" parent-indexes="2" start-suffix="1" end-suffix="2"/>
-                        <xxf:control id="description-textarea⊙2-1" label="Condition:"/>
-                        <xxf:control id="description-textarea⊙2-2" label="Condition:"/>
+                        <xxf:inner-html id="condition-repeat~iteration⊙2-1">
+                        <xxf:value>&lt;span id="description-textarea⊙2-1" class="xforms-control xforms-textarea"&gt;&lt;label class="xforms-label" for="description-textarea≡≡c⊙2-1"&gt;Condition:&lt;/label&gt;&lt;textarea id="description-textarea≡≡c⊙2-1" name="description-textarea⊙2-1"&gt;&lt;/textarea&gt;&lt;/span&gt;</xxf:value>
+                    </xxf:inner-html>
+                    <xxf:inner-html id="condition-repeat~iteration⊙2-2">
+                        <xxf:value>&lt;span id="description-textarea⊙2-2" class="xforms-control xforms-textarea"&gt;&lt;label class="xforms-label" for="description-textarea≡≡c⊙2-2"&gt;Condition:&lt;/label&gt;&lt;textarea id="description-textarea≡≡c⊙2-2" name="description-textarea⊙2-2"&gt;&lt;/textarea&gt;&lt;/span&gt;</xxf:value>
+                    </xxf:inner-html>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" new-index="2"/>
@@ -3103,7 +3106,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="company-repeat" parent-indexes="" start-suffix="1" end-suffix="1"/>
+                        <xxf:inner-html id="company-repeat~iteration⊙1">
+                            <xxf:value/>
+                        </xxf:inner-html>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="company-repeat" new-index="1"/>

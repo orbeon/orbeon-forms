@@ -29,7 +29,7 @@ class CacheTest
     val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
     val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
 
-    def runAndAssert(form: String, mode: String)(expectedInitialHit: Boolean, staticStateHoldsTemplate: Boolean): Unit = {
+    def runAndAssert(form: String, mode: String)(expectedInitialHit: Boolean): Unit = {
 
       def staticStateFoundOpt(events: List[CacheEvent]) =
         events collectFirst { case StaticState(found, _) ⇒ found }
@@ -55,19 +55,18 @@ class CacheTest
         // NOTE: no XFCD because the form has `xxf:no-updates="true"`.
       }
 
-      it(s"template to `$staticStateHoldsTemplate` for $form/$mode") {
-        assert(Some(staticStateHoldsTemplate) === staticStateHasTemplateOpt(events2))
+      it(s"template exists for $form/$mode") {
+        assert(staticStateHasTemplateOpt(events2) contains true)
       }
     }
 
     locally {
       val Form = "noscript-false-pdf-template-wizard-true"
-      val staticStateHoldsTemplate = false
 
-      runAndAssert(Form, "new" )(expectedInitialHit = false, staticStateHoldsTemplate)
-      runAndAssert(Form, "edit")(expectedInitialHit = true,  staticStateHoldsTemplate)
-      runAndAssert(Form, "view")(expectedInitialHit = false, staticStateHoldsTemplate)
-      runAndAssert(Form, "pdf" )(expectedInitialHit = true,  staticStateHoldsTemplate)
+      runAndAssert(Form, "new" )(expectedInitialHit = false)
+      runAndAssert(Form, "edit")(expectedInitialHit = true)
+      runAndAssert(Form, "view")(expectedInitialHit = false)
+      runAndAssert(Form, "pdf" )(expectedInitialHit = true)
 
       // NOTE: Need to run schema.xpl or FR PFC for this to work
       // See https://github.com/orbeon/orbeon-forms/issues/1731

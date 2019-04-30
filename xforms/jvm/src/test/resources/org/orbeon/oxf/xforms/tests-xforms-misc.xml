@@ -799,13 +799,11 @@
                                 </xh:label>
                             </xh:span>
                         </xh:span>
-                        <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
+                        <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end xforms-update-full"/>
                         <xh:span class="xforms-repeat-delimiter"/>
-                        <xh:span class="xforms-repeat-selected-item-1"/>
+                        <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                         <xh:span class="xforms-repeat-delimiter"/>
-                        <xh:span/>
-                        <xh:span class="xforms-repeat-delimiter"/>
-                        <xh:span class="xforms-repeat-template"/>
+                        <xh:span class="xforms-update-full"/>
                         <xh:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
                     </xh:form>
                 </xh:body>

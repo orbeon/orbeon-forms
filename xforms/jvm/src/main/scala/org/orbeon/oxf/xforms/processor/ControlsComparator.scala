@@ -312,8 +312,11 @@ class ControlsComparator(
 
               val mark = getMarkOrThrow(containerControl2)
 
-              for (newIteration ← children2.view(size1, size2))
-                processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+              if (control1Opt.isDefined)
+                for (newIteration ← children2.view(size1, size2))
+                  processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+              else
+                diffChildren(Nil, children2.view(size1, size2), fullUpdateBuffer) // test mode
 
             } else if (size2 < size1) {
               outputDeleteRepeatElements(repeatControl2, size1 - size2)

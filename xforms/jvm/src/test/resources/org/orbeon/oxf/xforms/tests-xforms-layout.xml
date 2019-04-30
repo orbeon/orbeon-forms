@@ -75,18 +75,18 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-input⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-input⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-input≡xforms-input-1⊙1">My label</xh:label>
                     <xh:input id="my-new-input≡xforms-input-1⊙1" type="text" name="my-new-input≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-required="true" aria-invalid="true"/>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-boolean-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-boolean-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-boolean-input≡≡e0⊙1">My label</xh:label>
                     <xh:span class="xforms-selected">
                         <xh:input id="my-new-boolean-input≡≡e0⊙1" type="checkbox" name="my-new-boolean-input⊙1" value="true" checked="checked"/>
@@ -95,75 +95,33 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-input-2≡≡l⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-input-2≡≡t⊙1">My hint</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-input-2⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡l⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-input-2⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:input id="my-new-input-2≡xforms-input-1⊙1" type="text" name="my-new-input-2≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-required="true" aria-invalid="true"/>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-input-2≡≡p⊙1">My help</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1" id="my-new-input-2≡≡a⊙1">My alert</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-boolean-input-2≡≡l⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-boolean-input-2≡≡t⊙1">My hint</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-boolean-input-2⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡p⊙1">My help</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡a⊙1">My alert</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡l⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-boolean-input-2⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span class="xforms-selected">
                         <xh:input id="my-new-boolean-input-2≡≡e0⊙1" type="checkbox" name="my-new-boolean-input-2⊙1" value="true" checked="checked"/>
                     </xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-boolean-input-2≡≡p⊙1">My help</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2≡≡a⊙1"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-input≡xforms-input-1"/>
-                    <xh:input id="my-new-input≡xforms-input-1" type="text" name="my-new-input≡xforms-input-1" value="" class="xforms-input-input"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-boolean-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-boolean-input≡xforms-input-1"/>
-                    <xh:input id="my-new-boolean-input≡xforms-input-1" type="text" name="my-new-boolean-input≡xforms-input-1" value="" class="xforms-input-input"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:label class="xforms-label xforms-repeat-template" id="my-new-input-2≡≡l" for="my-new-input-2≡xforms-input-1"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-hint xforms-repeat-template" id="my-new-input-2≡≡t"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:input id="my-new-input-2≡xforms-input-1" type="text" name="my-new-input-2≡xforms-input-1" value="" class="xforms-input-input"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-input-2≡≡p"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-input-2≡≡a"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:label class="xforms-label xforms-repeat-template" id="my-new-boolean-input-2≡≡l" for="my-new-boolean-input-2≡xforms-input-1"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-hint xforms-repeat-template" id="my-new-boolean-input-2≡≡t"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-boolean-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:input id="my-new-boolean-input-2≡xforms-input-1" type="text" name="my-new-boolean-input-2≡xforms-input-1" value="" class="xforms-input-input"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-boolean-input-2≡≡p"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-boolean-input-2≡≡a"/>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡p⊙1">My help</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡a⊙1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -203,10 +161,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-select1≡≡c⊙1">My label</xh:label>
                     <xh:select id="my-new-select1≡≡c⊙1" name="my-new-select1⊙1" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -216,20 +174,7 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-select1≡≡c"/>
-                    <xh:select id="my-new-select1≡≡c" name="my-new-select1">
-                        <xh:option value="apple">Apple</xh:option>
-                        <xh:option value="orange">Orange</xh:option>
-                    </xh:select>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -266,41 +211,24 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-output⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-output⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-output≡≡c⊙1">My label</xh:label>
                     <xh:output id="my-new-output≡≡c⊙1" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox">Hello!</xh:output>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-output-no-label⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-output-no-label⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-output-no-label≡≡c⊙1" class="xforms-output-output">Hello!</xh:span>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-output" class="xforms-control xforms-output xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-output≡≡c"/>
-                    <xh:output id="my-new-output≡≡c" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-output-no-label" class="xforms-control xforms-output xforms-repeat-template">
-                    <xh:span id="my-new-output-no-label≡≡c" class="xforms-output-output"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -354,10 +282,10 @@
         </input>
         <span name="response">
             <controls>
-                <xh:fieldset id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:fieldset id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:fieldset class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:fieldset id="my-new-group⊙1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:fieldset id="my-new-group⊙1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:legend class="xforms-label" id="my-new-group≡≡l⊙1">My label</xh:legend>
                     <xh:span id="my-new-span-1⊙1" class="xforms-control xforms-span">
                         <xh:span id="my-new-span-1≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
@@ -366,12 +294,12 @@
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:fieldset>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-span-2⊙1" class="xforms-control xforms-span xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-span-2⊙1" class="xforms-control xforms-span xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-span-2≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:fieldset id="my-new-fieldset-group⊙1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:fieldset id="my-new-fieldset-group⊙1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:legend class="xforms-label" id="my-new-fieldset-group≡≡l⊙1">My label</xh:legend>
                     <xh:span id="my-new-span-3⊙1" class="xforms-control xforms-span">
                         <xh:span id="my-new-span-3≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
@@ -380,8 +308,8 @@
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:fieldset>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:table class="xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:table class="xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:tr id="group-begin-my-new-table-group⊙1" class="xforms-group-begin-end xforms-invalid xforms-required"/>
                     <xh:tr class="xforms-invalid xforms-required">
                         <xh:td>
@@ -392,45 +320,7 @@
                     </xh:tr>
                     <xh:tr id="group-end-my-new-table-group⊙1" class="xforms-group-begin-end"/>
                 </xh:table>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:fieldset class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:fieldset id="my-new-group" class="xforms-group xforms-repeat-template">
-                    <xh:legend class="xforms-label" id="my-new-group≡≡l"/>
-                    <xh:span id="my-new-span-1" class="xforms-control xforms-span">
-                        <xh:span id="my-new-span-1≡≡c" class="xforms-span-span"/>
-                    </xh:span>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:fieldset>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-span-2" class="xforms-control xforms-span xforms-repeat-template">
-                    <xh:span id="my-new-span-2≡≡c" class="xforms-span-span"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-repeat-template">
-                    <xh:legend class="xforms-label" id="my-new-fieldset-group≡≡l"/>
-                    <xh:span id="my-new-span-3" class="xforms-control xforms-span">
-                        <xh:span id="my-new-span-3≡≡c" class="xforms-span-span"/>
-                    </xh:span>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:fieldset>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:table class="xforms-repeat-template">
-                    <xh:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end"/>
-                    <xh:tr>
-                        <xh:td>
-                            <xh:span id="my-new-span-4" class="xforms-control xforms-span">
-                                <xh:span id="my-new-span-4≡≡c" class="xforms-span-span"/>
-                            </xh:span>
-                        </xh:td>
-                    </xh:tr>
-                    <xh:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
-                </xh:table>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:fieldset id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </span>
@@ -481,51 +371,29 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-trigger≡≡c⊙1" title="My hint" type="button" class="btn">My label</xh:button>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:a id="my-new-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button">My label</xh:a>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-modal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-modal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-modal-trigger≡≡c⊙1" title="My hint" type="button" class="btn">My label</xh:button>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-modal-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-modal-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:a id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button">My label</xh:a>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-repeat-template">
-                    <xh:button id="my-new-trigger≡≡c" type="button" class="btn"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-template">
-                    <xh:a id="my-new-minimal-trigger≡≡c" tabindex="0" role="button"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-repeat-template">
-                    <xh:button id="my-new-modal-trigger≡≡c" type="button" class="btn"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-modal-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-repeat-template">
-                    <xh:a id="my-new-modal-minimal-trigger≡≡c" tabindex="0" role="button"/>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -557,10 +425,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:div id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div id="my-new-range⊙1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:div id="my-new-range⊙1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-range≡≡c⊙1">My label</xh:label>
                     <xh:div id="my-new-range≡≡c⊙1" class="xforms-range-background">
                         <xh:div class="xforms-range-thumb"/>
@@ -569,19 +437,7 @@
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:div>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:div id="my-new-range" class="xforms-control xforms-range xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-range≡≡c"/>
-                    <xh:div id="my-new-range≡≡c" class="xforms-range-background">
-                        <xh:div class="xforms-range-thumb"/>
-                    </xh:div>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:div>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:div id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -635,10 +491,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-select≡≡c⊙1">My label</xh:label>
                     <xh:select id="my-new-select≡≡c⊙1" name="my-new-select⊙1" multiple="multiple" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -648,8 +504,8 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-compact-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-compact-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-compact-select≡≡c⊙1">My label</xh:label>
                     <xh:select id="my-new-compact-select≡≡c⊙1" name="my-new-compact-select⊙1" multiple="multiple" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -659,31 +515,7 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-select≡≡c"/>
-                    <xh:select id="my-new-select≡≡c" name="my-new-select" multiple="multiple">
-                        <xh:option value="apple">Apple</xh:option>
-                        <xh:option value="orange">Orange</xh:option>
-                    </xh:select>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-compact-select≡≡c"/>
-                    <xh:select id="my-new-compact-select≡≡c" name="my-new-compact-select" multiple="multiple">
-                        <xh:option value="apple">Apple</xh:option>
-                        <xh:option value="orange">Orange</xh:option>
-                    </xh:select>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -734,10 +566,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-upload⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-upload⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload≡≡c⊙1">
                         <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on"/>
@@ -752,12 +584,12 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-upload-2≡≡l⊙1" for="my-new-upload-2≡xforms-input⊙1">My label</xh:label>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-upload-2≡≡t⊙1">My hint</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-upload-2⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡l⊙1" for="my-new-upload-2≡xforms-input⊙1">My label</xh:label>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-upload-2⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-upload-2≡≡c⊙1">
                         <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on"/>
                         <xh:span class="xforms-upload-info">
@@ -768,12 +600,12 @@
                         </xh:span>
                     </xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-upload-2≡≡p⊙1">My help</xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2≡≡a⊙1"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-upload-file⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡p⊙1">My help</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡a⊙1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-upload-file⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload-file≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload-file≡≡c⊙1">
                         <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input⊙1" name="my-new-upload-file⊙1" unselectable="on"/>
@@ -788,61 +620,7 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-upload" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-upload≡xforms-input"/>
-                    <xh:span id="my-new-upload≡≡c">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input" name="my-new-upload" unselectable="on"/>
-                        <xh:span class="xforms-upload-info">
-                            <xh:span class="xforms-upload-filename"/>
-                            <xh:span class="xforms-upload-mediatype"/>
-                            <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
-                        </xh:span>
-                    </xh:span>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:label class="xforms-label xforms-repeat-template" id="my-new-upload-2≡≡l" for="my-new-upload-2≡xforms-input"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-hint xforms-repeat-template" id="my-new-upload-2≡≡t"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-upload-2" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
-                    <xh:span id="my-new-upload-2≡≡c">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input" name="my-new-upload-2" unselectable="on"/>
-                        <xh:span class="xforms-upload-info">
-                            <xh:span class="xforms-upload-filename"/>
-                            <xh:span class="xforms-upload-mediatype"/>
-                            <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
-                        </xh:span>
-                    </xh:span>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-upload-2≡≡p"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-upload-2≡≡a"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-upload-file" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-upload-file≡xforms-input"/>
-                    <xh:span id="my-new-upload-file≡≡c">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input" name="my-new-upload-file" unselectable="on"/>
-                        <xh:span class="xforms-upload-info">
-                            <xh:span class="xforms-upload-filename"/>
-                            <xh:span class="xforms-upload-mediatype"/>
-                            <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
-                        </xh:span>
-                    </xh:span>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -1345,10 +1123,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span class="xforms-label" id="my-new-select1≡≡l⊙1">My label</xh:span>
                     <xh:span class="xforms-items" role="radiogroup" aria-labelledby="my-new-select1≡≡l⊙1">
                         <xh:span class="xforms-selected">
@@ -1382,44 +1160,7 @@
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-repeat-template">
-                    <xh:span class="xforms-label" id="my-new-select1≡≡l"/>
-                    <xh:span class="xforms-items" role="radiogroup">
-                        <xh:span class="xforms-deselected">
-                            <xh:label class="radio">
-                                <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>
-                                <xh:span>Apple</xh:span>
-                            </xh:label>
-                        </xh:span>
-                        <xh:span class="xforms-deselected">
-                            <xh:label class="radio">
-                                <xh:input id="my-new-select1≡≡e1" type="radio" name="my-new-select1" value="orange"/>
-                                <xh:span class="xforms-hint-region">Orange</xh:span>
-                                <xh:span class="xforms-help">Orange help</xh:span>
-                                <xh:span class="xforms-hint">Orange hint</xh:span>
-                            </xh:label>
-                        </xh:span>
-                        <xh:span class="xforms-deselected">
-                            <xh:label class="radio">
-                                <xh:input id="my-new-select1≡≡e2" type="radio" name="my-new-select1" value="blueberry"/>
-                                <xh:span>Blueberry</xh:span>
-                            </xh:label>
-                        </xh:span>
-                        <xh:span class="xforms-deselected">
-                            <xh:label class="radio">
-                                <xh:input id="my-new-select1≡≡e3" type="radio" name="my-new-select1" value="pineapple"/>
-                                <xh:span>Pineapple</xh:span>
-                            </xh:label>
-                        </xh:span>
-                    </xh:span>
-                    <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint"/>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -1727,10 +1468,10 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-xf-3" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-xf-3" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:select id="my-select1≡≡c⊙1" name="my-select1⊙1">
                         <xh:option value="default">default label</xh:option>
                         <xh:option value="" selected="selected">empty</xh:option>
@@ -1740,10 +1481,10 @@
                         <xh:option value="  ">two spaces in value</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="my-select1⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-select1⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="my-select1≡≡c⊙2" name="my-select1⊙2">
                         <xh:option value="default">default label</xh:option>
                         <xh:option value="">empty</xh:option>
@@ -1753,10 +1494,10 @@
                         <xh:option value="  ">two spaces in value</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="my-select1⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-select1⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="my-select1≡≡c⊙3" name="my-select1⊙3">
                         <xh:option value="default">default label</xh:option>
                         <xh:option value="">empty</xh:option>
@@ -1766,10 +1507,10 @@
                         <xh:option value="  ">two spaces in value</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="my-select1⊙4" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-select1⊙4" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="my-select1≡≡c⊙4" name="my-select1⊙4">
                         <xh:option value="default">default label</xh:option>
                         <xh:option value="">empty</xh:option>
@@ -1779,10 +1520,10 @@
                         <xh:option value="  " selected="selected">two spaces in value</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="my-select1⊙5" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-select1⊙5" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="my-select1≡≡c⊙5" name="my-select1⊙5">
                         <xh:option value="default">default label</xh:option>
                         <xh:option value="">empty</xh:option>
@@ -1792,20 +1533,7 @@
                         <xh:option value="  ">two spaces in value</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
-                    <xh:select id="my-select1≡≡c" name="my-select1">
-                        <xh:option value="default">default label</xh:option>
-                        <xh:option value="">empty</xh:option>
-                        <xh:option value="one">one label</xh:option>
-                        <xh:option value="two">two label</xh:option>
-                        <xh:option value=" ">one space in value</xh:option>
-                        <xh:option value="  ">two spaces in value</xh:option>
-                    </xh:select>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-xf-3" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -1964,58 +1692,41 @@
         </input>
         <output name="response">
             <controls>
-                <xh:div id="repeat-begin-outer-repeat" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-begin-outer-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div class="xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:div class="xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="repeat-begin-inner-repeat⊙1" class="xforms-repeat-begin-end"/>
                     <xh:span id="repeat-end-inner-repeat⊙1" class="xforms-repeat-begin-end"/>
                 </xh:div>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:br class="outer-br xforms-repeat-selected-item-1"></xh:br>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:div>
-                    <xh:span id="repeat-begin-inner-repeat⊙2" class="xforms-repeat-begin-end"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:br class="outer-br xforms-repeat-selected-item-1 xforms-update-full"></xh:br>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:div class="xforms-repeat-delimiter"></xh:div>
+                <xh:span class="xforms-update-full"/>
+                <xh:div class="xforms-update-full">
+                    <xh:span id="repeat-begin-inner-repeat⊙2" class="xforms-repeat-begin-end xforms-update-full"/>
                     <xh:span class="xforms-repeat-delimiter"/>
-                    <xh:span/>
-                    <xh:span id="my-input⊙2-1" class="xforms-control xforms-input">
+                    <xh:span class="xforms-update-full"/>
+                    <xh:span id="my-input⊙2-1" class="xforms-control xforms-input xforms-update-full">
                         <xh:input id="my-input≡xforms-input-1⊙2-1" type="text" name="my-input≡xforms-input-1⊙2-1" value="a" class="xforms-input-input"/>
                     </xh:span>
-                    <xh:span/>
-                    <xh:br class="inner-br"/>
-                    <xh:span/>
+                    <xh:span class="xforms-update-full"/>
+                    <xh:br class="inner-br xforms-update-full"/>
+                    <xh:span class="xforms-update-full"/>
                     <xh:span class="xforms-repeat-delimiter"/>
-                    <xh:span/>
-                    <xh:span id="my-input⊙2-2" class="xforms-control xforms-input">
+                    <xh:span class="xforms-update-full"/>
+                    <xh:span id="my-input⊙2-2" class="xforms-control xforms-input xforms-update-full">
                         <xh:input id="my-input≡xforms-input-1⊙2-2" type="text" name="my-input≡xforms-input-1⊙2-2" value="b" class="xforms-input-input"/>
                     </xh:span>
-                    <xh:span/>
-                    <xh:br class="inner-br"/>
-                    <xh:span/>
+                    <xh:span class="xforms-update-full"/>
+                    <xh:br class="inner-br xforms-update-full"/>
+                    <xh:span class="xforms-update-full"/>
                     <xh:span id="repeat-end-inner-repeat⊙2" class="xforms-repeat-begin-end"/>
                 </xh:div>
-                <xh:span/>
-                <xh:br class="outer-br"></xh:br>
-                <xh:span/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:div class="xforms-repeat-template">
-                    <xh:span id="repeat-begin-inner-repeat" class="xforms-repeat-begin-end"/>
-                    <xh:span class="xforms-repeat-delimiter"/>
-                    <xh:span/>
-                    <xh:span id="my-input" class="xforms-control xforms-input">
-                        <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input"/>
-                    </xh:span>
-                    <xh:span/>
-                    <xh:br class="inner-br"/>
-                    <xh:span/>
-                    <xh:span id="repeat-end-inner-repeat" class="xforms-repeat-begin-end"/>
-                </xh:div>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:br class="outer-br xforms-repeat-template"></xh:br>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:br class="outer-br xforms-update-full"></xh:br>
+                <xh:span class="xforms-update-full"/>
                 <xh:div id="repeat-end-outer-repeat" class="xforms-repeat-begin-end"/>
             </controls>
 
@@ -2108,35 +1819,21 @@
         <output name="response">
             <controls>
                 <xh:span id="my-group" class="xforms-group">
-                    <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                    <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                     <xh:span class="xforms-repeat-delimiter"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="gaga-1⊙1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="toto-1⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="gaga-2⊙1" class="xforms-disabled xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="toto-2⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="gaga-3⊙1" class="xforms-readonly xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span id="toto-3⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-selected-item-1"/>
-                    <xh:span class="xforms-repeat-delimiter"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="gaga-1" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="toto-1" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="gaga-2" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="toto-2" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="gaga-3" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
-                    <xh:span id="toto-3" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
-                    <xh:span class="xforms-repeat-template"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="gaga-1⊙1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="toto-1⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="gaga-2⊙1" class="xforms-disabled xbl-component xbl-fr-gaga xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="toto-2⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="gaga-3⊙1" class="xforms-readonly xbl-component xbl-fr-gaga xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span id="toto-3⊙1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1 xforms-update-full"/>
+                    <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                     <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
                 </xh:span>
             </controls>
@@ -2215,13 +1912,9 @@
         </input>
         <output name="response">
            <controls>
-                <xh:tr id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:tr id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:tr class="xforms-repeat-delimiter"/>
-                <xh:tr class="xforms-repeat-selected-item-1">
-                    <xh:td>Cat</xh:td>
-                </xh:tr>
-                <xh:tr class="xforms-repeat-delimiter"/>
-                <xh:tr class="xforms-repeat-template">
+                <xh:tr class="xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:td>Cat</xh:td>
                 </xh:tr>
                 <xh:tr id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -2369,71 +2062,55 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="select-1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="select-1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:select id="select-1≡≡c⊙1" name="select-1⊙1">
                         <xh:option value="0" selected="selected">Select...</xh:option>
                         <xh:option value="1">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="select-2⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="select-2⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:select id="select-2≡≡c⊙1" name="select-2⊙1">
                         <xh:option value="" selected="selected">Select...</xh:option>
                         <xh:option value="apple">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="select-1⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="select-1⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="select-1≡≡c⊙2" name="select-1⊙2">
                         <xh:option value="0">Select...</xh:option>
                         <xh:option value="1" selected="selected">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
-                <xh:span id="select-2⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="select-2⊙2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="select-2≡≡c⊙2" name="select-2⊙2">
                         <xh:option value="">Select...</xh:option>
                         <xh:option value="apple" selected="selected">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="select-1⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="select-1⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="select-1≡≡c⊙3" name="select-1⊙3">
                         <xh:option value="0">Select...</xh:option>
                         <xh:option value="1">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
-                <xh:span id="select-2⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="select-2⊙3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-update-full">
                     <xh:select id="select-2≡≡c⊙3" name="select-2⊙3">
                         <xh:option value="">Select...</xh:option>
                         <xh:option value="apple">Apple</xh:option>
                     </xh:select>
                 </xh:span>
-                <xh:span/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="select-1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
-                    <xh:select id="select-1≡≡c" name="select-1">
-                        <xh:option value="0">Select...</xh:option>
-                        <xh:option value="1">Apple</xh:option>
-                    </xh:select>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="select-2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
-                    <xh:select id="select-2≡≡c" name="select-2">
-                        <xh:option value="">Select...</xh:option>
-                        <xh:option value="apple">Apple</xh:option>
-                    </xh:select>
-                </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -2478,80 +2155,52 @@
         <output name="response">
             <controls>
                 <xh:span id="repeat-begin-empty-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
                 <xh:span id="repeat-end-empty-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-begin-empty-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-empty-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-empty-repeat-2-iterations" class="xforms-repeat-begin-end"/>
                 <xh:span id="repeat-begin-blank-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
                 <xh:span id="repeat-end-blank-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-begin-blank-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-blank-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-blank-repeat-2-iterations" class="xforms-repeat-begin-end"/>
                 <xh:span id="repeat-begin-characters-only-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template">foo</xh:span>
                 <xh:span id="repeat-end-characters-only-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-begin-characters-only-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-characters-only-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1">foo</xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full">foo</xh:span>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span>foo</xh:span>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template">foo</xh:span>
+                <xh:span class="xforms-update-full">foo</xh:span>
                 <xh:span id="repeat-end-characters-only-repeat-2-iterations" class="xforms-repeat-begin-end"/>
-                <xh:div id="repeat-begin-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-end-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-begin-div-whitespace-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:div class="xforms-repeat-template"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:div id="repeat-end-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:div id="repeat-begin-div-whitespace-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:div class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:div/>
-                <xh:span/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:div class="xforms-repeat-template"/>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
+                <xh:div class="xforms-update-full"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:div id="repeat-end-div-whitespace-repeat-2-iterations" class="xforms-repeat-begin-end"/>
-                <xh:div id="repeat-begin-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-end-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-begin-div-characters-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template">foo</xh:span>
-                <xh:div class="xforms-repeat-template"/>
-                <xh:span class="xforms-repeat-template">bar</xh:span>
-                <xh:div id="repeat-end-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:div id="repeat-begin-div-characters-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full">foo</xh:span>
+                <xh:div class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full">bar</xh:span>
                 <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1">foo</xh:span>
-                <xh:div class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-selected-item-1">bar</xh:span>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span>foo</xh:span>
-                <xh:div/>
-                <xh:span>bar</xh:span>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template">foo</xh:span>
-                <xh:div class="xforms-repeat-template"/>
-                <xh:span class="xforms-repeat-template">bar</xh:span>
+                <xh:span class="xforms-update-full">foo</xh:span>
+                <xh:div class="xforms-update-full"/>
+                <xh:span class="xforms-update-full">bar</xh:span>
                 <xh:div id="repeat-end-div-characters-repeat-2-iterations" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
@@ -2590,17 +2239,13 @@
         </input>
         <output name="response">
             <controls>
-                <xh:tr id="repeat-begin-repeat-around-tr" class="xforms-repeat-begin-end"/>
+                <xh:tr id="repeat-begin-repeat-around-tr" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:tr class="xforms-repeat-delimiter"/>
-                <xh:tr class="xforms-repeat-selected-item-1">
+                <xh:tr class="xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:td>1</xh:td>
                 </xh:tr>
                 <xh:tr class="xforms-repeat-delimiter"/>
-                <xh:tr>
-                    <xh:td>1</xh:td>
-                </xh:tr>
-                <xh:tr class="xforms-repeat-delimiter"/>
-                <xh:tr class="xforms-repeat-template">
+                <xh:tr class="xforms-update-full">
                     <xh:td>1</xh:td>
                 </xh:tr>
                 <xh:tr id="repeat-end-repeat-around-tr" class="xforms-repeat-begin-end"/>
@@ -2803,55 +2448,39 @@
                     <xh:i>Description Help</xh:i>
                 </xh:span>
                 <xh:span  id="my-gaga-help" class="xforms-control xforms-help">Gaga Help</xh:span>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:input id="my-input≡xforms-input-1⊙1" type="text" name="my-input≡xforms-input-1⊙1" value="input 1" class="xforms-input-input" aria-labelledby="my-input-label" aria-describedby="my-input-hint" aria-details="my-input-help" aria-required="true"/>
                 </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-textarea⊙1" class="xforms-control xforms-textarea xforms-repeat-selected-item-1">
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-textarea⊙1" class="xforms-control xforms-textarea xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:textarea id="my-textarea≡≡c⊙1" name="my-textarea⊙1" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 1</xh:textarea>
                 </xh:span>
-                 <xh:span  class="xforms-repeat-selected-item-1"/>
-                     <xh:span  id="my-gaga⊙1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1">
+                 <xh:span  class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                     <xh:span  id="my-gaga⊙1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1 xforms-update-full">
                          <xh:span id="my-gaga≡input⊙1" class="xforms-control xforms-input">
                              <xh:input id="my-gaga≡input≡xforms-input-1⊙1" type="text" name="my-gaga≡input≡xforms-input-1⊙1" value="gaga 1" class="xforms-input-input" aria-labelledby="my-gaga-label" aria-describedby="my-gaga-hint" aria-details="my-gaga-help"/>
                          </xh:span>
                      </xh:span>
-                <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span/>
-                <xh:span id="my-input⊙2" class="xforms-control xforms-input xforms-required xforms-filled">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-input⊙2" class="xforms-control xforms-input xforms-required xforms-filled xforms-update-full">
                     <xh:input id="my-input≡xforms-input-1⊙2" type="text" name="my-input≡xforms-input-1⊙2" value="input 2" class="xforms-input-input" aria-labelledby="my-input-label" aria-describedby="my-input-hint" aria-details="my-input-help" aria-required="true"/>
                 </xh:span>
-                <xh:span/>
-                <xh:span id="my-textarea⊙2" class="xforms-control xforms-textarea">
+                <xh:span class="xforms-update-full"/>
+                <xh:span id="my-textarea⊙2" class="xforms-control xforms-textarea xforms-update-full">
                     <xh:textarea id="my-textarea≡≡c⊙2" name="my-textarea⊙2" aria-labelledby="my-textarea-label" aria-describedby="my-textarea-hint" aria-details="my-textarea-help">textarea 2</xh:textarea>
                 </xh:span>
-                <xh:span />
-                    <xh:span  id="my-gaga⊙2" class="xbl-component xbl-fr-gaga">
-                        <xh:span id="my-gaga≡input⊙2" class="xforms-control xforms-input">
-                            <xh:input id="my-gaga≡input≡xforms-input-1⊙2" type="text" name="my-gaga≡input≡xforms-input-1⊙2" value="gaga 2" class="xforms-input-input" aria-labelledby="my-gaga-label" aria-describedby="my-gaga-hint" aria-details="my-gaga-help"/>
-                        </xh:span>
+                <xh:span class="xforms-update-full"/>
+                <xh:span  id="my-gaga⊙2" class="xbl-component xbl-fr-gaga xforms-update-full">
+                    <xh:span id="my-gaga≡input⊙2" class="xforms-control xforms-input">
+                        <xh:input id="my-gaga≡input≡xforms-input-1⊙2" type="text" name="my-gaga≡input≡xforms-input-1⊙2" value="gaga 2" class="xforms-input-input" aria-labelledby="my-gaga-label" aria-describedby="my-gaga-hint" aria-details="my-gaga-help"/>
                     </xh:span>
-                <xh:span/>
-                <xh:span class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
-                <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-textarea" class="xforms-control xforms-textarea xforms-repeat-template">
-                    <xh:textarea id="my-textarea≡≡c" name="my-textarea"/>
-                </xh:span>
-                <xh:span  class="xforms-repeat-template"/>
-                    <xh:span  id="my-gaga" class="xbl-component xbl-fr-gaga xforms-repeat-template">
-                        <xh:span id="my-gaga≡input" class="xforms-control xforms-input">
-                            <xh:input id="my-gaga≡input≡xforms-input-1" type="text" name="my-gaga≡input≡xforms-input-1" value="" class="xforms-input-input"/>
-                        </xh:span>
-                    </xh:span>
-                <xh:span class="xforms-repeat-template"/>
+                <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>

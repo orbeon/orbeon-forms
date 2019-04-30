@@ -17,7 +17,7 @@ import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
 import org.orbeon.dom
-import org.orbeon.dom.{Document, DocumentFactory}
+import org.orbeon.dom.Document
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor

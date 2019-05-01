@@ -732,9 +732,9 @@
                         _.each(childrenWithLocalName(controlValuesElement, 'delete-repeat-elements'), function(deleteElementElement) {
 
                             // Extract data from server response
-                            var deleteId = ORBEON.util.Dom.getAttribute(deleteElementElement, "id");
+                            var deleteId      = ORBEON.util.Dom.getAttribute(deleteElementElement, "id");
                             var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
-                            var count = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
+                            var count         = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
 
                             // Find end of the repeat
                             var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));

@@ -18,6 +18,7 @@ import java.{lang => jl}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
@@ -29,24 +30,24 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 
-// Created this just so we can reuse `getContainerAttributes`. Fix this as we complete conversion of
-// code to Scala.
+// Created this just so we can reuse `getContainerAttributes`.
+// TODO: Fix this as we complete conversion of code to Scala.
+// 2020-11-12: Unsure what comment above is about. This said, only `XXFormsDynamicHandler` derives
+// directly from `XFormsBaseHandler` now.
 abstract class XFormsBaseHandlerXHTML (
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : Any,
-  handlerContext : Any,
-  repeating      : Boolean,
-  forwarding     : Boolean
+  uri                : String,
+  localname          : String,
+  qName              : String,
+  localAtts          : Attributes,
+  handlerContext     : HandlerContext,
+  repeating          : Boolean,
+  forwarding         : Boolean
 ) extends
   XFormsBaseHandler(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
     handlerContext,
     repeating,
     forwarding
@@ -54,17 +55,14 @@ abstract class XFormsBaseHandlerXHTML (
 
   import XFormsBaseHandlerXHTML._
 
-  // Used by `XFormsSelect1Handler` only
-  def getHandlerContext: HandlerContext = this.xformsHandlerContext
-
-  final val getPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
-  final val getEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
+  final val getPrefixedId  = handlerContext.getPrefixedId(attributes)
+  final val getEffectiveId = handlerContext.getEffectiveId(attributes)
 
   // May be overridden by subclasses
   protected def isDefaultIncremental                                                = false
   protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
 
-  def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
+  final def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
     control match {
       case c: XFormsSingleNodeControl => c.isReadonly && ! containingDocument.staticReadonly
       case _ => false
@@ -74,7 +72,7 @@ abstract class XFormsBaseHandlerXHTML (
   // TODO: Move this to to control itself, like writeMIPsAsAttributes
   final def handleMIPClasses(controlPrefixedId: String, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
 
-    // xforms-disabled class
+    // `xforms-disabled` class
     // NOTE: We used to not output this class if the control existed and didn't have a binding. That looked either
     // like an inconsistent optimization (not done for controls with bindings), or like an oversight (likely).
     val isRelevant = control != null && control.isRelevant
@@ -84,7 +82,7 @@ abstract class XFormsBaseHandlerXHTML (
       appendWithSpace("xforms-disabled")
 
     // MIP classes for a concrete control
-    if (isRelevant && xformsHandlerContext.getPartAnalysis.hasBinding(controlPrefixedId)) {
+    if (isRelevant && handlerContext.getPartAnalysis.hasBinding(controlPrefixedId)) {
 
       if (control.visited)
         appendWithSpace("xforms-visited")
@@ -126,6 +124,7 @@ abstract class XFormsBaseHandlerXHTML (
     controlURI         : String,
     controlName        : String,
     controlAttributes  : Attributes,
+    elementAnalysis    : ElementAnalysis,
     control            : XFormsControl,
     incrementalDefault : Boolean,
     staticLabel        : Option[LHHAAnalysis]
@@ -136,51 +135,52 @@ abstract class XFormsBaseHandlerXHTML (
     // User-defined classes go first
     appendControlUserClasses(controlAttributes, control)
 
-    // Component control doesn't get xforms-control, xforms-[control name], incremental, mediatype, xforms-static
-    if (! elementAnalysis.isInstanceOf[ComponentControl]) {
+    elementAnalysis match {
+      case _: ComponentControl =>
+        // Component control doesn't get `xforms-control`, `xforms-[control name]`, `incremental`, `mediatype`, `xforms-static`
+      case _ =>
+        // We only call `xforms-control` the actual controls as per the spec
+        // NOTE: XForms 1.1 has core and container controls but our client depends on having `xforms-control`.
+        if (! XFormsControlFactory.isContainerControl(controlURI, controlName))
+          appendWithSpace("xforms-control xforms-")
+        else
+          appendWithSpace("xforms-")
 
-      // We only call xforms-control the actual controls as per the spec
-      // NOTE: XForms 1.1 has core and container controls but our client depends on having `xforms-control`.
-      if (! XFormsControlFactory.isContainerControl(controlURI, controlName))
-        appendWithSpace("xforms-control xforms-")
-      else
-        appendWithSpace("xforms-")
+        sb.append(controlName)
 
-      sb.append(controlName)
+        // Class for incremental mode
+        val value = controlAttributes.getValue("incremental")
 
-      // Class for incremental mode
-      val value = controlAttributes.getValue("incremental")
+        // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
+        // default is incremental and the user did not explicitly set it to false
+        if ((! incrementalDefault && value == "true") || (incrementalDefault && value != "false"))
+          appendWithSpace("xforms-incremental")
 
-      // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
-      // default is incremental and the user did not explicitly set it to false
-      if ((! incrementalDefault && value == "true") || (incrementalDefault && value != "false"))
-        appendWithSpace("xforms-incremental")
+        // Class for mediatype
+        Option(controlAttributes.getValue("mediatype")) foreach { mediatypeValue =>
 
-      // Class for mediatype
-      Option(controlAttributes.getValue("mediatype")) foreach { mediatypeValue =>
+          // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
+          val slashIndex = mediatypeValue.indexOf('/')
+          if (slashIndex == -1)
+            throw new ValidationException(s"Invalid mediatype attribute value: $mediatypeValue", handlerContext.getLocationData)
 
-        // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
-        val slashIndex = mediatypeValue.indexOf('/')
-        if (slashIndex == -1)
-          throw new ValidationException(s"Invalid mediatype attribute value: $mediatypeValue", xformsHandlerContext.getLocationData)
+          appendWithSpace("xforms-mediatype-")
 
-        appendWithSpace("xforms-mediatype-")
-
-        if (mediatypeValue.endsWith("/*")) {
-          // Add class with just type: "image/*" -> "xforms-mediatype-image"
-          sb.append(mediatypeValue.substring(0, mediatypeValue.length - 2))
-        } else {
-          // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
-          sb.append(mediatypeValue.replace('/', '-'))
-          // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
-          sb.append(" xforms-mediatype-")
-          sb.append(mediatypeValue.substring(0, slashIndex))
+          if (mediatypeValue.endsWith("/*")) {
+            // Add class with just type: `image/*` -> `xforms-mediatype-image`
+            sb.append(mediatypeValue.substring(0, mediatypeValue.length - 2))
+          } else {
+            // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
+            sb.append(mediatypeValue.replace('/', '-'))
+            // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
+            sb.append(" xforms-mediatype-")
+            sb.append(mediatypeValue.substring(0, slashIndex))
+          }
         }
-      }
 
-      // Static read-only
-      if (XFormsBaseHandler.isStaticReadonly(control))
-        appendWithSpace("xforms-static")
+        // Static read-only
+        if (XFormsBaseHandler.isStaticReadonly(control))
+          appendWithSpace("xforms-static")
     }
 
     // Classes for appearances
@@ -265,15 +265,15 @@ abstract class XFormsBaseHandlerXHTML (
       val elementName =
         requestedElementNameOpt getOrElse {
           lhha match {
-            case LHHA.Label => xformsHandlerContext.getLabelElementName
-            case LHHA.Help  => xformsHandlerContext.getHelpElementName
-            case LHHA.Hint  => xformsHandlerContext.getHintElementName
-            case LHHA.Alert => xformsHandlerContext.getAlertElementName
+            case LHHA.Label => handlerContext.labelElementName
+            case LHHA.Help  => handlerContext.helpElementName
+            case LHHA.Hint  => handlerContext.hintElementName
+            case LHHA.Alert => handlerContext.alertElementName
           }
         }
 
-      implicit val classes = new jl.StringBuilder(30)
 
+      implicit val classes: jl.StringBuilder = new jl.StringBuilder(30)
       // Put user classes first if any
       if (staticLHHAAttributes ne null) {
         val userClass = staticLHHAAttributes.getValue("class")
@@ -307,7 +307,7 @@ abstract class XFormsBaseHandlerXHTML (
 
       // Handle visibility
       // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-      if (controlOrNull != null) {
+      if (controlOrNull ne null) {
         if (! controlOrNull.isRelevant)
           appendWithSpace("xforms-disabled")
       } else if (lhha == LHHA.Help) {
@@ -328,7 +328,7 @@ abstract class XFormsBaseHandlerXHTML (
       lhhaAnalysis.encodeAndAppendAppearances(classes)
 
       XFormsBaseHandlerXHTML.outputLabelFor(
-        xformsHandlerContext,
+        handlerContext,
         getIdClassXHTMLAttributes(newAttributes, classes.toString, null),
         targetControlEffectiveId,
         forEffectiveId,
@@ -342,25 +342,26 @@ abstract class XFormsBaseHandlerXHTML (
   }
 
   final protected def getContainerAttributes(
-    uri           : String,
-    localname     : String,
-    attributes    : Attributes,
-    prefixedId    : String,
-    effectiveId   : String,
-    xformsControl : XFormsControl,
-    staticLabel   : Option[LHHAAnalysis]
+    uri             : String,
+    localname       : String,
+    attributes      : Attributes,
+    prefixedId      : String,
+    effectiveId     : String,
+    elementAnalysis : ElementAnalysis,
+    xformsControl   : XFormsControl,
+    staticLabel     : Option[LHHAAnalysis]
   ): AttributesImpl = {
 
     // Get classes
     // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
     implicit val classes: jl.StringBuilder =
-      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental, staticLabel)
+      getInitialClasses(uri, localname, attributes, elementAnalysis, xformsControl, isDefaultIncremental, staticLabel)
 
     // All MIP-related classes
     handleMIPClasses(prefixedId, xformsControl)
 
     // Static classes
-    xformsHandlerContext.getPartAnalysis.appendClasses(classes, prefixedId)
+    handlerContext.getPartAnalysis.appendClasses(classes, prefixedId)
 
     // Dynamic classes added by the control
     addCustomClasses(classes, xformsControl)
@@ -378,7 +379,7 @@ abstract class XFormsBaseHandlerXHTML (
 
 object XFormsBaseHandlerXHTML {
 
-  val LHHACodes = Map[LHHA, String](
+  val LHHACodes: Map[LHHA, String] = Map(
     LHHA.Label -> "l",
     LHHA.Help  -> "p",
     LHHA.Hint  -> "t",
@@ -386,7 +387,6 @@ object XFormsBaseHandlerXHTML {
   )
 
   val ControlCode = "c"
-  val LabelCode   = LHHACodes(LHHA.Label)
 
   def appendWithSpace(s: String)(implicit sb: jl.StringBuilder): Unit = {
     if (sb.length > 0)
@@ -416,7 +416,7 @@ object XFormsBaseHandlerXHTML {
     addIds: Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
-    outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.getController.getOutput)
+    outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
     outputLabelForEnd(handlerContext, elementName)
   }
 
@@ -443,7 +443,7 @@ object XFormsBaseHandlerXHTML {
           "",
           "",
           "id",
-          XFormsBaseHandler.getLHHACId(handlerContext.getContainingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+          XFormsBaseHandler.getLHHACId(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
         )
       } else {
         // Remove existing id attribute if any
@@ -456,7 +456,7 @@ object XFormsBaseHandlerXHTML {
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)
-    val contentHandler = handlerContext.getController.getOutput
+    val contentHandler = handlerContext.controller.output
 
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute)
   }
@@ -465,7 +465,7 @@ object XFormsBaseHandlerXHTML {
 
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val labelQName  = XMLUtils.buildQName(xhtmlPrefix, elementName)
-    val xmlReceiver = handlerContext.getController.getOutput
+    val xmlReceiver = handlerContext.controller.output
 
     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName)
   }

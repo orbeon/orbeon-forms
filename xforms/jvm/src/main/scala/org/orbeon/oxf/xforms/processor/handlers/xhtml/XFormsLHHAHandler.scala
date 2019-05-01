@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -21,23 +22,33 @@ import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 import shapeless.syntax.typeable._
 
+
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
  */
 class XFormsLHHAHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, false)
-     with WithOptionalControl {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsBaseHandlerXHTML(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) {
 
   import XFormsLHHAHandler._
 
@@ -45,33 +56,34 @@ class XFormsLHHAHandler(
 
     val lhhaEffectiveId = getEffectiveId
 
-    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     // For https://github.com/orbeon/orbeon-forms/issues/3989
     def mustOmitStaticReadonlyHint(staticLhha: LHHAAnalysis, currentControlOpt: Option[XFormsControl]): Boolean =
       staticLhha.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControlOpt.orNull)
 
-    staticControlOpt match {
-      case Some(staticLhha: LHHAAnalysis) if staticLhha.isForRepeat =>
+    elementAnalysis match {
+      case staticLhha: LHHAAnalysis if staticLhha.isForRepeat =>
+
+        val currentControl =
+          containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
         // Case where the LHHA has a dynamic representation and is in a lower nesting of repeats.
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
         // `aria-*` attributes to point to this element.
 
-        val currentControl = currentControlOpt getOrElse (throw new IllegalStateException)
-
-        if (! mustOmitStaticReadonlyHint(staticLhha, currentControlOpt)) {
+        if (! mustOmitStaticReadonlyHint(staticLhha, currentControl.some)) {
           val containerAtts =
-            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl, None)
+            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, elementAnalysis, currentControl, None)
 
-          withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
+          withElement("span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
             for {
               currentLHHAControl <- currentControl.narrowTo[XFormsLHHAControl]
               externalValue      <- currentLHHAControl.externalValueOpt
               if externalValue.nonEmpty
             } locally {
               if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
-                XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
+                XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
               } else {
                 xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
               }
@@ -79,7 +91,7 @@ class XFormsLHHAHandler(
           }
         }
 
-      case Some(staticLhha: LHHAAnalysis) if ! staticLhha.isForRepeat && ! staticLhha.isLocal =>
+      case staticLhha: LHHAAnalysis if ! staticLhha.isForRepeat && ! staticLhha.isLocal =>
 
         // Non-repeated case of an external label.
         // Here we have a `for` attribute.
@@ -102,7 +114,7 @@ class XFormsLHHAHandler(
               staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
                 case Some(Left(effectiveTargetControl)) =>
                   findTargetControlForEffectiveId(
-                    xformsHandlerContext,
+                    handlerContext,
                     effectiveTargetControl,
                     XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
                   )
@@ -110,7 +122,7 @@ class XFormsLHHAHandler(
                   Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
                 case None =>
                   findTargetControlForEffectiveId(
-                    xformsHandlerContext,
+                    handlerContext,
                     staticLhha.directTargetControl,
                     XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId)
                   )
@@ -128,8 +140,9 @@ class XFormsLHHAHandler(
           )
         }
 
-      case _ => // `None if staticLhha.isLocal && ! staticLhha.isForRepeat`
-        // Q: Can this happen? There should always be a static LHHA for the control, right?
+      case _ => // `if staticLhha.isLocal && ! staticLhha.isForRepeat`
+        // Q: Can this happen? Do we match on local LHHA?
+        // 2020-11-13: This seems to happen.
     }
   }
 }
@@ -151,7 +164,7 @@ object XFormsLHHAHandler {
     //
     // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
-    handlerContext.getController.findHandlerFromElem(targetControl.element, handlerContext) match {
+    handlerContext.controller.findHandlerFromElem(targetControl.element) match {
       case Some(handler: XFormsControlLifecyleHandler) => Option(handler.getForEffectiveId(targetControlEffectiveId))
       case _                                           => None
     }

@@ -11,7 +11,6 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 
@@ -20,14 +19,15 @@ import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
+
 
 // Handler for `<xh:head>`
 class XHTMLHeadHandler(
@@ -35,9 +35,17 @@ class XHTMLHeadHandler(
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = true) {
+  handlerContext : HandlerContext
+) extends
+  XFormsBaseHandlerXHTML(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    handlerContext,
+    repeating  = false,
+    forwarding = true
+  ) {
 
   import XHTMLHeadHandler._
 
@@ -45,18 +53,12 @@ class XHTMLHeadHandler(
 
   override def start(): Unit = {
 
-    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
-    // Register control handlers on controller
-    xformsHandlerContext.getController.registerHandler(
-      classOf[XXFormsTextHandler].getName,
-      XFormsNames.XXFORMS_NAMESPACE_URI,
-      "text",
-      XHTMLBodyHandler.ANY_MATCHER
-    )
+    handlerContext.controller.combinePf(XHTMLOutput.headPf)
 
     // Declare `xmlns:f`
-    formattingPrefix = xformsHandlerContext.findFormattingPrefixDeclare
+    formattingPrefix = handlerContext.findFormattingPrefixDeclare
 
     // Open head element
     xmlReceiver.startElement(uri, localname, qName, attributes)
@@ -68,7 +70,7 @@ class XHTMLHeadHandler(
     val isVersionedResources = URLRewriterUtils.isResourcesVersioned
 
     // Include static XForms CSS and JS
-    val externalContext = xformsHandlerContext.getExternalContext
+    val externalContext = handlerContext.externalContext
 
     if (containingDocument.isServeInlineResources)
       withElement("style", xhtmlPrefix, XHTML_NAMESPACE_URI, List("type" -> "text/css", "media" -> "all")) {
@@ -134,7 +136,7 @@ class XHTMLHeadHandler(
         findConfigurationProperties(
           containingDocument = containingDocument,
           versionedResources = isVersionedResources,
-          heartbeatDelay     = XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
+          heartbeatDelay     = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
         ) foreach
           writeContent
 
@@ -154,9 +156,9 @@ class XHTMLHeadHandler(
   }
 
   override def end(): Unit = {
-    val xmlReceiver = xformsHandlerContext.getController.getOutput
+    val xmlReceiver = handlerContext.controller.output
     xmlReceiver.endElement(uri, localname, qName)
-    xformsHandlerContext.findFormattingPrefixUndeclare(formattingPrefix)
+    handlerContext.findFormattingPrefixUndeclare(formattingPrefix)
   }
 }
 

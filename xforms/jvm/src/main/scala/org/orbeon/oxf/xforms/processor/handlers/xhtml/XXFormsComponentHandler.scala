@@ -16,31 +16,43 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang => jl}
 
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
 
+
 class XXFormsComponentHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false) {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    elementAnalysis,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) {
 
   private lazy val staticControl =
-    xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
+    handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
 
   override def getContainingElementName =
     staticControl.commonBinding.containerElementName
 
   protected override def getContainingElementQName =
-    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.commonBinding.containerElementName)
+    XMLUtils.buildQName(handlerContext.findXHTMLPrefix, staticControl.commonBinding.containerElementName)
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
@@ -49,12 +61,12 @@ class XXFormsComponentHandler(
     classes.append(staticControl.commonBinding.cssClasses)
   }
 
-  override protected def handleControlStart(): Unit = {
+  protected def handleControlStart(): Unit = {
 
     val prefixedId = getPrefixedId
-    val controller = xformsHandlerContext.getController
+    val controller = handlerContext.controller
 
-    xformsHandlerContext.pushComponentContext(prefixedId)
+    handlerContext.pushComponentContext(prefixedId)
 
     // Process shadow content
     staticControl.bindingOpt foreach { binding =>
@@ -63,7 +75,7 @@ class XXFormsComponentHandler(
   }
 
   protected override def handleControlEnd(): Unit =
-    xformsHandlerContext.popComponentContext()
+    handlerContext.popComponentContext()
 
   protected override def handleLabel() =
     if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
@@ -90,8 +102,7 @@ class XXFormsComponentHandler(
 
     val result =
       for {
-        staticControl                     <- staticControlOpt
-        staticLhhaSupport                 <- staticControl.narrowTo[StaticLHHASupport]
+        staticLhhaSupport                 <- elementAnalysis.narrowTo[StaticLHHASupport]
         staticLabel                       <- staticLhhaSupport.lhh(Label)
         effectiveTargetControlOrPrefixedI <- staticLabel.effectiveTargetControlOrPrefixedIdOpt
         currentControlSuffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
@@ -100,15 +111,15 @@ class XXFormsComponentHandler(
           case Left(effectiveTargetControl) =>
 
             // Push/pop component context so that handler resolution works
-            xformsHandlerContext.pushComponentContext(getPrefixedId)
+            handlerContext.pushComponentContext(getPrefixedId)
             try
               XFormsLHHAHandler.findTargetControlForEffectiveId(
-                xformsHandlerContext,
+                handlerContext,
                 effectiveTargetControl,
                 effectiveTargetControl.prefixedId + currentControlSuffix
               )
             finally
-              xformsHandlerContext.popComponentContext()
+              handlerContext.popComponentContext()
 
           case Right(targetPrefixedId) =>
             Some(targetPrefixedId + currentControlSuffix)
@@ -120,7 +131,7 @@ class XXFormsComponentHandler(
 
 object XXFormsComponentHandler {
 
-  def processShadowTree(controller: ElementHandlerController, templateTree: SAXStore): Unit = {
+  def processShadowTree[Ctx](controller: ElementHandlerController[Ctx], templateTree: SAXStore): Unit = {
     // Tell the controller we are providing a new body
     controller.startBody()
 

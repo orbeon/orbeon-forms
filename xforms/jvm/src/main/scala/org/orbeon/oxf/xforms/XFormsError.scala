@@ -22,13 +22,15 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.XFormsNames
 
-import scala.xml.Elem
 import scala.collection.compat._
+import scala.xml.Elem
+
 
 // Represent a non-fatal server XForms error
 case class ServerError(
@@ -156,15 +158,8 @@ object XFormsError {
   }
 
   // Output the Ajax error panel with a placeholder for errors
-  def outputAjaxErrorPanel(
-    containingDocument : XFormsContainingDocument,
-    helper             : XMLReceiverHelper,
-    htmlPrefix         : String
-  ): Unit =
-    helper.element("", XMLNames.XIncludeURI, "include", Array(
-      "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
-      "fixup-xml-base", "false"
-    ))
+  def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument)(implicit xmlReceiver: XMLReceiver): Unit =
+    outputXInclude(XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"))
 
   import XMLReceiverSupport._
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectAppearanceTrait, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
@@ -27,7 +28,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -142,7 +143,7 @@ object XFormsSelect1Handler {
     xmlReceiver        : XMLReceiver,
   ): Unit = {
 
-    val xformsHandlerContextForItem = baseHandler.getHandlerContext
+    val xformsHandlerContextForItem = baseHandler.handlerContext
 
     val isSelected = isItemSelected(control, item, isMultiple)
 
@@ -163,7 +164,7 @@ object XFormsSelect1Handler {
 
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = spanAttributes) {
 
-      val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.getContainingDocument, itemEffectiveId)
+      val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.containingDocument, itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
 
       if (! isBooleanInput) {
@@ -290,22 +291,23 @@ object XFormsSelect1Handler {
 }
 
 class XFormsSelect1Handler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  attributes     : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(
-  uri            = uri,
-  localname      = localname,
-  qName          = qName,
-  localAtts      = attributes,
-  matched        = matched,
-  handlerContext = handlerContext,
-  repeating      = false,
-  forwarding     = false
-) {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  attributes      : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsControlLifecyleHandler(
+    uri            = uri,
+    localname      = localname,
+    qName          = qName,
+    localAtts      = attributes,
+    elementAnalysis        = elementAnalysis,
+    handlerContext = handlerContext,
+    repeating      = false,
+    forwarding     = false
+  ) {
 
   // Incremental mode is the default
   override def isDefaultIncremental = true
@@ -335,7 +337,7 @@ class XFormsSelect1Handler(
       isMultiple           = staticSelectionControl.isMultiple,
       isFull               = staticSelectionControl.isFull,
       isBooleanInput       = false,
-      xformsHandlerContext = xformsHandlerContext
+      xformsHandlerContext = handlerContext
     )
   }
 
@@ -350,9 +352,9 @@ class XFormsSelect1Handler(
     xformsHandlerContext : HandlerContext
   ): Unit = {
 
-    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.controller.output
 
-    val containingDocument   = xformsHandlerContext.getContainingDocument
+    val containingDocument   = xformsHandlerContext.containingDocument
     val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, !isFull)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
     val appearanceTrait      = getAppearanceTrait
@@ -477,7 +479,7 @@ class XFormsSelect1Handler(
     encode           : Boolean
   ): Unit = {
 
-    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     val appearanceTrait = getAppearanceTrait
 
@@ -492,7 +494,7 @@ class XFormsSelect1Handler(
 
     handleAriaByAttForSelect1Full(containerAttributes)
 
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val fullItemType = if (isMultiple) "checkbox" else "radio"
 
     // TODO: Should we always use fieldset, or make this an option?

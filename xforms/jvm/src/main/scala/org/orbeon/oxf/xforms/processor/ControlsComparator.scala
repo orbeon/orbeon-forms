@@ -13,23 +13,24 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import cats.syntax.option._
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.RepeatSeparator
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{CrossPlatformSupport, Namespaces, rpc}
+import org.orbeon.xforms.{CrossPlatformSupport, rpc}
 import shapeless.syntax.typeable._
 
 import scala.collection.{immutable => i}
 import scala.util.control.Breaks
+
 
 class ControlsComparator(
   document                       : XFormsContainingDocument,
@@ -78,7 +79,7 @@ class ControlsComparator(
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "xxf:dynamic within full update is not supported")
 
-                def replay(r: XMLReceiver) =
+                def replay(r: XMLReceiver): Unit =
                   element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" -> c.getId))(r)
 
                 processFullUpdateForContent(c, None, replay)
@@ -175,7 +176,7 @@ class ControlsComparator(
 
           val mustOutputValueChange =
             vcc2.mustOutputAjaxValueChange(
-              previousValue   = valueChangeControlIdsAndValues.get(vcc2.effectiveId) orElse Some(vcc1.getExternalValue),
+              previousValue   = valueChangeControlIdsAndValues.get(vcc2.effectiveId) orElse Some(vcc1.getExternalValue()),
               previousControl = Some(vcc1)
             )
 
@@ -355,29 +356,13 @@ class ControlsComparator(
 
     val repeatIterationControlOpt = control.narrowTo[XFormsRepeatIterationControl]
 
-    def setupController: ElementHandlerController = {
+    def setupController: ElementHandlerController[HandlerContext] =
+      new ElementHandlerController[HandlerContext](
+        XHTMLOutput.fullUpdatePf.orElse(XHTMLOutput.bodyPf),
+        XHTMLOutput.defaultPf
+      )
 
-      implicit val controller = new ElementHandlerController
-
-      import XHTMLOutput.register
-
-      XHTMLBodyHandler.registerHandlers(controller, document)
-
-      // AVTs on HTML elements
-      if (XFormsProperties.isHostLanguageAVTs) {
-        register(classOf[XXFormsAttributeHandler], XXFORMS_NAMESPACE_URI, "attribute", any = true)
-        register(classOf[XHTMLElementHandler], XMLConstants.XHTML_NAMESPACE_URI)
-      }
-
-      // Swallow XForms elements that are unknown
-      register(classOf[NullHandler], XFORMS_NAMESPACE_URI)
-      register(classOf[NullHandler], XXFORMS_NAMESPACE_URI)
-      register(classOf[NullHandler], Namespaces.XBL)
-
-      controller
-    }
-
-    def setupOutputPipeline(controller: ElementHandlerController): Unit = {
+    def setupOutputPipeline(ehc: ElementHandlerController[HandlerContext]): Unit = {
       // Create the output SAX pipeline:
       //
       // - perform URL rewriting
@@ -399,7 +384,7 @@ class ControlsComparator(
       //
       val externalContext = CrossPlatformSupport.externalContext
 
-      controller.setOutput(
+      ehc.output =
         new DeferredXMLReceiverImpl(
           new XHTMLRewrite().getRewriteXMLReceiver(
             externalContext.getResponse,
@@ -407,10 +392,9 @@ class ControlsComparator(
             true
           )
         )
-      )
 
       // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
-      val handlerContext = new HandlerContext(controller, document, externalContext, control.effectiveId) {
+      val handlerContext = new HandlerContext(ehc, document, externalContext, control.effectiveId.some) {
         override def findXHTMLPrefix = ""
       }
 
@@ -424,7 +408,7 @@ class ControlsComparator(
         )
       }
 
-      controller.setElementHandlerContext(handlerContext)
+      ehc.handlerContext = handlerContext
     }
 
     withElement(
@@ -461,18 +445,18 @@ class ControlsComparator(
         uri    = XXFORMS_NAMESPACE_URI
       ) {
         // Setup everything and replay
-        val controller = setupController
-        setupOutputPipeline(controller)
+        val ehc = setupController
+        setupOutputPipeline(ehc)
 
-        controller.startDocument()
+        ehc.startDocument()
         repeatIterationControlOpt foreach { _ =>
-          controller.startElement("", "root", "root", SAXUtils.EMPTY_ATTRIBUTES)
+          ehc.startElement("", "root", "root", SAXUtils.EMPTY_ATTRIBUTES)
         }
-        replay(controller)
+        replay(ehc)
         repeatIterationControlOpt foreach { _ =>
-          controller.endElement("", "root", "root")
+          ehc.endElement("", "root", "root")
         }
-        controller.endDocument()
+        ehc.endDocument()
       }
 
       outputInitOrDestroy(control, isInit = true)

@@ -15,16 +15,14 @@ package org.orbeon.oxf.xml
 
 import org.xml.sax.Attributes
 
-import scala.xml.SAXException
 
 // Base class for all element handlers.
-abstract class ElementHandler(
+abstract class ElementHandler[HandlerContext](
   val uri            : String,
   val localname      : String,
   val qName          : String,
   val attributes     : Attributes,
-  val matched        : Any,
-  val handlerContext : Any
+  val handlerContext : HandlerContext
 ) {
 
   // Use of `attributes`:
@@ -42,11 +40,9 @@ abstract class ElementHandler(
   // `ElementAnalysis` In the future, we should not have to copy all the `Attributes` all the time.
 
   // Override this to detect that the element has started.
-  @throws[SAXException]
   def start(): Unit = ()
 
   // Override this to detect that the element has ended.
-  @throws[SAXException]
   def end(): Unit = ()
 
   // Whether the body of the handled element may be repeated.
@@ -57,16 +53,16 @@ abstract class ElementHandler(
 }
 
 // Handler that doesn't do anything besides letting its content be processed.
-final class TransparentHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
-  extends ElementHandler(uri, localname, qName, attributes, matched, handlerContext) {
+final class TransparentHandler[HandlerContext](uri: String, localname: String, qName: String, attributes: Attributes, handlerContext: HandlerContext)
+  extends ElementHandler[HandlerContext](uri, localname, qName, attributes, handlerContext) {
 
   def isRepeating  = false
   def isForwarding = true
 }
 
 // Handler that simply swallows its content and does nothing.
-class NullHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
-  extends ElementHandler(uri, localname, qName, attributes, matched, handlerContext) {
+final class NullHandler[HandlerContext](uri: String, localname: String, qName: String, attributes: Attributes, handlerContext: HandlerContext)
+  extends ElementHandler[HandlerContext](uri, localname, qName, attributes, handlerContext) {
 
   def isRepeating  = false
   def isForwarding = false

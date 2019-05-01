@@ -14,19 +14,35 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.controls.XXFormsTextControl
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.xml.sax.Attributes
 
-class XXFormsTextHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
-  extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
+
+// Only use within `xh:head/xh:title`
+class XXFormsTextHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  handlerContext : HandlerContext
+) extends
+  XFormsBaseHandlerXHTML(
+    uri,
+    localname,
+    qName,
+    attributes,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) {
 
   override def start(): Unit = {
-    val effectiveId    = xformsHandlerContext.getEffectiveId(attributes)
-    val textControl    = containingDocument.getControlByEffectiveId(effectiveId).asInstanceOf[XXFormsTextControl]
-    val contentHandler = xformsHandlerContext.getController.getOutput
+
+    val effectiveId = handlerContext.getEffectiveId(attributes)
+    val textControl = containingDocument.getControlByEffectiveId(effectiveId).asInstanceOf[XXFormsTextControl]
 
     val externalValue = textControl.getExternalValue()
-
-    if (externalValue != null && externalValue.length > 0)
-      contentHandler.characters(externalValue.toCharArray, 0, externalValue.length)
+    if ((externalValue ne null) && externalValue.nonEmpty)
+      handlerContext.controller.output.characters(externalValue.toCharArray, 0, externalValue.length)
   }
 }

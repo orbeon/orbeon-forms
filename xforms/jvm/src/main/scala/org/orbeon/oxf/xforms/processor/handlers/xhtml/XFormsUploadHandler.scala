@@ -18,11 +18,12 @@ import java.{lang => jl}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.UploadControl
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.ComponentSeparator
@@ -33,14 +34,23 @@ import org.xml.sax._
  * Handle xf:upload.
  */
 class XFormsUploadHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
-  with HandlerSupport {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    elementAnalysis,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) with HandlerSupport {
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     val uploadControl = control.asInstanceOf[XFormsUploadControl]
@@ -50,11 +60,11 @@ class XFormsUploadHandler(
 
   override protected def handleControlStart(): Unit = {
 
-    implicit val receiver   = xformsHandlerContext.getController.getOutput
+    implicit val receiver: XMLReceiver = handlerContext.controller.output
 
     val uploadControl       = Option(currentControl.asInstanceOf[XFormsUploadControl])
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, currentControl, addId = true)
-    val xhtmlPrefix         = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix         = handlerContext.findXHTMLPrefix
 
     // Enclosing xhtml:span
     withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
@@ -89,7 +99,7 @@ class XFormsUploadHandler(
         handleAriaByAtts(reusableAttributes)
 
         // `@multiple="multiple"`
-        if (staticControlOpt exists (_.asInstanceOf[UploadControl].multiple))
+        if (elementAnalysis.asInstanceOf[UploadControl].multiple)
           reusableAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
 
         element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
@@ -101,7 +111,7 @@ class XFormsUploadHandler(
       withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
 
         // Metadata
-        def outputSpan(name: String, value: XFormsUploadControl => Option[String]) = {
+        def outputSpan(name: String, value: XFormsUploadControl => Option[String]): Unit = {
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-" + name)
 
@@ -126,7 +136,7 @@ class XFormsUploadHandler(
     }
   }
 
-  override def getForEffectiveId(effectiveId: String) =
+  override def getForEffectiveId(effectiveId: String): String =
     XFormsUtils.namespaceId(
       containingDocument,
       XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")

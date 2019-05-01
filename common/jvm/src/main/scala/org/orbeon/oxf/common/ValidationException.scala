@@ -15,10 +15,10 @@ package org.orbeon.oxf.common
 
 import org.orbeon.oxf.xml.dom4j.LocationData
 
-class ValidationException(val message: String, val throwable: Throwable, locationData: LocationData)
-    extends OXFException((Option(locationData) map (_.toString + ": ") getOrElse "") + message, throwable) {
+class ValidationException(val message: String, val throwable: Throwable, locationDataOrNull: LocationData)
+    extends OXFException((Option(locationDataOrNull) map (_.toString + ": ") getOrElse "") + message, throwable) {
 
-  private var _allLocationData = Option(locationData).toList
+  private var _allLocationData = Option(locationDataOrNull).toList
 
   def this(message: String, locationData: LocationData) =
     this(message, null, locationData)
@@ -26,7 +26,7 @@ class ValidationException(val message: String, val throwable: Throwable, locatio
   def this(throwable: Throwable, locationData: LocationData) =
     this(throwable.getMessage, throwable, locationData)
 
-  def addLocationData(locationData: LocationData) =
+  def addLocationData(locationData: LocationData): Unit =
     _allLocationData ::= locationData ensuring (_ ne null)
 
   def allLocationData   = _allLocationData

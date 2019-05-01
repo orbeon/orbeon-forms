@@ -84,11 +84,11 @@ class Upload extends Control {
 
     lazy val ajaxResponseProcessed: js.Function = () ⇒ {
       scribe.debug("removing listener for ajaxResponseProcessed")
-        Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
-        // If progress indicator is still shown, this means some XForms reset the file name
-        // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
-        if ($(self.container).hasClass(StateClassPrefix + "progress"))
-          setState("empty") // switch back to the file selector, as we won't get a file name anymore
+      Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
+      // If progress indicator is still shown, this means some XForms reset the file name
+      // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
+      if ($(self.container).hasClass(StateClassPrefix + "progress"))
+        setState("empty") // switch back to the file selector, as we won't get a file name anymore
     }
 
     // After the file is uploaded, in general at the next Ajax response, we get the file name

@@ -3043,7 +3043,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             },
 
             /**
-             * Called whenever a component is initialized.
+             * Called whenever a component is initialized (legacy components only).
              *
              * @param component
              * @return {void}

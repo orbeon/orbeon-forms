@@ -113,5 +113,5 @@ object InternalHttpClient extends HttpClient {
     }
   }
 
-  override def shutdown() = ()
+  def shutdown(): Unit = ()
 }

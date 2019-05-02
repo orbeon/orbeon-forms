@@ -98,15 +98,15 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
     val requestMethod =
       method match {
-        case GET            ⇒ new HttpGet(uri)
-        case POST           ⇒ new HttpPost(uri)
-        case HEAD           ⇒ new HttpHead(uri)
-        case OPTIONS        ⇒ new HttpOptions(uri)
-        case PUT            ⇒ new HttpPut(uri)
-        case DELETE         ⇒ new HttpDelete(uri)
-        case TRACE          ⇒ new HttpTrace(uri)
-        case LOCK           ⇒ new HttpLock(uri)
-        case UNLOCK         ⇒ new HttpUnlock(uri)
+        case GET     ⇒ new HttpGet(uri)
+        case POST    ⇒ new HttpPost(uri)
+        case HEAD    ⇒ new HttpHead(uri)
+        case OPTIONS ⇒ new HttpOptions(uri)
+        case PUT     ⇒ new HttpPut(uri)
+        case DELETE  ⇒ new HttpDelete(uri)
+        case TRACE   ⇒ new HttpTrace(uri)
+        case LOCK    ⇒ new HttpLock(uri)
+        case UNLOCK  ⇒ new HttpUnlock(uri)
       }
 
     val skipAuthorizationHeader = credentials.isDefined
@@ -186,7 +186,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
   }
 
   def shutdown() = connectionManager.shutdown()
-  def usingProxy = proxyHost.isDefined
+  def usingProxy: Boolean = proxyHost.isDefined
 
   private object Private {
 
@@ -204,7 +204,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     }
 
     // The single ConnectionManager
-    val connectionManager = {
+    val connectionManager: PoolingClientConnectionManager = {
 
       // Create SSL context, based on a custom key store if specified
       val trustStore =

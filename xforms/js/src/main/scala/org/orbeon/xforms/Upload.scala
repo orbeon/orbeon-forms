@@ -69,6 +69,7 @@ class Upload extends Control {
   // This method is called when the server sends us a progress update for this upload control. If the upload was
   // interrupted we resume it and otherwise update the progress indicator to reflect the new value we got from the
   // server.
+  // This is called from JavaScript directly in AjaxServer.js.
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
       case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); scribe.debug("cancel")

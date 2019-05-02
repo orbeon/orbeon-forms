@@ -71,6 +71,10 @@ body.orbeon { background-color: @frBackground }
             .input-prepend .add-on {
             box-sizing: content-box; // Bootstrap 2 default (Liferay uses Bootstrap 3 which changes that)
         }
+
+        .navbar-inverse .navbar-inner {
+            width: 100%; // https://github.com/orbeon/orbeon-forms/issues/3959
+        }
     }
 
     .radio, .checkbox {

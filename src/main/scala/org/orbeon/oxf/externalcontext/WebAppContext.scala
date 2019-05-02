@@ -47,21 +47,26 @@ trait WebAppContext {
   def log(message: String)
 
   // Add webAppDestroyed listener
-  def addListener(listener: WebAppListener) =
+  def addListener(listener: WebAppListener): Unit =
     attributes.getOrElseUpdate(WebAppContext.WebAppListeners, new WebAppListeners)
       .asInstanceOf[WebAppListeners].addListener(listener)
 
   // Remove webAppDestroyed listener
-  def removeListener(listener: WebAppListener) =
-     webAppListenersOption foreach (_.removeListener(listener))
+  def removeListener(listener: WebAppListener): Unit =
+   webAppListenersOption foreach (_.removeListener(listener))
 
   // Call all webAppDestroyed listeners
-  def webAppDestroyed() = webAppListenersOption.toList flatMap (_.iterator) foreach {
-    // Run listener and ignore exceptions so we can continue running the remaining listeners
-    listener ⇒ try listener.webAppDestroyed() catch { case NonFatal(t) ⇒ log("Throwable caught when calling listener", t) }
-  }
+  def webAppDestroyed(): Unit =
+    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener ⇒
+      try {
+        listener.webAppDestroyed()
+      } catch {
+        case NonFatal(t) ⇒ log("Throwable caught when calling listener", t)
+      }
+    }
 
-  private def webAppListenersOption = attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
+  private def webAppListenersOption: Option[WebAppListeners] =
+    attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
 
   // Access to native context
   def getNativeContext: AnyRef
@@ -165,6 +170,7 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
  * Return the singleton WebAppContext for the current web app. When WebAppContext is created, also initialize Orbeon.
  */
 object WebAppContext {
+
   private val WebAppListeners = "oxf.webapp.listeners"
 
   def apply(servletContext: ServletContext): WebAppContext = new ServletWebAppContext(servletContext)

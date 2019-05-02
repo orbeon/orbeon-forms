@@ -41,7 +41,7 @@ trait ServletPortlet {
 
   // Web application context instance shared between all components of a web application
   private var _webAppContext: Option[WebAppContext] = None
-  def webAppContext = _webAppContext.get
+  def webAppContext: WebAppContext = _webAppContext.get
 
   // Initialize the servlet or portlet
   def init(webAppContext: WebAppContext, processor: Option[(String, String)]): Unit = {

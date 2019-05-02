@@ -224,13 +224,15 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
               wait(_pollingDelayMs)
             }
 
-            Logger.debug(s"closing expired connections if any")
+            if (_idleConnectionsDelayMs.isEmpty)
+              Logger.debug(s"closing expired connections if any")
+            else
+              Logger.debug(s"closing expired and idle connections if any")
+
             manager.closeExpiredConnections()
 
-            _idleConnectionsDelayMs foreach { delayMs ⇒
-              Logger.debug(s"closing idle connections if any")
-              manager.closeIdleConnections(delayMs, java.util.concurrent.TimeUnit.MILLISECONDS)
-            }
+            _idleConnectionsDelayMs foreach
+              (manager.closeIdleConnections(_, java.util.concurrent.TimeUnit.MILLISECONDS))
           }
         } catch {
           case _: InterruptedException ⇒

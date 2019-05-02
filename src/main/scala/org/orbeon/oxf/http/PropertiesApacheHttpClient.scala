@@ -13,37 +13,41 @@
  */
 package org.orbeon.oxf.http
 
-import org.orbeon.oxf.properties.Properties
-
 object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionSettings.apply)
 
 object PropertiesConnectionSettings {
 
   def apply: HttpClientSettings = {
 
+    import HttpClientSettings._
+    import org.orbeon.oxf.properties.Properties
+
+    import scala.concurrent.duration._
+
     val props = Properties.instance.getPropertySet
 
-    import HttpClientSettings._
-
     HttpClientSettings(
-      staleCheckingEnabled = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
-      soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
-      chunkRequests        = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
+      staleCheckingEnabled           = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
+      soTimeout                      = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
+      chunkRequests                  = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
 
-      proxyHost            = props.getNonBlankString(ProxyHostProperty),
-      proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
-      proxyExclude         = props.getNonBlankString(ProxyExcludeProperty),
+      proxyHost                      = props.getNonBlankString(ProxyHostProperty),
+      proxyPort                      = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
+      proxyExclude                   = props.getNonBlankString(ProxyExcludeProperty),
 
-      sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
-      sslKeystoreURI       = props.getStringOrURIAsStringOpt(SSLKeystoreURIProperty, allowEmpty = false),
-      sslKeystorePassword  = props.getNonBlankString(SSLKeystorePasswordProperty),
-      sslKeystoreType      = props.getNonBlankString(SSLKeystoreTypeProperty),
+      sslHostnameVerifier            = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
+      sslKeystoreURI                 = props.getStringOrURIAsStringOpt(SSLKeystoreURIProperty, allowEmpty = false),
+      sslKeystorePassword            = props.getNonBlankString(SSLKeystorePasswordProperty),
+      sslKeystoreType                = props.getNonBlankString(SSLKeystoreTypeProperty),
 
-      proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
-      proxyUsername        = props.getNonBlankString(ProxyUsernameProperty),
-      proxyPassword        = props.getNonBlankString(ProxyPasswordProperty),
-      proxyNTLMHost        = props.getNonBlankString(ProxyNTLMHostProperty),
-      proxyNTLMDomain      = props.getNonBlankString(ProxyNTLMDomainProperty)
+      proxySSL                       = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
+      proxyUsername                  = props.getNonBlankString(ProxyUsernameProperty),
+      proxyPassword                  = props.getNonBlankString(ProxyPasswordProperty),
+      proxyNTLMHost                  = props.getNonBlankString(ProxyNTLMHostProperty),
+      proxyNTLMDomain                = props.getNonBlankString(ProxyNTLMDomainProperty),
+
+      expiredConnectionsPollingDelay = Option(props.getInteger(ExpiredConnectionsPollingDelayProperty)) map (_.intValue.milliseconds),
+      idleConnectionsDelay           = Option(props.getInteger(IdleConnectionsDelayProperty))           map (_.intValue.milliseconds)
     )
   }
 }

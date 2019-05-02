@@ -80,6 +80,14 @@
             <param-name>oxf.http.proxy.ntlm.domain</param-name>
             <param-value/>
         </init-param>
+        <init-param>
+            <param-name>oxf.http.expired-connections-polling-delay</param-name>
+            <param-value>5000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.idle-connections-delay</param-name>
+            <param-value>30000</param-value>
+        </init-param>
     </filter>
     <!-- Any JSP resource is processed by the filter -->
     <filter-mapping>

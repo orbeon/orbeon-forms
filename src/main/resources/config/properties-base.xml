@@ -53,6 +53,9 @@
     <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.domain"                      value=""/>-->
     <!--<property as="xs:string"  name="oxf.http.proxy.exclude"                          value=""/>-->
 
+    <property as="xs:integer" name="oxf.http.expired-connections-polling-delay"      value="5000"/>
+    <property as="xs:integer" name="oxf.http.idle-connections-delay"                 value="30000"/>
+
     <!-- HTTP response -->
     <property as="xs:boolean" name="oxf.http.exceptions"                             value="false"/>
 

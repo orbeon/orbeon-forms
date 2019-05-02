@@ -14,9 +14,8 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet._
-
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext}
+import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext, WebAppListener}
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -72,6 +71,10 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
       val webAppContext = WebAppContext(getPortletContext)
       Version.instance.requirePEFeature("Orbeon Forms portlet")
       init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
+
+      webAppContext.addListener(new WebAppListener {
+        def webAppDestroyed(): Unit = PropertiesApacheHttpClient.shutdown()
+      })
     }
 
   // Portlet destroy

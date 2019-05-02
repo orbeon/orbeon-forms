@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.{immutable ⇒ i}
+import scala.concurrent.duration._
 
 trait Content {
   def inputStream   : InputStream
@@ -90,24 +91,27 @@ case class Redirect(
 }
 
 case class HttpClientSettings(
-  staleCheckingEnabled : Boolean,
-  soTimeout            : Int,
-  chunkRequests        : Boolean,
+  staleCheckingEnabled           : Boolean,
+  soTimeout                      : Int,
+  chunkRequests                  : Boolean,
 
-  proxyHost            : Option[String],
-  proxyPort            : Option[Int],
-  proxyExclude         : Option[String],
+  proxyHost                      : Option[String],
+  proxyPort                      : Option[Int],
+  proxyExclude                   : Option[String],
 
-  sslHostnameVerifier  : String,
-  sslKeystoreURI       : Option[String],
-  sslKeystorePassword  : Option[String],
-  sslKeystoreType      : Option[String],
+  sslHostnameVerifier            : String,
+  sslKeystoreURI                 : Option[String],
+  sslKeystorePassword            : Option[String],
+  sslKeystoreType                : Option[String],
 
-  proxySSL             : Boolean,
-  proxyUsername        : Option[String],
-  proxyPassword        : Option[String],
-  proxyNTLMHost        : Option[String],
-  proxyNTLMDomain      : Option[String]
+  proxySSL                       : Boolean,
+  proxyUsername                  : Option[String],
+  proxyPassword                  : Option[String],
+  proxyNTLMHost                  : Option[String],
+  proxyNTLMDomain                : Option[String],
+
+  expiredConnectionsPollingDelay : Option[FiniteDuration],
+  idleConnectionsDelay           : Option[FiniteDuration]
 )
 
 object HttpClientSettings {
@@ -120,6 +124,9 @@ object HttpClientSettings {
     def intParam(name: String) =
       param(name).trimAllToOpt map (_.toInt)
 
+    def longParam(name: String) =
+      param(name).trimAllToOpt map (_.toLong)
+
     def intParamWithDefault(name: String, default: Int) =
       intParam(name) getOrElse default
 
@@ -130,48 +137,54 @@ object HttpClientSettings {
       stringParam(name) getOrElse default
 
     HttpClientSettings(
-      staleCheckingEnabled = booleanParamWithDefault(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
-      soTimeout            = intParamWithDefault(SOTimeoutProperty, SOTimeoutPropertyDefault),
-      chunkRequests        = booleanParamWithDefault(ChunkRequestsProperty, ChunkRequestsDefault),
+      staleCheckingEnabled           = booleanParamWithDefault(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
+      soTimeout                      = intParamWithDefault(SOTimeoutProperty, SOTimeoutPropertyDefault),
+      chunkRequests                  = booleanParamWithDefault(ChunkRequestsProperty, ChunkRequestsDefault),
 
-      proxyHost            = stringParam(ProxyHostProperty),
-      proxyPort            = intParam(ProxyPortProperty),
-      proxyExclude         = stringParam(ProxyExcludeProperty),
+      proxyHost                      = stringParam(ProxyHostProperty),
+      proxyPort                      = intParam(ProxyPortProperty),
+      proxyExclude                   = stringParam(ProxyExcludeProperty),
 
-      sslHostnameVerifier  = stringParamWithDefault(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
-      sslKeystoreURI       = stringParam(SSLKeystoreURIProperty),
-      sslKeystorePassword  = stringParam(SSLKeystorePasswordProperty),
-      sslKeystoreType      = stringParam(SSLKeystoreTypeProperty),
+      sslHostnameVerifier            = stringParamWithDefault(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
+      sslKeystoreURI                 = stringParam(SSLKeystoreURIProperty),
+      sslKeystorePassword            = stringParam(SSLKeystorePasswordProperty),
+      sslKeystoreType                = stringParam(SSLKeystoreTypeProperty),
 
-      proxySSL             = booleanParamWithDefault(ProxySSLProperty, ProxySSLPropertyDefault),
-      proxyUsername        = stringParam(ProxyUsernameProperty),
-      proxyPassword        = stringParam(ProxyPasswordProperty),
-      proxyNTLMHost        = stringParam(ProxyNTLMHostProperty),
-      proxyNTLMDomain      = stringParam(ProxyNTLMDomainProperty)
+      proxySSL                       = booleanParamWithDefault(ProxySSLProperty, ProxySSLPropertyDefault),
+      proxyUsername                  = stringParam(ProxyUsernameProperty),
+      proxyPassword                  = stringParam(ProxyPasswordProperty),
+      proxyNTLMHost                  = stringParam(ProxyNTLMHostProperty),
+      proxyNTLMDomain                = stringParam(ProxyNTLMDomainProperty),
+
+      expiredConnectionsPollingDelay = longParam(ExpiredConnectionsPollingDelayProperty) map (_.milliseconds),
+      idleConnectionsDelay           = longParam(IdleConnectionsDelayProperty)           map (_.milliseconds)
     )
   }
 
-  val StaleCheckingEnabledProperty = "oxf.http.stale-checking-enabled"
-  val SOTimeoutProperty            = "oxf.http.so-timeout"
-  val ChunkRequestsProperty        = "oxf.http.chunk-requests"
-  val ProxyHostProperty            = "oxf.http.proxy.host"
-  val ProxyPortProperty            = "oxf.http.proxy.port"
-  val ProxyExcludeProperty         = "oxf.http.proxy.exclude"
-  val SSLHostnameVerifierProperty  = "oxf.http.ssl.hostname-verifier"
-  val SSLKeystoreURIProperty       = "oxf.http.ssl.keystore.uri"
-  val SSLKeystorePasswordProperty  = "oxf.http.ssl.keystore.password"
-  val SSLKeystoreTypeProperty      = "oxf.http.ssl.keystore.type"
-  val ProxySSLProperty             = "oxf.http.proxy.use-ssl"
-  val ProxyUsernameProperty        = "oxf.http.proxy.username"
-  val ProxyPasswordProperty        = "oxf.http.proxy.password"
-  val ProxyNTLMHostProperty        = "oxf.http.proxy.ntlm.host"
-  val ProxyNTLMDomainProperty      = "oxf.http.proxy.ntlm.domain"
+  val StaleCheckingEnabledProperty                  = "oxf.http.stale-checking-enabled"
+  val SOTimeoutProperty                             = "oxf.http.so-timeout"
+  val ChunkRequestsProperty                         = "oxf.http.chunk-requests"
+  val ProxyHostProperty                             = "oxf.http.proxy.host"
+  val ProxyPortProperty                             = "oxf.http.proxy.port"
+  val ProxyExcludeProperty                          = "oxf.http.proxy.exclude"
+  val SSLHostnameVerifierProperty                   = "oxf.http.ssl.hostname-verifier"
+  val SSLKeystoreURIProperty                        = "oxf.http.ssl.keystore.uri"
+  val SSLKeystorePasswordProperty                   = "oxf.http.ssl.keystore.password"
+  val SSLKeystoreTypeProperty                       = "oxf.http.ssl.keystore.type"
+  val ProxySSLProperty                              = "oxf.http.proxy.use-ssl"
+  val ProxyUsernameProperty                         = "oxf.http.proxy.username"
+  val ProxyPasswordProperty                         = "oxf.http.proxy.password"
+  val ProxyNTLMHostProperty                         = "oxf.http.proxy.ntlm.host"
+  val ProxyNTLMDomainProperty                       = "oxf.http.proxy.ntlm.domain"
+  val ExpiredConnectionsPollingDelayProperty        = "oxf.http.expired-connections-polling-delay"
+  val IdleConnectionsDelayProperty                  = "oxf.http.idle-connections-delay"
 
-  val StaleCheckingEnabledDefault  = true
-  val SOTimeoutPropertyDefault     = 0
-  val ChunkRequestsDefault         = false
-  val ProxySSLPropertyDefault      = false
-  val SSLHostnameVerifierDefault   = "strict"
+  val StaleCheckingEnabledDefault                   = true
+  val SOTimeoutPropertyDefault                      = 0
+  val ChunkRequestsDefault                          = false
+  val ProxySSLPropertyDefault                       = false
+  val SSLHostnameVerifierDefault                    = "strict"
+  val expiredConnectionsPollingDelayPropertyDefault = 5000
 }
 
 case class Credentials(username: String, password: Option[String], preemptiveAuth: Boolean, domain: Option[String]) {

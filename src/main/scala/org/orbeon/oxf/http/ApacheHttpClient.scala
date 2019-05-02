@@ -16,14 +16,15 @@ package org.orbeon.oxf.http
 import java.io.IOException
 import java.net.{CookieStore ⇒ _, _}
 import java.security.KeyStore
-import javax.net.ssl.SSLContext
 
+import javax.net.ssl.SSLContext
 import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
 import org.apache.http.auth._
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
 import org.apache.http.client.{CookieStore, CredentialsProvider}
+import org.apache.http.conn.ClientConnectionManager
 import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
 import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
 import org.apache.http.conn.ssl.SSLSocketFactory
@@ -39,6 +40,7 @@ import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
+import org.slf4j.LoggerFactory
 
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
@@ -185,10 +187,65 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     }
   }
 
-  def shutdown() = connectionManager.shutdown()
+  def shutdown(): Unit = {
+    idleConnectionMonitorThread foreach (_.shutdown())
+    connectionManager.shutdown()
+  }
+
   def usingProxy: Boolean = proxyHost.isDefined
 
   private object Private {
+
+    val Logger = LoggerFactory.getLogger(List("org", "orbeon", "http") mkString ".") // so JARJAR doesn't touch this!
+
+    import scala.concurrent.duration._
+
+    class IdleConnectionMonitorThread(
+      manager              : ClientConnectionManager,
+      pollingDelay         : FiniteDuration,        // for example  5.seconds
+      idleConnectionsDelay : Option[FiniteDuration] // for example 30.seconds
+    ) extends Thread("Orbeon HTTP connection monitor") {
+
+      thread ⇒
+
+      private var _mustShutdown = false
+
+      private val _pollingDelayMs         = pollingDelay.toMillis
+      private val _idleConnectionsDelayMs = idleConnectionsDelay map (_.toMillis)
+
+      override def run(): Unit = {
+
+        Logger.info(s"starting ${thread.getName} thread")
+
+        try {
+          while (! _mustShutdown) {
+
+            thread.synchronized {
+              wait(_pollingDelayMs)
+            }
+
+            Logger.debug(s"closing expired connections if any")
+            manager.closeExpiredConnections()
+
+            _idleConnectionsDelayMs foreach { delayMs ⇒
+              Logger.debug(s"closing idle connections if any")
+              manager.closeIdleConnections(delayMs, java.util.concurrent.TimeUnit.MILLISECONDS)
+            }
+          }
+        } catch {
+          case _: InterruptedException ⇒
+        }
+
+        Logger.info(s"stopping ${thread.getName} thread")
+      }
+
+      def shutdown(): Unit = {
+        _mustShutdown = true
+        thread.synchronized {
+          notifyAll()
+        }
+      }
+    }
 
     // BasicHttpParams is not thread-safe per the doc
     def newHttpParams =
@@ -309,6 +366,15 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
           }
       }
     }
+
+    val idleConnectionMonitorThread: Option[IdleConnectionMonitorThread] =
+      settings.expiredConnectionsPollingDelay map { expiredConnectionsPollingDelay ⇒
+        new IdleConnectionMonitorThread(
+          manager              = connectionManager,
+          pollingDelay         = expiredConnectionsPollingDelay,
+          idleConnectionsDelay = settings.idleConnectionsDelay
+        ) |!> (_.start())
+      }
 
     // The Apache folks are afraid we misuse preemptive authentication, and so force us to copy paste some code
     // rather than providing a simple configuration flag. See:

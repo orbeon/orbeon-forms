@@ -127,12 +127,13 @@
 
                         <xf:var name="can-add" value="empty($max) or count($repeat-sequence) lt $max"/>
 
+                        <!-- Insert code duplicated, see https://github.com/orbeon/orbeon-forms/issues/4018 -->
                         <xf:action event="DOMActivate" observer="fr-repeater-add fr-repeater-add-bottom">
                             <xsl:choose>
                                 <xsl:when test="$insert = 'index'">
                                     <xf:var
                                         name="p"
-                                        value="max(($repeat-index, $freeze))"/>
+                                        value="if (empty($repeat-sequence)) then 0 else max(($repeat-index, $freeze))"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xf:var
@@ -140,9 +141,30 @@
                                         value="count($repeat-sequence)"/>
                                 </xsl:otherwise>
                             </xsl:choose>
-                            <xf:dispatch name="fr-insert-below" targetid="fr-repeater-binding">
-                                <xf:property name="row" value="$p"/>
+
+                            <!-- Make sure we have stable references -->
+                            <xf:var name="context"  value="$repeat-context"/>
+                            <xf:var name="items"    value="$repeat-sequence"/>
+
+                            <xf:insert
+                                context="$context"
+                                ref="$items[$p]"
+                                origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                position="after"
+                                xxf:defaults="{$apply-defaults}"/>
+
+                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                            <xf:setfocus
+                                control="repeat-group"
+                                xxf:repeat-indexes="{{$p + 1}}"
+                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+
+                            <!-- Let the outside world know -->
+                            <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added">
+                                <xf:property name="index" value="$p + 1"/>
                             </xf:dispatch>
+
                         </xf:action>
 
                         <xf:action event="DOMActivate" observer="fr-repeater-remove-bottom">

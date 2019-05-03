@@ -251,6 +251,7 @@ class PropertySet {
   def getString(name: String, default: String): String =
     getNonBlankString(name) getOrElse default
 
+  // 2019-05-03: 2 Java callers
   def getNmtokens(name: String): ju.Set[String] =
     getPropertyValueOrNull(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
 
@@ -278,15 +279,13 @@ class PropertySet {
   def getQName(name: String, default: QName): QName =
     Option(getQName(name)) getOrElse default
 
+  // 2019-05-03: 1 Java caller
   def getURI(name: String): URI =
     getPropertyValueOrNull(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]
 
-  def getNonNegativeInteger(nm: String): jl.Integer =
-    getPropertyValueOrNull(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME).asInstanceOf[jl.Integer]
-
-  def getNCName(nm: String): String =
-    getPropertyValueOrNull(nm, XMLConstants.XS_NCNAME_QNAME).asInstanceOf[String]
-
-  def getNMTOKEN(nm: String): String =
-    getPropertyValueOrNull(nm, XMLConstants.XS_NMTOKEN_QNAME).asInstanceOf[String]
+  def getIntOpt     (name: String): Option[Int]     = Option(getInteger(name)) map (_.intValue)
+  def getBooleanOpt (name: String): Option[Boolean] = Option(getBoolean(name)) map (_.booleanValue)
+  def getDateOpt    (name: String): Option[ju.Date] = Option(getDate(name))
+  def getDateTimeOpt(name: String): Option[ju.Date] = Option(getDateTime(name))
+  def getQNameOpt   (name: String): Option[QName]   = Option(getQName(name))
 }

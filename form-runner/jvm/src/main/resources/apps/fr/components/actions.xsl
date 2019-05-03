@@ -398,7 +398,16 @@
         <xsl:variable name="left-name"  select="@left"/>
         <xsl:variable name="right-name" select="@right"/>
 
-        <xsl:variable name="apply-defaults" select="true()"/>
+        <xsl:variable
+            name="right-control"
+            select="frf:findControlByName(., $right-name)"/>
+
+
+        <!-- Pick `apply-defaults` from the destination control.
+             https://github.com/orbeon/orbeon-forms/issues/4038 -->
+        <xsl:variable
+            name="apply-defaults"
+            select="$right-control/@apply-defaults = 'true'"/>
 
         <!-- Initial status -->
         <xf:action event="xforms-model-construct-done">

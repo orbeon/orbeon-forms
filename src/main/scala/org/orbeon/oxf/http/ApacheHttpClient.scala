@@ -319,7 +319,6 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
           new SSLSocketFactory(SSLContext.getInstance("Default"), hostnameVerifier)
       }
 
-
       schemeRegistry.register(new Scheme("https", 443, sslSocketFactory))
 
       // Pooling connection manager with limits removed
@@ -327,7 +326,6 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         (_.setMaxTotal(Integer.MAX_VALUE))               |!>
         (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))
     }
-
 
     val (proxyHost, proxyExclude, proxyCredentials) = {
       // Set proxy if defined in properties

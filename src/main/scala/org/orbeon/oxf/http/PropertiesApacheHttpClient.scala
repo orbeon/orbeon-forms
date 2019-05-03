@@ -32,7 +32,7 @@ object PropertiesConnectionSettings {
       chunkRequests                  = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
 
       proxyHost                      = props.getNonBlankString(ProxyHostProperty),
-      proxyPort                      = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
+      proxyPort                      = props.getIntOpt(ProxyPortProperty),
       proxyExclude                   = props.getNonBlankString(ProxyExcludeProperty),
 
       sslHostnameVerifier            = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
@@ -46,8 +46,8 @@ object PropertiesConnectionSettings {
       proxyNTLMHost                  = props.getNonBlankString(ProxyNTLMHostProperty),
       proxyNTLMDomain                = props.getNonBlankString(ProxyNTLMDomainProperty),
 
-      expiredConnectionsPollingDelay = Option(props.getInteger(ExpiredConnectionsPollingDelayProperty)) map (_.intValue.milliseconds),
-      idleConnectionsDelay           = Option(props.getInteger(IdleConnectionsDelayProperty))           map (_.intValue.milliseconds)
+      expiredConnectionsPollingDelay = props.getIntOpt(ExpiredConnectionsPollingDelayProperty) filter (_ > 0) map (_.intValue.milliseconds),
+      idleConnectionsDelay           = props.getIntOpt(IdleConnectionsDelayProperty)           filter (_ > 0) map (_.intValue.milliseconds)
     )
   }
 }

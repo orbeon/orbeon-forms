@@ -156,8 +156,8 @@ object HttpClientSettings {
       proxyNTLMHost                  = stringParam(ProxyNTLMHostProperty),
       proxyNTLMDomain                = stringParam(ProxyNTLMDomainProperty),
 
-      expiredConnectionsPollingDelay = longParam(ExpiredConnectionsPollingDelayProperty) map (_.milliseconds),
-      idleConnectionsDelay           = longParam(IdleConnectionsDelayProperty)           map (_.milliseconds)
+      expiredConnectionsPollingDelay = longParam(ExpiredConnectionsPollingDelayProperty) filter (_ > 0) map (_.milliseconds),
+      idleConnectionsDelay           = longParam(IdleConnectionsDelayProperty)           filter (_ > 0) map (_.milliseconds)
     )
   }
 

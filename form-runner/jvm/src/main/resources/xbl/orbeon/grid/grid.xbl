@@ -250,7 +250,7 @@
                                     <xsl:when test="$insert = 'index'">
                                         <xf:var
                                             name="p"
-                                            value="max(($repeat-index, $freeze))"/>
+                                            value="if (empty($repeat-sequence)) then 0 else max(($repeat-index, $freeze))"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xf:var

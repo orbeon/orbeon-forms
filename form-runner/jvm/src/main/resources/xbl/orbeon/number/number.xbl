@@ -252,6 +252,8 @@
                                     ()
                                 else if ($has-optional and $v = '&#2262;') then
                                     ''
+                                else if (not($has-optional) and $v = '') then
+                                    ()
                                 else
                                     $v
                         "/>

@@ -61,11 +61,24 @@
                 <!--xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
             <!-- So all this is duplicated from `fr:number` for now. -->
             <control-details>
-                <xf:model xmlns="" id="fb-editor-currency-model">
+                <xf:model xmlns="" id="fb-editor-number-model">
 
-                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
                         <xf:var name="c" value="."/>
                         <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                        </xf:action>
+                        <!-- Special value to indicate that the default must be used -->
+                        <xf:setvalue
+                            ref="instance('local')/grouping-separator"
+                            value="
+                                if (empty(instance()/@grouping-separator)) then
+                                    '&#2261;'
+                                else if (instance()/@grouping-separator = '') then
+                                    '&#2262;'
+                                else
+                                    .
+                        "/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
@@ -84,7 +97,8 @@
                     <xf:bind ref="instance('local')">
                         <xf:bind ref="prefix | suffix | digits-after-decimal" xxf:whitespace="trim"/>
                         <xf:bind ref="digits-after-decimal" type="xf:integer" constraint="xxf:is-blank() or xxf:non-negative()"/>
-                        <xf:bind ref="decimal-separator | grouping-separator" constraint="xxf:max-length(1)"/>
+                        <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)"/>
+                        <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -102,6 +116,11 @@
                                     <item id="1">Always</item>
                                     <item id="2">Never</item>
                                 </default-always-never>
+                                <grouping-separators>
+                                    <item id="0">Use default</item>
+                                    <item id="1">No separator</item>
+                                    <item id="3">Single space</item>
+                                </grouping-separators>
                             </resource>
                             <resource xml:lang="fr">
                                 <prefix>Préfixe</prefix>
@@ -112,15 +131,20 @@
                                 <round-when-formatting>Arrondir au formattage</round-when-formatting>
                                 <round-when-storing>Arrondir au stockage</round-when-storing>
                                 <default-always-never>
-                                    <item id="0">Utiliser la défaut</item>
+                                    <item id="0">Utiliser le défaut</item>
                                     <item id="1">Toujours</item>
                                     <item id="2">Jamais</item>
                                 </default-always-never>
+                                <grouping-separators>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Aucun</item>
+                                    <item id="3">Un seul espace</item>
+                                </grouping-separators>
                             </resource>
                         </resources>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="" id="fb-editor-currency-grid">
+                <fr:grid xmlns="" id="fb-editor-number-grid">
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="instance('local')/prefix" id="prefix-control">
@@ -134,6 +158,16 @@
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
+                        <xh:td colspan="2" rowspan="5">
+                            <fr:open-select1 ref="instance('local')/grouping-separator"  id="grouping-separator-control">
+                                <xf:label ref="xxf:r('grouping-separator')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '&#2261;' else if (@id = 1) then '&#2262;' else ' '"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
@@ -145,12 +179,6 @@
                         <xh:td colspan="2">
                             <xf:input ref="instance('local')/decimal-separator"  id="decimal-separator-control">
                                 <xf:label ref="xxf:r('decimal-separator')"/>
-                                <xf:alert/>
-                            </xf:input>
-                        </xh:td>
-                        <xh:td colspan="2">
-                            <xf:input ref="instance('local')/grouping-separator"  id="grouping-separator-control">
-                                <xf:label ref="xxf:r('grouping-separator')"/>
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
@@ -183,6 +211,7 @@
                         <xh:td colspan="6">
                             <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
                                 <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:alert/>
                                 <xf:item>
                                     <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
                                     <xf:value/>
@@ -200,7 +229,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
-                    id="fb-editor-currency-action"
+                    id="fb-editor-number-action"
                     event="xforms-value-changed"
                     observer="
                         prefix-control
@@ -213,13 +242,30 @@
                         field-width-control">
 
                     <xf:var name="name"      value="name(event('xxf:binding'))"/>
-                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+
+                    <!-- Special value to indicate that the default must be used -->
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $v            := string(event('xxf:binding')),
+                                $has-optional := event('xxf:targetid') = 'grouping-separator-control'
+                            return
+                                if ($has-optional and $v = '&#2261;') then
+                                    ()
+                                else if ($has-optional and $v = '&#2262;') then
+                                    ''
+                                else if (not($has-optional) and $v = '') then
+                                    ()
+                                else
+                                    $v
+                        "/>
+
                     <xf:insert
                         context="instance()"
-                        if="xxf:non-blank($new-value)"
+                        if="exists($new-value)"
                         origin="xf:attribute($name, $new-value)"/>
                     <xf:delete
-                        if="xxf:is-blank($new-value)"
+                        if="empty($new-value)"
                         ref="instance()/@*[name() = $name]"/>
                 </xf:action>
             </control-details>

@@ -76,8 +76,8 @@ object InitUtils {
     var success = false
     try {
       // Set cache size
-      val cacheMaxSize = Properties.instance.getPropertySet.getInteger(CacheSizeProperty)
-      if (cacheMaxSize ne null) ObjectCache.instance.setMaxSize(cacheMaxSize)
+      Properties.instance.getPropertySet.getIntOpt(CacheSizeProperty) foreach
+        ObjectCache.instance.setMaxSize
 
       // Start execution
       processor.reset(pipelineContext)

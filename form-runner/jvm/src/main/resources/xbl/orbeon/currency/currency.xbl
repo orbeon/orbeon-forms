@@ -182,6 +182,18 @@
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
+                        <xh:td colspan="2" rowspan="5">
+                            <fr:open-select1 ref="instance('local')/grouping-separator"  id="grouping-separator-control">
+                                <xf:label ref="xxf:r('grouping-separator')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '&#2261;' else if (@id = 1) then '&#2262;' else ' '"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
                         <xh:td colspan="2">
                             <fr:number ref="instance('local')/digits-after-decimal" id="digits-after-decimal-control">
                                 <xf:label ref="xxf:r('digits-after-decimal')"/>
@@ -199,29 +211,6 @@
                                     <xf:value ref="
                                         if (@id = 0) then
                                             '&#2261;'
-                                        else if (@id = 4) then
-                                            ','
-                                        else
-                                            '.'
-                                    "/>
-                                </xf:itemset>
-                            </fr:open-select1>
-                        </xh:td>
-                        <xh:td colspan="3">
-                            <fr:open-select1 ref="instance('local')/grouping-separator" id="grouping-separator-control" appearance="minimal">
-                                <xf:label ref="xxf:r('grouping-separator')"/>
-                                <xf:alert/>
-                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
-                                    <xf:label ref="."/>
-                                    <xf:value ref="
-                                        if (@id = 0) then
-                                            '&#2261;'
-                                        else if (@id = 1) then
-                                            '&#2262;'
-                                        else if (@id = 2) then
-                                            ' '
-                                        else if (@id = 3) then
-                                            ''''
                                         else if (@id = 4) then
                                             ','
                                         else

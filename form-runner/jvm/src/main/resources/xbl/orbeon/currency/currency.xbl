@@ -297,7 +297,7 @@
                         value="
                             let $v            := string(event('xxf:binding')),
                                 $has-encoding := event('xxf:targetid') = ('grouping-separator-control', 'decimal-separator-control'),
-                                $has-optional := event('xxf:targetid') = 'grouping-separator-control')
+                                $has-optional := event('xxf:targetid') = 'grouping-separator-control'
                             return
                                 if ($has-encoding and $v = '&#2261;') then
                                     ()

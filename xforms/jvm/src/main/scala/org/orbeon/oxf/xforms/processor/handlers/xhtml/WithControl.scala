@@ -25,6 +25,7 @@ trait WithControl extends XFormsBaseHandlerXHTML {
   final def staticControlOpt: Option[ElementAnalysis] =
     getXFormsHandlerContext.getPartAnalysis.findControlAnalysis(getPrefixedId)
 
+  // See https://github.com/orbeon/orbeon-forms/issues/4046
   final lazy val currentControl: XFormsControl =
     getContainingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 

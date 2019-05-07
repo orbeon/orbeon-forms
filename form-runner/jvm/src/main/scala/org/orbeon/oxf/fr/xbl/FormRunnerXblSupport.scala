@@ -40,9 +40,9 @@ object FormRunnerXblSupport extends XBLSupport {
 
     def fromMetadataAndProperties(paramName: QName) =
       FRComponentParam.fromMetadataAndProperties(
-        constantMetadataRootElemOpt = FRComponentParam.findConstantMetadataRootElem(partAnalysis),
-        directNameOpt               = directNameOpt,
-        paramName                   = paramName
+        partAnalysis  = partAnalysis,
+        directNameOpt = directNameOpt,
+        paramName     = paramName
       ) map
         (_.getStringValue)
 
@@ -60,14 +60,10 @@ object FormRunnerXblSupport extends XBLSupport {
       }
 
     def isDesignTime =
-      partAnalysis.parent.isDefined && (
-        partAnalysis.ancestorIterator.lastOption() exists { topLevelPart ⇒
-          FRComponentParam.appFormFromMetadata(
-            FRComponentParam.findConstantMetadataRootElem(topLevelPart)
-          ) contains
-            FormBuilderAppName
-        }
-      )
+      partAnalysis.ancestorIterator.lastOption()      flatMap
+        FRComponentParam.findConstantMetadataRootElem flatMap
+        FRComponentParam.appFormFromMetadata          contains
+        FormBuilderAppName
 
     def keepIfDesignTime =
       elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {

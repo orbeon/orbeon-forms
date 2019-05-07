@@ -25,7 +25,7 @@ trait WithControl extends XFormsBaseHandlerXHTML {
   final def staticControlOpt: Option[ElementAnalysis] =
     getXFormsHandlerContext.getPartAnalysis.findControlAnalysis(getPrefixedId)
 
-  final val currentControl: XFormsControl =
+  final lazy val currentControl: XFormsControl =
     getContainingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =

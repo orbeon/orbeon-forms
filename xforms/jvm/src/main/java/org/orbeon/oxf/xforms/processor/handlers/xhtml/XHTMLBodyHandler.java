@@ -283,7 +283,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", ANY_MATCHER);
 
         // xf:group
-        controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+        controller.registerHandler(TransparentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
 
         controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", new Matcher() {
@@ -319,7 +319,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // xf:repeat
         controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", ANY_MATCHER);
-        controller.registerHandler(NullElementHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
+        controller.registerHandler(TransparentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
 
         // xf:secret
         controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", ANY_MATCHER);
@@ -335,9 +335,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
 
         // xf:select and xf:select1
-        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select",
+        controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
-        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1",
+        controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
         controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select", ANY_MATCHER);
         controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", ANY_MATCHER);

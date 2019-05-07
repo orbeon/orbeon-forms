@@ -185,14 +185,15 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
       currentHandlerInfoOpt flatMap (_.saxStore) foreach (_.replay(new XMLReceiverAdapter {
 
         override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-          result =
-            Some(
-              findHandler(uri, localname, qName, attributes) match {
-                case Some(handlerInfo) ⇒ Left(handlerInfo.elementHandler)
-                case None              ⇒ Right(new StructuredQName(XMLUtils.prefixFromQName(qName), uri, localname))
-              }
-            )
-          break()
+          findHandler(uri, localname, qName, attributes)  map (_.elementHandler) match {
+            case Some(_: NullHandler | _: TransparentHandler) ⇒
+            case Some(elementHandler) ⇒
+              result = Some(Left(elementHandler))
+              break()
+            case None ⇒
+              result = Some(Right(new StructuredQName(XMLUtils.prefixFromQName(qName), uri, localname)))
+              break()
+          }
         }
       }))
     }

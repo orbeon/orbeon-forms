@@ -42,8 +42,8 @@ abstract class ElementHandler(
   def isForwarding: Boolean
 }
 
-// NOTE: This is probably un uninformative name. See also `NullHandler`.
-final class NullElementHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
+// Handler that doesn't do anything besides letting its content be processed.
+final class TransparentHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
   extends ElementHandler(uri, localname, qName, attributes, matched, handlerContext) {
 
   def isRepeating  = false

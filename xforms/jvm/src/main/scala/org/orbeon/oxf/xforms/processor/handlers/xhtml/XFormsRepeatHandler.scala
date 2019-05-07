@@ -201,7 +201,15 @@ class XFormsRepeatHandler(
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
 
-        case Some(Right(structuredQName)) ⇒
+        case Some(Left(handler: XHTMLElementHandler)) ⇒
+
+          outputBeginEndDelimiters(
+            localName = handler.localname,
+            prefix    = xformsHandlerContext.findXHTMLPrefix,
+            uri       = XMLConstants.XHTML_NAMESPACE_URI
+          )
+
+        case Some(Right(structuredQName)) ⇒ // no handler for the element (shouldn't happen as we have `XHTMLElementHandler`)
 
           outputBeginEndDelimiters(
             localName = structuredQName.getLocalName,

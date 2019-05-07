@@ -76,6 +76,14 @@
                                 else
                                     .
                         "/>
+                        <xf:setvalue
+                            ref="instance('local')/decimal-separator"
+                            value="
+                                if (empty(instance()/@decimal-separator)) then
+                                    '&#2261;'
+                                else
+                                    .
+                        "/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
@@ -94,8 +102,8 @@
                     <xf:bind ref="instance('local')">
                         <xf:bind ref="prefix | suffix | digits-after-decimal" xxf:whitespace="trim"/>
                         <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
-                        <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)"/>
-                        <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)"/>
+                        <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
+                        <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -113,10 +121,18 @@
                                     <item id="1">Always</item>
                                     <item id="2">Never</item>
                                 </default-always-never>
+                                <decimal-separators>
+                                    <item id="0">Use default</item>
+                                    <item id="4">Comma (,)</item>
+                                    <item id="5">Dot/Point (.)</item>
+                                </decimal-separators>
                                 <grouping-separators>
                                     <item id="0">Use default</item>
                                     <item id="1">No separator</item>
-                                    <item id="3">Single space</item>
+                                    <item id="2">Single space</item>
+                                    <item id="3">Apostrophe (')</item>
+                                    <item id="4">Comma (,)</item>
+                                    <item id="5">Dot/Point (.)</item>
                                 </grouping-separators>
                             </resource>
                             <resource xml:lang="fr">
@@ -132,10 +148,18 @@
                                     <item id="1">Toujours</item>
                                     <item id="2">Jamais</item>
                                 </default-always-never>
+                                <decimal-separators>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="4">Virgule (,)</item>
+                                    <item id="5">Point (.)</item>
+                                </decimal-separators>
                                 <grouping-separators>
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="1">Aucun</item>
-                                    <item id="3">Un seul espace</item>
+                                    <item id="2">Un seul espace</item>
+                                    <item id="3">Apostrophe (')</item>
+                                    <item id="4">Virgule (,)</item>
+                                    <item id="5">Point (.)</item>
                                 </grouping-separators>
                             </resource>
                         </resources>
@@ -155,31 +179,54 @@
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
-                        <xh:td colspan="2" rowspan="5">
-                            <fr:open-select1 ref="instance('local')/grouping-separator"  id="grouping-separator-control">
-                                <xf:label ref="xxf:r('grouping-separator')"/>
-                                <xf:alert/>
-                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
-                                    <xf:label ref="."/>
-                                    <xf:value ref="if (@id = 0) then '&#2261;' else if (@id = 1) then '&#2262;' else ' '"/>
-                                </xf:itemset>
-                            </fr:open-select1>
-                        </xh:td>
-                    </xh:tr>
-                    <xh:tr>
                         <xh:td colspan="2">
-                            <fr:number ref="instance('local')/digits-after-decimal"  id="digits-after-decimal-control">
+                            <fr:number ref="instance('local')/digits-after-decimal" id="digits-after-decimal-control">
                                 <xf:label ref="xxf:r('digits-after-decimal')"/>
                                 <xf:alert/>
                             </fr:number>
                         </xh:td>
-                        <xh:td colspan="2">
-                            <xf:input ref="instance('local')/decimal-separator"  id="decimal-separator-control">
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:open-select1 ref="instance('local')/decimal-separator" id="decimal-separator-control" appearance="minimal">
                                 <xf:label ref="xxf:r('decimal-separator')"/>
                                 <xf:alert/>
-                            </xf:input>
+                                <xf:itemset ref="xxf:resource-elements('decimal-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="
+                                        if (@id = 0) then
+                                            '&#2261;'
+                                        else if (@id = 4) then
+                                            ','
+                                        else
+                                            '.'
+                                    "/>
+                                </xf:itemset>
+                            </fr:open-select1>
                         </xh:td>
-
+                        <xh:td colspan="3">
+                            <fr:open-select1 ref="instance('local')/grouping-separator" id="grouping-separator-control" appearance="minimal">
+                                <xf:label ref="xxf:r('grouping-separator')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="
+                                        if (@id = 0) then
+                                            '&#2261;'
+                                        else if (@id = 1) then
+                                            '&#2262;'
+                                        else if (@id = 2) then
+                                            ' '
+                                        else if (@id = 3) then
+                                            ''''
+                                        else if (@id = 4) then
+                                            ','
+                                        else
+                                            '.'
+                                    "/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="6">
@@ -239,18 +286,19 @@
                         round-when-storing-control
                         field-width-control">
 
-                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="name" value="name(event('xxf:binding'))"/>
 
                     <!-- Special value to indicate that the default must be used -->
                     <xf:var
                         name="new-value"
                         value="
                             let $v            := string(event('xxf:binding')),
-                                $has-optional := event('xxf:targetid') = 'grouping-separator-control'
+                                $has-encoding := event('xxf:targetid') = ('grouping-separator-control', 'decimal-separator-control'),
+                                $has-optional := event('xxf:targetid') = 'grouping-separator-control')
                             return
-                                if ($has-optional and $v = '&#2261;') then
+                                if ($has-encoding and $v = '&#2261;') then
                                     ()
-                                else if ($has-optional and $v = '&#2262;') then
+                                else if ($has-encoding and $v = '&#2262;') then
                                     ''
                                 else if (not($has-optional) and $v = '') then
                                     ()

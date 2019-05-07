@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, XMLReceiverHelper}
 import org.orbeon.xforms.Constants
 
 import scala.collection.JavaConverters._
@@ -59,30 +59,30 @@ class PartAnalysisImpl(
 
   partAnalysis ⇒
 
-  def getIndentedLogger = staticState.getIndentedLogger
+  def getIndentedLogger: IndentedLogger = staticState.getIndentedLogger
 
   private def partAnalysisIterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] =
     new Iterator[PartAnalysis] {
 
       private[this] var theNext = start
 
-      def hasNext = theNext.isDefined
+      def hasNext: Boolean = theNext.isDefined
 
-      def next() = {
+      def next(): PartAnalysis = {
         val newResult = theNext.get
         theNext = newResult.parent
         newResult
       }
     }
 
-  def ancestorIterator       = partAnalysisIterator(partAnalysis.parent)
-  def ancestorOrSelfIterator = partAnalysisIterator(Some(partAnalysis))
+  def ancestorIterator      : Iterator[PartAnalysis] = partAnalysisIterator(partAnalysis.parent)
+  def ancestorOrSelfIterator: Iterator[PartAnalysis] = partAnalysisIterator(Some(partAnalysis))
 
-  def getMark(prefixedId: String) = metadata.getMark(prefixedId)
+  def isTopLevel: Boolean = startScope.isTopLevelScope
 
-  def isTopLevel = startScope.isTopLevelScope
+  def getMark(prefixedId: String): Option[SAXStore#Mark] = metadata.getMark(prefixedId)
 
-  def isExposeXPathTypes = staticState.staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
+  def isExposeXPathTypes: Boolean = staticState.staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
 
   /**
    * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not
@@ -268,9 +268,9 @@ class PartAnalysisImpl(
     freeTransientState()
   }
 
-  def toXML(helper: XMLReceiverHelper) =
+  def toXML(helper: XMLReceiverHelper): Unit =
     controlAnalysisMap(startScope.prefixedIdForStaticId(Constants.DocumentId)).toXML(helper)
 
-  def dumpAnalysis() =
+  def dumpAnalysis(): Unit =
     println(Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this)))
 }

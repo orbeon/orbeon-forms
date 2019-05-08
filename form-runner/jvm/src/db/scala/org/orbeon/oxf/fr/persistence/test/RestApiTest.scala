@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import java.io.ByteArrayInputStream
+
 import org.junit.Test
 import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory, Text}
@@ -21,8 +22,8 @@ import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRo
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -56,7 +57,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Create)))))
 
   /**
-   * Test new form versioning introduced in 4.5, for form definitions.
+   * Test form versioning for form definitions.
    */
   @Test def formDefinitionVersionTest(): Unit = {
     Connect.withOrbeonTables("form definition") { (connection, provider) ⇒
@@ -110,17 +111,19 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   /**
-   * Test new form versioning introduced in 4.5, for form data
+   * Test form versioning for form data
    */
-  @Test def formDataVersionTest(): Unit = {
-    Connect.withOrbeonTables("form data version") { (connection, provider) ⇒
+  @Test def formDataVersionStageTest(): Unit = {
+    Connect.withOrbeonTables("form data version") { (_, provider) ⇒
       val FirstDataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
       // Storing for specific form version
       val first = <gaga1/>
+      val myStage = Some("my-stage")
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
-      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
+      HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), expectedCode = 201, stage = myStage)
+      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1), stage = myStage))
       HttpAssert.del(FirstDataURL, Unspecified, 204)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(410))
 
@@ -145,7 +148,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    * Get form definition corresponding to a document
    */
   @Test def formForDataTest(): Unit = {
-    Connect.withOrbeonTables("form data") { (connection, provider) ⇒
+    Connect.withOrbeonTables("form data") { (_, provider) ⇒
       val FormURL       = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val FirstDataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val SecondDataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"

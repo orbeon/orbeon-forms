@@ -20,7 +20,7 @@ import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
-import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
@@ -45,6 +45,7 @@ private[persistence] object HttpCall {
     path        : String,
     method      : HttpMethod,
     version     : Version,
+    stage       : Option[String]      = None,
     body        : Option[Body]        = None,
     credentials : Option[Credentials] = None,
     timeout     : Option[Int]         = None
@@ -64,12 +65,13 @@ private[persistence] object HttpCall {
   ): Unit = {
     useAndClose(
       request(
-        path = actualRequest.path,
-        method = actualRequest.method,
-        version = actualRequest.version,
-        body = actualRequest.body,
+        path        = actualRequest.path,
+        method      = actualRequest.method,
+        version     = actualRequest.version,
+        stage       = actualRequest.stage,
+        body        = actualRequest.body,
         credentials = actualRequest.credentials,
-        timeout = actualRequest.timeout
+        timeout     = actualRequest.timeout
       )
     ) { closableHttpResponse ⇒
 
@@ -118,6 +120,7 @@ private[persistence] object HttpCall {
     path            : String,
     method          : HttpMethod,
     version         : Version,
+    stage           : Option[String],
     body            : Option[Body],
     credentials     : Option[Credentials],
     timeout         : Option[Int] = None)(
@@ -137,7 +140,8 @@ private[persistence] object HttpCall {
         case Specific(version)       ⇒ Some(OrbeonFormDefinitionVersion → List(version.toString))
         case ForDocument(documentId) ⇒ Some(OrbeonForDocumentId         → List(documentId))
       }
-      val headers = (timeoutHeader.toList ++ versionHeader.toList).toMap
+      val stageHeader   = stage.map(StageHeader.HeaderName → List(_))
+      val headers = (timeoutHeader.toList ++ versionHeader.toList ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = UriScheme.Http,
@@ -186,16 +190,16 @@ private[persistence] object HttpCall {
   def metadataURL     (provider: Provider) = s"form/${provider.entryName}/$FormName"
 
   def post(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, POST, version, Some(body), credentials))(_.httpResponse.statusCode)
+    useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse.statusCode)
 
-  def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, PUT, version, Some(body), credentials))(_.httpResponse.statusCode)
+  def put(url: String, version: Version, stage: Option[String], body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+    useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse.statusCode)
 
   def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, DELETE, version, None, credentials))(_.httpResponse.statusCode)
+    useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse.statusCode)
 
   def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, GET, version, None, credentials)) { chr ⇒
+    useAndClose(request(url, GET, version, None, None, credentials)) { chr ⇒
 
       val httpResponse = chr.httpResponse
       val statusCode   = httpResponse.statusCode
@@ -228,7 +232,7 @@ private[persistence] object HttpCall {
       logger   : IndentedLogger
     ): Int = {
       val body = Some(XML(LockInfo.toDom4j(lockInfo)))
-      useAndClose(request(url, method, Version.Unspecified, body, None, timeout))(_.httpResponse.statusCode)
+      useAndClose(request(url, method, Version.Unspecified, None, body, None, timeout))(_.httpResponse.statusCode)
     }
   }
 }

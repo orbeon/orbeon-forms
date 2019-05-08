@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream
 
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
-import org.orbeon.oxf.fr.persistence.relational.Version
+import org.orbeon.oxf.fr.persistence.relational.{StageHeader, Version}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
@@ -41,7 +41,8 @@ private[persistence] object HttpAssert extends XMLSupport {
   case   class ExpectedBody(
     body        : HttpCall.Body,
     operations  : Operations,
-    formVersion : Option[Int]
+    formVersion : Option[Int],
+    stage       : Option[String] = None
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
 
@@ -60,7 +61,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
+      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage) ⇒
         assert(resultCode === 200)
         // Check body
         body match {
@@ -78,6 +79,10 @@ private[persistence] object HttpAssert extends XMLSupport {
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion === resultFormVersion)
+        // Check stage
+        val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head)
+        assert(expectedStage === resultStage)
+
       case ExpectedCode(expectedCode) ⇒
         assert(resultCode === expectedCode)
     }
@@ -100,10 +105,11 @@ private[persistence] object HttpAssert extends XMLSupport {
     version      : Version,
     body         : HttpCall.Body,
     expectedCode : Int,
-    credentials  : Option[Credentials] = None)(implicit
+    credentials  : Option[Credentials] = None,
+    stage        : Option[String]      = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
-    val actualCode = HttpCall.put(url, version, body, credentials)
+    val actualCode = HttpCall.put(url, version, stage, body, credentials)
     assert(actualCode === expectedCode)
   }
 

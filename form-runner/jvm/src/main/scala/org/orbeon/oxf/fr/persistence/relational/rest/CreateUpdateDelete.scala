@@ -187,7 +187,8 @@ trait CreateUpdateDelete
             username     = if (req.forData) Option(resultSet.getString("username" ))                     else None,
             group        = if (req.forData) Option(resultSet.getString("groupname"))                     else None,
             organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet) else None,
-            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None
+            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None,
+            stage        = None // We don't need to know about the stage of a possible existing row
           ))
         } else {
           None

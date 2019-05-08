@@ -44,7 +44,7 @@ private[persistence] object Connect {
             val statement = connection.createStatement
             // Create tables
             val sql = provider match {
-              case MySQL      ⇒ "mysql-2017_2.sql"
+              case MySQL      ⇒ "mysql-2019_1.sql"
               case PostgreSQL ⇒ "postgresql-2017_2.sql"
             }
             val createDDL = SQL.read(sql)

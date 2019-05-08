@@ -49,14 +49,16 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         // For form definition, everything is valid except Next
         (req.forForm && req.version == Next)
       if (badVersion) throw HttpStatusCodeException(StatusCode.BadRequest)
+      val hasStage = req.forData && ! req.forAttachment
 
       val sql = {
         val table  = tableName(req)
         val idCols = idColumns(req)
         val xmlCol = Provider.xmlCol(req.provider, "t")
         s"""|SELECT  t.last_modified_time, t.created
-            |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
-            |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
+            |        ${if (req.forAttachment) ", t.file_content"                             else s", $xmlCol"}
+            |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
+            |        ${if (hasStage)          ", t.stage"                                    else ""}
             |        , t.form_version, t.deleted
             |FROM    $table t,
             |        (
@@ -120,8 +122,12 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             val createdDateTime      = resultSet.getTimestamp("created")
             val lastModifiedDateTime = resultSet.getTimestamp("last_modified_time")
 
-            // Set form version header
+            // Set form version and stage headers
             httpResponse.setHeader(OrbeonFormDefinitionVersion, dbFormVersion.toString)
+            if (hasStage) {
+              val stage = resultSet.getString("stage")
+              Option(stage).foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
+            }
 
             // Write content (XML / file)
             if (req.forAttachment) {

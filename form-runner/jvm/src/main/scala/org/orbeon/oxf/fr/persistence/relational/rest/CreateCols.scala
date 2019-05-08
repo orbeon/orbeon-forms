@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport ⇒ _}
 trait CreateCols extends RequestResponse with Common {
 
   type ParamSetterFunc = (PreparedStatement, Int) ⇒ Unit
-  def param[T](setter: (PreparedStatement) ⇒ ((Int, T) ⇒ Unit), value: ⇒ T): ParamSetterFunc = {
+  def param[T](setter: PreparedStatement ⇒ (Int, T) ⇒ Unit, value: ⇒ T): ParamSetterFunc = {
     (ps: PreparedStatement, i: Int) ⇒ setter(ps)(i, value)
   }
 
@@ -30,7 +30,8 @@ trait CreateCols extends RequestResponse with Common {
     username     : Option[String],
     group        : Option[String],
     organization : Option[(Int, Organization)],
-    formVersion  : Option[Int]
+    formVersion  : Option[Int],
+    stage        : Option[String]
   )
 
   abstract class ColValue
@@ -125,6 +126,14 @@ trait CreateCols extends RequestResponse with Common {
         value         = DynamicColValue(
           placeholder = "?",
           paramSetter = param(_.setInt, versionToSet)
+        )
+      ),
+      Col(
+        included      = req.forData && req.dataPart.get.stage.isDefined,
+        name          = "stage",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, req.dataPart.get.stage.get)
         )
       ),
       Col(

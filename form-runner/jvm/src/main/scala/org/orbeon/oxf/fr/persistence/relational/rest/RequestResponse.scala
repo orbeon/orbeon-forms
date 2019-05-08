@@ -18,7 +18,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 
-case class DataPart(isDraft: Boolean, documentId: String)
+case class DataPart(isDraft: Boolean, documentId: String, stage: Option[String])
 
 case class Request(
   provider : Provider,
@@ -74,7 +74,7 @@ trait RequestResponse extends Common {
         Request(Provider.withName(provider), app, form, version, file, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
-        val dataPart = DataPart(dataOrDraft == "draft", documentId)
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = headerValue(StageHeader.HeaderNameLower))
         Request(Provider.withName(provider), app, form, version, file, Some(dataPart))
     }
   }

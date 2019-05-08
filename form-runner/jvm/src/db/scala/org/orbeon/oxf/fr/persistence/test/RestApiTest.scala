@@ -24,6 +24,7 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -119,7 +120,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       // Storing for specific form version
       val first = <gaga1/>
-      val myStage = Some("my-stage")
+      val myStage = Some(Stage("my-stage"))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), expectedCode = 201, stage = myStage)

@@ -21,6 +21,7 @@ import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
+import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
@@ -45,7 +46,7 @@ private[persistence] object HttpCall {
     path        : String,
     method      : HttpMethod,
     version     : Version,
-    stage       : Option[String]      = None,
+    stage       : Option[Stage]      = None,
     body        : Option[Body]        = None,
     credentials : Option[Credentials] = None,
     timeout     : Option[Int]         = None
@@ -120,7 +121,7 @@ private[persistence] object HttpCall {
     path            : String,
     method          : HttpMethod,
     version         : Version,
-    stage           : Option[String],
+    stage           : Option[Stage],
     body            : Option[Body],
     credentials     : Option[Credentials],
     timeout         : Option[Int] = None)(
@@ -140,7 +141,7 @@ private[persistence] object HttpCall {
         case Specific(version)       ⇒ Some(OrbeonFormDefinitionVersion → List(version.toString))
         case ForDocument(documentId) ⇒ Some(OrbeonForDocumentId         → List(documentId))
       }
-      val stageHeader   = stage.map(StageHeader.HeaderName → List(_))
+      val stageHeader   = stage.map(_.name).map(StageHeader.HeaderName → List(_))
       val headers = (timeoutHeader.toList ++ versionHeader.toList ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
@@ -192,7 +193,7 @@ private[persistence] object HttpCall {
   def post(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
     useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse.statusCode)
 
-  def put(url: String, version: Version, stage: Option[String], body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+  def put(url: String, version: Version, stage: Option[Stage], body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
     useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse.statusCode)
 
   def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =

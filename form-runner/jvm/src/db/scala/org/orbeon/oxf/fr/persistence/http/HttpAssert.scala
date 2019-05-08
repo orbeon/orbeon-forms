@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.{StageHeader, Version}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
+import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -42,7 +43,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     body        : HttpCall.Body,
     operations  : Operations,
     formVersion : Option[Int],
-    stage       : Option[String] = None
+    stage       : Option[Stage] = None
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
 
@@ -80,7 +81,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion === resultFormVersion)
         // Check stage
-        val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head)
+        val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage)
         assert(expectedStage === resultStage)
 
       case ExpectedCode(expectedCode) ⇒
@@ -106,7 +107,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     body         : HttpCall.Body,
     expectedCode : Int,
     credentials  : Option[Credentials] = None,
-    stage        : Option[String]      = None)(implicit
+    stage        : Option[Stage]      = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
     val actualCode = HttpCall.put(url, version, stage, body, credentials)

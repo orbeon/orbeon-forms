@@ -736,6 +736,7 @@
 
         <xf:action if="$is-xml">
 
+            <!-- Will be `()` if there is no metadata or no migration map -->
             <xf:var
                 name="maybe-migrated"
                 value="grid-migration:dataMaybeMigratedTo($body/root(), xxf:instance('fr-form-metadata')/root())"/>
@@ -744,9 +745,10 @@
             <xf:delete
                 ref="$maybe-migrated//(@xxf:relevant, @fr:relevant)"/>
 
+            <!-- See https://github.com/orbeon/orbeon-forms/issues/3935 -->
             <xf:insert
                 context="xxf:instance('fr-form-instance')/root()"
-                origin="$maybe-migrated"/>
+                origin="($maybe-migrated, $body/root())[1]"/>
 
         </xf:action>
         <xf:action if="not($is-xml)">

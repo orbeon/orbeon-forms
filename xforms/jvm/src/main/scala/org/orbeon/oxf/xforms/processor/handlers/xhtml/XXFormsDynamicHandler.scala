@@ -23,10 +23,10 @@ class XXFormsDynamicHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandler(uri, localname, qName, attributes, matched, handlerContext, false, false) {
+) extends XFormsBaseHandler(uri, localname, qName, localAtts, matched, handlerContext, false, false) {
 
   private var elementName: String = _
   private var elementQName: String = _
@@ -36,6 +36,7 @@ class XXFormsDynamicHandler(
     val controller = xformsHandlerContext.getController
     val contentHandler = controller.getOutput
 
+    // TODO: Duplicated with `XFormsBaseHandlerXHTML`. Use mixin?
     val prefixedId = xformsHandlerContext.getPrefixedId(attributes)
     val effectiveId = xformsHandlerContext.getEffectiveId(attributes)
 

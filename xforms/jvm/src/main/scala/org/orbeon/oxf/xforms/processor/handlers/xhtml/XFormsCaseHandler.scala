@@ -33,7 +33,7 @@ class XFormsCaseHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
 ) extends
@@ -41,7 +41,7 @@ class XFormsCaseHandler(
     uri,
     localname,
     qName,
-    attributes,
+    localAtts,
     matched,
     handlerContext,
     repeating  = false,

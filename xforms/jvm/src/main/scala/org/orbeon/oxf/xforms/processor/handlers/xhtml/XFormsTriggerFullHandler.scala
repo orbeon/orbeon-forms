@@ -32,10 +32,10 @@ class XFormsTriggerFullHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsTriggerHandler(uri, localname, qName, attributes, matched, handlerContext) {
+) extends XFormsTriggerHandler(uri, localname, qName, localAtts, matched, handlerContext) {
 
   override protected def handleControlStart(): Unit = {
 

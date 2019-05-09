@@ -23,10 +23,10 @@ class XFormsGroupDefaultHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsGroupHandler(uri, localname, qName, attributes, matched, handlerContext) {
+) extends XFormsGroupHandler(uri, localname, qName, localAtts, matched, handlerContext) {
 
   // Use explicit container element name if present, otherwise use default
   override def getContainingElementName =

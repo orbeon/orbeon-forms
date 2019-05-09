@@ -25,7 +25,7 @@ class XFormsGroupSeparatorHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
 ) extends
@@ -33,7 +33,7 @@ class XFormsGroupSeparatorHandler(
     uri,
     localname,
     qName,
-    attributes,
+    localAtts,
     matched,
     handlerContext
   ) {

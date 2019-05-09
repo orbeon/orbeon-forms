@@ -27,6 +27,20 @@ abstract class ElementHandler(
   val handlerContext : Any
 ) {
 
+  // Use of `attributes`:
+  //
+  // `handleAccessibilityAttributes`: `navindex`, `tabindex`, `accesskey`, `role` → should be static
+  // `xh:body` / `xh:head`: `startElement()`
+  // `HandlerContext.getEffectiveId(attributes())` / `HandlerContext.getEffectiveId(attributes())`
+  // getting `class` in `appendControlUserClasses`
+  // `xxf:dialog`: `close`, `draggable`, `visible` → get from static control!
+  // `getInitialClasses`: `incremental`, `mediatype` → should come from static
+  // `xxf:dialog`, `XFormsLHHAHandler`: `start()`: copies all attributes in XHTML namespace
+  // `XHTMLElementHandler`: AVTs
+  //
+  // Not all handlers need all attributes. Some information is known statically for example from
+  // `ElementAnalysis` In the future, we should not have to copy all the `Attributes` all the time.
+
   // Override this to detect that the element has started.
   @throws[SAXException]
   def start(): Unit = ()

@@ -33,10 +33,10 @@ class XFormsLHHAHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false)
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, false)
      with WithOptionalControl {
 
   import XFormsLHHAHandler._

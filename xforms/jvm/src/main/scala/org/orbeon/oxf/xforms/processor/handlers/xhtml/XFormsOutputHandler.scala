@@ -32,7 +32,7 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
   protected def getContainerAttributes(
     uri           : String,
     localname     : String,
-    attributes    : Attributes,
+    localAtts     : Attributes,
     effectiveId   : String,
     outputControl : XFormsSingleNodeControl,
     isField       : Boolean
@@ -50,10 +50,10 @@ class XFormsOutputDefaultHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
   override protected def handleControlStart(): Unit = {
@@ -97,10 +97,10 @@ class XFormsOutputHTMLHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
   override protected def handleControlStart(): Unit = {
@@ -133,10 +133,10 @@ class XFormsOutputImageHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
   override protected def handleControlStart(): Unit = {
@@ -169,10 +169,10 @@ class XFormsOutputTextHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
   override protected def handleControlStart(): Unit = {
@@ -194,10 +194,10 @@ class XFormsOutputDownloadHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
   // NOP because the label is output as the text within <a>

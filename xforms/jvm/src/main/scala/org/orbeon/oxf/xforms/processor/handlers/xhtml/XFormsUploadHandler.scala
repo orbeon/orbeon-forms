@@ -33,10 +33,10 @@ class XFormsUploadHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false)
   with HandlerSupport {
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {

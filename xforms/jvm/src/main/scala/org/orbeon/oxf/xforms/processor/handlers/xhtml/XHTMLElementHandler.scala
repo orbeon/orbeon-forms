@@ -23,8 +23,8 @@ object XHTMLElementHandler {
   val REF_ID_ATTRIBUTE_NAMES = Array("for")
 }
 
-class XHTMLElementHandler(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any, handlerContext: Any)
-  extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, true) {
+class XHTMLElementHandler(uri: String, localname: String, qName: String, localAtts: Attributes, matched: Any, handlerContext: Any)
+  extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, true) {
 
   @throws[SAXException]
   override def start(): Unit = {

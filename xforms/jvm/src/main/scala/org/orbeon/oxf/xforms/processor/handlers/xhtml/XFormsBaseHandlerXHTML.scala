@@ -34,7 +34,7 @@ abstract class XFormsBaseHandlerXHTML (
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : Any,
   handlerContext : Any,
   repeating      : Boolean,
@@ -44,7 +44,7 @@ abstract class XFormsBaseHandlerXHTML (
     uri,
     localname,
     qName,
-    attributes,
+    localAtts,
     matched,
     handlerContext,
     repeating,
@@ -190,9 +190,9 @@ abstract class XFormsBaseHandlerXHTML (
     sb                : jl.StringBuilder
   ): Unit = {
     // @class
-    var evaluatedClassValueOpt =
+    val evaluatedClassValueOpt =
       Option(controlAttributes.getValue("class")) flatMap { classValue ⇒
-        if (! XFormsUtils.maybeAVT(classValue)) {
+        if (!XFormsUtils.maybeAVT(classValue)) {
           // Definitely not an AVT
           Some(classValue)
         } else {
@@ -205,7 +205,7 @@ abstract class XFormsBaseHandlerXHTML (
             None
           }
         }
-    }
+      }
 
     evaluatedClassValueOpt foreach appendWithSpace
   }

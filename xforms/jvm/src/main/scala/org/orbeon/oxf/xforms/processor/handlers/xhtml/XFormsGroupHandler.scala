@@ -25,7 +25,7 @@ abstract class XFormsGroupHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
 ) extends
@@ -33,7 +33,7 @@ abstract class XFormsGroupHandler(
     uri,
     localname,
     qName,
-    attributes,
+    localAtts,
     matched,
     handlerContext,
     repeating  = false,

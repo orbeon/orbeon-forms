@@ -33,10 +33,10 @@ class XHTMLHeadHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, true) {
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, true) {
 
   private var formattingPrefix: String = null
 

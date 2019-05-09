@@ -40,7 +40,7 @@ abstract class XFormsControlLifecyleHandler(
   uri            : String,
   localname      : String,
   qName          : String,
-  attributes     : Attributes,
+  localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef,
   repeating      : Boolean,
@@ -50,7 +50,7 @@ abstract class XFormsControlLifecyleHandler(
     uri,
     localname,
     qName,
-    attributes,
+    localAtts,
     matched,
     handlerContext,
     repeating,
@@ -115,8 +115,8 @@ abstract class XFormsControlLifecyleHandler(
     }
 
   // May be overridden by subclasses
-  protected def isMustOutputControl(control: XFormsControl)                         = true
-  protected def isMustOutputContainerElement                                        = true
+  protected def isMustOutputControl(control: XFormsControl) = true
+  protected def isMustOutputContainerElement                = true
 
   // TODO: Those should take the static LHHA
   @throws[SAXException]

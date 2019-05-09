@@ -245,7 +245,45 @@
                     select="$metadata/email/body/template[@xml:lang = $request-language]/@mediatype = 'text/html'"/>
 
                 <part name="text" content-type="{if ($is-html) then 'text/html' else 'text/plain'}">
-                    <xsl:value-of select="fr:build-message('body', $is-html)"/>
+                    <xsl:choose>
+                        <xsl:when test="$is-html">
+
+                            <xsl:variable
+                                name="style"
+                                select="p:property(string-join(('oxf.fr.email.css.custom.inline', $app, $form), '.'))"/>
+
+                            <xsl:variable
+                                name="style-seq"
+                                select="
+                                    if (p:non-blank($style)) then
+                                        (
+                                            '&lt;head>',
+                                            '&lt;style type=&quot;text/css&quot;>',
+                                            $style,
+                                            '&lt;/style>',
+                                            '&lt;/head>'
+                                        )
+                                    else
+                                        ()"/>
+
+                            <xsl:value-of
+                                select="
+                                string-join(
+                                    (
+                                        '&lt;html>',
+                                        $style-seq,
+                                        '&lt;body>',
+                                        fr:build-message('body', $is-html),
+                                        '&lt;/body>',
+                                        '&lt;/html>'
+                                    ),
+                                    ''
+                                )"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="fr:build-message('body', $is-html)"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </part>
                 <!-- XML, PDF and TIFF attachments if needed -->
                 <xsl:for-each select="'xml', 'pdf', 'tiff'">

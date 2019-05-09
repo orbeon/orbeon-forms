@@ -28,63 +28,39 @@ import java.util.Set;
 public class SAXUtils {
 
     public static final Attributes EMPTY_ATTRIBUTES = new Attributes() {
-
-        @Override
         public int getLength() {
             return 0;
         }
-
-        @Override
         public String getURI(int i) {
             return null;
         }
-
-        @Override
         public String getLocalName(int i) {
             return null;
         }
-
-        @Override
         public String getQName(int i) {
             return null;
         }
-
-        @Override
         public String getType(int i) {
             return null;
         }
-
-        @Override
         public String getValue(int i) {
             return null;
         }
-
-        @Override
         public int getIndex(String s, String s1) {
             return -1;
         }
-
-        @Override
         public int getIndex(String s) {
             return -1;
         }
-
-        @Override
         public String getType(String s, String s1) {
             return null;
         }
-
-        @Override
         public String getType(String s) {
             return null;
         }
-
-        @Override
         public String getValue(String s, String s1) {
             return null;
         }
-
-        @Override
         public String getValue(String s) {
             return null;
         }

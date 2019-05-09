@@ -69,3 +69,8 @@ class ComponentControl(
   override protected def externalEventsDef = super.externalEventsDef ++ abstractBinding.allowedExternalEvents
   override def externalEvents              = externalEventsDef
 }
+
+trait ValueComponentTrait extends ComponentControl with ValueTrait with FormatTrait {
+  override val format  : Option[String] = abstractBinding.formatOpt
+  override val unformat: Option[String] = None
+}

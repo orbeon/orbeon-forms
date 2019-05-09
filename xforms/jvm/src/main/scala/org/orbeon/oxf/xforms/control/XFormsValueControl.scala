@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import java.{util ⇒ ju}
+
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
+import org.orbeon.oxf.xforms.analysis.controls.{FormatTrait, StaticLHHASupport, ValueTrait, ViewTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
@@ -26,6 +29,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
+import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -34,7 +38,7 @@ import scala.collection.JavaConverters._
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
 
-  override type Control <: ValueControl
+  override type Control <: ViewTrait with StaticLHHASupport with ValueTrait with FormatTrait
 
   // Value
   private[XFormsValueControl] var _value: String = null // TODO: use ControlProperty<String>?
@@ -141,18 +145,35 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // the controls as dirty, and they will be evaluated when necessary later.
   }
 
-  final protected def getValueUseFormat(format: Option[String]) =
-    format flatMap valueWithSpecifiedFormat orElse valueWithDefaultFormat
+  final protected def getValueUseFormat(
+    format             : Option[String],
+    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables
+  ): Option[String] =
+    format flatMap (valueWithSpecifiedFormat(_, namespaceMapping, variableToValueMap)) orElse valueWithDefaultFormat
 
-  // Convenience method for handler: return a formatted value for read-only output
+  // Formatted value for read-only output
   def getFormattedValue: Option[String] = Option(getExternalValue())
 
   // Format value according to format attribute
-  final protected def valueWithSpecifiedFormat(format: String): Option[String] = {
+  final protected def valueWithSpecifiedFormat(
+    format             : String,
+    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables,
+    functionContext    : FunctionContext                     = newFunctionContext
+  ): Option[String] = {
+
     assert(isRelevant)
     assert(getValue ne null)
 
-    evaluateAsString(format, Seq(stringToStringValue(getValue)), 1)
+    evaluateAsString(
+      format,
+      List(stringToStringValue(getValue)),
+      1,
+      namespaceMapping,
+      variableToValueMap,
+      functionContext
+    )
   }
 
   // Try default format for known types

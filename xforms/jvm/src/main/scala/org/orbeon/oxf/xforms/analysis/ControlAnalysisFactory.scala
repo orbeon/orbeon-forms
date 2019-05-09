@@ -289,9 +289,9 @@ object ControlAnalysisFactory {
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
     (false, false) → (new ComponentControl(_, _, _, _, _)                                       ),
-    (false, true)  → (new ComponentControl(_, _, _, _, _) with                 StaticLHHASupport),
-    (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueTrait                       ),
-    (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueTrait with StaticLHHASupport)
+    (false, true)  → (new ComponentControl(_, _, _, _, _) with                          StaticLHHASupport),
+    (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueComponentTrait                       ),
+    (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueComponentTrait with StaticLHHASupport)
   )
 
   def create(

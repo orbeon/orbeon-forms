@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import java.{util ⇒ ju}
 
+import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -85,7 +86,8 @@ trait ControlXPathSupport {
     contextItems       : Seq[Item],
     contextPosition    : Int,
     namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables
+    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables,
+    functionContext    : FunctionContext                     = newFunctionContext
   ): Option[String] = {
 
     assert(isRelevant)
@@ -105,7 +107,7 @@ trait ControlXPathSupport {
             namespaceMapping,
             variableToValueMap,
             containingDocument.getFunctionLibrary,
-            newFunctionContext,
+            functionContext,
             null,
             getLocationData,
             containingDocument.getRequestStats.addXPathStat

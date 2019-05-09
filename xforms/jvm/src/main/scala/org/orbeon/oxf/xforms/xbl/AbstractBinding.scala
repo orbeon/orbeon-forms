@@ -83,6 +83,7 @@ case class AbstractBinding(
   val modeHandlers            = ! xblMode("nohandlers")
 
   val labelFor : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
+  val formatOpt: Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)
 
   // Printable name for the binding match
   def debugBindingName = bindingElement.getQualifiedName

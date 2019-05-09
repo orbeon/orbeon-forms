@@ -171,6 +171,7 @@ public class XFormsConstants {
     public static final QName XXBL_GLOBAL_QNAME = QName.apply("global", XXBL_NAMESPACE);
     public static final QName XXBL_MODE_QNAME = QName.apply("mode", XXBL_NAMESPACE);
     public static final QName XXBL_LABEL_FOR_QNAME = QName.apply("label-for", XXBL_NAMESPACE);
+    public static final QName XXBL_FORMAT_QNAME = QName.apply("format", XXBL_NAMESPACE);
 
 
     public enum XXBLScope { inner, outer }

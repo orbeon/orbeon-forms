@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, StaticLHHASupport, ValueComponentTrait, ViewTrait}
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -49,15 +49,36 @@ class XFormsValueComponentControl(
   effectiveId
 ) with XFormsValueControl {
 
-  override type Control <: ComponentControl with ValueControl
+  // TODO: Fix hierarchy! We don't necessarily have `StaticLHHASupport`, in particular.
+  override type Control <: ComponentControl with ValueComponentTrait with ViewTrait with StaticLHHASupport
 
   // Don't expose an external value unless explicitly allowed
   override def handleExternalValue = staticControl.abstractBinding.modeExternalValue
 
-  // Try to use the value type and associated format
-  // TODO: Later: declarative support for formatted values in XBL controls.
-  // See https://github.com/orbeon/orbeon-forms/issues/2428
-  override def getFormattedValue: Option[String] = valueWithDefaultFormat
+  // See https://github.com/orbeon/orbeon-forms/issues/4041
+  override def getFormattedValue: Option[String] = {
+
+    // TODO: Unclear when we return `None` (no binding, etc.). Right now we flatten.
+    def fromBinding =
+      for {
+        binding              ← staticControl.bindingOpt
+        abstractBinding      = binding.abstractBinding
+        format               ← staticControl.format
+        nestedContainer      ← nestedContainerOpt
+        nestedBindingContext ← bindingContextForChildOpt
+        formatted            ← valueWithSpecifiedFormat(
+            format           = format,
+            namespaceMapping = abstractBinding.namespaceMapping,
+            functionContext  = XFormsFunction.Context(nestedContainer, nestedBindingContext, innerRootControl.effectiveId, nestedBindingContext.modelOpt, null)
+          )
+      } yield
+        formatted
+
+    def fromExternal =
+      Option(getExternalValue)
+
+    fromBinding orElse fromExternal
+  }
 
   // TODO
   override def findAriaByControlEffectiveId = None

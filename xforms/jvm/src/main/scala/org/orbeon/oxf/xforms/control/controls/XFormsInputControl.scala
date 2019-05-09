@@ -76,7 +76,7 @@ class XFormsInputControl(
         // Other types or no type
         // Format only if the format attribute is present. We don't use the default formats, because we don't
         // yet have default "unformats".
-        format flatMap valueWithSpecifiedFormat getOrElse internalValue
+        format flatMap (valueWithSpecifiedFormat(_)) getOrElse internalValue
 
     setExternalValue(updatedValue)
   }

@@ -35,6 +35,11 @@ class RepeatControl(
 
   val isAroundTableOrListElement: Boolean = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
+  val dndClasses: Option[String] =
+    element.attributeValueOpt(XXFORMS_DND_QNAME) filter
+      Set("vertical", "horizontal")              map
+      (dndType ⇒ s"xforms-dnd xforms-dnd-$dndType")
+
   override protected def externalEventsDef: Set[String] = super.externalEventsDef + XXFORMS_DND
   override val externalEvents             : Set[String] = externalEventsDef
 }

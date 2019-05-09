@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.common.OrbeonLocationException
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.appendWithSpace
 import org.orbeon.oxf.xforms.processor.handlers.{OutputInterceptor, XFormsBaseHandler}
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
@@ -107,22 +107,11 @@ class XFormsRepeatHandler(
         if (classes.nonEmpty)
           appendWithSpace(classes)
 
-      def addDnDClasses()(implicit sb: jl.StringBuilder): Unit = {
-        val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
-        if (Set("vertical", "horizontal")(dndAttribute)) {
-
-          appendClasses("xforms-dnd xforms-dnd-" + dndAttribute)
-
-          if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
-            appendClasses("xforms-dnd-over")
-        }
-      }
-
       def repeatBody(iteration: Int, repeatSelected: Boolean)(implicit sb: jl.StringBuilder): Unit = {
 
         // User and DnD classes
         appendClasses(userClasses)
-        addDnDClasses()
+        staticControlOpt flatMap (_.asInstanceOf[RepeatControl].dndClasses) foreach appendClasses
 
         outputInterceptor.setAddedClasses(sb.toString)
 

@@ -174,6 +174,8 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
     }
   }
 
+  // This should mirror what `OutputInterceptor` produces when there is content.
+  // See also the test for #151 which outputs various types of repeats.
   def findFirstHandlerOrElem: Option[ElementHandler Either StructuredQName] = {
 
     val breaks = new scala.util.control.Breaks

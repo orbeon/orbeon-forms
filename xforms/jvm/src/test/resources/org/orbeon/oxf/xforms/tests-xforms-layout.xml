@@ -2156,30 +2156,40 @@
             <controls>
                 <xh:span id="repeat-begin-empty-repeat-no-iteration" class="xforms-repeat-begin-end"/>
                 <xh:span id="repeat-end-empty-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
                 <xh:span id="repeat-begin-empty-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-empty-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+
+
                 <xh:span id="repeat-begin-blank-repeat-no-iteration" class="xforms-repeat-begin-end"/>
                 <xh:span id="repeat-end-blank-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
                 <xh:span id="repeat-begin-blank-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-update-full"/>
                 <xh:span id="repeat-end-blank-repeat-2-iterations" class="xforms-repeat-begin-end"/>
+
+
                 <xh:span id="repeat-begin-characters-only-repeat-no-iteration" class="xforms-repeat-begin-end"/>
                 <xh:span id="repeat-end-characters-only-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
                 <xh:span id="repeat-begin-characters-only-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full">foo</xh:span>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-update-full">foo</xh:span>
                 <xh:span id="repeat-end-characters-only-repeat-2-iterations" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-begin-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-end-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
+
+                <xh:div id="repeat-begin-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-end-div-whitespace-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
                 <xh:div id="repeat-begin-div-whitespace-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
@@ -2190,8 +2200,11 @@
                 <xh:div class="xforms-update-full"/>
                 <xh:span class="xforms-update-full"/>
                 <xh:div id="repeat-end-div-whitespace-repeat-2-iterations" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-begin-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
-                <xh:span id="repeat-end-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
+
+                <xh:div id="repeat-begin-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+                <xh:div id="repeat-end-div-characters-repeat-no-iteration" class="xforms-repeat-begin-end"/>
+
                 <xh:div id="repeat-begin-div-characters-repeat-2-iterations" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:div class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full">foo</xh:span>

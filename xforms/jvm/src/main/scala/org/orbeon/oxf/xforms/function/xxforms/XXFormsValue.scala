@@ -16,14 +16,22 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
+import shapeless.syntax.typeable._
 
 class XXFormsValue extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) =
-    relevantControl(0)(xpathContext) collect {
-      case control: XFormsValueControl ⇒ control.getValue
-    }
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    relevantControl(0)(xpathContext) flatMap (_.narrowTo[XFormsValueControl]) map (_.getValue)
+
+  // TODO: PathMap
+}
+
+class XXFormsFormattedValue extends XFormsFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    relevantControl(0)(xpathContext) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue)
 
   // TODO: PathMap
 }

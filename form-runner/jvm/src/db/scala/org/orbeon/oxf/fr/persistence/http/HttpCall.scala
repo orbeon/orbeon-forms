@@ -19,6 +19,7 @@ import org.orbeon.dom.Document
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.fr.workflow.definitions20191.Stage
@@ -45,8 +46,8 @@ private[persistence] object HttpCall {
   case class SolicitedRequest(
     path        : String,
     method      : HttpMethod,
-    version     : Version,
-    stage       : Option[Stage]      = None,
+    version     : Version             = Unspecified,
+    stage       : Option[Stage]       = None,
     body        : Option[Body]        = None,
     credentials : Option[Credentials] = None,
     timeout     : Option[Int]         = None

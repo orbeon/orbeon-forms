@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.StructuredQName
+import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
 import scala.collection.JavaConverters._
@@ -91,7 +92,16 @@ object ElementHandlerController {
       )
 
     withWrapThrowable {
-      constructor.newInstance(uri, localname, qName, attributes, matched, handlerContext)
+      // Copy the attributes if needed as they will be stored in the handler and they can mutate afterwards, causing problems!
+      // See also comments in `ElementHandler`.
+      constructor.newInstance(
+        uri,
+        localname,
+        qName,
+        if (attributes.getLength == 0) SAXUtils.EMPTY_ATTRIBUTES else new AttributesImpl(attributes),
+        matched,
+        handlerContext
+      )
     }
   }
 

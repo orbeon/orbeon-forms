@@ -43,7 +43,7 @@ class XFormsTextareaHandler(
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
-  private val placeHolderInfo: Option[PlaceHolderInfo] =
+  private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
   override protected def handleControlStart(): Unit = {

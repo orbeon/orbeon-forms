@@ -53,7 +53,7 @@ class XFormsInputHandler(
     forwarding = false
   ) with HandlerSupport {
 
-  private val placeHolderInfo: Option[PlaceHolderInfo] =
+  private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =

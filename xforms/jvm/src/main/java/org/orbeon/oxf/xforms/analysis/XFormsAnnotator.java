@@ -146,7 +146,11 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Gather binding information from xbl:xbl/xbl:binding/@element
                 final String elementAtt = attributes.getValue("element");
                 if (elementAtt != null)
-                    metadata.registerInlineBinding(namespaceContext.current().mappings(), elementAtt, rewriteId(reusableStringArray[0]));
+                    metadata.registerInlineBinding(
+                        NamespaceMapping.apply(namespaceContext.current().mappings()),
+                        elementAtt,
+                        rewriteId(reusableStringArray[0])
+                    );
             }
             // Output element
             stackElement.startElement(uri, localname, qName, attributes);

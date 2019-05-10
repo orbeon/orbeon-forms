@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -110,7 +111,7 @@ object BindingDescriptor {
 
     val newNameAndAppearanceOpt =
       for {
-        descriptor                           ← findMostSpecificWithDatatype(elemName, datatype, appearances.to[Set], descriptors)
+        descriptor                           ← findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
         relatedBindings                      = findRelatedBindings(descriptor, descriptors)
         BindingDescriptor(elemNameOpt, _, _) ← findDirectBinding(relatedBindings)
         elemName                             ← elemNameOpt
@@ -153,14 +154,14 @@ object BindingDescriptor {
       appearancesToBinding
   }
 
-  private def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: Map[String, String]) =
+  private def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping) =
     selectorOpt collect {
-      case TypeSelector(Some(Some(prefix)), localname) ⇒ QName(localname, prefix, ns(prefix))
+      case TypeSelector(Some(Some(prefix)), localname) ⇒ QName(localname, prefix, ns.mapping(prefix))
     }
 
   // Example: fr|number, xf|textarea
   def directBindingPF(
-    ns      : Map[String, String],
+    ns      : NamespaceMapping,
     binding : Option[NodeInfo]
   ): PartialFunction[Selector, BindingDescriptor] = {
     case Selector(
@@ -170,7 +171,7 @@ object BindingDescriptor {
         Nil) ⇒
 
       BindingDescriptor(
-        Some(QName(localname, prefix, ns(prefix))),
+        Some(QName(localname, prefix, ns.mapping(prefix))),
         None,
         None
       )(binding)
@@ -178,7 +179,7 @@ object BindingDescriptor {
 
   // Example: xf|input:xxf-type("xs:decimal")
   private def datatypeBindingPF(
-    ns      : Map[String, String],
+    ns      : NamespaceMapping,
     binding : Option[NodeInfo]
   ): PartialFunction[Selector, BindingDescriptor] = {
     case Selector(
@@ -189,8 +190,8 @@ object BindingDescriptor {
         Nil) ⇒
 
       BindingDescriptor(
-        Some(QName(localname, prefix, ns(prefix))),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.asJava, _, true)),
+        Some(QName(localname, prefix, ns.mapping(prefix))),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
         None
       )(binding)
   }
@@ -200,7 +201,7 @@ object BindingDescriptor {
   // - xf:select1[appearance ~= full]
   // - [appearance ~= character-counter]
   def attributeBindingPF(
-    ns      : Map[String, String],
+    ns      : NamespaceMapping,
     binding : Option[NodeInfo]
   ): PartialFunction[Selector, BindingDescriptor] = {
     case Selector(
@@ -219,7 +220,7 @@ object BindingDescriptor {
 
   // Example: xf|input:xxf-type('xs:date')[appearance ~= dropdowns]
   private def datatypeAndAttributeBindingPF(
-    ns      : Map[String, String],
+    ns      : NamespaceMapping,
     binding : Option[NodeInfo]
   ): PartialFunction[Selector, BindingDescriptor] = {
     case Selector(
@@ -234,7 +235,7 @@ object BindingDescriptor {
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.asJava, _, true)),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
         Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
       )(binding)
   }
@@ -251,13 +252,13 @@ object BindingDescriptor {
 
   private def getAllSelectorsWithPF(
     bindings  : Seq[NodeInfo],
-    collector : (Map[String, String], NodeInfo) ⇒ PartialFunction[Selector, BindingDescriptor]
-  ) = {
+    collector : (NamespaceMapping, NodeInfo) ⇒ PartialFunction[Selector, BindingDescriptor]
+  ): Seq[BindingDescriptor] = {
 
-    def getBindingSelectorsAndNamespaces(binding: NodeInfo) =
-      (binding attValue "element", binding.namespaceMappings.toMap)
+    def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
+      (bindingElem attValue "element", NamespaceMapping(bindingElem.namespaceMappings.toMap))
 
-    def descriptorsForSelectors(selectors: String, ns: Map[String, String], binding: NodeInfo) =
+    def descriptorsForSelectors(selectors: String, ns: NamespaceMapping, binding: NodeInfo) =
       CSSSelectorParser.parseSelectors(selectors) collect collector(ns, binding)
 
     for {
@@ -268,7 +269,7 @@ object BindingDescriptor {
       descriptor
   }
 
-  def findRelatedBindings(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]) =
+  def findRelatedBindings(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]): Seq[BindingDescriptor] =
     descriptors filter (d ⇒ d.binding == descriptor.binding)
 
   def findDirectBinding(

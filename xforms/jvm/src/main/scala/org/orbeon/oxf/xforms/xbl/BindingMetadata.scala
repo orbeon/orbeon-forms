@@ -21,6 +21,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
@@ -73,7 +74,7 @@ trait BindingMetadata extends Logging {
         debug("no binding index to commit")
     }
 
-  def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
+  def registerInlineBinding(ns: NamespaceMapping, elementAtt: String, bindingPrefixedId: String): Unit = {
     debug(
       "registering inline binding",
       List(
@@ -136,14 +137,14 @@ trait BindingMetadata extends Logging {
 
     def hasByNameSelector(binding: IndexableBinding) = {
 
-      val ns = binding.selectorsNamespaces
+      val ns = binding.namespaceMapping
 
       binding.selectors collectFirst {
         case Selector(
           ElementWithFiltersSelector(
             Some(TypeSelector(Some(Some(prefix)), `localname`)),
             Nil),
-          Nil) if ns.get(prefix) == someURI ⇒
+          Nil) if ns.mapping.get(prefix) == someURI ⇒
       } isDefined
     }
 

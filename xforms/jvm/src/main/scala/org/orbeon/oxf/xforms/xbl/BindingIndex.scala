@@ -68,7 +68,7 @@ object BindingIndex {
     binding : IndexableBinding
   ): BindingIndex[IndexableBinding] = {
 
-    val ns = binding.selectorsNamespaces
+    val ns = binding.namespaceMapping
 
     val attDescriptors      = binding.selectors.iterator collect BindingDescriptor.attributeBindingPF(ns, None)
     val nameOnlyDescriptors = binding.selectors.iterator collect BindingDescriptor.directBindingPF(ns, None)

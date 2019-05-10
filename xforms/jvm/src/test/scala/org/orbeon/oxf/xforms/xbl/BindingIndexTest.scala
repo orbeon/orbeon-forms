@@ -17,22 +17,22 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.scalatest.FunSpec
 
 class BindingIndexTest extends FunSpec {
 
   case class TestBinding(
-    selectors           : List[Selector],
-    selectorsNamespaces : Map[String, String]
+    selectors        : List[Selector],
+    namespaceMapping : NamespaceMapping
   ) extends IndexableBinding {
     val path         = None
     val lastModified = -1L
   }
 
   val FooURI     = "http://orbeon.org/oxf/xml/foo"
-  val Namespaces = Map("foo" → FooURI)
+  val Namespaces = NamespaceMapping(Map("foo" → FooURI))
 
   val AllSelectors =
     CSSSelectorParser.parseSelectors(
@@ -83,7 +83,7 @@ class BindingIndexTest extends FunSpec {
   def parseXMLElemWithNamespaces(xmlElem: String): Element = {
 
     val namespacesString =
-      Namespaces map { case (prefix, uri) ⇒ s"""xmlns:$prefix="$uri"""" } mkString " "
+      Namespaces.mapping map { case (prefix, uri) ⇒ s"""xmlns:$prefix="$uri"""" } mkString " "
 
     val encapsulated =
       s"""<root $namespacesString>$xmlElem</root>"""

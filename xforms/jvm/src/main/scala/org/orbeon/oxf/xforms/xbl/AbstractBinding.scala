@@ -27,24 +27,22 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.DocumentInfo
 
-import scala.collection.JavaConverters._
-
 trait IndexableBinding {
-  def selectors           : List[Selector]
-  def selectorsNamespaces : Map[String, String]
-  def path                : Option[String]
-  def lastModified        : Long
+  def selectors        : List[Selector]
+  def namespaceMapping : NamespaceMapping
+  def path             : Option[String]
+  def lastModified     : Long
 }
 
 // Inline binding details, which cannot be shared between forms
 case class InlineBindingRef(
-  bindingPrefixedId   : String,
-  selectors           : List[Selector],
-  selectorsNamespaces : Map[String, String]
+  bindingPrefixedId : String,
+  selectors         : List[Selector],
+  namespaceMapping  : NamespaceMapping
 ) extends IndexableBinding {
   val path         = None
   val lastModified = -1L
@@ -52,18 +50,19 @@ case class InlineBindingRef(
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
-  selectors      : List[Selector],
-  directName     : Option[QName],
-  cssName        : Option[String],
-  bindingElement : Element,
-  path           : Option[String],
-  lastModified   : Long,
-  bindingId      : Option[String],
-  scripts        : Seq[HeadElement],
-  styles         : Seq[HeadElement],
-  handlers       : Seq[Element],
-  modelElements  : Seq[Element],
-  global         : Option[Document]
+  selectors        : List[Selector],
+  directName       : Option[QName],
+  cssName          : Option[String],
+  bindingElement   : Element,
+  path             : Option[String],
+  lastModified     : Long,
+  bindingId        : Option[String],
+  scripts          : Seq[HeadElement],
+  styles           : Seq[HeadElement],
+  handlers         : Seq[Element],
+  modelElements    : Seq[Element],
+  global           : Option[Document],
+  namespaceMapping : NamespaceMapping
 ) extends IndexableBinding {
 
   val containerElementName =          // "div" by default
@@ -72,18 +71,18 @@ case class AbstractBinding(
 
   // XBL modes
   private val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
-  def modeBinding             = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
-  def modeValue               = xblMode("value")
-  def modeExternalValue       = modeValue && xblMode("external-value")
-  def modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
-  def modeLHHA                = xblMode("lhha")
-  def modeFocus               = xblMode("focus")
-  def modeLHHACustom          = modeLHHA && xblMode("custom-lhha")
-  def modeItemset             = xblMode("itemset") // NIY as of 2012-11-20
-  def modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
-  def modeHandlers            = ! xblMode("nohandlers")
+  val modeBinding             = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
+  val modeValue               = xblMode("value")
+  val modeExternalValue       = modeValue && xblMode("external-value")
+  val modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
+  val modeLHHA                = xblMode("lhha")
+  val modeFocus               = xblMode("focus")
+  val modeLHHACustom          = modeLHHA && xblMode("custom-lhha")
+  val modeItemset             = xblMode("itemset") // NIY as of 2019-05-09
+  val modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
+  val modeHandlers            = ! xblMode("nohandlers")
 
-  val labelFor                = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
+  val labelFor : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
 
   // Printable name for the binding match
   def debugBindingName = bindingElement.getQualifiedName
@@ -149,9 +148,6 @@ case class AbstractBinding(
 
       generatedDocument
   }
-
-  def selectorsNamespaces: Map[String, String] =
-    Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
 }
 
 object AbstractBinding {
@@ -169,47 +165,47 @@ object AbstractBinding {
     )
 
   def fromBindingElement(
-    bindingElement : Element,
-    path           : Option[String],
-    lastModified   : Long,
-    scripts        : Seq[HeadElement]
+    bindingElem  : Element,
+    path         : Option[String],
+    lastModified : Long,
+    scripts      : Seq[HeadElement]
   ): AbstractBinding = {
 
-    assert(bindingElement ne null)
+    assert(bindingElem ne null)
 
-    val bindingId = Option(XFormsUtils.getElementId(bindingElement))
+    val bindingId = Option(XFormsUtils.getElementId(bindingElem))
 
     val styles =
       for {
-        resourcesElement ← Dom4j.elements(bindingElement, XBL_RESOURCES_QNAME)
+        resourcesElement ← Dom4j.elements(bindingElem, XBL_RESOURCES_QNAME)
         styleElement     ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
       } yield
         HeadElement(styleElement)
 
     val handlers =
       for {
-        handlersElement ← Option(bindingElement.element(XBL_HANDLERS_QNAME)).toSeq
+        handlersElement ← Option(bindingElem.element(XBL_HANDLERS_QNAME)).toSeq
         handlerElement  ← Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
       } yield
         handlerElement
 
     val modelElements =
       for {
-        implementationElement ← Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
+        implementationElement ← Option(bindingElem.element(XBL_IMPLEMENTATION_QNAME)).toSeq
         modelElement          ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
       } yield
         modelElement
 
-    val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
+    val global = Option(bindingElem.element(XXBL_GLOBAL_QNAME)) map
       (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
 
     val selectors =
-      CSSSelectorParser.parseSelectors(bindingElement.attributeValue(ELEMENT_QNAME))
+      CSSSelectorParser.parseSelectors(bindingElem.attributeValue(ELEMENT_QNAME))
 
-    val directName = {
-      val ns = Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
-      selectors collectFirst BindingDescriptor.directBindingPF(ns, None) flatMap (_.elementName)
-    }
+    val bindingNs = NamespaceMapping(Dom4jUtils.getNamespaceContext(bindingElem))
+
+    val directName =
+      selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)
 
     // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
     val cssName =
@@ -219,7 +215,7 @@ object AbstractBinding {
       selectors,
       directName,
       cssName,
-      bindingElement,
+      bindingElem,
       path,
       lastModified,
       bindingId,
@@ -227,7 +223,8 @@ object AbstractBinding {
       styles,
       handlers,
       modelElements,
-      global
+      global,
+      bindingNs
     )
   }
 }

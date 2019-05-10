@@ -30,7 +30,7 @@ object UploaderClient {
   import Private._
 
   // Used by `Upload`
-  val uploadEventQueue = new ExecutionQueue(asyncUploadRequestSetPromise)
+  val uploadEventQueue = new ExecutionQueue[UploadEvent](asyncUploadRequestSetPromise)
 
   // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
   // remaining events.

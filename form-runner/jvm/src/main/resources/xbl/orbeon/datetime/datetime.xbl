@@ -161,6 +161,7 @@
                 <xf:action event="xforms-value-changed xforms-enabled">
                     <xf:var name="is-valid" value="$value castable as xs:dateTime"/>
                     <xf:action if="$is-valid">
+                        <!-- See https://github.com/orbeon/orbeon-forms/issues/4029 -->
                         <xf:setvalue ref="$local-date" value="substring($value, 1, 10)"/>
                         <xf:setvalue ref="$local-time" value="substring($value, 12, 8)"/>
                     </xf:action>

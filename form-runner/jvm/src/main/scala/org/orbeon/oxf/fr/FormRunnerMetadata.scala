@@ -152,12 +152,13 @@ object FormRunnerMetadata {
         case ControlDetails(name, typ @ "section", sectionLevel, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest ⇒
 
           val nextLevel    = sectionLevel + 1
+          val headingLevel = nextLevel + 1 // so we start at `<h2>` for top-level sections
 
           // TODO: use current/requested lang
           createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line ⇒
-            sb ++= s"<h$nextLevel>"
+            sb ++= s"<h$headingLevel>"
             sb ++= line
-            sb ++= s"</h$nextLevel>"
+            sb ++= s"</h$headingLevel>"
           }
 
           def f(c: ControlDetails) = c.level > sectionLevel

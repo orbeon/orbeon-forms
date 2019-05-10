@@ -412,16 +412,16 @@ class XFormsComponentControl(
       )
 
   // Get the control at the root of the inner scope of the component
-  def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
+  def innerRootControl: XXFormsComponentRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
 
   private lazy val handleLHHA =
     staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
 
   // Don't add Ajax LHHA for custom-lhha mode
-  override def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) =
+  override def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean =
     handleLHHA && super.addAjaxLHHA(attributesImpl, previousControlOpt)
 
   // Consider LHHA hasn't externally changed for custom-lhha mode
-  override def compareLHHA(other: XFormsControl) =
+  override def compareLHHA(other: XFormsControl): Boolean =
     ! handleLHHA || super.compareLHHA(other)
 }

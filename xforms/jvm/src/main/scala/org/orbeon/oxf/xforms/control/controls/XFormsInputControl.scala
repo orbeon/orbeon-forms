@@ -146,7 +146,7 @@ class XFormsInputControl(
       case None ⇒
         // No need to format
         null
-      case boundItem @ Some(_) ⇒
+      case Some(boundItem) ⇒
 
         // Format
         val xpathExpression =
@@ -164,7 +164,8 @@ class XFormsInputControl(
 
         evaluateAsString(
           xpathString        = xpathExpression,
-          contextItem        = boundItem,
+          contextItems       = List(boundItem),
+          contextPosition    = 1,
           namespaceMapping   = XFormsValueControl.FormatNamespaceMapping,
           variableToValueMap = variables.asJava
         )

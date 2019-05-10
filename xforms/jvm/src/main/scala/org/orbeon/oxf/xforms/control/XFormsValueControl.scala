@@ -162,11 +162,12 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
     def evaluateFormat(format: String) =
       evaluateAsString(
-         format,
-         Some(stringToStringValue(getValue)),
-         FormatNamespaceMapping,
-         bindingContext.getInScopeVariables
-       )
+        xpathString        = format,
+        contextItems       = List(stringToStringValue(getValue)),
+        contextPosition    = 1,
+        namespaceMapping   = FormatNamespaceMapping,
+        variableToValueMap = bindingContext.getInScopeVariables
+      )
 
     for {
       typeName ← getBuiltinTypeNameOpt

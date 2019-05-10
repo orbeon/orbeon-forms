@@ -77,12 +77,13 @@ trait ControlXPathSupport {
   }
 
   // Evaluate an XPath expression as a string in the context of this control.
-  // TODO: Remove duplication between this and following method. Check callers.
-  // 3 usages
+  // 5 usages
   def evaluateAsString(
-    xpathString     : String,
-    contextItems    : Seq[Item],
-    contextPosition : Int
+    xpathString        : String,
+    contextItems       : Seq[Item],
+    contextPosition    : Int,
+    namespaceMapping   : NamespaceMapping                  = getNamespaceMappings,
+    variableToValueMap : JMap[String, ValueRepresentation] = bindingContext.getInScopeVariables
   ): Option[String] = {
 
     assert(isRelevant)
@@ -99,8 +100,8 @@ trait ControlXPathSupport {
             contextItems.asJava,
             contextPosition,
             xpathString,
-            getNamespaceMappings,
-            bindingContext.getInScopeVariables,
+            namespaceMapping,
+            variableToValueMap,
             containingDocument.getFunctionLibrary,
             newFunctionContext,
             null,
@@ -115,38 +116,6 @@ trait ControlXPathSupport {
       }
     }
   }
-
-  // Evaluate an XPath expression as a string in the context of this control.
-  // 2 usages
-  def evaluateAsString(
-    xpathString        : String,
-    contextItem        : Option[Item],
-    namespaceMapping   : NamespaceMapping,
-    variableToValueMap : JMap[String, ValueRepresentation]
-  ): Option[String] =
-    contextItem match {
-      case None ⇒ None
-      case Some(contextItem) ⇒
-        try
-          Option(
-            XPathCache.evaluateAsString(
-              contextItem,
-              xpathString,
-              namespaceMapping,
-              variableToValueMap,
-              containingDocument.getFunctionLibrary,
-              newFunctionContext,
-              null,
-              getLocationData,
-              containingDocument.getRequestStats.addXPathStat
-            )
-          )
-        catch {
-          case NonFatal(t) ⇒
-            XFormsError.handleNonFatalXPathError(container, t)
-            None
-        }
-    }
 
   // Return an XPath function context having this control as source control.
   def newFunctionContext =

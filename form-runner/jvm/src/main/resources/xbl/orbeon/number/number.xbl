@@ -28,7 +28,25 @@
             xf|input:xxf-type('xs:integer')"
         xxbl:mode="lhha binding value focus javascript-lifecycle"
         xxf:external-events="fr-set-client-value"
-        xxbl:label-for="html-input">
+        xxbl:label-for="html-input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayAndEditValueJava(
+                        xxf:binding('fr-number'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true'
+                    )[1],
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+    >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>
@@ -104,6 +122,7 @@
                         <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
                         <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
                         <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
+                        xxx should be differn
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -387,7 +406,6 @@
             <!-- Readwrite mode -->
             <xf:group ref="$binding[not($view)]">
 
-
                 <xf:var name="prefix"      value="fr:component-param-value('prefix')"/>
                 <xf:var name="suffix"      value="fr:component-param-value('suffix')"/>
                 <xf:var name="field-width" value="fr:component-param-value('field-width')"/>
@@ -447,23 +465,7 @@
             <!-- Static readonly mode -->
             <xf:input
                 ref="$binding[$view]"
-                xxf:format="
-                    string-join(
-                        (
-                            fr:component-param-value('prefix'),
-                            NumberSupport:getDisplayAndEditValueJava(
-                                xxf:binding('fr-number'),
-                                fr:component-param-value('decimal-separator'),
-                                fr:component-param-value('grouping-separator'),
-                                fr:component-param-value('prefix'),
-                                fr:component-param-value('digits-after-decimal'),
-                                string(fr:component-param-value('round-when-formatting')) = 'true',
-                                string(fr:component-param-value('round-when-storing'))    = 'true'
-                            )[1],
-                            fr:component-param-value('suffix')
-                        ),
-                        ' '
-                    )"/>
+                xxf:format="xxf:formatted-value('fr-number')"/>
 
         </xbl:template>
     </xbl:binding>

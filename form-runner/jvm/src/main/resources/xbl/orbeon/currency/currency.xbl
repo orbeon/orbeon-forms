@@ -18,7 +18,8 @@
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava">
 
     <xbl:binding
         id="fr-number"
@@ -27,9 +28,26 @@
             xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')"
         xxbl:mode="lhha binding value focus javascript-lifecycle"
         xxf:external-events="fr-set-client-value"
-        xxbl:label-for="html-input">
+        xxbl:label-for="html-input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayAndEditValueJava(
+                        xxf:binding('fr-number'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true'
+                    )[1],
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+    >
 
-        <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Currency</display-name>
             <display-name lang="es">Moneda</display-name>

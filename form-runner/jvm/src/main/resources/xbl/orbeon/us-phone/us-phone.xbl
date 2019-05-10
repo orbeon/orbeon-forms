@@ -24,7 +24,24 @@
         element="fr|us-phone"
         xxbl:container="span"
         xxbl:mode="lhha binding value"
-        xxbl:label-for="input">
+        xxbl:label-for="input"
+        xxbl:format="
+            for $v in string(.) return
+                if (matches($v, '^\d+$')) then
+                    concat(
+                        '(',
+                        substring($v, 1, 3),
+                        ') ',
+                        substring($v, 4, 3),
+                        if (string-length($v) gt 6) then
+                            '-'
+                        else
+                            '',
+                        substring($v, 7)
+                    )
+                else
+                    $v"
+    >
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -115,24 +132,7 @@
                     value="xxf:binding('fr-phone-binding')"/>
             <xf:var name="view"
                     value="xxf:is-control-readonly('fr-phone-binding') and property('xxf:readonly-appearance') = 'static'"/>
-            <xf:var name="formatted"
-                    ref="$binding"
-                    value="
-                        for $v in string(.) return
-                            if (matches($v, '^\d+$')) then
-                                concat(
-                                    '(',
-                                    substring($v, 1, 3),
-                                    ') ',
-                                    substring($v, 4, 3),
-                                    if (string-length($v) gt 6) then
-                                        '-'
-                                    else
-                                        '',
-                                    substring($v, 7)
-                                )
-                            else
-                                $v"/>
+
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
                 <xf:var
@@ -144,7 +144,7 @@
                         xbl:attr="navindex navindex=tabindex"
                         ref="."
                         xxf:maxlength="14"
-                        xxf:format="$formatted"
+                        xxf:format="xxf:formatted-value('fr-phone-binding')"
                         xxf:unformat="
                             for $t in translate(xxf:trim(), '()*-[].#/'': ', '') return
                                 if (matches($t, '^\d+$')) then
@@ -159,7 +159,7 @@
                 </xh:span>
             </xf:group>
             <!-- View mode -->
-            <xf:input ref="$binding[$view]" xxf:format="$formatted"/>
+            <xf:input ref="$binding[$view]" xxf:format="xxf:formatted-value('fr-phone-binding')"/>
         </xbl:template>
     </xbl:binding>
 

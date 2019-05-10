@@ -170,11 +170,11 @@
                             </fr:us-state>
                         </fr:c>
                         <fr:c y="2" x="9" w="4">
-                            <xf:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="zip-control" bind="zip-bind">
+                            <fr:number id="zip-control" bind="zip-bind" grouping-separator="" field-width="full">
                                 <xf:label ref="$form-resources/zip/label"/>
                                 <xf:hint ref="$form-resources/zip/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
+                            </fr:number>
                         </fr:c>
                     </fr:grid>
                 </fr:section>

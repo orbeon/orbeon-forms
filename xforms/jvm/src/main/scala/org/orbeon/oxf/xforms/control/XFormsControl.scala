@@ -69,7 +69,7 @@ class XFormsControl(
   final val staticControl: Control = part.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)).asInstanceOf[Control]
   final def staticControlOpt = Option(staticControl)
 
-  final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsId.getPrefixedId(effectiveId)
+  final val prefixedId = staticControlOpt map (_.prefixedId) getOrElse XFormsId.getPrefixedId(effectiveId)
   final def absoluteId = XFormsId.effectiveIdToAbsoluteId(effectiveId)
 
   // Whether the control has been visited

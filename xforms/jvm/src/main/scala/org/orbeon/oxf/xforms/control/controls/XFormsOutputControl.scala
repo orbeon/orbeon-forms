@@ -50,7 +50,7 @@ class XFormsOutputControl(
   def supportedFileMetadata = Seq("mediatype", "filename") // could add "state"?
 
   // Optional format and mediatype
-  private def format = Option(staticControl) flatMap (_.format)
+  private def format = staticControlOpt flatMap (_.format)
 
   // Value attribute
   private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)

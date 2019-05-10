@@ -47,8 +47,8 @@ class XFormsInputControl(
 
   override type Control <: InputControl
 
-  private def format   = Option(staticControl) flatMap (_.format)
-  private def unformat = Option(staticControl) flatMap (_.unformat)
+  private def format   = staticControlOpt flatMap (_.format)
+  private def unformat = staticControlOpt flatMap (_.unformat)
 
   private def unformatTransform(v: String) = unformat match {
     case Some(expr) ⇒ evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""

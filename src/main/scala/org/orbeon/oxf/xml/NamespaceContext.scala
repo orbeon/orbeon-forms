@@ -71,7 +71,7 @@ class NamespaceContext {
 
   // Start with the standard "xml" prefix
   private var _current = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
-  def current = _current
+  def current: Context = _current
 
   // TODO: We create a copy of the map because we don't want the mapping from "" → default ns.
   // This is used only by `XFormsAnnotator` but needs to be fixed. Also, what about undeclarations?
@@ -79,7 +79,7 @@ class NamespaceContext {
 
   // Pending mappings, which will be in force for the next element
   private var _pending = Map.empty[String, String]
-  def pending = _pending
+  def pending: Map[String, String] = _pending
 
   // When an element starts, we freeze its mappings
   def startElement(): Unit = {
@@ -101,7 +101,7 @@ class NamespaceContext {
   // For compatibility with NamespaceSupport/NamespaceSupport2
   def getURI(prefix: String): String = current.uriForPrefix(prefix).orNull
   def getPrefixes: ju.Enumeration[String] = current.prefixes.iterator.asJavaEnumeration
-  def getPrefix(uri: String) = current.firstPrefixForURI(uri).orNull
+  def getPrefix(uri: String): String = current.firstPrefixForURI(uri).orNull
 
   // See http://www.w3.org/TR/REC-xml-names/#xmlReserved
   // We ignore these 2 prefixes but do not reject other prefixes starting with "xml"

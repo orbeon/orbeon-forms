@@ -69,10 +69,9 @@ object XPathCache {
         baseURI            = null,
         locationData       = null
       )
-
   }
 
-  def isDynamicXPathError(t: Throwable) = t match {
+  def isDynamicXPathError(t: Throwable): Boolean = t match {
     case e: XPathException if ! e.isStaticError ⇒ true
     case _ ⇒ false
   }

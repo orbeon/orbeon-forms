@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import java.{util ⇒ ju}
+
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.NamespaceMapping
-import java.util.{Map ⇒ JMap}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
-import collection.JavaConverters._
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 trait ControlXPathSupport {
@@ -29,7 +31,7 @@ trait ControlXPathSupport {
   def getNamespaceMappings: NamespaceMapping =
     if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
 
-  def evaluateBooleanAvt(attributeValue: String) =
+  def evaluateBooleanAvt(attributeValue: String): Boolean =
     evaluateAvt(attributeValue) == "true"
 
   /**
@@ -82,8 +84,8 @@ trait ControlXPathSupport {
     xpathString        : String,
     contextItems       : Seq[Item],
     contextPosition    : Int,
-    namespaceMapping   : NamespaceMapping                  = getNamespaceMappings,
-    variableToValueMap : JMap[String, ValueRepresentation] = bindingContext.getInScopeVariables
+    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables
   ): Option[String] = {
 
     assert(isRelevant)

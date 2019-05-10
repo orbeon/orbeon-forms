@@ -44,5 +44,4 @@ object NamespaceMapping {
 
   def apply(mapping: ju.Map[String, String]): NamespaceMapping =
     apply(mapping.asScala.toMap)
-
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -25,7 +25,9 @@ class ContainerControl(
   parent             : Option[ElementAnalysis],
   preceding          : Option[ElementAnalysis],
   scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with ViewTrait {
+) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+     with ViewTrait {
+
   // For <xf:group xxf:element="xh:div">. Can be null.
-  val elementQName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)
+  val elementQName: QName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)
 }

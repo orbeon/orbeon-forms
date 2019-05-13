@@ -1,5 +1,3 @@
-package org.orbeon.io
-
 /**
   * Copyright (C) 2007 Orbeon, Inc.
   *
@@ -13,6 +11,8 @@ package org.orbeon.io
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
+package org.orbeon.io
+
 object CharsetNames {
   val Utf8     = "UTF-8"
   val Iso88591 = "ISO-8859-1"

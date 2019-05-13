@@ -14,7 +14,6 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.dom
-import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils.stringToSet
 import org.orbeon.oxf.util.XPath

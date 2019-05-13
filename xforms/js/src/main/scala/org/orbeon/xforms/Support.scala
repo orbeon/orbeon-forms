@@ -15,7 +15,6 @@ package org.orbeon.xforms
 
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 

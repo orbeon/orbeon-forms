@@ -14,7 +14,6 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.facade.Control
 import org.scalajs.dom.html
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -60,16 +59,10 @@ object Page {
       id
   }
 
-  // Used for upload controls only:
-  //
-  // Create or return a control object corresponding to the provided container. Each control is inside a given
-  // form, so getControl() could be a method of a form, but since we can given a container or control id determine
-  // the control object without knowing the form, this method is defined at the Page level which makes it easier
-  // to use for a caller who doesn't necessarily have a reference to the form object.
   @JSExport
-  def getControl(container: html.Element): Control = {
+  def getUploadControl(container: html.Element): Upload = {
 
-    def getControlConstructor(container: html.Element): () ⇒ Control =
+    def getControlConstructor(container: html.Element): () ⇒ Upload =
       controlConstructors find (_.predicate(container)) match {
         case Some(result) ⇒ result.controlConstructor
         case None         ⇒ throw new IllegalArgumentException(s"Can't find a relevant control for container: `${container.id}`")
@@ -89,17 +82,17 @@ object Page {
     }
   }
 
-  // Register a control constructor (such as tree, input...). This is expected to be called by the control itself when loaded.
-  def registerControlConstructor(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean): Unit =
+  // NOTE: This mechanism is deprecated by XBL and only used for the native `Upload` as of 2019-05-13.
+  def registerControlConstructor(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean): Unit =
     controlConstructors ::= ConstructorPredicate(controlConstructor, predicate)
 
   private object Private {
 
-    case class ConstructorPredicate(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean)
+    case class ConstructorPredicate(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean)
 
     var forms = Map[String, Form]()
 
     var controlConstructors: List[ConstructorPredicate] = Nil
-    var idToControl = Map[String, Control]()
+    var idToControl = Map[String, Upload]()
   }
 }

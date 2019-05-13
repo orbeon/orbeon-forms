@@ -239,26 +239,3 @@ object Utils extends js.Object {
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element =      js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit = js.native
 }
-
-@JSGlobal("ORBEON.xforms.control.Control")
-@js.native
-class Control extends js.Object {
-
-  val container: html.Element = js.native
-
-  def init(container: html.Element) : Unit      = js.native
-  def getForm()                     : html.Form = js.native
-  def change()                      : Unit      = js.native
-
-  // Provide a new itemset for a control, if the control supports this.
-  def setItemset(itemset: js.Any): Unit = js.native
-
-  // Set the current value of the control in the UI, without sending an update to the server about the new value
-  def setValue(value: String): Unit = js.native
-
-  // Return the current value of the control
-  def getValue(): String = js.native
-
-  // Returns the first element with the given class name that are inside this control
-  def getElementByClassName(className: String): js.UndefOr[html.Element] = js.native
-}

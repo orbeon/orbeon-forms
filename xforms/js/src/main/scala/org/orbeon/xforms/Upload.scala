@@ -15,12 +15,17 @@ package org.orbeon.xforms
 
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
-import org.orbeon.xforms.facade.{Control, Events, Properties}
+import org.orbeon.xforms.facade.{Events, Properties}
 import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExport
 
 object Upload {
+
+  private val ListenerSuffix = ".orbeon.upload"
+  private val ClickEvent     = s"click$ListenerSuffix"
 
   scribe.debug("init object")
 
@@ -28,39 +33,45 @@ object Upload {
 }
 
 // Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
-class Upload extends Control {
+class Upload {
 
   self ⇒
 
-  private var yuiProgressBar: ProgressBar = null
+  import Upload._
+
+  private var _yuiProgressBar: ProgressBar = null
+
+  private var _container: html.Element = null
+  def container: Element = self._container
 
   // Creates markup for loading progress indicator element, if necessary
-  override def init(container: html.Element): Unit = {
+  def init(container: html.Element): Unit = {
 
-    super.init(container)
+    self._container = container
 
     scribe.debug("init class")
 
-    if (getElementByClassName(UploadProgressClass).isEmpty) {
+    if (findDescendantElem(UploadProgressClass).isEmpty) {
 
       // Add markup to the DOM
       // TODO: i18n of "Cancel" link
       val innerHtml = s"""<span class="$UploadProgressClass-bar"></span><a href="#" class="$UploadCancelClass">Cancel</a>"""
-      $(s"""<span class="$UploadProgressClass">$innerHtml</span>""").insertAfter(getElementByClassName(UploadSelectClass))
+      $(s"""<span class="$UploadProgressClass">$innerHtml</span>""").insertAfter(findDescendantElem(UploadSelectClass))
 
       // Register listener on the cancel link
-      val cancelAnchor = getElementByClassName(UploadCancelClass)
+      val cancelAnchor = findDescendantElem(UploadCancelClass)
 
-      $(cancelAnchor).on("click.orbeon.upload", self.cancel _)
+      $(cancelAnchor).on(ClickEvent, self.cancelButtonActivated _)
     }
   }
 
   // The change event corresponds to a file being selected. This will queue an event to submit this file in the
   // background  as soon as possible (pseudo-Ajax request).
-  override def change(): Unit = {
+  @JSExport
+  def change(): Unit = {
     scribe.debug("change → queueing")
     UploaderClient.uploadEventQueue.add(
-      UploadEvent(self.getForm(), self),
+      UploadEvent(getAncestorForm, self),
       Properties.delayBeforeIncrementalRequest.get(),
       ExecutionWait.MinWait
     )
@@ -70,10 +81,11 @@ class Upload extends Control {
   // interrupted we resume it and otherwise update the progress indicator to reflect the new value we got from the
   // server.
   // This is called from JavaScript directly in AjaxServer.js.
+  @JSExport
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
       case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); scribe.debug("cancel")
-      case _ if self.yuiProgressBar ne null ⇒ self.yuiProgressBar.set("value", 10 + 110 * received / expected); scribe.debug(s"update progress ${100 * received / expected}")
+      case _ if self._yuiProgressBar ne null ⇒ self._yuiProgressBar.set("value", 10 + 110 * received / expected); scribe.debug(s"update progress ${100 * received / expected}")
       case _ ⇒
     }
 
@@ -87,7 +99,7 @@ class Upload extends Control {
       Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
       // If progress indicator is still shown, this means some XForms reset the file name
       // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
-      if ($(self.container).hasClass(StateClassPrefix + "progress"))
+      if ($(_container).hasClass(StateClassPrefix + "progress"))
         setState("empty") // switch back to the file selector, as we won't get a file name anymore
     }
 
@@ -97,15 +109,9 @@ class Upload extends Control {
     scribe.debug("adding listener for ajaxResponseProcessed")
   }
 
-  // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
-  def cancel(event: js.Object): Unit = {
-    scribe.debug("cancel")
-    Event.preventDefault(event)
-    UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
-  }
-
   // Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
   // (file is being uploaded), or "file" (a file has been uploaded).
+  @JSExport
   def setState(state: String): Unit = {
 
     scribe.debug(s"setState $state")
@@ -114,16 +120,16 @@ class Upload extends Control {
 
     // Switch class
     for (s ← States)
-      $(self.container).removeClass(StateClassPrefix + s)
+      $(_container).removeClass(StateClassPrefix + s)
 
-    $(self.container).addClass(StateClassPrefix + state)
+    $(_container).addClass(StateClassPrefix + state)
 
     if (state == "progress") {
       // Create or recreate progress bar
-      val progressBarSpan = getElementByClassName(s"$UploadProgressClass-bar").get
+      val progressBarSpan = findDescendantElem(s"$UploadProgressClass-bar").get
       progressBarSpan.innerHTML = ""
 
-      self.yuiProgressBar = new ProgressBar(
+      self._yuiProgressBar = new ProgressBar(
         new js.Object {
           val width    = 100
           val height   = 10
@@ -134,9 +140,9 @@ class Upload extends Control {
         }
       )
 
-      self.yuiProgressBar.get("anim").duration = Properties.delayBeforeUploadProgressRefresh.get() / 1000 * 1.5
-      self.yuiProgressBar.render(progressBarSpan)
-      self.yuiProgressBar.set("value", 10)
+      self._yuiProgressBar.get("anim").duration = Properties.delayBeforeUploadProgressRefresh.get() / 1000 * 1.5
+      self._yuiProgressBar.render(progressBarSpan)
+      self._yuiProgressBar.set("value", 10)
     }
   }
 
@@ -145,7 +151,7 @@ class Upload extends Control {
 
     scribe.debug("clear")
 
-    val oldInputElement = getElementByClassName(UploadSelectClass).get.asInstanceOf[html.Input]
+    val oldInputElement = findDescendantElem(UploadSelectClass).get.asInstanceOf[html.Input]
 
     // TODO: Would be good to copy attributes generically.
     val newInputElement =
@@ -165,4 +171,17 @@ class Upload extends Control {
 
     $(oldInputElement).replaceWith(newInputElement)
   }
+
+  // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
+  private def cancelButtonActivated(event: js.Object): Unit = {
+    scribe.debug("cancel button activated")
+    Event.preventDefault(event)
+    UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
+  }
+
+  private def findDescendantElem(className: String): js.UndefOr[html.Element] =
+    $(_container).find(s".$className")(0)
+
+  private def getAncestorForm: html.Form =
+    $(_container).parents("form")(0).asInstanceOf[html.Form]
 }

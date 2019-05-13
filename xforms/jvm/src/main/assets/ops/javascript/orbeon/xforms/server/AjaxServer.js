@@ -1384,7 +1384,7 @@
                                     var sizeSpan      = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, documentElement)[0];
 
                                     // Set values in DOM
-                                    var upload = ORBEON.xforms.Page.getControl(documentElement);
+                                    var upload = ORBEON.xforms.Page.getUploadControl(documentElement);
 
                                     var state     = ORBEON.util.Dom.getAttribute(elem, "state");
                                     var fileName  = ORBEON.util.Dom.getAttribute(elem, "filename");
@@ -1505,7 +1505,7 @@
 
                             // Handle progress for upload controls
                             if (progressState != null && progressState != "")
-                                ORBEON.xforms.Page.getControl(documentElement).progress(
+                                ORBEON.xforms.Page.getUploadControl(documentElement).progress(
                                     progressState,
                                     progressReceived != null && progressReceived != "" ? parseInt(progressReceived) : null,
                                     progressExpected != null && progressExpected != "" ? parseInt(progressExpected) : null);

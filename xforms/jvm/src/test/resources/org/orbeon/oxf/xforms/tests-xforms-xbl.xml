@@ -5018,6 +5018,56 @@
         </output>
     </test>
 
+    <test description="For #4041: xxbl:format" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding
+                            id="fr-foo"
+                            element="fr|foo"
+
+                            xxbl:mode="binding value"
+                            xxbl:format="concat('The value is ', string(.), xf:element('my:elem')[0], '!')"
+                            xmlns:my="http://orbeon.org/oxf/xml/my">
+
+                            <xbl:implementation>
+                                <xf:model><xf:instance><i><my:a/><my:b/></i></xf:instance></xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <xf:output id="fr-foo-value" value="xxf:formatted-value('fr-foo')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:foo id="foo-1" ref="42"/>
+                    <xf:output id="my-foo-value" value="xxf:formatted-value('foo-1')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                 <xxf:action>
+                 <xxf:control-values>
+                     <xxf:control id="foo-1" readonly="true"/>
+                     <xxf:control id="foo-1≡fr-foo-value">
+                         <xxf:value>The value is 42!</xxf:value>
+                     </xxf:control>
+                     <xxf:control id="my-foo-value">
+                         <xxf:value>The value is 42!</xxf:value>
+                     </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

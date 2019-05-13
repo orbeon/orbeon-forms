@@ -379,10 +379,12 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       unmanagedBase.value,
       (includeFilter in unmanagedJars).value,
       (excludeFilter in unmanagedJars).value
-    )
+    ),
+    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % "provided"
   )
+  .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%  "scala-async" % "0.9.7" % "provided"
+    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % "0.9.7"        % "provided"
   )
 
 lazy val commonJVM = common.jvm

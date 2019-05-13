@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.FunSpec
@@ -251,5 +252,53 @@ class SharedUtilsTest extends FunSpec {
         assert(expected === s.substringAfter(search))
       }
 
+  }
+
+  describe("The `escapeXMLMinimal` and `unescapeXMLMinimal` functions") {
+
+    val expected = Seq(
+      """<a href="https://example.org/">a &amp; b and "c"</a>""" →
+        """&lt;a href="https://example.org/"&gt;a &amp;amp; b and "c"&lt;/a&gt;"""
+    )
+
+    for ((left, right) ← expected)
+      it(s"must escape with `$left`") {
+        assert(right === escapeXMLMinimal(left))
+      }
+
+    for ((left, right) ← expected)
+      it(s"must unescape with `$left`") {
+        assert(left === unescapeXMLMinimal(right))
+      }
+
+    for ((left, _) ← expected)
+      it(s"must roundtrip with `$left`") {
+        assert(left === unescapeXMLMinimal(escapeXMLMinimal(left)))
+      }
+  }
+
+  describe("The `escapeXMLForAttribute` function") {
+
+    val expected = Seq(
+      """<a href="https://example.org/">a &amp; b and "c"</a>""" →
+        """&lt;a href=&quot;https://example.org/&quot;&gt;a &amp;amp; b and &quot;c&quot;&lt;/a&gt;"""
+    )
+
+    for ((left, right) ← expected)
+      it(s"must escape with `$left`") {
+        assert(right === escapeXMLForAttribute(left))
+      }
+  }
+
+  describe("The `normalizeSerializedHTML` function") {
+
+    val expected = Seq(
+      "\rtext with\r\na new line\r" → "text with\na new line"
+    )
+
+    for ((left, right) ← expected)
+      it(s"must escape with `$left`") {
+        assert(right === normalizeSerializedHTML(left))
+      }
   }
 }

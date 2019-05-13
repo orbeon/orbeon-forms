@@ -17,7 +17,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Logging, NetUtils}
+import org.orbeon.oxf.util.{Logging, MarkupUtils, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLUtils}
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
@@ -279,7 +279,7 @@ object XFormsControl {
       private var isStartElement = false
 
       override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
-        sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length))) // NOTE: not efficient to create a new String here
+        sb.append(MarkupUtils.escapeXMLMinimal(new String(chars, start, length))) // NOTE: not efficient to create a new String here
         isStartElement = false
       }
 

@@ -60,11 +60,11 @@ private object SubmitResponseEvent {
       sb.append("<headers>")
       for ((name, values) ← headers) {
         sb.append("<header><name>")
-        sb.append(XMLUtils.escapeXMLMinimal(name))
+        sb.append(MarkupUtils.escapeXMLMinimal(name))
         sb.append("</name>")
         for (value ← values) {
           sb.append("<value>")
-          sb.append(XMLUtils.escapeXMLMinimal(value))
+          sb.append(MarkupUtils.escapeXMLMinimal(value))
           sb.append("</value>")
         }
         sb.append("</header>")

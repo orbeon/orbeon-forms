@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
-import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.xforms.XFormsId
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
@@ -53,7 +53,7 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, sup
       // Combine multiple values as a single HTML value using ul/li
       val combined = (
         valuesWithIsHtml
-        map { case (value, isHTML) ⇒ if (! isHTML) XMLUtils.escapeXMLMinimal(value) else value }
+        map { case (value, isHTML) ⇒ if (! isHTML) MarkupUtils.escapeXMLMinimal(value) else value }
         mkString ("<ul><li>", "</li><li>", "</li></ul>")
       )
 
@@ -88,7 +88,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
     if (_isHTML)
       XFormsControl.getEscapedHTMLValue(control.getLocationData, rawValue)
     else
-      XMLUtils.escapeXMLMinimal(rawValue)
+      MarkupUtils.escapeXMLMinimal(rawValue)
   }
 
   def isHTML = {

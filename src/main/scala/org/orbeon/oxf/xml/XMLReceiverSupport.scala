@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
+import org.orbeon.oxf.util.MarkupUtils
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -92,7 +93,7 @@ trait XMLReceiverSupport {
   def processingInstruction(name: String, atts: Seq[(String, String)] = Nil)(implicit receiver: XMLReceiver): Unit =
     receiver.processingInstruction(
       name,
-      atts map { case (name, value) ⇒ s"""$name="${XMLUtils.escapeXMLForAttribute(value)}"""" } mkString " "
+      atts map { case (name, value) ⇒ s"""$name="${MarkupUtils.escapeXMLForAttribute(value)}"""" } mkString " "
     )
 
   implicit def pairsToAttributes(atts: Seq[(String, String)]): Attributes = {

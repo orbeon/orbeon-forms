@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{GridDataMigration, FormRunner, FormRunnerPersistence}
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence, GridDataMigration}
+import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -128,7 +128,7 @@ trait FormDefinition {
             <resources lang={lang}>{
               val labelElemOpt =
                 resourceHolder elemValueOpt "label" map { label ⇒
-                  <label>{if (htmlLabel) label else XMLUtils.escapeXMLMinimal(label)}</label>
+                  <label>{if (htmlLabel) label else MarkupUtils.escapeXMLMinimal(label)}</label>
                 }
 
               val itemElems = resourceHolder child "item" map { item ⇒

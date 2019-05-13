@@ -19,6 +19,7 @@ import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.DebugProcessor;
+import org.orbeon.oxf.util.MarkupUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.XPathCache;
@@ -31,7 +32,6 @@ import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -164,7 +164,7 @@ public class XFormsUtils {
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
-                return XMLUtils.unescapeXMLMinimal(sb.toString());
+                return MarkupUtils.unescapeXMLMinimal(sb.toString());
             } else {
                 // We found some HTML, just return it
                 return sb.toString();
@@ -234,7 +234,7 @@ public class XFormsUtils {
                 final Item boundItem = currentBindingContext.getSingleItem();
                 final String tempResult = DataModel.getValue(boundItem);
                 if (tempResult != null) {
-                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    return (acceptHTML && containsHTML == null) ? MarkupUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
                     // There is a single-node binding but it doesn't point to an acceptable item
                     return null;
@@ -269,7 +269,7 @@ public class XFormsUtils {
                         tempResult = "";
                     }
 
-                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    return (acceptHTML && containsHTML == null) ? MarkupUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
                     // There is a value attribute but the evaluation context is empty
                     return null;
@@ -305,7 +305,7 @@ public class XFormsUtils {
             if (acceptHTML && containsHTML != null && ! containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
-                return XMLUtils.unescapeXMLMinimal(sb.toString());
+                return MarkupUtils.unescapeXMLMinimal(sb.toString());
             } else {
                 // We found some HTML, just return it
                 return sb.toString();
@@ -670,7 +670,7 @@ public class XFormsUtils {
                             sb.append(outputControl.getExternalValue());
                         } else {
                             // Mediatype is not HTML so we don't escape
-                            sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue()));
+                            sb.append(MarkupUtils.escapeXMLMinimal(outputControl.getExternalValue()));
                         }
                     } else {
                         if (isHTMLMediatype) {
@@ -727,7 +727,7 @@ public class XFormsUtils {
                             sb.append(currentAttributeName);
                             sb.append("=\"");
                             if (resolvedValue != null)
-                                sb.append(XMLUtils.escapeXMLMinimal(resolvedValue));
+                                sb.append(MarkupUtils.escapeXMLMinimal(resolvedValue));
                             sb.append('"');
                         }
                     }
@@ -750,7 +750,7 @@ public class XFormsUtils {
         }
 
         public void text(Text text) {
-            sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
+            sb.append(acceptHTML ? MarkupUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
             lastIsStart = false;
         }
     }

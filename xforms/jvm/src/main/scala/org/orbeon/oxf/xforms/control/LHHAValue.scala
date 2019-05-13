@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.control
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl._
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 case class LHHAValue(label: String, isHTML: Boolean) {
@@ -32,7 +32,7 @@ case class LHHAValue(label: String, isHTML: Boolean) {
         if (isHTML)
             getEscapedHTMLValue(locationData, label)
         else
-            escapeXMLMinimal(label)
+          MarkupUtils.escapeXMLMinimal(label)
 
     def javaScriptValue(locationData: LocationData) =
         escapeJavaScript(htmlValue(locationData))

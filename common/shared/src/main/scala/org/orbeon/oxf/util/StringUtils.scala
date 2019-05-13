@@ -16,14 +16,20 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.generic.CanBuildFrom
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
 
+@JSExportTopLevel("ORBEON.common.StringUtils")
 object StringUtils {
 
   // Convert a string of tokens to a set
   // TODO: Move to StringOps.
   def stringToSet(s: String)               = s.splitTo[Set]()
   def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
+
+  @JSExport
+  def endsWith(s: String, suffix: String): Boolean =
+    s.endsWith(suffix)
 
   //@XPathFunction
   // TODO: Move to StringOps.

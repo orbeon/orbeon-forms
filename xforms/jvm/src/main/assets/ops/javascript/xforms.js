@@ -24,7 +24,6 @@ var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
-var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
@@ -418,7 +417,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                             + ORBEON.util.DateTime._padAZero(jsDate.getMinutes());
                 } else {
                     // US time: [h]:[m]:[s] [P] or [h]:[m]:[s] [P,2-2]
-                    var amPm = ORBEON.util.StringOps.endsWith(formatInputTime, "-2]")
+                    var amPm = ORBEON.common.StringUtils.endsWith(formatInputTime, "-2]")
                         ? (jsDate.getHours() < 12 ? " am" : " pm")
                         : (jsDate.getHours() < 12 ? " a.m." : " p.m.");
                     return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
@@ -1743,8 +1742,8 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         setHelpMessage: function (control, message) {
             // We escape the value because the help element is a little special, containing escaped HTML
-            message = ORBEON.util.StringOps.escapeForMarkup(message);
-            ORBEON.xforms.Controls._setMessage(control, "help", message);
+            message = ORBEON.common.MarkupUtils.escapeXMLMinimal(message);
+            ORBEON.xforms.Controls._setMessage(control, "help", message); // uses `innerHTML`
             ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
         },
 

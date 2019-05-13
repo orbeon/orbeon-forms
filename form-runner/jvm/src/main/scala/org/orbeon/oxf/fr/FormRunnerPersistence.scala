@@ -33,7 +33,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -138,7 +138,7 @@ object FormRunnerPersistence {
         for {
           (name, value) ← headers
         } yield
-          <header><name>{XMLUtils.escapeXMLMinimal(name)}</name><value>{XMLUtils.escapeXMLMinimal(value)}</value></header>
+          <header><name>{MarkupUtils.escapeXMLMinimal(name)}</name><value>{MarkupUtils.escapeXMLMinimal(value)}</value></header>
       }</headers>.toString
 
     // Convert to TinyTree

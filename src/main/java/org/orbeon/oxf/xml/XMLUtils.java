@@ -1,15 +1,6 @@
 package org.orbeon.oxf.xml;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class XMLUtils {
-
-    public static String unescapeXMLMinimal(String str) {
-        str = StringUtils.replace(str, "&amp;", "&");
-        str = StringUtils.replace(str, "&lt;", "<");
-        str = StringUtils.replace(str, "&gt;", ">");
-        return str;
-    }
 
     public static String prefixFromQName(String qName) {
         final int colonIndex = qName.indexOf(':');
@@ -43,18 +34,5 @@ public class XMLUtils {
         else {
             return "Q{" + uri + '}' + localname;
         }
-    }
-
-    public static String escapeXMLMinimal(String str) {
-        str = StringUtils.replace(str, "&", "&amp;");
-        str = StringUtils.replace(str, "<", "&lt;");
-        str = StringUtils.replace(str, ">", "&gt;"); // do this one too because the sequence `]]>` is not allowed
-        return str;
-    }
-
-    public static String escapeXMLForAttribute(String str) {
-        str = escapeXMLMinimal(str);
-        str = StringUtils.replace(str, "\"", "&quot;");
-        return str;
     }
 }

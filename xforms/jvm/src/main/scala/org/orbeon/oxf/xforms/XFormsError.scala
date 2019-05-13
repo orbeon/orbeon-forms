@@ -13,27 +13,18 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
-import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
-
-import scala.collection.JavaConverters._
 
 // Represent a non-fatal server XForms error
 case class ServerError(
@@ -85,13 +76,13 @@ object ServerError {
   def errorsAsHTMLElem(errors: TraversableOnce[ServerError]) =
     <ul>{
       for (error ← errors)
-        yield <li>{XMLUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
     }</ul>
 
   def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]) =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
       for (error ← errors)
-        yield <li>{XMLUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
     }</ul>
 }
 

@@ -498,7 +498,6 @@ lazy val formRunnerJS = formRunner.js
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
 
     // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
     unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
@@ -624,7 +623,6 @@ lazy val xformsJS: Project = xforms.js
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
 
 //    jsEnv                         := NodeJSEnv().value,
 

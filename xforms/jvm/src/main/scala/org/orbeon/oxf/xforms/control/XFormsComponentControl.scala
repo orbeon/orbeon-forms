@@ -69,7 +69,13 @@ class XFormsValueComponentControl(
         formatted            ← valueWithSpecifiedFormat(
             format           = format,
             namespaceMapping = abstractBinding.namespaceMapping,
-            functionContext  = XFormsFunction.Context(nestedContainer, nestedBindingContext, innerRootControl.effectiveId, nestedBindingContext.modelOpt, null)
+            functionContext  = XFormsFunction.Context(
+                                 container         = nestedContainer,
+                                 bindingContext    = nestedBindingContext,
+                                 sourceEffectiveId = innerRootControl.effectiveId,
+                                 modelOpt          = nestedBindingContext.modelOpt,
+                                 data              = null
+                               )
           )
       } yield
         formatted
@@ -77,7 +83,7 @@ class XFormsValueComponentControl(
     def fromExternal =
       Option(getExternalValue)
 
-    fromBinding orElse fromExternal
+    fromBinding orElse valueWithDefaultFormat orElse fromExternal
   }
 
   // TODO

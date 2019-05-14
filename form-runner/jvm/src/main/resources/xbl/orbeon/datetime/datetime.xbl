@@ -19,12 +19,13 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xbl:binding id="fr-datetime"
-                 element="
-                    fr|datetime,
-                    xf|input:xxf-type('xs:dateTime')"
-                 xxbl:mode="lhha binding value"
-                 xxbl:label-for="date">
+    <xbl:binding
+        id="fr-datetime"
+        element="
+           fr|datetime,
+           xf|input:xxf-type('xs:dateTime')"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="date">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>

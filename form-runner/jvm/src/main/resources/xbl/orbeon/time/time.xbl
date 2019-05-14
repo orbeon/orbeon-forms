@@ -162,16 +162,7 @@
                 </xh:div>
             </xf:group>
 
-            <xf:input
-                ref="$binding[$view]"
-                xxf:format="
-                    format-time(
-                        xs:time($binding),
-                        xxf:property('oxf.xforms.format.input.time'),
-                        fr:lang(),
-                        (), ()
-                    )
-                "/>
+            <xf:input ref="$binding[$view]"/>
 
         </xbl:template>
     </xbl:binding>

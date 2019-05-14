@@ -68,13 +68,13 @@
 
     <!-- Formats -->
     <property as="xs:string"  name="oxf.xforms.format.output.date">
-        if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', xxf:lang(), (), ()) else .
+        if (. castable as xs:date) then format-date(xs:date(.), '[M]/[D]/[Y]', xxf:lang(), (), ()) else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.dateTime">
-        if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01]', xxf:lang(), (), ()) else .
+        if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[M]/[D]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ()) else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.time">
-        if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01]', xxf:lang(), (), ()) else .
+        if (. castable as xs:time) then format-time(xs:time(.), '[h]:[m]:[s] [P,*-2]', xxf:lang(), (), ()) else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.decimal">
         if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else .

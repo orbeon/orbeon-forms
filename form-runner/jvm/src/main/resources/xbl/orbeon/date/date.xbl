@@ -156,7 +156,7 @@
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>
 
-            <xf:group ref=".[not($view)]">
+            <xf:group ref="$binding[not($view)]">
 
                 <!-- Pass excluded dates from custom MIP to Date.scala -->
                 <xf:var name="excluded-dates" value="xxf:custom-mip($binding, 'excluded-dates')">
@@ -195,16 +195,7 @@
             </xf:group>
 
             <!-- Static readonly mode -->
-            <xf:input
-                ref="$binding[$view]"
-                xxf:format="
-                    format-date(
-                        xs:date($binding),
-                        xxf:property('oxf.xforms.format.input.date'),
-                        fr:lang(),
-                        (), ()
-                    )
-                "/>
+            <xf:input ref="$binding[$view]"/>
 
         </xbl:template>
     </xbl:binding>

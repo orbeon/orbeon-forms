@@ -96,7 +96,7 @@ class PartAnalysisImpl(
 
     val prefixedId = if (prefix ne null) prefix + id else id
 
-    Option(metadata.getNamespaceMapping(prefixedId)) getOrElse {
+    metadata.getNamespaceMapping(prefixedId) getOrElse {
       // NOTE: We hope to get rid of this case at some point as all mappings should be in the metadata (put an assert)
       getIndentedLogger.logDebug("", "namespace mappings not cached", "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element))
       NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(element))

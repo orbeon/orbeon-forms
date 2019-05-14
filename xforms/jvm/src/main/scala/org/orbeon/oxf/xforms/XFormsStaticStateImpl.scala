@@ -313,7 +313,7 @@ object XFormsStaticStateImpl {
       val staticId = attributes.getValue("id")
       if (staticId ne null) {
         val prefixedId = prefix + staticId
-        if (metadata.getNamespaceMapping(prefixedId) ne null) {
+        if (metadata.getNamespaceMapping(prefixedId).isDefined) {
           if (startScope.contains(staticId))
             throw new OXFException("Duplicate id found for static id: " + staticId)
           startScope += staticId → prefixedId

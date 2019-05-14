@@ -409,7 +409,7 @@ class XBLBindings(
       // if they have AVTs).
       if (staticId ne null) {
         val prefixedId = prefix + staticId
-        if (metadata.getNamespaceMapping(prefixedId) ne null) {
+        if (metadata.getNamespaceMapping(prefixedId).isDefined) {
           val scope = if (currentScope == XXBLScope.inner) innerScope else outerScope
 
           // Enforce constraint that mapping must be unique

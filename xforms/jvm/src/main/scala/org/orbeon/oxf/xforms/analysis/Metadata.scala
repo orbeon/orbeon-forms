@@ -90,6 +90,6 @@ trait NamespaceMappings {
   def removeNamespaceMapping(prefixedId: String): Unit =
     mappingsForPrefixedIds -= prefixedId
 
-  def getNamespaceMapping(prefixedId: String): NamespaceMapping =
-    mappingsForPrefixedIds.get(prefixedId).orNull
+  def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] =
+    mappingsForPrefixedIds.get(prefixedId)
 }

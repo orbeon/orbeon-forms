@@ -48,7 +48,7 @@ class SimpleElementAnalysis(
   // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
   lazy val model = findContainingModel
 
-  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
+  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
@@ -140,7 +140,7 @@ class SimpleElementAnalysis(
 
     val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
 
-    PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
+    PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId).orNull,
       contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element, avt)
   }
 

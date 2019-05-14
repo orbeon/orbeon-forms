@@ -47,7 +47,7 @@ class Model(
   require(staticStateContext ne null)
   require(scope ne null)
 
-  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
+  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   // NOTE: It is possible to imagine a model having a context and binding, but this is not supported now
   protected def computeContextAnalysis = None

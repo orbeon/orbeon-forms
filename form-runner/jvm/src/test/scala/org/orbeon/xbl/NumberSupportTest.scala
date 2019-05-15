@@ -100,53 +100,79 @@ class NumberSupportTest extends FunSpec {
 
   describe("The `storageValue` function") {
 
-    val Expected = List[(String, Option[Int], Boolean, String, String)](
-      ("123,456.789",     Some(2), true,  "123456.79"     , "123,456.789"   ),
-      (" 123,456.789",    Some(2), true,  "123456.79"     , " 123,456.789"  ),
-      ("123,456.789",     Some(3), true,  "123456.789"    , "123,456.789"   ),
-      ("123,456.789",     Some(4), true,  "123456.789"    , "123,456.789"   ),
-      ("123,456.789",     Some(2), false, "123456.789"    , "123,456.789"   ),
-      ("123,456.79",      Some(2), true,  "123456.79"     , "123,456.79"    ),
-      ("123,456.",        Some(2), false, "123456"        , "123,456."      ),
-      ("123,456",         Some(2), false, "123456"        , "123,456"       ),
-      ("123,456.",        Some(2), true,  "123456"        , "123,456."      ),
-      ("123,456",         Some(2), true,  "123456"        , "123,456"       ),
-      ("123,456.",        None,    true,  "123456"        , "123,456."      ),
-      ("123,456",         None,    true,  "123456"        , "123,456"       ),
-      ("123,456.789",     None,    true,  "123456.789"    , "123,456.789"   ),
-      ("123,456.789123",  None,    true,  "123456.789123" , "123,456.789123"),
-      (",,123,456.89",    Some(2), true,  "123456.89"     , ",,123,456.89"  ),
-      (".42",             Some(2), true,  "0.42"          , "0.42"          ),
-      (".0",              Some(2), true,  "0"             , "0"             ),
-      ("0.",              Some(2), true,  "0"             , "0"             ),
-      ("0.000",           Some(2), true,  "0"             , "0"             ),
-      ("42",              Some(2), true,  "42"            , "42"            ),
-      (" 42 ",            Some(2), true,  "42"            , "42"            ),
-      (" 42 ",            None,    true,  "42"            , "42"            ),
-      ("abc",             Some(2), true,  "abc"           , "abc"           ),
-      ("  abc  ",         Some(2), true,  "  abc  "       , "  abc  "       ) // Q: Should trim?
+    val Expected = List[(String, Char, Option[Char], Option[Int], Boolean, String)](
+      ("123,456.789",     '.', Some(','), Some(2), true,  "123456.79"     ),
+      ("123,456.789",     '.', None     , Some(2), true,  "123,456.789"   ),
+
+      (" 123,456.789",    '.', Some(','), Some(2), true,  "123456.79"     ),
+      (" 123,456.789",    '.', None     , Some(2), true,  " 123,456.789"  ),
+
+      ("123,456.789",     '.', Some(','), Some(3), true,  "123456.789"    ),
+      ("123,456.789",     '.', None     , Some(3), true,  "123,456.789"   ),
+
+      ("123,456.789",     '.', Some(','), Some(4), true,  "123456.789"    ),
+      ("123,456.789",     '.', None     , Some(4), true,  "123,456.789"   ),
+
+      ("123,456.789",     '.', Some(','), Some(2), false, "123456.789"    ),
+      ("123,456.789",     '.', None     , Some(2), false, "123,456.789"   ),
+
+      ("123,456.79",      '.', Some(','), Some(2), true,  "123456.79"     ),
+      ("123,456.79",      '.', None     , Some(2), true,  "123,456.79"    ),
+
+      ("123,456.",        '.', Some(','), Some(2), false, "123456"        ),
+      ("123,456.",        '.', None     , Some(2), false, "123,456."      ),
+
+      ("123,456",         '.', Some(','), Some(2), false, "123456"        ),
+      ("123,456",         '.', None     , Some(2), false, "123,456"       ),
+
+      ("123,456.",        '.', Some(','), Some(2), true,  "123456"        ),
+      ("123,456.",        '.', None     , Some(2), true,  "123,456."      ),
+
+      ("123,456",         '.', Some(','), Some(2), true,  "123456"        ),
+      ("123,456",         '.', None     , Some(2), true,  "123,456"       ),
+
+      ("123,456.",        '.', Some(','), None,    true,  "123456"        ),
+      ("123,456.",        '.', None     , None,    true,  "123,456."      ),
+
+      ("123,456",         '.', Some(','), None,    true,  "123456"        ),
+      ("123,456",         '.', None     , None,    true,  "123,456"       ),
+
+      ("123,456.789",     '.', Some(','), None,    true,  "123456.789"    ),
+      ("123,456.789",     '.', None     , None,    true,  "123,456.789"   ),
+
+      ("123,456.789123",  '.', Some(','), None,    true,  "123456.789123" ),
+      ("123,456.789123",  '.', None     , None,    true,  "123,456.789123"),
+
+      (",,123,456.89",    '.', Some(','), Some(2), true,  "123456.89"     ),
+      (",,123,456.89",    '.', None     , Some(2), true,  ",,123,456.89"  ),
+
+      (".42",             '.', Some(','), Some(2), true,  "0.42"          ),
+      (".0",              '.', Some(','), Some(2), true,  "0"             ),
+      ("0.",              '.', Some(','), Some(2), true,  "0"             ),
+      ("0.000",           '.', Some(','), Some(2), true,  "0"             ),
+      ("42",              '.', Some(','), Some(2), true,  "42"            ),
+      (" 42 ",            '.', Some(','), Some(2), true,  "42"            ),
+      (" 42 ",            '.', Some(','), None,    true,  "42"            ),
+      ("abcd",            '.', Some(','), Some(2), true,  "abcd"          ),
+      ("  abcd  ",        '.', Some(','), Some(2), true,  "  abcd  "      ) // Q: Should trim?
     )
 
-    for (t @ (value, digitsAfterDecimalOpt, roundWhenStoring, expectedSome, expectedNone) ← Expected)
-      for (groupingSeparator ← List(Some(','), None))
-        it (s"must format for $t/$groupingSeparator") {
+    for (t @ (value, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenStoring, expected) ← Expected)
+      it (s"must format for $t") {
 
-          val data = TestNode("", None, Map.empty)
+        val data = TestNode("", None, Map.empty)
 
-          implicit val params = NumberConfig(
-            decimalSeparator    = '.',
-            groupingSeparator   = groupingSeparator,
-            prefix              = "",
-            digitsAfterDecimal  = digitsAfterDecimalOpt,
-            roundWhenFormatting = true, // unused by `storageValue`
-            roundWhenStoring    = roundWhenStoring
-          )
+        implicit val params = NumberConfig(
+          decimalSeparator    = decimalSeparator,
+          groupingSeparator   = groupingSeparatorOpt,
+          prefix              = "",
+          digitsAfterDecimal  = digitsAfterDecimalOpt,
+          roundWhenFormatting = true, // unused by `storageValue`
+          roundWhenStoring    = roundWhenStoring
+        )
 
-          val expected =
-            groupingSeparator map (_ ⇒ expectedSome) getOrElse expectedNone
-
-          assert(expected === TestNumberSupport.storageValue(value, data))
-        }
+        assert(expected === TestNumberSupport.storageValue(value, data))
+      }
   }
 
   describe("The `roundBigDecimal` function") {
@@ -167,7 +193,5 @@ class NumberSupportTest extends FunSpec {
       it (s"must round for $t") {
         assert(expected === TestNumberSupport.roundBigDecimal(scala.BigDecimal(value), precision).bigDecimal.toPlainString)
       }
-
   }
-
 }

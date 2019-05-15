@@ -791,17 +791,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </fr:c>
                         <fr:c y="1" x="3" w="2"/>
                         <fr:c x="5" y="1" w="2" h="1">
-                            <xf:input bind="time-bind" id="time-control">
+                            <fr:time bind="time-bind" id="time-control">
                                 <xf:label ref="$form-resources/time/label"/>
                                 <xf:hint ref="$form-resources/time/hint"/>
-                            </xf:input>
+                            </fr:time>
                         </fr:c>
                         <fr:c x="7" y="1" w="2" h="1"/>
                         <fr:c y="1" x="9" w="4">
-                            <xf:input bind="datetime-bind" id="datetime-control">
+                            <fr:datetime bind="datetime-bind" id="datetime-control">
                                 <xf:label ref="$form-resources/datetime/label"/>
                                 <xf:hint ref="$form-resources/datetime/hint"/>
-                            </xf:input>
+                            </fr:datetime>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
                             <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">

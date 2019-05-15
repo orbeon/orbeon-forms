@@ -76,6 +76,9 @@ trait NumberSupport[Binding] {
     val fractionDigitsOpt =
       fractionDigitsFromValidationOrProp(binding)
 
+    val precisionForRoundingOpt =
+      if (params.roundWhenFormatting) fractionDigitsOpt else None
+
     def picture(precision: Int): String =
       pictureString(
         precision = precision,
@@ -83,18 +86,16 @@ trait NumberSupport[Binding] {
         zeroes    = true
       )
 
-    val precisionForRoundingOpt =
-      if (params.roundWhenFormatting) fractionDigitsOpt else None
+    def format(decimal: Long Either scala.BigDecimal, pictureString: String): String =
+      formatNumber(decimal, pictureString)
+        .translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
 
-    val formatted =
-      (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)), precisionForRoundingOpt) match {
-        case (Some(sl @ Left(l)),  _      ) ⇒ formatNumber(sl,                           picture(fractionDigitsOpt getOrElse 0))
-        case (Some(Right(d)) ,     Some(p)) ⇒ formatNumber(Right(roundBigDecimal(d, p)), picture(p))
-        case (Some(sd @ Right(d)), None   ) ⇒ formatNumber(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
-        case (None,                _      ) ⇒ editValue(getStringValue(binding))
-      }
-
-    formatted.translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
+    (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)), precisionForRoundingOpt) match {
+      case (Some(sl @ Left(l)),  _      ) ⇒ format(sl,                           picture(fractionDigitsOpt getOrElse 0))
+      case (Some(Right(d)) ,     Some(p)) ⇒ format(Right(roundBigDecimal(d, p)), picture(p))
+      case (Some(sd @ Right(d)), None   ) ⇒ format(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
+      case (None,                _      ) ⇒ editValue(getStringValue(binding))
+    }
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/3226

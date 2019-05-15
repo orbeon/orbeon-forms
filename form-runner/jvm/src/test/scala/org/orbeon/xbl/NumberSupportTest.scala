@@ -28,47 +28,74 @@ class NumberSupportTest extends FunSpec {
 
   describe("The `displayValue` function") {
 
-    val Expected = List[(String, Option[Int], Boolean, String, String)](
-      ("123456.789", Some(2), true,   "123,456.79"  , "123456.79"  ),
-      ("123456.789", None,    true,   "123,456.789" , "123456.789" ),
-      ("123456.789", None,    false,  "123,456.789" , "123456.789" ),
-      ("123456.789", Some(4), true,   "123,456.7890", "123456.7890"),
-      ("123456.789", Some(4), false,  "123,456.7890", "123456.7890"),
-      ("123456.789", Some(2), false,  "123,456.789" , "123456.789" ),
-      ("123456."   , Some(2), true,   "123,456.00"  , "123456.00"  ),
-      ("123456."   , Some(2), false,  "123,456.00"  , "123456.00"  ),
-      ("123456."   , Some(4), true,   "123,456.0000", "123456.0000"),
-      ("123456"    , Some(2), true,   "123,456.00"  , "123456.00"  ),
-      ("123456"    , Some(2), false,  "123,456.00"  , "123456.00"  ),
-      ("123456"    , Some(0), true,   "123,456"     , "123456"     ),
-      ("123456"    , Some(0), false,  "123,456"     , "123456"     ),
-      ("123456"    , Some(4), true,   "123,456.0000", "123456.0000"),
-      ("123456,78" , Some(2), true,   "123456,78"   , "12345678"   ), // ideal behavior unclear
-      ("123456,78" , Some(2), false,  "123456,78"   , "12345678"   ), // ideal behavior unclear
-      ("abc"       , Some(2), true,   "abc"         , "abc"        ),
-      ("abc"       , Some(2), false,  "abc"         , "abc"        )
+    val Expected = List[(String, Char, Option[Char], Option[Int], Boolean, String)](
+      ("123456.789", '.', Some(','), Some(2), true,   "123,456.79"  ),
+      ("123456.789", '.', None     , Some(2), true,   "123456.79"   ),
+
+      ("123456.789", '.', Some(','), None   , true,   "123,456.789" ),
+      ("123456.789", '.', None     , None   , true,   "123456.789"  ),
+
+      ("123456.789", '.', Some(','), None   , false,  "123,456.789" ),
+      ("123456.789", '.', None     , None   , false,  "123456.789"  ),
+
+      ("123456.789", '.', Some(','), Some(4), true,   "123,456.7890"),
+      ("123456.789", '.', None     , Some(4), true,   "123456.7890" ),
+
+      ("123456.789", '.', Some(','), Some(4), false,  "123,456.7890"),
+      ("123456.789", '.', None     , Some(4), false,  "123456.7890" ),
+
+      ("123456."   , '.', Some(','), Some(2), true,   "123,456.00"  ),
+      ("123456."   , '.', None     , Some(2), true,   "123456.00"   ),
+
+      ("123456."   , '.', Some(','), Some(2), false,  "123,456.00"  ),
+      ("123456."   , '.', None     , Some(2), false,  "123456.00"   ),
+
+      ("123456."   , '.', Some(','), Some(4), true,   "123,456.0000"),
+      ("123456."   , '.', None     , Some(4), true,   "123456.0000" ),
+
+      ("123456"    , '.', Some(','), Some(2), true,   "123,456.00"  ),
+      ("123456"    , '.', None     , Some(2), true,   "123456.00"   ),
+
+      ("123456"    , '.', Some(','), Some(2), false,  "123,456.00"  ),
+      ("123456"    , '.', None     , Some(2), false,  "123456.00"   ),
+
+      ("123456"    , '.', Some(','), Some(0), true,   "123,456"     ),
+      ("123456"    , '.', None     , Some(0), true,   "123456"      ),
+
+      ("123456"    , '.', Some(','), Some(0), false,  "123,456"     ),
+      ("123456"    , '.', None     , Some(0), false,  "123456"      ),
+
+      ("123456"    , '.', Some(','), Some(4), true,   "123,456.0000"),
+      ("123456"    , '.', None     , Some(4), true,   "123456.0000" ),
+
+      ("123456,78" , '.', Some(','), Some(2), true,   "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', None     , Some(2), true,   "123456,78"   ), // ideal behavior unclear
+
+      ("123456,78" , '.', Some(','), Some(2), false,  "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', None     , Some(2), false,  "123456,78"   ), // ideal behavior unclear
+
+      ("abcd"      , '.', Some(','), Some(2), true,   "abcd"        ),
+      ("abcd"      , '.', Some(','), Some(2), false,  "abcd"        ),
+
+      ("1234≡56"   , ',', None     , Some(2), false,  "1234.56"     )
     )
 
-    for (t @ (stored, digitsAfterDecimalOpt, roundWhenFormatting, expectedSome, expectedNone) ← Expected)
-      for (groupingSeparator ← List(Some(','), None))
-        it (s"must format for $t/$groupingSeparator") {
+    for (t @ (stored, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenFormatting, expected) ← Expected)
+      it (s"must format for $t") {
 
-          val data = TestNode(stored, None, Map.empty)
+        val data = TestNode(stored, None, Map.empty)
 
-          implicit val params = NumberConfig(
-            decimalSeparator    = '.',
-            groupingSeparator   = groupingSeparator,
-            prefix              = "",
-            digitsAfterDecimal  = digitsAfterDecimalOpt,
-            roundWhenFormatting = roundWhenFormatting,
-            roundWhenStoring    = true // unused by `displayValue`
-          )
+        implicit val params = NumberConfig(
+          decimalSeparator    = decimalSeparator,
+          groupingSeparator   = groupingSeparatorOpt,
+          prefix              = "",
+          digitsAfterDecimal  = digitsAfterDecimalOpt,
+          roundWhenFormatting = roundWhenFormatting,
+          roundWhenStoring    = true // unused by `displayValue`
+        )
 
-          val expected =
-            groupingSeparator map (_ ⇒ expectedSome) getOrElse expectedNone
-
-          assert(expected === TestNumberSupport.displayValue(data))
-        }
+        assert(expected === TestNumberSupport.displayValue(data))
+      }
   }
 
   describe("The `storageValue` function") {

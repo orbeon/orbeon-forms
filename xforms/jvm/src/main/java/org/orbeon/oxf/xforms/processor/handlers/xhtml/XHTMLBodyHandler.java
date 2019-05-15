@@ -237,10 +237,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
 
         // Add handlers for XBL components
-        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
         controller.registerHandler(XXFormsComponentHandler.class.getName(), new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                final Option<ElementAnalysis> control = ops.findControlAnalysis(getPrefixedId(attributes, handlerContext));
+                final HandlerContext hc = (HandlerContext) handlerContext;
+                final Option<ElementAnalysis> control = hc.getPartAnalysis().findControlAnalysis(getPrefixedId(attributes, handlerContext));
                 if (control.isDefined()) {
                     return control.get() instanceof ComponentControl;
                 } else {

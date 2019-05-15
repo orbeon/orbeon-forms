@@ -77,11 +77,6 @@ trait PartGlobalOps {
     case viewTrait: ViewTrait ⇒ viewTrait.index
   }
 
-  def getSelect1Analysis(prefixedId: String) = findControlAnalysis(prefixedId) match {
-    case Some(selectionControl: SelectionControlTrait) ⇒ selectionControl
-    case _ ⇒ null
-  }
-
   def isValueControl(effectiveId: String) =
     findControlAnalysis(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 

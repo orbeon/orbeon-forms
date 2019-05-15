@@ -78,7 +78,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // Get items if:
         // 1. The itemset is static
         // 2. The control exists and is relevant
-        final Itemset itemset = XFormsSelect1Control.getInitialItemset(containingDocument, xformsSelect1Control, getPrefixedId());
+        final Itemset itemset = XFormsSelect1Control.getInitialItemset(xformsSelect1Control, (SelectionControlTrait) staticControlOpt().get());
 
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         outputContent(

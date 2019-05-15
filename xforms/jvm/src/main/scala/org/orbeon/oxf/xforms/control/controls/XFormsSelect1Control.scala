@@ -286,14 +286,14 @@ object XFormsSelect1Control {
 
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
   // lookup by id takes place and the control must have a static itemset or otherwise null is returned.
-  def getInitialItemset(containingDocument: XFormsContainingDocument, control: XFormsSelect1Control, prefixedId: String): Itemset =
+  def getInitialItemset(control: XFormsSelect1Control, staticControl: SelectionControlTrait): Itemset =
     if ((control ne null) && control.isRelevant) {
       // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
       control.getItemset
     } else {
       // Control is not there or is not relevant, so use static itemsets
       // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-      containingDocument.getStaticOps.getSelect1Analysis(prefixedId).staticItemset orNull
+      staticControl.staticItemset.orNull
     }
 
   def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait) =

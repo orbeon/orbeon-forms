@@ -32,7 +32,6 @@ class ConcreteElement(var qname: QName)
     this(QName(name))
 
   def getQName: QName = qname
-  def setQName(name: QName) = this.qname = name
 
   protected var _attributes     = new ju.ArrayList[Attribute](DefaultContentListSize)
   private var _internalContent  = new ju.ArrayList[Node](DefaultContentListSize)
@@ -66,11 +65,8 @@ class ConcreteElement(var qname: QName)
       if (nyNamespace != Namespace.EmptyNamespace) {
         val myPrefix = nyNamespace.prefix
         val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
-        if (myPrefix == parentNamespace) { // ORBEON TODO: comparing unrelated!
-          val myNm = nyNamespace.getName
-          val newNm = QName(myNm)
-          setQName(newNm)
-        }
+        if (myPrefix == parentNamespace)// ORBEON TODO: comparing unrelated!
+          this.qname = QName(nyNamespace.getName)
       }
 
       val contentIt = internalContent.iterator
@@ -108,10 +104,6 @@ class ConcreteElement(var qname: QName)
       }
     }
     false
-  }
-
-  def setNamespace(namespace: Namespace): Unit = {
-    setQName(QName(getName, namespace))
   }
 
   def accept(visitor: Visitor): Unit = {

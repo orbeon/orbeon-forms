@@ -67,7 +67,7 @@ object QName {
 // `QName` represents a qualified name value of an XML element or
 // attribute. It consists of a local name and a instance.
 //
-// NOTE: This is a bit weird because the qualified name is not use for equality, and only the
+// NOTE: This is a bit weird because the qualified name is not used for equality: only the
 // namespace URI and local name are used.
 //
 // Ideally we would like this to be a case class, and equality to be distinct.

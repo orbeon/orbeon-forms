@@ -9,7 +9,6 @@ import java.{util ⇒ ju}
 trait Element extends Branch {
 
   def getQName: QName
-  def setQName(qname: QName): Unit
   def getNamespace: Namespace
   def getQName(qualifiedName: String): QName
   def getNamespaceForPrefix(prefix: String): Namespace

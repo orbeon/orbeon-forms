@@ -81,13 +81,9 @@ object ElementHandlerController {
     val constructor =
       classNameToHandlerClass.computeIfAbsent(
         handlerClassName,
-        // For Scala 2.11
-        new java.util.function.Function[String, Constructor[ElementHandler]] {
-          def apply(t: String): Constructor[ElementHandler] =
-            withWrapThrowable {
-              Class.forName(handlerClassName).asInstanceOf[Class[ElementHandler]]
-                .getConstructor(classOf[String], classOf[String], classOf[String], classOf[Attributes], classOf[AnyRef], classOf[AnyRef])
-            }
+        (_: String) ⇒ withWrapThrowable {
+          Class.forName(handlerClassName).asInstanceOf[Class[ElementHandler]]
+            .getConstructor(classOf[String], classOf[String], classOf[String], classOf[Attributes], classOf[AnyRef], classOf[AnyRef])
         }
       )
 

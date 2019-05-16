@@ -1,4 +1,4 @@
 -J-Xmx3G
--J-Xss1M
+-J-Xss8M
 -J-XX:+CMSClassUnloadingEnabled
 -J-XX:+UseConcMarkSweepGC

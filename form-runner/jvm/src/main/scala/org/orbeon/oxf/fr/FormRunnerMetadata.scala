@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
@@ -427,12 +428,21 @@ object FormRunnerMetadata {
                 val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
 
                 selectionControlOpt match {
-                  case Some(c: XFormsSelectControl) ⇒
-                    val selectedLabels = c.findSelectedItems map (_.label.label)  // TODO: HTML
-                    MultipleControlValue(c.getValue, selectedLabels) // TODO
-                  case Some(c) ⇒
-                    val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
-                    SingleControlValue(c.getValue, selectedLabel) // TODO
+                  case Some(selectControl: XFormsSelectControl) ⇒
+                    val selectedLabels = selectControl.findSelectedItems map (_.label.label)  // TODO: HTML
+                    MultipleControlValue(selectControl.getValue, selectedLabels) // TODO
+                  case Some(select1Control) ⇒
+
+                    // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
+                    val itemOpt =
+                      if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
+                        select1Control.findSelectedItem filter (_.value.nonBlank)
+                      else
+                        select1Control.findSelectedItem
+
+                    // TODO: HTML
+                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse Some("") // use a blank string so we get `N/A` in the end
+                    SingleControlValue(select1Control.getValue, selectedLabelOpt)
                   case None ⇒
                     throw new IllegalStateException
                 }

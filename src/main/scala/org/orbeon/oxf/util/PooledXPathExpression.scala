@@ -22,7 +22,7 @@ import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.sxpath.{XPathExpression, XPathVariable}
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -76,7 +76,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    */
   def evaluateKeepNodeInfo(functionContext: FunctionContext): ju.List[AnyRef] =
     withFunctionContext(functionContext) {
-      scalaIteratorToJavaList(asScalaIterator(evaluate()) map itemToJavaKeepNodeInfoOrNull)
+      scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()) map itemToJavaKeepNodeInfoOrNull)
     }
 
   /**
@@ -86,7 +86,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    */
   def evaluateKeepItems(functionContext: FunctionContext): ju.List[Item] =
     withFunctionContext(functionContext) {
-      scalaIteratorToJavaList(asScalaIterator(evaluate()))
+      scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()))
     }
 
   /**
@@ -144,7 +144,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    * NOTE: Used by legacy Java code only.
    */
   def iterateReturnJavaObjects: ju.Iterator[AnyRef] =
-    asScalaIterator(expression.iterate(expression.createDynamicContext(contextItem))) map Value.convertToJava asJava
+    Implicits.asScalaIterator(expression.iterate(expression.createDynamicContext(contextItem))) map Value.convertToJava asJava
 
   /**
    * Evaluate and return a List of native Java objects, including underlying wrapped nodes.
@@ -152,7 +152,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    * NOTE: Used by legacy Java code only.
    */
   def evaluateToJavaReturnToPool: ju.List[AnyRef] =
-    try scalaIteratorToJavaList(asScalaIterator(evaluate()) map Value.convertToJava)
+    try scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()) map Value.convertToJava)
     finally returnToPool()
 
   /**

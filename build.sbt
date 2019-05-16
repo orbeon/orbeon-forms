@@ -27,7 +27,7 @@ val FlyingSaucerVersion           = "9.1.18"
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumVersion,
-  "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
+  "org.parboiled"               %% "parboiled-scala"                % "1.1.8",
   "org.scala-sbt"               %% "sbinary"                        % "0.5.0",
   "io.spray"                    %% "spray-json"                     % "1.3.2",
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
@@ -98,7 +98,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // "ThisBuild is a Scope encompassing all projects"
-scalaVersion                in ThisBuild := "2.11.11"
+scalaVersion                in ThisBuild := "2.12.8"
 organization                in ThisBuild := "org.orbeon"
 version                     in ThisBuild := orbeonVersionFromProperties.value
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
@@ -271,8 +271,8 @@ lazy val commonSettings = Seq(
 
   javacOptions                  ++= Seq(
     "-encoding", "utf8",
-    "-source", "1.6",
-    "-target", "1.6"
+    "-source", "1.8",
+    "-target", "1.8"
   ),
   scalacOptions                 ++= Seq(
     "-encoding", "utf8",

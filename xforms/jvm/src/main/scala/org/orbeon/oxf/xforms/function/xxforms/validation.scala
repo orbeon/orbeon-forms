@@ -20,6 +20,7 @@ import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.value._
+import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
@@ -86,7 +87,7 @@ trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
     itemsArgumentOpt(0) map { itemsIt ⇒
 
       val datesIt =
-        asScalaIterator(itemsIt) flatMap {
+        Implicits.asScalaIterator(itemsIt) flatMap {
           case v: DateValue  ⇒ Some(v)
           case _             ⇒ None
         }

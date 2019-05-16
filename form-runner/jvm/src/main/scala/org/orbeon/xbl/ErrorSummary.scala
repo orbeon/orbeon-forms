@@ -25,11 +25,11 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
+import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -363,7 +363,7 @@ object ErrorSummary {
     }
 
     def visibleErrorsIt: Iterator[NodeInfo] =
-      findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
+      findErrorSummaryModel.iterator flatMap (m ⇒ Implicits.asScalaIterator(m.getVariable("visible-errors"))) collect {
         case n: NodeInfo ⇒ n
       }
 

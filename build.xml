@@ -158,7 +158,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -209,7 +209,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -262,7 +262,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar

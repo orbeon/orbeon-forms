@@ -1687,6 +1687,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             var lhhaElement = ORBEON.xforms.Controls.getControlLHHA(control, lhhaType);
             if (lhhaElement != null) {
                 lhhaElement.innerHTML = message;
+
+                // https://github.com/orbeon/orbeon-forms/issues/4062
+                if (lhhaType == "help")
+                    $(lhhaElement).toggleClass('xforms-disabled', message.trim() == "");
             }
             ORBEON.xforms.Controls.lhhaChangeEvent.fire({control: control, type: lhhaType, message: message});
         },

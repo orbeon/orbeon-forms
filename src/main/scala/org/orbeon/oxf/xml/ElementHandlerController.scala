@@ -81,7 +81,7 @@ object ElementHandlerController {
     val constructor =
       classNameToHandlerClass.computeIfAbsent(
         handlerClassName,
-        (_: String) ⇒ withWrapThrowable {
+        _ ⇒ withWrapThrowable {
           Class.forName(handlerClassName).asInstanceOf[Class[ElementHandler]]
             .getConstructor(classOf[String], classOf[String], classOf[String], classOf[Attributes], classOf[AnyRef], classOf[AnyRef])
         }

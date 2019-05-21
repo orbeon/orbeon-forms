@@ -43,7 +43,7 @@
                     <xsl:copy>
                         <xsl:apply-templates select="@* | node() except updated-with-version"/>
 
-                        <!-- We wan the `updated-with-version` to be contiguous, so we explicitly apply the existing ones here. -->
+                        <!-- We want the `updated-with-version` to be contiguous, so we explicitly apply the existing ones here. -->
                         <xsl:apply-templates select="updated-with-version"/>
 
                         <xsl:variable

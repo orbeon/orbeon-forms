@@ -43,7 +43,9 @@ class RepeatedSectionsTest
             <form>
               <my-section>
                 <my-section-iteration>
-                  <my-input/>
+                  <grid-1>
+                    <my-input/>
+                  </grid-1>
                   <my-grid>
                     <my-grid-iteration>
                       <my-textarea/>
@@ -55,7 +57,9 @@ class RepeatedSectionsTest
                 </my-section-iteration>
               </my-section>
               <other-section>
-                <other-input/>
+                <grid-2>
+                  <other-input/>
+                </grid-2>
               </other-section>
             </form>
           )
@@ -78,7 +82,9 @@ class RepeatedSectionsTest
             <form>
               <foo>
                 <foo-iteration>
-                  <my-input/>
+                  <grid-1>
+                    <my-input/>
+                  </grid-1>
                   <my-grid>
                     <my-grid-iteration>
                       <my-textarea/>
@@ -90,7 +96,9 @@ class RepeatedSectionsTest
                 </foo-iteration>
               </foo>
               <other-section>
-                <other-input/>
+                <grid-2>
+                  <other-input/>
+                </grid-2>
               </other-section>
             </form>
           )
@@ -112,7 +120,9 @@ class RepeatedSectionsTest
             <form>
               <my-section>
                 <bar>
-                  <my-input/>
+                  <grid-1>
+                    <my-input/>
+                  </grid-1>
                   <my-grid>
                     <my-grid-iteration>
                       <my-textarea/>
@@ -124,7 +134,9 @@ class RepeatedSectionsTest
                 </bar>
               </my-section>
               <other-section>
-                <other-input/>
+                <grid-2>
+                  <other-input/>
+                </grid-2>
               </other-section>
             </form>
           )
@@ -198,7 +210,9 @@ class RepeatedSectionsTest
             <form>
               <my-section>
                 <my-section-iteration>
-                  <my-input/>
+                  <grid-1>
+                    <my-input/>
+                  </grid-1>
                   <my-grid>
                     <my-grid-iteration>
                       <my-textarea/>
@@ -208,7 +222,9 @@ class RepeatedSectionsTest
                     </my-grid-iteration>
                   </my-grid>
                   <other-section>
-                    <other-input/>
+                    <grid-2>
+                  <other-input/>
+                </grid-2>
                   </other-section>
                 </my-section-iteration>
               </my-section>
@@ -231,7 +247,9 @@ class RepeatedSectionsTest
           elemToDom4j(
             <form>
               <my-section>
-                <my-input/>
+                <grid-1>
+                    <my-input/>
+                  </grid-1>
                 <my-grid>
                   <my-grid-iteration>
                     <my-textarea/>
@@ -242,7 +260,9 @@ class RepeatedSectionsTest
                 </my-grid>
               </my-section>
               <other-section>
-                <other-input/>
+                <grid-2>
+                  <other-input/>
+                </grid-2>
               </other-section>
             </form>
           )
@@ -271,7 +291,9 @@ class RepeatedSectionsTest
         val expected =
           elemToDom4j(
             <my-section-iteration>
-              <my-input/>
+              <grid-1>
+                <my-input/>
+              </grid-1>
               <my-grid>
                 <my-grid-iteration>
                   <my-textarea/>
@@ -299,7 +321,9 @@ class RepeatedSectionsTest
         val expected =
           elemToDom4j(
             <my-section-iteration>
-              <my-input/>
+              <grid-1>
+                <my-input/>
+              </grid-1>
               <my-grid>
                 <my-grid-iteration>
                   <my-textarea/>
@@ -338,7 +362,9 @@ class RepeatedSectionsTest
         val expected =
           elemToDom4j(
             <my-section-iteration>
-              <my-input/>
+              <grid-1>
+                <my-input/>
+              </grid-1>
               <my-grid>
                 <my-grid-iteration>
                   <my-textarea/>
@@ -371,7 +397,9 @@ class RepeatedSectionsTest
         val expected =
           elemToDom4j(
             <my-section-iteration>
-              <my-input/>
+              <grid-1>
+                <my-input/>
+              </grid-1>
               <my-grid>
                 <my-grid-iteration>
                   <my-textarea/>

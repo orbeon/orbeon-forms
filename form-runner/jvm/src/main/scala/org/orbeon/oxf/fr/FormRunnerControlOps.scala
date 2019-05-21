@@ -15,8 +15,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.GridDataMigration.PathElem
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -113,7 +113,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // Canonical way: use the `name` attribute
   def getBindNameOrEmpty(bind: NodeInfo): String =
-    bind attValue "name"
+    findBindName(bind).orNull
 
   def findBindName(bind: NodeInfo): Option[String] =
     bind attValueOpt "name"
@@ -248,7 +248,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // Also, specific case for Form Builder: drop language predicate, as we want to index/return values
     // for all languages. So far, this is handled as a special case, as this is not something that happens
     // in other forms.
-    def buildBindPath(bind: NodeInfo): List[GridDataMigration.PathElem] =
+    def buildBindPath(bind: NodeInfo): List[PathElem] =
       (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef ⇒
         PathElem(
           if (bindRef.endsWith(FBLangPredicate))

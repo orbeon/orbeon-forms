@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.Document
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -104,7 +103,6 @@ trait FormBuilderSupport extends XFormsSupport {
                 ref="xxf:instance('fb-components-instance')"
                 origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
 
-              <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
               <xf:var name="temp" value="xxf:create-document()"/>
 
               <xf:insert
@@ -136,7 +134,8 @@ trait FormBuilderSupport extends XFormsSupport {
               />
 
               <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
-                fbf:initializeGrids($temp)
+                fbf:initializeGrids($temp),
+                fbf:updateSectionTemplateContentHolders($temp)
               </xf:action>
 
               <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>

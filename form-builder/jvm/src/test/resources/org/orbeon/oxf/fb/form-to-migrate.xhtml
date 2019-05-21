@@ -67,6 +67,8 @@
                             <!--</grid-3-iteration>-->
                         <!--</grid-3>-->
                     </section-23>
+                    <section-24>
+                    </section-24>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -87,6 +89,7 @@
                 <xf:bind id="section-13-bind" ref="section-13" name="section-13"/>
                 <xf:bind id="section-8-bind" ref="section-8" name="section-8"/>
                 <xf:bind id="section-23-bind" ref="section-23" name="section-23"/>
+                <xf:bind id="section-24-bind" ref="section-24" name="section-24"/>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
                 <metadata>
@@ -132,6 +135,10 @@
                             <label>S22</label>
                             <help/>
                         </section-23>
+                        <section-24>
+                            <label>Address</label>
+                            <help/>
+                        </section-24>
                         <control-1>
                             <label/>
                             <hint/>
@@ -157,12 +164,10 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                     xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <fr:body>
                 <fr:section id="section-1-control" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
-                    <fr:grid>
+                    <fr:grid id="grid-1-grid">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="control-1-control" bind="control-1-bind">
@@ -178,7 +183,7 @@
                 <fr:section id="section-3-control" bind="section-3-bind" repeat="true" min="1"
                             template="instance('section-3-template')">
                     <xf:label ref="$form-resources/section-3/label"/>
-                    <fr:grid>
+                    <fr:grid id="grid-2-grid">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="control-6-control" bind="control-6-bind">
@@ -194,7 +199,6 @@
                         <xh:tr>
                             <xh:td>
                                 <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                              id="control-7-control"
                                              bind="control-7-bind">
                                     <xf:label ref="$form-resources/control-7/label"/>
@@ -207,24 +211,19 @@
                 </fr:section>
                 <fr:section id="section-13-control" bind="section-13-bind">
                     <xf:label ref="$form-resources/section-13/label"/>
-                    <component:section-5 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
-                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
+                    <component:section-5 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"/>
                 </fr:section>
                 <fr:section id="section-8-control" bind="section-8-bind">
                     <xf:label ref="$form-resources/section-8/label"/>
-                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
-                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
+                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"/>
                 </fr:section>
                 <fr:section id="section-23-control" bind="section-23-bind">
                     <xf:label ref="$form-resources/section-23/label"/>
-                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
-                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
+                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"/>
+                </fr:section>
+                <fr:section id="section-24-control" bind="section-24-bind">
+                    <xf:label ref="$form-resources/section-24/label"/>
+                    <component:address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
                 </fr:section>
             </fr:body>
         </fr:view>

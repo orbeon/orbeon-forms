@@ -43,6 +43,7 @@ object XMLNames {
 
   val FRGridTest               : Test      = FR → "grid"
   val FRSectionTest            : Test      = FR → "section"
+  val FRRepeatTest             : Test      = FR → "repeat" // legacy
 
   val XFModelTest              : Test      = XF → "model"
   val XFInstanceTest           : Test      = XF → "instance"
@@ -58,6 +59,12 @@ object XMLNames {
   val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
   val FRItemsetMapQName        : QName     = QName("itemsetmap",          FRNamespace)
   val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
+
+  val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
+
+  val GridQName                : QName     = QName("grid",                FRNamespace)
+
+  val RepeatQName              : QName     = QName("repeat")
 
   val XMLLangQName             : QName     = XML_LANG_QNAME
 

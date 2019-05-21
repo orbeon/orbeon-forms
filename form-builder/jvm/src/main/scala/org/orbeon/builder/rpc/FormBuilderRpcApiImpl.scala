@@ -55,16 +55,18 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     // The client might send this after the control is deleted and we don't want to crash
     FormRunner.findControlByName(ctx.bodyElem, controlName) foreach { controlElem ⇒
 
-      val xcvElem = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+      val xcvElemOpt = ToolboxOps.controlOrContainerElemToXcv(controlElem)
 
       if (FormBuilder.setControlLabelHintHelpOrText(controlName, lhha, value, None, isHTML))
-        Undo.pushUserUndoAction(
-          ControlSettings(
-            controlName,
-            controlName,
-            xcvElem
+        xcvElemOpt foreach { xcvElem ⇒
+          Undo.pushUserUndoAction(
+            ControlSettings(
+              controlName,
+              controlName,
+              xcvElem
+            )
           )
-        )
+        }
     }
   }
 
@@ -181,7 +183,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def containerCopy(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.writeXcvToClipboard(ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)))
+    ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)) foreach ToolboxOps.writeXcvToClipboard
   }
 
   def containerCut(containerId: String): Unit = {

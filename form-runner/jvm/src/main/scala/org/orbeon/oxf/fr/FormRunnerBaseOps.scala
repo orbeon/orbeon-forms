@@ -19,8 +19,8 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{DateUtils, NetUtils, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.NamespaceMapping
@@ -132,11 +132,16 @@ trait FormRunnerBaseOps {
   def getFormRunnerBodyElem(inDoc: NodeInfo): NodeInfo =
     findFormRunnerBodyElem(inDoc).get
 
+  private val FRGridOrLegacyRepeatTest: Test = FRGridTest || FRRepeatTest
+
   def findFormRunnerBodyElem(inDoc: NodeInfo): Option[NodeInfo] = {
+
+    def parentIsNotGridOrLegacyRepeat(n: NodeInfo) =
+      n parent FRGridOrLegacyRepeatTest isEmpty
 
     def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
-    def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest headOption
+    def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest  find parentIsNotGridOrLegacyRepeat
     def fromTemplate  = inDoc.rootElement / XBLTemplateTest headOption
 
     fromGroupById orElse fromGroup orElse fromFRBody orElse fromTemplate

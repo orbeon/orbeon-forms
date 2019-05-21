@@ -279,7 +279,7 @@
                         <readonly/>
 
                         <was-repeat/>
-                        <is-repeat/>             <!-- Whether we repeat or not -->
+                        <is-repeat/>
 
                         <was-custom-iteration-name/>
                         <is-custom-iteration-name/>
@@ -357,11 +357,6 @@
                     ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
                     type="xs:boolean"
                     xxf:default="false()"/>
-
-                <!-- Don't yet allow changing grids back and forth -->
-                <xf:bind
-                    ref="is-repeat"
-                    readonly="$i/container-type = 'grid'"/>
 
                 <xf:bind
                     ref="custom-iteration-name"

@@ -35,25 +35,27 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     IsGrid(node) || IsSection(node)
 
   def isContentRepeat(node: NodeInfo): Boolean =
-    isRepeatable(node) && node.attValue("repeat") == RepeatContentToken
+    isRepeatable(node) && node.attValue(RepeatQName) == RepeatContentToken
 
   def isLegacyRepeat(node: NodeInfo): Boolean =
     ! isContentRepeat(node) &&
     isRepeatable(node)      && (
-      node.attValue("repeat") == LegacyRepeatContentToken ||
-      node.att("minOccurs").nonEmpty                      ||
-      node.att("maxOccurs").nonEmpty                      ||
-      node.att("min").nonEmpty                            ||
+      node.attValue(RepeatQName) == LegacyRepeatContentToken ||
+      node.att("minOccurs").nonEmpty                         ||
+      node.att("maxOccurs").nonEmpty                         ||
+      node.att("min").nonEmpty                               ||
       node.att("max").nonEmpty
     )
+
+  def isLegacyUnrepeatedGrid(node: NodeInfo): Boolean =
+    IsGrid(node) && ! node.hasAtt(XFormsConstants.BIND_QNAME)
 
   //@XPathFunction
   def isRepeat(node: NodeInfo): Boolean =
     isContentRepeat(node) || isLegacyRepeat(node)
 
-  // Non-repeated grid doesn't (yet) have container settings
   def hasContainerSettings(node: NodeInfo): Boolean =
-    IsSection(node) || isRepeat(node)
+    IsSection(node) || IsGrid(node)
 
   val IsContainer: NodeInfo ⇒ Boolean =
     node ⇒ (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
@@ -75,27 +77,26 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def getContainerNameOrEmpty(elem: NodeInfo): String = getControlNameOpt(elem).orNull
 
   def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): List[NodeInfo] =
-      (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
+    (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
 
-  // Find ancestor sections and grids (including non-repeated grids)
+  // Find ancestor sections and grids
   def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
   // Find ancestor section and grid names from root to leaf
-  // Don't return non-repeated `fr:grid` until an enclosing element is needed. See:
+  // See also:
   // - https://github.com/orbeon/orbeon-forms/issues/2173
   // - https://github.com/orbeon/orbeon-forms/issues/1947
   def findContainerNamesForModel(
     descendant               : NodeInfo,
     includeSelf              : Boolean = false,
     includeIterationElements : Boolean = true
-  ): Seq[String] = {
+  ): List[String] = {
 
     val namesWithContainers =
       for {
-        container ← findAncestorContainersLeafToRoot(descendant, includeSelf)
+        container ← findAncestorContainersLeafToRoot(descendant, includeSelf).to[List]
         name      ← getControlNameOpt(container)
-        if ! (IsGrid(container) && ! isRepeat(container))
       } yield
         name
 
@@ -142,4 +143,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
+
+  def findNestedControls(containerElem: NodeInfo): Seq[NodeInfo] =
+    containerElem descendant (NodeInfoCell.CellTest || NodeInfoCell.TdTest) child * filter IsControl
 }

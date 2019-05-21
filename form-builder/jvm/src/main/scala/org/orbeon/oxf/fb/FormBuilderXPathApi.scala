@@ -15,12 +15,15 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
+import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
+import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -212,6 +215,14 @@ object FormBuilderXPathApi {
     ctx.bodyElem descendant GridTest descendant CellTest take 1 foreach selectCell
   }
 
+  //@XPathFunction
+  def findModelElem(doc: NodeInfo): NodeInfo =
+    FormBuilderDocContext(doc).modelElem
+
+  //@XPathFunction
+  def findDataInstanceElem(doc: NodeInfo): NodeInfo =
+    FormBuilderDocContext(doc).dataInstanceElem
+
   // Create template content from a bind name
   // FIXME: Saxon can pass null as `bindings`.
   //@XPathFunction
@@ -242,8 +253,8 @@ object FormBuilderXPathApi {
         holder → instanceRoot
 
     holdersWithRoots foreach { case (holder, instanceRoot) ⇒
-        delete(holder / *)
-        insert(into = holder, origin = instanceRoot / *)
+      delete(holder / *)
+      insert(into = holder, origin = instanceRoot / *)
     }
   }
 
@@ -274,15 +285,6 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def nextValidationIds(inDoc: NodeInfo, count: Int): Seq[String] =
     FormBuilder.nextTmpIds(token = Names.Validation, count = count)(FormBuilderDocContext(inDoc))
-
-  // Canonical way: use the `name` attribute
-  //@XPathFunction
-  def getBindNameOrEmpty(bind: NodeInfo): String =
-    FormRunner.getBindNameOrEmpty(bind)
-
-  //@XPathFunction
-  def defaultIterationName(repeatName: String): String =
-    FormRunner.defaultIterationName(repeatName)
 
   //@XPathFunction
   def hasCustomIterationName(controlName: String): Boolean = {
@@ -609,7 +611,7 @@ object FormBuilderXPathApi {
 
     for {
       control ← FormRunner.findControlByName(ctx.formDefinitionRootElem, oldName)
-      xcv     = ToolboxOps.controlOrContainerElemToXcv(control)
+      xcv     ← ToolboxOps.controlOrContainerElemToXcv(control)
     } locally {
       Undo.pushUserUndoAction(ControlSettings(oldName, newName, xcv))
     }
@@ -721,7 +723,7 @@ object FormBuilderXPathApi {
       case ControlSettings(oldName, newName, xcvElem) ⇒
         for {
           controlElem ← FormRunner.findControlByName(ctx.formDefinitionRootElem, newName)
-          newXcvElem  = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+          newXcvElem  ← ToolboxOps.controlOrContainerElemToXcv(controlElem)
         } yield {
 
           if (FormRunner.IsContainer(controlElem)) {

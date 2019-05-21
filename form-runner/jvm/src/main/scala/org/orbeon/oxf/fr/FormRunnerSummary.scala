@@ -23,13 +23,17 @@ trait FormRunnerSummary {
 
   //@XPathFunction
   def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
-    Index.findIndexedControls(formDoc, app, form) map (_.toXML)
+    Index.findIndexedControls(
+      formDoc,
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+    ) map
+      (_.toXML)
 
   //@XPathFunction
   def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
 
     val someFormVersion           = Some(formVersion) // use the same form version as the data to clone
-    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
+    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
     putWithAttachments(
       data               = data.root,
@@ -38,7 +42,7 @@ trait FormRunnerSummary {
       fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
       filename           = "data.xml",
-      commonQueryString  = s"$DataFormatVersionName=$databaseDataFormatVersion",
+      commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
       forceAttachments   = true,
       formVersion        = someFormVersion
     )

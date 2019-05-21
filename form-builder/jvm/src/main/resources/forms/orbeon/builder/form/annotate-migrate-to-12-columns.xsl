@@ -11,29 +11,25 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xsl:stylesheet version="2.0"
+<xsl:stylesheet
+    version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-    <!-- ======== Migrate grid to 12-column format ======== -->
-
-    <!-- No migration needed -->
-    <!-- fr:grid → fr:grid/@edit-ref -->
-    <xsl:template match="*:grid[exists(fr:c)]" mode="within-body">
+    <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
         <xsl:copy>
-            <xsl:attribute name="edit-ref"/>
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:apply-templates select="@* | node()" mode="within-body"/>
         </xsl:copy>
     </xsl:template>
 
-    <!-- Migration needed -->
+    <!-- ======== Migrate grids to 12-column format ======== -->
+
     <xsl:template match="*:grid[empty(fr:c)]" mode="within-body">
 
         <xsl:variable
@@ -42,7 +38,6 @@
             select="cell:analyzeTrTdGridAndFillHoles(., true())"/>
 
         <xsl:copy>
-            <xsl:attribute name="edit-ref"/>
             <xsl:apply-templates select="@*" mode="#current"/>
 
             <xsl:choose>

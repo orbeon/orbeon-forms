@@ -144,18 +144,19 @@
                     origin="
                         let $format-migrated :=
                             (
-                                if (not(xxf:get-request-parameter('data-format-version') = 'edge')) then
-                                    grid-migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
-                                else
-                                    (),
+                                grid-migration:dataMigratedToEdgeOrEmpty(
+                                    $form-data,
+                                    xxf:instance('fr-form-metadata')/root(),
+                                    xxf:get-request-parameter('data-format-version')
+                                ),
                                 $form-data
                             )[1]/root()/*,
-                            $simply-migrated :=
-                                simple-migration:dataMaybeWithSimpleMigration(
-                                    xxf:absolute-id('fr-form-model'),
-                                    instance('fr-initial-instance'),
-                                    $format-migrated
-                                )
+                        $simply-migrated :=
+                            simple-migration:dataMaybeWithSimpleMigration(
+                                xxf:absolute-id('fr-form-model'),
+                                instance('fr-initial-instance'),
+                                $format-migrated
+                            )
                         return
                             if (exists($simply-migrated)) then
                                 $simply-migrated
@@ -738,17 +739,23 @@
 
             <!-- Will be `()` if there is no metadata or no migration map -->
             <xf:var
-                name="maybe-migrated"
-                value="grid-migration:dataMaybeMigratedTo($body/root(), xxf:instance('fr-form-metadata')/root())"/>
+                name="body-migrated-opt"
+                as="document-node()?"
+                value="
+                    grid-migration:dataMigratedToEdgeOrEmpty(
+                        $body/root(),
+                        xxf:instance('fr-form-metadata')/root(),
+                        '4.0.0' (: as documented as of 2019.1 :)
+                    )"/>
 
             <!-- Be consistent with `fr-get-document-submission` -->
             <xf:delete
-                ref="$maybe-migrated//(@xxf:relevant, @fr:relevant)"/>
+                ref="$body-migrated-opt//(@xxf:relevant, @fr:relevant)"/>
 
             <!-- See https://github.com/orbeon/orbeon-forms/issues/3935 -->
             <xf:insert
                 context="xxf:instance('fr-form-instance')/root()"
-                origin="($maybe-migrated, $body/root())[1]"/>
+                origin="($body-migrated-opt, $body/root())[1]"/>
 
         </xf:action>
         <xf:action if="not($is-xml)">

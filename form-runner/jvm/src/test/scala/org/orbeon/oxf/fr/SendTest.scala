@@ -34,7 +34,7 @@ class SendTest
 
     val Expected =
       List(
-        (DataFormatVersion400, false, true) →
+        (DataFormatVersion.V400, false, true) →
           <form>
             <section-1>
               <control-1.1/>
@@ -49,7 +49,7 @@ class SendTest
               </grid-2>
             </section-2>
           </form>,
-        (DataFormatVersion400, true, true) →
+        (DataFormatVersion.V400, true, true) →
           <form>
             <section-1>
               <control-1.1/>
@@ -58,7 +58,7 @@ class SendTest
               </grid-1>
             </section-1>
           </form>,
-        (DataFormatVersionEdge, false, true) →
+        (DataFormatVersion.Edge, false, true) →
           <form>
             <section-1>
               <control-1.1/>
@@ -77,7 +77,7 @@ class SendTest
               </grid-2>
             </section-2>
           </form>,
-        (DataFormatVersionEdge, true, true) →
+        (DataFormatVersion.Edge, true, true) →
           <form>
             <section-1>
               <control-1.1/>
@@ -88,7 +88,7 @@ class SendTest
               </grid-1>
             </section-1>
           </form>,
-        (DataFormatVersion400, false, false) →
+        (DataFormatVersion.V400, false, false) →
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <section-1>
               <control-1.1 fr:foo="42"/>
@@ -104,7 +104,7 @@ class SendTest
             </section-2>
             <fr:metadata/>
           </form>,
-        (DataFormatVersion400, true, false) →
+        (DataFormatVersion.V400, true, false) →
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <section-1>
               <control-1.1 fr:foo="42"/>
@@ -114,7 +114,7 @@ class SendTest
             </section-1>
             <fr:metadata/>
           </form>,
-        (DataFormatVersionEdge, false, false) →
+        (DataFormatVersion.Edge, false, false) →
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <section-1>
               <control-1.1 fr:foo="42"/>
@@ -134,7 +134,7 @@ class SendTest
             </section-2>
             <fr:metadata/>
           </form>,
-        (DataFormatVersionEdge, true, false) →
+        (DataFormatVersion.Edge, true, false) →
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
             <section-1>
               <control-1.1 fr:foo="42"/>
@@ -149,7 +149,7 @@ class SendTest
       )
 
     for (((dataFormatVersion, prune, pruneMetadata), expected) ← Expected) {
-      it(s"""must pass with `$DataFormatVersionName = "$dataFormatVersion"`, `prune = "$prune"` and `$PruneMetadataName = "$pruneMetadata"`""") {
+      it(s"""must pass with `$DataFormatVersionName = "${dataFormatVersion.entryName}"`, `prune = "$prune"` and `$PruneMetadataName = "$pruneMetadata"`""") {
 
         val (processorService, docOpt, _) =
           runFormRunner("tests", "send-action", "new", document = "", initialize = true)
@@ -165,7 +165,7 @@ class SendTest
                   s"""
                     send(
                       uri                    = "/fr/service/custom/orbeon/echo",
-                      $DataFormatVersionName = "$dataFormatVersion",
+                      $DataFormatVersionName = "${dataFormatVersion.entryName}",
                       content                = "xml",
                       method                 = "post",
                       replace                = "instance",

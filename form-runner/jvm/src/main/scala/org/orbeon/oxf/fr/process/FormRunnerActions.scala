@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.HttpMethod
@@ -25,6 +26,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -130,18 +132,31 @@ trait FormRunnerActions {
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
-      import GridDataMigration._
+      val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
-      val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
+      def maybeMigrateData(originalData: DocumentInfo): DocumentInfo = {
 
-      def maybeMigrateData(originalData: DocumentInfo) =
-        dataMaybeMigratedToDatabaseFormat(
-          app,
-          form,
-          originalData,
-          metadataInstance map (_.root),
-          pruneMetadata
+        val providerDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+
+        val databaseData =
+          MigrationSupport.migrateDataWithFormMetadataMigrations(
+            data          = originalData,
+            metadataOpt   = metadataInstance map (_.root),
+            srcVersion    = DataFormatVersion.Edge,
+            dstVersion    = providerDataFormatVersion,
+            pruneMetadata = pruneMetadata
+          ) getOrElse
+            originalData
+
+        // Add `data-format-version` attribute on the root element
+        insert(
+          into       = databaseData / *,
+          origin     = NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, providerDataFormatVersion.entryName),
+          doDispatch = false
         )
+
+        databaseData
+      }
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(
@@ -151,7 +166,7 @@ trait FormRunnerActions {
         fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
-        commonQueryString = s"valid=$dataValid&$DataFormatVersionName=$databaseDataFormatVersion" + querySuffix,
+        commonQueryString = s"valid=$dataValid&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,
         forceAttachments  = false,
         formVersion       = Some(formVersion.toString)
       )
@@ -287,7 +302,7 @@ trait FormRunnerActions {
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
     "content"             → "xml",
-    DataFormatVersionName → "4.0.0",
+    DataFormatVersionName → DataFormatVersion.V400.entryName,
     "parameters"          → s"app form form-version document valid language process $DataFormatVersionName"
   )
 
@@ -498,7 +513,7 @@ trait FormRunnerActions {
           Some(             Some("replace")               → replace),
           Some(             Some(ShowProgressName)        → showProgress.toString),
           Some(             Some("content")               → "xml"),
-          Some(             Some(DataFormatVersionName)   → DataFormatVersionEdge),
+          Some(             Some(DataFormatVersionName)   → DataFormatVersion.Edge.entryName),
           Some(             Some(PruneMetadataName)       → false.toString),
           Some(             Some("parameters")            → s"$FormVersionParam $DataFormatVersionName"),
           formTargetOpt.map(Some(FormTargetName)          → _),

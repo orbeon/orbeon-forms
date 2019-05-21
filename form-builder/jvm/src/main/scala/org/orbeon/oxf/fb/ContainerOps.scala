@@ -47,9 +47,6 @@ trait ContainerOps extends ControlOps {
   def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
     containerElem descendant FRContainerTest
 
-  def findNestedControls(containerElem: NodeInfo): Seq[NodeInfo] =
-    containerElem descendant CellTest child * filter IsControl
-
   // Find all siblings of the given element with the given name, excepting the given element
   def findSiblingsWithName(element: NodeInfo, siblingName: String): Seq[NodeInfo] =
     element parent * child * filter
@@ -83,17 +80,15 @@ trait ContainerOps extends ControlOps {
     ctx         : FormBuilderDocContext
   ): Option[UndoAction] = {
     val container = containerById(containerId)
-    canDelete(container) option {
+    canDelete(container) flatOption {
 
-      val undo =
-        UndoAction.DeleteContainer(
-          containerPosition(containerId),
-          ToolboxOps.controlOrContainerElemToXcv(container)
-        )
+      val undoOpt =
+        ToolboxOps.controlOrContainerElemToXcv(container) map
+          (UndoAction.DeleteContainer(containerPosition(containerId), _))
 
       deleteContainer(container)
 
-      undo
+      undoOpt
     }
   }
 
@@ -106,7 +101,8 @@ trait ContainerOps extends ControlOps {
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
-      // NOTE: Deleting is tricky because NodeInfo is mutation-averse as it keeps a node's index, among others.
+      // NOTE: Deleting is tricky because NodeInfo is mutation-averse as it keeps a node's index, among others
+      // (no longer the case with #3630!).
       // So deleting a node under a given NodeInfo can cause the position of following siblings to be out of date
       // and cause errors. So we delete from back to front. But a safer solution should be found.
 
@@ -289,7 +285,7 @@ trait ContainerOps extends ControlOps {
         delete(controlBind / *)
         insert(into = controlBind, origin = oldNestedBinds)
 
-        // Mover data holders up and keep only the first iteration
+        // Move data holders up and keep only the first iteration
         findDataHolders(controlName) foreach { holder ⇒
           val nestedHolders = holder / * take 1 child *
           delete(holder / *)

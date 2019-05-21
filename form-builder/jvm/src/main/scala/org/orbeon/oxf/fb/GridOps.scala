@@ -33,28 +33,34 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
-  def annotateGridsAndCells(startElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
+  def canDeleteGrid(gridElem: NodeInfo): Boolean =
+    canDeleteContainer(gridElem)
 
-    // 1. Annotate all the grid and grid cells of the given document with unique ids,
-    // if they don't have them already. We do this so that ids are stable as we move
-    // things around, otherwise if the XForms document is recreated new automatic ids
-    // are generated for objects without id.
+  def annotateGridsAndCells(bodyElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
 
-    val grids = startElem descendantOrSelf GridTest
+    val grids = bodyElem descendantOrSelf GridTest
 
-    // Annotate cells
-    locally {
-      val toAnnotate = grids descendant CellTest filterNot (_.hasId)
-      val ids        = nextTmpIds(count = toAnnotate.size).toIterator
-      toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
-    }
+    addMissingCellIds(grids)
+    addMissingGridIds(grids)
+  }
 
-    // Annotate grids
-    locally {
-      val toAnnotate = grids filterNot (_.hasId)
-      val ids        = nextIds("grid", toAnnotate.size).toIterator
-      toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
-    }
+  def addMissingGridIds(bodyElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
+    addMissingGridIds(bodyElem descendantOrSelf GridTest)
+
+  private def addMissingCellIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val toAnnotate = grids descendant CellTest filterNot (_.hasId)
+    val ids        = nextTmpIds(count = toAnnotate.size).toIterator
+
+    toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
+  }
+
+  private def addMissingGridIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
+
+    val toAnnotate = grids filterNot (_.hasId)
+    val ids        = nextIds("grid", toAnnotate.size).toIterator
+
+    toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
   }
 
   // Get the first enclosing repeated grid or legacy repeat
@@ -184,10 +190,10 @@ trait GridOps extends ContainerOps {
     val allCells       = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells
     val adjustedRowPos = rowPos % allCells.size
 
-    (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size) option
+    (allCells.lengthCompare(1) > 0 && adjustedRowPos < allCells.size) flatOption
       withDebugGridOperation("delete row") {
 
-        val undo = DeleteRow(gridId, ToolboxOps.controlOrContainerElemToXcv(gridElem), adjustedRowPos)
+        val undo = ToolboxOps.controlOrContainerElemToXcv(gridElem) map (DeleteRow(gridId, _, adjustedRowPos))
 
         // Reduce height of cells which start on a previous row
         val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
@@ -424,9 +430,6 @@ trait GridOps extends ContainerOps {
   def deleteGridByIdIfPossible(gridId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     findContainerById(gridId) flatMap
       (_ ⇒ deleteContainerById(canDeleteGrid, gridId))
-
-  def canDeleteGrid(gridElem: NodeInfo): Boolean =
-    canDeleteContainer(gridElem)
 
   def canDeleteRow(gridElem: NodeInfo): Boolean =
     Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells.lengthCompare(1) > 0

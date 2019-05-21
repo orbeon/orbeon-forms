@@ -14,7 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence, GridDataMigration}
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
+import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
@@ -28,10 +30,10 @@ trait FormDefinition {
   private val ClassesPredicate = Set(FRSummary, FRSearch)
 
   // Returns the controls that are searchable from a form definition
-  def findIndexedControls(formDoc: DocumentInfo, app: String, form: String): Seq[IndexedControl] = {
-
-    val mustMigratePathsTo40Format =
-      FormRunnerPersistence.providerDataFormatVersion(app, form) == FormRunnerPersistence.DataFormatVersion400
+  def findIndexedControls(
+    formDoc                   : DocumentInfo,
+    databaseDataFormatVersion : DataFormatVersion
+  ): Seq[IndexedControl] = {
 
     // Controls in the view, with the `fr-summary` or `fr-search` class
     val indexedControlBindPathHolders = {
@@ -63,42 +65,35 @@ trait FormDefinition {
       }
     }
 
-    val migrationPaths =
-      if (mustMigratePathsTo40Format)
-        FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
-          GridDataMigration.migrationMapFromMetadata           flatMap
-          GridDataMigration.decodeMigrationsFromJSON
-      else
-        Nil
+    val (_, migrationOpsToApply) =
+      findMigrationOps(
+        srcVersion = DataFormatVersion.Edge,
+        dstVersion = databaseDataFormatVersion
+      )
+
+    // Find the migration functions once and for all
+    val pathMigrationFunctions =
+      for {
+        metadataElem ← FormRunner.metadataInstanceRootOpt(formDoc).toList
+        ops          ← migrationOpsToApply
+        json         ← findMigrationForVersion(metadataElem, ops.version)
+      } yield
+        ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
 
     indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) ⇒
 
-      val controlName = FormRunner.getControlName(control)
-
-      val adjustedBindPathElems = {
-
-        // Adjust the search paths if needed by dropping the repeated grid iteration element. We know that a grid
-        // iteration can only contain a leaf control. Example:
-        //
-        // - bind refs      : "my-section" :: "my-grid" :: "my-grid-iteration" :: "my-text" :: Nil
-        // - migration path : "my-section" :: "my-grid" :: Nil
-        // - migrated path  : "my-section" :: "my-grid" :: "my-text" :: Nil
-        //
-        if (mustMigratePathsTo40Format && (migrationPaths exists (migration ⇒ path.startsWith(migration.path))))
-          path.dropRight(2) ::: path.last :: Nil
-        else
-          path
-      }
+      val adjustedBindPathElems =
+        (pathMigrationFunctions.iterator flatMap (_.apply(path)) nextOption()) getOrElse path
 
       IndexedControl(
-        name      = controlName,
+        name      = FormRunner.getControlName(control),
         inSearch  = control.attClasses(FRSearch),
         inSummary = control.attClasses(FRSummary),
         xpath     = adjustedBindPathElems map (_.value) mkString "/",
         xsType    = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
         htmlLabel = FormRunner.hasHTMLMediatype(control / (XF → "label")),
-        resources = resources
+        resources = resources.toList
       )
     }
   }
@@ -111,7 +106,7 @@ trait FormDefinition {
     xsType    : String,
     control   : String,
     htmlLabel : Boolean,
-    resources : Seq[(String, NodeInfo)]
+    resources : List[(String, NodeInfo)]
   ) {
     def toXML: NodeInfo =
       <query

@@ -17,9 +17,9 @@ import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl.resolveId
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
+import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike

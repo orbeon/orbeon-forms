@@ -19,7 +19,32 @@
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data"     href="#data"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+                <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:template match="/">
+                    <xsl:apply-templates
+                        xmlns:migration="java:org.orbeon.oxf.fb.FormBuilderMigrationXPathApi"
+                        select="migration:migrateGridsEnclosingElements(p:mutable-document(/))/root()/*"/>
+                </xsl:template>
+
+            </xsl:stylesheet>
+        </p:input>
+        <p:input name="data" href="#data"/>
+        <p:output name="data" id="with-native-migrations"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="data"   href="#with-native-migrations"/>
+        <p:input  name="config" href="annotate-migrate-to-12-columns.xsl"/>
+        <p:output name="data"   id="migrated-to-12-columns"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data"     href="#migrated-to-12-columns"/>
         <p:input name="bindings" href="#bindings"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0"
@@ -32,10 +57,9 @@
                 xmlns:ev="http://www.w3.org/2001/xml-events"
                 xmlns:xbl="http://www.w3.org/ns/xbl">
 
-                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+                <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:include href="annotate-migrate.xsl"/>
                 <xsl:include href="annotate-design-time.xsl"/>
-                <xsl:include href="annotate-migrate-to-12-columns.xsl"/>
 
                 <!-- NOTE: `annotate-migrate.xsl` relies on `$model`. -->
                 <xsl:variable name="model" select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>

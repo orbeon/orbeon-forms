@@ -3,7 +3,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xf="http://www.w3.org/2002/xforms">
 
-    <fr:grid edit-ref="">
+    <fr:grid>
         <xh:tr>
            <xh:td colspan="4">
                <xf:input/>

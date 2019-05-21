@@ -57,17 +57,19 @@
                             </xsl:element>
                         </xsl:if>
 
+                        <!-- For example ('4.8.0', '[...json...]', '2019.1.0', '...json...') -->
                         <xsl:variable
-                            xmlns:migration="java:org.orbeon.oxf.fb.MigrationOps"
+                            xmlns:migration="java:org.orbeon.oxf.fb.FormBuilderMigrationXPathApi"
                             name="migration"
-                            select="migration:buildGridMigrationMap(/, doc('input:bindings'), false())"/>
+                            select="migration:buildGridMigrationMapXPath(/, doc('input:bindings'))"/>
 
-                        <xsl:if test="normalize-space($migration)">
+                        <xsl:for-each select="1 to count($migration) div 2">
+                            <xsl:variable name="i" select="."/>
                             <xsl:element name="migration">
-                                <xsl:attribute name="version">4.8.0</xsl:attribute>
-                                <xsl:value-of select="$migration"/>
+                                <xsl:attribute name="version" select="$migration[$i * 2 - 1]"/>
+                                <xsl:value-of select="$migration[$i * 2]"/>
                             </xsl:element>
-                        </xsl:if>
+                        </xsl:for-each>
 
                     </xsl:copy>
                 </xsl:template>

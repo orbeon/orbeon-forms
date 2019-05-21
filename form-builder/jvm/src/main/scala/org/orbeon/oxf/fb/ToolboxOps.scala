@@ -32,7 +32,6 @@ import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -42,9 +41,6 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.mutable
 
 
-/*
- * Form Builder: toolbox operations.
- */
 object ToolboxOps {
 
   import Private._
@@ -168,44 +164,13 @@ object ToolboxOps {
   // TODO: Review these. They are probably not needed as of 2017-10-12.
   //@XPathFunction
   def canInsertSection(inDoc: NodeInfo) = inDoc ne null
+
   //@XPathFunction
   def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedCell(FormBuilderDocContext(inDoc)).isDefined
+
   //@XPathFunction
   def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyCellSucceed(FormBuilderDocContext(inDoc))
 
-  // Insert a new grid
-  //@XPathFunction
-  def insertNewGrid(): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
-
-    withDebugGridOperation("insert new grid") {
-
-      val (into, after, _) = findGridInsertionPoint
-
-      // Obtain ids first
-      val ids = nextTmpIds(count = 2).toIterator
-
-      // The grid template
-      val gridTemplate: NodeInfo =
-        <fr:grid edit-ref="" id={nextId("grid")} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-          <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
-        </fr:grid>
-
-      // Insert after current level 2 if found, otherwise into level 1
-      val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
-
-      // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
-
-      // Select first grid cell
-      selectFirstCellInContainer(newGridElem)
-
-      Undo.pushUserUndoAction(InsertGrid(newGridElem.id))
-    }
-  }
-
-  // Insert a new section with optionally a nested grid
   //@XPathFunction
   def insertNewSection(withGrid: Boolean): Some[NodeInfo] = {
 
@@ -269,13 +234,12 @@ object ToolboxOps {
     }
   }
 
-  // Insert a new repeat
   //@XPathFunction
-  def insertNewRepeatedGrid(): Some[String] = {
+  def insertNewGrid(repeated: Boolean): Some[String] = {
 
     implicit val ctx = FormBuilderDocContext()
 
-    withDebugGridOperation("insert new repeat") {
+    withDebugGridOperation(s"insert new ${if (repeated) "repeated " else ""}grid") {
 
       val (into, after, grid) = findGridInsertionPoint
       val newGridName         = controlNameFromId(nextId("grid"))
@@ -307,16 +271,17 @@ object ToolboxOps {
       ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
 
       // This takes care of all the repeat-related items
-      setRepeatProperties(
-        controlName          = newGridName,
-        repeat               = true,
-        min                  = "1",
-        max                  = "",
-        freeze               = "",
-        iterationNameOrEmpty = "",
-        applyDefaults        = true,
-        initialIterations    = "first"
-      )
+      if (repeated)
+        setRepeatProperties(
+          controlName          = newGridName,
+          repeat               = true,
+          min                  = "1",
+          max                  = "",
+          freeze               = "",
+          iterationNameOrEmpty = "",
+          applyDefaults        = true,
+          initialIterations    = "first"
+        )
 
       // Select new td
       selectFirstCellInContainer(newGridElem)
@@ -392,7 +357,10 @@ object ToolboxOps {
     case object Bind      extends XcvEntry
   }
 
-  def controlOrContainerElemToXcv(controlOrContainerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): NodeInfo = {
+  def controlOrContainerElemToXcv(
+    controlOrContainerElem : NodeInfo)(implicit
+    ctx                    : FormBuilderDocContext
+  ): Option[NodeInfo] = {
 
     val resourcesRootElem = resourcesRoot
 
@@ -404,101 +372,51 @@ object ToolboxOps {
         predicate      = _ ⇒ true
       ).headOption
 
-    val (xcvContent, isNonRepeatedGrid) =
-      controlDetailsOpt match {
-        case Some(ControlBindPathHoldersResources(control, bind, _, holders, _)) ⇒
-          // The control has a name and a bind
+    // In the context of Form Builder, we *should* always find the information. But there are some cases in tests where
+    // the controls to delete don't have ids and binds.
+    controlDetailsOpt collect {
+      case ControlBindPathHoldersResources(control, bind, _, holders, _) ⇒
 
-          val bindAsList = List(bind)
+        val bindAsList = List(bind)
 
-          // Handle resources separately since unlike holders and binds, they are not nested
-          val resourcesWithLang =
-            for {
-              rootBind ← bindAsList
-              lang     ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
-            } yield
-              elementInfo(
-                "resource",
-                attributeInfo(XMLLangQName, lang) ++
-                  FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
-              )
-
-          (
-            XcvEntry.values map {
-              case e @ XcvEntry.Control   ⇒ e → List(control)
-              case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
-              case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
-              case e @ XcvEntry.Bind      ⇒ e → bindAsList
-            },
-            false
-          )
-
-        case None ⇒
-          // Non-repeated grids don't have a name or a bind.
-          // In this case, we use the grid control as a source of truth and find the nested controls.
-
-          val nestedControlDetails = searchControlBindPathHoldersInDoc(
-            controlElems   = findNestedControls(controlOrContainerElem),
-            inDoc          = ctx.formDefinitionRootElem,
-            contextItemOpt = Some(ctx.dataRootElem),
-            predicate      = _ ⇒ true
-          )
-
-          val resourcesWithLangWithContainer = nestedControlDetails map { d ⇒
-
-            val resourceElems =
-              d.resources groupBy (_._1) map {
-                case (lang, langsAndElems) ⇒
-                  elementInfo(
-                    "resource",
-                    attributeInfo(XMLLangQName, lang) ++ (langsAndElems map (_._2))
-                  )
-              }
-
+        // Handle resources separately since unlike holders and binds, they are not nested
+        val resourcesWithLang =
+          for {
+            rootBind ← bindAsList
+            lang     ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
+          } yield
             elementInfo(
-              getControlName(d.control),
-              resourceElems.toList
+              "resource",
+              attributeInfo(XMLLangQName, lang) ++
+                FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
             )
+
+        val xcvContent =
+          XcvEntry.values map {
+            case e @ XcvEntry.Control   ⇒ e → List(control)
+            case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
+            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
+            case e @ XcvEntry.Bind      ⇒ e → bindAsList
           }
 
-          // See https://github.com/orbeon/orbeon-forms/issues/3781
-          val dataHoldersWithContainer =
-            nestedControlDetails map { d ⇒
-              elementInfo(
-                getControlName(d.control),
-                d.holders.toList.flatten
-              )
-            }
-
-          (
-            XcvEntry.values map {
-              case e @ XcvEntry.Control   ⇒ e → List(controlOrContainerElem)
-              case e @ XcvEntry.Holder    ⇒ e → dataHoldersWithContainer
-              case e @ XcvEntry.Resources ⇒ e → resourcesWithLangWithContainer
-              case e @ XcvEntry.Bind      ⇒ e → (nestedControlDetails map (_.bind))
-            },
-            true
+        val result =
+          elementInfo(
+            "xcv",
+            xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) }
           )
-      }
 
-    val result =
-      elementInfo(
-        "xcv",
-        attributeInfo(IsNonRepeatedGridName, isNonRepeatedGrid.toString) +:
-          (xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
-      )
+        // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
+        // we just re-annotate at that time
+        result descendant (FRGridTest || NodeInfoCell.CellTest) att "id" filter
+          (a ⇒ a.stringValue.startsWith("tmp-") && a.stringValue.endsWith("-tmp")) foreach (delete(_))
 
-    // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
-    // we just re-annotate at that time
-    result descendant (FRGridTest || NodeInfoCell.CellTest) att "id" filter
-      (a ⇒ a.stringValue.startsWith("tmp-") && a.stringValue.endsWith("-tmp")) foreach (delete(_))
-
-    result
+        result
+    }
   }
 
   def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val name  = getControlName(cellElem / * head)
-    findControlByName(ctx.formDefinitionRootElem, name) map controlOrContainerElemToXcv
+    findControlByName(ctx.formDefinitionRootElem, name) flatMap controlOrContainerElemToXcv
   }
 
   // Copy control to the clipboard
@@ -771,20 +689,22 @@ object ToolboxOps {
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[UndoAction] =
-    xcvFromSectionWithTemplate(containerId) map { xcvElem ⇒
+    xcvFromSectionWithTemplate(containerId) flatMap { xcvElem ⇒
 
-      val undo =
-        MergeSectionTemplate(
-          containerId,
-          TransformerUtils.extractAsMutableDocument(controlOrContainerElemToXcv(containerById(containerId))).rootElement,
-          prefix,
-          suffix
-        )
+      val undoOpt =
+        controlOrContainerElemToXcv(containerById(containerId)) map { xcvElem2 ⇒
+          MergeSectionTemplate(
+            containerId,
+            TransformerUtils.extractAsMutableDocument(xcvElem2).rootElement,
+            prefix,
+            suffix
+          )
+        }
 
       deleteSectionByIdIfPossible(containerId)
       pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)))
 
-      undo
+      undoOpt
     }
 
   // Paste control from the clipboard
@@ -826,7 +746,6 @@ object ToolboxOps {
     require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
-    val isNonRepeatedGrid    = xcvElem attValueOpt IsNonRepeatedGridName contains true.toString
 
     // Rename control names if needed
     locally {
@@ -852,10 +771,7 @@ object ToolboxOps {
 
         // Rename holders
         val holders =
-          if (isNonRepeatedGrid)
-            xcvElem / XcvEntry.Holder.entryName / * / *
-          else
-            xcvElem / XcvEntry.Holder.entryName / *
+          xcvElem / XcvEntry.Holder.entryName / *
 
         holders.iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem ⇒
 
@@ -876,10 +792,7 @@ object ToolboxOps {
 
         // Rename resources
         val resourceHolderContainers =
-          if (isNonRepeatedGrid)
-            xcvElem / XcvEntry.Resources.entryName / * / "resource"
-          else
-            xcvElem / XcvEntry.Resources.entryName / "resource"
+          xcvElem / XcvEntry.Resources.entryName / "resource"
 
         resourceHolderContainers / * foreach { holderElem ⇒
 
@@ -889,14 +802,6 @@ object ToolboxOps {
             rename(holderElem, newName)
           }
         }
-
-        // Rename container elements if needed
-        if (isNonRepeatedGrid)
-          (xcvElem / XcvEntry.Resources.entryName / *) ++ (xcvElem / XcvEntry.Holder.entryName / *) foreach { elem ⇒
-            oldToNewNames.get(elem.localname) foreach { newName ⇒
-              rename(elem, newName)
-            }
-          }
 
         // Rename binds
         (xcvElem / XcvEntry.Bind.entryName / *).iterator flatMap iterateSelfAndDescendantBindsReversed foreach { bindElem ⇒
@@ -982,7 +887,11 @@ object ToolboxOps {
     val precedingContainerNameOpt = afterElemOpt flatMap getControlNameOpt
 
     val newContainerElem =
-      insert(into = intoContainerElem, after = afterElemOpt.toList, origin = containerControlElem).head
+      insert(
+        into   = intoContainerElem,
+        after  = afterElemOpt.toList,
+        origin = containerControlElem
+      ).head
 
     def resourceHolders(resourceElems: Seq[NodeInfo]): Seq[(String, Seq[NodeInfo])] =
       for {
@@ -991,46 +900,18 @@ object ToolboxOps {
       } yield
         lang → (resourceElem / *)
 
-    // Insert holders
-    if (isNonRepeatedGrid) {
-
-      val holderContainers   = xcvElem / XcvEntry.Holder.entryName / *
-      val resources          = xcvElem / XcvEntry.Resources.entryName
-
-      // Insert the holders for each nested control in turn.
-      /// NOTE: Use `to[List]` to ensure eager evaluation.
-      holderContainers.to[List].scanLeft(precedingContainerNameOpt) { case (precedingControlNameOpt, container) ⇒
-
-        val controlName = container.localname
-
-        insertHolders(
-          controlElement       = newContainerElem, // in order to find containers
-          dataHolders          = container / *,
-          resourceHolders      = resourceHolders(resources / controlName / *),
-          precedingControlName = precedingControlNameOpt
-        )
-
-        (container / * headOption) map (_.localname)
-      }
-    } else {
       insertHolders(
         controlElement       = newContainerElem, // in order to find containers
         dataHolders          = xcvElem / XcvEntry.Holder.entryName / *,
         resourceHolders      = resourceHolders(xcvElem / XcvEntry.Resources.entryName / "resource"),
         precedingControlName = precedingContainerNameOpt
       )
-    }
 
     val xcvBinds = xcvElem / XcvEntry.Bind.entryName / *
 
     if (newContainerElem.hasAtt(XFormsConstants.BIND_QNAME.localName)) {
       // Insert the bind element for the container and descendants
       val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
-      insert(after = tmpBind, origin = xcvBinds)
-      delete(tmpBind)
-    } else if (xcvBinds.nonEmpty) {
-      // There are descendant binds (case of an unbound non-repeated grid containing at least one control)
-      val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = false) :+ getControlName(xcvBinds.head))
       insert(after = tmpBind, origin = xcvBinds)
       delete(tmpBind)
     }
@@ -1171,8 +1052,6 @@ object ToolboxOps {
 
     // This is for `insertNewControl`
     val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
-
-    val IsNonRepeatedGridName = "is-non-repeated-grid"
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =

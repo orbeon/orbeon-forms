@@ -40,9 +40,7 @@
                         <empty/>
                     </xf:instance>
                     <xf:instance id="fr-form-template">
-                        <address xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <address>
                             <street-number/>
                             <street-name/>
                             <apt-suite/>
@@ -52,142 +50,98 @@
                         </address>
                     </xf:instance>
                     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="street-number-bind"
+                        <xf:bind id="street-number-bind"
                                  name="street-number" required="true()" ref="street-number">
                             <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
                                            level="warning"/>
                         </xf:bind>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="street-name-bind"
+                        <xf:bind id="street-name-bind"
                                  name="street-name" ref="street-name" required="true()"/>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="apt-suite-bind"
+                        <xf:bind id="apt-suite-bind"
                                  name="apt-suite" ref="apt-suite"/>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="city-bind" name="city"
+                        <xf:bind id="city-bind" name="city"
                                  ref="city" required="true()"/>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="state-bind" name="state"
+                        <xf:bind id="state-bind" name="state"
                                  ref="state" required="true()"/>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="zip-bind" name="zip"
+                        <xf:bind id="zip-bind" name="zip"
                                  required="true()" ref="zip" type="xs:integer"/>
                     </xf:bind>
                     <xf:instance id="fr-form-resources">
                         <resources>
                             <resource xml:lang="en">
-                                <address xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <address>
                                     <label>US Address</label>
                                     <help/>
                                 </address>
-                                <street-number xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                               xmlns:saxon="http://saxon.sf.net/"
-                                               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <street-number>
                                     <label>Street Number</label>
                                     <hint/>
                                     <alert>The street number is usually a number</alert>
                                 </street-number>
-                                <street-name xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                             xmlns:saxon="http://saxon.sf.net/"
-                                             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <street-name>
                                     <label>Street Name</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </street-name>
-                                <apt-suite xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <apt-suite>
                                     <label>Apt/Suite</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </apt-suite>
-                                <city xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                      xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <city>
                                     <label>City</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </city>
-                                <state xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                       xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <state>
                                     <label>State</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </state>
-                                <zip xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                     xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <zip>
                                     <label>Zip</label>
                                     <hint/>
                                 </zip>
                             </resource>
                             <resource xml:lang="fr">
-                                <address xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <address>
                                     <label>Adresse US</label>
                                     <help/>
                                 </address>
-                                <street-number xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                               xmlns:saxon="http://saxon.sf.net/"
-                                               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <street-number>
                                     <label>Numéro de rue</label>
                                     <hint/>
                                     <alert>Le numéro de rue est en général un nombre</alert>
                                 </street-number>
-                                <street-name xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                             xmlns:saxon="http://saxon.sf.net/"
-                                             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <street-name>
                                     <label>Nom de rue</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </street-name>
-                                <apt-suite xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <apt-suite>
                                     <label>Appartement/suite</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </apt-suite>
-                                <city xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                      xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <city>
                                     <label>Ville</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </city>
-                                <state xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                       xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <state>
                                     <label>Etat</label>
                                     <hint/>
                                     <help/>
                                     <alert/>
                                 </state>
-                                <zip xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                     xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <zip>
                                     <label>Code postal</label>
                                     <hint/>
                                 </zip>
@@ -223,13 +177,8 @@
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
                         as="element(resource)"/>
                 <xf:group appearance="xxf:internal">
-                    <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                              xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                              ref="$form-resources/address/label"/>
-                    <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                             xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" columns="3">
+                    <xf:label ref="$form-resources/address/label"/>
+                    <fr:grid id="grid-15-grid" columns="3">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="street-number-control" bind="street-number-bind">
@@ -241,18 +190,14 @@
                                 </xf:input>
                             </xh:td>
                             <xh:td>
-                                <xf:input
-                                        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                        id="street-name-control" bind="street-name-bind">
+                                <xf:input id="street-name-control" bind="street-name-bind">
                                     <xf:label ref="$form-resources/street-name/label"/>
                                     <xf:hint ref="$form-resources/street-name/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>
                             <xh:td>
-                                <xf:input
-                                        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                        id="apt-suite-control" bind="apt-suite-bind">
+                                <xf:input id="apt-suite-control" bind="apt-suite-bind">
                                     <xf:label ref="$form-resources/apt-suite/label"/>
                                     <xf:hint ref="$form-resources/apt-suite/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -261,27 +206,21 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:input
-                                        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                        id="city-control" bind="city-bind">
+                                <xf:input id="city-control" bind="city-bind">
                                     <xf:label ref="$form-resources/city/label"/>
                                     <xf:hint ref="$form-resources/city/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>
                             <xh:td>
-                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                             id="state-control" bind="state-bind">
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="state-control" bind="state-bind">
                                     <xf:label ref="$form-resources/state/label"/>
                                     <xf:hint ref="$form-resources/state/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:us-state>
                             </xh:td>
                             <xh:td>
-                                <xf:input
-                                        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                        id="zip-control" bind="zip-bind">
+                                <xf:input id="zip-control" bind="zip-bind">
                                     <xf:label ref="$form-resources/zip/label"/>
                                     <xf:hint ref="$form-resources/zip/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -328,9 +267,7 @@
                         <empty/>
                     </xf:instance>
                     <xf:instance id="fr-form-template">
-                        <section-1 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                   xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <section-1>
                             <control-1/>
                             <grid-3>
                                 <my-custom-grid-3-iteration>
@@ -340,9 +277,7 @@
                             </grid-3>
                         </section-1>
                     </xf:instance>
-                    <xf:instance xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xxf:readonly="true"
+                    <xf:instance xxf:readonly="true"
                                  id="grid-3-template">
                         <grid-3-iteration>
                             <control-8/>
@@ -350,13 +285,9 @@
                         </grid-3-iteration>
                     </xf:instance>
                     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="control-1-bind"
+                        <xf:bind id="control-1-bind"
                                  name="control-1" ref="control-1"/>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-3-bind" ref="grid-3"
+                        <xf:bind id="grid-3-bind" ref="grid-3"
                                  name="grid-3">
                             <xf:bind id="my-custom-grid-3-iteration-bind" ref="my-custom-grid-3-iteration" name="my-custom-grid-3-iteration">
                                 <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
@@ -367,27 +298,19 @@
                     <xf:instance id="fr-form-resources">
                         <resources>
                             <resource xml:lang="en">
-                                <section-1 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <section-1>
                                     <label>One repeated grid</label>
                                 </section-1>
-                                <control-1 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-1>
                                     <label>Name</label>
                                     <hint/>
                                     <alert/>
                                 </control-1>
-                                <control-8 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-8>
                                     <label>I1</label>
                                     <hint/>
                                 </control-8>
-                                <control-9 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-9>
                                     <label>I2</label>
                                     <hint/>
                                 </control-9>
@@ -423,13 +346,8 @@
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
                         as="element(resource)"/>
                 <xf:group appearance="xxf:internal">
-                    <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                              xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                              ref="$form-resources/section-1/label"/>
-                    <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                             xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-16-grid">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="control-1-control" bind="control-1-bind">
@@ -441,9 +359,7 @@
                             <xh:td/>
                         </xh:tr>
                     </fr:grid>
-                    <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                             xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-3-grid" bind="grid-3-bind"
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind"
                              repeat="content" min="1" template="instance('grid-3-template')">
                         <xh:tr>
                             <xh:td>
@@ -484,9 +400,7 @@
                         <empty/>
                     </xf:instance>
                     <xf:instance id="fr-form-template">
-                        <section-5 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                   xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <section-5>
                             <grid-6>
                                 <grid-6-iteration>
                                     <control-10/>
@@ -502,9 +416,7 @@
                             </grid-14>
                         </section-5>
                     </xf:instance>
-                    <xf:instance xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xxf:readonly="true"
+                    <xf:instance xxf:readonly="true"
                                  id="grid-6-template">
                         <grid-6-iteration>
                             <control-10/>
@@ -513,18 +425,14 @@
                             <control-13/>
                         </grid-6-iteration>
                     </xf:instance>
-                    <xf:instance xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xxf:readonly="true"
+                    <xf:instance xxf:readonly="true"
                                  id="grid-14-template">
                         <grid-14-iteration>
                             <control-16/>
                         </grid-14-iteration>
                     </xf:instance>
                     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-6-bind" ref="grid-6"
+                        <xf:bind id="grid-6-bind" ref="grid-6"
                                  name="grid-6">
                             <xf:bind id="grid-6-iteration-bind" ref="grid-6-iteration" name="grid-6-iteration">
                                 <xf:bind id="control-10-bind" ref="control-10" name="control-10" type="xf:email"/>
@@ -534,9 +442,7 @@
                                 <xf:bind id="control-13-bind" ref="control-13" name="control-13" type="xf:decimal"/>
                             </xf:bind>
                         </xf:bind>
-                        <xf:bind xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-14-bind" ref="grid-14"
+                        <xf:bind id="grid-14-bind" ref="grid-14"
                                  name="grid-14">
                             <xf:bind id="grid-14-iteration-bind" ref="grid-14-iteration" name="grid-14-iteration">
                                 <xf:bind id="control-16-bind" ref="control-16" name="control-16"/>
@@ -546,39 +452,27 @@
                     <xf:instance id="fr-form-resources">
                         <resources>
                             <resource xml:lang="en">
-                                <section-5 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                           xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <section-5>
                                     <label>Two repeated grids</label>
                                     <help/>
                                 </section-5>
-                                <control-10 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-10>
                                     <label>Email</label>
                                     <hint/>
                                 </control-10>
-                                <control-11 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-11>
                                     <label>Phone</label>
                                     <hint/>
                                 </control-11>
-                                <control-12 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-12>
                                     <label>Number</label>
                                     <hint/>
                                 </control-12>
-                                <control-13 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-13>
                                     <label>Amount</label>
                                     <hint/>
                                 </control-13>
-                                <control-16 xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:saxon="http://saxon.sf.net/"
-                                            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <control-16>
                                     <label>Textarea</label>
                                     <hint/>
                                 </control-16>
@@ -614,13 +508,8 @@
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
                         as="element(resource)"/>
                 <xf:group appearance="xxf:internal">
-                    <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                              xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                              ref="$form-resources/section-5/label"/>
-                    <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                             xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-6-grid" bind="grid-6-bind"
+                    <xf:label ref="$form-resources/section-5/label"/>
+                    <fr:grid id="grid-6-grid" bind="grid-6-bind"
                              repeat="content" min="1" template="instance('grid-6-template')">
                         <xh:tr>
                             <xh:td>
@@ -642,7 +531,7 @@
                         <xh:tr>
                             <xh:td>
                                 <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                           xmlns:xsl="http://www.w3.org/1999/XSL/Transform" id="control-12-control"
+                                           id="control-12-control"
                                            bind="control-12-bind">
                                     <xf:label ref="$form-resources/control-12/label"/>
                                     <xf:hint ref="$form-resources/control-12/hint"/>
@@ -659,9 +548,7 @@
                             </xh:td>
                         </xh:tr>
                     </fr:grid>
-                    <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                             xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="grid-14-grid" bind="grid-14-bind"
+                    <fr:grid id="grid-14-grid" bind="grid-14-bind"
                              repeat="content" min="1" template="instance('grid-14-template')">
                         <xh:tr>
                             <xh:td>

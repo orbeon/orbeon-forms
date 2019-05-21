@@ -10,7 +10,9 @@
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <section-1>
-                        <control-1/>
+                        <grid-1>
+                            <control-1/>
+                        </grid-1>
                         <grid-3>
                             <grid-3-iteration>
                                 <control-5/>
@@ -26,7 +28,9 @@
                     </section-1>
                     <section-9>
                         <section-9-iteration>
-                            <control-10/>
+                            <grid-2>
+                                <control-10/>
+                            </grid-2>
                         </section-9-iteration>
                     </section-9>
                     <section-11>
@@ -54,17 +58,19 @@
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42" type="xf:string">
-                        <xxf:default value="43"/>
-                        <xf:constraint value="string-length() le 100" id="validation-1-validation"/>
-                        <xf:constraint value="string-length() ge 10" id="validation-2-validation"/>
-                        <xf:type id="validation-3-validation">xf:string</xf:type>
-                        <xf:required value="true()" id="validation-4-validation"/>
-                        <xxf:default value="43"/>
-                        <xf:constraint value="string-length() le 100" id="validation-5-validation"/>
-                        <xf:constraint value="string-length() ge 10" id="validation-6-validation"/>
-                        <xf:type id="validation-7-validation">xf:string</xf:type>
-                        <xf:required value="true()" id="validation-8-validation"/>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42" type="xf:string">
+                            <xxf:default value="43"/>
+                            <xf:constraint value="string-length() le 100" id="validation-1-validation"/>
+                            <xf:constraint value="string-length() ge 10" id="validation-2-validation"/>
+                            <xf:type id="validation-3-validation">xf:string</xf:type>
+                            <xf:required value="true()" id="validation-4-validation"/>
+                            <xxf:default value="43"/>
+                            <xf:constraint value="string-length() le 100" id="validation-5-validation"/>
+                            <xf:constraint value="string-length() ge 10" id="validation-6-validation"/>
+                            <xf:type id="validation-7-validation">xf:string</xf:type>
+                            <xf:required value="true()" id="validation-8-validation"/>
+                        </xf:bind>
                     </xf:bind>
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration">
@@ -81,7 +87,9 @@
                 </xf:bind>
                 <xf:bind id="section-9-bind" ref="section-9" name="section-9">
                     <xf:bind id="section-9-iteration-bind" ref="section-9-iteration" name="section-9-iteration">
-                        <xf:bind id="control-10-bind" ref="control-10" name="control-10"/>
+                        <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                            <xf:bind id="control-10-bind" ref="control-10" name="control-10"/>
+                        </xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-11-bind" ref="section-11" name="section-11">
@@ -175,7 +183,9 @@
             </xf:instance>
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="section-9-template">
                 <section-9-iteration>
-                    <control-10/>
+                    <grid-2>
+                        <control-10/>
+                    </grid-2>
                 </section-9-iteration>
             </xf:instance>
             <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-12-template">
@@ -246,7 +256,7 @@
             <fr:body>
                 <fr:section id="section-1-control" bind="section-1-bind">
                    <xf:label ref="$form-resources/section-1/label"/>
-                   <fr:grid>
+                   <fr:grid id="grid-1-grid" bind="grid-1-bind">
                        <fr:c y="1" x="1" w="6">
                            <xf:input id="control-1-control" bind="control-1-bind">
                                <xf:label ref="$form-resources/control-1/label"/>
@@ -297,7 +307,7 @@
                </fr:section>
                 <fr:section id="section-9-control" bind="section-9-bind" repeat="content" min="1" template="instance('section-9-template')">
                     <xf:label ref="$form-resources/section-9/label"/>
-                    <fr:grid>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="12">
                             <xf:input id="control-10-control" bind="control-10-bind">
                                 <xf:label ref="$form-resources/control-10/label"/>

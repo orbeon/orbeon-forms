@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.FunSpec
 
@@ -29,7 +29,7 @@ class FormRunnerActionsTest extends FunSpec{
         def document          : String  = "b77484136e0d4631908adba3e42ebe44fa224ed2"
         def valid             : Boolean = true
         def language          : String  = "fr"
-        def dataFormatVersion : String  = FormRunnerPersistence.DataFormatVersionEdge
+        def dataFormatVersion : String  = "edge"
       }
 
     val ServerBase = "https://example.org/"

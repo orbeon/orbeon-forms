@@ -54,41 +54,58 @@ object FormOrData extends Enum[FormOrData] {
 object FormRunnerPersistenceJava {
   //@XPathFunction
   def providerDataFormatVersion(app: String, form: String): String =
-    FormRunnerPersistence.providerDataFormatVersion(app, form)
+    FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form).entryName
 
   //@XPathFunction
   def findProvider(app: String, form: String, formOrData: String): Option[String] =
     FormRunnerPersistence.findProvider(app, form, FormOrData.withName(formOrData))
 }
 
+sealed abstract class DataFormatVersion(override val entryName: String) extends EnumEntry
+
+object DataFormatVersion extends Enum[DataFormatVersion] {
+
+  sealed trait MigrationVersion extends DataFormatVersion
+
+  val values = findValues
+
+  case object V400   extends DataFormatVersion("4.0.0")
+  case object V480   extends DataFormatVersion("4.8.0")    with MigrationVersion
+  case object V20191 extends DataFormatVersion("2019.1.0") with MigrationVersion
+
+  val Edge: DataFormatVersion = values.last
+
+  def isLatest(dataFormatVersion: DataFormatVersion): Boolean =
+    dataFormatVersion == Edge
+
+  def withNameIncludeEdge(s: String): DataFormatVersion =
+    if (s == "edge")
+      Edge
+    else
+      withName(s)
+}
+
 object FormRunnerPersistence {
 
-  val DataFormatVersion400                       = "4.0.0"
-  val DataFormatVersion480                       = "4.8.0"
-  val DataFormatVersionEdge                      = "edge"
+  val DataFormatVersionName               = "data-format-version"
+  val PruneMetadataName                   = "prune-metadata"
+  val ShowProgressName                    = "show-progress"
+  val FormTargetName                      = "formtarget"
+  val NonRelevantName                     = "nonrelevant"
 
-  val DataFormatVersionName                      = "data-format-version"
-  val PruneMetadataName                          = "prune-metadata"
-  val ShowProgressName                           = "show-progress"
-  val FormTargetName                             = "formtarget"
-  val NonRelevantName                            = "nonrelevant"
+  val PersistenceDefaultDataFormatVersion = DataFormatVersion.V400
 
-  val DefaultDataFormatVersion                   = DataFormatVersion400
-  val FormRunnerCurrentInternalDataFormatVersion = DataFormatVersion480
+  val CRUDBasePath                        = "/fr/service/persistence/crud"
+  val FormMetadataBasePath                = "/fr/service/persistence/form"
+  val PersistencePropertyPrefix           = "oxf.fr.persistence"
+  val PersistenceProviderPropertyPrefix   = PersistencePropertyPrefix + ".provider"
 
-  val AllowedDataFormatVersions                  = Set(DataFormatVersion400, DataFormatVersion480)
+  val NewFromServiceUriPropertyPrefix     = "oxf.fr.detail.new.service"
+  val NewFromServiceUriProperty           = NewFromServiceUriPropertyPrefix + ".uri"
+  val NewFromServiceParamsProperty        = NewFromServiceUriPropertyPrefix + ".passing-request-parameters"
 
-  val CRUDBasePath                               = "/fr/service/persistence/crud"
-  val FormMetadataBasePath                       = "/fr/service/persistence/form"
-  val PersistencePropertyPrefix                  = "oxf.fr.persistence"
-  val PersistenceProviderPropertyPrefix          = PersistencePropertyPrefix + ".provider"
-
-  val NewFromServiceUriPropertyPrefix            = "oxf.fr.detail.new.service"
-  val NewFromServiceUriProperty                  = NewFromServiceUriPropertyPrefix + ".uri"
-  val NewFromServiceParamsProperty               = NewFromServiceUriPropertyPrefix + ".passing-request-parameters"
-
-  val StandardProviderProperties                 = Set("uri", "autosave", "active", "permissions")
-  val AttachmentAttributeNames                   = List("filename", "mediatype", "size")
+  val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions")
+  val AttachmentAttributeNames            = List("filename", "mediatype", "size")
 
   def findProvider(app: String, form: String, formOrData: FormOrData): Option[String] = {
     val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData.entryName :: Nil mkString "."
@@ -145,20 +162,23 @@ object FormRunnerPersistence {
     TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, headersXML, false, false)
   }
 
-  def providerDataFormatVersion(app: String, form: String): String = {
+  def providerDataFormatVersionOrThrow(app: String, form: String): DataFormatVersion = {
 
     val provider =
       findProvider(app, form, FormOrData.Data) getOrElse
         (throw new IllegalArgumentException(s"no provider property configuration found for `$app/$form`"))
 
-    val dataFormatVersion = providerPropertyAsString(provider, DataFormatVersionName, DefaultDataFormatVersion)
+    val dataFormatVersionString =
+      providerPropertyAsString(provider, DataFormatVersionName, PersistenceDefaultDataFormatVersion.entryName)
 
-    require(
-      AllowedDataFormatVersions(dataFormatVersion),
-      s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property must be one of ${AllowedDataFormatVersions mkString ", "}"
-    )
-
-    dataFormatVersion
+    DataFormatVersion.withNameOption(dataFormatVersionString) match {
+      case Some(dataFormatVersion) ⇒
+        dataFormatVersion
+      case None ⇒
+        throw new IllegalArgumentException(
+          s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property is set to `$dataFormatVersionString` but must be one of ${DataFormatVersion.values map (_.entryName) mkString ("`", "`, `", "`")}"
+        )
+    }
   }
 
   private def fullProviderPropertyName(provider: String, property: String) =

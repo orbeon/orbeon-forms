@@ -88,6 +88,13 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="fr:grid" mode="within-body">
+        <xsl:copy>
+            <xsl:attribute name="edit-ref"/>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Convert MIP names (attributes and nested elements) -->
     <!-- NOTE: We leave custom MIPs as they are. The user must not use fb:* custom MIPs. -->
     <xsl:template match="xf:bind/@relevant

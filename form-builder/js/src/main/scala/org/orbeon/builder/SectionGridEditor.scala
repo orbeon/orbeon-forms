@@ -112,9 +112,7 @@ object SectionGridEditor {
 
           val frGridEl = sectionGridBody.el.children(".fr-grid")
           frGridEl.addClass("fb-hover")
-          if (frGridEl.is(".fr-repeat")) {
-            sectionGridEditorContainer.children(ContainerEditDetails.className).show()
-          }
+          sectionGridEditorContainer.children(ContainerEditDetails.className).show()
 
           hideShowCutDeleteIcons(frGridEl, GridDelete)
           sectionGridEditorContainer.children(ContainerCopy.className).show()

@@ -177,7 +177,7 @@ class SimpleDataMigrationTest
         form       = "data-migration",
         mode       = "new",
         document   = "",
-        query      = List(FormRunnerPersistence.DataFormatVersionName → FormRunnerPersistence.DataFormatVersionEdge),
+        query      = List(FormRunnerPersistence.DataFormatVersionName → DataFormatVersion.Edge.entryName),
         initialize = true,
         content    = Some(contentToPost)
       )

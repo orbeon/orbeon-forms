@@ -156,7 +156,7 @@ class FormBuilderFunctionsTest
         assert(containers(0).localname === "grid")
         assert(containers(1).localname === "section")
 
-        assert(findContainerNamesForModel(firstTd) === List("section-1"))
+        assert(findContainerNamesForModel(firstTd) === List("section-1", "grid-1"))
       }
     }
   }
@@ -187,7 +187,7 @@ class FormBuilderFunctionsTest
         assert(newlySelectedCell.get / * /@ "id" === controlId(newControlName))
 
         val containerNames = findContainerNamesForModel(newlySelectedCell.get)
-        assert(containerNames == List("section-1"))
+        assert(containerNames == List("section-1", "grid-1"))
 
         // NOTE: We should maybe just compare the XML for holders, binds, and resources
         val dataHolder = assertDataHolder(newControlName)
@@ -244,7 +244,7 @@ class FormBuilderFunctionsTest
 
         // Insert a new repeated grid after the current grid
         selectFirstCell()
-        val newRepeatNameOption = insertNewRepeatedGrid()
+        val newRepeatNameOption = insertNewGrid(repeated = true)
 
         assert(newRepeatNameOption === Some("grid-2"))
         val newRepeatName          = newRepeatNameOption.get
@@ -261,11 +261,11 @@ class FormBuilderFunctionsTest
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
           val dataHolder = assertDataHolder(containerNames.init.last)
-          assert((dataHolder.head precedingSibling * head).name === "control-1")
+          assert((dataHolder.head precedingSibling * head).name === "grid-1")
 
           val controlBind = findBindByName(doc, newRepeatName).get
           assert(controlBind.hasIdValue(bindId(newRepeatName)))
-          assert((controlBind precedingSibling * att "id") === bindId("control-1"))
+          assert((controlBind precedingSibling * att "id") === bindId("grid-1"))
 
           assert(getModelElem(doc) / XFInstanceTest exists (_.hasIdValue("grid-2-template")))
         }

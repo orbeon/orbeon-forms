@@ -168,13 +168,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     updateTemplates : Boolean = false)(implicit
     ctx             : FormBuilderDocContext
   ): Option[UndoAction] =
-    cellElem firstChildOpt * map { controlElem ⇒
+    cellElem firstChildOpt * flatMap { controlElem ⇒
 
       val undo =
-        DeleteControl(
-          controlPosition(controlElem),
-          ToolboxOps.controlOrContainerElemToXcv(controlElem)
-        )
+        ToolboxOps.controlOrContainerElemToXcv(controlElem) map
+          (DeleteControl(controlPosition(controlElem), _))
 
       controlElementsToDelete(controlElem) foreach (delete(_))
 

@@ -27,8 +27,8 @@
                     </p:processor>
 
                     <p:processor name="oxf:pipeline">
-                        <p:input name="config" href="/forms/orbeon/builder/form/annotate.xpl"/>
-                        <p:input name="data" href="template.xml"/>
+                        <p:input name="config"   href="/forms/orbeon/builder/form/annotate.xpl"/>
+                        <p:input name="data"     href="template.xml"/>
                         <p:input name="bindings" href="#toolbox"/>
                         <p:output name="data" ref="data"/>
                     </p:processor>
@@ -61,7 +61,6 @@
                     </xsl:template>
 
                 </xsl:stylesheet>
-
             </input>
             <input name="data" href="grids-to-migrate.xml"/>
             <output name="data" href="/org/orbeon/oxf/fr/grids-12-columns.xml"/>

@@ -1,9 +1,8 @@
 <fr:body
-    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xf="http://www.w3.org/2002/xforms">
 
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1"        w="4"><xf:input/></fr:c>
         <fr:c y="1" x="5"        w="3"/>
         <fr:c y="1" x="8"  h="3"      ><xf:input/></fr:c>
@@ -23,7 +22,7 @@
         <fr:c y="4" x="9"/>
         <fr:c y="4" x="10"       w="3"><xf:input/></fr:c>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="6">
             <xf:input>
                 <xf:label ref="$form-resources/control-10/label"/>
@@ -42,7 +41,7 @@
         <fr:c y="3" x="1" w="6"/>
         <fr:c y="3" x="7" w="6"/>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="12">
             <xf:input>
                 <xf:label ref="$form-resources/control-1/label"/>
@@ -62,7 +61,7 @@
             </fr:dropdown-select1>
         </fr:c>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="6">
             <xf:input>
                 <xf:label ref="$form-resources/control-10/label"/>
@@ -103,7 +102,7 @@
             </fr:dropdown-select1>
         </fr:c>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="4">
             <xf:input>
                 <xf:label ref="$form-resources/control-19/label"/>
@@ -161,7 +160,7 @@
             </xf:input>
         </fr:c>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="3">
             <xf:input>
                 <xf:label ref="$form-resources/control-33/label"/>
@@ -289,7 +288,7 @@
             </xf:input>
         </fr:c>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="2">
             <xf:input>
                 <xf:label ref="$form-resources/control-59/label"/>
@@ -547,7 +546,7 @@
         </fr:c>
         <fr:c y="11" x="11" w="2"/>
     </fr:grid>
-    <fr:grid edit-ref="">
+    <fr:grid>
         <fr:c y="1" x="1" w="2">
             <xf:input>
                 <xf:label ref="$form-resources/control-104/label"/>

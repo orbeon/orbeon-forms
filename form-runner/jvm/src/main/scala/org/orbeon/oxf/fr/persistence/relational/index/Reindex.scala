@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import java.sql.{Connection, PreparedStatement}
 
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
@@ -207,7 +207,10 @@ trait Reindex extends FormDefinition {
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                   Seq.empty
                 case Some(formDefinition) ⇒
-                  findIndexedControls(formDefinition, app, form)
+                  findIndexedControls(
+                    formDefinition,
+                    FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+                  )
               }
           }
 

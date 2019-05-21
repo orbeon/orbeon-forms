@@ -80,7 +80,7 @@ private object PersistenceProxyProcessor {
   val ReindexPath                    =   "/fr/service/persistence/reindex"
 
   val RawDataFormatVersion           = "raw"
-  val AllowedDataFormatVersionParams = AllowedDataFormatVersions + RawDataFormatVersion
+  val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
 
   val FRRelevantQName                = QName("relevant", XMLNames.FRNamespace)
 
@@ -173,10 +173,10 @@ private object PersistenceProxyProcessor {
 
       val incomingVersion =
         request.getFirstParamAsString(DataFormatVersionName) getOrElse
-          DefaultDataFormatVersion
+          PersistenceDefaultDataFormatVersion.entryName
 
       val providerVersion =
-        providerDataFormatVersion(app, form)
+        providerDataFormatVersionOrThrow(app, form)
 
       require(
         AllowedDataFormatVersionParams(incomingVersion),
@@ -185,7 +185,7 @@ private object PersistenceProxyProcessor {
 
       // We can remove this once we are able to perform conversions here, see:
       // https://github.com/orbeon/orbeon-forms/issues/3110
-      if (! Set(RawDataFormatVersion, providerVersion)(incomingVersion))
+      if (! Set(RawDataFormatVersion, providerVersion.entryName)(incomingVersion))
         throw HttpStatusCodeException(StatusCode.BadRequest)
     }
 

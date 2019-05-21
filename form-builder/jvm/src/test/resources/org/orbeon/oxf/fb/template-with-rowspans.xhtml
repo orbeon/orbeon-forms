@@ -1,16 +1,40 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model id="fr-form-model" xmlns:xf="http://www.w3.org/2002/xforms">
-            <xf:instance id="fr-form-instance"><form/></xf:instance>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1/>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1"/>
+            </xf:bind>
         </xf:model>
     </xh:head>
     <xh:body>
-        <fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-            <fr:grid>
-                <xh:tr><xh:td id="11"/><xh:td id="12" rowspan="2"/><xh:td id="13"/></xh:tr>
-                <xh:tr><xh:td id="21" rowspan="2"/><xh:td id="23"/></xh:tr>
-                <xh:tr><xh:td id="32"/><xh:td id="33"/></xh:tr>
-            </fr:grid>
-        </fr:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind" repeat="content" min="1"
+                            template="instance('section-1-template')"
+                            apply-defaults="true"
+                            fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr><xh:td id="11"/><xh:td id="12" rowspan="2"/><xh:td id="13"/></xh:tr>
+                        <xh:tr><xh:td id="21" rowspan="2"/><xh:td id="23"/></xh:tr>
+                        <xh:tr><xh:td id="32"/><xh:td id="33"/></xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
     </xh:body>
 </xh:html>

@@ -246,9 +246,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     import XMLNames._
 
     val allMappings =
-      startNode ancestor *            flatMap
-      (_ attValueOpt ItemsetMapQName) flatMap
-      decodeSimpleQuery               keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
+      startNode ancestor *              flatMap
+      (_ attValueOpt FRItemsetMapQName) flatMap
+      decodeSimpleQuery                 keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
       (_._1)
 
     if (allMappings.isEmpty) {
@@ -264,7 +264,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       } foreach { e ⇒
         XFormsAPI.insert(
           into   = e,
-          origin = NodeInfoFactory.attributeInfo(ItemsetIdQName, map(e.localname))
+          origin = NodeInfoFactory.attributeInfo(FRItemsetIdQName, map(e.localname))
         )
       }
 

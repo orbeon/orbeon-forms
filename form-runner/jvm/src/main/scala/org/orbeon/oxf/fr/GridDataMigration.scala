@@ -109,7 +109,7 @@ object GridDataMigration {
     // Add data format version attribute on root element
     insert(
       into       = databaseData / *,
-      origin     = NodeInfoFactory.attributeInfo(XMLNames.DataFormatVersionQName, dstDataFormatVersion),
+      origin     = NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dstDataFormatVersion),
       doDispatch = false
     )
 

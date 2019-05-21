@@ -29,36 +29,37 @@ object XMLNames {
   val XS  = XSD_URI
   val XBL = XBL_NAMESPACE_URI
 
-  val XHHeadTest             : Test      = XH → "head"
-  val XHBodyTest             : Test      = XH → "body"
+  val XHHeadTest               : Test      = XH → "head"
+  val XHBodyTest               : Test      = XH → "body"
 
-  val XBLXBLTest             : Test      = XBL → "xbl"
-  val XBLBindingTest         : Test      = XBL → "binding"
-  val XBLTemplateTest        : Test      = XBL → "template"
-  val XBLImplementationTest  : Test      = XBL → "implementation"
+  val XBLXBLTest               : Test      = XBL → "xbl"
+  val XBLBindingTest           : Test      = XBL → "binding"
+  val XBLTemplateTest          : Test      = XBL → "template"
+  val XBLImplementationTest    : Test      = XBL → "implementation"
 
-  val XSSchemaTest           : Test      = XS → "schema"
+  val XSSchemaTest             : Test      = XS → "schema"
 
-  val FRBodyTest             : Test      = FR → "body"
+  val FRBodyTest               : Test      = FR → "body"
 
-  val FRGridTest             : Test      = FR → "grid"
-  val FRSectionTest          : Test      = FR → "section"
+  val FRGridTest               : Test      = FR → "grid"
+  val FRSectionTest            : Test      = FR → "section"
 
-  val XFModelTest            : Test      = XF → "model"
-  val XFInstanceTest         : Test      = XF → "instance"
-  val XFBindTest             : Test      = XF → "bind"
-  val XFGroupTest            : Test      = XF → "group"
+  val XFModelTest              : Test      = XF → "model"
+  val XFInstanceTest           : Test      = XF → "instance"
+  val XFBindTest               : Test      = XF → "bind"
+  val XFGroupTest              : Test      = XF → "group"
 
-  val FRMetadata             : Test      = FR → "metadata"
-  val FRItemsetId            : Test      = FR → "itemsetid"
-  val FRItemsetMap           : Test      = FR → "itemsetmap"
+  val FRMetadata               : Test      = FR → "metadata"
+  val FRItemsetId              : Test      = FR → "itemsetid"
+  val FRItemsetMap             : Test      = FR → "itemsetmap"
 
-  val FRNamespace            : Namespace = Namespace(FRPrefix, FR)
-  val ItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
-  val ItemsetMapQName        : QName     = QName("itemsetmap",          FRNamespace)
-  val DataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
+  val FRNamespace              : Namespace = Namespace(FRPrefix, FR)
 
-  val XMLLangQName           : QName     = XML_LANG_QNAME
+  val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
+  val FRItemsetMapQName        : QName     = QName("itemsetmap",          FRNamespace)
+  val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
+
+  val XMLLangQName             : QName     = XML_LANG_QNAME
 
   val FRContainerTest = FRSectionTest || FRGridTest
 }

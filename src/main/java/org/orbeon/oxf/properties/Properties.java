@@ -167,6 +167,13 @@ public class Properties {
         return propertyStore.getGlobalPropertySet();
     }
 
+    public PropertySet getPropertySetOrThrow() {
+        final PropertySet ps = getPropertySet();
+        if (ps == null)
+            throw new OXFException("property set not found");
+        return ps;
+    }
+
     public PropertySet getPropertySet(final QName processorName) {
         if (propertyStore == null)
             return null;

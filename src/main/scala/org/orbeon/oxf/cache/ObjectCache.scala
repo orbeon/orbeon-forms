@@ -39,8 +39,10 @@ object ObjectCache {
     namedObjectCaches.computeIfAbsent(
       cacheName,
       _ ⇒ {
+
         val propertyName = s"$CachePropertyNamePrefix.$cacheName.$CachePropertyNameSizeSuffix"
-        val size = Properties.instance.getPropertySet.getInteger(propertyName, defaultSize)
+        val size         = Properties.instance.getPropertySetOrThrow.getInteger(propertyName, defaultSize)
+
         new MemoryCacheImpl(size)
       }
     )

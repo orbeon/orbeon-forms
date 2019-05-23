@@ -220,9 +220,15 @@ abstract class XFormsBaseHandlerXHTML (
     isExternal               : Boolean
   ): Unit = {
 
+    val isInternal = lhhaAnalysis.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME)
     val staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element)
 
-    if ((staticLHHAAttributes ne null) || lhha == LHHA.Alert) {
+    if (
+      ! isInternal &&
+      (
+        (staticLHHAAttributes ne null) ||
+        lhha == LHHA.Alert
+      )) {
 
       // If no attributes were found, there is no such label / help / hint / alert
 

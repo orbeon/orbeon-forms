@@ -177,58 +177,59 @@
                     </xf:action>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-service-continuation-id', 'my-action-1-id')</xf:action>
                     <xf:send submission="my-service-gaga-submission"/>
-                    <xf:action
-                        observer="my-service-gaga-submission"
-                        event="xforms-submit-done"
-                        context="xxf:instance('fr-service-response-instance')"
-                        if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-1-id'">
+                </xf:action>
+                <xf:action
+                    observer="my-service-gaga-submission"
+                    event="xforms-submit-done"
+                    context="xxf:instance('fr-service-response-instance')"
+                    if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-1-id'">
+                    <xf:action>
+                        <xf:var name="value" value="/response/foo"/>
+                        <xf:rebuild/>
+                        <xf:revalidate/>
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-foo', true())">
+                           <xf:setvalue ref="." value="$value"/>
+                       </xf:action>
+                    </xf:action>
+                    <xf:action>
+                        <xf:var name="value" value="/response/bar"/>
+                        <xf:rebuild/>
+                        <xf:revalidate/>
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-bar', true())">
+                           <xf:setvalue ref="." value="$value"/>
+                       </xf:action>
+                    </xf:action>
+                    <xf:insert
+                        ref="xxf:instance('fr-service-request-instance')"
+                        origin="saxon:parse(xxf:instance('my-service-toto-instance'))"/>
+                    <xf:var
+                        name="original-context"
+                        value="."/>
+                    <xf:action context="xxf:instance('fr-service-request-instance')">
                         <xf:action>
-                            <xf:var name="value" value="/response/foo"/>
-                            <xf:rebuild/>
-                            <xf:revalidate/>
-                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-foo', true())">
-                               <xf:setvalue ref="." value="$value"/>
-                           </xf:action>
+                            <xf:var
+                                name="value"
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control4', true())"/>
+                            <xf:setvalue
+                                ref="/request/control4"
+                                value="$value"/>
                         </xf:action>
                         <xf:action>
-                            <xf:var name="value" value="/response/bar"/>
-                            <xf:rebuild/>
-                            <xf:revalidate/>
-                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-bar', true())">
-                               <xf:setvalue ref="." value="$value"/>
-                           </xf:action>
+                            <xf:var
+                                name="value"
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control5', true())"/>
+                            <xf:setvalue
+                                ref="/*/param5"
+                                value="$value"/>
                         </xf:action>
-                        <xf:insert
-                            ref="xxf:instance('fr-service-request-instance')"
-                            origin="saxon:parse(xxf:instance('my-service-toto-instance'))"/>
-                        <xf:var
-                            name="original-context"
-                            value="."/>
-                        <xf:action context="xxf:instance('fr-service-request-instance')">
-                            <xf:action>
-                                <xf:var
-                                    name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control4', true())"/>
-                                <xf:setvalue
-                                    ref="/request/control4"
-                                    value="$value"/>
-                            </xf:action>
-                            <xf:action>
-                                <xf:var
-                                    name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control5', true())"/>
-                                <xf:setvalue
-                                    ref="/*/param5"
-                                    value="$value"/>
-                            </xf:action>
-                            <xf:action>
-                                <xf:var
-                                    name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control6', true())"/>
-                                <xf:setvalue
-                                    xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                    ref="/sql:config/sql:query/sql:param[2]/(@value | @select)[1]"
-                                    value="
+                        <xf:action>
+                            <xf:var
+                                name="value"
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control6', true())"/>
+                            <xf:setvalue
+                                xmlns:sql="http://orbeon.org/oxf/xml/sql"
+                                ref="/sql:config/sql:query/sql:param[2]/(@value | @select)[1]"
+                                value="
                                         concat(
                                             '''',
                                             replace(
@@ -240,171 +241,170 @@
                                             ),
                                             ''''
                                         )"/>
-                            </xf:action>
-                            <xf:action>
-                                <xf:var
-                                    name="value"
-                                    context="$original-context"
-                                    value="current-date()"/>
-
-                                <xf:setvalue
-                                    ref="/request/value7"
-                                    value="$value"/>
-                            </xf:action>
                         </xf:action>
-                        <xf:action type="xpath">xxf:set-request-attribute('fr-service-continuation-id', 'my-action-2-id')</xf:action>
-                        <xf:send submission="my-service-toto-submission"/>
+                        <xf:action>
+                            <xf:var
+                                name="value"
+                                context="$original-context"
+                                value="current-date()"/>
+
+                            <xf:setvalue
+                                ref="/request/value7"
+                                value="$value"/>
+                        </xf:action>
                     </xf:action>
-                    <xf:action
-                        observer="my-service-toto-submission"
-                        event="xforms-submit-done"
-                        context="xxf:instance('fr-service-response-instance')"
-                        if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-2-id'">
-                        <xf:action>
-                            <xf:var name="value" value="'after'"/>
-                            <xf:rebuild/>
-                            <xf:revalidate/>
-                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-after', true())">
-                               <xf:setvalue ref="." value="$value"/>
-                           </xf:action>
-                        </xf:action>
-                        <xf:action>
-                            <xf:var name="value" value="."/>
-                            <xf:insert
-                                context="xxf:instance('fr-service-response-instance')"
-                                ref="instance('fr-dataset-my-dataset')"
-                                origin="$value"/>
-                        </xf:action>
-                        <xf:delete ref="bind(frf:bindId('my-grid'))/*"/>
-                        <xf:action iterate="/response/row">
-                            <xf:action>
-                                <xf:var
-                                    name="container"
-                                    value="bind(frf:bindId('my-grid'))"/>
-                                <xf:var
-                                    name="repeat-template"
-                                    value="instance(frf:templateId('my-grid'))"/>
-                                <xf:insert
-                                    context="$container"
-                                    ref="*[last()]"
-                                    origin="frf:updateTemplateFromInScopeItemsetMaps($container, $repeat-template)"
-                                    position="after"
-                                    xxf:defaults="true"/>
-                            </xf:action>
-                            <xf:action>
-                                <xf:var name="value" value="name"/>
-                                <xf:rebuild/>
-                                <xf:revalidate/>
-                                <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-name')[last()]">
-                                   <xf:setvalue ref="." value="$value"/>
-                               </xf:action>
-                            </xf:action>
-                            <xf:action>
-
-                                <xf:rebuild/>
-                                <xf:revalidate/>
-
-                                <xf:var
-                                    xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-                                    name="new-itemset-id"
-                                    value="concat('fr', secure:randomHexId())"/>
-
-                                <xf:var
-                                    name="new-itemset-holder"
-                                    value="xf:element('itemset', xf:attribute('id', $new-itemset-id))"/>
-
-                                <xf:var
-                                    name="items-expr-context"
-                                    value="."/>
-
-                                <xf:action iterate="xxf:instance('fr-form-resources')/resource">
-
-                                    <xf:var name="fr-lang" value="@xml:lang"/>
-
-                                    <xf:var
-                                        name="response-items"
-                                        context="$items-expr-context"
-                                        value="item"/>
-
-                                    <xf:insert
-                                        context="$new-itemset-holder"
-                                        ref="*"
-                                        origin="xf:element('choices')"/>
-
-                                    <xf:var
-                                        name="new-choices-holder"
-                                        value="$new-itemset-holder/choices[last()]"/>
-
-                                    <xf:action iterate="$response-items">
-                                        <xf:var name="item-label" value="@label"/>
-                                        <xf:var name="item-value" value="@value"/>
-                                        <xf:insert
-                                            context="$new-choices-holder"
-                                            ref="*"
-                                            origin="xf:element('item', (xf:element('label', xs:string($item-label)), xf:element('value', xs:string($item-value))))"/>
-                                    </xf:action>
-                                </xf:action>
-
-                                <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
-                                    <xf:property name="control-name"       value="'my-dropdown'"/>
-                                    <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
-                                    <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>
-                                    <xf:property name="at"                 value="'end'"/>
-                                </xf:dispatch>
-
-                            </xf:action>
-
-                             <xf:action>
-                               <xf:var name="value" value="xxf:instance('fr-service-response-instance')/string()"/>
-                               <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
-                               <xf:rebuild/>
-                               <xf:revalidate/>
-                               <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
-                                   <xf:setvalue ref="." value="$value"/>
-                                   <xf:setvalue ref="@mediatype" value="$mediatype"/>
-                               </xf:action>
-                           </xf:action>
-                           <xf:action>
-                               <xf:var name="value" value="'My Image.png'"/>
-                               <xf:rebuild/>
-                               <xf:revalidate/>
-                               <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
-                                   <xf:setvalue ref="@filename" value="$value"/>
-                               </xf:action>
-                           </xf:action>
-                            <xf:action>
-                               <xf:var name="value" value="'image/png'"/>
-                               <xf:rebuild/>
-                               <xf:revalidate/>
-                               <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
-                                   <xf:setvalue ref="@mediatype" value="$value"/>
-                               </xf:action>
-                           </xf:action>
-
-                        </xf:action>
-
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-service-continuation-id', 'my-action-2-id')</xf:action>
+                    <xf:send submission="my-service-toto-submission"/>
+                </xf:action>
+                <xf:action
+                    observer="my-service-toto-submission"
+                    event="xforms-submit-done"
+                    context="xxf:instance('fr-service-response-instance')"
+                    if="xxf:get-request-attribute('fr-service-continuation-id') = 'my-action-2-id'">
+                    <xf:action>
+                        <xf:var name="value" value="'after'"/>
+                        <xf:rebuild/>
+                        <xf:revalidate/>
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-after', true())">
+                           <xf:setvalue ref="." value="$value"/>
+                       </xf:action>
+                    </xf:action>
+                    <xf:action>
+                        <xf:var name="value" value="."/>
+                        <xf:insert
+                            context="xxf:instance('fr-service-response-instance')"
+                            ref="instance('fr-dataset-my-dataset')"
+                            origin="$value"/>
+                    </xf:action>
+                    <xf:delete ref="bind(frf:bindId('my-grid'))/*"/>
+                    <xf:action iterate="/response/row">
                         <xf:action>
                             <xf:var
                                 name="container"
                                 value="bind(frf:bindId('my-grid'))"/>
-                            <xf:delete
+                            <xf:var
+                                name="repeat-template"
+                                value="instance(frf:templateId('my-grid'))"/>
+                            <xf:insert
                                 context="$container"
-                                ref="*[1]"/>
+                                ref="*[last()]"
+                                origin="frf:updateTemplateFromInScopeItemsetMaps($container, $repeat-template)"
+                                position="after"
+                                xxf:defaults="true"/>
+                        </xf:action>
+                        <xf:action>
+                            <xf:var name="value" value="name"/>
+                            <xf:rebuild/>
+                            <xf:revalidate/>
+                            <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-name')[last()]">
+                               <xf:setvalue ref="." value="$value"/>
+                           </xf:action>
+                        </xf:action>
+                        <xf:action>
+
+                            <xf:rebuild/>
+                            <xf:revalidate/>
+
+                            <xf:var
+                                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
+                                name="new-itemset-id"
+                                value="concat('fr', secure:randomHexId())"/>
+
+                            <xf:var
+                                name="new-itemset-holder"
+                                value="xf:element('itemset', xf:attribute('id', $new-itemset-id))"/>
+
+                            <xf:var
+                                name="items-expr-context"
+                                value="."/>
+
+                            <xf:action iterate="xxf:instance('fr-form-resources')/resource">
+
+                                <xf:var name="fr-lang" value="@xml:lang"/>
+
+                                <xf:var
+                                    name="response-items"
+                                    context="$items-expr-context"
+                                    value="item"/>
+
+                                <xf:insert
+                                    context="$new-itemset-holder"
+                                    ref="*"
+                                    origin="xf:element('choices')"/>
+
+                                <xf:var
+                                    name="new-choices-holder"
+                                    value="$new-itemset-holder/choices[last()]"/>
+
+                                <xf:action iterate="$response-items">
+                                    <xf:var name="item-label" value="@label"/>
+                                    <xf:var name="item-value" value="@value"/>
+                                    <xf:insert
+                                        context="$new-choices-holder"
+                                        ref="*"
+                                        origin="xf:element('item', (xf:element('label', xs:string($item-label)), xf:element('value', xs:string($item-value))))"/>
+                                </xf:action>
+                            </xf:action>
+
+                            <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
+                                <xf:property name="control-name"       value="'my-dropdown'"/>
+                                <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
+                                <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>
+                                <xf:property name="at"                 value="'end'"/>
+                            </xf:dispatch>
+
                         </xf:action>
 
-                        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                            process:runProcessByName('oxf.fr.detail.process', 'summary')
-                        </xf:action>
-
-                        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                            process:runProcess('navigate(uri = ''https://www.bbc.com/news'')')
-                        </xf:action>
-
-                        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                            process:runProcess('navigate(uri = ''https://www.bbc.com/news'', target = ''_blank'')')
-                        </xf:action>
+                         <xf:action>
+                           <xf:var name="value" value="xxf:instance('fr-service-response-instance')/string()"/>
+                           <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
+                           <xf:rebuild/>
+                           <xf:revalidate/>
+                           <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
+                               <xf:setvalue ref="." value="$value"/>
+                               <xf:setvalue ref="@mediatype" value="$mediatype"/>
+                           </xf:action>
+                       </xf:action>
+                       <xf:action>
+                           <xf:var name="value" value="'My Image.png'"/>
+                           <xf:rebuild/>
+                           <xf:revalidate/>
+                           <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
+                               <xf:setvalue ref="@filename" value="$value"/>
+                           </xf:action>
+                       </xf:action>
+                        <xf:action>
+                           <xf:var name="value" value="'image/png'"/>
+                           <xf:rebuild/>
+                           <xf:revalidate/>
+                           <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
+                               <xf:setvalue ref="@mediatype" value="$value"/>
+                           </xf:action>
+                       </xf:action>
 
                     </xf:action>
+
+                    <xf:action>
+                        <xf:var
+                            name="container"
+                            value="bind(frf:bindId('my-grid'))"/>
+                        <xf:delete
+                            context="$container"
+                            ref="*[1]"/>
+                    </xf:action>
+
+                    <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                        process:runProcessByName('oxf.fr.detail.process', 'summary')
+                    </xf:action>
+
+                    <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                        process:runProcess('navigate(uri = ''https://www.bbc.com/news'')')
+                    </xf:action>
+
+                    <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                        process:runProcess('navigate(uri = ''https://www.bbc.com/news'', target = ''_blank'')')
+                    </xf:action>
+
                 </xf:action>
             </xf:model>
 

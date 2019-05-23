@@ -175,42 +175,48 @@
 
                 <xsl:variable name="group-position" select="position()"/>
 
-                <xsl:choose>
-                    <xsl:when test="position() = 1">
-                        <xsl:apply-templates select="current-group()" mode="within-action-2018.2">
-                            <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
-                            <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
-                            <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
-                        </xsl:apply-templates>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:variable
-                            name="preceding-service-name"
-                            select="preceding-sibling::fr:service-call[1]/@service/string()"/>
-                        <xsl:variable
-                            name="preceding-continuation-id"
-                            select="concat($action-name, '-', $group-position - 1, '-id')"/>
-                        <xf:action
-                            observer="{$preceding-service-name}-submission"
-                            event="xforms-submit-done"
-                            context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-request-attribute('{$continuation-key}') = '{$preceding-continuation-id}'">
-
-                            <!-- TODO: check whether we need to put this at the top-level -->
-
-                            <xsl:apply-templates select="current-group()" mode="within-action-2018.2">
-                                <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
-                                <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
-                                <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
-                            </xsl:apply-templates>
-
-                        </xf:action>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <xsl:if test="$group-position = 1">
+                    <xsl:apply-templates select="current-group()" mode="within-action-2018.2">
+                        <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
+                        <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
+                        <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
+                    </xsl:apply-templates>
+                </xsl:if>
 
             </xsl:for-each-group>
 
         </xf:action>
+
+        <!-- Place continuations at the top-level, see https://github.com/orbeon/orbeon-forms/issues/4068 -->
+        <xsl:for-each-group
+            select="fr:*"
+            group-ending-with="fr:service-call">
+
+            <xsl:variable name="group-position" select="position()"/>
+
+            <xsl:if test="$group-position gt 1">
+                <xsl:variable
+                    name="preceding-service-name"
+                    select="preceding-sibling::fr:service-call[1]/@service/string()"/>
+                <xsl:variable
+                    name="preceding-continuation-id"
+                    select="concat($action-name, '-', $group-position - 1, '-id')"/>
+                <xf:action
+                    observer="{$preceding-service-name}-submission"
+                    event="xforms-submit-done"
+                    context="xxf:instance('fr-service-response-instance')"
+                    if="xxf:get-request-attribute('{$continuation-key}') = '{$preceding-continuation-id}'">
+
+                    <xsl:apply-templates select="current-group()" mode="within-action-2018.2">
+                        <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
+                        <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
+                        <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
+                    </xsl:apply-templates>
+
+                </xf:action>
+            </xsl:if>
+
+        </xsl:for-each-group>
 
     </xsl:template>
 

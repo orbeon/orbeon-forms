@@ -17,7 +17,7 @@ import com.typesafe.scalalogging.Logger
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.fr.FormRunner.{formRunnerProperty, _}
+import org.orbeon.oxf.fr.FormRunner.formRunnerProperty
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}

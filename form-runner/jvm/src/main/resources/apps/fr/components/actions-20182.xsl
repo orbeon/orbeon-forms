@@ -24,7 +24,7 @@
 
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
-    <xsl:variable name="continuation-key">fr-service-continuation-id</xsl:variable>
+    <xsl:variable name="continuation-key">fr-action-continuation-id</xsl:variable>
 
     <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
         <xsl:param name="model-id"        as="xs:string"/>

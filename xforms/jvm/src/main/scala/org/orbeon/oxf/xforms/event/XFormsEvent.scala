@@ -30,23 +30,26 @@ import scala.collection.JavaConverters._
  * - a property can be defined or not
  * - if a property is defined, it may have a value or not
  * - properties are obtained from 3 sources
- *   - XFormsEvent base properties
+ *   - `XFormsEvent` base properties
  *   - overriding lazyProperties
  *   - passing to the constructor
- * - the reason we use lazyProperties is that we had trouble passing a PropertyGetter with a reference to this to the
+ * - the reason we use `lazyProperties` is that we had trouble passing a `PropertyGetter` with a reference to this to the
  *   constructor!
- * - all property values are Java values or Seq of Java values
- * - for Java/Scala consumers, use property[T]
- * - for XPath consumers, use getAttribute
- * - PropertyGetter is used instead of a plain Map because:
+ * - all property values are Java values or `Seq` of Java values
+ * - for Java/Scala consumers, use `property[T]``
+ * - for XPath consumers, use `getAttribute``
+ * - `PropertyGetter` is used instead of a plain `Map` because:
  *   - it allows for values to be computed dynamically, so we don't compute all property values unnecessarily
- *   - it is a PartialFunction so PropertyGetter can be easily composed with orElse
- *   - a Map is automatically a PropertyGetter
+ *   - it is a `PartialFunction` so `PropertyGetter` can be easily composed with `orElse`
+ *   - a `Map` is automatically a `PropertyGetter`
  * - whenever possible, all aspects of an event are represented as properties
- * - in some cases, events store special values natively (e.g. Throwable, ConnectionResult, etc.)
+ * - in some cases, events store special values natively (e.g. `Throwable`, `ConnectionResult`, etc.)
  *
  * Possible improvement: we might be able to use reflection for standard properties. This would simply the
- * implementation of XFormsEvent, XFormsUIEvent, and derived events which have more complex properties.
+ * implementation of `XFormsEvent`, `XFormsUIEvent`, and derived events which have more complex properties.
+ *
+ * 2019-05-29: Reflection is generally not desirable. Also, we might want to revise more in depth how we represent
+ * events and properties. It is a little messy.
  */
 abstract class XFormsEvent(
   val name         : String,
@@ -135,7 +138,7 @@ object XFormsEvent {
   object Target   extends Phase("target")
   object Bubbling extends Phase("bubbling")
 
-  // PropertyGetter is more general than Map, but a Map is automatically a PropertyGetter
+  // PropertyGetter is more general than `Map`, but a `Map` is automatically a `PropertyGetter`
   type PropertyGetter = PartialFunction[String, Option[Any]]
   val EmptyGetter: PropertyGetter = Map()
 

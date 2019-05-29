@@ -99,6 +99,18 @@
 
                             <fr:repeat-remove-iteration repeat="my-grid" at="start"/>
 
+                            <fr:data-iterate ref="/response/row[exists(foo)]">
+
+                                <fr:process-call scope="oxf.fr.detail.process" name="acme-process"/>
+
+                                <fr:service-call service="my-service-get-attachment">
+                                    <fr:url-param name="my-attachment-id" value="foo"/>
+                                </fr:service-call>
+
+                                <fr:repeat-add-iteration repeat="my-grid" at="end"/>
+                                <fr:control-setattachment control="my-attachment" at="end"/>
+                            </fr:data-iterate>
+
                             <fr:process-call scope="oxf.fr.detail.process" name="summary"/>
                             <fr:navigate location="https://www.bbc.com/news"/>
                             <fr:navigate location="https://www.bbc.com/news" target="_blank"/>
@@ -176,6 +188,7 @@
                         </xf:action>
                     </xf:action>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-1-id')</xf:action>
+                    <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-gaga-submission"/>
                 </xf:action>
                 <xf:action
@@ -254,6 +267,7 @@
                         </xf:action>
                     </xf:action>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
+                    <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-toto-submission"/>
                 </xf:action>
                 <xf:action
@@ -278,6 +292,7 @@
                     </xf:action>
                     <xf:delete ref="bind(frf:bindId('my-grid'))/*"/>
                     <xf:action iterate="/response/row">
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
                         <xf:action>
                             <xf:var
                                 name="container"
@@ -354,7 +369,6 @@
                             </xf:dispatch>
 
                         </xf:action>
-
                          <xf:action>
                            <xf:var name="value" value="xxf:instance('fr-service-response-instance')/string()"/>
                            <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
@@ -381,8 +395,16 @@
                                <xf:setvalue ref="@mediatype" value="$value"/>
                            </xf:action>
                        </xf:action>
-
+                        <xf:dispatch
+                            if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration') = true()"
+                            name="fr-action-continuation-my-action-3-id"
+                            targetid="fr-form-model"/>
                     </xf:action>
+                    </xf:action>
+
+                <xf:action
+                    observer="fr-form-model"
+                    event="fr-action-continuation-my-action-3-id">
 
                     <xf:action>
                         <xf:var
@@ -392,6 +414,64 @@
                             context="$container"
                             ref="*[1]"/>
                     </xf:action>
+
+                    <xf:action iterate="/response/row[exists(foo)]">
+
+                       <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+
+                       <xf:action xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" type="xpath">
+                           process:runProcessByName('oxf.fr.detail.process', 'acme-process')
+                       </xf:action>
+
+                       <xf:insert
+                           ref="xxf:instance('fr-service-request-instance')"
+                           origin="saxon:parse(xxf:instance('my-service-get-attachment-instance'))"/>
+
+                       <xf:var name="original-context" value="."/>
+                       <xf:action context="xxf:instance('fr-service-request-instance')">
+                           <xf:action>
+                               <xf:var name="value" context="$original-context" value="foo"/>
+                               <xf:setvalue ref="/*/my-attachment-id" value="$value"/>
+                           </xf:action>
+                       </xf:action>
+                       <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-4-id')</xf:action>
+                        <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                       <xf:send submission="my-service-get-attachment-submission"/>
+                   </xf:action>
+               </xf:action>
+               <xf:action
+                   observer="my-service-get-attachment-submission"
+                   event="xforms-submit-done"
+                   context="xxf:instance('fr-service-response-instance')"
+                   if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-4-id'">
+                   <xf:action>
+                       <xf:var name="container" value="bind(frf:bindId('my-grid'))"/>
+                       <xf:var name="repeat-template" value="instance(frf:templateId('my-grid'))"/>
+                       <xf:insert
+                           context="$container"
+                           ref="*[last()]"
+                           origin="frf:updateTemplateFromInScopeItemsetMaps($container, $repeat-template)"
+                           position="after"
+                           xxf:defaults="true"/>
+                   </xf:action>
+                   <xf:action>
+                       <xf:var name="value" value="xxf:instance('fr-service-response-instance')/string()"/>
+                       <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
+                       <xf:rebuild/>
+                       <xf:revalidate/>
+                       <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
+                           <xf:setvalue ref="." value="$value"/>
+                           <xf:setvalue ref="@mediatype" value="$mediatype"/>
+                       </xf:action>
+                   </xf:action>
+                   <xf:dispatch
+                       if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration') = true()"
+                       name="fr-action-continuation-my-action-5-id"
+                       targetid="fr-form-model"/>
+               </xf:action>
+               <xf:action
+                   observer="fr-form-model"
+                   event="fr-action-continuation-my-action-5-id">
 
                     <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                         process:runProcessByName('oxf.fr.detail.process', 'summary')

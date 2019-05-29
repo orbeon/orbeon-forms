@@ -148,7 +148,7 @@
 
         <xf:action id="{@name}-binding" event="fr-call-user-{@name}-action" target="{$model-id}">
 
-            <!-- TODO -->
+            <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
             <xsl:variable name="var" select="()"/>
 
             <!-- Choose to iterate or not on `$iterate-control-name` -->

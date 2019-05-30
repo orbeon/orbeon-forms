@@ -1,241 +1,181 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xf="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:sql="http://orbeon.org/oxf/xml/sql"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-         fr:data-format-version="4.0.0">
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title>Untitled Form</xh:title>
+        <xh:title>Issue #4067</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
-
+            <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <section-1>
-                        <foo/>
-                        <bar/>
+                        <my-grid>
+                            <my-grid-iteration>
+                                <my-attachment filename="" mediatype="" size=""/>
+                            </my-grid-iteration>
+                        </my-grid>
                         <my-button/>
                     </section-1>
-                    <section-2>
-                        <my-repeated-grid>
-                            <my-repeated-grid-iteration>
-                                <result-field/>
-                                <result-dropdown/>
-                            </my-repeated-grid-iteration>
-                        </my-repeated-grid>
-                    </section-2>
                 </form>
             </xf:instance>
 
-
+            <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="foo-bind" name="foo" ref="foo" xxf:whitespace="trim"/>
-                    <xf:bind id="bar-bind" name="bar" ref="bar" xxf:whitespace="trim"/>
                     <xf:bind id="my-button-bind" ref="my-button" name="my-button"/>
-                </xf:bind>
-                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
-                    <xf:bind id="my-repeated-grid-bind" ref="my-repeated-grid" name="my-repeated-grid">
-                        <xf:bind id="my-repeated-grid-iteration-bind" ref="my-repeated-grid-iteration"
-                                 name="my-repeated-grid-iteration">
-                            <xf:bind id="result-field-bind" ref="result-field" name="result-field"
-                                     xxf:whitespace="trim"/>
-                            <xf:bind id="result-dropdown-bind" ref="result-dropdown" name="result-dropdown"/>
+                    <xf:bind id="my-grid-bind" ref="my-grid" name="my-grid">
+                        <xf:bind id="my-grid-iteration-bind" ref="my-grid-iteration" name="my-grid-iteration">
+                            <xf:bind id="my-attachment-bind" ref="my-attachment" name="my-attachment"
+                                     type="xf:anyURI"
+                                     constraint="xxf:upload-mediatypes('image/*')"
+                                     readonly="true()"/>
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
 
-
-            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>issue</application-name>
-                    <form-name>3803</form-name>
-                    <title xml:lang="en">Untitled Form</title>
+                    <form-name>4067</form-name>
+                    <title xml:lang="en">Issue #4067</title>
                     <description xml:lang="en"/>
-                    <wizard>false</wizard>
+                    <created-with-version>2019.1-SNAPSHOT PE</created-with-version>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
                 </metadata>
             </xf:instance>
 
-
+            <!-- Attachments -->
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments/>
             </xf:instance>
 
-
+            <!-- All form resources -->
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <result-field>
-                            <label>Result Field</label>
+                        <my-attachment>
+                            <label>Image</label>
                             <hint/>
-                        </result-field>
-                        <result-dropdown>
-                            <label>Result Dropdown</label>
-                            <hint/>
-                            <item>
-                                <label>First choice</label>
-                                <value>1</value>
-                            </item>
-                            <item>
-                                <label>Second choice</label>
-                                <value>2</value>
-                            </item>
-                            <item>
-                                <label>Third choice</label>
-                                <value>3</value>
-                            </item>
-                        </result-dropdown>
-                        <foo>
-                            <label>Bar</label>
-                            <hint/>
-                        </foo>
-                        <bar>
-                            <label>Foo</label>
-                            <hint/>
-                        </bar>
+                        </my-attachment>
                         <my-button>
-                            <label>Call Service</label>
+                            <label>Start</label>
                             <hint/>
                         </my-button>
+
                         <section-1>
-                            <label>Request</label>
+                            <label>Test Section</label>
                         </section-1>
-                        <section-2>
-                            <label>Response</label>
-                            <help/>
-                        </section-2>
+
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all"
-                         id="my-repeated-grid-template">
-                <my-repeated-grid-iteration>
-                    <result-field/>
-                    <result-dropdown/>
-                </my-repeated-grid-iteration>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="my-grid-template">
+                <my-grid-iteration>
+                    <my-attachment filename="" mediatype="" size=""/>
+                </my-grid-iteration>
             </xf:instance>
-            <xf:instance id="my-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
-                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">&lt;document&gt;
-    &lt;request&gt;
-        &lt;foo/&gt;
-        &lt;bar/&gt;
-    &lt;/request&gt;
-    &lt;response&gt;
-        &lt;row field="Alice" dropdown="apple"/&gt;
-        &lt;row field="Bob" dropdown="banana"/&gt;
-        &lt;row field="Erin" dropdown="orange"/&gt;
-        &lt;item label="Orange" value="orange"/&gt;
-        &lt;item label="Apple" value="apple"/&gt;
-        &lt;item label="Banana" value="banana"/&gt;
-        &lt;item label="Strawberry" value="strawberry"/&gt;
-    &lt;/response&gt;
-&lt;/document&gt;</body>
-            </xf:instance>
-            <xf:submission id="my-service-submission" class="fr-service"
+
+
+            <xf:instance id="echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                        <body>&lt;response&gt;
+    &lt;text&gt;First&lt;/text&gt;
+    &lt;text&gt;Second&lt;/text&gt;
+&lt;/response&gt;</body>
+                    </xf:instance>
+            <xf:submission id="echo-submission" class="fr-service"
                            resource="/fr/service/custom/orbeon/echo"
                            method="post"
                            serialization="application/xml"
                            mediatype="application/xml"/>
+            <xf:instance id="get-attachment-instance" class="fr-service"
+                         xxf:exclude-result-prefixes="#all">
+                        <body>&lt;params&gt;
+    &lt;text&gt;none&lt;/text&gt;
+&lt;/params&gt;</body>
+                    </xf:instance>
+            <xf:submission id="get-attachment-submission" class="fr-service"
+                           resource="https://via.placeholder.com/200x50/0000FF/FFFFFF/"
+                           method="get"
+                           serialization="application/x-www-form-urlencoded"
+                           replace="xxf:binary"
+                           mediatype="application/x-www-form-urlencoded"/>
 
-            <fr:listener
-                version="2018.2"
-                events="activate"
-                controls="my-button"
-                actions="my-action"/>
+            <fr:listener version="2018.2" events="activated" controls="my-button"
+                         actions="populate-attachments"/>
 
-            <fr:action name="my-action" version="2018.2">
+            <fr:listener version="2018.2" events="form-load-after-data"
+                         actions="populate-attachments"/>
 
-                <fr:service-call service="my-service">
-                    <fr:value control="foo" ref="/*/request/foo"/>
-                    <fr:value control="bar" ref="/*/request/bar"/>
-                </fr:service-call>
+            <fr:action name="populate-attachments" version="2018.2">
 
-                <fr:repeat-clear repeat="my-repeated-grid"/>
+                <fr:service-call service="echo"/>
+                <fr:repeat-clear repeat="my-grid"/>
 
-                <fr:data-iterate ref="/*/response/row">
-                    <fr:repeat-add-iteration repeat="my-repeated-grid" at="end"/>
-                    <fr:control-setvalue value="@field" control="result-field" at="end"/>
-                    <fr:control-setvalue value="@dropdown" control="result-dropdown" at="end"/>
+                <fr:data-iterate ref="/response/text">
+
+                    <fr:service-call service="get-attachment">
+                        <fr:url-param name="text" value="."/>
+                    </fr:service-call>
+
+                    <fr:repeat-add-iteration repeat="my-grid" at="end"/>
+                    <fr:control-setattachment control="my-attachment" at="end"/>
                 </fr:data-iterate>
 
-                <fr:control-setitems
-                    items="/*/response/item"
-                    label="@label"
-                    value="@value"
-                    control="result-dropdown"/>
-
             </fr:action>
+
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body>
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="grid-1-grid">
-                        <fr:c y="1" x="1" w="2">
-                            <xf:input id="foo-control" bind="foo-bind">
-                                <xf:label ref="$form-resources/foo/label"/>
-                                <xf:hint ref="$form-resources/foo/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
-                        </fr:c>
-                        <fr:c y="1" x="3" w="2">
-                            <xf:input id="bar-control" bind="bar-bind">
-                                <xf:label ref="$form-resources/bar/label"/>
-                                <xf:hint ref="$form-resources/bar/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
-                        </fr:c>
-                        <fr:c x="5" y="1" w="8" h="1">
+                        <fr:c y="1" x="1" w="6">
                             <xf:trigger id="my-button-control" bind="my-button-bind">
                                 <xf:label ref="$form-resources/my-button/label"/>
+
                                 <xf:hint ref="$form-resources/my-button/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
                             </xf:trigger>
-                        </fr:c>
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
                     </fr:grid>
-                </fr:section>
-                <fr:section id="section-2-section" bind="section-2-bind">
-                    <xf:label ref="$form-resources/section-2/label"/>
-                    <fr:grid id="my-repeated-grid-grid" bind="my-repeated-grid-bind" repeat="content"
-                             min="1"
-                             template="instance('my-repeated-grid-template')"
+                    <fr:grid id="my-grid-grid" bind="my-grid-bind" repeat="content"
+                             template="instance('my-grid-template')"
                              apply-defaults="true"
                              fb:initial-iterations="first">
                         <fr:c x="1" y="1" w="6">
-                            <xf:input id="result-field-control" bind="result-field-bind">
-                                <xf:label ref="$form-resources/result-field/label"/>
-                                <xf:hint ref="$form-resources/result-field/hint"/>
+                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                 id="my-attachment-control"
+                                                 bind="my-attachment-bind"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/my-attachment/label"/>
+                                <xf:hint ref="$form-resources/my-attachment/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:input>
+                            </fr:image-attachment>
                         </fr:c>
-                        <fr:c x="7" y="1" w="6">
-                            <xf:select1 id="result-dropdown-control" bind="result-dropdown-bind" appearance="dropdown">
-                                <xf:label ref="$form-resources/result-dropdown/label"/>
-                                <xf:hint ref="$form-resources/result-dropdown/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                <xf:itemset ref="$form-resources/result-dropdown/item">
-                                    <xf:label ref="label"/>
-                                    <xf:value ref="value"/>
-                                </xf:itemset>
-                            </xf:select1>
-                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
                     </fr:grid>
+
                 </fr:section>
             </fr:body>
         </fr:view>

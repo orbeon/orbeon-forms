@@ -14,6 +14,8 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.scalatest.FunSpecLike
 
 class ActionsFormat20182Test
@@ -32,7 +34,14 @@ class ActionsFormat20182Test
     it("must pass all service result checks") {
       withTestExternalContext { _ ⇒
         withFormRunnerDocument(processorService, doc) {
-          // TODO
+          for {
+            (expectedSize, i) ← List(252, 354).zipWithIndex
+            control           = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
+            value             = control.getValue
+          } locally {
+            assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
+            assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
+          }
         }
       }
     }

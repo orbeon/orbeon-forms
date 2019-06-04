@@ -651,7 +651,10 @@
 
     <!-- Reset the displayed page as the iframe might show the result from a previous test -->
     <xf:action type="javascript" ev:event="fb-test-form">
-        ORBEON.jQuery('.fb-test-iframe')[0].contentWindow.location.href = "about:blank";
+        var testIframeDoc = ORBEON.jQuery('.fb-test-iframe')[0].contentWindow.document;
+        testIframeDoc.open();
+        testIframeDoc.write("");
+        testIframeDoc.close();
         ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
     </xf:action>
 

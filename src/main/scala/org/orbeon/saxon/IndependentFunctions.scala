@@ -220,5 +220,9 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE),
       Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE) // `map(*)`
     )
+
+    Fun("mutable-document", classOf[XXFormsMutableDocument], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
+      Arg(Type.NODE_TYPE, EXACTLY_ONE)
+    )
   }
 }

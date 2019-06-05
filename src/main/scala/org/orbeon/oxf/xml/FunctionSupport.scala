@@ -20,6 +20,8 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 
 
+abstract class JavaDefaultFunctionSupport extends DefaultFunctionSupport
+
 trait DefaultFunctionSupport
   extends FunctionSupport
     with NoPathMapDependencies

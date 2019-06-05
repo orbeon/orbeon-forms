@@ -129,10 +129,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("mutable-document", classOf[XXFormsMutableDocument], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
-      Arg(Type.NODE_TYPE, EXACTLY_ONE)
-    )
-
     Fun("component-context", classOf[XXFormsComponentContext], op = 0, min = 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
 
     Fun("component-param-value", classOf[XXFormsComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,

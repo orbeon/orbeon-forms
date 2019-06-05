@@ -164,7 +164,12 @@ trait BaseOps extends Logging {
 
   // Find a series of next available ids for a given token
   // Return ids of the form "foo-123-foo", where "foo" is the token
-  def nextIds(token: String, count: Int, others: Iterable[String] = Nil)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
+  def nextIds(
+    token  : String,
+    count  : Int,
+    others : Iterable[String] = Nil)(implicit
+    ctx    : FormBuilderDocContext
+  ): immutable.IndexedSeq[String] = {
 
     val prefix = token + "-"
     val suffix = "-" + token

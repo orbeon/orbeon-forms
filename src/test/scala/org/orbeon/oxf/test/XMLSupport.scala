@@ -25,7 +25,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait XMLSupport extends AssertionsForJUnit {
 
-  def readURLAsImmutableXMLDocument(url: String) =
+  def readURLAsImmutableXMLDocument(url: String): DocumentInfo =
     useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
     }

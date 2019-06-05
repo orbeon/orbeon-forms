@@ -5110,11 +5110,11 @@
             <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; Reject</reject>
 
             <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
-            <review>&lt;i class="icon-eye-open"/&gt; Opsummering</review>
+            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Opsummering</review>
             <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove-sign"/&gt; Slet</delete>
-            <import>&lt;i class="icon-upload"/&gt; Importér</import>
+            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importér</import>
             <new>&lt;i class="fa fa-fw fa-plus"/&gt; Ny blanket</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplikér</duplicate>
 
@@ -5122,7 +5122,7 @@
             <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save-final>
             <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Gem</save-draft>
-            <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validér]</validate>
@@ -5130,7 +5130,7 @@
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send ind</submit>
             <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Opsummering</workflow-review>
-            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</workflow-edit>
             <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
@@ -5142,8 +5142,8 @@
             <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
             <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Genindlæs"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Næste</wizard-next>
-            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Forrige</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Næste</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Forrige</wizard-prev>
             <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Indhold</wizard-toc>
 
             <!-- Submit dialog -->

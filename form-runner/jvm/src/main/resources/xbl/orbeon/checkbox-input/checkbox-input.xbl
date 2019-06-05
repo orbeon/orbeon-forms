@@ -40,7 +40,7 @@
             <display-name lang="nl" todo="true">[Single Checkbox]</display-name>
             <display-name lang="pt" todo="true">[Single Checkbox]</display-name>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
+                <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>
             <templates>
                 <bind type="xf:boolean"/>

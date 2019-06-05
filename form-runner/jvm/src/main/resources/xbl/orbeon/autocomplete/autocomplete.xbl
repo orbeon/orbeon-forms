@@ -50,7 +50,7 @@
             <display-name lang="pt">Autocompletar</display-name>
             <form-settings show="false"/>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/autocomplete.png</small-icon>
+                <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>
             <templates>
                 <instance label=""/>

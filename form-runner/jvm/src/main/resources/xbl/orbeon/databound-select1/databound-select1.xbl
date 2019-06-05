@@ -43,7 +43,7 @@
             <display-name lang="pt">Lista de Opções Dinâmica</display-name>
             <form-settings show="false"/>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
+                <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>
             <datatype>xf:string</datatype>
             <editors static-itemset="false"/>

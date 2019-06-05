@@ -39,7 +39,7 @@
             <display-name lang="pt">Menu Lista de Opções</display-name>
             <display-name lang="sv">Rullgardinsmeny</display-name>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
+                <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>
             <editors static-itemset="true"/>
             <templates>

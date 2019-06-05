@@ -44,8 +44,7 @@
             <display-name lang="nl">Afbeeldingbijlage</display-name>
             <display-name lang="pt">Anexar imagem</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/picture.png</small-icon>
-                <!--<icon-class>fa fa-fw fa-file-image</icon-class>-->
+                <icon-class>fa fa-fw fa-file-image-o</icon-class>
             </icon>
             <templates>
                 <bind type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/>

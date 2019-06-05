@@ -27,7 +27,7 @@
             <display-name lang="sv">Knapp</display-name>
             <display-name lang="pt">Botão</display-name>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
+                <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
             <template>
                 <xf:trigger id="" xmlns="">

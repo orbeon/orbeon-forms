@@ -392,7 +392,7 @@
                                 <!-- Upload XML Schema -->
                                 <xf:trigger>
                                     <xf:label>
-                                        <xh:img src="/apps/fr/style/images/other/schema-16.png" alt=""/>
+                                        <xh:i class="fa fa-w fa-file-code-o"/>
                                         <xh:span>
                                             <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
                                         </xh:span>
@@ -405,7 +405,7 @@
                                 <!-- Upload PDF Template -->
                                 <xf:trigger>
                                     <xf:label>
-                                        <xh:img src="/apps/fr/style/pdf.png" alt=""/>
+                                        <xh:i class="fa fa-w fa-file-pdf-o"/>
                                         <xh:span>
                                             <xf:output value="$form-resources/pdf-templates/label"/>
                                         </xh:span>

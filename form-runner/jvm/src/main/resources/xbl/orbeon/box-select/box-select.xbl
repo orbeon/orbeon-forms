@@ -45,7 +45,7 @@
             <display-name lang="nl">Schuifbare keuzevakjes</display-name>
             <display-name lang="pt">Lista de Caixas de Verificação</display-name>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
+                <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>
             <editors static-itemset="true"/>
             <template>

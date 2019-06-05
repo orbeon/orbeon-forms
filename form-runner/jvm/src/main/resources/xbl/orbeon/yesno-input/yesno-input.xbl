@@ -38,7 +38,7 @@
             <display-name lang="nl" todo="true">[Yes/No Answer]</display-name>
             <display-name lang="pt" todo="true">[Yes/No Answer]</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/other/yesno-16.png</small-icon>
+                <icon-class>fa fa-fw fa-toggle-on</icon-class>
             </icon>
             <templates>
                 <bind type="xf:boolean"/>

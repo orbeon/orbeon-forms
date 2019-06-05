@@ -30,7 +30,7 @@
             <display-name lang="pt">Entrada Booleana</display-name>
             <toolbox show="false"/>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
+                <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>
             <templates>
                 <bind type="xf:boolean"/>

@@ -48,7 +48,7 @@
             <fb:display-name lang="nl">Afbeelding annotatie</fb:display-name>
             <fb:display-name lang="pt">Anotação da imagem</fb:display-name>
             <fb:icon>
-                <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
+                <fb:icon-class>fa fa-fw fa-paint-brush</fb:icon-class>
             </fb:icon>
             <fb:templates>
                 <fb:view>

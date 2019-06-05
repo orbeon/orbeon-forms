@@ -42,7 +42,7 @@
             <display-name lang="pt" todo="true">[Radio Buttons with "Other"]</display-name>
             <display-name lang="sv">Enkelval med "Annat"</display-name>
             <icon>
-                <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
+                <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
             </icon>
             <editors static-itemset="true" item-hint="true"/>
             <templates>

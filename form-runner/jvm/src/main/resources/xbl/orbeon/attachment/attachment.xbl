@@ -38,7 +38,7 @@
             <display-name lang="nl">Bestandsbijlage</display-name>
             <display-name lang="pt">Anexar ficheiro</display-name>
             <icon>
-                <icon-class>fa fa-fw fa-paperclip</icon-class>
+                <icon-class>fa fa-fw fa-file-o</icon-class>
             </icon>
             <templates>
                 <bind type="xf:anyURI"/>

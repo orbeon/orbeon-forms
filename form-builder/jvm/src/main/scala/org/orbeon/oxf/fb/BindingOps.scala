@@ -153,7 +153,7 @@ trait BindingOps {
   }
 
   def hasViewTemplateSupportElementFor(binding: NodeInfo, name: String): Boolean =
-    bindingMetadata(binding) / FBTemplatesTest / FBViewTest / * / name nonEmpty
+    findViewTemplate(binding).toSeq / name nonEmpty
 
   // In other words we leave Type and Required and custom MIPs as they are
   // This must match what is done in annotate.xpl

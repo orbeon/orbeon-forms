@@ -69,8 +69,8 @@
                 xsl:version="2.0"
             >
                 <xbl:content includes=":root > xf|help, :root > xf|hint, :root > xf|alert"/>
-                <xf:label appearance="xxf:internal">
-                    <xsl:copy-of select="@* | node()"/>
+                <xf:label xxbl:scope="outer" appearance="xxf:internal">
+                    <xsl:copy-of select="/fr:checkbox-input/xf:label/(@* | node())"/>
                 </xf:label>
                 <xf:item>
                     <xbl:content includes=":root > xf|label"/>

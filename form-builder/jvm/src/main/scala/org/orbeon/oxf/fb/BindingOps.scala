@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.XMLNames._
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -38,7 +39,7 @@ trait BindingOps {
   ): List[NodeInfo] = {
 
     val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
-    val lang        = FormBuilder.currentLang
+    val lang        = FormRunner.currentLang
 
     for {
       controlElem                  ← findControlByName(ctx.formDefinitionRootElem, controlName).toList

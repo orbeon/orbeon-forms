@@ -33,7 +33,7 @@ object DatasourceDescriptor {
       case MySQL ⇒
         DatasourceDescriptor(
           name      = provider.entryName,
-          driver    = "com.mysql.jdbc.Driver",
+          driver    = "com.mysql.cj.jdbc.Driver",
           url       = "jdbc:mysql://localhost:3306/",
           username  = "orbeon",
           password  = "password",

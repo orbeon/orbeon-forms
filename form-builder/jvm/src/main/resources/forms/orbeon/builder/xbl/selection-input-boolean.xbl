@@ -18,16 +18,16 @@
 
     <xbl:binding id="fb-input-boolean" element="xf|input:xxf-type('xs:boolean')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Boolean Input</display-name>
+            <display-name lang="en">Single Checkbox with Label on Top</display-name>
             <display-name lang="es">Entrada Booleana</display-name>
-            <display-name lang="fi">Boolean-syöttäminen</display-name>
-            <display-name lang="fr">Champ booléen</display-name>
-            <display-name lang="ru">[Boolean Input]</display-name>
-            <display-name lang="de">Boolsche Eingabe</display-name>
-            <display-name lang="it">Campo boolean</display-name>
-            <display-name lang="nl">Booleaanse invoer</display-name>
-            <display-name lang="sv">Booleskt värde</display-name>
-            <display-name lang="pt">Entrada Booleana</display-name>
+            <display-name lang="fi" todo="true">Boolean-syöttäminen</display-name>
+            <display-name lang="fr">Case à cocher unique avec libellé en dessus</display-name>
+            <display-name lang="ru" todo="true">[Boolean Input]</display-name>
+            <display-name lang="de" todo="true">Boolsche Eingabe</display-name>
+            <display-name lang="it" todo="true">Campo boolean</display-name>
+            <display-name lang="nl" todo="true">Booleaanse invoer</display-name>
+            <display-name lang="sv" todo="true">Booleskt värde</display-name>
+            <display-name lang="pt" todo="true">Entrada Booleana</display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>

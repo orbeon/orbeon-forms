@@ -50,8 +50,6 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
             readInput(pipelineContext, input, config, writer);
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
-        } catch (IOException e) {
-            throw new OXFException(e);
         }
     }
 

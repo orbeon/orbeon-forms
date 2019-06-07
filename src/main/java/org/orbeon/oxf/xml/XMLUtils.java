@@ -26,13 +26,4 @@ public class XMLUtils {
             return "{" + uri + '}' + localname;
         }
     }
-
-    // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
-    public static String buildURIQualifiedName(String uri, String localname) {
-        if ("".equals(uri))
-            return localname;
-        else {
-            return "Q{" + uri + '}' + localname;
-        }
-    }
 }

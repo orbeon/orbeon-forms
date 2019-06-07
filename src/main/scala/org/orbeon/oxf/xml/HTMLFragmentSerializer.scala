@@ -20,7 +20,6 @@ import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.Attributes
 
 object HTMLFragmentSerializer {
@@ -31,17 +30,15 @@ object HTMLFragmentSerializer {
 
     TransformerUtils.applyOutputProperties(
       identity.getTransformer,
-      Dom4jUtils.qNameToExplodedQName(
-        Properties.instance.getPropertySet(
-          QName(
-            "html-converter",
-            XMLConstants.OXF_PROCESSORS_NAMESPACE
-          )
-        ).getQName(
-          TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
-          XMLConverter.DEFAULT_METHOD
+      Properties.instance.getPropertySet(
+        QName(
+          "html-converter",
+          XMLConstants.OXF_PROCESSORS_NAMESPACE
         )
-      ),
+      ).getQName(
+        TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
+        XMLConverter.DEFAULT_METHOD
+      ).clarkName,
       null,
       null,
       null,

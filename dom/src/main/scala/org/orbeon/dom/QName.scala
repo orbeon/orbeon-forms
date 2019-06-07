@@ -2,7 +2,25 @@ package org.orbeon.dom
 
 import java.{util ⇒ ju}
 
+
+
 object QName {
+
+  implicit class QNameOps(val q: QName) extends AnyVal {
+
+    // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
+    def uriQualifiedName: String =
+      if (q.namespace.uri.isEmpty)
+        q.localName
+      else
+        "Q{" + q.namespace.uri + '}' + q.localName
+
+    def clarkName: String =
+      if (q.namespace.uri.isEmpty)
+        q.localName
+      else
+        "{" + q.namespace.uri + '}' + q.localName
+  }
 
   // 2017-10-27: 84 usages
   def apply(localName: String): QName = apply(localName, Namespace.EmptyNamespace, localName)

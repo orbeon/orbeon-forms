@@ -98,13 +98,11 @@ object SubmissionParameters {
       val resolvedMethodQName =
         staticSubmission.avtMethod flatMap stringAvtTrimmedOpt getOrElse "get"
 
-      Dom4jUtils.qNameToExplodedQName(
-        Dom4jUtils.extractTextValueQName(
-          staticSubmission.namespaceMapping.mapping.asJava,
-          resolvedMethodQName,
-          true
-        )
-      )
+      Dom4jUtils.extractTextValueQName(
+        staticSubmission.namespaceMapping.mapping.asJava,
+        resolvedMethodQName,
+        true
+      ).clarkName
     }
     val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethod)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt

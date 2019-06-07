@@ -50,7 +50,7 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
 //        final Map namespaceMappings = containingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
     val attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName, true)
-    event.getAttribute(Dom4jUtils.qNameToExplodedQName(attributeQName))
+    event.getAttribute(attributeQName.clarkName)
   }
 
   // The following copies StaticContext namespace information

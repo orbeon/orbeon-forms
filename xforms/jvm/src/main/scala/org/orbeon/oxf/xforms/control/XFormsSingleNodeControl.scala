@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
 import org.xml.sax.helpers.AttributesImpl
@@ -242,7 +241,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   def isValueChangedCommit() = false // TODO: move this to trait shared by value control and variable
-  def typeExplodedQName = Dom4jUtils.qNameToExplodedQName(valueType)
+  def typeClarkNameOpt: Option[String] = valueTypeOpt map (_.clarkName)
 
   // Convenience method to return the local name of a built-in XML Schema or XForms type.
   def getBuiltinTypeNameOpt =

@@ -30,10 +30,6 @@ import scala.xml.{Elem, XML}
 
 object Dom4j {
 
-  implicit class QNameOps(val q: QName) extends AnyVal {
-    def uriQualifiedName = XMLUtils.buildURIQualifiedName(q.namespace.uri, q.localName)
-  }
-
   /**
    * Compare two dom4j documents.
    *
@@ -65,10 +61,10 @@ object Dom4j {
   /**
    * Same as compareDocumentsIgnoreNamespacesInScope but collapse white space when comparing text.
    */
-  def compareDocumentsIgnoreNamespacesInScopeCollapse(left: Document, right: Document) =
+  def compareDocumentsIgnoreNamespacesInScopeCollapse(left: Document, right: Document): Boolean =
     compareElementsIgnoreNamespacesInScopeCollapse(left.getRootElement, right.getRootElement)
 
-  def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element) = {
+  def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element): Boolean = {
     val normalizeText = (c: String) ⇒ Whitespace.collapseWhitespace(c).toString
     compareTwoNodes(normalizeTextNodes(createCopy(left)), normalizeTextNodes(createCopy(right)))(normalizeText)
   }
@@ -87,8 +83,8 @@ object Dom4j {
 
   // An ordering for attributes, which takes into account the namespace URI and the local name
   private implicit object AttributeOrdering extends Ordering[Attribute] {
-    def compare(x: Attribute, y: Attribute) =
-      Dom4jUtils.buildURIQualifiedName(x.getQName) compare Dom4jUtils.buildURIQualifiedName(y.getQName)
+    def compare(x: Attribute, y: Attribute): Int =
+      x.getQName.uriQualifiedName compare y.getQName.uriQualifiedName
   }
 
   private def compareTwoNodes(left: Node, right: Node)(normalizeText: String ⇒ String): Boolean =
@@ -177,7 +173,7 @@ object Dom4j {
 
   // Ordering on QName, comparing first by namespace URI then by local name
   implicit object QNameOrdering extends Ordering[QName] {
-    def compare(x: QName, y: QName) = {
+    def compare(x: QName, y: QName): Int = {
       val nsOrder = x.namespace.uri compareTo y.namespace.uri
       if (nsOrder != 0)
         nsOrder

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -197,9 +196,9 @@ class XFormsInputControl(
 
     val previousSingleNodeControlOpt = previousControlOpt.asInstanceOf[Option[XFormsSingleNodeControl]]
 
-    val typeValue2 = typeExplodedQName
-    if (previousControlOpt.isEmpty || previousSingleNodeControlOpt.exists(_.typeExplodedQName != typeValue2)) {
-      val attributeValue = StringUtils.defaultString(typeValue2)
+    val typeValue2 = typeClarkNameOpt
+    if (previousControlOpt.isEmpty || previousSingleNodeControlOpt.exists(_.typeClarkNameOpt != typeValue2)) {
+      val attributeValue = typeValue2 getOrElse ""
       added |= ControlAjaxSupport.addOrAppendToAttributeIfNeeded(
         attributesImpl,
         "type",

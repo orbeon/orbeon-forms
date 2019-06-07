@@ -722,11 +722,6 @@ public class Dom4jUtils {
         return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.namespace().uri(), qName.localName());
     }
 
-    // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
-    public static String buildURIQualifiedName(QName qName) {
-        return XMLUtils.buildURIQualifiedName(qName.namespace().uri(), qName.localName());
-    }
-
     public interface VisitorListener {
         void startElement(Element element);
         void endElement(Element element);

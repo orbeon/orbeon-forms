@@ -37,7 +37,7 @@ case class Migration20191(
   afterElem     : Option[PathElem],
   content       : List[PathElem],
   topLevel      : Boolean
-) extends Migration {
+) {
   require(containerPath.nonEmpty || ! topLevel)
 }
 

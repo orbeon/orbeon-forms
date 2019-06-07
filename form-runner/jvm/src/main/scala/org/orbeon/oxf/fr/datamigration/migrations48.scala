@@ -32,7 +32,7 @@ import org.orbeon.scaxon.SimplePath._
 case class Migration48(
   containerPath : List[PathElem],
   iterationElem : PathElem
-) extends Migration {
+) {
   require(containerPath.nonEmpty)
 }
 

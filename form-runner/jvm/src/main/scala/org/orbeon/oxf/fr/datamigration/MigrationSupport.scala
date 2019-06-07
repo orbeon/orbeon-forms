@@ -72,7 +72,7 @@ object MigrationSupport {
       (_.attValueOpt("version") contains version.entryName) flatMap
       (_.stringValue.trimAllToOpt)
 
-  def buildGridMigrations[M <: Migration](
+  def buildGridMigrations[M](
     outerDocument         : DocumentInfo,
     availableXBLBindings  : Option[DocumentInfo],
     migrationsForBinding  : (DocumentInfo, Boolean) ⇒ Seq[M],

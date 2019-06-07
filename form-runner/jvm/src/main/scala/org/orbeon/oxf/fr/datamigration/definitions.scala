@@ -20,8 +20,6 @@ import org.orbeon.saxon.om.{DocumentInfo, Name10Checker}
 import scala.util.matching.Regex
 
 
-trait Migration
-
 trait MigrationSet {
   val version: MigrationVersion
 }

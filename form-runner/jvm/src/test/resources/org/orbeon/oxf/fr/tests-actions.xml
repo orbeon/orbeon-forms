@@ -400,7 +400,7 @@
                             name="fr-action-continuation-my-action-3-id"
                             targetid="fr-form-model"/>
                     </xf:action>
-                    </xf:action>
+                </xf:action>
 
                 <xf:action
                     observer="fr-form-model"

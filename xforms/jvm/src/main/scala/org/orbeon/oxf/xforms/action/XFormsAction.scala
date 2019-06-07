@@ -90,12 +90,12 @@ abstract class XFormsAction extends Logging {
 
   // Resolve an optional boolean AVT
   // Return None if there is no attribute or if the AVT cannot be evaluated
-  def resolveStringAVT(att: String)(implicit context: DynamicActionContext) =
+  def resolveStringAVT(att: String)(implicit context: DynamicActionContext): Option[String] =
     context.element.attributeValueOpt(att) flatMap
       (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
 
   // Resolve an optional boolean AVT
-  def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext) =
+  def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext): Boolean =
     resolveStringAVT(att)(context) map (_ == "true") getOrElse default
 
   def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
@@ -106,7 +106,7 @@ abstract class XFormsAction extends Logging {
 object XFormsAction {
 
   // Obtain context attributes based on nested xf:property elements.
-  def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element) = {
+  def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): Map[String, Option[AnyRef]] = {
 
     val contextStack = actionInterpreter.actionXPathContext
 
@@ -122,7 +122,7 @@ object XFormsAction {
             (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {
-          case Some(value) ⇒
+          case Some(valueExpr) ⇒
             // XPath expression
 
             // Set context on context element
@@ -140,7 +140,7 @@ object XFormsAction {
                 XPathCache.evaluate(
                   contextItems       = actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
                   contextPosition    = actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
-                  xpathString        = value,
+                  xpathString        = valueExpr,
                   namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
                   functionLibrary    = actionInterpreter.containingDocument.getFunctionLibrary,

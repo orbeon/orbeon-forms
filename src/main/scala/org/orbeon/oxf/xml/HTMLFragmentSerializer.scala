@@ -24,7 +24,7 @@ import org.xml.sax.Attributes
 
 object HTMLFragmentSerializer {
 
-  def create(writer: Writer, skipRootElement: Boolean) = {
+  def create(writer: Writer, skipRootElement: Boolean): ForwardingXMLReceiver = {
 
     val identity = TransformerUtils.getIdentityTransformerHandler
 

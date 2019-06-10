@@ -1,4 +1,4 @@
-<form>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>War and Peace</title>
         <author>Leo Tolstoy</author>

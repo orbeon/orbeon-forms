@@ -1,50 +1,60 @@
-<xh:html xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
-            xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:xh="http://www.w3.org/1999/xhtml"
-            xmlns:saxon="http://saxon.sf.net/"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:exf="http://www.exforms.org/exf/1-0"
-            xmlns:sql="http://orbeon.org/oxf/xml/sql"
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
-            <xf:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <contact>
-                        <first-name/>
-                        <last-name/>
-                        <email/>
-                        <phone/>
+                        <grid-1>
+                            <first-name/>
+                            <last-name/>
+                            <email/>
+                            <phone/>
+                        </grid-1>
                     </contact>
                     <message>
-                        <order-number/>
-                        <topic/>
-                        <comments/>
+                        <grid-2>
+                            <order-number/>
+                            <topic/>
+                        </grid-2>
+                        <grid-3>
+                            <comments/>
+                        </grid-3>
                     </message>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="contact-bind" ref="contact" name="contact">
-                    <xf:bind id="first-name-bind" ref="first-name" type="xs:string" required="true()"
-                                 name="first-name" xxf:whitespace="trim"/>
-                    <xf:bind id="last-name-bind" ref="last-name" type="xs:string" required="true()"
-                                 name="last-name" xxf:whitespace="trim"/>
-                    <xf:bind id="email-bind" ref="email" type="xf:email" required="true()"
-                                 name="email" xxf:whitespace="trim"/>
-                    <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="first-name-bind" ref="first-name" type="xs:string" required="true()" name="first-name" xxf:whitespace="trim"/>
+                        <xf:bind id="last-name-bind" ref="last-name" type="xs:string" required="true()" name="last-name" xxf:whitespace="trim"/>
+                        <xf:bind id="email-bind" ref="email" type="xf:email" required="true()" name="email" xxf:whitespace="trim"/>
+                        <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
+                    </xf:bind>
                 </xf:bind>
                 <xf:bind id="message-bind" ref="message" name="message">
-                    <xf:bind id="order-number-bind" ref="order-number" type="xs:string"
-                                 required="true()" xxf:whitespace="trim"
-                                 name="order-number"/>
-                    <xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
-                    <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()"
-                                 name="comments"/>
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()" name="comments"/>
+                    </xf:bind>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="order-number-bind" ref="order-number" type="xs:string" required="true()" xxf:whitespace="trim" name="order-number"/>
+                        <xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
+                    </xf:bind>
                 </xf:bind>
             </xf:bind>
             <xf:instance id="fr-form-metadata" xxf:readonly="true">
@@ -55,6 +65,8 @@
                     <description xml:lang="en">The Contact form is a simple form which can be created in a few minutes with Form Builder.</description>
                     <title xml:lang="fr">Contact</title>
                     <description xml:lang="fr">Le formulaire Contact peut être créé à l'aide de Form Builder en quelques minutes.</description>
+                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"first-name"},{"value":"last-name"},{"value":"email"},{"value":"phone"}],"topLevel":true},{"containerPath":[{"value":"message"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"order-number"},{"value":"topic"}],"topLevel":true},{"containerPath":[{"value":"message"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"comments"}],"topLevel":true}]}</migration>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -63,7 +75,7 @@
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
-            <xf:instance id="fr-form-resources" xxf:readonly="true">
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
                         <comments>
@@ -215,116 +227,70 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="contact-section" bind="contact-bind">
                     <xf:label ref="$form-resources/contact/label"/>
-                    <xf:help ref="$form-resources/contact/help"/>
-                    <fr:grid columns="2">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input bind="first-name-bind" id="first-name-control" class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/first-name/label"/>
-                                    <xf:hint ref="$form-resources/first-name/hint"/>
-                                    <xf:help ref="$form-resources/first-name/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              bind="last-name-bind"
-                                              id="last-name-control"
-                                              class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/last-name/label"/>
-                                    <xf:hint ref="$form-resources/last-name/hint"/>
-                                    <xf:help ref="$form-resources/last-name/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              bind="email-bind"
-                                              id="email-control"
-                                              class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/email/label"/>
-                                    <xf:hint ref="$form-resources/email/hint"/>
-                                    <xf:help ref="$form-resources/email/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:xbl="http://www.w3.org/ns/xbl"
-                                             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                             bind="phone-bind"
-                                             id="phone-control">
-                                    <xf:label ref="$form-resources/phone/label"/>
-                                    <xf:hint ref="$form-resources/phone/hint"/>
-                                    <xf:help ref="$form-resources/phone/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:us-phone>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="2" id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input bind="first-name-bind" id="first-name-control" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/first-name/label"/>
+                                <xf:hint ref="$form-resources/first-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="last-name-bind" id="last-name-control" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/last-name/label"/>
+                                <xf:hint ref="$form-resources/last-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="email-bind" id="email-control" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/email/label"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" bind="phone-bind" id="phone-control">
+                                <xf:label ref="$form-resources/phone/label"/>
+                                <xf:hint ref="$form-resources/phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:us-phone>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="message-section" bind="message-bind">
                     <xf:label ref="$form-resources/message/label"/>
-                    <xf:help ref="$form-resources/message/help"/>
-                    <fr:grid columns="2">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              bind="order-number-bind"
-                                              id="order-number-control"
-                                              class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/order-number/label"/>
-                                    <xf:hint ref="$form-resources/order-number/hint"/>
-                                    <xf:help ref="$form-resources/order-number/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:select1 bind="topic-bind" id="topic-control" appearance="dropdown">
-                                    <xf:label ref="$form-resources/topic/label"/>
-                                    <xf:hint ref="$form-resources/topic/hint"/>
-                                    <xf:help ref="$form-resources/topic/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="$form-resources/topic/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="2" id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="order-number-bind" id="order-number-control" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/order-number/label"/>
+                                <xf:hint ref="$form-resources/order-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:select1 bind="topic-bind" id="topic-control" appearance="dropdown">
+                                <xf:label ref="$form-resources/topic/label"/>
+                                <xf:hint ref="$form-resources/topic/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/topic/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                 bind="comments-bind"
-                                                 id="comments-control">
-                                    <xf:label ref="$form-resources/comments/label"/>
-                                    <xf:hint ref="$form-resources/comments/hint"/>
-                                    <xf:help ref="$form-resources/comments/help"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:textarea>
-                            </xh:td>
-                        </xh:tr>
+                    <fr:grid columns="1" id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c y="1" x="1" w="12">
+                            <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" bind="comments-bind" id="comments-control">
+                                <xf:label ref="$form-resources/comments/label"/>
+                                <xf:hint ref="$form-resources/comments/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

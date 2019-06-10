@@ -1,6 +1,22 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:dmv="http://orbeon.org/oxf/examples/dmv" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" fr:data-format-version="4.0.0">
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <personal-information>
@@ -438,7 +454,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:ev="http://www.w3.org/2001/xml-events">
+            <fr:body>
                 <fr:section id="personal-information-section" bind="personal-information-bind">
                     <xf:label ref="$form-resources/personal-information/label"/>
                     <fr:grid id="grid-1-grid">

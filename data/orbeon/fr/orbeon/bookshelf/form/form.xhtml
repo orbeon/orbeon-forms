@@ -1,15 +1,23 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
-                  xxf:help-tooltip="false"
-                  xxf:xpath-analysis="true">
-            <!-- Inline schema -->
+        <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:xpath-analysis="true">
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
-
                 <xs:element name="form">
                     <xs:complexType>
                         <xs:sequence>
@@ -18,20 +26,30 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-
                 <xs:complexType name="details">
                     <xs:sequence>
-                        <xs:element name="title" type="xs:string"/>
-                        <xs:element name="author" type="xs:string"/>
-                        <xs:element name="language" type="language"/>
-                        <xs:element name="link" type="link"/>
-                        <xs:element name="rating" type="rating"/>
-                        <xs:element name="publication-year" type="publication-year"/>
-                        <xs:element name="review" type="xs:string"/>
-                        <xs:element name="image" type="image"/>
+                        <xs:element name="grid-1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="title" type="xs:string"/>
+                                    <xs:element name="author" type="xs:string"/>
+                                    <xs:element name="image" type="image"/>
+                                    <xs:element name="language" type="language"/>
+                                    <xs:element name="link" type="link"/>
+                                    <xs:element name="rating" type="rating"/>
+                                    <xs:element name="publication-year" type="publication-year"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="grid-2">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="review" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
-
                 <xs:complexType name="notes">
                     <xs:sequence>
                         <xs:element name="note">
@@ -43,14 +61,11 @@
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
-
                 <xs:complexType name="note-iteration">
                     <xs:sequence>
                         <xs:element name="note-text" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
-
-                <!-- Type for image -->
                 <xs:complexType name="image">
                     <xs:simpleContent>
                         <xs:extension base="xs:anyURI">
@@ -60,8 +75,6 @@
                         </xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>
-
-                <!-- Type for rating -->
                 <xs:simpleType name="rating">
                     <xs:restriction base="xs:string">
                         <xs:enumeration value=""/>
@@ -72,8 +85,6 @@
                         <xs:enumeration value="5"/>
                     </xs:restriction>
                 </xs:simpleType>
-
-                <!-- Type for publication year -->
                 <xs:simpleType name="publication-year">
                     <xs:union>
                         <xs:simpleType>
@@ -89,8 +100,6 @@
                         </xs:simpleType>
                     </xs:union>
                 </xs:simpleType>
-
-                <!-- Type for language -->
                 <xs:simpleType name="language">
                     <xs:restriction base="xs:string">
                         <xs:enumeration value=""/>
@@ -103,29 +112,27 @@
                         <xs:enumeration value="zh"/>
                     </xs:restriction>
                 </xs:simpleType>
-
-                <!-- Type for link -->
                 <xs:simpleType name="link">
                     <xs:restriction base="xs:string">
-                        <!-- Approximative regexp for HTTP URLs -->
                         <xs:pattern value="(https?\://([^/?#]+)(/([^?#]*)(\?([^?#]+))?(#(.*))?)?)?"/>
                     </xs:restriction>
                 </xs:simpleType>
-
             </xs:schema>
-
-            <!-- Instance that contains all the books -->
             <xf:instance id="fr-form-instance" xxf:validation="strict" xxf:index="id">
                 <form>
                     <details>
-                        <title/>
-                        <author/>
-                        <language/>
-                        <link/>
-                        <rating/>
-                        <publication-year/>
-                        <review/>
-                        <image filename="" mediatype="" size=""/>
+                        <grid-1>
+                            <title/>
+                            <author/>
+                            <image filename="" mediatype="" size=""/>
+                            <language/>
+                            <link/>
+                            <rating/>
+                            <publication-year/>
+                        </grid-1>
+                        <grid-2>
+                            <review/>
+                        </grid-2>
                     </details>
                     <notes>
                         <note>
@@ -136,20 +143,20 @@
                     </notes>
                 </form>
             </xf:instance>
-
             <xf:bind id="fr-form-binds" ref=".">
                 <xf:bind id="details-bind" name="details" ref="details">
-                    <xf:bind id="title-bind" name="title" ref="title" required="true()"
-                             xxf:whitespace="trim"/>
-                    <xf:bind id="author-bind" name="author" ref="author" required="true()"
-                             xxf:whitespace="trim"/>
-                    <xf:bind id="language-bind" name="language" ref="language"/>
-                    <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
-                    <xf:bind id="rating-bind" name="rating" ref="rating"/>
-                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year"
-                             xxf:whitespace="trim"/>
-                    <xf:bind id="review-bind" name="review" ref="review"/>
-                    <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="title-bind" name="title" ref="title" required="true()" xxf:whitespace="trim"/>
+                        <xf:bind id="author-bind" name="author" ref="author" required="true()" xxf:whitespace="trim"/>
+                        <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
+                        <xf:bind id="language-bind" name="language" ref="language"/>
+                        <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
+                        <xf:bind id="rating-bind" name="rating" ref="rating"/>
+                        <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year" xxf:whitespace="trim"/>
+                    </xf:bind>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="review-bind" name="review" ref="review"/>
+                    </xf:bind>
                 </xf:bind>
                 <xf:bind id="notes-bind" name="notes" ref="notes">
                     <xf:bind id="note-bind" name="note" ref="note">
@@ -159,8 +166,6 @@
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
-
-            <!-- Metadata -->
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
@@ -183,20 +188,20 @@
                             </fr:param>
                         </subject>
                     </email>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="4.8.0">[{ "path": "notes/note", "iteration-name": "note-iteration" }]</migration>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"review"}],"topLevel":true}]}</migration>
                 </metadata>
             </xf:instance>
-
-            <!-- Attachments -->
             <xf:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
-                    <!-- Fix this once we have proper template -->
-                    <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
-
-            <!-- XForms instance containing all the resources -->
             <xf:instance id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
@@ -265,7 +270,6 @@
                             <hint>Your rating</hint>
                             <help>This contains your rating about the book. For example...</help>
                             <alert>The rating selected is invalid</alert>
-
                             <item>
                                 <label>None</label>
                                 <value/>
@@ -380,7 +384,6 @@
                             <hint>Votre évaluation</hint>
                             <help>Ce champ contient votre évaluation du livre, par exemple...</help>
                             <alert>L'évaluation sélectionnée est invalide</alert>
-
                             <item>
                                 <label>Aucune</label>
                                 <value/>
@@ -431,121 +434,112 @@
                     </resource>
                 </resources>
             </xf:instance>
-
             <xf:instance xxf:exclude-result-prefixes="#all" id="note-template">
                 <note-iteration>
                     <note-text/>
                 </note-iteration>
             </xf:instance>
-
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="3" id="grid-1-grid">
+                    <fr:grid columns="3" id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="4">
-                                <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/title/label"/>
-                                    <xf:hint ref="$form-resources/title/hint"/>
-                                    <xf:help ref="$form-resources/title/help"/>
-                                    <xf:alert ref="$form-resources/title/alert"/>
-                                </xf:input>
-                            </fr:c>
+                            <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/title/label"/>
+                                <xf:hint ref="$form-resources/title/hint"/>
+                                <xf:help ref="$form-resources/title/help"/>
+                                <xf:alert ref="$form-resources/title/alert"/>
+                            </xf:input>
+                        </fr:c>
                         <fr:c y="1" x="5" w="4">
-                                <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/author/label"/>
-                                    <xf:hint ref="$form-resources/author/hint"/>
-                                    <xf:help ref="$form-resources/author/help"/>
-                                    <xf:alert ref="$form-resources/author/alert"/>
-                                </xf:input>
-                            </fr:c>
+                            <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/author/label"/>
+                                <xf:hint ref="$form-resources/author/hint"/>
+                                <xf:help ref="$form-resources/author/help"/>
+                                <xf:alert ref="$form-resources/author/alert"/>
+                            </xf:input>
+                        </fr:c>
                         <fr:c y="1" x="9" h="3" w="4">
-                                <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
-                                    <xf:label ref="$form-resources/image/label"/>
-                                    <xf:hint ref="$form-resources/image/hint"/>
-                                    <xf:help ref="$form-resources/image/help"/>
-                                    <xf:alert ref="$form-resources/image/alert"/>
-                                </fr:image-attachment>
-                            </fr:c>
+                            <fr:image-attachment id="image-control" bind="image-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/image/label"/>
+                                <xf:hint ref="$form-resources/image/hint"/>
+                                <xf:help ref="$form-resources/image/help"/>
+                                <xf:alert ref="$form-resources/image/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
                         <fr:c y="2" x="1" w="4">
-                                <xf:select1 id="language-control" bind="language-bind"
-                                        class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/language/label"/>
-                                    <xf:hint ref="$form-resources/language/hint"/>
-                                    <xf:help ref="$form-resources/language/help"/>
-                                    <xf:alert ref="$form-resources/language/alert"/>
-                                    <xf:item>
-                                        <xf:label>Choose One...</xf:label>
-                                        <xf:value/>
-                                    </xf:item>
-                                    <xf:itemset ref="$form-resources/language/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </fr:c>
+                            <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/language/label"/>
+                                <xf:hint ref="$form-resources/language/hint"/>
+                                <xf:help ref="$form-resources/language/help"/>
+                                <xf:alert ref="$form-resources/language/alert"/>
+                                <xf:item>
+                                    <xf:label>Choose One...</xf:label>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:itemset ref="$form-resources/language/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
                         <fr:c y="2" x="5" w="4">
-                                <xf:input id="link-control" bind="link-bind">
-                                    <xf:label ref="$form-resources/link/label"/>
-                                    <xf:hint ref="$form-resources/link/hint"/>
-                                    <xf:help ref="$form-resources/link/help"/>
-                                    <xf:alert ref="$form-resources/link/alert"/>
-                                </xf:input>
-                            </fr:c>
+                            <xf:input id="link-control" bind="link-bind">
+                                <xf:label ref="$form-resources/link/label"/>
+                                <xf:hint ref="$form-resources/link/hint"/>
+                                <xf:help ref="$form-resources/link/help"/>
+                                <xf:alert ref="$form-resources/link/alert"/>
+                            </xf:input>
+                        </fr:c>
                         <fr:c y="3" x="1" w="4">
-                                <xf:select1 id="rating-control" bind="rating-bind" class="fr-width-5em"
-                                        appearance="full xxf:horizontal">
-                                    <xf:label ref="$form-resources/rating/label"/>
-                                    <xf:hint ref="$form-resources/rating/hint"/>
+                            <xf:select1 id="rating-control" bind="rating-bind" appearance="full xxf:horizontal">
+                                <xf:label ref="$form-resources/rating/label"/>
+                                <xf:hint ref="$form-resources/rating/hint"/>
                                 <xf:help ref="$form-resources/rating/help"/>
-                                    <xf:alert ref="$form-resources/rating/alert"/>
-
-                                    <xf:itemset ref="$form-resources/rating/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </fr:c>
+                                <xf:alert ref="$form-resources/rating/alert"/>
+                                <xf:itemset ref="$form-resources/rating/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
                         <fr:c y="3" x="5" w="4">
-                                <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
-                                    <xf:label ref="$form-resources/publication-year/label"/>
-                                    <xf:hint ref="$form-resources/publication-year/hint"/>
-                                    <xf:help ref="$form-resources/publication-year/help"/>
-                                    <xf:alert ref="$form-resources/publication-year/alert"/>
-                                </xf:input>
-                            </fr:c>
+                            <xf:input id="publication-year-control" bind="publication-year-bind">
+                                <xf:label ref="$form-resources/publication-year/label"/>
+                                <xf:hint ref="$form-resources/publication-year/hint"/>
+                                <xf:help ref="$form-resources/publication-year/help"/>
+                                <xf:alert ref="$form-resources/publication-year/alert"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1" id="grid-2-grid">
+                    <fr:grid columns="1" id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="12">
-                                <fr:tinymce id="review-control" bind="review-bind">
-                                    <xf:label ref="$form-resources/review/label"/>
-                                    <xf:hint ref="$form-resources/review/hint"/>
-                                    <xf:help ref="$form-resources/review/help"/>
-                                    <xf:alert ref="$form-resources/review/alert"/>
-                                </fr:tinymce>
-                            </fr:c>
+                            <fr:tinymce id="review-control" bind="review-bind">
+                                <xf:label ref="$form-resources/review/label"/>
+                                <xf:hint ref="$form-resources/review/hint"/>
+                                <xf:help ref="$form-resources/review/help"/>
+                                <xf:alert ref="$form-resources/review/alert"/>
+                            </fr:tinymce>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
-                    <fr:grid repeat="content" bind="note-bind" id="note-grid"
-                             template="instance('note-template')"
-                             min="0">
+                    <fr:grid repeat="content" bind="note-bind" id="note-grid" template="instance('note-template')" min="0">
                         <fr:c y="1" x="1" w="12">
-                                <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
-                                    <xf:label ref="$form-resources/note-text/label"/>
-                                    <xf:hint ref="$form-resources/note-text/hint"/>
-                                    <xf:help ref="$form-resources/note-text/help"/>
-                                    <xf:alert ref="$form-resources/note-text/alert"/>
-                                </xf:textarea>
-                            </fr:c>
+                            <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
+                                <xf:label ref="$form-resources/note-text/label"/>
+                                <xf:hint ref="$form-resources/note-text/hint"/>
+                                <xf:help ref="$form-resources/note-text/help"/>
+                                <xf:alert ref="$form-resources/note-text/alert"/>
+                            </xf:textarea>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

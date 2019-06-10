@@ -54,6 +54,15 @@
         <p:output name="data" id="global-parameters"/>
     </p:processor>
 
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="config"     href="toolbox.xsl"/>
+        <p:input  name="data"               ><dummy/></p:input>
+        <p:input  name="global-template-xbl"><dummy/></p:input>
+        <p:input  name="custom-template-xbl"><dummy/></p:input>
+        <p:input  name="request"   href="#request"/>
+        <p:output name="data"      id="components-but-not-section-templates"/>
+    </p:processor>
+
     <!-- Read template form for global orbeon library -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
@@ -61,9 +70,22 @@
         <p:output name="data" id="global-template-form"/>
     </p:processor>
 
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
+        <p:input name="data"       href="#global-template-form"/>
+        <p:input name="bindings"   href="#components-but-not-section-templates"/>
+        <p:output name="data"      id="global-template-form-annotated"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
+        <p:input name="data"       href="#global-template-form-annotated"/>
+        <p:output name="data"      id="global-template-form-deannotated"/>
+    </p:processor>
+
     <p:processor name="oxf:exception-catcher">
         <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
-        <p:input name="data" href="#global-template-form"/>
+        <p:input name="data" href="#global-template-form-deannotated"/>
         <p:output name="data" id="global-template-form-safe"/>
     </p:processor>
 
@@ -74,24 +96,39 @@
         <p:output name="data" id="custom-template-form"/>
     </p:processor>
 
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
+        <p:input name="data"       href="#custom-template-form"/>
+        <p:input name="bindings"   href="#components-but-not-section-templates"/>
+        <p:output name="data"      id="custom-template-form-annotated"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
+        <p:input name="data"       href="#custom-template-form-annotated"/>
+        <p:output name="data"      id="custom-template-form-deannotated"/>
+    </p:processor>
+
     <p:processor name="oxf:exception-catcher">
         <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
-        <p:input name="data" href="#custom-template-form"/>
+        <p:input name="data" href="#custom-template-form-deannotated"/>
         <p:output name="data" id="custom-template-form-safe"/>
     </p:processor>
 
     <!-- Convert templates to XBL -->
+
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config" href="form-to-xbl.xsl"/>
-        <p:input name="data" href="#global-template-form-safe"/>
+        <p:input name="config"     href="form-to-xbl.xsl"/>
+        <p:input name="data"       href="#global-template-form-safe"/>
         <p:input name="parameters" href="#global-parameters"/>
-        <p:output name="data" id="global-template-xbl"/>
+        <p:output name="data"      id="global-template-xbl"/>
     </p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config" href="form-to-xbl.xsl"/>
-        <p:input name="data" href="#custom-template-form-safe"/>
+        <p:input name="config"     href="form-to-xbl.xsl"/>
+        <p:input name="data"       href="#custom-template-form-safe"/>
         <p:input name="parameters" href="#parameters"/>
-        <p:output name="data" id="custom-template-xbl"/>
+        <p:output name="data"      id="custom-template-xbl"/>
     </p:processor>
 
     <!-- Aggregate results -->

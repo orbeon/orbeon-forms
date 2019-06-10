@@ -17,6 +17,11 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="annotate-design-time.xsl"/>
 
+    <xsl:variable
+        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+        name="metadata-root-id"
+        select="fbf:findMetadataInstanceElem(/)/generate-id()"/>
+
     <xsl:template match="/*/bind">
         <xsl:copy>
             <xsl:apply-templates select="*" mode="within-model"/>

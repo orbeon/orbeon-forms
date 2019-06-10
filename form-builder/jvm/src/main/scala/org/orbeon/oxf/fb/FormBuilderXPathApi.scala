@@ -223,6 +223,10 @@ object FormBuilderXPathApi {
   def findDataInstanceElem(doc: NodeInfo): NodeInfo =
     FormBuilderDocContext(doc).dataInstanceElem
 
+  //@XPathFunction
+  def findMetadataInstanceElem(doc: NodeInfo): NodeInfo =
+    FormBuilderDocContext(doc).metadataInstanceElem
+
   // Create template content from a bind name
   // FIXME: Saxon can pass null as `bindings`.
   //@XPathFunction

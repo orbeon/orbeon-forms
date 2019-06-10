@@ -53,9 +53,7 @@
                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                 xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:xf="http://www.w3.org/2002/xforms"
-                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events"
-                xmlns:xbl="http://www.w3.org/ns/xbl">
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
                 <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:include href="annotate-migrate.xsl"/>
@@ -63,12 +61,14 @@
 
                 <!-- NOTE: `annotate-migrate.xsl` relies on `$model`. -->
                 <xsl:variable
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                     name="model"
-                    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+                    select="fbf:findModelElem(/)"/>
 
                 <xsl:variable
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                     name="metadata-root-id"
-                    select="$model/xf:instance[@id = 'fr-form-metadata']/metadata[1]/generate-id()"/>
+                    select="fbf:findMetadataInstanceElem(/)/generate-id()"/>
 
                 <!-- Add model actions -->
                 <xsl:template match="xf:model[generate-id() = generate-id($model)]">

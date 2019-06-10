@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.{DocumentInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
-// Form Builder migration operations called from XSLT/XForms
+// Form Builder migration operations called from XSLT/XForms. See also `GridDataMigrationTest`.
 object FormBuilderMigrationXPathApi {
 
   //@XPathFunction
@@ -30,15 +30,6 @@ object FormBuilderMigrationXPathApi {
     getFormRunnerBodyElem(doc) descendant * filter isRepeat map getControlName
 
   // Return a sequence of (dataFormatVersion, jsonMigrations)
-  //
-  // Assumptions:
-  //
-  // - grids are not nested (they are not meant to be)
-  // - section templates are not nested (they could be in the future)
-  // - repeated grids can have `repeat="true|content"`
-  //
-  // For an example of JSON, see `MigrationTest`.
-  //
   //@XPathFunction
   def buildGridMigrationMapXPath(
     outerDocument        : DocumentInfo,

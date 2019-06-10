@@ -18,7 +18,6 @@ import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
 import org.orbeon.oxf.fr.datamigration._
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -44,7 +43,7 @@ object FormBuilderMigrationXPathApi {
   def buildGridMigrationMapXPath(
     outerDocument        : DocumentInfo,
     availableXBLBindings : Option[DocumentInfo]
-  ): Seq[String] =
+  ): SequenceIterator =
     MigrationSupport.buildGridMigrationSet(
       outerDocument        = outerDocument,
       availableXBLBindings = availableXBLBindings,

@@ -41,7 +41,7 @@
                 <!-- Add migration information -->
                 <xsl:template match="metadata[generate-id() = $metadata-root-id]">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* | node() except updated-with-version"/>
+                        <xsl:apply-templates select="@* | node() except (updated-with-version | migration)"/>
 
                         <!-- We want the `updated-with-version` to be contiguous, so we explicitly apply the existing ones here. -->
                         <xsl:apply-templates select="updated-with-version"/>
@@ -73,9 +73,6 @@
 
                     </xsl:copy>
                 </xsl:template>
-
-                <!-- Remove existing `migration` element if any-->
-                <xsl:template match="metadata[generate-id() = $metadata-root-id]/migration[@version = '4.8.0']"/>
 
             </xsl:stylesheet>
         </p:input>

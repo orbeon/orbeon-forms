@@ -62,7 +62,13 @@
                 <xsl:include href="annotate-design-time.xsl"/>
 
                 <!-- NOTE: `annotate-migrate.xsl` relies on `$model`. -->
-                <xsl:variable name="model" select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xsl:variable
+                    name="model"
+                    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+
+                <xsl:variable
+                    name="metadata-root-id"
+                    select="$model/xf:instance[@id = 'fr-form-metadata']/metadata[1]/generate-id()"/>
 
                 <!-- Add model actions -->
                 <xsl:template match="xf:model[generate-id() = generate-id($model)]">

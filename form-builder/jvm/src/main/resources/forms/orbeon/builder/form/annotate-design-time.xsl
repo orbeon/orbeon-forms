@@ -42,6 +42,9 @@
         <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
     </xsl:template>
 
+    <!-- Remove migrations as they are recreated at publish time -->
+    <xsl:template match="metadata[generate-id() = $metadata-root-id]/migration" mode="within-model"/>
+
     <!-- Update namespace on actions and services so that they don't run at design time -->
     <!-- NOTE: We disable all event handlers below so this is probably not needed anymore, but Form Builder
          currently (2015-07-06) depends on the fb:* prefixes on the elements. -->

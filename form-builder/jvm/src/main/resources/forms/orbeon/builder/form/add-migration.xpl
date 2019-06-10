@@ -63,7 +63,7 @@
                             name="migration"
                             select="migration:buildGridMigrationMapXPath(/, doc('input:bindings'))"/>
 
-                        <xsl:for-each select="1 to count($migration) div 2">
+                        <xsl:for-each select="1 to count($migration) idiv 2">
                             <xsl:variable name="i" select="."/>
                             <xsl:element name="migration">
                                 <xsl:attribute name="version" select="$migration[$i * 2 - 1]"/>

@@ -207,16 +207,28 @@
         <xsl:variable
             name="dataset-names"
             select="
-                distinct-values(
-                    $action-bindings//
-                        xf:action[
-                            p:has-class('fr-save-to-dataset-action')
-                        ]/
-                        xf:var[@name = 'dataset-name']/
-                        string()
-                )"/>
+                $action-bindings//
+                    xf:action[
+                        p:has-class('fr-save-to-dataset-action')
+                    ]/
+                    xf:var[@name = 'dataset-name']/
+                    string()
+                "/>
 
-        <xsl:for-each select="$dataset-names">
+        <xsl:variable
+            name="actions-20182"
+            select="
+                $model/
+                    fr:action[
+                        @version = '2018.2'
+                    ]"/>
+
+        <xsl:variable
+            name="dataset-names-20182"
+            select="$actions-20182//fr:dataset-write/@name/string()"/>
+
+
+        <xsl:for-each select="distinct-values(($dataset-names, $dataset-names-20182))">
             <xf:instance id="fr-dataset-{.}"><dataset/></xf:instance>
         </xsl:for-each>
 

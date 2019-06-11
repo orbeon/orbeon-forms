@@ -15,15 +15,12 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
-import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, Names}
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -490,13 +487,31 @@ object FormBuilderXPathApi {
   // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
   //@XPathFunction
   def gridCanDoClasses(gridId: String): List[String] = {
+
     implicit val ctx = FormBuilderDocContext()
 
     val container = containerById(gridId)
 
-    "fr-editable"                                     ::
-      (canDeleteGrid(container) list "fb-can-delete") :::
-      (canDeleteRow (container) list "fb-can-delete-row")
+    val directionClasses =
+      ContainerDirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction.entryName }
+
+    "fr-editable"                                          ::
+      directionClasses                                     :::
+      (canDeleteContainer(container) list "fb-can-delete") :::
+      (canDeleteRow      (container) list "fb-can-delete-row")
+  }
+
+  // Return all classes that need to be added to an editable section
+  //@XPathFunction
+  def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
+
+    val directionClasses =
+      ContainerDirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction.entryName }
+
+    val deleteClasses =
+      canDeleteContainer(container) list "fb-can-delete"
+
+    "fr-section-container" :: deleteClasses ::: directionClasses
   }
 
   //@XPathFunction
@@ -511,18 +526,6 @@ object FormBuilderXPathApi {
 
     val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
     rolesJsonOpt.to[List].flatMap(_.parseJson.convertTo[List[String]])
-  }
-
-  // Return all classes that need to be added to an editable section
-  //@XPathFunction
-  def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
-    val directionClasses =
-      DirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction }
-
-    val deleteClasses =
-      canDeleteSection(container) list "fb-can-delete"
-
-    "fr-section-container" :: deleteClasses ::: directionClasses
   }
 
   //@XPathFunction

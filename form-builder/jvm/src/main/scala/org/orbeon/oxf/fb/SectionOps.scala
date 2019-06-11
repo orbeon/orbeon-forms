@@ -24,12 +24,9 @@ trait SectionOps extends ContainerOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  def canDeleteSection(section: NodeInfo): Boolean =
-    canDeleteContainer(section)
-
   def deleteSectionByIdIfPossible(sectionId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     findContainerById(sectionId) flatMap
-      (_ ⇒ deleteContainerById(canDeleteSection, sectionId))
+      (_ ⇒ deleteContainerById(canDeleteContainer, sectionId))
 
   def moveSection(container: NodeInfo, direction: Direction)(implicit ctx: FormBuilderDocContext): Some[UndoAction] = {
 
@@ -48,19 +45,19 @@ trait SectionOps extends ContainerOps {
 
   // Move the section up if possible
   def moveSectionUp(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    if (canMoveUp(container))
+    if (canContainerMove(container, Direction.Up))
       moveContainer(container, container precedingSibling * filter IsContainer head, moveElementBefore)
 
   // Move the section down if possible
   def moveSectionDown(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    if (canMoveDown(container))
+    if (canContainerMove(container, Direction.Down))
       moveContainer(container, container followingSibling * filter IsContainer head, moveElementAfter)
 
   // Move the section right if possible
   def moveSectionRight(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    if (canMoveRight(container)) {
+    if (canContainerMove(container, Direction.Right)) {
 
-      val otherContainer = precedingSection(container).get
+      val otherContainer = firstPrecedingContainerToMoveInto(container).get
       val destIsRepeat   = isRepeat(otherContainer)
 
       // If the destination is a repeat and is not the container itself (which doesn't have a nested iteration
@@ -73,7 +70,7 @@ trait SectionOps extends ContainerOps {
 
   // Move the section left if possible
   def moveSectionLeft(container: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    if (canMoveLeft(container))
+    if (canContainerMove(container, Direction.Left))
       moveContainer(container, findAncestorContainersLeafToRoot(container).head, moveElementAfter)
 
   // Find the section name given a descendant node
@@ -83,30 +80,4 @@ trait SectionOps extends ContainerOps {
   // Find the section name for a given control name
   def findSectionName(doc: NodeInfo, controlName: String): Option[String] =
     findControlByName(doc, controlName) map findSectionName
-
-  // Whether the given container can be moved up
-  def canMoveUp(container: NodeInfo): Boolean =
-    container precedingSibling * exists IsContainer
-
-  // Whether the given container can be moved down
-  def canMoveDown(container: NodeInfo): Boolean =
-    container followingSibling * exists IsContainer
-
-  // Whether the given container can be moved to the right
-  def canMoveRight(container: NodeInfo): Boolean =
-    precedingSection(container) exists canMoveInto
-
-  // Whether the given container can be moved to the left
-  def canMoveLeft(container: NodeInfo): Boolean =
-    canDeleteSection(container) && findAncestorContainersLeafToRoot(container).lengthCompare(2) >= 0
-
-  val DirectionCheck = List(
-    "up"    → canMoveUp _,
-    "right" → canMoveRight _,
-    "down"  → canMoveDown _,
-    "left"  → canMoveLeft _
-  )
-
-  private def precedingSection(container: NodeInfo) =
-    container precedingSibling "*:section" headOption
 }

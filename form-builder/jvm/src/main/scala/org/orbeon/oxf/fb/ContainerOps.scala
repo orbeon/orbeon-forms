@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
@@ -199,6 +200,21 @@ trait ContainerOps extends ControlOps {
   // Later: fr:tab (maybe fr:tabview), wizard
   def canMoveInto(containerElem: NodeInfo): Boolean =
     IsSection(containerElem) && ! (containerElem / * exists isSectionTemplateContent)
+
+  def firstPrecedingContainerToMoveInto(container: NodeInfo): Option[NodeInfo] =
+    container precedingSibling * find canMoveInto
+
+  def canContainerMove(container: NodeInfo, direction: Direction): Boolean =
+    direction match {
+      case Direction.Up    ⇒ container precedingSibling * exists IsContainer
+      case Direction.Right ⇒ firstPrecedingContainerToMoveInto(container).nonEmpty
+      case Direction.Down  ⇒ container followingSibling * exists IsContainer
+      case Direction.Left  ⇒ canDeleteContainer(container) && findAncestorContainersLeafToRoot(container).lengthCompare(if (IsSection(container)) 2 else 3) >= 0
+    }
+
+  val ContainerDirectionCheck: List[(Direction, NodeInfo ⇒ Boolean)] = Direction.values.to[List] map { d ⇒
+    d → (canContainerMove(_, d))
+  }
 
   def isCustomIterationName(controlName: String, iterationName: String): Boolean =
     defaultIterationName(controlName) != iterationName

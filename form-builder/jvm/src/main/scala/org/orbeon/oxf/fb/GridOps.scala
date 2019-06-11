@@ -429,7 +429,7 @@ trait GridOps extends ContainerOps {
 
   def deleteGridByIdIfPossible(gridId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     findContainerById(gridId) flatMap
-      (_ ⇒ deleteContainerById(canDeleteGrid, gridId))
+      (_ ⇒ deleteContainerById(canDeleteContainer, gridId))
 
   def canDeleteRow(gridElem: NodeInfo): Boolean =
     Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells.lengthCompare(1) > 0

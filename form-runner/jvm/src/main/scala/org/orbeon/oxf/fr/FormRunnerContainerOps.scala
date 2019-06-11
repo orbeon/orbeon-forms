@@ -79,7 +79,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def precedingSiblingOrSelfContainers(container: NodeInfo, includeSelf: Boolean = false): List[NodeInfo] =
     (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
 
-  // Find ancestor sections and grids
+  // Find ancestor sections and grids and root
   def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 

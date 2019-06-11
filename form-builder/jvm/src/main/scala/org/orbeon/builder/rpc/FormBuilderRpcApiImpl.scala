@@ -192,9 +192,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
     val containerElem = FormBuilder.containerById(containerId)
 
-    if (FormRunner.IsGrid(containerElem) && FormBuilder.canDeleteGrid(containerElem) ||
-      FormRunner.IsSection(containerElem) && FormBuilder.canDeleteSection(containerElem)) {
-
+    if (FormBuilder.canDeleteContainer(containerElem)) {
       containerCopy(containerId)
       containerDelete(containerId)
     }

@@ -40,12 +40,11 @@ object SectionGridEditor {
 
     object ContainerEditor extends Enum[ContainerEditor] {
       val values = findValues
-      case object SectionDelete        extends ContainerEditor
       case object SectionMoveUp        extends ContainerEditor
       case object SectionMoveDown      extends ContainerEditor
       case object SectionMoveRight     extends ContainerEditor
       case object SectionMoveLeft      extends ContainerEditor
-      case object GridDelete           extends ContainerEditor
+      case object ContainerDelete      extends ContainerEditor
       case object ContainerEditDetails extends ContainerEditor
       case object ContainerCopy        extends ContainerEditor
       case object ContainerCut         extends ContainerEditor
@@ -54,7 +53,7 @@ object SectionGridEditor {
 
     import ContainerEditor._
 
-    val SectionAlwaysVisibleIcons =
+    val SectionGridAlwaysVisibleIcons =
       List(
         ContainerEditDetails,
         ContainerCopy
@@ -84,15 +83,9 @@ object SectionGridEditor {
         // Start by hiding all the icons
         sectionGridEditorContainer.children().hide()
 
-        // Sections
-        if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
+        def showContainerIcons(container: JQuery) = {
 
-          // Icons which are always visible
-          sectionGridEditorContainer.children(SectionAlwaysVisibleIcons map (_.className) mkString ",").show()
-
-          // Hide/show section move icons
-          val container = sectionGridBody.el.children(".fr-section-container")
-          Direction.values foreach { direction ⇒
+           Direction.values foreach { direction ⇒
 
             val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
@@ -101,7 +94,18 @@ object SectionGridEditor {
               trigger.show()
           }
 
-          hideShowCutDeleteIcons(container, SectionDelete)
+          hideShowCutDeleteIcons(container, ContainerDelete)
+        }
+
+        // Icons which are always visible
+        sectionGridEditorContainer.children(SectionGridAlwaysVisibleIcons map (_.className) mkString ",").show()
+
+        // Sections
+        if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
+
+          // Hide/show section move icons
+          val container = sectionGridBody.el.children(".fr-section-container")
+          showContainerIcons(container)
 
           if (container.find(".fr-section-component").length > 0)
             sectionGridEditorContainer.children(ContainerMerge.className).show()
@@ -110,12 +114,10 @@ object SectionGridEditor {
         // Grids
         if (sectionGridBody.el.is(BlockCache.GridSelector)) {
 
-          val frGridEl = sectionGridBody.el.children(".fr-grid")
-          frGridEl.addClass("fb-hover")
-          sectionGridEditorContainer.children(ContainerEditDetails.className).show()
+          val container = sectionGridBody.el.children(".fr-grid")
+          showContainerIcons(container)
 
-          hideShowCutDeleteIcons(frGridEl, GridDelete)
-          sectionGridEditorContainer.children(ContainerCopy.className).show()
+          container.addClass("fb-hover")
         }
 
         def hideShowCutDeleteIcons(
@@ -147,12 +149,11 @@ object SectionGridEditor {
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
-            case SectionDelete        ⇒ client.containerDelete     (sectionGridId).call()
             case SectionMoveUp        ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
             case SectionMoveDown      ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
             case SectionMoveRight     ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
             case SectionMoveLeft      ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
-            case GridDelete           ⇒ client.containerDelete     (sectionGridId).call()
+            case ContainerDelete      ⇒ client.containerDelete     (sectionGridId).call()
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
             case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()

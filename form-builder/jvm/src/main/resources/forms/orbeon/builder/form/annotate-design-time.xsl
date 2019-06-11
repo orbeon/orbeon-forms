@@ -72,8 +72,10 @@
         <xsl:copy>
             <xsl:attribute name="edit-ref"/>
             <xsl:attribute name="xxf:update" select="'full'"/>
-            <!-- Save current value of @open as @fb:open -->
-            <xsl:if test="@open"><xsl:attribute name="fb:open" select="@open"/></xsl:if>
+            <!-- Save current value of `@open` as `@fb:open` -->
+            <xsl:if test="exists(@open)"><xsl:attribute name="fb:open" select="@open"/></xsl:if>
+            <!-- Save current value of `@collapsible` as `@fb:collapsible` (converting from `@collapse` as well) -->
+            <xsl:if test="exists(@collapse | @collapsible)"><xsl:attribute name="fb:collapsible" select="(@collapse | @collapsible)[1]"/></xsl:if>
             <!-- If "many" controls close all sections but the first -->
             <xsl:choose>
                 <xsl:when test="$many-controls and empty(preceding::fr:section)">
@@ -87,7 +89,7 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:apply-templates select="@* except @open | node()" mode="#current"/>
+            <xsl:apply-templates select="(@* except (@open | @collapse | @collapsible)) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

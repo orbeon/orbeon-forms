@@ -42,7 +42,7 @@
 
                 <xf:action if="$i/container-type = 'section'">
                     <xf:setvalue ref="$i/initially-open"             value="not($control/@fb:open = 'false')"/>
-                    <xf:setvalue ref="$i/collapsible"                value="(for $a in $control/(@collapse, @collapsible)[1] return $a = 'true', 'default')[1]"/>
+                    <xf:setvalue ref="$i/collapsible"                value="(for $a in $control/@fb:collapsible return $a = 'true', 'default')[1]"/>
                 </xf:action>
                 <xf:action if="not($i/container-type = 'section')">
                     <xf:setvalue ref="$i/initially-open"             value="false()"/>
@@ -204,8 +204,8 @@
                         <xf:insert if="not(data($i/initially-open))" context="$control" origin="xf:attribute('fb:open', 'false')"/>
 
                         <!-- Collapsible -->
-                        <xf:delete if="$i/collapsible = 'default'"      ref="$control/(@collapse, @collapsible)"/>
-                        <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xf:attribute('collapsible', $i/collapsible = true())"/>
+                        <xf:delete if="$i/collapsible = 'default'"      ref="$control/@fb:collapsible"/>
+                        <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xf:attribute('fb:collapsible', $i/collapsible = true())"/>
                     </xf:action>
                 </xf:action>
 

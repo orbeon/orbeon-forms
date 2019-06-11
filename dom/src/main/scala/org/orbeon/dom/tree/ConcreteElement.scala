@@ -55,6 +55,7 @@ class ConcreteElement(var qname: QName)
 
   override def setParent(parent: Element): Unit = {
 
+    // 2019-05-16: Not sure that this test does: in which case would we *not* set `_parentBranch`?
     if (_parentBranch.isInstanceOf[Element] || (parent ne null))
       _parentBranch = parent
 

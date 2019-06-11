@@ -29,6 +29,7 @@ object GridDataMigration {
     metadata  : Option[DocumentInfo]
   ): DocumentInfo =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
+      appForm       = AppForm(app, form),
       data          = data,
       metadataOpt   = metadata,
       srcVersion    = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
@@ -39,12 +40,15 @@ object GridDataMigration {
 
   //@XPathFunction
   def dataMaybeMigratedFromEdge(
+    app                     : String,
+    form                    : String,
     data                    : DocumentInfo,
     metadataOpt             : Option[DocumentInfo],
     dataFormatVersionString : String,
     pruneMetadata           : Boolean
   ): DocumentInfo =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
+      appForm       = AppForm(app, form),
       data          = data,
       metadataOpt   = metadataOpt,
       srcVersion    = DataFormatVersion.Edge,
@@ -55,11 +59,14 @@ object GridDataMigration {
 
   //@XPathFunction
   def dataMigratedToEdgeOrEmpty(
+    app                     : String,
+    form                    : String,
     data                    : DocumentInfo,
     metadataOpt             : Option[DocumentInfo],
     dataFormatVersionString : String
   ): Option[DocumentWrapper] =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
+      appForm       = AppForm(app, form),
       data          = data,
       metadataOpt   = metadataOpt,
       srcVersion    = dataFormatVersionString.trimAllToOpt    map

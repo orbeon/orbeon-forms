@@ -145,6 +145,8 @@
                         let $format-migrated :=
                             (
                                 grid-migration:dataMigratedToEdgeOrEmpty(
+                                    $app,
+                                    $form,
                                     $form-data,
                                     xxf:instance('fr-form-metadata')/root(),
                                     xxf:get-request-parameter('data-format-version')
@@ -743,6 +745,8 @@
                 as="document-node()?"
                 value="
                     grid-migration:dataMigratedToEdgeOrEmpty(
+                        $app,
+                        $form,
                         $body/root(),
                         xxf:instance('fr-form-metadata')/root(),
                         '4.0.0' (: as documented as of 2019.1 :)

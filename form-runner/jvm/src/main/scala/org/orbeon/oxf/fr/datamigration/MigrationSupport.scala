@@ -18,7 +18,7 @@ import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{DataFormatVersion, XMLNames}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, XMLNames}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
@@ -34,6 +34,8 @@ import scala.collection.{immutable ⇒ i}
 object MigrationSupport {
 
   val AllMigrationOps: List[MigrationOps] = List(MigrationOps48, MigrationOps20191)
+
+  val FormBuilderAppName = AppForm("orbeon", "builder")
 
   // `val migrationsFromForm: (ops: MigrationOps) ⇒ ops.M ` = ops ⇒ ...`
   class MigrationsFromForm(
@@ -179,28 +181,31 @@ object MigrationSupport {
     }
 
   def migrateDataWithFormMetadataMigrations(
+    appForm       : AppForm,
     data          : DocumentInfo,
     metadataOpt   : Option[DocumentInfo],
     srcVersion    : DataFormatVersion,
     dstVersion    : DataFormatVersion,
     pruneMetadata : Boolean
-  ): Option[DocumentWrapper] = {
+  ): Option[DocumentWrapper] =
+    appForm match {
+      case FormBuilderAppName ⇒ None
+      case _ ⇒
+        val mutableData = copyDocumentKeepInstanceData(data)
 
-    val mutableData = copyDocumentKeepInstanceData(data)
+        val result =
+          migrateDataInPlace(
+            dataRootElem     = mutableData.rootElement.asInstanceOf[NodeWrapper],
+            srcVersion       = srcVersion,
+            dstVersion       = dstVersion,
+            findMigrationSet = new MigrationsFromMetadata(metadataOpt)
+          )
 
-    val result =
-      migrateDataInPlace(
-        dataRootElem     = mutableData.rootElement.asInstanceOf[NodeWrapper],
-        srcVersion       = srcVersion,
-        dstVersion       = dstVersion,
-        findMigrationSet = new MigrationsFromMetadata(metadataOpt)
-      )
+        if (pruneMetadata)
+          pruneFormRunnerMetadataFromMutableData(mutableData)
 
-    if (pruneMetadata)
-      pruneFormRunnerMetadataFromMutableData(mutableData)
-
-    result == MigrationResult.Some || pruneMetadata option mutableData
-  }
+        result == MigrationResult.Some || pruneMetadata option mutableData
+    }
 
   // TODO: This is not strictly related to migration, maybe move somewhere else.
   def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =

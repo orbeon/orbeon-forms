@@ -40,6 +40,8 @@
                    metadata:createFormMetadataDocument()
                 else
                    migration:dataMaybeMigratedFromEdge(
+                       fr:app-name(),
+                       fr:form-name(),
                        xxf:instance('fr-form-instance')/root(),
                        xxf:instance('fr-form-metadata')/root(),
                        instance('fr-send-submission-params')/@data-format-version,

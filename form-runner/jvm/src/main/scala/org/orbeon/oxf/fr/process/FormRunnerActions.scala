@@ -179,7 +179,7 @@ trait FormRunnerActions {
 
       (beforeURLs, afterURLs, isDraft)
     } map {
-      case result @ (beforeURLs, afterURLs, isDraft) ⇒
+      case result @ (_, _, isDraft) ⇒
         // Mark data clean
         trySetDataStatus(Map(Some("status") → "safe", Some("draft") → isDraft.toString))
         result

@@ -233,17 +233,25 @@ body.orbeon {
     // Style static readonly plain text and rich text the same as Bootstrap's pre (see code.less)
     .fr-grid .xforms-static.xforms-readonly {
         &.xforms-textarea pre, &.xforms-output.xforms-mediatype-text-html {
-            &:not(.xforms-text) {
-                color: @grayDark;
-                display: block;
-                padding: (@baseLineHeight - 1) / 2; // We override these in form-runner-base.less, do we need this here?
-                margin: 0 0 @baseLineHeight / 2;    // We override these in form-runner-base.less, do we need this here?
-                font-size: @baseFontSize - 1;       // 14px to 13px
-                line-height: @baseLineHeight;
-                background-color: darken(@inputBackground, 5%);
-                border: 1px solid rgba(0, 0, 0, .15);
-                .border-radius(4px);
-            }
+            color: @grayDark;
+            display: block;
+            padding: (@baseLineHeight - 1) / 2; // We override these in form-runner-base.less, do we need this here?
+            margin: 0 0 @baseLineHeight / 2;    // We override these in form-runner-base.less, do we need this here?
+            font-size: @baseFontSize - 1;       // 14px to 13px
+            line-height: @baseLineHeight;
+            background-color: darken(@inputBackground, 5%);
+            border: 1px solid @inputBorder;
+            .border-radius(@inputBorderRadius);
+        }
+
+        // See https://github.com/orbeon/orbeon-forms/issues/3988
+        // Use `:not(.xforms-text)` above instead once supported by the PDF renderer.
+        &.xforms-output.xforms-mediatype-text-html.xforms-text {
+            color: @textColor;
+            padding: 0;
+            margin: 0;
+            background-color: @bodyBackground;
+            border: none;
         }
     }
 

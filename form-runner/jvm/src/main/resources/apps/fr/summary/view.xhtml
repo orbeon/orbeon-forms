@@ -705,12 +705,21 @@
                                             <xf:input ref=".[@control = ('input', 'inplace-input', 'output')]">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
-                                            <fr:number ref=".[@control = 'number']">
+                                            <fr:number ref=".[@control = 'number']" field-width="full">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </fr:number>
-                                            <fr:currency ref=".[@control ='currency']">
+                                            <fr:currency ref=".[@control ='currency']" field-width="full">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </fr:currency>
+                                            <fr:date ref=".[@control ='date']" field-width="full">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:date>
+                                            <fr:time ref=".[@control ='time']" field-width="full">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:time>
+                                            <fr:datetime ref=".[@control ='datetime']" field-width="full">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:datetime>
                                             <!-- textarea -->
                                             <xf:input ref=".[@control = 'textarea']">
                                                 <xf:label mediatype="text/html" value="$label"/>

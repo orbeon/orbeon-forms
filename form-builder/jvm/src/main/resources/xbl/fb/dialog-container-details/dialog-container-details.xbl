@@ -57,6 +57,8 @@
                 <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then frf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
+                <xf:setvalue ref="$i/appearance"                     value="($control/@appearance, 'default')[1]"/>
+
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/freeze"                         value="fbf:getNormalizedFreeze($form, $i/control-name)"/>
@@ -207,6 +209,10 @@
                         <xf:delete if="$i/collapsible = 'default'"      ref="$control/@fb:collapsible"/>
                         <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xf:attribute('fb:collapsible', $i/collapsible = true())"/>
                     </xf:action>
+
+                    <xf:delete if="$i/appearance = 'default'"      ref="$control/@appearance"/>
+                    <xf:insert if="not($i/appearance = 'default')" context="$control" origin="xf:attribute('appearance', $i/appearance/string())"/>
+
                 </xf:action>
 
             </xbl:handler>
@@ -289,6 +295,8 @@
 
                         <apply-defaults/>
                         <initial-iterations/>
+
+                        <appearance/>
 
                         <min-repeat/>
                         <max-repeat/>
@@ -639,6 +647,18 @@
                                                 <xf:hint  ref="$resources/dialog-container-details/iteration-name/hint"/>
                                                 <xf:alert ref="$resources/dialog-container-details/iteration-name/alert"/>
                                             </xf:input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="appearance" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-container-details/appearance-minimal/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-details/appearance-minimal/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'minimal' else 'full'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>

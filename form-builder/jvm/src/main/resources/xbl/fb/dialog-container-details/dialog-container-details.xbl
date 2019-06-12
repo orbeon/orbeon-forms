@@ -544,18 +544,6 @@
                             <xf:group ref=".[is-repeat = true()]">
                                 <fr:grid id="repeat-tab-grid-2">
                                     <xh:tr>
-                                        <xh:td colspan="1">
-                                            <fr:checkbox-input ref="apply-defaults">
-                                                <xf:label ref="$resources/dialog-container-details/apply-defaults/label"/>
-                                            </fr:checkbox-input>
-                                        </xh:td>
-                                        <xh:td colspan="1">
-                                            <fr:checkbox-input ref="initial-iterations">
-                                                <xf:label ref="$resources/dialog-container-details/initial-iterations/label"/>
-                                            </fr:checkbox-input>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="$i/min-repeat" appearance="full" id="min-repeat">
                                                 <xf:label value="$resources/dialog-container-details/min/label"/>
@@ -604,7 +592,7 @@
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
-                                        <xh:td rowspan="2">
+                                        <xh:td>
                                             <xf:select1 ref="$i/freeze" appearance="full" id="freeze">
                                                 <xf:label value="$resources/dialog-container-details/freeze/label"/>
                                                 <xf:item>
@@ -629,6 +617,31 @@
                                             </xf:input>
                                         </xh:td>
                                         <xh:td>
+                                            <xf:select1 ref="appearance" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-container-details/appearance-minimal/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-details/appearance-minimal/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'minimal' else 'full'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td colspan="1">
+                                            <fr:checkbox-input ref="apply-defaults">
+                                                <xf:label ref="$resources/dialog-container-details/apply-defaults/label"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                        <xh:td colspan="1">
+                                            <fr:checkbox-input ref="initial-iterations">
+                                                <xf:label ref="$resources/dialog-container-details/initial-iterations/label"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+
+                                    <xh:tr>
+                                        <xh:td>
                                             <fr:checkbox-input ref="is-custom-iteration-name">
                                                 <xf:label ref="$resources/dialog-container-details/custom-iteration-name/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-details/custom-iteration-name/hint"/>
@@ -639,26 +652,12 @@
                                                 </xf:action>
                                             </fr:checkbox-input>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <xf:input ref="custom-iteration-name[$i/is-custom-iteration-name = true()]" incremental="true" >
                                                 <xf:label ref="$resources/dialog-container-details/iteration-name/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-details/iteration-name/hint"/>
                                                 <xf:alert ref="$resources/dialog-container-details/iteration-name/alert"/>
                                             </xf:input>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:select1 ref="appearance" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-container-details/appearance-minimal/label"/>
-                                                <xf:hint  ref="$resources/dialog-container-details/appearance-minimal/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'minimal' else 'full'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>

@@ -845,6 +845,9 @@
                         name="static-is-top-level-section"
                         select="empty($static-current-section/ancestor::fr:section)"/>
                     <xsl:variable
+                        name="static-section-has-html-label"
+                        select="$static-current-section/xf:label/@mediatype = 'text/html'"/>
+                    <xsl:variable
                         name="static-top-level-section-id"
                         select="($static-current-section/ancestor-or-self::fr:section/@id)[1]"/>
                     <xsl:variable
@@ -903,7 +906,9 @@
 
                             <xf:trigger appearance="minimal">
                                 <xf:label>
-                                    <xf:output value="$section-label"/>
+                                    <xf:output value="$section-label">
+                                        <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
+                                    </xf:output>
                                     <xh:span class="fr-toc-edit"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                     <xsl:if test="$static-is-top-level-section">
                                         <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
@@ -930,7 +935,9 @@
                                                 )"/></xh:span>
                                     </xsl:if>
                                 </xf:label>
-                                <xf:hint value="$section-label"/>
+                                <xf:hint value="$section-label">
+                                    <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
+                                </xf:hint>
                                 <!-- DOMActivate handler which depends on `$static-validation-mode` -->
                                 <xsl:copy-of select="$do-next-handler"/>
                                 <xf:action event="fr-do-next" if="$top-level-section-available">

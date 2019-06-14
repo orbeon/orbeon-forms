@@ -479,7 +479,7 @@ public class XFormsUtils {
      * @param document      the Document to display
      */
     public static void logDebugDocument(String debugMessage, Document document) {
-        DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToPrettyString(document));
+        DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToPrettyStringJava(document));
     }
 
     /**

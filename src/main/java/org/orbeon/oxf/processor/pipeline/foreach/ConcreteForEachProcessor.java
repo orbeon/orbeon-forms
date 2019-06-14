@@ -72,7 +72,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             if (logger.isDebugEnabled()) {
                 final ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                 astPipeline.walk(astDocumentHandler);
-                logger.debug("Iteration pipeline:\n" + Dom4jUtils.domToStringJava(astDocumentHandler.getDocument().getRootElement()));
+                logger.debug("Iteration pipeline:\n" + Dom4jUtils.domToStringJava(astDocumentHandler.getDocument()));
             }
             forEachBlockProcessor = new PipelineProcessor(astPipeline);
         }

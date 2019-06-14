@@ -140,7 +140,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                             }
                                         });
                                         verifierFactory.setFeature(Const.PANIC_MODE_FEATURE, false);
-                                        final InputSource is = new InputSource(new StringReader(Dom4jUtils.domToStringJava(schemaDoc.getRootElement())));
+                                        final InputSource is = new InputSource(new StringReader(Dom4jUtils.domToStringJava(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
                                         // Just a precaution, as the factory is not thread-safe. Does this makes sense?

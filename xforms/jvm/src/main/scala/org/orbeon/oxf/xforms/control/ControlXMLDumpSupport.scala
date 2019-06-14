@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
+
 import collection.JavaConverters._
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.saxon.om.{NodeInfo, Item}
+import org.orbeon.saxon.om.{Item, NodeInfo}
 
 trait ControlXMLDumpSupport extends DebugXML{
 
@@ -53,7 +55,7 @@ trait ControlXMLDumpSupport extends DebugXML{
   }
 
   def toXMLString =
-    Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this))
+    Dom4jUtils.createDocument(this).getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
   def dumpXML(): Unit =
     println(toXMLString)

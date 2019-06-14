@@ -101,7 +101,7 @@ public class BeanGenerator extends ProcessorImpl {
                         Document dom = readInputAsOrbeonDom(context, input);
 
                         Mapping mapping = new Mapping();
-                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToStringJava(dom.getRootElement()))));
+                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToStringJava(dom))));
 
                         return mapping;
                     } catch (Exception e) {

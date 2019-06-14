@@ -169,8 +169,8 @@ public class TestScriptProcessor extends ProcessorImpl {
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
                 if (!Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
-                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + Dom4jUtils.domToCompactString(actualDocument)
-                        +  " ', but expected '" + Dom4jUtils.domToCompactString(expectedDocument) + "'.");
+                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + Dom4jUtils.domToCompactStringJava(actualDocument)
+                        +  " ', but expected '" + Dom4jUtils.domToCompactStringJava(expectedDocument) + "'.");
 
             } else {
                 throw new IllegalArgumentException("Not implemented yet.");

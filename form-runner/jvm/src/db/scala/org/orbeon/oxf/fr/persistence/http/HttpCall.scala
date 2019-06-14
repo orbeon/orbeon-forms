@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.http
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.Operations
@@ -108,8 +109,8 @@ private[persistence] object HttpCall {
             val resultDoc  = Dom4jUtils.readDom4j(new ByteArrayInputStream(actualBody))
             if (! Dom4j.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
-                Dom4jUtils.domToPrettyString(resultDoc) ===
-                Dom4jUtils.domToPrettyString(expectedDoc)
+                resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
+                  expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
               )
           case HttpCall.Binary(expectedFile) ⇒
             assert(actualBody == expectedFile)
@@ -161,7 +162,7 @@ private[persistence] object HttpCall {
     }
 
     val messageBody = body map {
-      case XML   (doc ) ⇒ Dom4jUtils.domToStringJava(doc.getRootElement).getBytes
+      case XML   (doc ) ⇒ doc.getRootElement.serializeToString().getBytes
       case Binary(file) ⇒ file
     }
 

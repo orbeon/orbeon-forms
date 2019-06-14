@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
@@ -587,7 +588,7 @@ class XFormsServer extends ProcessorImpl {
     val logRequestResponse = XFormsProperties.getDebugLogging.contains("server-body")
 
     if (logRequestResponse)
-      debug("ajax request", List("body" → Dom4jUtils.domToPrettyString(requestDocument)))
+      debug("ajax request", List("body" → requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
 
     // Get action
     val actionElement = requestDocument.getRootElement.element(XFormsConstants.XXFORMS_ACTION_QNAME)
@@ -763,7 +764,7 @@ class XFormsServer extends ProcessorImpl {
                               }
 
                               debugContentHandlerOpt foreach { debugContentHandler ⇒
-                                debugResults(List("ajax response" → Dom4jUtils.domToPrettyString(debugContentHandler.getDocument)))
+                                debugResults(List("ajax response" → debugContentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
                               }
                             }
                           }
@@ -783,7 +784,7 @@ class XFormsServer extends ProcessorImpl {
               case NonFatal(t) ⇒
                 // Log body of Ajax request if needed
                 if (XFormsProperties.getErrorLogging.contains("server-body"))
-                  indentedLogger.logError("", "error processing Ajax update", "request", Dom4jUtils.domToPrettyString(requestDocument))
+                  indentedLogger.logError("", "error processing Ajax update", "request", requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
 
                 // Don't keep the document around
                 throw new OXFException(t)

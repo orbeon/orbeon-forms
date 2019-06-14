@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.log4j.Logger;
+import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.cache.*;
@@ -374,7 +375,8 @@ public class URLGenerator extends ProcessorImpl {
                 final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
                     readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<ConfigURIReferences>() {
                         public ConfigURIReferences read(PipelineContext context, ProcessorInput input) {
-                            final Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
+                            final Document configDocument = readInputAsOrbeonDom(context, input);
+                            final Element configElement = configDocument.getRootElement();
 
                             // Processor location data
                             final LocationData locationData = URLGenerator.this.getLocationData();
@@ -391,7 +393,7 @@ public class URLGenerator extends ProcessorImpl {
                             // We have the /config/url syntax
                             final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
                             if (url == null) {
-                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToStringJava(configElement), locationData);
+                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToStringJava(configDocument), locationData);
                             }
 
                             // Get content-type

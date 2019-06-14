@@ -263,8 +263,8 @@ class XBLBindings(
 
     if (logShadowTrees)
       debugResults(Seq(
-        "full tree"    → Dom4jUtils.domToStringJava(TransformerUtils.saxStoreToDom4jDocument(templateTree).getRootElement),
-        "compact tree" → Dom4jUtils.domToStringJava(compactTree.getRootElement)
+        "full tree"    → TransformerUtils.saxStoreToDom4jDocument(templateTree).getRootElement.serializeToString(),
+        "compact tree" → compactTree.getRootElement.serializeToString()
       ))
 
     // Result is full annotated tree and, if needed, the compact tree

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -461,6 +462,6 @@ object XFormsStaticStateImpl {
       EncodeDecode.encodeXML(xmlDocument, true, isClientStateHandling, true) // compress = true, encrypt = isClientStateHandling, location = true
 
     def dump() =
-      println(Dom4jUtils.domToPrettyString(xmlDocument))
+      println(xmlDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
   }
 }

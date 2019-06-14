@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 
 import org.orbeon.dom.Element
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
@@ -272,5 +273,5 @@ class PartAnalysisImpl(
     controlAnalysisMap(startScope.prefixedIdForStaticId(Constants.DocumentId)).toXML(helper)
 
   def dumpAnalysis(): Unit =
-    println(Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this)))
+    println(Dom4jUtils.createDocument(this).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 }

@@ -17,14 +17,15 @@ import java.io.{File, FileInputStream}
 import java.security.SignatureException
 
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.errorified.Exceptions
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
 import org.orbeon.oxf.util.DateUtils._
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -182,7 +183,8 @@ private object PEVersion {
       val key = createURLGenerator(OrbeonPublicKeyURL)
 
       // Remove blank spaces as that's the way it was signed
-      val inputLicenseDocument = Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawDocument))
+      val inputLicenseDocument =
+        Dom4jUtils.readDom4j(rawDocument.getRootElement.serializeToString(XMLWriter.CompactFormat))
 
       // Connect pipeline
       val serializer = {

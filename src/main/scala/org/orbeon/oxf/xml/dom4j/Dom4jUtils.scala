@@ -18,7 +18,6 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
-import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.StringUtils
@@ -50,41 +49,16 @@ object Dom4jUtils {
     * Convert an XML string to a prettified XML string.
     */
   def prettyfy(xmlString: String): String =
-    domToPrettyString(readDom4j(xmlString))
+    readDom4j(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
-  /**
-    * Convert a dom4j document to a pretty string, for formatting/debugging purposes only.
-    *
-    * @param document document to convert
-    * @return resulting string
-    */
-  def domToPrettyString(document: Document): String =
-    domToPrettyString(document.getRootElement)
+  def domToPrettyStringJava(document: Document): String =
+    document.getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
-  def domToPrettyString(elem: Element): String =
-    domToString(elem, OutputFormat(indent = true, newlines = true, trimText = true))
+  def domToCompactStringJava(document: Document): String =
+    document.getRootElement.serializeToString(XMLWriter.CompactFormat)
 
-  /**
-    * Convert a dom4j document to a compact string, with all text being trimmed.
-    *
-    * @param document document to convert
-    * @return resulting string
-    */
-  def domToCompactString(document: Document): String =
-    domToString(document.getRootElement, OutputFormat(indent = false, newlines = false, trimText = true))
-
-  // 16 usages
-  def domToStringJava(elem: Element): String =
-    domToString(elem, XMLWriter.DefaultFormat)
-
-  // 4 usages
-  def domToString(node: Node, format: OutputFormat = XMLWriter.DefaultFormat): String =
-    IOUtils.useAndClose(new StringBuilderWriter) { writer ⇒
-      val xmlWriter =
-        new XMLWriter(writer, if (format eq null) XMLWriter.DefaultFormat else format)
-      xmlWriter.write(node)
-      writer.result
-    }
+  def domToStringJava(elem: Document): String =
+    elem.getRootElement.serializeToString(XMLWriter.DefaultFormat)
 
   def readDom4j(reader: Reader): Document =
     createSAXReader.read(reader)

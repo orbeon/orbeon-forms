@@ -1,8 +1,20 @@
 package org.orbeon.dom
 
+import org.orbeon.dom.io.{OutputFormat, XMLWriter}
 import org.orbeon.dom.tree.{AbstractNode, WithParent}
+import org.orbeon.io.{IOUtils, StringBuilderWriter}
 
 object Node {
+
+  implicit class NodeOps(val n: Node) extends AnyVal {
+
+    def serializeToString(format: OutputFormat = XMLWriter.DefaultFormat): String =
+      IOUtils.useAndClose(new StringBuilderWriter) { writer ⇒
+        new XMLWriter(writer, format).write(n)
+        writer.result
+      }
+  }
+
   def nodeTypeName(node: Node): String = node match {
     case _: Element               ⇒ "Element"
     case _: Attribute             ⇒ "Attribute"

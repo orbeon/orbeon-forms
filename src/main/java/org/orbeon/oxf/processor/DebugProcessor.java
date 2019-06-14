@@ -70,7 +70,7 @@ public class DebugProcessor extends ProcessorImpl {
                         // Send to log4j
                         logger.info(debugMessage + ":\n"
                                 + (debugLocationData != null ? debugLocationData.toString() + "\n" : "")
-                                + Dom4jUtils.domToPrettyString(loggedDocument));
+                                + Dom4jUtils.domToPrettyStringJava(loggedDocument));
 
                         // Set to output
                         saxStore.replay(xmlReceiver);

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import java.{util ⇒ ju}
 
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
@@ -239,7 +240,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         helper.endDocument()
 
         debugContentHandler foreach
-          (ch ⇒ debugResults(Seq("ajax response" → Dom4jUtils.domToPrettyString(ch.getDocument))))
+          (ch ⇒ debugResults(Seq("ajax response" → ch.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))))
       }
 
       true

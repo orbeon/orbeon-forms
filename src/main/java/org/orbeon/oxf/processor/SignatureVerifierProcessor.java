@@ -69,7 +69,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final Document sigData = Document.apply();
                     sigData.add(sigDataNode);
 
-                    dsa.update(Dom4jUtils.domToStringJava(sigData.getRootElement()).getBytes(CharsetNames.Utf8()));
+                    dsa.update(Dom4jUtils.domToStringJava(sigData).getBytes(CharsetNames.Utf8()));
 
                     // Verify signature and throw in case of failure
                     try {

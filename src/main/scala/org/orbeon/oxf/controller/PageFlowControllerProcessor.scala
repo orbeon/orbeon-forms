@@ -16,6 +16,7 @@ package org.orbeon.oxf.controller
 import java.util.regex.Pattern
 import java.util.{List ⇒ JList, Map ⇒ JMap}
 
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
@@ -338,7 +339,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         ast.walk(astDocumentHandler)
         debug(
           "created PFC pipeline",
-          Seq("path" → page.path, "pipeline" → ('\n' + domToPrettyString(astDocumentHandler.getDocument)))
+          Seq("path" → page.path, "pipeline" → ('\n' + astDocumentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
         )
       }
 

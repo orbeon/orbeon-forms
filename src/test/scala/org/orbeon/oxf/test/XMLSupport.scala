@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.test
 
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.io.IOUtils._
@@ -39,7 +40,10 @@ trait XMLSupport extends AssertionsForJUnit {
 
     // Produce a nicer message
     if (! result) {
-      assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
+      assert(
+        left.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
+          right.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+      )
       assert(false)
     }
   }
@@ -50,7 +54,10 @@ trait XMLSupport extends AssertionsForJUnit {
 
     // Produce a nicer message
     if (! result) {
-      assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
+      assert(
+        left.serializeToString(XMLWriter.PrettyFormat) ===
+          right.serializeToString(XMLWriter.PrettyFormat)
+      )
       assert(false)
     }
   }

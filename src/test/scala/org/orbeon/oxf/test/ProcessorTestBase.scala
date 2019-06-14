@@ -14,6 +14,7 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.Version
@@ -69,7 +70,10 @@ abstract class ProcessorTestBase(
           runOneTest(descriptor) match {
             case SuccessTestResult ⇒
             case FailedTestResult(expected, actual) ⇒
-              assert(Dom4jUtils.domToPrettyString(expected) === Dom4jUtils.domToPrettyString(actual))
+              assert(
+                expected.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
+                  actual.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+              )
               assert(false)
             case ErrorTestResult(t) ⇒
               throw Exceptions.getRootThrowable(t)

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -48,7 +49,7 @@ trait FormBuilderSupport extends XFormsSupport {
     }
 
   def prettyPrintElem(elem: NodeInfo): Unit =
-    println(Dom4jUtils.domToPrettyString(TransformerUtils.tinyTreeToDom4j(elem)))
+    println(TransformerUtils.tinyTreeToDom4j(elem).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 
   private def formBuilderDoc(url: String): Document =
     NodeConversions.elemToDom4j(

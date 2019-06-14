@@ -840,7 +840,7 @@ public class NetUtils {
     }
 
     public static void debugLogRequestAsXML(final ExternalContext.Request request) {
-        System.out.println(Dom4jUtils.domToPrettyString(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
+        System.out.println(Dom4jUtils.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
     }
 
     public static boolean isSuccessCode(int code) {

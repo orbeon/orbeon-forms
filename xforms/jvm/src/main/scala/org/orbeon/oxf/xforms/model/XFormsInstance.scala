@@ -272,7 +272,7 @@ class XFormsInstance(
   // For state serialization
   def contentAsString: String =
     underlyingDocumentOpt map
-      (Dom4jUtils.domToString(_, dom.io.XMLWriter.DefaultFormat)) getOrElse
+      (_.serializeToString(dom.io.XMLWriter.DefaultFormat)) getOrElse
         TransformerUtils.tinyTreeToString(_documentInfo)
 
   // Don't allow any external events

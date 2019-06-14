@@ -215,7 +215,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     try {
                         Document mappingDocument = readInputAsOrbeonDom(context, input);
                         Mapping mapping = new Mapping();
-                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToStringJava(mappingDocument.getRootElement()))));
+                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToStringJava(mappingDocument))));
                         return mapping;
                     } catch (Exception e) {
                         throw new OXFException(e);

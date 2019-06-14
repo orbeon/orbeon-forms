@@ -8,6 +8,8 @@ import org.orbeon.dom.tree.NamespaceStack
 
 object XMLWriter {
   val DefaultFormat = OutputFormat(indent = false, newlines = false, trimText = false)
+  val CompactFormat = OutputFormat(indent = false, newlines = false, trimText = true)
+  val PrettyFormat  = OutputFormat(indent = true, newlines = true, trimText = true)
 }
 
 /**

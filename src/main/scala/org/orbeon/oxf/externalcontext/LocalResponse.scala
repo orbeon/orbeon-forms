@@ -54,7 +54,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     if (_inputStream eq null) {
       _inputStream =
         if (_stringWriter ne null) {
-          val bytes = _stringWriter.getBuilder.toString.getBytes(ExternalContext.StandardCharacterEncoding)
+          val bytes = _stringWriter.builder.toString.getBytes(ExternalContext.StandardCharacterEncoding)
           new ByteArrayInputStream(bytes, 0, bytes.length)
         } else if (_byteStream ne null) {
           new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)

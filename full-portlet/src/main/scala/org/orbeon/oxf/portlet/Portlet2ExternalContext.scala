@@ -126,7 +126,7 @@ object Portlet2ExternalContext {
     private def getBytes: Array[Byte] =
       if (streams._1.size > 0) {
         streams._1.toByteArray
-      } else if (streams._2.getBuilder.length > 0) {
+      } else if (streams._2.builder.length > 0) {
         // 2016-10-12: We never really use `getWriter` except in `BaseSubmission` to force a close and in
         // `ProcessorService` to try to write out an error message. So we should not have to deal with character
         // encoding here.

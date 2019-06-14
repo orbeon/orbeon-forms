@@ -575,7 +575,7 @@ public class TransformerUtils {
         try {
             final Transformer identity = getXMLIdentityTransformer();
             identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            final StringBuilderWriter writer = new StringBuilderWriter();
+            final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
             identity.transform(nodeInfo, new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {
@@ -606,7 +606,7 @@ public class TransformerUtils {
             Transformer transformer = getXMLIdentityTransformer();
             DOMSource source = new DOMSource(node);
 
-            StringBuilderWriter writer = new StringBuilderWriter();
+            StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
             transformer.transform(source, new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {

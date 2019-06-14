@@ -382,7 +382,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
         private XMLReceiver getDebugReceiver(final IndentedLogger indentedLogger) {
             final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-            final StringBuilderWriter writer = new StringBuilderWriter();
+            final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
             identity.setResult(new StreamResult(writer));
 
             return new ForwardingXMLReceiver(identity) {

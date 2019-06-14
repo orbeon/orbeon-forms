@@ -208,7 +208,7 @@ public class JavaProcessor extends ProcessorImpl {
 
             // Compile
             if (!fileUpToDate) {
-                StringBuilderWriter javacOutput = new StringBuilderWriter();
+                StringBuilderWriter javacOutput = new StringBuilderWriter(new StringBuilder());
 
                 final ArrayList<String> argLst = new ArrayList<String>();
                 final String[] cmdLine;

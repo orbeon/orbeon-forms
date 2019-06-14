@@ -99,7 +99,7 @@ abstract class SimpleExternalContext extends ExternalContext {
 
     def reset(): Unit = {
       outputStream.reset()
-      writer.getBuilder.delete(0, writer.getBuilder.length)
+      writer.builder.delete(0, writer.builder.length)
     }
 
     def setContentType(contentType: String)                                           = this.contentType = contentType

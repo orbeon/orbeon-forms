@@ -741,14 +741,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         StringBuilderWriter saxonStringBuilderWriter = null;
         if (transformerClassName.equals("org.orbeon.saxon.Controller")) {
             // Built-in Saxon transformer
-            saxonStringBuilderWriter = new StringBuilderWriter();
+            saxonStringBuilderWriter = new StringBuilderWriter(new StringBuilder());
             final Controller saxonController = (Controller) transformerHandler.getTransformer();
             final MessageEmitter emitter = new MessageEmitter();
             emitter.setStreamResult(new StreamResult(saxonStringBuilderWriter));
             saxonController.setMessageEmitter(emitter);
         } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
             // A Saxon transformer, we don't know which version
-            saxonStringBuilderWriter = new StringBuilderWriter();
+            saxonStringBuilderWriter = new StringBuilderWriter(new StringBuilder());
             final Transformer saxonController = transformerHandler.getTransformer();
             final Method getMessageEmitter = saxonController.getClass().getMethod("getMessageEmitter");
             Object messageEmitter = getMessageEmitter.invoke(saxonController);

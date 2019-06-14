@@ -26,6 +26,8 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.trans.XPathException
 
+import scala.xml.Elem
+
 // Represent a non-fatal server XForms error
 case class ServerError(
   message  : String,
@@ -66,20 +68,20 @@ object ServerError {
   private def collectList(error: ServerError, names: List[String]) =
     collectTuples(error, names) collect { case (k, v) ⇒ List(k, v) } flatten
 
-  def getDetailsAsList(error: ServerError) =
+  def getDetailsAsList(error: ServerError): List[(String, String)] =
     collectTuples(error, attributes)
 
   // NOTE: A similar concatenation logic is in AjaxServer.js
-  def getDetailsAsUserMessage(error: ServerError) =
+  def getDetailsAsUserMessage(error: ServerError): String =
     error.message :: collectList(error, description) mkString " "
 
-  def errorsAsHTMLElem(errors: TraversableOnce[ServerError]) =
+  def errorsAsHTMLElem(errors: TraversableOnce[ServerError]): Elem =
     <ul>{
       for (error ← errors)
         yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
     }</ul>
 
-  def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]) =
+  def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]): Elem =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
       for (error ← errors)
         yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
@@ -136,7 +138,7 @@ object XFormsError {
     def causesContainFatalError =
       Exceptions.causesIterator(t) exists {
         case e: XPathException if e.isStaticError ⇒ true
-        case e: HttpStatusCode                    ⇒ true
+        case _: HttpStatusCode                    ⇒ true
         case _                                    ⇒ false
       }
 

@@ -197,7 +197,7 @@ public class SQLProcessor extends ProcessorImpl {
                 throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
                 // Just use an empty document
-                data = Dom4jUtils.NULL_DOCUMENT;
+                data = Dom4jUtils.NullDocument();
             } else {
                 // There is a data input connected and there are some XPath expressions operating on it
                 boolean useXPathContentHandler = false;

@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2018 Orbeon, Inc.
+  Copyright (C) 2019 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,15 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<p:config
-    xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-    <p:param type="input" name="instance"/>
-
-    <p:processor name="oxf:redirect">
-        <p:input name="data" href="#instance"/>
-    </p:processor>
-
-</p:config>
+<redirect-url>
+    <path-info/>
+</redirect-url>

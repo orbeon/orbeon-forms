@@ -269,10 +269,10 @@ class XFormsInstance(
       case _                        ⇒ None
     }
 
-  // LATER: Measure performance of Dom4jUtils.domToString(instance.getDocument)
-  def contentAsString =
+  // For state serialization
+  def contentAsString: String =
     underlyingDocumentOpt map
-      (TransformerUtils.dom4jToString(_, false)) getOrElse
+      (Dom4jUtils.domToString(_, dom.io.XMLWriter.DefaultFormat)) getOrElse
         TransformerUtils.tinyTreeToString(_documentInfo)
 
   // Don't allow any external events

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
@@ -22,10 +23,12 @@ import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -563,21 +566,6 @@ public class TransformerUtils {
      */
     public static void writeDom4j(org.orbeon.dom.Node node, ContentHandler contentHandler) {
         sourceToSAX(new LocationDocumentSource(node), contentHandler);
-    }
-
-    /**
-     * Transform a dom4j document to a String.
-     */
-    public static String dom4jToString(Document document, boolean location) {
-        try {
-            final Transformer identity = getXMLIdentityTransformer();
-            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            final StringBuilderWriter writer = new StringBuilderWriter();
-            identity.transform(location ? new LocationDocumentSource(document) : new DocumentSource(document), new StreamResult(writer));
-            return writer.toString();
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
     }
 
     /**

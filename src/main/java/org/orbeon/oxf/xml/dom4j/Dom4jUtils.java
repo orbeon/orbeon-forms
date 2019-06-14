@@ -141,7 +141,7 @@ public class Dom4jUtils {
         return domToString(branch, OutputFormat.apply(false, false, false));
     }
 
-    private static String domToString(final Node node, final OutputFormat format) {
+    public static String domToString(final Node node, final OutputFormat format) {
         final StringBuilderWriter writer = new StringBuilderWriter();
         final XMLWriter xmlWriter = new XMLWriter(writer, format == null ? XMLWriter.DefaultFormat() : format);
         xmlWriter.write(node);

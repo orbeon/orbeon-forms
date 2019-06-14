@@ -65,7 +65,7 @@ public class TransformerUtils {
     private static final String SAXON_INDENT_AMOUNT_PROPERTY = "{http://saxon.sf.net/}indent-spaces";
 
     // Class.forName is expensive, so we cache mappings
-    private static Map<String, Class> classNameToHandlerClass = new HashMap<String, Class>();
+    private static Map<String, Class> classNameToHandlerClass = new HashMap<>();
 
     private static Class getTransformerClass(String clazz) throws ClassNotFoundException {
         Class transformerClass = classNameToHandlerClass.get(clazz);

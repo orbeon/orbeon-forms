@@ -133,7 +133,7 @@ object RequestReader {
 
     newTransformer.transform(source, new SAXResult(resultReceiver))
 
-    (dataWriter.toString, metadataWriterAndReceiver map (_._1.toString))
+    (dataWriter.result, metadataWriterAndReceiver map (_._1.result))
   }
 
   // Used by FlatView

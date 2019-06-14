@@ -134,7 +134,7 @@ object Portlet2ExternalContext {
         val characterEncoding =
           _responseContentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
 
-        streams._2.toString.getBytes(characterEncoding)
+        streams._2.result.getBytes(characterEncoding)
       } else {
         Array.empty[Byte]
       }

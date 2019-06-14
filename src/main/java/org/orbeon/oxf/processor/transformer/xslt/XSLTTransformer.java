@@ -473,7 +473,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         // Log message from Saxon
                         if (saxonStringBuilderWriter != null) {
-                            String message = saxonStringBuilderWriter.toString();
+                            String message = saxonStringBuilderWriter.result();
                             if (message.length() > 0)
                                 logger.info(message);
                         }
@@ -514,7 +514,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         if (rootCause instanceof TerminationException) {
                             // Saxon-specific exception thrown by xsl:message terminate="yes"
-                            final ValidationException customException = new ValidationException("Processing terminated by xsl:message: " + saxonStringBuilderWriter.toString(), locationData);
+                            final ValidationException customException = new ValidationException("Processing terminated by xsl:message: " + saxonStringBuilderWriter.result(), locationData);
                             throw new ValidationException(customException, new ExtendedLocationData(locationData, "executing XSLT transformation"));
                         } else {
                             // Other transformation error

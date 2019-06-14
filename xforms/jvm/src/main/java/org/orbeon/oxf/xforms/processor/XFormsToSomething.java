@@ -391,7 +391,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 public void endDocument() throws SAXException {
                     super.endDocument();
                     // Log out at end of document
-                    indentedLogger.logDebug("", "static state input", "input", writer.toString());
+                    indentedLogger.logDebug("", "static state input", "input", writer.result());
                 }
             };
         }

@@ -577,7 +577,7 @@ public class TransformerUtils {
             identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
             identity.transform(nodeInfo, new StreamResult(writer));
-            return writer.toString();
+            return writer.result();
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -608,7 +608,7 @@ public class TransformerUtils {
 
             StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
             transformer.transform(source, new StreamResult(writer));
-            return writer.toString();
+            return writer.result();
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

@@ -343,7 +343,7 @@ class EmailProcessor extends ProcessorImpl {
         val locationSAXWriter = new LocationSAXWriter
         locationSAXWriter.setContentHandler(identity)
         locationSAXWriter.write(document)
-        writer.toString
+        writer.result
       } else
         // For other types, just return the text nodes
         document.getStringValue

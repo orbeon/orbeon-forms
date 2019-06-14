@@ -233,7 +233,7 @@ public class NetUtils {
     public static String readStreamAsString(Reader reader) throws IOException {
         final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
         copyStream(reader, writer);
-        return writer.toString();
+        return writer.result();
     }
 
     /**

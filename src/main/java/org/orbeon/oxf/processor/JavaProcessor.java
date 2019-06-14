@@ -292,7 +292,7 @@ public class JavaProcessor extends ProcessorImpl {
                     thrown = t;
                 }
                 if (exitCode != 0) {
-                    String javacOutputString = "\n" + javacOutput.toString();
+                    String javacOutputString = "\n" + javacOutput.result();
                     javacOutputString = StringUtils.replace(javacOutputString, "\n", "\n    ");
                     throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown);
                 }

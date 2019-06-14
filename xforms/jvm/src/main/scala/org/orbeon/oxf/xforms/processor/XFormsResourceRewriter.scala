@@ -96,7 +96,7 @@ object XFormsResourceRewriter extends Logging {
       Try {
         val sbw = new StringBuilderWriter
         copyReader(new InputStreamReader(is, CharsetNames.Utf8), sbw)
-        sbw.toString
+        sbw.result
       } onFailure
         logFailure(path)
 

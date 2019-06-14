@@ -42,5 +42,7 @@ class StringBuilderWriter(val builder: java.lang.StringBuilder = new java.lang.S
   def write(value: Array[Char], offset: Int, length: Int): Unit =
     if (value ne null) builder.append(value, offset, length)
 
+  def result: String = builder.toString
+
   override def toString: String = builder.toString
 }

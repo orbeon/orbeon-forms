@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.scalatest.FunSpec
 

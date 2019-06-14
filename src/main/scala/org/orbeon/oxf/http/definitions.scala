@@ -17,7 +17,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import enumeratum._
 import org.apache.commons.io.IOUtils
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.{immutable ⇒ i}

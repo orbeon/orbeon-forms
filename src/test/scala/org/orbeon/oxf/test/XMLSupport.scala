@@ -15,7 +15,7 @@ package org.orbeon.oxf.test
 
 import org.orbeon.dom.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils

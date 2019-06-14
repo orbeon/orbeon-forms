@@ -19,7 +19,7 @@ import javax.servlet._
 import javax.servlet.http._
 
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}

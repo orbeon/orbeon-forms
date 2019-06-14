@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 

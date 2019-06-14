@@ -23,7 +23,7 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.AssetPath

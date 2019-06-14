@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo

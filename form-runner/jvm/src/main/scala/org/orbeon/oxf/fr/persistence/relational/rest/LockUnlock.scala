@@ -21,7 +21,7 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.NetUtils
 
 import scala.util.Try

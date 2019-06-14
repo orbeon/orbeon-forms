@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo

@@ -31,7 +31,7 @@ import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
 import org.orbeon.oxf.xml.{JXQName, _}

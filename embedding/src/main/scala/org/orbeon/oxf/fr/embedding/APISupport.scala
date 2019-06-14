@@ -26,7 +26,7 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, MarkupUtils, PathUtils}

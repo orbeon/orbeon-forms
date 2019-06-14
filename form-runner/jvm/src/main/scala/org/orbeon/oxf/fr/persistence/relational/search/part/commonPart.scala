@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.StringUtils._
 
 object commonPart  {

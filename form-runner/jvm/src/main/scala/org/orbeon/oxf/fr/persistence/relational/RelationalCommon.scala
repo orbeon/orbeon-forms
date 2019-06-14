@@ -17,7 +17,7 @@ import java.sql.Connection
 
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 
 object RelationalCommon {
 

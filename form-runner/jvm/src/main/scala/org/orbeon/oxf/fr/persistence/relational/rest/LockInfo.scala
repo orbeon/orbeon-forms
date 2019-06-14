@@ -17,7 +17,7 @@ import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.util
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions

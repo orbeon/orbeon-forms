@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 
 object Statement {
 

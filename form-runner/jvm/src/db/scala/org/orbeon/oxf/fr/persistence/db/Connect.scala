@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
 import scala.sys.process._

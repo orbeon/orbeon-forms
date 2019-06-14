@@ -20,7 +20,7 @@ import com.drew.metadata.bmp.BmpHeaderDirectory
 import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 

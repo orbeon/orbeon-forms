@@ -20,7 +20,7 @@ import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
 

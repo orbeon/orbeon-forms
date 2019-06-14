@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import java.sql.{Connection, ResultSet}
 
 import org.orbeon.oxf.fr.persistence.relational.Provider

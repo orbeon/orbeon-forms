@@ -18,7 +18,7 @@ import java.sql.{Connection, ResultSet}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import javax.xml.transform.stream.StreamSource
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils

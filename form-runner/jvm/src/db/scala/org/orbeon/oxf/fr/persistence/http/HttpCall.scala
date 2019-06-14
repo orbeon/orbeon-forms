@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
-import org.orbeon.oxf.util.IOUtils.useAndClose
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xml.Dom4j

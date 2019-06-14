@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 
 // Operations on organizations
 // - When creating data, if we have an organization, we want to create it or return it

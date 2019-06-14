@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
 

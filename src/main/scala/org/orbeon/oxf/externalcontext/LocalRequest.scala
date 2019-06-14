@@ -20,7 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 

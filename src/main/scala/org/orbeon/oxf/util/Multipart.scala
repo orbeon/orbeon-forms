@@ -28,7 +28,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.io.IOUtils._
 
 import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal

@@ -31,7 +31,7 @@ import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 

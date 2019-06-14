@@ -34,7 +34,7 @@ import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;

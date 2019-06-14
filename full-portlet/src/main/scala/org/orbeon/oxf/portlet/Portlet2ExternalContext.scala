@@ -18,6 +18,7 @@ import java.util.Locale
 import java.{util ⇒ ju}
 
 import javax.portlet._
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}

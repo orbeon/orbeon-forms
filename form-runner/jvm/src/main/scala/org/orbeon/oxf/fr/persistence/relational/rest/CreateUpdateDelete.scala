@@ -32,8 +32,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.io.IOUtils._
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
+import org.orbeon.oxf.util.{NetUtils, Whitespace, XPath}
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo

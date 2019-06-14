@@ -24,7 +24,7 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory, Element}
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext

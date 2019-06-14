@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;

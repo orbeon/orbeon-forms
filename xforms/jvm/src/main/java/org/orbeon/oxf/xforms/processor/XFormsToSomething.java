@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.dom.Document;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

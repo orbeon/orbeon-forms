@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.processor
 import java.io._
 import java.util.regex.Matcher
 
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}

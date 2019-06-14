@@ -16,11 +16,11 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.{util ⇒ ju}
 
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, StringBuilderWriter}
+import org.orbeon.oxf.util.{LoggerFactory, SecureUtils}
 
 import scala.collection.{immutable ⇒ i, mutable ⇒ m}
 

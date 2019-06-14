@@ -15,9 +15,10 @@ package org.orbeon.oxf.externalcontext
 
 import java.io._
 
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
-import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter}
+import org.orbeon.oxf.util.NetUtils
 
 import scala.collection.mutable
 

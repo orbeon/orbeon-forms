@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.log4j.Logger;
 import org.orbeon.io.CharsetNames;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;

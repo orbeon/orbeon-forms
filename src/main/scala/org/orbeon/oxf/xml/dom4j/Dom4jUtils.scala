@@ -18,12 +18,14 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.generator.DOMGenerator
-import org.orbeon.oxf.util.{StringBuilderWriter, StringUtils}
+import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xml._
 import org.xml.sax.SAXException
 import org.xml.sax.helpers.AttributesImpl
+
 import scala.collection.JavaConverters._
 
 // TODO: move this to Scala/remove unneeded stuff

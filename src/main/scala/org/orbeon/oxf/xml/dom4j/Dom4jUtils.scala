@@ -67,21 +67,6 @@ object Dom4jUtils {
     domToString(elem.asInstanceOf[Branch])
 
   /**
-    * Convert a dom4j node to a string.
-    *
-    * @param node node to convert
-    * @return resulting string
-    */
-  // 2 usages in tests
-  def nodeToString(node: Node): String =
-    node match {
-      case doc: Document ⇒ domToString(doc.getRootElement.asInstanceOf[Branch])
-      case _: Element ⇒ domToString(node.asInstanceOf[Branch])
-      case _: Text ⇒ node.getText
-      case _ ⇒ domToString(node, null)
-    }
-
-  /**
     * Convert an XML string to a prettified XML string.
     */
   def prettyfy(xmlString: String): String =

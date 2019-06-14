@@ -60,7 +60,7 @@ public class SignatureProcessor extends ProcessorImpl {
                     xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
 
                     final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
-                    final String dataStr = Dom4jUtils.domToString(data);
+                    final String dataStr = Dom4jUtils.domToStringJava(data.getRootElement());
                     dsa.update(dataStr.getBytes(CharsetNames.Utf8()));
                     final String sig = Base64.encode(dsa.sign(), true);
 

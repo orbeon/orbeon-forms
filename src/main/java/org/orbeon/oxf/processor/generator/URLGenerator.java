@@ -391,7 +391,7 @@ public class URLGenerator extends ProcessorImpl {
                             // We have the /config/url syntax
                             final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
                             if (url == null) {
-                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToString(configElement), locationData);
+                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToStringJava(configElement), locationData);
                             }
 
                             // Get content-type

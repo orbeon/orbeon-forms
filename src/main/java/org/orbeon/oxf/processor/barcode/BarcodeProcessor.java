@@ -62,7 +62,7 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 
 		try {
 			final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
-			final Configuration cfg = builder.build(new StringInputStream(Dom4jUtils.domToString(configDocument)));
+			final Configuration cfg = builder.build(new StringInputStream(Dom4jUtils.domToStringJava(configDocument.getRootElement())));
 			final BarcodeGenerator gen = BarcodeUtil.getInstance().createBarcodeGenerator(cfg);
 
             // TODO: These parameters (DPI, etc.) should be configurable

@@ -34,8 +34,7 @@ public class Dom4jUtilsTest extends TestCase {
         rootElement.addText("    ");
 
         // Normal output
-        assertEquals("<div>    <b>bold</b>    </div>", Dom4jUtils.domToString(document));
-        assertEquals("<div>    <b>bold</b>    </div>", Dom4jUtils.domToString(document.getRootElement()));
+        assertEquals("<div>    <b>bold</b>    </div>", Dom4jUtils.domToStringJava(document.getRootElement()));
 
         // Formatted output
         assertEquals("\n<div>\n    <b>bold</b>\n</div>", Dom4jUtils.domToPrettyString(document));

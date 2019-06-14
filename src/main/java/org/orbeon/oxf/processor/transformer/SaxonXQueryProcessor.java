@@ -122,7 +122,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                     xqueryBody = xqueryDocument.getRootElement().getStringValue();
                                 } else {
                                     // Content is XQuery embedded into XML
-                                    xqueryBody = Dom4jUtils.domToString(xqueryDocument);
+                                    xqueryBody = Dom4jUtils.domToStringJava(xqueryDocument.getRootElement());
                                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
                                 }

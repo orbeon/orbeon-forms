@@ -18,7 +18,7 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
-import org.orbeon.io.StringBuilderWriter
+import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.StringUtils
@@ -47,26 +47,6 @@ object Dom4jUtils {
     createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY)
 
   /**
-    * Convert a dom4j document to a string.
-    *
-    * @param document document to convert
-    * @return resulting string
-    */
-  // 14 usages
-  def domToString(document: Document): String =
-    domToString(document.getRootElement.asInstanceOf[Branch])
-
-  /**
-    * Convert a dom4j element to a string.
-    *
-    * @param elem element to convert
-    * @return resulting string
-    */
-  // 3 usages
-  def domToString(elem: Element): String =
-    domToString(elem.asInstanceOf[Branch])
-
-  /**
     * Convert an XML string to a prettified XML string.
     */
   def prettyfy(xmlString: String): String =
@@ -93,18 +73,18 @@ object Dom4jUtils {
   def domToCompactString(document: Document): String =
     domToString(document.getRootElement, OutputFormat(indent = false, newlines = false, trimText = true))
 
-  private def domToString(branch: Branch): String =
-    domToString(branch, OutputFormat(indent = false, newlines = false, trimText = false))
+  // 16 usages
+  def domToStringJava(elem: Element): String =
+    domToString(elem, XMLWriter.DefaultFormat)
 
   // 4 usages
-  def domToString(node: Node, format: OutputFormat): String = {
-    val writer = new StringBuilderWriter
-    val xmlWriter =
-      new XMLWriter(writer, if (format eq null) XMLWriter.DefaultFormat else format)
-    xmlWriter.write(node)
-    writer.close()
-    writer.toString
-  }
+  def domToString(node: Node, format: OutputFormat = XMLWriter.DefaultFormat): String =
+    IOUtils.useAndClose(new StringBuilderWriter) { writer ⇒
+      val xmlWriter =
+        new XMLWriter(writer, if (format eq null) XMLWriter.DefaultFormat else format)
+      xmlWriter.write(node)
+      writer.result
+    }
 
   def readDom4j(reader: Reader): Document =
     createSAXReader.read(reader)

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.io.CharsetNames;
@@ -70,7 +69,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final Document sigData = Document.apply();
                     sigData.add(sigDataNode);
 
-                    dsa.update(Dom4jUtils.domToString(sigData).getBytes(CharsetNames.Utf8()));
+                    dsa.update(Dom4jUtils.domToStringJava(sigData.getRootElement()).getBytes(CharsetNames.Utf8()));
 
                     // Verify signature and throw in case of failure
                     try {

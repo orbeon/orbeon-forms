@@ -219,7 +219,7 @@ object Dom4j {
   // TODO: should ideally not got go through serialization/deserialization
   implicit def elemToDocument(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
   implicit def elemToElement(e: Elem): Element   = Dom4jUtils.readDom4j(e.toString).getRootElement
-  implicit def elementToElem(e: Element): Elem   = XML.loadString(Dom4jUtils.domToString(e))
+  implicit def elementToElem(e: Element): Elem   = XML.loadString(Dom4jUtils.domToStringJava(e))
 
   // TODO: There is probably a better way to write these conversions
   implicit def scalaElemSeqToDom4jElementSeq(seq: Iterable[Elem]): Seq[Element] = seq map elemToElement toList

@@ -161,7 +161,7 @@ private[persistence] object HttpCall {
     }
 
     val messageBody = body map {
-      case XML   (doc ) ⇒ Dom4jUtils.domToString(doc).getBytes
+      case XML   (doc ) ⇒ Dom4jUtils.domToStringJava(doc.getRootElement).getBytes
       case Binary(file) ⇒ file
     }
 

@@ -40,10 +40,10 @@ object SectionGridEditor {
 
     object ContainerEditor extends Enum[ContainerEditor] {
       val values = findValues
-      case object SectionMoveUp        extends ContainerEditor
-      case object SectionMoveDown      extends ContainerEditor
-      case object SectionMoveRight     extends ContainerEditor
-      case object SectionMoveLeft      extends ContainerEditor
+      case object ContainerMoveUp      extends ContainerEditor
+      case object ContainerMoveDown    extends ContainerEditor
+      case object ContainerMoveRight   extends ContainerEditor
+      case object ContainerMoveLeft    extends ContainerEditor
       case object ContainerDelete      extends ContainerEditor
       case object ContainerEditDetails extends ContainerEditor
       case object ContainerCopy        extends ContainerEditor
@@ -83,18 +83,22 @@ object SectionGridEditor {
         // Start by hiding all the icons
         sectionGridEditorContainer.children().hide()
 
-        def showContainerIcons(container: JQuery) = {
+        def showContainerIcons(container: JQuery): Unit = {
 
            Direction.values foreach { direction ⇒
 
             val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
-            val trigger  = sectionGridEditorContainer.children(".fb-section-move-" + direction.entryName.toLowerCase)
+            val trigger  = sectionGridEditorContainer.children(".fb-container-move-" + direction.entryName.toLowerCase)
 
             if (relevant)
               trigger.show()
           }
 
-          hideShowCutDeleteIcons(container, ContainerDelete)
+          if (container.is(".fb-can-delete"))
+            Set(ContainerDelete, ContainerCut)
+              .map(_.className)
+              .map(sectionGridEditorContainer.children(_))
+              .foreach(_.show())
         }
 
         // Icons which are always visible
@@ -119,16 +123,6 @@ object SectionGridEditor {
 
           container.addClass("fb-hover")
         }
-
-        def hideShowCutDeleteIcons(
-          container       : JQuery,
-          containerDelete : ContainerEditor
-        )                 : Unit =
-          if (container.is(".fb-can-delete"))
-            Set(containerDelete, ContainerCut)
-              .map(_.className)
-              .map(sectionGridEditorContainer.children(_))
-              .foreach(_.show())
       }
     )
 
@@ -149,10 +143,10 @@ object SectionGridEditor {
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
-            case SectionMoveUp        ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
-            case SectionMoveDown      ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
-            case SectionMoveRight     ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
-            case SectionMoveLeft      ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
+            case ContainerMoveUp      ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
+            case ContainerMoveDown    ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
+            case ContainerMoveRight   ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
+            case ContainerMoveLeft    ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
             case ContainerDelete      ⇒ client.containerDelete     (sectionGridId).call()
             case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
             case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()

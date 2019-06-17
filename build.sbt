@@ -408,8 +408,8 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
     name := "orbeon-dom"
   )
 
-lazy val domJVM = dom.jvm
-lazy val domJS  = dom.js
+lazy val domJVM = dom.jvm.dependsOn(commonJVM)
+lazy val domJS  = dom.js.dependsOn(commonJS)
 
 lazy val embedding = (project in file("embedding"))
   .dependsOn(core)

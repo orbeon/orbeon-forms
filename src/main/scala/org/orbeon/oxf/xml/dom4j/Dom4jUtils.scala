@@ -579,14 +579,8 @@ object Dom4jUtils {
     result.getDocument
   }
 
-  /**
-    * Encode a QName to an exploded QName (also known as a "Clark name") String.
-    */
   def qNameToExplodedQName(qName: QName): String =
-    if (qName eq null)
-      null
-    else
-      XMLUtils.buildExplodedQName(qName.namespace.uri, qName.localName)
+    if (qName eq null) null else qName.clarkName
 
   trait VisitorListener {
     def startElement(element: Element)

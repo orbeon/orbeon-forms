@@ -224,20 +224,13 @@ class ResourcesAggregator extends ProcessorImpl {
                 outputCSS()
 
                 // 2. Combined and inline JS
-                if (! XFormsProperties.isJavaScriptAtBottom)
-                  outputJS()
+                outputJS()
 
                 // Close head element
                 super.endElement(uri, localname, qName)
 
                 inHead = false
               } else if (level == 2 && localname == "body") {
-
-                // Combined and inline JS
-                // Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                // performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom
-                if (XFormsProperties.isJavaScriptAtBottom)
-                  outputJS()
 
                 // Close body element
                 super.endElement(uri, localname, qName)

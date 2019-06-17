@@ -314,9 +314,6 @@ public class XFormsProperties {
     public static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
     public static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
 
-    public static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
-    public static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
-
     public static final String REPLICATION_PROPERTY = XFORMS_PROPERTY_PREFIX + "replication";
     public static final boolean REPLICATION_PROPERTY_DEFAULT = false;
 
@@ -385,11 +382,6 @@ public class XFormsProperties {
     public static boolean isCacheCombinedResources() {
         return Properties.instance().getPropertySet().getBoolean
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
-    }
-
-    public static boolean isJavaScriptAtBottom() {
-        return Properties.instance().getPropertySet().getBoolean
-                (JAVASCRIPT_AT_BOTTOM_PROPERTY, JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT);
     }
 
     public static boolean isReplication() {

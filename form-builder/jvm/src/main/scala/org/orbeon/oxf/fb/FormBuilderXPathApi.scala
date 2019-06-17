@@ -550,6 +550,7 @@ object FormBuilderXPathApi {
         )
     }
 
+  // See also `buildPDFFieldNameFromHTML`.
   //@XPathFunction
   def findPdfFieldName(controlName: String, currentControlName: String): Option[String] = {
 
@@ -561,7 +562,8 @@ object FormBuilderXPathApi {
         FormRunner.findContainerNamesForModel(
           controlElem,
           includeSelf              = false,
-          includeIterationElements = false
+          includeIterationElements = false,
+          includeNonRepeatedGrids  = false // https://github.com/orbeon/orbeon-forms/issues/4099
         )
 
       val suffix =

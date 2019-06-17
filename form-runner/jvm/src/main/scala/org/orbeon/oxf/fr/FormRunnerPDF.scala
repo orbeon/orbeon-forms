@@ -69,6 +69,7 @@ trait FormRunnerPDF {
   }
 
   // Build a PDF control id from the given HTML control
+  // See also `findPdfFieldName`.
   //@XPathFunction
   def buildPDFFieldNameFromHTML(control: NodeInfo): String = {
 

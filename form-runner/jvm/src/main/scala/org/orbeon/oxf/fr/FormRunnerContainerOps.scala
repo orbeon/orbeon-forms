@@ -90,13 +90,15 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def findContainerNamesForModel(
     descendant               : NodeInfo,
     includeSelf              : Boolean = false,
-    includeIterationElements : Boolean = true
+    includeIterationElements : Boolean = true,
+    includeNonRepeatedGrids  : Boolean = true
   ): List[String] = {
 
     val namesWithContainers =
       for {
         container ← findAncestorContainersLeafToRoot(descendant, includeSelf).to[List]
         name      ← getControlNameOpt(container)
+        if includeNonRepeatedGrids || ! (IsGrid(container) && ! isRepeat(container))
       } yield
         name
 

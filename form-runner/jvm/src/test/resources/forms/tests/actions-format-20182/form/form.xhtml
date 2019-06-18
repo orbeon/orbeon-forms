@@ -26,7 +26,6 @@
                                 <my-attachment filename="" mediatype="" size=""/>
                             </my-grid-iteration>
                         </my-grid>
-                        <my-button/>
                     </section-1>
                 </form>
             </xf:instance>
@@ -34,7 +33,6 @@
             <!-- Bindings -->
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="my-button-bind" ref="my-button" name="my-button"/>
                     <xf:bind id="my-grid-bind" ref="my-grid" name="my-grid">
                         <xf:bind id="my-grid-iteration-bind" ref="my-grid-iteration" name="my-grid-iteration">
                             <xf:bind id="my-attachment-bind" ref="my-attachment" name="my-attachment"
@@ -73,11 +71,6 @@
                             <label>Image</label>
                             <hint/>
                         </my-attachment>
-                        <my-button>
-                            <label>Start</label>
-                            <hint/>
-                        </my-button>
-
                         <section-1>
                             <label>Test Section</label>
                         </section-1>
@@ -116,9 +109,6 @@
                            replace="xxf:binary"
                            mediatype="application/x-www-form-urlencoded"/>
 
-            <fr:listener version="2018.2" events="activated" controls="my-button"
-                         actions="populate-attachments"/>
-
             <fr:listener version="2018.2" events="form-load-after-data"
                          actions="populate-attachments"/>
 
@@ -146,19 +136,6 @@
             <fr:body>
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
-                    <fr:grid id="grid-1-grid">
-                        <fr:c y="1" x="1" w="6">
-                            <xf:trigger id="my-button-control" bind="my-button-bind">
-                                <xf:label ref="$form-resources/my-button/label"/>
-
-                                <xf:hint ref="$form-resources/my-button/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-                            </xf:trigger>
-
-                            </fr:c>
-                        <fr:c y="1" x="7" w="6"/>
-                    </fr:grid>
                     <fr:grid id="my-grid-grid" bind="my-grid-bind" repeat="content"
                              template="instance('my-grid-template')"
                              apply-defaults="true"

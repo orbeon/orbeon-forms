@@ -64,12 +64,10 @@ class XFormsRepeatControl(
   setLocal(new XFormsRepeatControlLocal)
 
   // The repeat's sequence binding
-  final override def bindingEvenIfNonRelevant: Seq[Item] = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
+  final override def bindingEvenIfNonRelevant: Seq[Item] =
+    Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
 
-  // Store initial repeat index information
-  private val startIndexString = element.attributeValue("startindex")
-  private val startIndex = Option(startIndexString) map (_.toInt) getOrElse  1
-  def getStartIndex: Int = startIndex
+  def getStartIndex: Int = staticControl.startIndex
 
   override def supportsRefreshEvents = true
   override def children: Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
@@ -137,7 +135,7 @@ class XFormsRepeatControl(
 
   def doDnD(dndEvent: XXFormsDndEvent): Unit = {
 
-    require(isDnD, s"attempt to process `xxforms-dnd` event on non-DnD-enabled control `$effectiveId`")
+    require(staticControl.isDnD, s"attempt to process `xxforms-dnd` event on non-DnD-enabled control `$effectiveId`")
 
     // Get all repeat iteration details
     val dndStart = dndEvent.getDndStart.splitTo[List]("-")
@@ -210,9 +208,6 @@ class XFormsRepeatControl(
 
     // TODO: should dispatch xxforms-move instead of xforms-insert?
   }
-
-  def isDnD: Boolean =
-    element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
 
   // Push binding but ignore non-relevant iterations
   override protected def computeBinding(parentContext: BindingContext): BindingContext = {

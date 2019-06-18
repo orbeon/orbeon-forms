@@ -357,6 +357,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_REFRESH_ITEMS_QNAME = QName.apply("refresh-items", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = QName.apply("repeat-indexes", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_REPEAT_STARTINDEX_QNAME = QName.apply("startindex");
     public static final QName XXFORMS_DND_QNAME = QName.apply("dnd", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFERRED_UPDATES_QNAME = QName.apply("deferred-updates", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_WHITESPACE_QNAME = QName.apply("whitespace", XXFORMS_NAMESPACE);

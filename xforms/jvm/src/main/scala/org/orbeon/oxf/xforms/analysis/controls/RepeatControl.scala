@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -35,10 +36,19 @@ class RepeatControl(
 
   val isAroundTableOrListElement: Boolean = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
+  def isDnD: Boolean =
+    element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
+
   val dndClasses: Option[String] =
     element.attributeValueOpt(XXFORMS_DND_QNAME) filter
       Set("vertical", "horizontal")              map
       (dndType ⇒ s"xforms-dnd xforms-dnd-$dndType")
+
+  private def findPositiveInt(attName: QName): Option[Int] =
+    element.attributeValueOpt(attName) flatMap (_.trimAllToOpt) map (_.toInt) filter (_ > 0)
+
+  val startIndex: Int =
+    findPositiveInt(XXFORMS_REPEAT_STARTINDEX_QNAME) getOrElse  1
 
   override protected def externalEventsDef: Set[String] = super.externalEventsDef + XXFORMS_DND
   override val externalEvents             : Set[String] = externalEventsDef

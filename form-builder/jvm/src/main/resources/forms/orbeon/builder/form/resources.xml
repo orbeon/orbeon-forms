@@ -221,12 +221,9 @@
         <move-icon>
             <label>Drag &amp; drop to move or copy</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Delete Grid</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Delete Section</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label>Delete Section or Grid</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Delete Row</label>
         </delete-row-icon>
@@ -1420,12 +1417,9 @@
         <move-icon>
             <label>Glisser-déposer pour déplacer ou copier</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Supprimer la grille</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Supprimer la section</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label>Supprimer la section ou grille</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Supprimer la rangée</label>
         </delete-row-icon>
@@ -2602,12 +2596,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Slett rutenett</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Slett seksjon</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Slett seksjon</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Slett rad</label>
         </delete-row-icon>
@@ -3812,12 +3803,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Удалить сетку</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Удалить раздел</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Удалить раздел</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Удалить строку</label>
         </delete-row-icon>
@@ -5022,12 +5010,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Elimina griglia</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Elimina sezione</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Elimina sezione</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Elimina riga</label>
         </delete-row-icon>
@@ -6224,12 +6209,9 @@
         <move-icon>
             <label>Per Drag &amp; drop verschieben oder kopieren</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Raster löschen</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Abschnitt löschen</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Abschnitt löschen</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Zeile löschen</label>
         </delete-row-icon>
@@ -7429,12 +7411,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Poista ruudukko</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Poista lohko</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Poista lohko</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Poista rivi</label>
         </delete-row-icon>
@@ -8631,12 +8610,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Eliminar Grilla</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Eliminar Sección</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Eliminar Sección</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Eliminar Fila</label>
         </delete-row-icon>
@@ -9834,12 +9810,9 @@
         <move-icon>
             <label>Versleep om te verplaatsen of kopiëren</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Verwijder grid</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Verwijder section</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Verwijder section</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Verwijder rij</label>
         </delete-row-icon>
@@ -11016,12 +10989,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Apagar Grelha</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Apagar Secção</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Apagar Secção</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Apagar Linha</label>
         </delete-row-icon>
@@ -12225,12 +12195,9 @@
         <move-icon>
             <label todo="true">[Drag &amp; drop to move or copy]</label>
         </move-icon>
-        <delete-grid-icon>
-            <label>Ta bort rutnät</label>
-        </delete-grid-icon>
-        <delete-section-icon>
-            <label>Ta bort sektion</label>
-        </delete-section-icon>
+        <delete-container-icon>
+            <label todo="true">Ta bort sektion</label>
+        </delete-container-icon>
         <delete-row-icon>
             <label>Ta bort rad</label>
         </delete-row-icon>

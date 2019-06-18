@@ -1,0 +1,134 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Issue #4075</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <my-result/>
+                        </grid-1>
+
+
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="my-result-bind" ref="my-result" name="my-result"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>4075</form-name>
+                    <title xml:lang="en">Issue #4075</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2019.1-SNAPSHOT PE</created-with-version>
+
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-result>
+                            <label>Result</label>
+                            <hint/>
+                        </my-result>
+
+                        <section-1>
+                            <label>Test Section</label>
+                        </section-1>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+
+
+            <xf:instance id="echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                        <body>&lt;response&gt;
+    &lt;text&gt;First&lt;/text&gt;
+    &lt;text&gt;Second&lt;/text&gt;
+&lt;/response&gt;</body>
+                    </xf:instance>
+            <xf:submission id="echo-submission" class="fr-service"
+                           resource="/fr/service/custom/orbeon/echo"
+                           method="post"
+                           serialization="application/xml"
+                           mediatype="application/xml"/>
+
+            <fr:listener version="2018.2" events="form-load-after-data" actions="populate-attachments"/>
+
+            <fr:action name="populate-attachments" version="2018.2">
+
+                <fr:service-call service="echo"/>
+                <fr:control-setvalue control="my-result" value="'after echo service call'"/>
+
+                <fr:data-iterate ref="/response/text">
+                    <fr:control-setvalue control="my-result" value="."/>
+                    <fr:service-call service="error"/>
+                </fr:data-iterate>
+
+            </fr:action>
+
+            <xf:instance id="error-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                        <body xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">&lt;params/&gt;</body>
+                    </xf:instance>
+            <xf:submission id="error-submission" class="fr-service"
+                           resource="https://httpbin.org/status/404"
+                           method="get"
+                           serialization="none"
+                           mediatype=""/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="7" w="6">
+                            <xf:output id="my-result-control" bind="my-result-bind">
+                                <xf:label ref="$form-resources/my-result/label"/>
+                                <xf:hint ref="$form-resources/my-result/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

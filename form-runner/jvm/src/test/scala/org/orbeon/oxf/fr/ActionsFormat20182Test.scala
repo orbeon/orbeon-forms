@@ -26,25 +26,44 @@ class ActionsFormat20182Test
 
   describe("Form Runner actions in 2018.2 format") {
 
-    val (processorService, docOpt, _) =
-      runFormRunner("tests", "actions-format-20182", "new", document = "", initialize = true)
+    describe("Binary HTTP service within `fr:data-iterate` sets attachment") {
 
-    val doc = docOpt.get
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "actions-format-20182", "new", document = "", initialize = true)
 
-    it("must pass all service result checks") {
-      withTestExternalContext { _ ⇒
-        withFormRunnerDocument(processorService, doc) {
-          for {
-            (expectedSize, i) ← List(252, 354).zipWithIndex
-            control           = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
-            value             = control.getValue
-          } locally {
-            assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
-            assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
+      val doc = docOpt.get
+
+      it("must pass all service result checks") {
+        withTestExternalContext { _ ⇒
+          withFormRunnerDocument(processorService, doc) {
+            for {
+              (expectedSize, i) ← List(252, 354).zipWithIndex
+              control           = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
+              value             = control.getValue
+            } locally {
+              assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
+              assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
+            }
+          }
+        }
+      }
+    }
+
+    describe("HTTP service error within `fr:data-iterate`") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "actions-format-20182-error", "new", document = "", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must pass all service result checks") {
+        withTestExternalContext { _ ⇒
+          withFormRunnerDocument(processorService, doc) {
+            val myResult = resolveObject[XFormsValueControl]("my-result-control").get
+            assert("First" == myResult.getValue)
           }
         }
       }
     }
   }
-
 }

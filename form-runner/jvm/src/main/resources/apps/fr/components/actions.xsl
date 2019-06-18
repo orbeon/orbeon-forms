@@ -234,6 +234,57 @@
 
     </xsl:function>
 
+    <xsl:function name="fr:common-service-actions-impl" as="element(xf:action)*">
+        <xsl:param name="model" as="element(xf:model)"/>
+
+        <xsl:variable
+            name="action-bindings"
+            select="
+                $model/
+                    xf:action[
+                        ends-with(@id, '-binding')
+                    ]"/>
+
+        <xsl:variable
+            name="service-names"
+            select="
+                $action-bindings//
+                    xf:send/@submission[
+                        ends-with(., '-submission')
+                    ]/substring-before(., '-submission')
+                "/>
+
+        <xsl:variable
+            name="actions-20182"
+            select="
+                $model/
+                    fr:action[
+                        @version = '2018.2'
+                    ]"/>
+
+        <xsl:variable
+            name="service-names-20182"
+            select="$actions-20182//fr:service-call/@service/string()"/>
+
+        <xsl:variable
+            name="all-service-names"
+            select="distinct-values(($service-names, $service-names-20182))"/>
+
+        <xsl:if test="exists($all-service-names)">
+            <xf:action
+                event="xforms-submit-error"
+                observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
+                type="xpath"
+                xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+
+                xxf:set-request-attribute('fr-action-error', true()),
+                process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+            </xf:action>
+        </xsl:if>
+
+    </xsl:function>
+
+
     <!--
         Update actions so that the implementation of the actions is up to date. Forms generated with Form Builder
         prior to this change embed a specific implementation of the actions. Forms generated after this change
@@ -896,6 +947,7 @@
                 <xsl:copy-of select="fr:itemset-action-common-impl($model/@id/string())"/>
             </xsl:if>
             <xsl:copy-of select="fr:common-dataset-actions-impl($model)"/>
+            <xsl:copy-of select="fr:common-service-actions-impl($model)"/>
         </xsl:copy>
     </xsl:template>
 

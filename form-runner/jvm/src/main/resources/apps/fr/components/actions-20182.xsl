@@ -186,25 +186,13 @@
 
         <xf:action id="{@name}-binding" event="fr-call-user-{@name}-action" target="{$model-id}">
 
-            <!-- Choose to iterate or not on `$iterate-control-name` -->
-            <!-- Also store the absolute id of the source in the request -->
-            <!-- NOTE: If another action was triggered during the execution of this action, there
-                 could be a race condition and `fr-action-source` might be set to the incorrect
-                 value. -->
-            <xsl:variable name="var" select="()"/>
-            <xsl:choose>
-                <xsl:when test="exists($var)">
-                    <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
-                    <xsl:copy-of select="$var"/>
-                    <!-- Q: Why `@iterate` and not `@context`, or just on the nested action? -->
-                    <xf:action iterate="frf:findRepeatedControlsForTarget(event('action-source'), $iterate-control-name)">
-                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', string(.))</xf:action>
-                    </xf:action>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('action-source'))</xf:action>
-                </xsl:otherwise>
-            </xsl:choose>
+            <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
+            <!-- Reset global state-->
+            <xf:action type="xpath">
+                xxf:set-request-attribute('fr-action-source',                         event('action-source')),
+                xxf:set-request-attribute('fr-action-error',                          false()),
+                xxf:set-request-attribute('fr-action-continuation-is-last-iteration', false())
+            </xf:action>
 
             <xsl:for-each-group
                 select="$content-with-delimiters/fr:* | $content-with-delimiters/fr:data-iterate/fr:*"
@@ -388,8 +376,10 @@
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
-                    <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
+                    <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+                        <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
+                    </xf:action>
                 </xsl:if>
 
             </xsl:for-each-group>

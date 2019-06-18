@@ -682,6 +682,7 @@
                 <xsl:copy-of select="fr:itemset-action-common-impl('fr-form-model')"/>
             </xsl:if>
             <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
+            <xsl:copy-of select="fr:common-service-actions-impl(.)"/>
 
         </xsl:copy>
 

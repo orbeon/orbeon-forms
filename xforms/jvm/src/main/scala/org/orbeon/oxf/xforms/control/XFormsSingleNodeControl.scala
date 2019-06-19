@@ -85,7 +85,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   // Type
   private var _valueType: QName = null
-  def valueType    = _valueType
+  def valueType: QName = _valueType
   def valueTypeOpt = Option(valueType)
 
   // Custom MIPs

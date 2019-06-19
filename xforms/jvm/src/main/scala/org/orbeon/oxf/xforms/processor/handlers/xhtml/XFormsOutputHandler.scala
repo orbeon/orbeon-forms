@@ -69,7 +69,7 @@ class XFormsOutputDefaultHandler(
       staticControlOpt exists (XFormsControl.appearances(_)(XFORMS_MINIMAL_APPEARANCE_QNAME))
 
     val containerAttributes =
-      getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, hasLabel && ! isMinimal)
+      getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl, isField = hasLabel && ! isMinimal)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)

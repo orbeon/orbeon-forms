@@ -450,7 +450,7 @@ class XFormsRepeatControl(
           partialFocusRepeatOption
         )
       } else {
-        // New repeat nodeset is now empty
+        // New repeat sequence is now empty
 
         // If focused control is in removed iterations, remove focus first
         if (Focus.isFocusWithinContainer(XFormsRepeatControl.this))
@@ -568,11 +568,11 @@ object XFormsRepeatControl {
     extends ControlLocalSupport.XFormsControlLocal
 
   case class RefreshInfo(
-    isNodesetChanged: Boolean,
-    newIterations: Seq[XFormsRepeatIterationControl],
-    movedIterationsOldPositions: Seq[Int],
-    movedIterationsNewPositions: Seq[Int],
-    oldRepeatIndex: Int
+    isNodesetChanged            : Boolean,
+    newIterations               : Seq[XFormsRepeatIterationControl],
+    movedIterationsOldPositions : Seq[Int],
+    movedIterationsNewPositions : Seq[Int],
+    oldRepeatIndex              : Int
   )
 
   // Find the initial repeat indexes for the given doc

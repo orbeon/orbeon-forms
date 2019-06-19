@@ -76,7 +76,7 @@ public class HandlerContext {
         this.alertElementName = containingDocument.getAlertElementName();
 
         // Top-level part is containing document
-        this.partAnalysisStack = new Stack<PartAnalysis>();
+        this.partAnalysisStack = new Stack<>();
         this.partAnalysisStack.push(containingDocument.getStaticState().topLevelPart());
     }
 
@@ -181,7 +181,7 @@ public class HandlerContext {
             getController().getOutput().endPrefixMapping(formattingPrefix);
     }
 
-    public String findNewPrefix() {
+    private String findNewPrefix() {
         int i = 0;
         while (controller.namespaceContext().getURI("p" + i) != null) {
             i++;
@@ -233,7 +233,7 @@ public class HandlerContext {
         final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
         if (componentContextStack == null)
-            componentContextStack = new Stack<String>();
+            componentContextStack = new Stack<>();
         componentContextStack.push(newIdPrefix);
     }
 
@@ -243,7 +243,7 @@ public class HandlerContext {
 
     public void pushCaseContext(boolean visible) {
         if (caseContextStack == null)
-            caseContextStack = new Stack<Boolean>();
+            caseContextStack = new Stack<>();
         final boolean currentVisible = caseContextStack.size() == 0 ? true : caseContextStack.peek();
         caseContextStack.push(currentVisible && visible);
     }
@@ -280,7 +280,7 @@ public class HandlerContext {
                 : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iteration;
 
         if (repeatContextStack == null)
-            repeatContextStack = new Stack<RepeatContext>();
+            repeatContextStack = new Stack<>();
         repeatContextStack.push(new RepeatContext(iteration, newIdPostfix, repeatSelected));
     }
 
@@ -324,7 +324,7 @@ public class HandlerContext {
     public void restoreContext(XFormsControl control) {
 
         // Get ancestor controls
-        final List<XFormsControl> controls = new ArrayList<XFormsControl>();
+        final List<XFormsControl> controls = new ArrayList<>();
         {
             XFormsControl currentControl = control.parent();
             while (currentControl != null) {

@@ -354,7 +354,7 @@
 
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
-                                                <xsl:attribute name="collapse">false</xsl:attribute>
+                                                <xsl:attribute name="collapsible">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
 
                                                 <!-- Update the `changed` token -->
@@ -399,7 +399,7 @@
                                                                     <xf:group appearance="xxf:internal">
                                                                         <xsl:copy>
                                                                             <xsl:if test="self::fr:section">
-                                                                                <xsl:attribute name="collapse">false</xsl:attribute>
+                                                                                <xsl:attribute name="collapsible">false</xsl:attribute>
                                                                             </xsl:if>
                                                                             <xsl:if test="not(@id)">
                                                                                 <xsl:attribute name="id" select="$section-or-grid-id"/>

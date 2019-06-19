@@ -380,7 +380,6 @@ trait ContainingDocumentProperties {
   def isLocalInstanceInclude                = staticBooleanProperty(LOCAL_INSTANCE_INCLUDE_PROPERTY)
   def isExposeXPathTypes                    = staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
   def isSessionHeartbeat                    = staticBooleanProperty(SESSION_HEARTBEAT_PROPERTY)
-  def isUpdateRepeats                       = staticBooleanProperty(UPDATE_REPEATS_PROPERTY)
   def isXForms11Switch                      = staticBooleanProperty(XFORMS11_SWITCH_PROPERTY)
   def isClientStateHandling                 = staticBooleanProperty[String](STATE_HANDLING_PROPERTY, _ == STATE_HANDLING_CLIENT_VALUE)
   def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, _ == "full")

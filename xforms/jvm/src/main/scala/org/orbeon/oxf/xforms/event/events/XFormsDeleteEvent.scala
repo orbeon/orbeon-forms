@@ -44,5 +44,4 @@ class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def deletionDescriptors = _deletionDescriptorsOpt.get
 
   def deletedNodes  = property[Seq[NodeInfo]]("deleted-nodes").get
-  def updateRepeats = property[Boolean]("update-repeats").get
 }

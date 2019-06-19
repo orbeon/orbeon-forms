@@ -434,7 +434,6 @@
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xbl-support="org.orbeon.oxf.fr.xbl.FormRunnerXblSupport"
             xxf:xforms11-switch="false"
-            xxf:update-repeats="false"
             xxf:xpath-analysis="true"
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"

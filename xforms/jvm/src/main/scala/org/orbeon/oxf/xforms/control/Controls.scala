@@ -412,7 +412,7 @@ object Controls {
             evaluateBindingAndValues()
 
             val (newIterations, partialFocusRepeatOption) =
-              repeatControl.updateIterations(oldRepeatSeq, None, isInsertDelete = false)
+              repeatControl.updateIterations(oldRepeatSeq, isInsertDelete = false)
 
             // Remember partial focus out of repeat if needed
             if (this._partialFocusRepeatOption.isEmpty && partialFocusRepeatOption.isDefined)

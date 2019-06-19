@@ -123,7 +123,6 @@ public class XFormsProperties {
     public static final String USE_ARIA = "use-aria";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
-    public static final String UPDATE_REPEATS_PROPERTY = "update-repeats";
 
     public static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
@@ -263,7 +262,6 @@ public class XFormsProperties {
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD                    , 20,                             false),
             new PropertyDefinition(NO_UPDATES                                    , false,                          false),
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY                      , false,                          false),
-            new PropertyDefinition(UPDATE_REPEATS_PROPERTY                       , false,                          false),
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY                       , false,                          false),
             new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY                   , false,                          false),
             new PropertyDefinition(SANITIZE_PROPERTY                             , "",                             false),

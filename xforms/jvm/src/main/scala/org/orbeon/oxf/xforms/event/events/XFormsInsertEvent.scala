@@ -50,7 +50,6 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def insertLocationNode  = property[NodeInfo]("insert-location-node").get
   def insertLocationIndex = property[Int]("insert-location-index").get
   def position            = property[String]("position").get
-  def updateRepeats       = property[Boolean]("update-repeats").get
 
   // Whether this event was dispatched when the root element of an instance was replaced
   def isRootElementReplacement = insertLocationNode.isInstanceOf[DocumentInfo]

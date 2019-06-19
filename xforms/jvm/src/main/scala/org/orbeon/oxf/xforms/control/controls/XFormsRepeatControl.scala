@@ -227,78 +227,15 @@ class XFormsRepeatControl(
       contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
   }
 
-  def updateSequenceForInsertDelete(insertedNodeInfos: Option[Seq[NodeInfo]]): Unit = {
-
-    // NOTE: This can be called even if we are not relevant!
-
-    // Don't do any work if our parent is non-relevant because that means we are necessarily not relevant either
-    if (! parent.isRelevant)
-      return
-
-    // Get old nodeset
-    val oldRepeatNodeset = bindingContext.nodeset.asScala
-
-    // Set new binding context on the repeat control
-    locally {
-      // NOTE: Here we just reevaluate against the parent; maybe we should reevaluate all the way down. See also:
-      // https://github.com/orbeon/orbeon-forms/issues/2156
-      val contextStack = container.getContextStack
-      if (bindingContext.parent eq null)
-        // This might happen at the top-level if there is no model and no variables in scope?
-        contextStack.resetBindingContext
-      else {
-        contextStack.setBinding(bindingContext)
-        // If there are some preceding variables in scope, the top of the stack is now the last scoped variable
-        contextStack.popBinding
-      }
-
-      // Do this before evaluating the binding because after that controls are temporarily in an inconsistent
-      // state
-      containingDocument.getControls.cloneInitialStateIfNeeded()
-
-      evaluateBindingAndValues(
-        parentContext = contextStack.getCurrentBindingContext,
-        update        = true,
-        restoreState  = false,
-        state         = None
-      )
-    }
-
-    // Move things around and create new iterations if needed
-    if (! SaxonUtils.compareItemSeqs(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
-      // Update iterationsInitialStateIfNeeded()
-
-      val focusedBeforeOpt = containingDocument.getControls.getFocusedControl
-
-      val (newIterations, partialFocusRepeatOption) =
-        updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
-
-      // Evaluate all controls and then dispatches creation events
-      val currentControlTree = containingDocument.getControls.getCurrentControlTree
-      for (newIteration ← newIterations)
-        currentControlTree.initializeSubTree(newIteration, includeCurrent = true)
-
-      // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events
-      // if needed on the repeat control itself (subtrees are handled above).
-      containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(List(getEffectiveId), isInitial = false)
-
-      // Handle focus changes
-      Focus.updateFocusWithEvents(focusedBeforeOpt, partialFocusRepeatOption)(containingDocument)
-    }
-  }
-
   /**
-    * Update this repeat's iterations given the old and new sequences, and a list of inserted nodes if any (used for
-    * index updates). This returns a list of entirely new repeat iterations added, if any. The repeat's index is
-    * adjusted.
+    * This returns a list of entirely new repeat iterations added, if any. The repeat's index is adjusted.
     *
     * This dispatches destruction events for removed iterations, but does not dispatch creation events.
     *
     * NOTE: The new binding context must have been set on this control before calling.
     */
   def updateIterations(
-    oldRepeatItems : Seq[Item],             // old items
-    insertedItems  : Option[Seq[NodeInfo]], // items just inserted by `xf:insert` if any
+    oldRepeatItems : Seq[Item],
     isInsertDelete : Boolean
   ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
@@ -363,30 +300,8 @@ class XFormsRepeatControl(
         }
 
         // Set new repeat index (do this before creating new iterations so that index is available then)
-        val didSetIndex =
-          insertedItems match {
-            case Some(insertedItems) ⇒
-              // Insert logic
-
-              // We want to point to a new node (case of insert)
-
-              // First, try to point to the last inserted node if found
-              findItemIndexes(insertedItems, newRepeatItems).reverse find (_ != -1) exists { index ⇒
-                val newRepeatIndex = index + 1
-
-                debug("setting index to new node", Seq(
-                  "id"        → getEffectiveId,
-                  "new index" → newRepeatIndex.toString
-                ))
-
-                setIndexInternal(newRepeatIndex)
-                true
-              }
-            case None ⇒ false
-          }
-
-        if (! didSetIndex) {
-          // Non-insert logic (covers delete and other arbitrary changes to the repeat sequence)
+        locally {
+          // Covers delete and other arbitrary changes to the repeat sequence)
 
           val indexOfLastNewIteration = oldIndexes lastIndexOf -1
 

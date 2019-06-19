@@ -23,7 +23,6 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
@@ -194,14 +193,8 @@ class XFormsInstance(
 
         val insertedNodes = insertEvent.insertedNodes
 
-        if (insertEvent.updateRepeats) {
-          // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
-          // inserted.
-          updateRepeatSequences(container.getContainingDocument.getControls, Some(insertedNodes))
-        }
-
         // Update index
-        // If this was a root element replacement, rely on XXFormsReplaceEvent instead
+        // If this was a root element replacement, rely on `XXFormsReplaceEvent` instead
         if (! insertEvent.isRootElementReplacement)
           updateIndexForInsert(insertedNodes)
 
@@ -209,8 +202,6 @@ class XFormsInstance(
         // New nodes were just deleted
         if (deleteEvent.deletedNodes.nonEmpty) {
           // Find affected repeats and update them
-          if (deleteEvent.updateRepeats)
-            updateRepeatSequences(container.getContainingDocument.getControls, None)
           updateIndexForDelete(deleteEvent.deletedNodes)
         }
       case replaceEvent: XXFormsReplaceEvent ⇒
@@ -222,43 +213,6 @@ class XFormsInstance(
       case valueChangeEvent: XXFormsValueChangedEvent ⇒
         updateIndexForValueChange(valueChangeEvent)
       case _ ⇒
-    }
-
-  private def updateRepeatSequences(controls: XFormsControls, insertedNodes: Option[Seq[NodeInfo]]): Unit =
-    if (containingDocument.isUpdateRepeats) {
-
-      val repeatControls = controls.getCurrentControlTree.getRepeatControls
-      if (repeatControls.nonEmpty) {
-        val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
-
-        // Copy into `List` as `repeatControls` may change within `updateSequenceForInsertDelete()`
-        val repeatControlsList = repeatControls.to[List]
-
-        // Only update controls within same scope as modified instance
-        //
-        // - This can clearly break with e.g. `xxf:instance()`
-        // - The control may be non-relevant.
-        val candidateRepeatsIt =
-          for {
-            repeatControl ← repeatControlsList.iterator
-            // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
-            newRepeatControl ← Option(containingDocument.getControlByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
-            if newRepeatControl.getResolutionScope == instanceScope
-        } yield
-            newRepeatControl
-
-        // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail
-        if (candidateRepeatsIt.nonEmpty) {
-          // - https://github.com/orbeon/orbeon-forms/issues/2473
-          // - https://github.com/orbeon/orbeon-forms/issues/2474
-          // - https://github.com/orbeon/orbeon-forms/issues/3113
-          model.doRebuild()
-          model.doRecalculateRevalidate()
-        }
-
-        candidateRepeatsIt foreach
-          (_.updateSequenceForInsertDelete(insertedNodes))
-      }
     }
 
   // Return the instance document as a dom4j Document

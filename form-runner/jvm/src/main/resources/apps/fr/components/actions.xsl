@@ -527,8 +527,8 @@
 
                 <xsl:for-each select="fr:map">
                     <xf:action>
-                        <xf:var name="src" context="$left-container/*[$p]"  value="bind(frf:bindId('{@left}'))"/>
-                        <xf:var name="dst" context="$right-container/*[$p]" value="bind(frf:bindId('{@right}'))"/>
+                        <xf:var name="src" context="$left-container/*[$p]"  value="(.//{@left})[1]"/>
+                        <xf:var name="dst" context="$right-container/*[$p]" value="(.//{@right})[1]"/>
 
                         <xf:setvalue
                             ref="$dst"
@@ -559,10 +559,10 @@
                         bind(
                             frf:bindId('{$right-name}')
                         )/*[$p]"/>
-
+                
                 <xf:setvalue
                     context="$right-context"
-                    ref="bind(frf:bindId('{@right}'))"
+                    ref="(.//{@right})[1]"
                     value="event('xxf:value')"/>
 
             </xf:action>

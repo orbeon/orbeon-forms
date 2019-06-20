@@ -273,7 +273,6 @@
                             <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" xxf:update="full">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
-                                <!-- TODO: Move to Scala.js. -->
                                 <xf:action type="javascript" event="fr-section-scroll" target="#observer">
                                     <![CDATA[
                                     var $ = ORBEON.jQuery;
@@ -341,11 +340,11 @@
 
                                             <xf:var
                                                 name="section-id"
-                                                value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
+                                                value="replace(event('xxf:targetid'), '-case$', '')"
                                                 xxbl:scope="inner"/>
 
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
-                                                <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
+                                                <xf:property name="section-binding" value="xxf:binding(replace(event('xxf:targetid'), '-case$', ''))" xxbl:scope="outer"/>
                                                 <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
                                                 <xf:property name="validate"        value="$local/validate/data(.)"/>
                                                 <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
@@ -355,7 +354,7 @@
 
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
-                                                <xsl:attribute name="collapsible">false</xsl:attribute>
+                                                <xsl:attribute name="collapse">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
 
                                                 <!-- Update the `changed` token -->
@@ -400,7 +399,7 @@
                                                                     <xf:group appearance="xxf:internal">
                                                                         <xsl:copy>
                                                                             <xsl:if test="self::fr:section">
-                                                                                <xsl:attribute name="collapsible">false</xsl:attribute>
+                                                                                <xsl:attribute name="collapse">false</xsl:attribute>
                                                                             </xsl:if>
                                                                             <xsl:if test="not(@id)">
                                                                                 <xsl:attribute name="id" select="$section-or-grid-id"/>
@@ -453,53 +452,15 @@
                                 <!-- Statically-known section and grid ids -->
                                 <xf:var
                                     name="nav-section-or-grid-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-nav-section-or-grid-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
+                                    value="{string-join(for $id in $static-nav-section-or-grid-ids return concat('''', $id, ''''), ',')}"/>
 
                                 <xf:var
                                     name="nav-matching-top-level-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-matching-top-level-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
+                                    value="{string-join(for $id in $static-matching-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
 
                                 <xf:var
                                     name="top-level-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-top-level-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="sections-with-paging-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-sections-with-paging-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="sections-with-paging-case-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-sections-with-paging-case-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
+                                    value="{string-join(for $id in $static-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
 
                                 <xf:var
                                     name="validated-mode"
@@ -512,14 +473,7 @@
                                 <xf:var
                                     name="relevant-nav-section-or-grid-ids"
                                     value="
-                                        $nav-section-or-grid-ids[
-                                            xxf:is-control-relevant(.) and (
-                                                not(
-                                                    . = $sections-with-paging-section-ids and
-                                                    count(xxf:binding(.)/*) = 0
-                                                )
-                                            )
-                                        ]"/>
+                                        $nav-section-or-grid-ids[xxf:is-control-relevant(.)]"/>
 
                                 <!-- TODO: maybe use xxf:is-control-relevant(.) too -->
                                 <xf:var
@@ -573,6 +527,26 @@
                                 <xf:var
                                     name="next-top-level-case-ids"
                                     value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
+
+                                <xf:var
+                                    name="sections-with-paging-section-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-section-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
+
+                                <xf:var
+                                    name="sections-with-paging-case-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-case-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
 
                                 <xf:var
                                     name="current-section-uses-paging"
@@ -645,7 +619,7 @@
 
                                 <!-- Wizard.scala uses this via the variable `id`-->
                                 <xf:var
-                                    id="fr-wizard-allow-prev"
+                                    id="fr-wizard-is-first-nav"
                                     name="allow-prev"
                                     value="
                                         exists($prev-repeat-id-and-index-opt) or
@@ -654,7 +628,7 @@
 
                                 <!-- Wizard.scala uses this via the variable `id`-->
                                 <xf:var
-                                    id="fr-wizard-allow-next"
+                                    id="fr-wizard-is-last-nav"
                                     name="allow-next"
                                     value="
                                         (: We can go to the next top-level section :)
@@ -665,19 +639,8 @@
                                         exists($next-nested-case-id-opt)
                                     "/>
 
-
-                                <xf:var
-                                    id="fr-wizard-is-first-nav"
-                                    name="is-first-nav"
-                                    value="empty($prev-nav-case-ids)"/>
-
-                                <xf:var
-                                    id="fr-wizard-is-last-nav"
-                                    name="is-last-nav"
-                                    value="empty($next-nav-case-ids)"/>
-
-                                <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
-                                <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="prev-button-ref" value="if ($allow-prev) then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="next-button-ref" value="if ($allow-next) then xxf:instance('local')/readwrite else ''"/>
 
                                 <!-- We put this here because we need `$relevant-top-level-section-ids` -->
                                 <xf:action event="fr-update-section-status">
@@ -806,10 +769,7 @@
                                             <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-case-id"
-                                                value="(
-                                                    Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1],
-                                                    $last-available-and-visited-top-level-case-id
-                                                )[1]"/>
+                                                value="Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1]"/>
 
                                             <xf:toggle
                                                 case="{{$last-available-and-visited-top-level-case-id}}"/>
@@ -890,14 +850,10 @@
                                                     <xf:output value="
                                                         sum(
                                                             (
-                                                                count(
-                                                                    $relevant-nav-case-ids[
-                                                                        not(. = $sections-with-paging-case-ids)
-                                                                    ]
-                                                                ),
+                                                                count($relevant-nav-case-ids),
                                                                 for $section-id in $sections-with-paging-section-ids
                                                                 return
-                                                                    count(xxf:binding($section-id)/*)
+                                                                    count(xxf:binding($section-id)/*) - 1
                                                             )
                                                         )"/>
                                                 </xh:span>
@@ -1237,7 +1193,7 @@
 
                                             <xf:var
                                                 name="current-top-level-section-id"
-                                                value="Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id)"/>
+                                                value="replace($current-top-level-case-id, '-case$', '')"/>
 
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
                                                 <xf:property name="section-binding" value="xxf:binding($current-top-level-section-id)"              xxbl:scope="outer"/>

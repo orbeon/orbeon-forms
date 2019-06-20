@@ -57,7 +57,7 @@
                         name="base-level"
                         select="
                             (
-                                @base-level[. castable as xs:integer]/xs:integer(.)[. ge 0],
+                                $root/@base-level[. castable as xs:integer]/xs:integer(.)[. ge 0],
                                 0
                             )[1]"/>
 
@@ -67,7 +67,7 @@
                             min(
                                 (
                                     (
-                                        @level[. castable as xs:integer]/xs:integer(.)[. ge $min-level],
+                                        $root/@level[. castable as xs:integer]/xs:integer(.)[. ge $min-level],
                                         $default-level
                                     )[1] + $base-level,
                                     $max-level
@@ -75,15 +75,15 @@
                             )"/>
 
                     <!-- Section configuration -->
-                    <xsl:variable name="editable"       select="exists(@edit-ref)"/>
-                    <xsl:variable name="collapsible"    select="not(@collapsible = 'false' or @collapse = 'false')"/>
-                    <xsl:variable name="animate"        select="not(@animate = 'false')"/>
-                    <xsl:variable name="readonly"       select="@readonly = 'true'"/>
+                    <xsl:variable name="editable"       select="exists($root/@edit-ref)"/>
+                    <xsl:variable name="collapsible"    select="not($root/@collapsible = 'false' or $root/@collapse = 'false')"/>
+                    <xsl:variable name="animate"        select="not($root/@animate = 'false')"/>
+                    <xsl:variable name="readonly"       select="$root/@readonly = 'true'"/>
                     <xsl:variable name="is-repeat"      select="frf:isRepeat(.)"/>
-                    <xsl:variable name="appearance"     select="(@appearance, 'full')[1]"/>
+                    <xsl:variable name="appearance"     select="($root/@appearance, 'full')[1]"/>
                     <xsl:variable name="repeat-menu"    select="$appearance = 'full'    and not($readonly)"/>
                     <xsl:variable name="right-column"   select="$appearance = 'minimal' and not($readonly)"/>
-                    <xsl:variable name="has-html-label" select="xf:label/@mediatype = 'text/html'"/>
+                    <xsl:variable name="has-html-label" select="xf:label/$root/@mediatype = 'text/html'"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -102,14 +102,14 @@
 
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
-                            class="{@class}{if ($editable) then ' {$fb-can-do-classes}' else ''}"
+                            class="{$root/@class}{if ($editable) then ' {$fb-can-do-classes}' else ''}"
                             xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
                                 <xf:var
                                     name="initially-open"
-                                    value="fr:is-readonly-mode() or not('{@open}' = 'false')"/>
+                                    value="fr:is-readonly-mode() or not('{$root/@open}' = 'false')"/>
 
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="xh:h{$level}">
@@ -167,7 +167,7 @@
                                                         ref="*"
                                                         xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly">
 
-                                                        <!-- Forward iteration events -->
+                                                        <!-- Forward iteration events to the outside -->
                                                         <xf:action
                                                             event="fr-iteration-added fr-iteration-removed"
                                                             target="#observer"

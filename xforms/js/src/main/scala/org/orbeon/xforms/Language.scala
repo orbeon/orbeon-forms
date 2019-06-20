@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.xforms.Constants.HtmlLangAttr
 import org.scalajs.dom
+import org.scalajs.dom.Element
 import org.scalajs.dom.raw.{MutationObserver, MutationRecord}
 
 import scala.scalajs.js
@@ -52,13 +53,13 @@ object Language {
 
     def langElement: Option[dom.Element] = {
 
-      val langElements = Iterator(
-        () ⇒ dom.document.documentElement,
-        () ⇒ dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]")
+      val langElements: Iterator[() ⇒ Option[Element]] = Iterator(
+        () ⇒ Option(dom.document.documentElement),
+        () ⇒ Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]"))
       )
       langElements
         .map(_.apply)
-        .find(_.hasAttribute(HtmlLangAttr))
+        .collectFirst { case Some(element) if element.hasAttribute(HtmlLangAttr) ⇒ element }
     }
   }
 }

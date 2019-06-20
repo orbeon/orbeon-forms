@@ -155,7 +155,22 @@
                 <xsl:variable name="remove-constraint"        select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"                select="concat($root/@id, '-repeat')"/>
 
-                <xsl:variable name="binding-expression-opt"   select="($root/@ref, $root/@nodeset, for $b in $root/@bind return concat('bind(''', $b, ''')'))[1]" as="xs:string?"/>
+                <xsl:variable
+                    name="binding-expression-opt"
+                    as="xs:string?"
+                    select="
+                        (
+                            $root/@ref,
+                            $root/@nodeset,
+                            for $b in $root/@bind
+                            return
+                                concat(
+                                    'bind(''',
+                                    $b,
+                                    ''')'
+                                )
+                        )[1]"/>
+
                 <xsl:variable name="repeat-expression-suffix" select="if ($is-content-repeat) then '/*' else ''"/>
 
                 <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>

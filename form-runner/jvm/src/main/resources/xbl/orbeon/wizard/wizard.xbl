@@ -887,9 +887,9 @@
                             value="not($separate-toc-mode) and $current-nav-case-id = '{concat($static-section-id, '-case')}'"/>
 
                         <xh:li class="{{
-                            'disabled'   [not($top-level-section-available)],
-                            'active'     [$section-active or $top-level-section-active],
-                            'started'    [$top-level-section-visited],
+                            'disabled'           [not($top-level-section-available)],
+                            'active'             [$section-active or $top-level-section-active],
+                            'started'            [$top-level-section-visited],
                             $top-level-section-tokens,
 
                             'first-page'         [$relevant-top-level-case-ids[1]      = '{concat($static-section-id, '-case')}'],

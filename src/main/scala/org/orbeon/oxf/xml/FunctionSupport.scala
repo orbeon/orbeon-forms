@@ -28,18 +28,18 @@ trait DefaultFunctionSupport
     with NoPreEvaluate
 
 trait RuntimeDependentFunction extends DefaultFunctionSupport {
-  override def getIntrinsicDependencies =
+  override def getIntrinsicDependencies: Int =
     super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
 }
 
 trait DependsOnContextItem extends FunctionSupport {
-  override def getIntrinsicDependencies =
+  override def getIntrinsicDependencies: Int =
     super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 }
 
 // Mix-in for functions which use the context if single optional argument is missing
 trait DependsOnContextItemIfSingleArgumentMissing extends FunctionSupport {
-  override def getIntrinsicDependencies =
+  override def getIntrinsicDependencies: Int =
     super.getIntrinsicDependencies | (if (arguments.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0)
 }
 

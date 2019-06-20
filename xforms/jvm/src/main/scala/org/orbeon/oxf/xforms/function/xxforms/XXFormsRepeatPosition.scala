@@ -26,7 +26,7 @@ import org.orbeon.saxon.value.Int64Value
  */
 class XXFormsRepeatPosition extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext): Int64Value = {
     implicit val ctx = xpathContext
     new Int64Value(bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).position)
   }

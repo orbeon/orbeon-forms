@@ -195,7 +195,7 @@ public class XFormsActionInterpreter {
 
             // Get action and execute it
             final DynamicActionContext dynamicActionContext =
-                    new DynamicActionContext(this, actionAnalysis, hasOverriddenContext ? Option.apply(contextItem) : Option.apply((Item) null));
+                    new DynamicActionContext(this, actionAnalysis, hasOverriddenContext ? Option.apply(contextItem) : Option.apply(null));
 
             // Push binding excluding excluding @context and @model
             // NOTE: If we repeat, re-evaluate the action binding.
@@ -405,7 +405,7 @@ public class XFormsActionInterpreter {
 
         // First resolve the object by static id
         final scala.Option<XFormsObject> result =
-            _container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.<Item>apply(null));
+            _container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.apply(null));
 
         if (result.isEmpty()) {
             return null;

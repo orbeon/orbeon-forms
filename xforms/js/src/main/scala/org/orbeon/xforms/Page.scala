@@ -15,8 +15,8 @@ package org.orbeon.xforms
 
 import org.orbeon.xforms.facade.Control
 import org.scalajs.dom
-import org.scalajs.dom.html
-import org.scalajs.dom.raw.{Attr, MutationObserver, MutationRecord}
+import org.scalajs.dom.raw.{MutationObserver, MutationRecord}
+import org.scalajs.dom.{Element, html}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -47,13 +47,13 @@ object Page {
 
   private def langElement: Option[dom.Element] = {
 
-    val langElements = Iterator(
-      () ⇒ dom.document.documentElement,
-      () ⇒ dom.document.querySelector(".orbeon-portlet-div[lang]")
+    val langElements: Iterator[() ⇒ Option[Element]] = Iterator(
+      () ⇒ Option(dom.document.documentElement),
+      () ⇒ Option(dom.document.querySelector(".orbeon-portlet-div[lang]"))
     )
     langElements
       .map(_.apply())
-      .find(_.hasAttribute(LangAttr))
+      .collectFirst { case Some(element) if element.hasAttribute(LangAttr) ⇒ element }
   }
 
   // noinspection AccessorLikeMethodIsEmptyParen

@@ -77,16 +77,30 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
 
-                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+                <!-- Allow  -->
+                <xsl:variable
+                    name="repeat-expression"
+                    as="xs:string"
+                    select="
+                        (
+                            $root/@ref,
+                            $root/@nodeset,
+                            for $b in $root/@bind
+                            return
+                                concat(
+                                    'bind(''',
+                                    $b,
+                                    ''')'
+                                )
+                        )[1]"/>
 
                 <xsl:variable name="appearance"         select="($root/@appearance, 'full')[1]"/>
                 <xsl:variable name="insert"             select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
                 <xsl:variable name="remove-at-bottom"   select="false()"/>
+                <xsl:variable name="use-paging"         select="$root/@page-size = '1'"/>
 
                 <xsl:template match="/*">
-
-                    <!-- Root element -->
-                    <xh:div xxf:control="true" class="{'fr-repeat-container', @class}">
+                    <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-paging], @class}">
 
                         <xf:var name="repeat-context">
                             <xxf:value value="." xxbl:scope="outer"/>
@@ -358,8 +372,22 @@
                                                 xxbl:scope="inner"
                                                 value="'can-remove' = xxf:split(xxf:avt-value('fr-repeater-repeat-iteration', 'class'))"/>
                                         </xf:var>
-                                        <!-- Content of the repeat iteration -->
-                                        <xsl:apply-templates select="*"/>
+
+                                        <xsl:choose>
+                                            <xsl:when test="$use-paging">
+                                                <xf:switch caseref="xxf:repeat-position() = index('{$repeat-id}')" xxf:update="full">
+                                                    <xf:case value="true()">
+                                                        <xsl:apply-templates select="*"/>
+                                                    </xf:case>
+                                                    <xf:case value="false()"/>
+                                                </xf:switch>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <!-- Content of the repeat iteration -->
+                                                <xsl:apply-templates select="*"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+
                                     </xf:group>
                                 </xh:div>
                             </xf:group>

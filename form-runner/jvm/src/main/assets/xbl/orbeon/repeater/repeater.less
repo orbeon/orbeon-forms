@@ -21,9 +21,14 @@
             width: 100%;
         }
 
+        .fr-repeat-container:not(.fr-repeater-paging) {
+            .fr-repeater-repeat-iteration {
+                border-bottom: 3px solid #ddd;
+            }
+        }
+
         .fr-repeater-repeat-iteration {
             display: flex;
-            border-bottom: 3px solid #ddd;
             margin-bottom: 0; // https://github.com/orbeon/orbeon-forms/issues/3745
         }
 

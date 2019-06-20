@@ -46,6 +46,8 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
+                <xsl:variable name="root" select="/*[1]"/>
+
                 <xsl:template match="/*">
 
                     <!-- Section level, see https://github.com/orbeon/orbeon-forms/issues/3011 -->
@@ -163,9 +165,15 @@
                                             xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
+
+                                                    <xsl:variable
+                                                        name="repeater-id"
+                                                        select="concat($root/@id, '-repeater')"/>
+
                                                     <fr:repeater
+                                                        id="{$repeater-id}"
                                                         ref="*"
-                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly">
+                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly page-size">
 
                                                         <!-- Forward iteration events to the outside -->
                                                         <xf:action

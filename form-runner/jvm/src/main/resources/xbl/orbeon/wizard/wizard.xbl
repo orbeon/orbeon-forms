@@ -257,6 +257,14 @@
                     name="static-top-level-section-ids"
                     select="/*/fr:section/@id/string()"/>
 
+                <xsl:variable
+                    name="static-sections-with-paging-section-ids"
+                    select="/*//fr:section[@page-size = '1']/@id/string()"/>
+
+                <xsl:variable
+                    name="static-sections-with-paging-case-ids"
+                    select="for $id in $static-sections-with-paging-section-ids return concat($id, '-case')"/>
+
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal">
                         <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
@@ -521,44 +529,118 @@
                                     value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
 
                                 <xf:var
-                                    name="allow-next-top-level"
+                                    name="sections-with-paging-section-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-section-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
+
+                                <xf:var
+                                    name="sections-with-paging-case-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-case-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
+
+                                <xf:var
+                                    name="current-section-uses-paging"
+                                    value="$current-nav-case-id = $sections-with-paging-case-ids"/>
+
+                                <xf:var
+                                    name="prev-repeat-id-and-index-opt"
+                                    value="
+                                        if ($current-section-uses-paging) then
+                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                                $current-index := index($repeat-id)
+                                            return
+                                                if ($current-index gt 1) then
+                                                    ($repeat-id, $current-index - 1)
+                                                else
+                                                    ()
+                                        else
+                                            ()
+                                    "/>
+
+                                <xf:var
+                                    name="next-repeat-id-and-index-opt"
+                                    value="
+                                        if ($current-section-uses-paging) then
+                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                                $current-index := index($repeat-id),
+                                                $last-index    := count(xxf:binding($section-id)/*)
+                                            return
+                                                if ($current-index lt $last-index) then
+                                                    ($repeat-id, $current-index + 1)
+                                                else
+                                                    ()
+                                        else
+                                            ()
+                                    "/>
+
+                                <xf:var
+                                    name="next-nested-case-id-opt"
+                                    value="
+                                        let $next-nav-case-id := $next-nav-case-ids[1]
+                                        return
+                                            $next-nav-case-id[
+                                                Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id) =
+                                                    $nav-matching-top-level-section-ids[
+                                                        index-of(
+                                                            $nav-section-or-grid-ids,
+                                                            Wizard:sectionIdFromCaseIdOpt($next-nav-case-id)
+                                                        )
+                                                    ]
+                                            ]
+                                    "/>
+
+                                <xf:var
+                                    name="next-top-level-case-id-opt"
                                     value="
                                         let $next-top-level-case-id := $next-top-level-case-ids[1]
                                         return
-                                            exists($next-top-level-case-id) and
-                                            exists(
-                                                index-of(
-                                                    xxf:split(xxf:instance('available-top-level-sections')),
-                                                    frf:controlNameFromIdOpt(replace($next-top-level-case-id, '-case$', ''))
+                                            (: Exists and is available :)
+                                            $next-top-level-case-id[
+                                                exists(
+                                                    index-of(
+                                                        xxf:split(xxf:instance('available-top-level-sections')),
+                                                        frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($next-top-level-case-id))
+                                                    )
                                                 )
-                                            )"/>
+                                            ]
+                                    "/>
 
+                                <!-- Wizard.scala uses this via the variable `id`-->
                                 <xf:var
+                                    id="fr-wizard-is-first-nav"
+                                    name="allow-prev"
+                                    value="
+                                        exists($prev-repeat-id-and-index-opt) or
+                                        exists($prev-nav-case-ids)
+                                    "/>
+
+                                <!-- Wizard.scala uses this via the variable `id`-->
+                                <xf:var
+                                    id="fr-wizard-is-last-nav"
                                     name="allow-next"
                                     value="
                                         (: We can go to the next top-level section :)
-                                        $allow-next-top-level or
-                                        (: Next is not in a different top-level section :)
-                                        replace($current-top-level-case-id, '-case$', '') =
-                                            $nav-matching-top-level-section-ids[
-                                                index-of(
-                                                    $nav-section-or-grid-ids,
-                                                    replace($next-nav-case-ids[1], '-case$', '')
-                                                )
-                                            ]"/>
+                                        exists($next-top-level-case-id-opt) or
+                                        (: We can go to the next repeated section iteration :)
+                                        exists($next-repeat-id-and-index-opt) or
+                                        (: Next is in the same top-level section :)
+                                        exists($next-nested-case-id-opt)
+                                    "/>
 
-                                <xf:var
-                                    id="fr-wizard-is-first-nav"
-                                    name="is-first-nav"
-                                    value="empty($prev-nav-case-ids)"/>
-
-                                <xf:var
-                                    id="fr-wizard-is-last-nav"
-                                    name="is-last-nav"
-                                    value="empty($next-nav-case-ids)"/>
-
-                                <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
-                                <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="prev-button-ref" value="if ($allow-prev) then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="next-button-ref" value="if ($allow-next) then xxf:instance('local')/readwrite else ''"/>
 
                                 <!-- We put this here because we need `$relevant-top-level-section-ids` -->
                                 <xf:action event="fr-update-section-status">
@@ -716,23 +798,64 @@
                                                         <xh:i class="fa fa-fw fa-chevron-left"/>&#x200b;
                                                     </xf:label>
                                                     <xf:action event="DOMActivate">
-                                                        <xf:setvalue
-                                                            ref="xxf:instance('local')/current-case-id"
-                                                            value="$prev-nav-case-ids[last()]"/>
-                                                        <xf:toggle
-                                                            case="{{$prev-nav-case-ids[last()]}}"/>
-                                                        <xf:setfocus
-                                                            control="{{$prev-nav-case-ids[last()]}}"
-                                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                                        <xf:action if="$allow-prev">
+                                                            <xf:action if="exists($prev-repeat-id-and-index-opt)">
+                                                                <xf:setindex
+                                                                    repeat="{{$prev-repeat-id-and-index-opt[1]}}"
+                                                                    index="$prev-repeat-id-and-index-opt[2]"/>
+                                                            </xf:action>
+                                                            <xf:action if="empty($prev-repeat-id-and-index-opt)">
+                                                                <xf:var name="prev-case-id" value="$prev-nav-case-ids[last()]"/>
+                                                                <xf:setvalue
+                                                                    ref="xxf:instance('local')/current-case-id"
+                                                                    value="$prev-case-id"/>
+                                                                <xf:toggle
+                                                                    case="{{$prev-case-id}}"/>
+                                                                <xf:action if="$prev-case-id = $sections-with-paging-case-ids">
+                                                                    <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($prev-case-id)"/>
+                                                                    <xf:setindex
+                                                                        repeat="{{concat($section-id, '-repeater-repeat')}}"
+                                                                        index="count(xxf:binding($section-id)/*)"/>
+                                                                </xf:action>
+                                                                <xf:setfocus
+                                                                    control="{{$prev-case-id}}"
+                                                                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                                                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                                            </xf:action>
+                                                        </xf:action>
                                                     </xf:action>
                                                 </xf:trigger>
                                             </xh:li>
                                             <xh:li>
                                                 <xh:span class="fr-page-number">
-                                                    <xf:output value="$nav-case-index"/>
+                                                    <xf:output value="
+                                                        sum(
+                                                            (
+                                                                if (exists($prev-repeat-id-and-index-opt)) then
+                                                                    $prev-repeat-id-and-index-opt[2] + 1
+                                                                else
+                                                                    1,
+                                                                for $case-id in $prev-nav-case-ids
+                                                                return
+                                                                    if (
+                                                                        $case-id = $sections-with-paging-case-ids
+                                                                    ) then
+                                                                        count(xxf:binding(Wizard:sectionIdFromCaseIdOpt($case-id))/*)
+                                                                    else
+                                                                        1
+                                                            )
+                                                        )"/>
+
                                                     <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
-                                                    <xf:output value="count($relevant-nav-case-ids)"/>
+                                                    <xf:output value="
+                                                        sum(
+                                                            (
+                                                                count($relevant-nav-case-ids),
+                                                                for $section-id in $sections-with-paging-section-ids
+                                                                return
+                                                                    count(xxf:binding($section-id)/*) - 1
+                                                            )
+                                                        )"/>
                                                 </xh:span>
                                             </xh:li>
                                             <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
@@ -747,15 +870,29 @@
                                                             name="fr-wizard-visit-all-to-current"
                                                             targetid="fr-wizard-visit-all-to-current"/>
                                                         <xf:action if="$allow-next">
-                                                            <xf:setvalue
-                                                                ref="xxf:instance('local')/current-case-id"
-                                                                value="$next-nav-case-ids[1]"/>
-                                                            <xf:toggle
-                                                                case="{{$next-nav-case-ids[1]}}"/>
-                                                            <xf:setfocus
-                                                                control="{{$next-nav-case-ids[1]}}"
-                                                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                                            <xf:action if="exists($next-repeat-id-and-index-opt)">
+                                                                <xf:setindex
+                                                                    repeat="{{$next-repeat-id-and-index-opt[1]}}"
+                                                                    index="$next-repeat-id-and-index-opt[2]"/>
+                                                            </xf:action>
+                                                            <xf:action if="empty($next-repeat-id-and-index-opt)">
+                                                                <xf:var name="next-case-id" value="$next-nav-case-ids[1]"/>
+                                                                <xf:setvalue
+                                                                    ref="xxf:instance('local')/current-case-id"
+                                                                    value="$next-case-id"/>
+                                                                <xf:toggle
+                                                                    case="{{$next-case-id}}"/>
+                                                                <xf:action if="$next-case-id = $sections-with-paging-case-ids">
+                                                                    <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($next-case-id)"/>
+                                                                    <xf:setindex
+                                                                        repeat="{{concat($section-id, '-repeater-repeat')}}"
+                                                                        index="1"/>
+                                                                </xf:action>
+                                                                <xf:setfocus
+                                                                    control="{{$next-case-id}}"
+                                                                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                                                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                                            </xf:action>
                                                         </xf:action>
                                                         <xf:action if="not($allow-next)">
                                                             <xf:setfocus
@@ -853,10 +990,39 @@
                     <xsl:variable
                         name="static-top-level-section-case-id"
                         select="concat($static-top-level-section-id, '-case')"/>
+                    <xsl:variable
+                        name="use-paging"
+                        select="$static-current-section/@page-size = '1'"/>
 
                     <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
-                    <xf:group>
-                        <xsl:copy-of select="@model | @context | @bind | @ref"/>
+                    <xsl:element name="xf:{if ($use-paging) then 'repeat' else 'group'}">
+
+                        <xsl:choose>
+                            <xsl:when test="$use-paging">
+                                <xsl:variable
+                                    name="repeat-expression"
+                                    as="xs:string?"
+                                    select="
+                                        (
+                                            $static-current-section/@ref,
+                                            $static-current-section/@nodeset,
+                                            for $b in $static-current-section/@bind
+                                                return
+                                                    concat(
+                                                        'bind(''',
+                                                        $b,
+                                                        ''')'
+                                                    )
+                                        )[1]"/>
+
+                                <xsl:attribute
+                                    name="ref"
+                                    select="concat($repeat-expression, '/*')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy-of select="@model | @context | @bind | @ref"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
                         <xf:var name="top-level-section-available">
                             <xxf:value
@@ -878,13 +1044,42 @@
                             name="top-level-section-tokens"
                             value="xxf:split(@fr:section-status)"/>
 
-                        <xf:var
-                            name="top-level-section-active"
-                            value="not($separate-toc-mode) and $current-top-level-case-id = '{concat($static-section-id, '-case')}'"/>
+                        <xsl:choose>
+                            <xsl:when test="$use-paging">
+                                <xf:var
+                                    name="top-level-section-active"
+                                    value="
+                                        not($separate-toc-mode) and
+                                        $current-top-level-case-id = '{$static-section-id}-case' and
+                                        xxf:repeat-position() = index('{$static-section-id}-repeater-repeat')"/>
+                                <xf:var
+                                    name="section-active"
+                                    value="
+                                        not($separate-toc-mode) and
+                                        $current-nav-case-id = '{$static-section-id}-case' and
+                                        xxf:repeat-position() = index('{$static-section-id}-repeater-repeat')"/>
+                                <xf:var
+                                    name="section-label"
+                                    value="concat(xxf:label('{$static-section-id}'), ' ', xxf:repeat-position())"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:var
+                                    name="top-level-section-active"
+                                    value="
+                                        not($separate-toc-mode) and
+                                        $current-top-level-case-id = '{$static-section-id}-case'"/>
+                                <xf:var
+                                    name="section-active"
+                                    value="
+                                        not($separate-toc-mode) and
+                                        $current-nav-case-id = '{$static-section-id}-case'"/>
+                                <xf:var
+                                    name="section-label"
+                                    value="xxf:label('{$static-section-id}')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
-                        <xf:var
-                            name="section-active"
-                            value="not($separate-toc-mode) and $current-nav-case-id = '{concat($static-section-id, '-case')}'"/>
+
 
                         <xh:li class="{{
                             'disabled'           [not($top-level-section-available)],
@@ -896,13 +1091,6 @@
                             'last-top-level-page'[$relevant-top-level-case-ids[last()] = '{concat($static-section-id, '-case')}'],
                             'last-page'          [$relevant-nav-case-ids[last()]       = '{concat($static-section-id, '-case')}']
                         }}">
-
-                            <!-- For debugging -->
-                            <!--<xf:output value="string-join($top-level-section-tokens, '/')"/>-->
-
-                            <xf:var
-                                name="section-label"
-                                value="xxf:label('{$static-section-id}')"/>
 
                             <xf:trigger appearance="minimal">
                                 <xf:label>
@@ -981,6 +1169,12 @@
                                     <xf:toggle
                                         case="{$static-nav-section-id}-case"/>
 
+                                    <xsl:if test="$use-paging">
+                                        <xf:setindex
+                                            repeat="{$static-section-id}-repeater-repeat"
+                                            index="xxf:repeat-position()"/>
+                                    </xsl:if>
+
                                     <!-- ...and always focus on specific sub-section -->
                                     <xf:setfocus
                                         control="{$static-section-id}"
@@ -1033,7 +1227,7 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xh:li>
-                    </xf:group>
+                    </xsl:element>
                 </xsl:template>
 
             </xsl:transform>

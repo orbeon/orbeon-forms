@@ -386,7 +386,7 @@
                             select="$resources/*/xbl:binding/fb:metadata/(fb:template | fb:templates/fb:view)/*"
                             mode="filter-fb-template"/>
                         <!-- So that the xxbl:global for repeated sections is included -->
-                        <fr:repeater/>
+                        <fr:repeater ref="()"/>
                     </xf:group>
                 </xsl:if>
             </xsl:if>

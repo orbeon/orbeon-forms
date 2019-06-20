@@ -83,6 +83,7 @@ object Wizard {
   def wizardCurrentCaseIdOpt: Option[String] =
     findWizardState map (_ elemValue "current-case-id") flatMap (_.trimAllToOpt)
 
+  //@XPathFunction
   def sectionIdFromCaseIdOpt(id: String): Option[String] =
     id.endsWith("-case") option id.substring(0, id.length - "-case".length)
 

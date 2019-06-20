@@ -80,13 +80,8 @@ abstract class XFormsAction extends Logging {
     }
   }
 
-  def resolveControl(controlId: String)(implicit context: DynamicActionContext): Option[XFormsControl] = {
-
-    val interpreter = context.interpreter
-    val element = context.element
-
-    collectByErasedType[XFormsControl](interpreter.resolveObject(element, controlId))
-  }
+  def resolveControl(controlId: String)(implicit context: DynamicActionContext): Option[XFormsControl] =
+    collectByErasedType[XFormsControl](context.interpreter.resolveObject(context.element, controlId))
 
   // Resolve an optional boolean AVT
   // Return None if there is no attribute or if the AVT cannot be evaluated

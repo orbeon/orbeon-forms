@@ -15,13 +15,12 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
-
-import scala.util.control.NonFatal
 
 /**
  * 9.3.7 The setindex Element
@@ -33,13 +32,11 @@ class XFormsSetindexAction extends XFormsAction {
     val interpreter = context.interpreter
     val element = context.analysis.element
 
-    // Get the repeat static id
     val repeatStaticId =
       resolveStringAVT("repeat")(context) getOrElse
         (throw new OXFException(s"Cannot resolve mandatory 'repeat' attribute on ${context.actionName} action."))
 
-    // Determine the index
-    val index = {
+    val indexOpt = {
 
       val indexXPath = element.attributeValue("index")
       val contextStack = interpreter.actionXPathContext
@@ -51,12 +48,11 @@ class XFormsSetindexAction extends XFormsAction {
         "number(" + indexXPath + ")"
       )
 
-      try indexString.toInt
-      catch { case NonFatal(_) ⇒ return } // "If the index evaluates to NaN the action has no effect."
+      indexString.toIntOpt // "If the index evaluates to NaN the action has no effect."
     }
 
-    // Execute
-    XFormsSetindexAction.executeSetindexAction(interpreter, element, repeatStaticId, index)
+    indexOpt foreach
+      (XFormsSetindexAction.executeSetindexAction(interpreter, element, repeatStaticId, _))
   }
 }
 

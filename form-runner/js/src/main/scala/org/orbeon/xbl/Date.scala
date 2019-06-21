@@ -17,9 +17,9 @@ import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI, Language}
+import org.orbeon.xforms.{$, DocumentAPI, EventNames, Language}
 import org.scalajs.dom
-import org.scalajs.jquery.JQuery
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.util.control.NonFatal
@@ -56,6 +56,7 @@ private class DateCompanion extends XBLCompanion {
       datePicker = inputEl.parent().datepicker(options)
       // Register listeners
       inputEl.on("blur", () ⇒ onBlur())
+      inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ onKeypress(e))
       datePicker.onChangeDate(() ⇒ onChangeDate())
       Language.onLangChange { newLang ⇒
         datePicker.options.language = newLang
@@ -131,6 +132,11 @@ private class DateCompanion extends XBLCompanion {
   // On blur, update the field value if we have a valid date, say so the value goes from `1/2` to `1/2/2019`
   def onBlur(): Unit =
     Option(datePicker.getDate).foreach(datePicker.setDate(_))
+
+  def onKeypress(event: JQueryEventObject): Unit = {
+    if (event.keyCode.exists(keyCode ⇒ keyCode == 10 || keyCode == 13))
+      DocumentAPI.dispatchEvent(containerElem.id, eventName = "DOMActivate")
+  }
 }
 
 private object DatePickerFacade {

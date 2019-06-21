@@ -27,7 +27,7 @@
             xf|input:xxf-type('xs:decimal'),
             xf|input:xxf-type('xs:integer')"
         xxbl:mode="lhha binding value focus javascript-lifecycle"
-        xxf:external-events="fr-set-client-value"
+        xxf:external-events="fr-set-client-value DOMActivate"
         xxbl:label-for="html-input"
         xxbl:format="
             string-join(

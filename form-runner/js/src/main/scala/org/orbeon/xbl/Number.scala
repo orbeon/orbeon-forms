@@ -107,8 +107,10 @@ object Number {
 
             scribe.debug(EventNames.KeyPress)
 
-            if (e.which == 13)
+            if (Set(10, 13)(e.which)) {
               sendValueToServer()
+              DocumentAPI.dispatchEvent(containerElem.id, eventName = "DOMActivate")
+            }
           }
         }: js.ThisFunction)
 

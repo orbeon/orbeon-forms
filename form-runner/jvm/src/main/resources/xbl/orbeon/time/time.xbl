@@ -106,6 +106,12 @@
             <xbl:style src="/xbl/orbeon/time/time.css"/>
         </xbl:resources>
 
+        <xbl:handlers>
+            <xbl:handler event="DOMActivate" observer="fr-time-input">
+                <xf:dispatch name="DOMActivate" targetid="fr-time"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
@@ -153,7 +159,7 @@
 
             <xf:group ref="$binding[not($view)]">
                 <xh:div class="input-append fr-field-width-{$field-width}">
-                    <xf:input ref=".">
+                    <xf:input ref="." id="fr-time-input">
                         <xf:hint value="$placeholder" appearance="minimal"/>
                     </xf:input>
                     <xh:span class="add-on">

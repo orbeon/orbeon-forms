@@ -35,7 +35,8 @@
     <xbl:binding
         id="fr-date"
         element="fr|date, xf|input:xxf-type('xs:date')"
-        xxbl:mode="lhha binding value focus external-value javascript-lifecycle">
+        xxbl:mode="lhha binding value focus external-value javascript-lifecycle"
+        xxf:external-events="DOMActivate">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>

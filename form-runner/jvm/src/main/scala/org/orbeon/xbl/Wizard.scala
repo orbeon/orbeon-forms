@@ -74,11 +74,11 @@ object Wizard {
     resultOpt getOrElse (throw new IllegalStateException)
   }
 
-  def isWizardLastPage: Boolean =
-    findWizardVariableValue("fr-wizard-is-last-nav") exists booleanValue
-
   def isWizardFirstPage: Boolean =
-    findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
+    ! (findWizardVariableValue("fr-wizard-allow-prev") exists booleanValue)
+
+  def isWizardLastPage: Boolean =
+    ! (findWizardVariableValue("fr-wizard-allow-next") exists booleanValue)
 
   def wizardCurrentCaseIdOpt: Option[String] =
     findWizardState map (_ elemValue "current-case-id") flatMap (_.trimAllToOpt)

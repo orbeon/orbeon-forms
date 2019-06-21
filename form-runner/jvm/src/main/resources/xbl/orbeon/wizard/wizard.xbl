@@ -619,7 +619,7 @@
 
                                 <!-- Wizard.scala uses this via the variable `id`-->
                                 <xf:var
-                                    id="fr-wizard-is-first-nav"
+                                    id="fr-wizard-allow-prev"
                                     name="allow-prev"
                                     value="
                                         exists($prev-repeat-id-and-index-opt) or
@@ -628,7 +628,7 @@
 
                                 <!-- Wizard.scala uses this via the variable `id`-->
                                 <xf:var
-                                    id="fr-wizard-is-last-nav"
+                                    id="fr-wizard-allow-next"
                                     name="allow-next"
                                     value="
                                         (: We can go to the next top-level section :)

@@ -463,6 +463,26 @@
                                     value="{string-join(for $id in $static-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
 
                                 <xf:var
+                                    name="sections-with-paging-section-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-section-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
+
+                                <xf:var
+                                    name="sections-with-paging-case-ids"
+                                    value="{
+                                        string-join(
+                                            for $id in $static-sections-with-paging-case-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    }"/>
+
+                                <xf:var
                                     name="validated-mode"
                                     value="xxf:instance('local')/validate/data(.) != 'free'"/>
 
@@ -473,7 +493,14 @@
                                 <xf:var
                                     name="relevant-nav-section-or-grid-ids"
                                     value="
-                                        $nav-section-or-grid-ids[xxf:is-control-relevant(.)]"/>
+                                        $nav-section-or-grid-ids[
+                                            xxf:is-control-relevant(.) and (
+                                                not(
+                                                    . = $sections-with-paging-section-ids and
+                                                    count(xxf:binding(.)/*) = 0
+                                                )
+                                            )
+                                        ]"/>
 
                                 <!-- TODO: maybe use xxf:is-control-relevant(.) too -->
                                 <xf:var
@@ -527,26 +554,6 @@
                                 <xf:var
                                     name="next-top-level-case-ids"
                                     value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
-
-                                <xf:var
-                                    name="sections-with-paging-section-ids"
-                                    value="{
-                                        string-join(
-                                            for $id in $static-sections-with-paging-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    }"/>
-
-                                <xf:var
-                                    name="sections-with-paging-case-ids"
-                                    value="{
-                                        string-join(
-                                            for $id in $static-sections-with-paging-case-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    }"/>
 
                                 <xf:var
                                     name="current-section-uses-paging"
@@ -850,10 +857,14 @@
                                                     <xf:output value="
                                                         sum(
                                                             (
-                                                                count($relevant-nav-case-ids),
+                                                                count(
+                                                                    $relevant-nav-case-ids[
+                                                                        not(. = $sections-with-paging-case-ids)
+                                                                    ]
+                                                                ),
                                                                 for $section-id in $sections-with-paging-section-ids
                                                                 return
-                                                                    count(xxf:binding($section-id)/*) - 1
+                                                                    count(xxf:binding($section-id)/*)
                                                             )
                                                         )"/>
                                                 </xh:span>

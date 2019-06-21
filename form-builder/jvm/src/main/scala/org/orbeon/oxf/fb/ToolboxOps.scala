@@ -181,10 +181,10 @@ object ToolboxOps {
       val (into, after) = findSectionInsertionPoint
 
       val newSectionName = controlNameFromId(nextId("section"))
-      val precedingSectionName = after flatMap getControlNameOpt
+      val newGridName    = controlNameFromId(nextId("grid"))
+      val newCellIdsIt   = nextTmpIds(count = 2).toIterator
 
-      // Obtain ids first
-      val ids = nextTmpIds(count = 2).toIterator
+      val precedingSectionName = after flatMap getControlNameOpt
 
       // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
       val sectionTemplate: NodeInfo =
@@ -196,8 +196,11 @@ object ToolboxOps {
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
           <xf:label ref={FormBuilder.buildResourcePointer(newSectionName, LHHA.Label.entryName, None)}/>{
           if (withGrid)
-            <fr:grid edit-ref="" id={nextId("grid")}>
-              <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
+            <fr:grid
+              edit-ref=""
+              id={gridId(newGridName)}
+              bind={bindId(newGridName)}>
+              <fr:c id={newCellIdsIt.next()} x="1" y="1" w="6"/><fr:c id={newCellIdsIt.next()} x="7" y="1" w="6"/>
             </fr:grid>
         }</fr:section>
 
@@ -242,9 +245,9 @@ object ToolboxOps {
     withDebugGridOperation(s"insert new ${if (repeated) "repeated " else ""}grid") {
 
       val (into, after, grid) = findGridInsertionPoint
-      val newGridName         = controlNameFromId(nextId("grid"))
 
-      val ids = nextTmpIds(count = 2).toIterator
+      val newGridName  = controlNameFromId(nextId("grid"))
+      val newCellIdsIt = nextTmpIds(count = 2).toIterator
 
       // The grid template
       val gridTemplate: NodeInfo =
@@ -253,7 +256,7 @@ object ToolboxOps {
            id={gridId(newGridName)}
            bind={bindId(newGridName)}
            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-          <fr:c id={ids.next()} x="1" y="1" w="6"/><fr:c id={ids.next()} x="7" y="1" w="6"/>
+          <fr:c id={newCellIdsIt.next()} x="1" y="1" w="6"/><fr:c id={newCellIdsIt.next()} x="7" y="1" w="6"/>
         </fr:grid>
 
       // Insert grid

@@ -122,7 +122,7 @@
                         <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
                         <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
                         <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
-                        xxx should be differn
+                        <!-- TODO: Validate that the two separators should be different. -->
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">

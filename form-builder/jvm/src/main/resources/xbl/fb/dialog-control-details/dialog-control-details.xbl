@@ -694,22 +694,47 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-
                                                 <xf:var
                                                     name="items-to-show"
                                                     value="
                                                         $resources/dialog-control-details/options/item[
-                                                            fr:is-pe() or value != 'fr-encrypt'
+                                                            (fr:is-pe() or value != 'fr-encrypt') or
+                                                            not(contains(value, 'email'))
                                                         ]
                                                     "/>
-
-                                                <xf:select ref="$i/standard-classes" appearance="full">
-                                                    <xf:label ref="$resources/dialog-control-details/options/label"/>
-                                                    <xf:itemset ref="$items-to-show[not(contains(value, 'email'))]">
-                                                        <xf:label ref="label"/>
-                                                        <xf:value ref="value"/>
-                                                    </xf:itemset>
-                                                </xf:select>
+                                                <xf:group ref=".[exists($items-to-show)]">
+                                                    <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
+                                                        <xf:var name="item-to-show"      value="."/>
+                                                        <xf:var name="selected-values"   value="xxf:split($i/standard-classes)"/>
+                                                        <xf:var name="current-value"     value="$item-to-show/value"/>
+                                                        <xf:var
+                                                            name="checkbox-disabled"
+                                                            value="
+                                                                (: Don't disable this checkbox if checked, for backward compatibility :)
+                                                                not($current-value = $selected-values) and
+                                                                (
+                                                                    (
+                                                                        $selected-values   = 'fr-encrypt'
+                                                                        and $current-value = ('fr-summary', 'fr-search')
+                                                                    ) or
+                                                                    (
+                                                                        $selected-values   = ('fr-summary', 'fr-search')
+                                                                        and $current-value = 'fr-encrypt'
+                                                                    )
+                                                                )"/>
+                                                        <xf:var
+                                                            name="checkbox-binding"
+                                                            value="
+                                                                $i/standard-classes/
+                                                                (if ($checkbox-disabled) then string() else .)"/>
+                                                        <xf:select ref="$checkbox-binding" appearance="full">
+                                                            <xf:itemset ref="$item-to-show">
+                                                                <xf:label ref="label"/>
+                                                                <xf:value ref="value"/>
+                                                            </xf:itemset>
+                                                        </xf:select>
+                                                    </xf:repeat>
+                                                </xf:group>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>

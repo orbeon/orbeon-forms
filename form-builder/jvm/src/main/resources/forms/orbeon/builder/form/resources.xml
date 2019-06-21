@@ -427,7 +427,6 @@
                 <label>Name of the PDF field</label>
             </pdf-field-name>
             <options>
-                <label>Options</label>
                 <item>
                     <label>Show on Summary page</label>
                     <value>fr-summary</value>
@@ -1623,7 +1622,6 @@
                 <label>Nom du champ PDF</label>
             </pdf-field-name>
             <options>
-                <label>Options</label>
                 <item>
                     <label>Inclure dans le sommaire</label>
                     <value>fr-summary</value>
@@ -2802,7 +2800,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label todo="true">[Options]</label>
                 <item>
                     <label>Vis i oppsummering</label>
                     <value>fr-summary</value>
@@ -4009,7 +4006,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label todo="true">[Options]</label>
                 <item>
                     <label>Показывать в сводной странице</label>
                     <value>fr-summary</value>
@@ -5216,7 +5212,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Opzioni</label>
                 <item>
                     <label>Mostra nel sommario</label>
                     <value>fr-summary</value>
@@ -6415,7 +6410,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Optionen</label>
                 <item>
                     <label>In Übersicht anzeigen</label>
                     <value>fr-summary</value>
@@ -7617,7 +7611,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Asetukset</label>
                 <item>
                     <label>Näytä tiivistelmänä</label>
                     <value>fr-summary</value>
@@ -8816,7 +8809,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Página de Resumen</label>
                 <item>
                     <label>Mostar en el Resumen</label>
                     <value>fr-summary</value>
@@ -10016,7 +10008,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Opties</label>
                 <item>
                     <label>Toon in samenvatting</label>
                     <value>fr-summary</value>
@@ -11195,7 +11186,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Opções</label>
                 <item>
                     <label>Mostrar no Resumo</label>
                     <value>fr-summary</value>
@@ -12401,7 +12391,6 @@
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
             <options>
-                <label>Val</label>
                 <item>
                     <label>Visa i sammanställningen</label>
                     <value>fr-summary</value>

@@ -340,11 +340,11 @@
 
                                             <xf:var
                                                 name="section-id"
-                                                value="replace(event('xxf:targetid'), '-case$', '')"
+                                                value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
                                                 xxbl:scope="inner"/>
 
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
-                                                <xf:property name="section-binding" value="xxf:binding(replace(event('xxf:targetid'), '-case$', ''))" xxbl:scope="outer"/>
+                                                <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
                                                 <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
                                                 <xf:property name="validate"        value="$local/validate/data(.)"/>
                                                 <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
@@ -1193,7 +1193,7 @@
 
                                             <xf:var
                                                 name="current-top-level-section-id"
-                                                value="replace($current-top-level-case-id, '-case$', '')"/>
+                                                value="Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id)"/>
 
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
                                                 <xf:property name="section-binding" value="xxf:binding($current-top-level-section-id)"              xxbl:scope="outer"/>

@@ -55,7 +55,7 @@ private class DateCompanion extends XBLCompanion {
       options.language         = Language.getLang()
       datePicker = inputEl.parent().datepicker(options)
       // Register listeners
-      inputEl.on("blur", () ⇒ onBlur())
+      inputEl.on(EventNames.FocusOut, ()                     ⇒ onFocusOut())
       inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ onKeypress(e))
       datePicker.onChangeDate(() ⇒ onChangeDate())
       Language.onLangChange { newLang ⇒
@@ -129,8 +129,8 @@ private class DateCompanion extends XBLCompanion {
     DocumentAPI.setValue(containerElem.id, newValue)
   }
 
-  // On blur, update the field value if we have a valid date, say so the value goes from `1/2` to `1/2/2019`
-  def onBlur(): Unit =
+  // On `focusout`, update the field value if we have a valid date, say so the value goes from `1/2` to `1/2/2019`
+  def onFocusOut(): Unit =
     Option(datePicker.getDate).foreach(datePicker.setDate(_))
 
   def onKeypress(event: JQueryEventObject): Unit = {

@@ -75,10 +75,10 @@ object Wizard {
   }
 
   def isWizardFirstPage: Boolean =
-    ! (findWizardVariableValue("fr-wizard-allow-prev") exists booleanValue)
+    findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
 
   def isWizardLastPage: Boolean =
-    ! (findWizardVariableValue("fr-wizard-allow-next") exists booleanValue)
+    findWizardVariableValue("fr-wizard-is-last-nav") exists booleanValue
 
   def isWizardLastPage: Boolean =
     findWizardVariableValue("fr-wizard-is-last-nav") exists booleanValue

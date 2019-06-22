@@ -805,7 +805,10 @@
                                             <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-case-id"
-                                                value="Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1]"/>
+                                                value="(
+                                                    Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1],
+                                                    $last-available-and-visited-top-level-case-id
+                                                )[1]"/>
 
                                             <xf:toggle
                                                 case="{{$last-available-and-visited-top-level-case-id}}"/>

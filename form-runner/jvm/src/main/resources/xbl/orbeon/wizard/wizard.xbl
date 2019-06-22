@@ -452,35 +452,53 @@
                                 <!-- Statically-known section and grid ids -->
                                 <xf:var
                                     name="nav-section-or-grid-ids"
-                                    value="{string-join(for $id in $static-nav-section-or-grid-ids return concat('''', $id, ''''), ',')}"/>
+                                    value="({
+                                        string-join(
+                                            for $id in $static-nav-section-or-grid-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    })"/>
 
                                 <xf:var
                                     name="nav-matching-top-level-section-ids"
-                                    value="{string-join(for $id in $static-matching-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
+                                    value="({
+                                        string-join(
+                                            for $id in $static-matching-top-level-section-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    })"/>
 
                                 <xf:var
                                     name="top-level-section-ids"
-                                    value="{string-join(for $id in $static-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
+                                    value="({
+                                        string-join(
+                                            for $id in $static-top-level-section-ids
+                                                return concat('''', $id, ''''),
+                                            ','
+                                        )
+                                    })"/>
 
                                 <xf:var
                                     name="sections-with-paging-section-ids"
-                                    value="{
+                                    value="({
                                         string-join(
                                             for $id in $static-sections-with-paging-section-ids
                                                 return concat('''', $id, ''''),
                                             ','
                                         )
-                                    }"/>
+                                    })"/>
 
                                 <xf:var
                                     name="sections-with-paging-case-ids"
-                                    value="{
+                                    value="({
                                         string-join(
                                             for $id in $static-sections-with-paging-case-ids
                                                 return concat('''', $id, ''''),
                                             ','
                                         )
-                                    }"/>
+                                    })"/>
 
                                 <xf:var
                                     name="validated-mode"

@@ -1,9 +1,3 @@
-package org.orbeon.io
-
-import java.io.{InputStream, OutputStream, Reader, Writer}
-
-import scala.util.control.NonFatal
-
 /**
   * Copyright (C) 2007 Orbeon, Inc.
   *
@@ -17,6 +11,13 @@ import scala.util.control.NonFatal
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
+package org.orbeon.io
+
+import java.io.{InputStream, OutputStream, Reader, Writer}
+
+import scala.util.control.NonFatal
+
+
 object IOUtils {
 
   private val CopyBufferSize = 8192
@@ -54,6 +55,7 @@ object IOUtils {
     }
   }
 
+  // Scala 2.13 has `scala.util.Using`. Switch to that when possible.
   // Use a closable item and make sure an attempt to close it is done after use
   def useAndClose[T <: {def close()}, U](closable: T)(block: T ⇒ U): U =
     try block(closable)

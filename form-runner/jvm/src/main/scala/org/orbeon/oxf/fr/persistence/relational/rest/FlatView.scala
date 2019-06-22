@@ -26,8 +26,6 @@ import org.orbeon.scaxon.SimplePath._
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-import org.orbeon.oxf.util.IOUtils._
-
 private object FlatView {
 
   val SupportedProviders: Set[Provider] = Set(PostgreSQL)

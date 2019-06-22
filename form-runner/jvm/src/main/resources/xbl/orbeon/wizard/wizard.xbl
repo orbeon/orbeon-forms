@@ -273,6 +273,7 @@
                             <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" xxf:update="full">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
+                                <!-- TODO: Move to Scala.js. -->
                                 <xf:action type="javascript" event="fr-section-scroll" target="#observer">
                                     <![CDATA[
                                     var $ = ORBEON.jQuery;

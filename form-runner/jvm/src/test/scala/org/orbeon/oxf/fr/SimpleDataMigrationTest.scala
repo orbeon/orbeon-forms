@@ -32,7 +32,7 @@ class SimpleDataMigrationTest
      with FormRunnerSupport
      with XMLSupport {
 
-  describe("Simple data migration") {
+  ignore("Simple data migration") {
 
     val ExpectedFormData: NodeInfo =
       <form>

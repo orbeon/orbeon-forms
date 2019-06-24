@@ -637,10 +637,10 @@
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
                 <xf:setvalue
-                    ref="."
+                    ref="image, ."
                     value="$value"/>
                 <xf:setvalue
-                    ref="@mediatype"
+                    ref="image/@mediatype, ./@mediatype"
                     value="$mediatype"/>
             </xf:action>
 

@@ -396,8 +396,8 @@
                                 <xf:rebuild/>
                                 <xf:revalidate/>
                                 <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
-                                    <xf:setvalue ref="." value="$value"/>
-                                    <xf:setvalue ref="@mediatype" value="$mediatype"/>
+                                    <xf:setvalue ref="image, ." value="$value"/>
+                                    <xf:setvalue ref="image/@mediatype, ./@mediatype" value="$mediatype"/>
                                 </xf:action>
                             </xf:action>
                             <xf:action>
@@ -485,8 +485,8 @@
                         <xf:rebuild/>
                         <xf:revalidate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
-                            <xf:setvalue ref="." value="$value"/>
-                            <xf:setvalue ref="@mediatype" value="$mediatype"/>
+                            <xf:setvalue ref="image, ." value="$value"/>
+                            <xf:setvalue ref="image/@mediatype, ./@mediatype" value="$mediatype"/>
                         </xf:action>
                     </xf:action>
                     <xf:dispatch

@@ -443,6 +443,28 @@
 
     .yui-tt-shadow { display: none }                // Remove shadow, which now looks tacky, and also for issue #581
 
+    // 2018-11-06: added `.xforms-form` only to make rule stronger for the field width
+    // 2019-06-25: not sure how to test for this, or if this is still needed
+    .xforms-form .xbl-component {
+        .input-prepend, .input-append {
+
+            display: flex;
+
+            > .add-on {
+                .xforms-output-output {
+                    white-space: nowrap;
+                }
+                flex-grow: 0; // 0 is the default only if it's NOT the first flex item, so make it the default all the time
+            }
+
+            > :not(.add-on) { // the `input` element
+                flex-grow: 1; // 1 is the default only if it's the first flex item, so make it the default all the time
+                width: 1px;   // `width: auto` doesn't always work correctly!
+                min-width: 0; // For the input to get smaller than its "implied width"
+            }
+        }
+    }
+
     // ***** Indicators and messages ***********************************************************************************
 
     .xforms-error-panel .bd {

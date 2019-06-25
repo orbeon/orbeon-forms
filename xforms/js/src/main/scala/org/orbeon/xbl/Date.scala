@@ -35,6 +35,7 @@ private class DateCompanion extends XBLCompanion {
   var datePicker : DatePicker = null
 
   override def init(): Unit = {
+    println("date init")
 
     // Add `readonly` attribute on the input if the control is readonly
     val isReadonly = $(containerElem).is(".xforms-readonly")

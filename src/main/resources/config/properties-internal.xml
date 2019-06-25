@@ -153,7 +153,6 @@
         /apps/fr/style/form-runner-common.css
         /apps/fr/style/form-runner-base.css
         /apps/fr/style/form-runner-orbeon.css
-        /apps/fr/style/font-awesome/css/font-awesome.css
     </property>
     <!-- WARNING: Check `properties-form-builder.xml` for overrides when changing this. -->
     <property as="xs:string"  name="oxf.fr.js.uri.*.*">

@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.xbl
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
 import org.orbeon.xforms.facade.Init
 
@@ -23,6 +24,7 @@ object XFormsApp extends App {
   def onOrbeonApiLoaded(): Unit = {
     Init.initializeGlobals() // should go away in the future
     Upload
+    xbl.Date
   }
 
   def onPageContainsFormsMarkup(): Unit = {

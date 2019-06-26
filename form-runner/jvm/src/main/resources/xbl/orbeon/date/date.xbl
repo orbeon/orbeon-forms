@@ -36,6 +36,7 @@
         id="fr-date"
         element="fr|date, xf|input:xxf-type('xs:date')"
         xxbl:mode="lhha binding value focus external-value javascript-lifecycle"
+        xxbl:label-for="input"
         xxf:external-events="DOMActivate">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -188,7 +189,7 @@
                             return
                                 $translated
                         "/>
-                    <xh:input type="text" class="span2" placeholder="{$placeholder}"/>
+                    <xh:input type="text" class="span2" placeholder="{$placeholder}" id="input"/>
                     <xh:span class="add-on">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>

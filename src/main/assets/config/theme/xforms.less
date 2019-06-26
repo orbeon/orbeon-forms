@@ -448,7 +448,7 @@
     .xforms-form .xbl-component {
         .input-prepend, .input-append {
 
-            display: flex;
+            display: inline-flex;
 
             > .add-on {
                 .xforms-output-output {
@@ -459,7 +459,6 @@
 
             > :not(.add-on) { // the `input` element
                 flex-grow: 1; // 1 is the default only if it's the first flex item, so make it the default all the time
-                width: 1px;   // `width: auto` doesn't always work correctly!
                 min-width: 0; // For the input to get smaller than its "implied width"
             }
         }

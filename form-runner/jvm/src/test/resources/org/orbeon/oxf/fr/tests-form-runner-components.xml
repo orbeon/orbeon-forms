@@ -110,6 +110,7 @@
                 <xh:link href="/ops/yui/calendar/assets/skins/sam/calendar.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/bootstrap/css/bootstrap.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
+                <xh:link href="/apps/fr/style/font-awesome/css/font-awesome.min.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
                 <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>

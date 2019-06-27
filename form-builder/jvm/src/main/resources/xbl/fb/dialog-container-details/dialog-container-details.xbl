@@ -378,7 +378,7 @@
 
                 <xf:bind
                     ref="use-paging"
-                    readonly="$i/user-can-add-remove = true()"/>
+                    readonly="$i/container-type = 'grid' or $i/user-can-add-remove = true()"/>
 
                 <xf:bind
                     ref="custom-iteration-name"

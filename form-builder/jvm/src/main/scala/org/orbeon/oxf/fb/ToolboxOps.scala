@@ -292,6 +292,7 @@ object ToolboxOps {
           controlName          = newGridName,
           repeat               = true,
           userCanAddRemove     = true,
+          usePaging            = false,
           min                  = "1",
           max                  = "",
           freeze               = "",

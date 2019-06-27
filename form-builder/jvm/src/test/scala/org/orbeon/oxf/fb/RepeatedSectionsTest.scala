@@ -36,7 +36,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         val expected =
           elemToDom4j(
@@ -73,7 +73,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
         renameControlIterationIfNeeded("my-section", "foo", None, None)
         renameControlIfNeeded("my-section", "foo")
 
@@ -112,7 +112,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
         renameControlIterationIfNeeded("my-section", "foo", None, Some("bar"))
 
         val expected =
@@ -150,7 +150,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "1", "2", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "1", "2", "", "", applyDefaults = false, "")
 
         val section = findControlByName(doc, "my-section").get
 
@@ -167,7 +167,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "1 + 1", "count(//*[contains(@foo, '{')])", "", "", applyDefaults = false, "")
 
         val section = findControlByName(doc, "my-section").get
 
@@ -184,7 +184,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "3", "4", "2", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "3", "4", "2", "", applyDefaults = false, "")
 
         val section = findControlByName(doc, "my-section").get
 
@@ -202,7 +202,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
         moveSectionRight(findControlByName(doc, "other-section").get)
 
         val expected =
@@ -240,8 +240,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true,  "", "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-section", repeat = false, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true,  usePaging = false, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = false, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         val expected =
           elemToDom4j(
@@ -285,7 +285,7 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         // Expect 1 iteration of `my-grid`
         val expected =
@@ -314,8 +314,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "first")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "first")
 
         // Expect 2 iterations of `my-grid`
         val expected =
@@ -347,8 +347,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "first")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "first")
 
         val myTextareaCell = findControlByName(doc, "my-textarea").get.parentUnsafe
 
@@ -390,8 +390,8 @@ class RepeatedSectionsTest
 
         val doc = ctx.formDefinitionRootElem
 
-        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
-        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
+        setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         // Expect 1 iteration of `my-grid`
         val expected =

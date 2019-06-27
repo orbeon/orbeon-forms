@@ -73,7 +73,7 @@
             <xsl:attribute name="edit-ref"/>
             <xsl:attribute name="xxf:update" select="'full'"/>
             <!-- Save current value of attributes that must not operate at design-time -->
-            <xsl:for-each select="@open | @readonly">
+            <xsl:for-each select="@open | @readonly | @page-size">
                 <xsl:attribute name="fb:{local-name(.)}" select="."/>
             </xsl:for-each>
             <!-- Save current value of `@collapsible` as `@fb:collapsible` (converting from `@collapse` as well) -->
@@ -92,7 +92,7 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:apply-templates select="(@* except (@open | @readonly | @collapse | @collapsible)) | node()" mode="#current"/>
+            <xsl:apply-templates select="(@* except (@open | @readonly | @page-size | @collapse | @collapsible)) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

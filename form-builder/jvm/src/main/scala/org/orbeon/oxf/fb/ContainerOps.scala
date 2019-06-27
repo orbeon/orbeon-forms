@@ -223,6 +223,7 @@ trait ContainerOps extends ControlOps {
     controlName          : String,
     repeat               : Boolean,
     userCanAddRemove     : Boolean,
+    usePaging            : Boolean,
     min                  : String,
     max                  : String,
     freeze               : String,
@@ -251,6 +252,7 @@ trait ContainerOps extends ControlOps {
       // don't set the attribute value. This means that in the end we only set positive integer values.
       toggleAttribute(control, "repeat",          RepeatContentToken,                              repeat)
       toggleAttribute(control, FBReadonly,        "true",                                          repeat && ! userCanAddRemove)
+      toggleAttribute(control, FBPageSize,        "1",                                             repeat && ! userCanAddRemove && usePaging)
       toggleAttribute(control, "min",             minOpt.get,                                      repeat && minOpt.isDefined)
       toggleAttribute(control, "max",             maxOpt.get,                                      repeat && maxOpt.isDefined)
       toggleAttribute(control, "freeze",          freezeOpt.get,                                   repeat && freezeOpt.isDefined)

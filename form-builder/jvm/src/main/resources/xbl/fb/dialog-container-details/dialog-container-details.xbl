@@ -52,6 +52,7 @@
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
                 <xf:setvalue ref="$i/user-can-add-remove"            value="not($control/@fb:readonly = 'true')"/>
+                <xf:setvalue ref="$i/use-paging"                     value="$control/@fb:page-size = '1'"/>
 
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
                 <xf:setvalue ref="$i/is-custom-iteration-name"       value="$i/was-custom-iteration-name"/>
@@ -179,6 +180,7 @@
                             $new-name,
                             $i/is-repeat = true(),
                             $i/user-can-add-remove = true(),
+                            $i/use-paging = true(),
                             $i/min-repeat,
                             $i/max-repeat,
                             $i/freeze,
@@ -291,6 +293,7 @@
                         <is-repeat/>
 
                         <user-can-add-remove/>
+                        <use-paging/>
 
                         <was-custom-iteration-name/>
                         <is-custom-iteration-name/>
@@ -367,15 +370,21 @@
                     readonly="$i/container-type = 'grid'"/>
 
                 <xf:bind
-                    ref="was-repeat | is-repeat | user-can-add-remove | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
+                    ref="
+                        was-repeat | is-repeat | user-can-add-remove | use-paging |
+                        was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
                     type="xs:boolean"
                     xxf:default="false()"/>
+
+                <xf:bind
+                    ref="use-paging"
+                    readonly="$i/user-can-add-remove = true()"/>
 
                 <xf:bind
                     ref="custom-iteration-name"
                     type="xf:NCName"
                     xxf:whitespace="trim"
-                    readonly="false()"
+                    readonly="$i/is-custom-iteration-name = false()"
                     required="$i/is-custom-iteration-name = true()"
                     constraint="
                         $i/is-custom-iteration-name = false() or
@@ -654,6 +663,11 @@
 
                                     <xh:tr>
                                         <xh:td>
+                                            <fr:checkbox-input ref="use-paging">
+                                                <xf:label ref="$resources/dialog-container-details/use-paging/label"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                        <xh:td>
                                             <fr:checkbox-input ref="is-custom-iteration-name">
                                                 <xf:label ref="$resources/dialog-container-details/custom-iteration-name/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-details/custom-iteration-name/hint"/>
@@ -663,10 +677,8 @@
                                                     <xf:setvalue ref="$i/custom-iteration-name" value="''"/>
                                                 </xf:action>
                                             </fr:checkbox-input>
-                                        </xh:td>
-                                        <xh:td>
-                                            <xf:input ref="custom-iteration-name[$i/is-custom-iteration-name = true()]" incremental="true" >
-                                                <xf:label ref="$resources/dialog-container-details/iteration-name/label"/>
+                                            <xf:input ref="custom-iteration-name" incremental="true" >
+                                                <xf:label ref="$resources/dialog-container-details/iteration-name/label" class="xforms-hidden"/>
                                                 <xf:hint  ref="$resources/dialog-container-details/iteration-name/hint"/>
                                                 <xf:alert ref="$resources/dialog-container-details/iteration-name/alert"/>
                                             </xf:input>

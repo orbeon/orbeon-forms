@@ -681,6 +681,10 @@
                 <label>Allow the user to add, remove, or move repetitions</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label>Show one iteration at a time in the wizard</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Enable custom iteration name</label>
                 <hint/>
@@ -1880,6 +1884,10 @@
                 <label>Permettre à l'utilisateur d'ajouter, supprimer ou déplacer des répétitions</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label>Montrer une répétition à la fois dans le wizard</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Activer un nom d'itération personalisé</label>
                 <hint/>
@@ -3063,6 +3071,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
@@ -4272,6 +4284,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
@@ -5482,6 +5498,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Attiva nome iterazione personalizzato</label>
                 <hint/>
@@ -6684,6 +6704,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Benutzerdefinierte Namen der Wiederholung aktivieren</label>
                 <hint/>
@@ -9087,6 +9111,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Habilitar Nombre Customizado de Iteracción</label>
                 <hint/>
@@ -10290,6 +10318,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Activeer aangepaste iteratienaam</label>
                 <hint/>
@@ -11472,6 +11504,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label> Nome da Iteração Personalizado</label>
                 <hint/>
@@ -12681,6 +12717,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Namnge iterationen</label>
                 <hint/>

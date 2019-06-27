@@ -682,15 +682,15 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label>Show one iteration at a time in the wizard</label>
+                <label>Show one repetition at a time in the wizard</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
-                <label>Enable custom iteration name</label>
+                <label>Enable custom repetition element name</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>Custom Iteration Name</label>
+                <label>Custom Repetition Element Name</label>
                 <alert>Name is already in use or incorrect</alert>
                 <hint/>
             </iteration-name>
@@ -1889,11 +1889,11 @@
                 <hint/>
             </use-paging>
             <custom-iteration-name>
-                <label>Activer un nom d'itération personalisé</label>
+                <label>Activer un nom de répétition personalisé</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>Nom d'itération personalisé</label>
+                <label>Nom de répétition personalisé</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint/>
             </iteration-name>
@@ -3072,15 +3072,15 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
-                <label todo="true">[Enable custom iteration name]</label>
+                <label todo="true">[Enable custom repetition element name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
+                <label todo="true">[Custom Repetition Element Name]</label>
                 <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
@@ -4285,15 +4285,15 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
-                <label todo="true">[Enable custom iteration name]</label>
+                <label todo="true">[Enable custom repetition element name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
+                <label todo="true">[Custom Repetition Element Name]</label>
                 <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
@@ -5499,7 +5499,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -6705,7 +6705,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -9112,7 +9112,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -10319,7 +10319,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -11505,7 +11505,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>
@@ -12718,7 +12718,7 @@
                 <hint/>
             </user-can-add-remove>
             <use-paging>
-                <label todo="true">[Show one iteration at a time in the wizard]</label>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
             </use-paging>
             <custom-iteration-name>

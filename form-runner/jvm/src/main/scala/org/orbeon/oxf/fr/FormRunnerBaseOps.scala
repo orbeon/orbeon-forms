@@ -117,7 +117,7 @@ trait FormRunnerBaseOps {
     def fromIndex =
       Option(inDoc.getDocumentRoot.selectID(id)) match {
         case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) ⇒ elemOpt
-        case Some(elem)                                                ⇒ fromSearch
+        case Some(_)                                                   ⇒ fromSearch
         case None                                                      ⇒ None
       }
 
@@ -170,7 +170,7 @@ trait FormRunnerBaseOps {
   def inlineInstanceRootElem(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     instanceElem(inDoc, id).toList / * headOption
 
-  def isTemplateId(id: String) = id endsWith TemplateSuffix
+  def isTemplateId(id: String): Boolean = id endsWith TemplateSuffix
 
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
@@ -295,7 +295,7 @@ trait FormRunnerBaseOps {
           case "SimpleCaptcha" ⇒ Array(XMLNames.FR, "fr:simple-captcha")
           case captchaName     ⇒
             captchaName.splitTo[List](":") match {
-              case List(prefix, localName) ⇒
+              case List(prefix, _) ⇒
                 captchaProperty.namespaces.get(prefix) match {
                   case Some(namespaceURI) ⇒
                     Array(namespaceURI, captchaName)
@@ -313,8 +313,8 @@ trait FormRunnerBaseOps {
 
   private val ReadonlyModes = Set("view", "pdf", "email", "controls")
 
-  def isDesignTime(implicit p: FormRunnerParams): Boolean = p.app == "orbeon" && p.form == "builder"
-  def isReadonlyMode(implicit p: FormRunnerParams) = ReadonlyModes(p.mode)
+  def isDesignTime(implicit p: FormRunnerParams)  : Boolean = p.app == "orbeon" && p.form == "builder"
+  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 

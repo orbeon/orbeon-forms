@@ -761,8 +761,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-13"/>
-                        <xxf:attribute for="my-date≡xf-16" name="placeholder"/>
-                        <xxf:control id="my-date≡xf-18" relevant="false"/>
+                        <xxf:attribute for="my-date≡input" name="placeholder"/>
+                        <xxf:control id="my-date≡xf-17" relevant="false"/>
                         <xxf:init id="my-date">
                             <xxf:value>2010-01-13</xxf:value>
                         </xxf:init>

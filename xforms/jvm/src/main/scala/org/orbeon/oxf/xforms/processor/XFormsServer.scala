@@ -37,7 +37,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvents}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
@@ -272,8 +272,9 @@ object XFormsServer {
 
               (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
                 case (Some(beforeFocusEffectiveId), None) ⇒
-                  // Focus removed: notify the client only if the control still exists
-                  if (containingDocument.getControls.getCurrentControlTree.findControl(beforeFocusEffectiveId).isDefined)
+                  // Focus removed: notify the client only if the control still exists AND is visible
+                  // See https://github.com/orbeon/orbeon-forms/issues/4113
+                  if (containingDocument.getControls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c ⇒ ! Focus.isHidden(c)))
                     outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
                 case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt ⇒
                   // There is a focused control and it is different from the focus as known by the client

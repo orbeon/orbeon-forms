@@ -204,7 +204,8 @@ object ToolboxOps {
             </fr:grid>
         }</fr:section>
 
-      val newSectionElem = insert(into = into, after = after.toList, origin = sectionTemplate).head
+      val newSectionElem       = insert(into = into, after = after.toList, origin = sectionTemplate).head
+      val newNestedGridElemOpt = newSectionElem child GridQName headOption
 
       // Create and insert holders
       val resourceHolder = {
@@ -221,6 +222,18 @@ object ToolboxOps {
 
       // Insert the bind element
       ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
+
+      newNestedGridElemOpt foreach { newNestedGridElem ⇒
+        insertHolders(
+          controlElement       = newNestedGridElem,
+          dataHolders          = List(elementInfo(newGridName)),
+          resourceHolders      = Nil,
+          precedingControlName = None
+        )
+
+        // Insert the bind element
+        ensureBinds(findContainerNamesForModel(newNestedGridElem, includeSelf = true))
+      }
 
       // This can impact templates
       updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])

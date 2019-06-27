@@ -51,6 +51,8 @@
                 <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(fbf:findControlByNameOrEmpty($i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
+                <xf:setvalue ref="$i/user-can-add-remove"            value="not($control/@fb:readonly = 'true')"/>
+
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
                 <xf:setvalue ref="$i/is-custom-iteration-name"       value="$i/was-custom-iteration-name"/>
 
@@ -176,6 +178,7 @@
                         fbf:setRepeatProperties(
                             $new-name,
                             $i/is-repeat = true(),
+                            $i/user-can-add-remove = true(),
                             $i/min-repeat,
                             $i/max-repeat,
                             $i/freeze,
@@ -287,6 +290,8 @@
                         <was-repeat/>
                         <is-repeat/>
 
+                        <user-can-add-remove/>
+
                         <was-custom-iteration-name/>
                         <is-custom-iteration-name/>
 
@@ -362,7 +367,7 @@
                     readonly="$i/container-type = 'grid'"/>
 
                 <xf:bind
-                    ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
+                    ref="was-repeat | is-repeat | user-can-add-remove | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
                     type="xs:boolean"
                     xxf:default="false()"/>
 
@@ -381,8 +386,8 @@
                 <xf:bind
                     ref="min-repeat | max-repeat | freeze"
                     type="xxf:xpath2"
-                    xxf:whitespace="trim"
-                    readonly="false()"/>
+                    readonly="../user-can-add-remove = false()"
+                    xxf:whitespace="trim"/>
 
                 <xf:bind
                     ref="min-repeat | freeze"
@@ -543,6 +548,13 @@
 
                             <xf:group ref=".[is-repeat = true()]">
                                 <fr:grid id="repeat-tab-grid-2">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="$i/user-can-add-remove" appearance="full" id="user-can-add-remove">
+                                                <xf:label value="$resources/dialog-container-details/user-can-add-remove/label"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
                                     <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="$i/min-repeat" appearance="full" id="min-repeat">

@@ -72,8 +72,10 @@
         <xsl:copy>
             <xsl:attribute name="edit-ref"/>
             <xsl:attribute name="xxf:update" select="'full'"/>
-            <!-- Save current value of `@open` as `@fb:open` -->
-            <xsl:if test="exists(@open)"><xsl:attribute name="fb:open" select="@open"/></xsl:if>
+            <!-- Save current value of attributes that must not operate at design-time -->
+            <xsl:for-each select="@open | @readonly">
+                <xsl:attribute name="fb:{local-name(.)}" select="."/>
+            </xsl:for-each>
             <!-- Save current value of `@collapsible` as `@fb:collapsible` (converting from `@collapse` as well) -->
             <xsl:if test="exists(@collapse | @collapsible)"><xsl:attribute name="fb:collapsible" select="(@collapse | @collapsible)[1]"/></xsl:if>
             <!-- If "many" controls close all sections but the first -->
@@ -85,18 +87,22 @@
                     <xsl:attribute name="open" select="'false'"/>
                 </xsl:when>
                 <xsl:otherwise>
+                    <!-- Q: Is this right? We save `@open` above, but should it operate at design-time? -->
                     <xsl:apply-templates select="@open"/>
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:apply-templates select="(@* except (@open | @collapse | @collapsible)) | node()" mode="#current"/>
+            <xsl:apply-templates select="(@* except (@open | @readonly | @collapse | @collapsible)) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 
     <xsl:template match="fr:grid" mode="within-body">
         <xsl:copy>
             <xsl:attribute name="edit-ref"/>
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:for-each select="@readonly">
+                <xsl:attribute name="fb:{local-name(.)}" select="."/>
+            </xsl:for-each>
+            <xsl:apply-templates select="(@* except @readonly) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

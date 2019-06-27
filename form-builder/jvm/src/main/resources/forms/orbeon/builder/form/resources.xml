@@ -677,6 +677,10 @@
             <repeat>
                 <label>Repeat content</label>
             </repeat>
+            <user-can-add-remove>
+                <label>Allow the user to add, remove, or move repetitions</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Enable custom iteration name</label>
                 <hint/>
@@ -1872,6 +1876,10 @@
             <repeat>
                 <label>Répéter le contenu</label>
             </repeat>
+            <user-can-add-remove>
+                <label>Permettre à l'utilisateur d'ajouter, supprimer ou déplacer des répétitions</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Activer un nom d'itération personalisé</label>
                 <hint/>
@@ -3051,6 +3059,10 @@
             <repeat>
                 <label todo="true">[Repeat content]</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
@@ -4256,6 +4268,10 @@
             <repeat>
                 <label todo="true">[Repeat content]</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label todo="true">[Enable custom iteration name]</label>
                 <hint/>
@@ -5462,6 +5478,10 @@
             <repeat>
                 <label>Ripeti contenuto</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Attiva nome iterazione personalizzato</label>
                 <hint/>
@@ -6660,6 +6680,10 @@
             <repeat>
                 <label>Inhalt wiederholen</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Benutzerdefinierte Namen der Wiederholung aktivieren</label>
                 <hint/>
@@ -9059,6 +9083,10 @@
             <repeat>
                 <label>Repetir Contenido</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Habilitar Nombre Customizado de Iteracción</label>
                 <hint/>
@@ -10258,6 +10286,10 @@
             <repeat>
                 <label>Herhaal inhoud</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Activeer aangepaste iteratienaam</label>
                 <hint/>
@@ -11436,6 +11468,10 @@
             <repeat>
                 <label>Repetir conteúdo</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label> Nome da Iteração Personalizado</label>
                 <hint/>
@@ -12641,6 +12677,10 @@
             <repeat>
                 <label>Upprepa</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
             <custom-iteration-name>
                 <label>Namnge iterationen</label>
                 <hint/>

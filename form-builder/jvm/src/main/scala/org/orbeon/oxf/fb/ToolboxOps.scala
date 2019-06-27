@@ -291,6 +291,7 @@ object ToolboxOps {
         setRepeatProperties(
           controlName          = newGridName,
           repeat               = true,
+          userCanAddRemove     = true,
           min                  = "1",
           max                  = "",
           freeze               = "",

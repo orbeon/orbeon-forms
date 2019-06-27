@@ -73,7 +73,10 @@
                 <!-- Remove @edit-ref and @xxf:update, handle section @open, fb:view → fr:view -->
                 <xsl:template match="xh:body//fb:view | xh:body//fr:section | xh:body//fr:grid">
                     <xsl:element name="fr:{local-name()}">
-                        <!-- Restore @open if needed -->
+                        <!-- Restore `@fb:*` if needed -->
+                        <xsl:for-each select="@fb:readonly">
+                            <xsl:attribute name="{local-name(.)}" select="."/>
+                        </xsl:for-each>
                         <xsl:if test="exists(self::fr:section)">
                             <xsl:if test="exists(@fb:open)">
                                 <xsl:attribute name="open" select="@fb:open"/>
@@ -83,7 +86,7 @@
                             </xsl:if>
                         </xsl:if>
                         <!-- Process everything else -->
-                        <xsl:apply-templates select="(@* except (@edit-ref | @xxf:update | @open | @fb:open | @fb:collapsible)) | node()"/>
+                        <xsl:apply-templates select="(@* except (@edit-ref | @xxf:update | @open | @fb:open | @fb:readonly | @fb:collapsible)) | node()"/>
                     </xsl:element>
                 </xsl:template>
 

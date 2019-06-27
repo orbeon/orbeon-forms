@@ -108,6 +108,7 @@ object FormBuilderXPathApi {
   def setRepeatProperties(
     controlName          : String,
     repeat               : Boolean,
+    userCanAddRemove     : Boolean,
     min                  : String,
     max                  : String,
     freeze               : String,
@@ -118,6 +119,7 @@ object FormBuilderXPathApi {
     FormBuilder.setRepeatProperties(
       controlName          = controlName,
       repeat               = repeat,
+      userCanAddRemove     = userCanAddRemove,
       min                  = min,
       max                  = max,
       freeze               = freeze,

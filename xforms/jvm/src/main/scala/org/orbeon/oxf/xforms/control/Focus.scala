@@ -56,10 +56,10 @@ object Focus {
   // Update focus based on a previously focused control
   def updateFocusWithEvents(
     focusedBeforeOpt : Option[XFormsControl],
-    repeat           : Option[XFormsRepeatControl] = None)(
+    repeatOpt        : Option[XFormsRepeatControl] = None)(
     doc              : XFormsContainingDocument
   ): Unit =
-    repeat match {
+    repeatOpt match {
       case Some(repeat) ⇒
         // Update the focus based on a previously focused control for which focus out events up to a repeat have
         // already been dispatched when a repeat iteration has been removed
@@ -69,12 +69,12 @@ object Focus {
 
         // Called if the focus is fully removed
         // Focus out events have been dispatched up to the iteration already, so just dispatch from the repeat to the root
-        def removeFocus() =
+        def removeFocus(): Unit =
           containersAndSelf(repeat) foreach focusOut
 
         // Called if the focus is changing to a new control
         // This will dispatch focus events from the new repeat iteration to the control
-        def focus(control: XFormsControl) =
+        def focus(control: XFormsControl): Unit =
           setFocusPartially(control, Some(repeat))
 
         updateFocus(focusedBeforeOpt, _ ⇒ removeFocus(), focus)
@@ -146,7 +146,7 @@ object Focus {
     }
 
   // Whether focus is currently within the given container
-  def isFocusWithinContainer(container: XFormsContainerControl) =
+  def isFocusWithinContainer(container: XFormsContainerControl): Boolean =
     container.containingDocument.getControls.getFocusedControl match {
       case Some(control) if new AncestorOrSelfIterator(control.parent) exists (_ eq container) ⇒ true
       case _ ⇒ false
@@ -160,7 +160,7 @@ object Focus {
   def removeFocusPartially(doc: XFormsContainingDocument, boundary: Option[XFormsContainerControl]): Unit = {
 
     // Dispatch DOMFocusOut events to the given control and to its container ancestors
-    def dispatchFocusOuts(control: XFormsControl) =
+    def dispatchFocusOuts(control: XFormsControl): Unit =
       containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) foreach focusOut
 
     // Dispatch focus out events if needed
@@ -181,7 +181,7 @@ object Focus {
     doc.getControls.setFocusedControl(Some(control))
 
     // Dispatch DOMFocusOut events to the given control and to its container ancestors
-    def dispatchFocusIns(control: XFormsControl) =
+    def dispatchFocusIns(control: XFormsControl): Unit =
       (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) reverse) foreach focusIn
 
     // Dispatch focus in events
@@ -189,7 +189,7 @@ object Focus {
   }
 
   // Remove the focus entirely and dispatch the appropriate events
-  def removeFocus(doc: XFormsContainingDocument) =
+  def removeFocus(doc: XFormsContainingDocument): Unit =
     removeFocusPartially(doc, boundary = None)
 
   // Whether the control is hidden within a non-visible case or dialog
@@ -200,15 +200,15 @@ object Focus {
   }
 
   // Return all the ancestor-or-self hidden cases
-  def hiddenCases(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) collect {
+  def hiddenCases(control: XFormsControl): Iterator[XFormsCaseControl] = new AncestorOrSelfIterator(control.parent) collect {
     case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
   }
 
   // Dispatch DOMFocusOut and DOMFocusIn
-  private def focusOut(control: XFormsControl) = dispatch(control, DOM_FOCUS_OUT)
-  private def focusIn(control: XFormsControl)  = dispatch(control, DOM_FOCUS_IN)
+  private def focusOut(control: XFormsControl): Unit = dispatch(control, DOM_FOCUS_OUT)
+  private def focusIn(control: XFormsControl) : Unit = dispatch(control, DOM_FOCUS_IN)
 
-  private def dispatch(control: XFormsControl, eventName: String) =
+  private def dispatch(control: XFormsControl, eventName: String): Unit =
     Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, control))
 
   // Find all ancestor container controls of the given control from leaf to root

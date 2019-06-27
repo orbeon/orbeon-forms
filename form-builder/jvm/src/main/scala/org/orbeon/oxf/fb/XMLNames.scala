@@ -37,9 +37,9 @@ object XMLNames {
   val FBIconClassTest   : Test  = FB → "icon-class"
   val FBSmallIconTest   : Test  = FB → "small-icon"
 
-  val InitialIterations : QName = QName("initial-iterations", FBPrefix, FB)
-  val FBReadonly        : QName = QName("readonly",  FBPrefix, FB)
-  val FBPageSize        : QName = QName("page-size", FBPrefix, FB)
+  val FBReadonly          : QName = QName("readonly",           FBPrefix, FB)
+  val FBPageSize          : QName = QName("page-size",          FBPrefix, FB)
+  val FBInitialIterations : QName = QName("initial-iterations", FBPrefix, FB)
 
   val XFConstraintTest  : Test = XF → "constraint"
   val XFTypeTest        : Test = XF → "type"

@@ -55,7 +55,7 @@ trait ContainerOps extends ControlOps {
       (_ == element)
 
   def getInitialIterationsAttribute(controlElem: NodeInfo): Option[String] =
-    controlElem attValueOpt InitialIterations flatMap trimAllToOpt
+    controlElem attValueOpt FBInitialIterations flatMap trimAllToOpt
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
@@ -250,15 +250,15 @@ trait ContainerOps extends ControlOps {
       // Update control attributes first
       // A missing or invalid min/max value is taken as the default value: 0 for min, none for max. In both cases, we
       // don't set the attribute value. This means that in the end we only set positive integer values.
-      toggleAttribute(control, "repeat",          RepeatContentToken,                              repeat)
-      toggleAttribute(control, FBReadonly,        "true",                                          repeat && ! userCanAddRemove)
-      toggleAttribute(control, FBPageSize,        "1",                                             repeat && ! userCanAddRemove && usePaging)
-      toggleAttribute(control, "min",             minOpt.get,                                      repeat && minOpt.isDefined)
-      toggleAttribute(control, "max",             maxOpt.get,                                      repeat && maxOpt.isDefined)
-      toggleAttribute(control, "freeze",          freezeOpt.get,                                   repeat && freezeOpt.isDefined)
-      toggleAttribute(control, "template",        makeInstanceExpression(templateId(controlName)), repeat)
-      toggleAttribute(control, "apply-defaults",  "true",                                          repeat && applyDefaults)
-      toggleAttribute(control, InitialIterations, initialIterationsOpt.get,                        repeat && initialIterationsOpt.isDefined)
+      toggleAttribute(control, "repeat",            RepeatContentToken,                              repeat)
+      toggleAttribute(control, FBReadonly,          "true",                                          repeat && ! userCanAddRemove)
+      toggleAttribute(control, FBPageSize,          "1",                                             repeat && ! userCanAddRemove && usePaging)
+      toggleAttribute(control, "min",               minOpt.get,                                      repeat && minOpt.isDefined)
+      toggleAttribute(control, "max",               maxOpt.get,                                      repeat && maxOpt.isDefined)
+      toggleAttribute(control, "freeze",            freezeOpt.get,                                   repeat && freezeOpt.isDefined)
+      toggleAttribute(control, "template",          makeInstanceExpression(templateId(controlName)), repeat)
+      toggleAttribute(control, "apply-defaults",    "true",                                          repeat && applyDefaults)
+      toggleAttribute(control, FBInitialIterations, initialIterationsOpt.get,                        repeat && initialIterationsOpt.isDefined)
 
       if (! wasRepeat && repeat) {
         // Insert new bind and template

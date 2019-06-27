@@ -273,32 +273,6 @@
             clear: left;
         }
 
-        &.xforms-select1-appearance-xxforms-horizontal,
-        &.xforms-select-appearance-xxforms-horizontal {
-
-            // Don't clear float for horizontal display
-            .xforms-selected,
-            .xforms-deselected,
-            .xforms-items {
-                clear: none;
-            }
-
-            // Make sure there is more space between items
-            .xforms-selected,
-            .xforms-deselected {
-                label {
-                    margin-right: 12px;
-                }
-            }
-
-            &.xforms-static.xforms-readonly {
-                .xforms-selected,
-                .xforms-deselected {
-                    margin-right: 12px;
-                }
-            }
-        }
-
         label.radio,
         label.checkbox {
             display: inline-block;
@@ -312,6 +286,35 @@
         label.checkbox > span {
             display: block;
             margin-left: 20px;
+        }
+    }
+
+    // Allow the CSS class to be outside of the `<xf:select1>`, for the `<fr:open-select1>`
+    .xforms-select1-appearance-full.xforms-select1-appearance-xxforms-horizontal,
+    .xforms-select-appearance-full.xforms-select-appearance-xxforms-horizontal,
+    .xforms-select1-appearance-xxforms-horizontal .xforms-select1-appearance-full,
+    .xforms-select-appearance-xxforms-horizontal .xforms-select-appearance-full {
+
+        // Don't clear float for horizontal display
+        .xforms-selected,
+        .xforms-deselected,
+        .xforms-items {
+            clear: none;
+        }
+
+        // Make sure there is more space between items
+        .xforms-selected,
+        .xforms-deselected {
+            label {
+                margin-right: 12px;
+            }
+        }
+
+        &.xforms-static.xforms-readonly {
+            .xforms-selected,
+            .xforms-deselected {
+                margin-right: 12px;
+            }
         }
     }
 

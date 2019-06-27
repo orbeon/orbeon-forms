@@ -164,6 +164,18 @@
             )[1]"/>
 
     <xsl:variable
+        name="use-view-appearance"
+        as="xs:boolean"
+        select="
+            not(
+                $mode != 'import' and (
+                    not($mode = ('edit', 'new', 'test')) or
+                    $is-form-builder                     or
+                    $view-appearance = 'full'
+                )
+            )"/>
+
+    <xsl:variable
         name="wizard-mode"
         as="xs:string"
         select="

@@ -208,7 +208,7 @@
             <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
-                <xsl:when test="$mode != 'import' and (not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = 'full')">
+                <xsl:when test="not($use-view-appearance)">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
 
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>

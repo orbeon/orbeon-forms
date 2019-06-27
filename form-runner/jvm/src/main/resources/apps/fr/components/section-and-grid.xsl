@@ -66,7 +66,11 @@
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 
-            <xsl:apply-templates select="@*"/>
+            <xsl:if test="$use-view-appearance and $view-appearance = 'wizard' and not($mode = ('view', 'pdf', 'email', 'controls'))">
+                <xsl:copy-of select="@page-size"/>
+            </xsl:if>
+
+            <xsl:apply-templates select="@* except @page-size"/>
             <xsl:apply-templates select="node()">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
             </xsl:apply-templates>

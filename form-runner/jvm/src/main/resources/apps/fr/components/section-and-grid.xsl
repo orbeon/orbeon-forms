@@ -14,12 +14,23 @@
 <xsl:stylesheet
     version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="starting-section-level" select="2"/>
+
+    <!-- TODO: Move to separate file. -->
+    <xsl:template match="xh:body//xf:output[exists(xf:label) and empty(@appearance)] | xbl:binding/xbl:template//fr:section[exists(xf:label) and empty(@appearance)]">
+        <xsl:copy>
+            <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
+                <xsl:attribute name="appearance" select="."/>
+            </xsl:for-each>
+            <xsl:apply-templates select="@* | node()"/>
+        </xsl:copy>
+    </xsl:template>
 
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xh:body//fr:section | xbl:binding/xbl:template//fr:section">

@@ -46,7 +46,7 @@ object Version {
   def versionStringIfAllowed: Option[String] =
     Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
 
-  // For XPath callers
+  //@XPathFunction
   def versionStringIfAllowedOrEmpty: String =
     versionStringIfAllowed.orNull
 
@@ -56,6 +56,7 @@ object Version {
 
   val logger = LoggerFactory.createLogger(classOf[Version])
 
+  //@XPathFunction
   def compare(leftVersion: String, rightVersion: String): Option[Int] = {
     (majorMinor(leftVersion), majorMinor(rightVersion)) match {
       case (Some((leftMajor, leftMinor)), Some((rightMajor, rightMinor))) ⇒

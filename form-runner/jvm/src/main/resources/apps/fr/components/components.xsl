@@ -288,6 +288,24 @@
         select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"/>
 
     <xsl:variable
+        xmlns:version="java:org.orbeon.oxf.common.Version"
+        name="calculated-value-appearance"
+        as="xs:string"
+        select="
+            (
+                (: Consider this a pseudo-XBL component called `fr:calculated-value` :)
+                $fr-form-metadata/xbl/fr:calculated-value/@appearance[normalize-space()],
+                p:property(string-join(('oxf.xforms.xbl.fr.calculated-value.appearance', $app, $form), '.'))[normalize-space()],
+                for $created-version in $fr-form-metadata/created-with-version[normalize-space()]/normalize-space()
+                    return
+                        if (version:compare($created-version, '2018.2') ge 0) then
+                            'full'
+                        else
+                            'minimal',
+                'minimal'
+            )[1]"/>
+
+    <xsl:variable
         name="section-insert"
         as="xs:string?"
         select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'))[normalize-space()]"/>

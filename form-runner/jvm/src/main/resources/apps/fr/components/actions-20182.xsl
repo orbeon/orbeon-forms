@@ -69,6 +69,16 @@
 
     </xsl:function>
 
+    <xsl:function name="fr:build-context-att" as="attribute()?">
+        <xsl:param name="context" as="xs:string?"/>
+
+         <xsl:if test="$context = 'current-iteration'">
+            <xsl:attribute name="context">
+                xxf:get-request-attribute('fr-iteration-context')
+            </xsl:attribute>
+         </xsl:if>
+    </xsl:function>
+
     <!-- Match and modify `fr:action`s -->
     <xsl:template
         match="
@@ -319,7 +329,9 @@
                                 <xf:var
                                     name="value"
                                     context="$original-context"
-                                    value="{$value}"/>
+                                    value="{$value}">
+                                    <xsl:copy-of select="fr:build-context-att(@context)"/>
+                                </xf:var>
                             </xsl:when>
                         </xsl:choose>
                         <xsl:choose>
@@ -368,6 +380,7 @@
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
 
         <xf:action iterate="{@ref}">
+            <xsl:copy-of select="fr:build-context-att(@context)"/>
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067-->
             <xsl:for-each-group
@@ -378,6 +391,7 @@
                 <xsl:if test="$group-position = 1">
                     <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
                         <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context',                     .)</xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
                 </xsl:if>
@@ -497,6 +511,7 @@
         <xsl:variable name="label-expr"      select="@label/string()"   as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+        <xsl:variable name="context"         select="@context/string()" as="xs:string?"/>
 
         <xf:action>
 
@@ -527,7 +542,9 @@
                 <xf:var
                     name="response-items"
                     context="$items-expr-context"
-                    value="{$items-expr}"/>
+                    value="{$items-expr}">
+                    <xsl:copy-of select="fr:build-context-att($context)"/>
+                </xf:var>
 
                 <xf:insert
                     context="$new-itemset-holder"

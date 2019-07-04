@@ -167,8 +167,11 @@
                                     $type
                                 )"/>
 
+                        <xsl:message select="concat('XXX component-name ', $component-name)"/>
                         <xsl:if test="$expression">
                             <xsl:variable name="value" select="$control/saxon:evaluate($expression)"/>
+                            <xsl:message select="concat('XXX expression ', $expression)"/>
+                            <xsl:message select="concat('XXX value ', $value)"/>
                             <xsl:if test="$value">
                                 <xsl:choose>
                                     <xsl:when test="$classes = $image-attachment-classes">

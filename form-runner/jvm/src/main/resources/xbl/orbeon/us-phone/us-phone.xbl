@@ -20,7 +20,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding
-        id="fr-phone-binding"
+        id="fr-us-phone"
         element="fr|us-phone"
         xxbl:container="span"
         xxbl:mode="lhha binding value"
@@ -129,9 +129,9 @@
 
         <xbl:template>
             <xf:var name="binding"
-                    value="xxf:binding('fr-phone-binding')"/>
+                    value="xxf:binding('fr-us-phone')"/>
             <xf:var name="view"
-                    value="xxf:is-control-readonly('fr-phone-binding') and property('xxf:readonly-appearance') = 'static'"/>
+                    value="xxf:is-control-readonly('fr-us-phone') and property('xxf:readonly-appearance') = 'static'"/>
 
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
@@ -144,7 +144,7 @@
                         xbl:attr="navindex navindex=tabindex"
                         ref="."
                         xxf:maxlength="14"
-                        xxf:format="xxf:formatted-value('fr-phone-binding')"
+                        xxf:format="xxf:formatted-value('fr-us-phone')"
                         xxf:unformat="
                             for $t in translate(xxf:trim(), '()*-[].#/'': ', '') return
                                 if (matches($t, '^\d+$')) then
@@ -159,7 +159,7 @@
                 </xh:span>
             </xf:group>
             <!-- View mode -->
-            <xf:input ref="$binding[$view]" xxf:format="xxf:formatted-value('fr-phone-binding')"/>
+            <xf:input ref="$binding[$view]" xxf:format="xxf:formatted-value('fr-us-phone')"/>
         </xbl:template>
     </xbl:binding>
 

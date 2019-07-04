@@ -131,8 +131,16 @@
                                 <!-- XBL component -->
                                 <xsl:copy-of
                                     select="
-                                        for $c in $classes[starts-with(., 'xbl-') and not(. = ('xbl-component', 'xbl-focusable'))][1]
-                                            return substring-after($c, 'xbl-')"/>
+                                        for $c in
+                                            $classes[
+                                                starts-with(., 'xbl-') and
+                                                not(. = (
+                                                    'xbl-component',
+                                                    'xbl-focusable',
+                                                    'xbl-javascript-lifecycle'
+                                                ))
+                                            ][1]
+                                        return substring-after($c, 'xbl-')"/>
                             </xsl:when>
                             <xsl:when test="$classes = $control-classes">
                                 <!-- Built-in controls -->

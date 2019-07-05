@@ -37,6 +37,15 @@
              <xbl:style src="/xbl/orbeon/tabbable/tabbable.css"/>
         </xbl:resources>
 
+        <xbl:handlers>
+            <!-- Basic fix for https://github.com/orbeon/orbeon-forms/issues/4090 -->
+            <xbl:handler event="xxforms-visible" phase="target">
+                <xf:action type="javascript">
+                    ORBEON.xforms.XBL.instanceForControl(this).selectTab(0);
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">

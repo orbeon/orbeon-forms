@@ -313,6 +313,7 @@
                     <xf:action iterate="/response/row">
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
                             <xf:action>
                                 <xf:var
                                     name="container"
@@ -440,6 +441,7 @@
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
 
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
 
                             <xf:action xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" type="xpath">
                                 process:runProcessByName('oxf.fr.detail.process', 'acme-process')

@@ -1,0 +1,153 @@
+<!--
+  Copyright (C) 2019 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.js"/>
+    <xbl:binding
+        id="fr-databound-select1-search"
+        element="
+            fr|databound-select1-search,
+            fr|databound-select1[appearance ~= search]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value selection javascript-lifecycle">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">With Search</display-name>
+            <display-name lang="es" todo="true">[With Search]</display-name>
+            <display-name lang="fi" todo="true">[With Search]</display-name>
+            <display-name lang="fr" todo="true">[With Search]</display-name>
+            <display-name lang="ru" todo="true">[With Search]</display-name>
+            <display-name lang="de" todo="true">[With Search]</display-name>
+            <display-name lang="it" todo="true">[With Search]</display-name>
+            <display-name lang="nl" todo="true">[With Search]</display-name>
+            <display-name lang="sv" todo="true">[With Search]</display-name>
+            <display-name lang="pt" todo="true">[With Search]</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-search</icon-class>
+            </icon>
+            <editors static-itemset="false"/>
+            <templates>
+                <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
+                <view>
+                    <fr:databound-select1 id="" appearance="search" ref="" resource="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                    </fr:databound-select1>
+                </view>
+            </templates>
+<!--            <xi:include -->
+<!--                href="../databound-select1/databound-select1.xbl" -->
+<!--                xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
+            <control-details>
+                <xf:model>
+                    <xf:bind ref="@resource"/>
+                    <xf:bind ref="xf:itemset">
+                        <xf:bind
+                            ref="@ref | xf:label/@ref | xf:value/@ref"
+                            type="xxf:xpath2"
+                            required="true()"/>
+                    </xf:bind>
+                </xf:model>
+                <fr:grid>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="@resource">
+                                <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="xf:itemset/@ref">
+                                <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:input ref="xf:itemset/xf:label/@ref">
+                                <xf:label ref="xxf:r('dialog-actions.item-label.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.item-label.hint',  '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td>
+                            <xf:input ref="xf:itemset/xf:value/@ref">
+                                <xf:label ref="xxf:r('dialog-actions.item-value.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.item-value.hint',  '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.min.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><select>Please select:</select></resource>
+                        <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
+                        <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
+                        <resource xml:lang="no"><select>Velg:</select></resource>
+                        <resource xml:lang="ru"><select>Выберите:</select></resource>
+                        <resource xml:lang="it"><select>Si prega di selezionare:</select></resource>
+                        <resource xml:lang="de"><select>Bitte auswählen:</select></resource>
+                        <resource xml:lang="fi"><select>Valitse:</select></resource>
+                        <resource xml:lang="nl"><select>Selecteren:</select></resource>
+                        <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
+                        <resource xml:lang="sv"><select>Välj:</select></resource>
+                        <resource xml:lang="da"><select>Vælg:</select></resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xh:span data-placeholder="{xxf:r('select')}">
+                <fr:databound-select1
+                    id="select1"
+                    appearance="minimal"
+                    ref="xxf:binding('fr-databound-select1-search')"
+                    xbl:attr="xxf:encrypt-item-values resource"
+                >
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                </fr:databound-select1>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

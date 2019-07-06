@@ -202,6 +202,8 @@
         fr:yesno-input
         fr:open-select1
         fr:tree-select1
+        fr:dropdown-select1-search
+        fr:databound-select1-search
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

@@ -46,7 +46,6 @@ private class DateCompanion extends XBLCompanionWithState {
   var datePicker : DatePicker = _
 
   override def init(): Unit = {
-    println("date init")
 
     scribe.debug("init")
 

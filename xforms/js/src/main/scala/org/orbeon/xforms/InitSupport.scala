@@ -52,8 +52,8 @@ object InitSupport {
 
     val initializations =
       decode[rpc.Initializations](initializationsString) match {
-        case Left(e)                ⇒ throw e
-        case Right(initializations) ⇒ initializations
+        case Left(e)  ⇒ throw e
+        case Right(i) ⇒ i
       }
 
     scribe.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")

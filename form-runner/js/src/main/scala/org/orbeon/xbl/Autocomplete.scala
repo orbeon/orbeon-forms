@@ -36,12 +36,12 @@ private class AutocompleteCompanion extends XBLCompanion {
     val select                 = container.find("select")
     val elementWithPlaceholder = container.children(s"[$DataPlaceholder]")
 
-    // Select2 wants the first option not to have a value when using a placeholder
-    select.find("option").first().removeAttr("value")
-
     def initOrUpdatePlaceholder() {
         select.select2(new Select2Options {
-          val placeholder: String = elementWithPlaceholder.attr(DataPlaceholder).get
+          val placeholder: Placeholder = new Placeholder {
+            val id   : String = "0"
+            val text : String = elementWithPlaceholder.attr(DataPlaceholder).get
+          }
         })
     }
     initOrUpdatePlaceholder()
@@ -68,6 +68,15 @@ private object Select2Facade {
   }
 
   trait Select2Options extends js.Object {
-    val placeholder: String
+    val placeholder : Placeholder
+  }
+
+  trait Placeholder extends js.Object {
+    val id   : String
+    val text : String
+  }
+
+  trait Select2Ajax extends js.Object {
+    val transport: (js.Object, js.Function0[Unit], js.Function0[Unit]) ⇒ Unit
   }
 }

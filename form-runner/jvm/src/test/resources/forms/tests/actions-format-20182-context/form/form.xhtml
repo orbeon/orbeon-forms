@@ -112,7 +112,7 @@
                     <fr:control-setvalue control="my-result-1" value="/value"/>
 
                     <fr:service-call service="echo2">
-                        <fr:value context="current-iteration" value="result-2" ref="/value"/>
+                        <fr:value expression-context="current-iteration" value="result-2" ref="/value"/>
                     </fr:service-call>
 
                     <fr:control-setvalue control="my-result-2" value="/value"/>

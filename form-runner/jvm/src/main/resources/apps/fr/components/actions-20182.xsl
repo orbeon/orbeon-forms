@@ -330,7 +330,7 @@
                                     name="value"
                                     context="$original-context"
                                     value="{$value}">
-                                    <xsl:copy-of select="fr:build-context-att(@context)"/>
+                                    <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
                                 </xf:var>
                             </xsl:when>
                         </xsl:choose>
@@ -380,7 +380,7 @@
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
 
         <xf:action iterate="{@ref}">
-            <xsl:copy-of select="fr:build-context-att(@context)"/>
+            <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067-->
             <xsl:for-each-group
@@ -506,12 +506,12 @@
 
         <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
 
-        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
-        <xsl:variable name="items-expr"      select="@items/string()"   as="xs:string"/>
-        <xsl:variable name="label-expr"      select="@label/string()"   as="xs:string"/>
-        <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
-        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
-        <xsl:variable name="context"         select="@context/string()" as="xs:string?"/>
+        <xsl:variable name="to-control-name" select="@control/string()"            as="xs:string"/>
+        <xsl:variable name="items-expr"      select="@items/string()"              as="xs:string"/>
+        <xsl:variable name="label-expr"      select="@label/string()"              as="xs:string"/>
+        <xsl:variable name="value-expr"      select="@value/string()"              as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"                 as="xs:string?"/>
+        <xsl:variable name="context"         select="@expression-context/string()" as="xs:string?"/>
 
         <xf:action>
 

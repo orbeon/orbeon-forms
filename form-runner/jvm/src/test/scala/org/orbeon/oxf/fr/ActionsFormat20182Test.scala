@@ -59,8 +59,24 @@ class ActionsFormat20182Test
       it("must pass all service result checks") {
         withTestExternalContext { _ ⇒
           withFormRunnerDocument(processorService, doc) {
-            val myResult = resolveObject[XFormsValueControl]("my-result-control").get
-            assert("First" == myResult.getValue)
+            assert("First" == resolveObject[XFormsValueControl]("my-result-control").get.getValue)
+          }
+        }
+      }
+    }
+
+    describe("#4116: explicit iteration context with `fr:data-iterate`") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "actions-format-20182-context", "new", document = "", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must pass all service result checks") {
+        withTestExternalContext { _ ⇒
+          withFormRunnerDocument(processorService, doc) {
+            assert("21" == resolveObject[XFormsValueControl]("my-result-1-control").get.getValue)
+            assert("22" == resolveObject[XFormsValueControl]("my-result-2-control").get.getValue)
           }
         }
       }

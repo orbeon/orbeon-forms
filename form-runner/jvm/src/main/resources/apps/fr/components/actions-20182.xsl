@@ -73,9 +73,9 @@
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-            <xsl:attribute name="context">
-                xxf:get-request-attribute('fr-iteration-context')
-            </xsl:attribute>
+             <xsl:attribute name="context">
+                 xxf:get-request-attribute('fr-iteration-context')
+             </xsl:attribute>
          </xsl:if>
     </xsl:function>
 

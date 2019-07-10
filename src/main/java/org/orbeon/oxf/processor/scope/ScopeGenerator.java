@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.scope;
 
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
@@ -31,9 +30,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.ParserAdapter;
 
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import java.io.IOException;
 import java.io.StringReader;
 
 public class ScopeGenerator extends ScopeProcessorBase {
@@ -138,7 +135,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
         return output;
     }
 
-    public static SAXStore getSAXStore(Object value, Mapping mapping, String contentType, String key) throws SAXException, TransformerException, IOException, MappingException {
+    public static SAXStore getSAXStore(Object value, Mapping mapping, String contentType, String key) throws SAXException {
         if (ScopeProcessorBase.TextPlain().equals(contentType)) {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
@@ -154,7 +151,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
         }
     }
 
-    public static SAXStore getSAXStore(Object value, Mapping mapping) throws SAXException, TransformerException, IOException, MappingException {
+    private static SAXStore getSAXStore(Object value, Mapping mapping) {
         final SAXStore resultStore;
         if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
@@ -187,7 +184,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
         return resultStore;
     }
 
-    protected static void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {
+    private static void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {
         try {
             contentHandler.startDocument();
 

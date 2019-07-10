@@ -185,7 +185,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
             super.endCDATA();
         }
 
-        private void log(String message) {
+        public void log(String message) {
             final StringBuilder builder = new StringBuilder(getLogSpaces());
             builder.append(message);
             addLocatorInfo(builder);

@@ -197,10 +197,15 @@ class SetRequestAttribute extends DefaultFunctionSupport with RuntimeDependentFu
     implicit val ctx = xpathContext
 
     val attributeName = stringArgument(0)
-    val item          = argument(1).evaluateItem(xpathContext)
+    val item          = itemArgument(1)
+
     val request = NetUtils.getExternalContext.getRequest
 
-    ScopeFunctionSupport.storeAttribute(request.getAttributesMap.put, attributeName, item)
+    // See https://github.com/orbeon/orbeon-forms/issues/4116
+    if (item eq null)
+      request.getAttributesMap.remove(attributeName)
+    else
+      request.getAttributesMap.put(attributeName, item)
 
     EmptyIterator.getInstance
   }

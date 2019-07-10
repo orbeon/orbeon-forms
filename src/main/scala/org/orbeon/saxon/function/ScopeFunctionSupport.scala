@@ -59,7 +59,7 @@ object ScopeFunctionSupport {
     xpathContext    : XPathContext
   ): SequenceIterator =
     valueOpt match {
-      case Some(v: AtomicValue) ⇒
+      case Some(v: Item) ⇒
         // NOTE: This can be a `StringValueWithEquals`
         SingletonIterator.makeIterator(v)
       case Some(v) ⇒

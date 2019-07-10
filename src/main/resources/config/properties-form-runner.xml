@@ -356,6 +356,10 @@
     <!-- If empty, process is generated based on legacy properties -->
     <property as="xs:string"  name="oxf.fr.detail.process.workflow-send.*.*"                    value=''/>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.action-service-error.*.*">
+        error-message("service-error")
+    </property>
+
     <!-- Default send parameters -->
     <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>

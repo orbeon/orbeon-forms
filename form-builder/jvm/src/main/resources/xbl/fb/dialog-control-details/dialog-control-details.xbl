@@ -67,57 +67,9 @@
                         value="fbf:hasViewTemplateSupportElementFor($xbl-binding, $support-element-name)"/>
                 </xf:action>
 
-                <!-- Process `fb:control-details` -->
-                <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->
-                <xf:action>
-
-                    <xf:delete
-                        ref="instance('dynamic')/*"/>
-
-                    <xf:var
-                        name="control-details"
-                        value="$xbl-binding/fb:metadata/fb:control-details"/>
-
-                    <xf:action if="exists($control-details)">
-
-                        <xf:var
-                            name="mutable-control-details"
-                            value="xxf:mutable-document($control-details)/*"/>
-
-                        <!-- Process the LHHA of each details control -->
-                        <xf:var name="current-language" value="fbf:currentLang()"/>
-                        <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
-                            <xf:var name="lhha" value="."/>
-                            <!-- If it has a lang attribute, only keep if matches the current language -->
-                            <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
-                            <!-- If it has a ref="$resources/...", evaluate it -->
-                            <xf:action if="starts-with($lhha/@ref, '$resources/')">
-                                <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
-                                <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
-                                <xf:delete ref="$lhha/@ref"/>
-                            </xf:action>
-                        </xf:action>
-
-                        <!-- Complete the custom form -->
-                        <xf:insert
-                            ref="instance('dynamic')"
-                            origin="instance('dynamic-template')"/>
-
-                        <xf:insert
-                            context="instance('dynamic')//xf:model"
-                            ref="*"
-                            origin="$mutable-control-details/xf:model/*"/>
-
-                        <xf:insert
-                            context="instance('dynamic')//xf:instance"
-                            origin="$control"/>
-
-                        <xf:insert
-                            context="instance('dynamic')//xh:body"
-                            origin="$mutable-control-details/(* except xf:model)"/>
-
-                    </xf:action>
-                </xf:action>
+                <xf:dispatch
+                    name="fb-process-xbl-fb-control-details"
+                    targetid="fb-dialog-control-details"/>
 
                 <!-- Clear default alert -->
                 <xf:var name="default-alert" value="$i/default-alert"/>
@@ -233,6 +185,82 @@
                     value="false()"/>
 
             </xbl:handler>
+
+            <xbl:handler event="fb-process-xbl-fb-control-details">
+                <!-- Process `fb:control-details` -->
+                <!-- NOTE: Part of this is duplicated in `dialog-form-settings.xbl`. -->
+
+                <xf:delete
+                    ref="instance('dynamic')/*"/>
+
+                <!-- Get control and insert in a new document, so the form isn't changed if we update the control appearance -->
+                <xf:var
+                    name="control-document"
+                    value="xxf:create-document()"/>
+                <xf:insert
+                    context="$control-document"
+                    origin="fbf:findControlByNameOrEmpty($i/control-name)"/>
+
+                <!-- If the form author changed the appearance, change it on the control before we get the XBL binding -->
+                <xf:var
+                    name="control"
+                    value="$control-document/*"/>
+                <xf:var
+                    name="new-appearance"
+                    value="event('fb-new-appearance')"/>
+                <xf:setvalue
+                    if="exists($new-appearance)"
+                    ref="$control/@appearance"
+                    value="$new-appearance"/>
+
+                <xf:var
+                    name="xbl-binding"
+                    value="fbf:bindingForControlElementOrEmpty($control)"/>
+                <xf:var
+                    name="control-details"
+                    value="$xbl-binding/fb:metadata/fb:control-details"/>
+
+                <xf:action if="exists($control-details)">
+
+                    <xf:var
+                        name="mutable-control-details"
+                        value="xxf:mutable-document($control-details)/*"/>
+
+                    <!-- Process the LHHA of each details control -->
+                    <xf:var name="current-language" value="fbf:currentLang()"/>
+                    <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
+                        <xf:var name="lhha" value="."/>
+                        <!-- If it has a lang attribute, only keep if matches the current language -->
+                        <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
+                        <!-- If it has a ref="$resources/...", evaluate it -->
+                        <xf:action if="starts-with($lhha/@ref, '$resources/')">
+                            <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
+                            <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
+                            <xf:delete ref="$lhha/@ref"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <!-- Complete the custom form -->
+                    <xf:insert
+                        ref="instance('dynamic')"
+                        origin="instance('dynamic-template')"/>
+
+                    <xf:insert
+                        context="instance('dynamic')//xf:model"
+                        ref="*"
+                        origin="$mutable-control-details/xf:model/*"/>
+
+                    <xf:insert
+                        context="instance('dynamic')//xf:instance"
+                        origin="$control"/>
+
+                    <xf:insert
+                        context="instance('dynamic')//xh:body"
+                        origin="$mutable-control-details/(* except xf:model)"/>
+
+                </xf:action>
+            </xbl:handler>
+
             <!-- Save data upon close unless the sub-form is not valid. Do this upon capture phase so that we can
                  process values, including custom control settings, before the dialog is actually closed and becomes
                  non-relevant. -->
@@ -803,6 +831,13 @@
                                         <xh:tr>
                                             <xh:td>
                                                 <xf:group ref=".[$multi or $toggle]">
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:dispatch
+                                                            name="fb-process-xbl-fb-control-details"
+                                                            targetid="fb-dialog-control-details">
+                                                            <xf:property name="fb-new-appearance" value="event('xxf:value')"/>
+                                                        </xf:dispatch>
+                                                    </xf:action>
                                                     <!-- Propose a choice between multiple items -->
                                                     <xf:select1 ref="$i/appearances/@selection[$multi]" appearance="full">
                                                         <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>

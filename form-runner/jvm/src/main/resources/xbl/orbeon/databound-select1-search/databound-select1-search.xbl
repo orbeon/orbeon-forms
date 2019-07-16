@@ -19,8 +19,10 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:saxon="http://saxon.sf.net/">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
     <xbl:binding
@@ -28,6 +30,7 @@
         element="
             fr|databound-select1-search,
             fr|databound-select1[appearance ~= search]"
+        xxf:external-events="fr-search"
         xxbl:container="span"
         xxbl:mode="lhha binding value selection javascript-lifecycle">
 
@@ -62,9 +65,6 @@
                     </fr:databound-select1>
                 </view>
             </templates>
-<!--            <xi:include -->
-<!--                href="../databound-select1/databound-select1.xbl" -->
-<!--                xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
             <control-details>
                 <xf:model>
                     <xf:bind ref="@resource"/>
@@ -115,38 +115,120 @@
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.min.css"/>
         </xbl:resources>
 
-        <xbl:implementation>
-            <xf:model>
-                <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
-                        <resource xml:lang="en"><select>Please select:</select></resource>
-                        <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
-                        <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
-                        <resource xml:lang="no"><select>Velg:</select></resource>
-                        <resource xml:lang="ru"><select>Выберите:</select></resource>
-                        <resource xml:lang="it"><select>Si prega di selezionare:</select></resource>
-                        <resource xml:lang="de"><select>Bitte auswählen:</select></resource>
-                        <resource xml:lang="fi"><select>Valitse:</select></resource>
-                        <resource xml:lang="nl"><select>Selecteren:</select></resource>
-                        <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
-                        <resource xml:lang="sv"><select>Välj:</select></resource>
-                        <resource xml:lang="da"><select>Vælg:</select></resource>
-                    </resources>
-                </xf:instance>
-            </xf:model>
-        </xbl:implementation>
+        <xbl:handlers>
 
-        <xbl:template>
-            <xh:span data-placeholder="{xxf:r('select')}">
-                <fr:databound-select1
-                    id="select1"
-                    appearance="minimal"
-                    ref="xxf:binding('fr-databound-select1-search')"
-                    xbl:attr="xxf:encrypt-item-values resource"
-                >
-                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-                </fr:databound-select1>
-            </xh:span>
+            <!-- Scala.js asks us to call the service to get a list of suggestions -->
+            <xbl:handler event="fr-search">
+
+                <!-- Build URL -->
+                <xf:var name="fr-search-value" value="event('fr-search-value')"/>
+                <xf:var name="resource-attr"   value="instance('local')/resource-attr"/>
+                <xf:var name="resource"        value="xxf:evaluate-avt($resource-attr)"/>
+
+                <!-- Call service -->
+                <xf:send submission="get-result">
+                    <xf:property name="fr-resource" value="$resource"/>
+                </xf:send>
+
+                <!-- Build JSON for Select2 -->
+                <xf:delete ref="instance('result-json')/*"/>
+                <xf:var name="items" value="instance('result-raw')/saxon:evaluate(instance('local')/itemset-ref)"/>
+                <xf:action iterate="$items">
+                    <xf:var name="item" value="."/>
+                    <xf:setvalue ref="instance('item-template')/id"   value="$item/saxon:evaluate(instance('local')/value-ref)"/>
+                    <xf:setvalue ref="instance('item-template')/text" value="$item/saxon:evaluate(instance('local')/label-ref)"/>
+                    <xf:insert
+                        context="instance('result-json')"
+                        ref="*"
+                        position="after"
+                        origin="instance('item-template')"/>
+                </xf:action>
+
+                <!-- Send JSON to Scala.js, which will pass it to Select2 to update the list of suggestions -->
+                <xf:action type="javascript">
+                    <xf:param name="json" value="xxf:xml-to-json(instance('result-json'))"/>
+                    <xf:body>
+                        var i = ORBEON.xforms.XBL.instanceForControl(this);
+                        if (i) i.updateSuggestions(json);
+                    </xf:body>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:template match="/*">
+                    <xf:group appearance="xxf:internal">
+
+                        <xf:model>
+
+                            <xf:instance id="orbeon-resources" xxf:readonly="true">
+                                <resources>
+                                    <resource xml:lang="en"><select>Please select:</select></resource>
+                                    <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
+                                    <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
+                                    <resource xml:lang="no"><select>Velg:</select></resource>
+                                    <resource xml:lang="ru"><select>Выберите:</select></resource>
+                                    <resource xml:lang="it"><select>Si prega di selezionare:</select></resource>
+                                    <resource xml:lang="de"><select>Bitte auswählen:</select></resource>
+                                    <resource xml:lang="fi"><select>Valitse:</select></resource>
+                                    <resource xml:lang="nl"><select>Selecteren:</select></resource>
+                                    <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
+                                    <resource xml:lang="sv"><select>Välj:</select></resource>
+                                    <resource xml:lang="da"><select>Vælg:</select></resource>
+                                </resources>
+                            </xf:instance>
+
+                            <xf:instance id="local">
+                                <local>
+                                    <resource-attr><xsl:value-of select="@resource"/></resource-attr>
+                                    <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
+                                    <label-ref><xsl:value-of select="xf:itemset/xf:label/@ref"/></label-ref>
+                                    <value-ref><xsl:value-of select="xf:itemset/xf:value/@ref"/></value-ref>
+                                </local>
+                            </xf:instance>
+
+                            <xf:instance id="result-raw"    ><result/></xf:instance>
+                            <xf:instance id="result-json"><results type="array"/></xf:instance>
+                            <xf:instance id="item-template">
+                                <_ type="object">
+                                    <id/>
+                                    <text/>
+                                </_>
+                            </xf:instance>
+                            <xf:submission
+                                id="get-result"
+                                method="get"
+                                resource="{{event('fr-resource')}}"
+                                replace="instance"
+                                instance="result-raw"
+                                serialization="none"/>
+
+                        </xf:model>
+
+                        <xf:var name="service-performs-search-attr" xbl:attr="xbl:text=service-performs-search"/>
+                        <xf:var name="service-performs-search"      value="$service-performs-search-attr = 'true'"/>
+
+                        <xh:span
+                            data-placeholder="{{xxf:r('select')}}"
+                            data-service-performs-search="{{$service-performs-search}}">
+
+                            <xf:var name="fr-search-value"/>
+                            <fr:databound-select1
+                                id="select1"
+                                appearance="minimal"
+                                ref="xxf:binding('fr-databound-select1-search')"
+                                xbl:attr="xxf:encrypt-item-values resource">
+
+                                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+
+                            </fr:databound-select1>
+
+                        </xh:span>
+
+                    </xf:group>
+                </xsl:template>
+            </xsl:transform>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -23,12 +23,12 @@ import org.scalajs.jquery.JQuery
 import scala.collection.mutable
 import scala.scalajs.js
 
-object Autocomplete {
-  XBL.declareCompanion(name = "fr|dropdown-select1-search" , new AutocompleteCompanion())
-  XBL.declareCompanion(name = "fr|databound-select1-search", new AutocompleteCompanion())
+object Select1Search {
+  XBL.declareCompanion(name = "fr|dropdown-select1-search" , new Select1SearchCompanion())
+  XBL.declareCompanion(name = "fr|databound-select1-search", new Select1SearchCompanion())
 }
 
-private class AutocompleteCompanion extends XBLCompanion {
+private class Select1SearchCompanion extends XBLCompanion {
 
   val DataPlaceholder           = "data-placeholder"
   val DataServicePerformsSearch = "data-service-performs-search"

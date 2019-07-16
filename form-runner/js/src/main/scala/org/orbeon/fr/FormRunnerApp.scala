@@ -29,7 +29,7 @@ object FormRunnerApp extends App {
     xbl.TreeSelect1
     xbl.WPaint
     xbl.HrefButton
-    xbl.Autocomplete
+    xbl.Select1Search
     xbl.AutosizeTextarea
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.

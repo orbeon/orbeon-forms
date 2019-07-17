@@ -31,10 +31,10 @@
             xmlns="http://orbeon.org/oxf/xml/form-builder"
             xmlns:xf="http://www.w3.org/2002/xforms">
 
-            <display-name lang="en">Dynamic Data Dropdown</display-name>
+            <display-name lang="en">Dynamic Dropdown</display-name>
             <display-name lang="es">Lista Desplegable Dinámica</display-name>
             <display-name lang="fi">Dynaamisen datan pudotusvalikko</display-name>
-            <display-name lang="fr">Menu données dynamique</display-name>
+            <display-name lang="fr">Menu déroulant dynamique</display-name>
             <display-name lang="ru">Список из веб-сервиса</display-name>
             <display-name lang="de">Daten Dropdown-Liste</display-name>
             <display-name lang="it">Tendina dati</display-name>

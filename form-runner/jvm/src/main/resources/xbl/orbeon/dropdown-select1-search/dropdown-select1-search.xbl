@@ -40,7 +40,7 @@
             <display-name lang="nl" todo="true">[With Search]</display-name>
             <display-name lang="sv" todo="true">[With Search]</display-name>
             <display-name lang="pt" todo="true">[With Search]</display-name>
-<!--            <toolbox show="false"/>-->
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-search</icon-class>
             </icon>

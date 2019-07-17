@@ -75,14 +75,6 @@
                             type="xxf:xpath2"
                             required="true()"/>
                     </xf:bind>
-                    <xf:action event="xforms-model-construct-done">
-                        <!-- Make sure we have a `service-performs-search` attribute; it might be missing if we're switching
-                             to this `fr:databound-select1-search` from a `fr:databound-select1`. -->
-                        <xf:insert
-                            if="empty(@service-performs-search)"
-                            context="."
-                            origin="xf:attribute('service-performs-search', 'false')"/>
-                    </xf:action>
                 </xf:model>
                 <fr:grid>
                     <xh:tr>

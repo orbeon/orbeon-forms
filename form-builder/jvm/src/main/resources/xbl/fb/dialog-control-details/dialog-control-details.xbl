@@ -240,20 +240,36 @@
                         </xf:action>
                     </xf:action>
 
+                    <!-- Add/remove attributes on the control to match those on the template -->
+                    <xf:var
+                        name="control-template"
+                        value="$xbl-binding/fb:metadata/fb:templates/fb:view/*"/>
+                    <xf:action iterate="$control-template/@*">
+                        <xf:var name="template-attribute" value="."/>
+                        <xf:insert
+                            if="empty($control/@*[local-name() = $template-attribute/local-name()])"
+                            context="$control"
+                            origin="$template-attribute"/>
+                    </xf:action>
+                    <xf:action iterate="$control/@*">
+                        <xf:var name="control-attribute" value="."/>
+                        <xf:delete
+                            if="$control-attribute/local-name() != 'bind' and
+                                empty($control-template/@*[local-name() = $control-attribute/local-name()])"
+                            ref="$control-attribute"/>
+                    </xf:action>
+
                     <!-- Complete the custom form -->
                     <xf:insert
                         ref="instance('dynamic')"
                         origin="instance('dynamic-template')"/>
-
                     <xf:insert
                         context="instance('dynamic')//xf:model"
                         ref="*"
                         origin="$mutable-control-details/xf:model/*"/>
-
                     <xf:insert
                         context="instance('dynamic')//xf:instance"
                         origin="$control"/>
-
                     <xf:insert
                         context="instance('dynamic')//xh:body"
                         origin="$mutable-control-details/(* except xf:model)"/>

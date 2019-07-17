@@ -53,7 +53,7 @@
             <templates>
                 <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
                 <view>
-                    <fr:databound-select1 id="" appearance="search" ref="" resource="">
+                    <fr:databound-select1 id="" appearance="search" ref="" service-performs-search="false" resource="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
@@ -67,6 +67,7 @@
             </templates>
             <control-details>
                 <xf:model>
+                    <xf:bind ref="@service-performs-search" type="xs:boolean"/>
                     <xf:bind ref="@resource"/>
                     <xf:bind ref="xf:itemset">
                         <xf:bind
@@ -74,8 +75,24 @@
                             type="xxf:xpath2"
                             required="true()"/>
                     </xf:bind>
+                    <xf:action event="xforms-model-construct-done">
+                        <!-- Make sure we have a `service-performs-search` attribute; it might be missing if we're switching
+                             to this `fr:databound-select1-search` from a `fr:databound-select1`. -->
+                        <xf:insert
+                            if="empty(@service-performs-search)"
+                            context="."
+                            origin="xf:attribute('service-performs-search', 'false')"/>
+                    </xf:action>
                 </xf:model>
                 <fr:grid>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <fr:yesno-input ref="@service-performs-search">
+                                <xf:label ref="xxf:r('dialog-http-services.service-performs-search.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-http-services.service-performs-search.hint',  '|fr-form-resources|')"/>
+                            </fr:yesno-input>
+                        </xh:td>
+                    </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="@resource">

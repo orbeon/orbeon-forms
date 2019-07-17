@@ -877,6 +877,13 @@
                 <label>Service Name</label>
                 <hint>Choose a unique name for this service</hint>
             </service-name>
+            <service-performs-search>
+                <label>Service performs search</label>
+                <hint>
+                    Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
+                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL below.
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>Resource URL</label>
                 <hint>HTTP URL at which the service reside</hint>
@@ -2084,6 +2091,14 @@
                 <label>Nom du service</label>
                 <hint>Choisisez un nom de service unique</hint>
             </service-name>
+            <service-performs-search>
+                <label>Le service effectue la recherche</label>
+                <hint>
+                    Choisissez "Non" si votre service retourne touts les valeurs possible, et "Oui" s'il ne retourne que les valeurs à
+                    afficher en fonction de la saisie de l'utilisateur. Si vous avez choisi "Oui", veuillez fournir la valeur saisie
+                    l'utilisateur à votre service en utilisant {$fr-search-value} dans l'URL de la ressource ci-dessous.
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>URL de la ressource</label>
                 <hint>URL HTTP auquel réside le service</hint>
@@ -6908,6 +6923,14 @@
                 <label>Name des Dienstes</label>
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
+            <service-performs-search>
+                <label todo="true">[Service performs search]</label>
+                <hint todo="true">
+                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
+                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
+                    below.]
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>URL der Ressourcen</label>
                 <hint>HTTP URL an dem der Dienst bereitgestellt wird</hint>
@@ -9329,6 +9352,14 @@
                 <label>Nombre del Servicio</label>
                 <hint>Ingrese un nombre único para este Servicio</hint>
             </service-name>
+            <service-performs-search>
+                <label todo="true">[Service performs search]</label>
+                <hint todo="true">
+                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
+                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
+                    below.]
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>Recursos de URL</label>
                 <hint>HTTP URL dónde reside el servicio</hint>
@@ -10546,6 +10577,14 @@
                 <label>Servicenaam</label>
                 <hint>Kies een unieke naam voor deze service</hint>
             </service-name>
+            <service-performs-search>
+                <label todo="true">[Service performs search]</label>
+                <hint todo="true">
+                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
+                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
+                    below.]
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>Resource URL</label>
                 <hint>HTTP URL waarop de service beschikbaar is</hint>
@@ -12951,6 +12990,14 @@
                 <label>Namn</label>
                 <hint>Definiera ett unikt namn för denna HTTP-tjänst</hint>
             </service-name>
+            <service-performs-search>
+                <label todo="true">[Service performs search]</label>
+                <hint todo="true">
+                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
+                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
+                    below.]
+                </hint>
+            </service-performs-search>
             <resource>
                 <label>URL</label>
                 <hint>URL som ska användas för att nå tjänsten</hint>

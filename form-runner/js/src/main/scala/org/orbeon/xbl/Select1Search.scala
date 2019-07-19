@@ -71,12 +71,12 @@ private class Select1SearchCompanion extends XBLCompanion {
 
   var select2SuccessCallbacks = new mutable.Queue[Select2.Success]
 
-  def updateSuggestions(results: String): Unit = {
+  def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results)
     val data = new Select2.Data {
       val results    = parsedResults.asInstanceOf[js.Array[Select2.Option]]
       val pagination = new Select2.Pagination {
-        val more = false
+        val more = ! isLastPage.toBoolean
       }
     }
     val success = select2SuccessCallbacks.dequeue()
@@ -94,6 +94,7 @@ private class Select1SearchCompanion extends XBLCompanion {
     ): Unit = {
 
       val searchValue = params.data.term.getOrElse("")
+      val searchPage  = params.data.page.getOrElse(1)
       searchValue match {
         case "" ⇒
           val htmlSelect = jSelect.get(0).asInstanceOf[dom.html.Select]
@@ -118,7 +119,8 @@ private class Select1SearchCompanion extends XBLCompanion {
             targetId = containerElem.id,
             eventName = "fr-search",
             properties = js.Dictionary(
-              "fr-search-value" → searchValue
+              "fr-search-value" → searchValue,
+              "fr-search-page"  → searchPage.toString
             )
           )
       }
@@ -148,6 +150,7 @@ private object Select2 {
 
   trait ParamsData extends js.Object {
     val term: js.UndefOr[String]
+    val page: js.UndefOr[Int]
   }
 
   trait Params extends js.Object {

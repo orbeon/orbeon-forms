@@ -879,11 +879,10 @@
             </service-name>
             <service-performs-search>
                 <label>Service performs search</label>
-                <hint>
-                    Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL below.
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label>Service supports paging</label>
+            </service-supports-paging>
             <resource>
                 <label>Resource URL</label>
                 <hint>HTTP URL at which the service reside</hint>
@@ -1096,6 +1095,9 @@
                 <label>Value XPath expression</label>
                 <hint>Relative to choice node</hint>
             </item-value>
+            <is-last-page>
+                <label>Is last page XPath expression</label>
+            </is-last-page>
             <save>
                 <label>Save</label>
             </save>
@@ -2093,12 +2095,10 @@
             </service-name>
             <service-performs-search>
                 <label>Le service effectue la recherche</label>
-                <hint>
-                    Choisissez "Non" si votre service retourne touts les valeurs possible, et "Oui" s'il ne retourne que les valeurs à
-                    afficher en fonction de la saisie de l'utilisateur. Si vous avez choisi "Oui", veuillez fournir la valeur saisie
-                    l'utilisateur à votre service en utilisant {$fr-search-value} dans l'URL de la ressource ci-dessous.
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label>Le service permet la pagination</label>
+            </service-supports-paging>
             <resource>
                 <label>URL de la ressource</label>
                 <hint>URL HTTP auquel réside le service</hint>
@@ -3290,12 +3290,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>Ressurs-URL</label>
                 <hint>HTTP-URL-en til denne tjenesten</hint>
@@ -4514,12 +4512,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>URL сервиса</label>
                 <hint>Адрес HTTP расположения сервиса</hint>
@@ -5731,12 +5727,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>URL della fonte</label>
                 <hint>URL HTTP in cui il servizio risiede</hint>
@@ -6949,12 +6943,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>URL der Ressourcen</label>
                 <hint>HTTP URL an dem der Dienst bereitgestellt wird</hint>
@@ -8169,12 +8161,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>Resurssi URL</label>
                 <hint>HTTP URL jolla palvelu sijaitsee</hint>
@@ -9386,12 +9376,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>Recursos de URL</label>
                 <hint>HTTP URL dónde reside el servicio</hint>
@@ -10611,12 +10599,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>Resource URL</label>
                 <hint>HTTP URL waarop de service beschikbaar is</hint>
@@ -11807,12 +11793,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>Recurso URL</label>
                 <hint>HTTP URL no qual o serviço reside</hint>
@@ -13032,12 +13016,10 @@
             </service-name>
             <service-performs-search>
                 <label todo="true">[Service performs search]</label>
-                <hint todo="true">
-                    [Choose "No" if your service returns all the possible values, and "Yes" if you your service return the values to show
-                    based on the user's input. If you chose "Yes", pass the user's input with {$fr-search-value} in the Resource URL
-                    below.]
-                </hint>
             </service-performs-search>
+            <service-supports-paging>
+                <label todo="true">[Service supports paging]</label>
+            </service-supports-paging>
             <resource>
                 <label>URL</label>
                 <hint>URL som ska användas för att nå tjänsten</hint>

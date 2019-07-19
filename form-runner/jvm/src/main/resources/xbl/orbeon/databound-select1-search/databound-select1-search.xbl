@@ -53,7 +53,14 @@
             <templates>
                 <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
                 <view>
-                    <fr:databound-select1 id="" appearance="search" ref="" service-performs-search="false" resource="">
+                    <fr:databound-select1
+                            id=""
+                            appearance="search"
+                            ref=""
+                            service-performs-search="false"
+                            service-supports-paging="false"
+                            is-last-page=""
+                            resource="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
@@ -67,8 +74,24 @@
             </templates>
             <control-details>
                 <xf:model>
-                    <xf:bind ref="@service-performs-search" type="xs:boolean"/>
-                    <xf:bind ref="@resource"/>
+                    <xf:bind
+                        ref="@service-performs-search"
+                        type="xs:boolean"/>
+                    <xf:bind
+                        ref="@service-supports-paging"
+                        type="xs:boolean"
+                        readonly="../@service-performs-search = false()"
+                        calculate="if (../@service-performs-search = true()) then . else 'false'"/>
+                    <xf:bind
+                        ref="@is-last-page"
+                        type="xxf:xpath2"
+                        readonly="../@service-supports-paging = false()"
+                        required="../@service-supports-paging = true()"
+                        calculate="if (../@service-supports-paging = true()) then . else ''"/>
+                    <xf:bind
+                        ref="@resource"
+                        type="xxf:xpath2"
+                        required="true()"/>
                     <xf:bind ref="xf:itemset">
                         <xf:bind
                             ref="@ref | xf:label/@ref | xf:value/@ref"
@@ -79,9 +102,22 @@
                 <fr:grid>
                     <xh:tr>
                         <xh:td colspan="2">
+                            <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
+                            <xh:a
+                                href="https://doc.orbeon.com/form-runner/component/autocomplete"
+                                target="_blank"
+                                >Learn more about the settings below</xh:a>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="1">
                             <fr:yesno-input ref="@service-performs-search">
                                 <xf:label ref="xxf:r('dialog-http-services.service-performs-search.label', '|fr-form-resources|')"/>
-                                <xf:hint  ref="xxf:r('dialog-http-services.service-performs-search.hint',  '|fr-form-resources|')"/>
+                            </fr:yesno-input>
+                        </xh:td>
+                        <xh:td colspan="1">
+                            <fr:yesno-input ref="@service-supports-paging">
+                                <xf:label ref="xxf:r('dialog-http-services.service-supports-paging.label', '|fr-form-resources|')"/>
                             </fr:yesno-input>
                         </xh:td>
                     </xh:tr>
@@ -94,10 +130,15 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="2">
+                        <xh:td>
                             <xf:input ref="xf:itemset/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td>
+                            <xf:input ref="@is-last-page">
+                                <xf:label ref="xxf:r('dialog-actions.is-last-page.label', '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
@@ -131,6 +172,7 @@
 
                 <!-- Build URL -->
                 <xf:var name="fr-search-value" value="event('fr-search-value')"/>
+                <xf:var name="fr-search-page"  value="event('fr-search-page')"/>
                 <xf:var name="resource-attr"   value="instance('local')/resource-attr"/>
                 <xf:var name="resource"        value="xxf:evaluate-avt($resource-attr)"/>
 
@@ -153,12 +195,20 @@
                         origin="instance('item-template')"/>
                 </xf:action>
 
+                <xf:var
+                    name="is-last-page"
+                    value="
+                        if (instance('local')/service-supports-paging = 'true')
+                        then instance('result-raw')/saxon:evaluate(instance('local')/is-last-page-ref)
+                        else 'true'"/>
+
                 <!-- Send JSON to Scala.js, which will pass it to Select2 to update the list of suggestions -->
                 <xf:action type="javascript">
-                    <xf:param name="json" value="xxf:xml-to-json(instance('result-json'))"/>
+                    <xf:param name="results"    value="xxf:xml-to-json(instance('result-json'))"/>
+                    <xf:param name="isLastPage" value="$is-last-page"/>
                     <xf:body>
                         var i = ORBEON.xforms.XBL.instanceForControl(this);
-                        if (i) i.updateSuggestions(json);
+                        if (i) i.updateSuggestions(results, isLastPage);
                     </xf:body>
                 </xf:action>
             </xbl:handler>
@@ -191,13 +241,15 @@
                             <xf:instance id="local">
                                 <local>
                                     <resource-attr><xsl:value-of select="@resource"/></resource-attr>
+                                    <service-supports-paging><xsl:value-of select="@service-supports-paging"/></service-supports-paging>
+                                    <is-last-page-ref><xsl:value-of select="@is-last-page"/></is-last-page-ref>
                                     <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
                                     <label-ref><xsl:value-of select="xf:itemset/xf:label/@ref"/></label-ref>
                                     <value-ref><xsl:value-of select="xf:itemset/xf:value/@ref"/></value-ref>
                                 </local>
                             </xf:instance>
 
-                            <xf:instance id="result-raw"    ><result/></xf:instance>
+                            <xf:instance id="result-raw" ><result/></xf:instance>
                             <xf:instance id="result-json"><results type="array"/></xf:instance>
                             <xf:instance id="item-template">
                                 <_ type="object">
@@ -206,12 +258,20 @@
                                 </_>
                             </xf:instance>
                             <xf:submission
-                                id="get-result"
-                                method="get"
-                                resource="{{event('fr-resource')}}"
-                                replace="instance"
-                                instance="result-raw"
-                                serialization="none"/>
+                                    id="get-result"
+                                    method="get"
+                                    resource="{{event('fr-resource')}}"
+                                    replace="instance"
+                                    instance="result-raw"
+                                    serialization="none">
+                                <!-- For services that require a user agent, like GitHub's API
+                                     (we should have more general solution, like setting a User-Agent by default,
+                                     unless a property says otherwise) -->
+                                <xf:header>
+                                    <xf:name>User-Agent</xf:name>
+                                    <xf:value>OrbeonForms</xf:value>
+                                </xf:header>
+                            </xf:submission>
 
                         </xf:model>
 
@@ -222,7 +282,10 @@
                             data-placeholder="{{xxf:r('select')}}"
                             data-service-performs-search="{{$service-performs-search}}">
 
-                            <xf:var name="fr-search-value"/>
+                            <!-- Default values to populate the dropdown before users start typing -->
+                            <xf:var name="fr-search-value" value="''"/>
+                            <xf:var name="fr-search-page"  value="'1'"/>
+
                             <fr:databound-select1
                                 id="select1"
                                 appearance="minimal"

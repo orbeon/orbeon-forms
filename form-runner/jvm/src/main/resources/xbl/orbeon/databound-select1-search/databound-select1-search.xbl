@@ -89,7 +89,6 @@
                         calculate="if (../@service-supports-paging = true()) then . else ''"/>
                     <xf:bind
                         ref="@resource"
-                        type="xxf:xpath2"
                         required="true()"/>
                     <xf:bind ref="xf:itemset">
                         <xf:bind

@@ -14,11 +14,11 @@
 package org.orbeon.xbl
 
 import org.orbeon.xbl.Select2.toJQuerySelect2
-import org.orbeon.xforms.{$, DocumentAPI}
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.scalajs.dom.{MutationObserver, MutationObserverInit}
+import org.orbeon.xforms.{$, DocumentAPI}
 import org.scalajs.dom
-import org.scalajs.jquery.JQuery
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -32,9 +32,12 @@ private class Select1SearchCompanion extends XBLCompanion {
 
   val DataPlaceholder           = "data-placeholder"
   val DataServicePerformsSearch = "data-service-performs-search"
+  val DataInitialLabel          = "data-initial-label"
+  val DataInitialValue          = "data-initial-value"
 
-  def jContainer : JQuery = $(containerElem)
-  def jSelect    : JQuery = jContainer.find("select")
+  def jContainer : JQuery      = $(containerElem)
+  def jSelect    : JQuery      = jContainer.find("select")
+  def htmlSelect : html.Select = jSelect.get(0).asInstanceOf[dom.html.Select]
 
   override def init(): Unit = {
 
@@ -42,6 +45,19 @@ private class Select1SearchCompanion extends XBLCompanion {
     val performsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
 
     def initOrUpdatePlaceholder() {
+
+      if (performsSearch) {
+        val initialLabel = elementWithData.attr(DataInitialLabel).get
+        val initialValue = elementWithData.attr(DataInitialValue).get
+        if (initialValue != "") {
+          val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
+          initialOption.text     = initialLabel
+          initialOption.value    = initialValue
+          initialOption.selected = true
+          htmlSelect.appendChild(initialOption)
+        }
+      }
+
       jSelect.select2(new Select2.Options {
         val placeholder =
           new Select2.Option {
@@ -54,6 +70,8 @@ private class Select1SearchCompanion extends XBLCompanion {
           else
             js.undefined
       })
+      if (performsSearch)
+        jSelect.on("change", onChange _)
     }
 
     initOrUpdatePlaceholder()
@@ -67,6 +85,21 @@ private class Select1SearchCompanion extends XBLCompanion {
       attributes = true,
       attributeFilter = js.Array(attributeName)
     ))
+  }
+
+  private def onChange(event: JQueryEventObject): Unit = {
+    val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+    val label = selectedOption.text
+    val value = selectedOption.value
+    org.scalajs.dom.console.log("saving ", label, value)
+    DocumentAPI.dispatchEvent(
+      targetId = containerElem.id,
+      eventName = "fr-change",
+      properties = js.Dictionary(
+        "fr-label" → label,
+        "fr-value" → value
+      )
+    )
   }
 
   var select2SuccessCallbacks = new mutable.Queue[Select2.Success]
@@ -95,35 +128,15 @@ private class Select1SearchCompanion extends XBLCompanion {
 
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
-      searchValue match {
-        case "" ⇒
-          val htmlSelect = jSelect.get(0).asInstanceOf[dom.html.Select]
-          val resultsFromOptions =
-            htmlSelect.options.map { option ⇒
-              new Select2.Option {
-                val id = option.value
-                val text = option.text
-              }
-            }
-          val data =
-            new Select2.Data {
-              val results = resultsFromOptions
-              val pagination = new Select2.Pagination {
-                val more = false
-              }
-            }
-          success(data)
-        case _ ⇒
-          select2SuccessCallbacks.enqueue(success)
-          DocumentAPI.dispatchEvent(
-            targetId = containerElem.id,
-            eventName = "fr-search",
-            properties = js.Dictionary(
-              "fr-search-value" → searchValue,
-              "fr-search-page"  → searchPage.toString
-            )
-          )
-      }
+      select2SuccessCallbacks.enqueue(success)
+      DocumentAPI.dispatchEvent(
+        targetId = containerElem.id,
+        eventName = "fr-search",
+        properties = js.Dictionary(
+          "fr-search-value" → searchValue,
+          "fr-search-page"  → searchPage.toString
+        )
+      )
     }
   }
 }

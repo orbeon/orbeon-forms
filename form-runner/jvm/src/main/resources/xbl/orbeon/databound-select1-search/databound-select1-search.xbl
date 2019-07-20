@@ -30,7 +30,7 @@
         element="
             fr|databound-select1-search,
             fr|databound-select1[appearance ~= search]"
-        xxf:external-events="fr-search"
+        xxf:external-events="fr-search fr-change"
         xxbl:container="span"
         xxbl:mode="lhha binding value selection javascript-lifecycle">
 
@@ -51,7 +51,6 @@
             </icon>
             <editors static-itemset="false"/>
             <templates>
-                <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
                 <view>
                     <fr:databound-select1
                             id=""
@@ -212,6 +211,17 @@
                     </xf:body>
                 </xf:action>
             </xbl:handler>
+
+            <!-- Scala.js tells us that a new value was selected, save the label -->
+            <xbl:handler event="fr-change">
+                <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
+                <!-- Create `label` attribute if necessary  -->
+                <xf:insert if="empty($binding/@label)" context="$binding" origin="xf:attribute('label')"/>
+                <!-- Save label and value -->
+                <xf:setvalue ref="$binding/@label" value="event('fr-label')"/>
+                <xf:setvalue ref="$binding"        value="event('fr-value')"/>
+            </xbl:handler>
+
         </xbl:handlers>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -264,7 +274,7 @@
                                     replace="instance"
                                     instance="result-raw"
                                     serialization="none">
-                                <!-- For services that require a user agent, like GitHub's API
+                                <!-- Set user agent for services that require one, like GitHub's API
                                      (we should have more general solution, like setting a User-Agent by default,
                                      unless a property says otherwise) -->
                                 <xf:header>
@@ -275,26 +285,38 @@
 
                         </xf:model>
 
-                        <xf:var name="service-performs-search-attr" xbl:attr="xbl:text=service-performs-search"/>
-                        <xf:var name="service-performs-search"      value="$service-performs-search-attr = 'true'"/>
-
+                        <xsl:variable name="service-performs-search" select="@service-performs-search = 'true'"/>
+                        <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
                         <xh:span
                             data-placeholder="{{xxf:r('select')}}"
-                            data-service-performs-search="{{$service-performs-search}}">
+                            data-service-performs-search="{$service-performs-search}">
+
+                            <xsl:if test="$service-performs-search">
+                                <xsl:attribute name="data-initial-label">{$binding/@label}</xsl:attribute>
+                                <xsl:attribute name="data-initial-value">{$binding}</xsl:attribute>
+                            </xsl:if>
 
                             <!-- Default values to populate the dropdown before users start typing -->
                             <xf:var name="fr-search-value" value="''"/>
                             <xf:var name="fr-search-page"  value="'1'"/>
 
-                            <fr:databound-select1
-                                id="select1"
-                                appearance="minimal"
-                                ref="xxf:binding('fr-databound-select1-search')"
-                                xbl:attr="xxf:encrypt-item-values resource">
-
-                                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-
-                            </fr:databound-select1>
+                            <xsl:choose>
+                                <xsl:when test="$service-performs-search">
+                                    <xf:select1
+                                        id="select1"
+                                        appearance="minimal"
+                                        ref="$binding"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <fr:databound-select1
+                                            id="select1"
+                                            appearance="minimal"
+                                            ref="$binding"
+                                            xbl:attr="xxf:encrypt-item-values resource">
+                                        <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                                    </fr:databound-select1>
+                                </xsl:otherwise>
+                            </xsl:choose>
 
                         </xh:span>
 

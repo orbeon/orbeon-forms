@@ -7906,9 +7906,17 @@
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
-            <repeat todo="true">
-                <label>Toista osion sisältö</label>
+            <repeat>
+                <label todo="true">Toista osion sisältö</label>
             </repeat>
+            <user-can-add-remove>
+                <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+                <hint/>
+            </user-can-add-remove>
+            <use-paging>
+                <label todo="true">[Show one repetition at a time in the wizard]</label>
+                <hint/>
+            </use-paging>
             <custom-iteration-name>
                 <label>Aktivoi mukautetun silmukan nimi</label>
                 <hint/>

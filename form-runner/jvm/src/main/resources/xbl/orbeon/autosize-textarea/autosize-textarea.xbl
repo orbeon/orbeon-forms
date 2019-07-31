@@ -11,11 +11,27 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fb-textarea-autosize" element="xf|textarea[appearance ~= 'xxf:autosize']">
+    <xbl:script src="/xbl/orbeon/autosize-textarea/autosize.min.js"/>
+
+    <xbl:binding
+        id="fr-autosize-textarea"
+        element="
+            fr|autosize-textarea,
+            xf|textarea[appearance ~= 'xxf:autosize']"
+        xxbl:mode="binding lhha value javascript-lifecycle external-value"
+        xxbl:label-for="field"
+        xxbl:container="span">
+
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Resizing</display-name>
             <display-name lang="es">Con Redimensionamiento</display-name>
@@ -32,6 +48,16 @@
                 <icon-class>fa fa-fw fa-arrow-down</icon-class>
             </icon>
         </metadata>
-    </xbl:binding>
 
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xh:span xsl:version="2.0">
+                <xsl:element name="{name(/*)}">
+                    <xsl:attribute name="id">field</xsl:attribute>
+                    <xsl:attribute name="ref">xxf:binding('fr-autosize-textarea')</xsl:attribute>
+                    <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'xxf:autosize']"/>
+                </xsl:element>
+            </xh:span>
+        </xbl:template>
+
+    </xbl:binding>
 </xbl:xbl>

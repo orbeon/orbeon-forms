@@ -204,6 +204,7 @@
         fr:tree-select1
         fr:dropdown-select1-search
         fr:databound-select1-search
+        fr:autosize-textarea
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->
@@ -242,7 +243,6 @@
             { "full": "/ops/jquery/jquery-browser-mobile.js",                                "min": true  },
             { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
-            { "full": "/ops/javascript/autosize/autosize.js",                                "min": true  },
             { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
             { "full": "/ops/bowser/bowser.js",                                               "min": true  },
             { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
@@ -272,7 +272,6 @@
             { "full": "/ops/javascript/orbeon/xforms/controls/Placement.js",                 "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/controls/Help.js",                      "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/controls/Hint.js",                      "min": true  },
-            { "full": "/ops/javascript/orbeon/xforms/controls/Textarea.js",                  "min": true  },
 
             { "full": "/ops/javascript/scalajs/orbeon-xforms.js",                            "min": false }
           ]

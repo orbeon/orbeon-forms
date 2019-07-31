@@ -37,7 +37,7 @@
         oxf:/forms/orbeon/builder/xbl/text-controls.xbl
         oxf:/forms/orbeon/builder/xbl/text-input.xbl
         oxf:/forms/orbeon/builder/xbl/text-textarea.xbl
-        oxf:/forms/orbeon/builder/xbl/text-textarea-autosize.xbl
+        oxf:/xbl/orbeon/autosize-textarea/autosize-textarea.xbl
         oxf:/xbl/orbeon/tinymce/tinymce.xbl
         oxf:/forms/orbeon/builder/xbl/text-secret.xbl
         oxf:/xbl/orbeon/character-counter/character-counter.xbl

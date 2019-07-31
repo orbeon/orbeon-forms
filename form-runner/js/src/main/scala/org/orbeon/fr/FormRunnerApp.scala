@@ -30,6 +30,7 @@ object FormRunnerApp extends App {
     xbl.WPaint
     xbl.HrefButton
     xbl.Autocomplete
+    xbl.AutosizeTextarea
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI

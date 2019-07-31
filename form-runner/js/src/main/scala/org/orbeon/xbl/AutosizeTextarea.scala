@@ -17,7 +17,8 @@ import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
 
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSGlobal
 
 
 object AutosizeTextarea {
@@ -26,22 +27,35 @@ object AutosizeTextarea {
     "fr|autosize-textarea",
     new XBLCompanion {
 
-      def textarea: html.TextArea =
+      private def textarea: html.TextArea =
         $(containerElem).find("textarea")(0).asInstanceOf[html.TextArea]
 
       override def init(): Unit =
-        g.autosize(textarea)
+        Autosize(textarea)
 
       override def destroy(): Unit =
-        g.autosize.destroy(textarea)
+        Autosize.destroy(textarea)
 
       override def xformsUpdateValue(newValue: String): Unit =
-        g.autosize.update(textarea)
+        Autosize.update(textarea)
 
+      // In order to be notified of value updates, we enable the `external-value` mode.
+      // This means that we also need to implement this method, even though we don't
+      // actually need to store the value independently from the textarea. So we just
+      // delegate to the text area. This is required when the server updates client
+      // values, in which case we check the current client value for comparison.
       override def xformsGetValue(): String = {
-        g.autosize.update(textarea)
+        Autosize.update(textarea)
         textarea.value
       }
     }
   )
+}
+
+@js.native
+@JSGlobal("autosize")
+object Autosize extends js.Function1[html.TextArea, Unit] {
+  def apply  (textarea: html.TextArea): Unit = js.native
+  def update (textarea: html.TextArea): Unit = js.native
+  def destroy(textarea: html.TextArea): Unit = js.native
 }

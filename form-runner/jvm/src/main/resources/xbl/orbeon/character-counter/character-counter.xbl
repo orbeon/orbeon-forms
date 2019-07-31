@@ -88,7 +88,6 @@
                     <xsl:copy-of select="/*/@mediatype"/>
                 </xsl:element>
 
-                <!-- Will appear below field for IE < 11 -->
                 <xh:span class="fr-charcounter-count">
                     <xf:output
                         value="if (empty($remaining)) then $current else abs($remaining)"

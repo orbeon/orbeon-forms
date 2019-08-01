@@ -52,7 +52,7 @@
     <!--
         These JARs are checked in. They can be rebuilt with the jarjar target
 
-        - xerces-2.11-orbeon.jar
+        - xerces-2.12-orbeon.jar
         - msv-20081113-orbeon.jar
 
         For directory scanner and SSH support:
@@ -122,14 +122,17 @@
 
     <target name="jarjar" depends="prepare">
         <!-- Xerces fat JAR -->
-        <jarjar jarfile="lib/xerces-2.11-orbeon.jar">
-            <zipfileset src="lib/src/xerces-xercesImpl-2.11.jar">
+        <jarjar jarfile="lib/xerces-2.12-orbeon.jar">
+            <zipfileset src="lib/src/xerces-xercesImpl-2.12.jar">
                 <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
+                <exclude name="META-INF/**"/>
+                <exclude name="org/apache/wml/**"/>
+                <exclude name="org/apache/html/**"/>
+                <exclude name="org/w3c/**"/>
             </zipfileset>
-            <zipfileset src="lib/src/xerces-serializer-2.11.jar">
+            <zipfileset src="lib/src/xerces-serializer-2.12.jar">
                 <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
+                <exclude name="META-INF/**"/>
             </zipfileset>
             <rule pattern="org.apache.**" result="orbeon.apache.@1"/>
         </jarjar>

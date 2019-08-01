@@ -405,27 +405,10 @@
         </output>
     </test>
 
-    <test description="Prevent doc('input:data') from being read in XSLT and XUpdate" name="oxf:pipeline">
+    <test description="Prevent doc('input:data') from being read in XSLT" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="result"/>
-
-                <p:processor name="oxf:xupdate">
-                    <p:input name="data">
-                        <a/>
-                    </p:input>
-                    <p:input name="config">
-                        <xu:modifications>
-                            <xu:copy-of select="doc('input:data')"/>
-                        </xu:modifications>
-                    </p:input>
-                    <p:output name="data" id="xupdate-result"/>
-                </p:processor>
-
-                <p:processor name="oxf:exception-catcher">
-                    <p:input name="data" href="#xupdate-result"/>
-                    <p:output name="data" id="xupdate-exception"/>
-                </p:processor>
 
                 <p:processor name="oxf:xslt">
                     <p:input name="data">
@@ -448,7 +431,7 @@
                     <p:output name="data" id="xslt-exception"/>
                 </p:processor>
 
-                <p:for-each href="aggregate('root', #xupdate-exception, #xslt-exception)" select="root/*" root="root" ref="result">
+                <p:for-each href="aggregate('root', #xslt-exception)" select="root/*" root="root" ref="result">
                     <p:processor name="oxf:identity">
                         <!-- NOTE: We used to test the complete message, but Saxon now outputs a different message so we just test on "input" -->
                         <p:input name="data" href="aggregate('result', current()#xpointer(contains(/exceptions/exception[1]/message, 'input')))"/>
@@ -460,7 +443,6 @@
         </input>
         <output name="result">
             <root>
-                <result>true</result>
                 <result>true</result>
             </root>
         </output>

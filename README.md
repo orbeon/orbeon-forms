@@ -4,7 +4,7 @@ Orbeon Forms
 Web Forms for the Enterprise. Done the Right Way.
 -------------------------------------------------
 
-Last updated for Orbeon Forms 2019.1 (July 2019)
+Last updated for Orbeon Forms 2019.1 (August 2019)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -22,7 +22,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
-- [Orbeon Forms 2019.1](https://blog.orbeon.com/2019/07/orbeon-forms-20191.html)
+- [Orbeon Forms 2019.1](https://blog.orbeon.com/2019/08/orbeon-forms-20191.html)
 - [Orbeon Forms 2018.2.2 PE](https://blog.orbeon.com/2019/03/orbeon-forms-201822-pe.html)
 - [Orbeon Forms 2018.2.1 PE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-pe.html)
 - [Orbeon Forms 2018.2.1 CE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-ce.html)

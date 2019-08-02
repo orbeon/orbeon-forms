@@ -52,6 +52,7 @@
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
             <display-name lang="sv" todo="true">Beräknat värde</display-name>
             <display-name lang="pt" todo="true">Saída de Texto</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
             </icon>

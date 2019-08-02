@@ -85,7 +85,7 @@
                     <xsl:variable name="appearance"     select="($root/@appearance, 'full')[1]"/>
                     <xsl:variable name="repeat-menu"    select="$appearance = 'full'    and not($readonly)"/>
                     <xsl:variable name="right-column"   select="$appearance = 'minimal' and not($readonly)"/>
-                    <xsl:variable name="has-html-label" select="xf:label/$root/@mediatype = 'text/html'"/>
+                    <xsl:variable name="has-html-label" select="$root/xf:label/@mediatype = 'text/html'"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">

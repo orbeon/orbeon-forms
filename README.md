@@ -179,12 +179,12 @@ In addition, this product includes the following software:
 - Castor
 - [CodeMirror](https://codemirror.net/)
 - dom4j
-- [Ehcache](https://ehcache.org/)
+- [Ehcache](https://www.ehcache.org/)
 - [eXist](https://exist-db.org/)
 - [Flying Saucer](https://code.google.com/archive/p/flying-saucer/)
 - [iText](https://itextpdf.com/)
 - Jaxen
-- [JCIFS](https://jcifs.samba.org/)
+- [JCIFS](https://www.jcifs.org/)
 - [JTidy](http://jtidy.sourceforge.net/)
 - [JUnit](https://junit.org/)
 - [Saxon](http://saxon.sourceforge.net/)

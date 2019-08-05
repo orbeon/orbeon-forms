@@ -102,9 +102,8 @@
                             name="view-mode"
                             value="xxf:readonly(xxf:component-context()) or fr:is-readonly-mode()"/>
 
-                        <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
-                            class="{$root/@class}{if ($editable) then ' {$fb-can-do-classes}' else ''}"
+                            class="{if ($editable) then '{$fb-can-do-classes}' else ''}"
                             xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">

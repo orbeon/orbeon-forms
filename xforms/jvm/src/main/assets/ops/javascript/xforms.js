@@ -3329,7 +3329,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.
         _range: function (range) {
             range.tabIndex = 0;
-            ORBEON.xforms.ServerValueStore.set(range.id, 0);
+            ORBEON.xforms.ServerValueStore.set(range.id, "0");
 
             // In both cases the background <div> element must already have an id
             var backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];

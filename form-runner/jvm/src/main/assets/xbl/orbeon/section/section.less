@@ -158,7 +158,7 @@
 
             .fr-section-content {
 
-                page-break-before: auto; // curiously `avoid` breaks things
+                page-break-before: avoid; // `avoid` used to break things but now appears ok
                 page-break-inside: auto;
                 page-break-after: auto;
 
@@ -176,11 +176,15 @@
 
                     .fr-grid-tr {
                         page-break-before: auto;
-                        page-break-inside: avoid; // no break within a `<tr>`
+                        page-break-inside: auto; // https://github.com/orbeon/orbeon-forms/issues/2573
                         page-break-after:  auto;
 
                         &.fr-page-break-before {
                             page-break-before: always;
+                        }
+
+                        .fr-grid-td .xforms-label {
+                            page-break-after: avoid; // keep with the control that follows
                         }
                       }
                   }

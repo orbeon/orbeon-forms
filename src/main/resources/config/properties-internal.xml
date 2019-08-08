@@ -174,7 +174,7 @@
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
     <!-- NOTE: Can't use xxf:split() in these expressions yet (saxon:evaluate() doesn't find the functions). -->
     <property as="xs:string"  name="oxf.fr.pdf.format.input-string">
-        (.//*[tokenize(@class, '\s+') = 'xforms-input']/input)[1]/@value/string()
+        (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-input']/input)[1]/@value/string()
     </property>
     <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime">
         string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')

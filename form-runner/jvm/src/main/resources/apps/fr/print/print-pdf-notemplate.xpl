@@ -152,8 +152,8 @@
                     </xsl:element>
                 </xsl:template>
 
-                 <!-- These are unneeded and can make iText choke (values too long) -->
-                 <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
+                <!-- These are unneeded and can make iText choke (values too long) -->
+                <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
 
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form" mode="#all">

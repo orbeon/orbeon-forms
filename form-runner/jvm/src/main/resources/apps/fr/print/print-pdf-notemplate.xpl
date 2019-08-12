@@ -163,6 +163,24 @@
                     </xsl:element>
                 </xsl:template>
 
+                <!-- For https://github.com/orbeon/orbeon-forms/issues/2573. This appears to solve one of the problems. -->
+                <xsl:template
+                        match="*[
+                                p:has-class('xforms-label') and
+                                empty(*)                    and
+                                p:is-blank(.)
+                            ]"
+                        mode="#all"/>
+
+                <!-- Not a big deal but this is extra unneeded markup -->
+                <xsl:template
+                        match="
+                            *:span[
+                                p:has-class('xforms-case-selected') and
+                                empty(*)                            and
+                                p:is-blank(.)]"
+                        mode="#all"/>
+
                 <xsl:template
                     match="
                         *[

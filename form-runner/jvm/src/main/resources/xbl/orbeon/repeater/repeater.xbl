@@ -20,7 +20,10 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
     <xbl:binding
         id="fr-repeater-binding"
@@ -76,6 +79,7 @@
                 <xsl:variable name="readonly"           select="$root/@readonly = 'true'"/>
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
+                <xsl:variable name="level"              select="$root/@level"/>
 
                 <!-- Allow  -->
                 <xsl:variable
@@ -203,6 +207,13 @@
                         </xsl:if>
 
                         <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
+                            <xsl:for-each select="fr:iteration-label[1]">
+                                <xsl:element name="xh:h{$level + 1}">
+                                    <xsl:attribute name="class">fr-section-iteration-title</xsl:attribute>
+                                    <xf:output value="{@ref}"/>
+                                </xsl:element>
+                            </xsl:for-each>
+
                             <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 
                                 <!-- Run row operations, checking that they are allowed first -->

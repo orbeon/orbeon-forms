@@ -172,6 +172,7 @@
                                                     <fr:repeater
                                                         id="{$repeater-id}"
                                                         ref="*"
+                                                        level="{$level}"
                                                         xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly">
 
                                                         <!-- Paging is only available at runtime, not design-time -->
@@ -179,7 +180,9 @@
                                                             <xsl:copy-of select="$root/@page-size"/>
                                                         </xsl:if>
 
-                                                        <!-- Forward iteration events to the outside -->
+                                                        <xsl:apply-templates select="fr:iteration-label"/>
+                                                        
+                                                        <!-- Forward iteration events -->
                                                         <xf:action
                                                             event="fr-iteration-added fr-iteration-removed"
                                                             target="#observer"
@@ -202,7 +205,7 @@
                                                             </xh:div>
                                                         </xsl:if>
                                                         <xh:div class="fr-repeat-content">
-                                                            <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                                            <xsl:apply-templates select="* except (xf:label, xf:hint, xf:help, fr:buttons, fr:iteration-label)"/>
                                                         </xh:div>
                                                         <xsl:if test="$right-column">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-section-right-column">
@@ -221,7 +224,7 @@
                                                     </fr:repeater>
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                    <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                                    <xsl:apply-templates select="* except (xf:label, xf:hint, xf:help, fr:buttons, fr:iteration-label)"/>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xf:group>

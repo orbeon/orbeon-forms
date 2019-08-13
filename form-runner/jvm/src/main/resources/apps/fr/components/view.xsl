@@ -1053,11 +1053,12 @@
     <!-- Process dynamic LHHA with parameters -->
     <xsl:template
         match="
-            xf:label[exists(fr:param)] |
-            xf:help [exists(fr:param)] |
-            xf:hint [exists(fr:param)] |
-            xf:alert[exists(fr:param)] |
-            fr:text [exists(fr:param)]">
+            xf:label          [exists(fr:param)] |
+            xf:help           [exists(fr:param)] |
+            xf:hint           [exists(fr:param)] |
+            xf:alert          [exists(fr:param)] |
+            fr:text           [exists(fr:param)] |
+            fr:iteration-label[exists(fr:param)]">
 
         <xsl:copy>
             <xsl:apply-templates select="@*"/>

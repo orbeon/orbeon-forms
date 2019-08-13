@@ -66,7 +66,7 @@ object Number {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
-            // Don"t set value if not needed, so not to unnecessarily disturb the cursor position
+            // Don't set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state ⇒
               if (companion.visibleInputElem.value != state.editValue)
                 companion.visibleInputElem.value = state.editValue

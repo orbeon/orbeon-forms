@@ -247,7 +247,6 @@
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection [REALLY?] -->
                                 <xxf:value value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
-                            <!-- NOTE: We need a better way to get the Form Runner mode. -->
                             <xf:var
                                 name="view-mode"
                                 value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>

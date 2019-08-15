@@ -48,9 +48,19 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   import XFormsFunction._
 
   // Resolve the relevant control by argument expression
-  // TODO: Check callers and consider passing `followIndexes` or creating another function.
+  // TODO: Check callers and consider using `relevantControls`.
   def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
     findRelevantControls(arguments(i).evaluateAsString(xpathContext).toString, followIndexes = true).headOption
+
+  def relevantControls(
+    i             : Int,
+    followIndexes : Boolean)(implicit
+    xpathContext  : XPathContext
+  ): List[XFormsControl] =
+    findRelevantControls(
+      arguments(i).evaluateAsString(xpathContext).toString,
+      followIndexes
+    )
 
   // Resolve a relevant control by id
   def findRelevantControls(

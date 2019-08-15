@@ -172,7 +172,12 @@
                                                     <fr:repeater
                                                         id="{$repeater-id}"
                                                         ref="*"
-                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly page-size">
+                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly">
+
+                                                        <!-- Paging is only available at runtime, not design-time -->
+                                                        <xsl:if test="not($editable)">
+                                                            <xsl:copy-of select="$root/@page-size"/>
+                                                        </xsl:if>
 
                                                         <!-- Forward iteration events to the outside -->
                                                         <xf:action

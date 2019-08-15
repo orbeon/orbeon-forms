@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
@@ -386,15 +386,24 @@ trait ContainerResolver {
    * @param contextItemOpt      context item, or null (used for bind resolution only)
    * @return                    object, or null if not found
    */
-  def resolveObjectById(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItemOpt: Option[Item]): XFormsObject = {
+  def resolveObjectById(
+    sourceEffectiveId  : String,
+    staticOrAbsoluteId : String,
+    contextItemOpt     : Option[Item]
+  ): XFormsObject =
+    resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes = true).headOption.orNull
 
-    def isEffectiveIdResolvableByThisContainer(effectiveId: String) =
-      self eq findScopeRoot(XFormsId.getPrefixedId(effectiveId))
+  def resolveObjectsById(
+    sourceEffectiveId  : String,
+    staticOrAbsoluteId : String,
+    contextItemOpt     : Option[Item],
+    followIndexes      : Boolean
+  ): List[XFormsObject] = {
 
     // Handle "absolute ids"
     // NOTE: Experimental, definitive format TBD
     if (XFormsId.isAbsoluteId(staticOrAbsoluteId))
-      return containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(staticOrAbsoluteId))
+      return Option(containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(staticOrAbsoluteId))).toList
 
     // Make sure the static id passed is actually a static id
     require(XFormsId.isStaticId(staticOrAbsoluteId), "Target id must be static id: " + staticOrAbsoluteId)
@@ -410,54 +419,62 @@ trait ContainerResolver {
     // part if any?
     val bindingIdOpt = containingDocument.getStaticOps.getBinding(self.prefixedId) map (_.bindingId)
     if (bindingIdOpt.contains(staticOrAbsoluteId))
-      return containingDocument.getControlByEffectiveId(effectiveId)
+      return containingDocument.findControlByEffectiveId(effectiveId).toList
 
     // 2. Search in directly contained models
     val resultModelObject = searchContainedModels(staticOrAbsoluteId, contextItemOpt)
     if (resultModelObject.isDefined)
-      return resultModelObject.get
+      return resultModelObject.toList
 
     // Check that source is resolvable within this container
     if (! isEffectiveIdResolvableByThisContainer(sourceEffectiveId))
       throw new OXFException("Source not resolvable in container: " + sourceEffectiveId)
 
     // 3. Search in controls
-
     // NOTE: in the future, sub-tree of components might be rooted in this class
-
-    // Find closest control
-    val sourceControlEffectiveId = {
-
-      val tempModelObject =
-        searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItemOpt)
-
-      if (tempModelObject.isDefined) {
-        // Source is a model object, so get first control instead
-        val firstControlEffectiveId = getFirstControlEffectiveId
-        if (firstControlEffectiveId eq null)
-          return null
-        firstControlEffectiveId
-      } else {
-        // Assume the source is a control
-        sourceEffectiveId
-      }
-    }
-
-    // Resolve on controls
-    val controlOpt =
-      containingDocument.getControls.resolveObjectByIdOpt(
-        sourceControlEffectiveId,
-        staticOrAbsoluteId
-      )
-
-    controlOpt match {
-      case Some(control) if ! isEffectiveIdResolvableByThisContainer(control.getEffectiveId) ⇒
-        // This should not happen!
-        throw new OXFException(s"Resulting control is not in proper scope: `${control.getEffectiveId}`")
-      case controlOpt ⇒
-        controlOpt.orNull
-    }
+    resolveControlById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes)
   }
+
+  private def resolveControlById(
+    sourceEffectiveId  : String,
+    staticOrAbsoluteId : String,
+    contextItemOpt     : Option[Item],
+    followIndexes      : Boolean
+  ): List[XFormsControl] =
+    findSourceControlEffectiveId(sourceEffectiveId, contextItemOpt).toList flatMap { sourceControlEffectiveId ⇒
+
+      // Resolve on controls
+      val controls =
+        Controls.resolveControlsById(
+          containingDocument,
+          sourceControlEffectiveId,
+          staticOrAbsoluteId,
+          followIndexes
+        )
+
+      controls find (c ⇒ ! isEffectiveIdResolvableByThisContainer(c.getEffectiveId)) foreach { c ⇒
+        // This should not happen!
+        throw new OXFException(s"Resulting control is not in proper scope: `${c.getEffectiveId}`")
+      }
+
+      controls
+    }
+
+  private def isEffectiveIdResolvableByThisContainer(effectiveId: String): Boolean =
+    self eq findScopeRoot(XFormsId.getPrefixedId(effectiveId))
+
+  private def findSourceControlEffectiveId(
+    sourceEffectiveId : String,
+    contextItemOpt    : Option[Item]
+  ): Option[String] =
+    searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItemOpt) match {
+      case Some(_) ⇒
+        // Source is a model object, so find first control instead
+        findFirstControlEffectiveId
+      case None ⇒
+        // Assume the source is a control
+        Some(sourceEffectiveId)
+    }
 
   // Recursively find the instance containing the specified node
   def getInstanceForNode(nodeInfo: NodeInfo): XFormsInstance =
@@ -491,9 +508,9 @@ trait ContainerResolver {
 
   protected def initializeNestedControls() = ()
 
-  def getFirstControlEffectiveId: String =
+  def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
-    getChildrenControls(containingDocument.getControls).headOption map (_.getEffectiveId) orNull
+    getChildrenControls(containingDocument.getControls).headOption map (_.getEffectiveId)
 
   def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
     associatedControlOpt match {

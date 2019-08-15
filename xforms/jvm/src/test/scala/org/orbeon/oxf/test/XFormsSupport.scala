@@ -84,7 +84,7 @@ trait XFormsSupport extends MockitoSugar {
     Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString) thenAnswer new Answer[XFormsObject] {
       def answer(invocation: InvocationOnMock) = {
         val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
-        doc.resolveObjectById(Constants.DocumentId, targetStaticOrAbsoluteId, None)
+        doc.resolveObjectById(Constants.DocumentId, targetStaticOrAbsoluteId, contextItemOpt = None)
       }
     }
 

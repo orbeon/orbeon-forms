@@ -17,8 +17,8 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
+import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -79,7 +79,7 @@ class XFormsLHHAHandler(
         // Here we have a `for` attribute.
 
         def resolveControlOpt(staticControl: ElementAnalysis) =
-          containingDocument.getControls.resolveObjectByIdOpt(lhhaEffectiveId, staticControl.staticId) collect {
+          Controls.resolveControlsById(containingDocument, lhhaEffectiveId, staticControl.staticId, followIndexes = true).headOption collect {
             case control: XFormsControl ⇒ control
           }
 

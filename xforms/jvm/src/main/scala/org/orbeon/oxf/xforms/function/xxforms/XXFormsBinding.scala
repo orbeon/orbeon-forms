@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.Implicits._
 
 class XXFormsBinding extends XFormsFunction {
 
-  override def iterate(xpathContext: XPathContext) =
-    findControl(0)(xpathContext) map (_.bindingEvenIfNonRelevant)
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    findControls(0, followIndexes = true)(xpathContext).headOption map (_.bindingEvenIfNonRelevant)
 
   // TODO: PathMap
 }

@@ -48,20 +48,35 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   import XFormsFunction._
 
   // Resolve the relevant control by argument expression
+  // TODO: Check callers and consider passing `followIndexes` or creating another function.
   def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    relevantControl(arguments(i).evaluateAsString(xpathContext).toString)
+    findRelevantControls(arguments(i).evaluateAsString(xpathContext).toString, followIndexes = true).headOption
 
   // Resolve a relevant control by id
-  def relevantControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
+  def findRelevantControls(
+    staticOrAbsoluteId : String,
+    followIndexes      : Boolean)(implicit
+    xpathContext       : XPathContext
+  ): List[XFormsControl] =
+    findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes) collect
       { case control: XFormsControl if control.isRelevant ⇒ control }
 
-  def findControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    findControl(arguments(i).evaluateAsString(xpathContext).toString)
+  def findControls(i: Int, followIndexes: Boolean)(implicit xpathContext: XPathContext): List[XFormsControl] =
+    findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpathContext).toString, followIndexes)
 
-  def findControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
-      { case control: XFormsControl ⇒ control }
+  // Resolve a control by id
+  def findControlsByStaticOrAbsoluteId(
+    staticOrAbsoluteId : String,
+    followIndexes      : Boolean)(implicit
+    xpathContext       : XPathContext
+  ): List[XFormsControl] = {
+
+    val sourceEffectiveId        = getSourceEffectiveId
+    val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId)
+    val resolutionScopeContainer = context.container.findScopeRoot(sourcePrefixedId)
+
+    resolutionScopeContainer.resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt = None, followIndexes) collect { case c: XFormsControl ⇒ c }
+  }
 
   // Resolve an object by id
   def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =

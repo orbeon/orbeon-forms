@@ -184,7 +184,8 @@ object Controls {
       sourceControlEffectiveId,
       targetStaticId,
       followIndexes = true
-    ).toIterator flatMap XFormsRepeatControl.findAllRepeatedControls
+    ).toIterator flatMap
+      XFormsRepeatControl.findAllRepeatedControls
 
   def resolveControlsById(
     containingDocument       : XFormsContainingDocument,
@@ -211,18 +212,6 @@ object Controls {
     } yield
       control
   }
-
-  def resolveObjectById(
-    containingDocument       : XFormsContainingDocument,
-    sourceControlEffectiveId : String,
-    targetStaticId           : String
-  ): Option[XFormsControl] =
-    resolveControlsById(
-      containingDocument,
-      sourceControlEffectiveId,
-      targetStaticId,
-      followIndexes = true
-    ).headOption
 
   /**
    * Find effective control ids based on a source and a control static id, following XBL scoping and the repeat

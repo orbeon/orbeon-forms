@@ -32,7 +32,7 @@ class XXFormsAVTValue extends XFormsFunction {
     for {
       forPrefixedId      ← sourceScope.prefixedIdForStaticIdOpt(forId)
       attControlAnalysis ← Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
-      control            ← relevantControl(attControlAnalysis.staticId)
+      control            ← findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         ← CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
     } yield
       attControl.getValue

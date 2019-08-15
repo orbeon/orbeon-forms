@@ -143,11 +143,6 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   def findObjectByEffectiveId(effectiveId: String): Option[XFormsControl] =
     currentControlTree.findControl(effectiveId)
 
-  // Resolve an object. This optionally depends on a source control, and involves resolving whether the source
-  // is within a repeat or a component
-  def resolveObjectByIdOpt(sourceControlEffectiveId: String, targetStaticId: String): Option[XFormsControl] =
-    Controls.resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId)
-
   // Get the items for a given control id
   def getConstantItems(controlPrefixedId: String): Option[Itemset] =
       constantItems.get(controlPrefixedId)

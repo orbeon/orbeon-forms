@@ -207,13 +207,6 @@
                         </xsl:if>
 
                         <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
-                            <xsl:for-each select="fr:iteration-label[1]">
-                                <xsl:element name="xh:h{$level + 1}">
-                                    <xsl:attribute name="class">fr-section-iteration-title</xsl:attribute>
-                                    <xf:output value="{@ref}"/>
-                                </xsl:element>
-                            </xsl:for-each>
-
                             <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 
                                 <!-- Run row operations, checking that they are allowed first -->
@@ -374,33 +367,56 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
 
-                                <xh:div id="fr-repeater-repeat-iteration">
-                                    <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
-                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                        <!-- Scope var in outer scope so content can handle remove availability -->
-                                        <xf:var name="fr-repeater-can-remove">
-                                            <xxf:value
-                                                xxbl:scope="inner"
-                                                value="'can-remove' = xxf:split(xxf:avt-value('fr-repeater-repeat-iteration', 'class'))"/>
-                                        </xf:var>
+                                <xsl:variable name="iteration-label-content" as="element()?">
+                                    <xsl:for-each select="fr:iteration-label[1]">
 
-                                        <xsl:choose>
-                                            <xsl:when test="$use-paging">
-                                                <xf:switch caseref="xxf:repeat-position() = index('{$repeat-id}')" xxf:update="full">
-                                                    <xf:case value="true()">
-                                                        <xsl:apply-templates select="*"/>
-                                                    </xf:case>
-                                                    <xf:case value="false()"/>
-                                                </xf:switch>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- Content of the repeat iteration -->
-                                                <xsl:apply-templates select="*"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
+                                        <xsl:variable
+                                            name="iteration-label-id"
+                                            select="concat($root/@id, '-iteration-label')"/>
 
-                                    </xf:group>
-                                </xh:div>
+                                        <xsl:element name="xh:h{$level + 1}">
+                                            <xsl:attribute name="class">fr-section-iteration-title</xsl:attribute>
+                                            <xf:output
+                                                id="{$iteration-label-id}"
+                                                value="{@ref}"
+                                                xxbl:scope="outer"/>
+                                        </xsl:element>
+                                    </xsl:for-each>
+                                </xsl:variable>
+
+                                <!-- Scope `xf:var` in outer scope so content can handle remove availability -->
+                                <xf:var name="fr-repeater-can-remove" xxbl:scope="outer">
+                                    <xxf:value
+                                        xxbl:scope="inner"
+                                        value="'can-remove' = xxf:split($can-classes)"/>
+                                </xf:var>
+
+                                <xsl:choose>
+                                    <xsl:when test="$use-paging">
+                                        <xf:switch caseref="xxf:repeat-position() = index('{$repeat-id}')" xxf:update="full" xxbl:scope="outer">
+                                            <xf:case value="true()" xxbl:scope="inner">
+                                                <xsl:copy-of select="$iteration-label-content"/>
+                                                <xh:div id="fr-repeater-repeat-iteration">
+                                                    <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
+                                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                        <xsl:apply-templates select="* except fr:iteration-label3"/>
+                                                    </xf:group>
+                                                </xh:div>
+                                            </xf:case>
+                                            <xf:case value="false()"/>
+                                        </xf:switch>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:copy-of select="$iteration-label-content"/>
+                                        <xh:div id="fr-repeater-repeat-iteration">
+                                            <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
+                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                <xsl:apply-templates select="* except fr:iteration-label"/>
+                                            </xf:group>
+                                        </xh:div>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
                             </xf:group>
                         </xf:repeat>
 

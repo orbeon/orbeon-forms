@@ -266,28 +266,28 @@ trait ResourcesOps extends BaseOps {
 
   def lhhaHoldersForAllLangsUseDoc(
     controlName : String,
-    lhha        : String)(implicit
+    lhhaName    : String)(implicit
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] =
     for {
       (_, controlHolder) ← findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName)
-      lhhaHolder         ← controlHolder child lhha
+      lhhaHolder         ← controlHolder child lhhaName
     } yield
       lhhaHolder
 
   // NOTE: Also return `false` if there are any children `fr:param`.
   def hasBlankOrMissingLHHAForAllLangsUseDoc(
     controlName : String,
-    lhha        : LHHA)(implicit
+    lhhaName    : String)(implicit
     ctx         : FormBuilderDocContext
   ): Boolean = {
 
     val hasParams =
-      FormBuilder.lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhha.entryName)).nonEmpty
+      FormBuilder.lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhhaName)).nonEmpty
 
     ! hasParams && {
       findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall
-        { case (_, holder) ⇒ (holder child lhha.entryName stringValue).isBlank }
+        { case (_, holder) ⇒ (holder child lhhaName stringValue).isBlank }
     }
   }
 }

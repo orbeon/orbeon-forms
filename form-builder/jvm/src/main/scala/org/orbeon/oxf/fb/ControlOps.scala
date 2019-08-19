@@ -54,7 +54,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
-  private val PossibleResourcePointerNames: Set[String] = (LHHA.values map (_.entryName)).to[Set] + "itemset" + "text"
+
+  private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v ⇒ v.localName → v) toMap
+
+  private val PossibleResourcePointerNames: Set[String] =
+    (LHHA.values map (_.entryName)).to[Set] ++
+      FRResourceElemLocalNamesToQNames.keys +
+      "itemset"
+
+  private def controlLHHATQName(lhhaName: String): QName =
+    FRResourceElemLocalNamesToQNames.get(lhhaName)         orElse
+    (LHHA.withNameOption(lhhaName) map LHHA.QNameForValue) getOrElse
+    (throw new IllegalArgumentException(lhhaName))
 
   private val TopLevelBindTemplate: NodeInfo =
     <xf:bind
@@ -605,7 +616,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
-    lhhatNodes child (FR → "param")
+    lhhatNodes child FRParamQName
 
   private def setControlLHHATParams(
     controlName : String,
@@ -649,8 +660,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   // Find a control's LHHAT (there can be more than one for alerts)
-  def getControlLhhat(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
-    findControlByName(ctx.formDefinitionRootElem, controlName).toList child ((if (lhha == "text") FR else XF) → lhha)
+  def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+    findControlByName(ctx.formDefinitionRootElem, controlName).toList child controlLHHATQName(lhhaName)
 
   // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -681,7 +692,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def ensureCleanLHHAElements(
     controlName : String,
-    lhha        : LHHA,
+    lhhaName    : String,
     count       : Int,
     replace     : Boolean)(implicit
     ctx         : FormBuilderDocContext
@@ -689,13 +700,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     val inDoc = ctx.formDefinitionRootElem
 
-    val lhhaName = lhha.entryName
-
     val control  = findControlByName(inDoc, controlName).get
     val existing = getControlLhhat(controlName, lhhaName)
     val params   = lhhatChildrenParams(existing)
 
-    val lhhaQName = LHHA.QNameForValue(lhha)
+    val lhhaQName = controlLHHATQName(lhhaName)
 
     if (replace)
       delete(existing)
@@ -732,14 +741,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def removeLHHAElementAndResources(
     controlName : String,
-    lhha        : LHHA)(implicit
+    lhhaName    : String)(implicit
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
     val control = findControlByName(ctx.formDefinitionRootElem, controlName).get
 
-    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhha.entryName))
-    val removedLHHA    = delete(control child LHHA.QNameForValue(lhha))
+    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhhaName))
+    val removedLHHA    = delete(control child controlLHHATQName(lhhaName))
 
     removedHolders ++ removedLHHA
   }

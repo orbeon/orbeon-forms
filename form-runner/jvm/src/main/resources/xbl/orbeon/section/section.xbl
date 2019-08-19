@@ -181,7 +181,7 @@
                                                         </xsl:if>
 
                                                         <xsl:apply-templates select="fr:iteration-label"/>
-                                                        
+
                                                         <!-- Forward iteration events -->
                                                         <xf:action
                                                             event="fr-iteration-added fr-iteration-removed"

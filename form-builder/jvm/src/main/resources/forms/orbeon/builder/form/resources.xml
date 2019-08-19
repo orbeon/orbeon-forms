@@ -623,6 +623,9 @@
                 <label>Explanatory Text</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label>Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Alert Message</label>
                 <hint>Displayed when the alert is active</hint>
@@ -1826,6 +1829,9 @@
                 <label>Text explicatif</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label>Libellé des itérations</label>
+            </control-iteration-label>
             <alert>
                 <label>Message d'alerte</label>
                 <hint>Affiché lorsque l'alerte est active</hint>
@@ -3013,6 +3019,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label todo="true">[Feilmelding]</label>
                 <hint todo="true">[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
@@ -4226,6 +4235,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label todo="true">[Сообщение об ошибке]</label>
                 <hint todo="true">[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
@@ -5440,6 +5452,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Messaggio di avviso</label>
                 <hint>Visualizzato quando l'avviso é attivo</hint>
@@ -6646,6 +6661,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Warnmeldung</label>
                 <hint>Wird angezeigt, falls die Warnungen aktiviert wurden</hint>
@@ -7855,6 +7873,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Virheviesti</label>
                 <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
@@ -9061,6 +9082,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Mensaje de Alerta</label>
                 <hint>Se muestra cuando se activa la alerta</hint>
@@ -10268,6 +10292,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Waarschuwingsmelding</label>
                 <hint>Wordt getoond zolang de waarschuwing actief is</hint>
@@ -11454,6 +11481,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Mensagem de Alerta</label>
                 <hint>DÉ mostrada quando o alerta está activo</hint>
@@ -12667,6 +12697,9 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-iteration-label>
+                <label todo="true">Iteration Label</label>
+            </control-iteration-label>
             <alert>
                 <label>Avisering</label>
                 <hint>Visas när avisering är aktiv</hint>

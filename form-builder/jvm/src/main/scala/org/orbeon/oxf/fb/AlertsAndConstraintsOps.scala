@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
-import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, UploadMediatypesValidation, ValidationFunction}
+import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -227,7 +227,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val newAlertElements =
       ensureCleanLHHAElements(
         controlName = controlName,
-        lhha        = LHHA.Alert,
+        lhhaName    = LHHA.Alert.entryName,
         count       = alertsWithResources.size,
         replace     = true
       )
@@ -241,7 +241,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Write global default alert if needed
     if (defaultAlert.global) {
-      val newGlobalAlert = ensureCleanLHHAElements(controlName, LHHA.Alert, count = 1, replace = false).head
+      val newGlobalAlert = ensureCleanLHHAElements(controlName, LHHA.Alert.entryName, count = 1, replace = false).head
       setvalue(newGlobalAlert /@ "ref", OldStandardAlertRef)
     }
   }

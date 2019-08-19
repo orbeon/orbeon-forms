@@ -59,10 +59,12 @@ object XMLNames {
   val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
   val FRItemsetMapQName        : QName     = QName("itemsetmap",          FRNamespace)
   val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
+  val GridQName                : QName     = QName("grid",                FRNamespace)
+  val FRTextQName              : QName     = QName("text",                FRNamespace)
+  val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
+  val FRParamQName             : QName     = QName("param",               FRNamespace)
 
   val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
-
-  val GridQName                : QName     = QName("grid",                FRNamespace)
 
   val RepeatQName              : QName     = QName("repeat")
 

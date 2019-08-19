@@ -167,14 +167,18 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    // Make sure the `xf:help` element is there while we set content or attributes.
-    if (lhht == "help")
-      FormBuilder.ensureCleanLHHAElements(controlName, LHHA.Help, count = 1, replace = true)
+    val isOptionalLHHAT =
+      lhht == LHHA.Help.entryName || lhht == fr.XMLNames.FRIterationLabelQName.localName
+
+    // Make sure an optional element is present while we set content or attributes
+    if (isOptionalLHHAT)
+      FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true)
 
     FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
 
-    if (lhht == "help" && hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, LHHA.Help))
-      FormBuilder.removeLHHAElementAndResources(controlName, LHHA.Help)
+    // If an optional element turns out to be empty, then remove it
+    if (isOptionalLHHAT && hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhht))
+      FormBuilder.removeLHHAElementAndResources(controlName, lhht)
   }
 
   // Set the control's items for all languages
@@ -280,7 +284,7 @@ object FormBuilderXPathApi {
 
     val allUnneededHolders =
       allHelpElements collect {
-        case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhha) ⇒
+        case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhha.entryName) ⇒
            lhhaHoldersForAllLangsUseDoc(controlName, lhha.entryName) :+ lhhaElement
       }
 

@@ -32,7 +32,6 @@
 
                 <!-- Clear all local values -->
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
-                <xf:delete ref="$i/(label, help)/fr:param"/>
 
                 <xf:var name="control" value="event('container')"/>
 
@@ -89,21 +88,34 @@
                 <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <!-- Read Label/Help if we are a section -->
-                <xf:action iterate="$i/(label, help)[$i/container-type = 'section']">
+                <xf:action iterate="$i/(label, help, iteration-label)">
 
-                    <xf:var name="lhh" value="local-name()"/>
+                    <xf:delete ref="fr:param"/>
 
                     <xf:setvalue
-                        ref="value"
-                        value="fbf:getControlLhhOrEmpty($i/control-name, $lhh)"/>
+                        ref="@supported"
+                        value="$i/container-type = 'section'"/>
 
                     <xf:setvalue
                         ref="@isHTML"
-                        value="if (fbf:isControlLhhatHtmlMediatype($i/control-name, $lhh)) then 'true' else ''"/>
+                        value="false()"/>
 
-                    <xf:insert
-                        ref="value"
-                        origin="fbf:getControlLhhtParams($i/control-name, $lhh)"/>
+                    <xf:action if="@supported = 'true'">
+
+                        <xf:var name="lhh" value="local-name()"/>
+
+                        <xf:setvalue
+                            ref="value"
+                            value="fbf:getControlLhhOrEmpty($i/control-name, $lhh)"/>
+
+                        <xf:setvalue
+                            ref="@isHTML"
+                            value="if (fbf:isControlLhhatHtmlMediatype($i/control-name, $lhh)) then 'true' else ''"/>
+
+                        <xf:insert
+                            ref="value"
+                            origin="fbf:getControlLhhtParams($i/control-name, $lhh)"/>
+                    </xf:action>
 
                 </xf:action>
 
@@ -188,7 +200,7 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
-                        for $lh in $i/(label, help)[$i/container-type = 'section'] return
+                        for $lh in $i/(label, help, iteration-label)[@supported = 'true'] return
                             fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
                                 local-name($lh),
@@ -314,14 +326,18 @@
 
                         <save-button/>
 
-                        <label isHTML="">
+                        <label isHTML="" supported="">
                             <value/>
                             <!--<fr:param/>-->
                         </label>
-                        <help  isHTML="">
+                        <help  isHTML="" supported="">
                             <value/>
                             <!--<fr:param/>-->
                         </help>
+                        <iteration-label isHTML="" supported="">
+                            <value/>
+                            <!--<fr:param/>-->
+                        </iteration-label>
 
                         <prev-control-id/>
                         <next-control-id/>
@@ -446,8 +462,14 @@
                     readonly="xxf:is-blank()"/>
 
                 <xf:bind
-                    ref="label | help"
-                    readonly="$i/container-type = 'grid'"/>
+                    ref="label | help | iteration-label"
+                    readonly="not(@supported = 'true')"/>
+
+                <!-- We could do this but the issue is that things will look inconsistent when switching between repeated and
+                     non-repeated in the settings until the changes are saved. -->
+<!--                <xf:bind-->
+<!--                    ref="iteration-label"-->
+<!--                    readonly="../is-repeat = false()"/>-->
 
                 <xf:bind
                     ref="(label | help)/value"
@@ -688,7 +710,7 @@
                             </xf:group>
                         </fr:tab>
 
-                        <fr:tab id="label-help-tab" ref="label, help">
+                        <fr:tab id="label-help-tab" ref="(label, help, iteration-label)[true() or @supported = 'true']">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-details/*[

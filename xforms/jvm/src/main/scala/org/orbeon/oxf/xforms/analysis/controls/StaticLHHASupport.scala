@@ -46,7 +46,7 @@ object LHHA extends Enum[LHHA] {
   // By default all controls support HTML LHHA
   val DefaultLHHAHTMLSupport = values.toSet
 
-  def isLHHA(e: Element) = QNamesSet(e.getQName)
+  def isLHHA(e: Element): Boolean = QNamesSet(e.getQName)
 
   def getBeforeAfterOrderTokens(tokens: String): (List[String], List[String]) = {
 

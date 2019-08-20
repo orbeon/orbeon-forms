@@ -624,7 +624,7 @@
                 <hint/>
             </control-text>
             <control-iteration-label>
-                <label>Iteration Label</label>
+                <label>Repetition Label</label>
             </control-iteration-label>
             <alert>
                 <label>Alert Message</label>
@@ -1830,7 +1830,7 @@
                 <hint/>
             </control-text>
             <control-iteration-label>
-                <label>Libellé des itérations</label>
+                <label>Libellé des répétitions</label>
             </control-iteration-label>
             <alert>
                 <label>Message d'alerte</label>

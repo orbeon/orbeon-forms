@@ -173,7 +173,7 @@
                                                         id="{$repeater-id}"
                                                         ref="*"
                                                         level="{$level}"
-                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly">
+                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly view-appearance">
 
                                                         <!-- Paging is only available at runtime, not design-time -->
                                                         <xsl:if test="not($editable)">

@@ -122,7 +122,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     )
 
     Fun("formatted-value", classOf[XXFormsFormattedValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-      Arg(STRING, EXACTLY_ONE)
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE)
     )
 
     Fun("avt-value", classOf[XXFormsAVTValue], op = 0, min = 2, STRING, ALLOWS_ZERO_OR_MORE,

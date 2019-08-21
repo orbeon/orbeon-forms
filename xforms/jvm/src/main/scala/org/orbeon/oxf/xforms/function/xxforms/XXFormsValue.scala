@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import shapeless.syntax.typeable._
 
@@ -33,8 +32,10 @@ class XXFormsValue extends XFormsFunction {
 
 class XXFormsFormattedValue extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): StringValue =
-    relevantControl(0)(xpathContext) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue)
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+    implicit val ctx = xpathContext
+    relevantControls(0, booleanArgument(1, default = true)) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue)
+  }
 
   // TODO: PathMap
 }

@@ -73,10 +73,28 @@
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-             <xsl:attribute name="context">
-                 xxf:get-request-attribute('fr-iteration-context')
-             </xsl:attribute>
+             <xsl:attribute name="context">xxf:get-request-attribute('fr-iteration-context')</xsl:attribute>
          </xsl:if>
+    </xsl:function>
+
+    <xsl:function name="fr:continuation-id" as="xs:string">
+        <xsl:param name="action-name"           as="xs:string"/>
+        <xsl:param name="continuation-position" as="xs:integer"/>
+
+        <xsl:value-of select="concat($action-name, '-', $continuation-position,     '-id')"/>
+    </xsl:function>
+
+    <xsl:function name="fr:following-continuation-id" as="xs:string">
+        <xsl:param name="block-elem"            as="element()"/>
+        <xsl:param name="action-name"           as="xs:string"/>
+        <xsl:param name="continuation-position" as="xs:integer"/>
+
+        <xsl:value-of
+            select="
+                fr:continuation-id(
+                    $action-name,
+                    $continuation-position + 1 + count($block-elem//(fr:service-call | fr:data-iterate | fr:if))
+                )"/>
     </xsl:function>
 
     <!-- Match and modify `fr:action`s -->
@@ -154,6 +172,15 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Mark the end of `fr:if` content -->
+    <xsl:template match="fr:if" mode="within-action-2018.2-marking">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <!-- We append this so we can perform grouping -->
+            <fr:if-end-marker/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Copy everything else -->
     <xsl:template match="fr:*" mode="within-action-2018.2-marking">
         <xsl:copy>
@@ -164,11 +191,25 @@
     <!-- Trigger continuation if needed -->
     <xsl:template match="fr:data-iterate-end-marker" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="continuation-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
             if="xxf:get-request-attribute('{$is-last-iteration-key}') = true()"
-            name="{$continuation-event-prefix}{$continuation-id}"
+            name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
+            targetid="fr-form-model">
+        </xf:dispatch>
+
+    </xsl:template>
+
+    <!-- Trigger continuation -->
+    <xsl:template match="fr:if-end-marker" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+
+        <xf:dispatch
+            name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
         </xf:dispatch>
 
@@ -188,7 +229,7 @@
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 
         <!-- Create a document with a root element so that `preceding::` works -->
-        <xsl:variable name="content-with-delimiters" as="element(root)">
+        <xsl:variable name="content-with-markers" as="element(root)">
             <root>
                 <xsl:apply-templates select="fr:*" mode="within-action-2018.2-marking"/>
             </root>
@@ -205,24 +246,28 @@
             </xf:action>
 
             <xsl:for-each-group
-                select="$content-with-delimiters/fr:* | $content-with-delimiters/fr:data-iterate/fr:*"
-                group-ending-with="fr:service-call | fr:data-iterate-end-marker">
+                select="$content-with-markers//fr:*[not(parent::fr:service-call)]"
+                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker">
 
                 <xsl:variable name="group-position"   select="position()"/>
-                <xsl:variable name="current-group"    select="current-group()"/>
-                <xsl:variable name="data-iterate-opt" select="$current-group[self::fr:data-iterate]" as="element(fr:data-iterate)?"/>
 
-                <!-- To handle nested repetitions, this might have to be updated. -->
-                <!-- Going into an `fr:data-iterate` boundary. The content of the iteration is handled separately so remove it. :) -->
-                <xsl:variable
-                    name="group-content"
-                    select="$current-group except ($data-iterate-opt/fr:*)"/>
-
+                <!-- This handles only the execution of the initial actions up to before the first continuation -->
                 <xsl:if test="$group-position = 1">
+
+                    <xsl:variable name="current-group"   select="current-group()"/>
+                    <xsl:variable name="nested-elem-opt" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element()*"/>
+
+                    <!-- NOTE: To handle more nesting, this might have to be updated. -->
+
+                    <!-- Going into a nested construct boundary. The content of the nested construct is handled separately so remove it. :) -->
+                    <xsl:variable
+                        name="group-content"
+                        select="$current-group except $nested-elem-opt/fr:*"/>
+
                     <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
-                        <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
-                        <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
-                        <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
+                        <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
+                        <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
+                        <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
                     </xsl:apply-templates>
                 </xsl:if>
 
@@ -232,31 +277,34 @@
 
         <!-- Place continuations at the top-level, see https://github.com/orbeon/orbeon-forms/issues/4068 -->
         <xsl:for-each-group
-            select="$content-with-delimiters/fr:* | $content-with-delimiters/fr:data-iterate/fr:*"
-            group-ending-with="fr:service-call | fr:data-iterate-end-marker">
+            select="$content-with-markers//fr:*[not(parent::fr:service-call)]"
+            group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker">
 
             <xsl:variable name="group-position"   select="position()"/>
-            <xsl:variable name="current-group"    select="current-group()"/>
-            <xsl:variable name="data-iterate-opt" select="$current-group[self::fr:data-iterate]" as="element(fr:data-iterate)?"/>
-
-            <!-- TODO: To handle nested repetitions, this might have to be updated. -->
-            <!-- Going into an `fr:data-iterate` boundary. The content of the iteration is handled separately so remove it. :) -->
-            <xsl:variable
-                name="group-content"
-                select="$current-group except ($data-iterate-opt/fr:*)"/>
 
             <xsl:if test="$group-position gt 1">
+
+                <xsl:variable name="current-group"    select="current-group()"/>
+                <xsl:variable name="nested-elem-opt" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element(*)*"/>
+
+                <!-- NOTE: To handle more nesting, this might have to be updated. -->
+
+                <!-- Going into a nested construct boundary. The content of the nested construct is handled separately so remove it. :) -->
+                <xsl:variable
+                    name="group-content"
+                    select="$current-group except $nested-elem-opt/fr:*"/>
+
                 <!-- Use `preceding::` so that `fr:service-call` nested in preceding iterations are found too -->
                 <xsl:variable
                     name="preceding-delimiter"
-                    select="preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker')][1]"/>
+                    select="preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker', 'if-end-marker')][1]"/>
 
                 <xsl:variable
                     name="preceding-service-name-opt"
-                    select="$preceding-delimiter/@service/string()" as="xs:string?"/>
+                    select="$preceding-delimiter/self::fr:service-call/@service/string()" as="xs:string?"/>
                 <xsl:variable
-                    name="preceding-continuation-id"
-                    select="concat($action-name, '-', $group-position - 1, '-id')"/>
+                    name="current-continuation-id"
+                    select="concat($action-name, '-', $group-position,    '-id')"/>
 
                 <xsl:choose>
                     <xsl:when test="exists($preceding-service-name-opt)">
@@ -264,12 +312,12 @@
                             observer="{$preceding-service-name-opt}-submission"
                             event="xforms-submit-done"
                             context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-request-attribute('{$continuation-key}') = '{$preceding-continuation-id}'">
+                            if="xxf:get-request-attribute('{$continuation-key}') = '{$current-continuation-id}'">
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
-                                <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
-                                <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
-                                <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
+                                <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
+                                <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
+                                <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
                             </xsl:apply-templates>
 
                         </xf:action>
@@ -277,12 +325,12 @@
                     <xsl:otherwise>
                         <xf:action
                             observer="fr-form-model"
-                            event="{$continuation-event-prefix}{$preceding-continuation-id}">
+                            event="{$continuation-event-prefix}{$current-continuation-id}">
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
-                                <xsl:with-param tunnel="yes" name="model-id"        select="$model-id"/>
-                                <xsl:with-param tunnel="yes" name="action-name"     select="$action-name"/>
-                                <xsl:with-param tunnel="yes" name="continuation-id" select="concat($action-name, '-', $group-position, '-id')"/>
+                                <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
+                                <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
+                                <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
                             </xsl:apply-templates>
 
                         </xf:action>
@@ -296,7 +344,8 @@
 
     <xsl:template match="fr:service-call" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="continuation-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xsl:variable name="service-name" select="@service/string()"/>
 
@@ -371,7 +420,7 @@
             </xf:action>
         </xsl:if>
 
-        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="$continuation-key"/>', '<xsl:value-of select="$continuation-id"/>')</xf:action>
+        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="$continuation-key"/>', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')</xf:action>
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
         <xf:send submission="{$service-name}-submission"/>
 
@@ -382,16 +431,16 @@
         <xf:action iterate="{@ref}">
             <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
 
-            <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067-->
+            <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
             <xsl:for-each-group
                 select="fr:*"
-                group-ending-with="fr:service-call | fr:data-iterate-end-marker">
+                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if | fr:data-iterate">
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
                     <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
                         <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
-                        <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context',                     .)</xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
                 </xsl:if>
@@ -400,6 +449,36 @@
 
         </xf:action>
 
+    </xsl:template>
+
+    <xsl:template match="fr:if" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+
+        <xsl:variable name="if-position-within-block" select="count(preceding-sibling::fr:if)"/>
+        <xsl:variable name="var-name"                 select="concat('cond', $if-position-within-block + 1)"/>
+
+        <xf:var name="{$var-name}" value="{@condition}">
+            <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
+        </xf:var>
+        <xf:action if="${$var-name}">
+            <xsl:for-each-group
+                select="fr:*"
+                group-ending-with="fr:service-call | fr:if-end-marker | fr:if | fr:data-iterate">
+
+                <xsl:variable name="group-position" select="position()"/>
+                <xsl:if test="$group-position = 1">
+                    <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
+                </xsl:if>
+            </xsl:for-each-group>
+        </xf:action>
+        <xf:action if="not(${$var-name})">
+            <xf:dispatch
+                name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
+                targetid="fr-form-model">
+            </xf:dispatch>
+        </xf:action>
     </xsl:template>
 
     <xsl:template match="fr:repeat-clear" mode="within-action-2018.2">

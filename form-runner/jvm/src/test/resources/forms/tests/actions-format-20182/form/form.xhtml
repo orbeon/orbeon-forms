@@ -88,7 +88,9 @@
             <xf:instance id="echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
                         <body>&lt;response&gt;
     &lt;text&gt;First&lt;/text&gt;
-    &lt;text&gt;Second&lt;/text&gt;
+    &lt;text/&gt;
+    &lt;text&gt;Third&lt;/text&gt;
+    &lt;text/&gt;
 &lt;/response&gt;</body>
                     </xf:instance>
             <xf:submission id="echo-submission" class="fr-service"
@@ -109,8 +111,7 @@
                            replace="xxf:binary"
                            mediatype="application/x-www-form-urlencoded"/>
 
-            <fr:listener version="2018.2" events="form-load-after-data"
-                         actions="populate-attachments"/>
+            <fr:listener version="2018.2" events="form-load-after-data" actions="populate-attachments"/>
 
             <fr:action name="populate-attachments" version="2018.2">
 
@@ -118,13 +119,13 @@
                 <fr:repeat-clear repeat="my-grid"/>
 
                 <fr:data-iterate ref="/response/text">
-
-                    <fr:service-call service="get-attachment">
-                        <fr:url-param name="text" value="."/>
-                    </fr:service-call>
-
                     <fr:repeat-add-iteration repeat="my-grid" at="end"/>
-                    <fr:control-setattachment control="my-attachment" at="end"/>
+                    <fr:if condition="xxf:non-blank(.)">
+                        <fr:service-call service="get-attachment">
+                            <fr:url-param name="text" value="."/>
+                        </fr:service-call>
+                        <fr:control-setattachment control="my-attachment" at="end"/>
+                    </fr:if>
                 </fr:data-iterate>
 
             </fr:action>
@@ -133,7 +134,8 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="my-grid-grid" bind="my-grid-bind" repeat="content"
@@ -141,8 +143,7 @@
                              apply-defaults="true"
                              fb:initial-iterations="first">
                         <fr:c x="1" y="1" w="6">
-                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 id="my-attachment-control"
+                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" id="my-attachment-control"
                                                  bind="my-attachment-bind"
                                                  class="fr-attachment">
                                 <xf:label ref="$form-resources/my-attachment/label"/>

@@ -12,49 +12,19 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <group
-    description="Form Runner Actions"
-    xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:saxon="http://saxon.sf.net/">
+    xmlns:saxon="http://saxon.sf.net/"
+
+    description="Form Runner Actions"
+>
 
     <test description="For #3803: Basic flattening of actions" name="oxf:unsafe-xslt">
-        <input name="config">
-            <xsl:transform version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml">
-
-                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                <xsl:import href="oxf:/apps/fr/components/actions.xsl"/>
-                <xsl:import href="oxf:/apps/fr/components/actions-20182.xsl"/>
-
-                <xsl:variable
-                    name="fr-form-model"
-                    select="/xh:html/xh:head/xf:model[@id = 'fr-form-model']"/>
-
-                <xsl:variable
-                    name="fr-form-model-id"
-                    select="$fr-form-model/generate-id()"/>
-
-                <xsl:variable
-                    name="candidate-action-models-ids"
-                    select="$fr-form-model-id"/>
-
-                <xsl:template match="/">
-                    <xsl:for-each select="$fr-form-model">
-                        <xsl:copy>
-                            <xsl:apply-templates select="@* | node()"/>
-                            <xsl:copy-of select="fr:common-service-actions-impl($fr-form-model)"/>
-                        </xsl:copy>
-                    </xsl:for-each>
-                </xsl:template>
-
-            </xsl:transform>
-        </input>
+        <input name="config" href="test-actions.xsl"/>
         <input name="data">
             <xh:html>
                 <xh:head>
@@ -98,6 +68,10 @@
 
                             <fr:control-setvalue value="'after'" control="control-after"/>
                             <fr:dataset-write name="my-dataset"/>
+
+                            <fr:if condition="true()">
+                                <fr:control-setvalue value="'in-if'" control="control-in-if"/>
+                            </fr:if>
 
                             <fr:repeat-clear repeat="my-grid"/>
 
@@ -206,7 +180,7 @@
                                 value="$value"/>
                         </xf:action>
                     </xf:action>
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-1-id')</xf:action>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
                     <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-gaga-submission"/>
                 </xf:action>
@@ -214,7 +188,7 @@
                     observer="my-service-gaga-submission"
                     event="xforms-submit-done"
                     context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-1-id'">
+                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
                     <xf:action>
                         <xf:var name="value" value="/response/foo"/>
                         <xf:rebuild/>
@@ -285,7 +259,7 @@
                                 value="$value"/>
                         </xf:action>
                     </xf:action>
-                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-3-id')</xf:action>
                     <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-toto-submission"/>
                 </xf:action>
@@ -293,7 +267,7 @@
                     observer="my-service-toto-submission"
                     event="xforms-submit-done"
                     context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
+                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-3-id'">
                     <xf:action>
                         <xf:var name="value" value="'after'"/>
                         <xf:rebuild/>
@@ -309,6 +283,25 @@
                             ref="instance('fr-dataset-my-dataset')"
                             origin="$value"/>
                     </xf:action>
+
+                    <xf:var name="cond1" value="true()"/>
+                    <xf:action if="$cond1">
+                        <xf:action>
+                            <xf:var name="value" value="'in-if'"/>
+                            <xf:rebuild/>
+                            <xf:revalidate/>
+                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-in-if', true())">
+                                <xf:setvalue ref="." value="$value"/>
+                            </xf:action>
+                        </xf:action>
+                        <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model"/>
+                    </xf:action>
+                    <xf:action if="not($cond1)">
+                        <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model"/>
+                    </xf:action>
+
+               </xf:action>
+               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-4-id">
                     <xf:delete ref="bind(frf:bindId('my-grid'))/*"/>
                     <xf:action iterate="/response/row">
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
@@ -418,7 +411,7 @@
                             </xf:action>
                             <xf:dispatch
                                 if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration') = true()"
-                                name="fr-action-continuation-my-action-3-id"
+                                name="fr-action-continuation-my-action-5-id"
                                 targetid="fr-form-model"/>
                         </xf:action>
                     </xf:action>
@@ -426,7 +419,7 @@
 
                 <xf:action
                     observer="fr-form-model"
-                    event="fr-action-continuation-my-action-3-id">
+                    event="fr-action-continuation-my-action-5-id">
 
                     <xf:action>
                         <xf:var
@@ -458,7 +451,7 @@
                                     <xf:setvalue ref="/*/my-attachment-id" value="$value"/>
                                 </xf:action>
                             </xf:action>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-4-id')</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-6-id')</xf:action>
                             <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                             <xf:send submission="my-service-get-attachment-submission"/>
                         </xf:action>
@@ -468,7 +461,7 @@
                     observer="my-service-get-attachment-submission"
                     event="xforms-submit-done"
                     context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-4-id'">
+                    if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-6-id'">
                     <xf:action>
                         <xf:var name="container" value="bind(frf:bindId('my-grid'))"/>
                         <xf:var name="repeat-template" value="instance(frf:templateId('my-grid'))"/>
@@ -491,12 +484,12 @@
                     </xf:action>
                     <xf:dispatch
                         if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration') = true()"
-                        name="fr-action-continuation-my-action-5-id"
+                        name="fr-action-continuation-my-action-7-id"
                         targetid="fr-form-model"/>
                 </xf:action>
                 <xf:action
                     observer="fr-form-model"
-                    event="fr-action-continuation-my-action-5-id">
+                    event="fr-action-continuation-my-action-7-id">
 
                      <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                          process:runProcessByName('oxf.fr.detail.process', 'summary')
@@ -521,6 +514,199 @@
                     process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
                 </xf:action>
             </xf:model>
+        </output>
+    </test>
+
+    <test description="For #4142: Flattening of simple condition" name="oxf:unsafe-xslt">
+        <input name="config" href="test-actions.xsl"/>
+        <input name="data">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="fr-form-model">
+
+                        <fr:listener
+                            version="2018.2"
+                            events="form-load-after-controls"
+                            actions="my-action"/>
+
+                        <fr:action name="my-action" version="2018.2">
+                            <fr:repeat-clear repeat="my-grid-1"/>
+                            <fr:if condition="true()">
+                                <fr:repeat-clear repeat="my-grid-2"/>
+                            </fr:if>
+                            <fr:repeat-clear repeat="my-grid-3"/>
+                        </fr:action>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="data">
+            <xf:model id="fr-form-model">
+
+               <xf:action target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                   <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
+
+               <xf:action id="my-action-binding" event="fr-call-user-my-action-action" target="fr-form-model">
+                   <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('action-source')), xxf:set-request-attribute('fr-action-error', false()), xxf:set-request-attribute('fr-action-continuation-is-last-iteration', false())</xf:action>
+                   <xf:delete ref="bind(frf:bindId('my-grid-1'))/*"/>
+                   <xf:var name="cond1" value="true()"/>
+                   <xf:action if="$cond1">
+                       <xf:delete ref="bind(frf:bindId('my-grid-2'))/*"/>
+                       <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model"/>
+                   </xf:action>
+                   <xf:action if="not($cond1)">
+                       <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model"/>
+                   </xf:action>
+               </xf:action>
+               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-2-id">
+                   <xf:delete ref="bind(frf:bindId('my-grid-3'))/*"/>
+               </xf:action>
+
+            </xf:model>
+        </output>
+    </test>
+
+    <test description="For #4142: Flattening of service within condition within iteration" name="oxf:unsafe-xslt">
+        <input name="config" href="test-actions.xsl"/>
+        <input name="data">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="fr-form-model">
+
+                        <fr:listener
+                            version="2018.2"
+                            events="form-load-after-controls"
+                            actions="my-action"/>
+
+                        <fr:action name="my-action" version="2018.2">
+                            <fr:repeat-clear repeat="my-grid-1"/>
+                            <fr:service-call service="my-service-1"/>
+
+                            <fr:repeat-clear repeat="my-grid-2"/>
+                            <fr:data-iterate ref="/*/record">
+                                <fr:repeat-clear repeat="my-grid-3"/>
+                                <fr:service-call service="my-service-2"/>
+
+                                <fr:repeat-clear repeat="my-grid-4"/>
+                                <fr:if condition="true()">
+                                    <fr:repeat-clear repeat="my-grid-5"/>
+                                    <fr:service-call service="my-service-3">
+                                        <fr:url-param name="text" value="." expression-context="current-iteration"/>
+                                    </fr:service-call>
+
+                                    <fr:repeat-clear repeat="my-grid-6"/>
+                                </fr:if>
+                                <fr:repeat-clear repeat="my-grid-7"/>
+                            </fr:data-iterate>
+                            <fr:repeat-clear repeat="my-grid-8"/>
+                            <fr:service-call service="my-service-4"/>
+                            <fr:repeat-clear repeat="my-grid-9"/>
+                        </fr:action>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="data">
+            <xf:model id="fr-form-model">
+
+                <xf:action target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                    <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                        <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                    </xf:dispatch>
+                </xf:action>
+
+                <xf:action id="my-action-binding" event="fr-call-user-my-action-action" target="fr-form-model">
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('action-source')),
+                        xxf:set-request-attribute('fr-action-error', false()),
+                        xxf:set-request-attribute('fr-action-continuation-is-last-iteration', false())
+                    </xf:action>
+                    <xf:delete ref="bind(frf:bindId('my-grid-1'))/*"/>
+                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
+                               origin="saxon:parse(xxf:instance('my-service-1-instance'))"/>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
+                    <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                    <xf:send submission="my-service-1-submission"/>
+                </xf:action>
+                <xf:action observer="my-service-1-submission" event="xforms-submit-done"
+                           context="xxf:instance('fr-service-response-instance')"
+                           if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
+                    <xf:delete ref="bind(frf:bindId('my-grid-2'))/*"/>
+                    <xf:action iterate="/*/record">
+                        <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() =
+                                last())
+                            </xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
+                            <xf:delete ref="bind(frf:bindId('my-grid-3'))/*"/>
+                            <xf:insert ref="xxf:instance('fr-service-request-instance')"
+                                       origin="saxon:parse(xxf:instance('my-service-2-instance'))"/>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-3-id')</xf:action>
+                            <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                            <xf:send submission="my-service-2-submission"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+                <xf:action observer="my-service-2-submission" event="xforms-submit-done"
+                           context="xxf:instance('fr-service-response-instance')"
+                           if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-3-id'">
+                    <xf:delete ref="bind(frf:bindId('my-grid-4'))/*"/>
+                    <xf:var name="cond1" value="true()"/>
+                    <xf:action if="$cond1">
+                        <xf:delete ref="bind(frf:bindId('my-grid-5'))/*"/>
+                        <xf:insert ref="xxf:instance('fr-service-request-instance')"
+                                   origin="saxon:parse(xxf:instance('my-service-3-instance'))"/>
+                        <xf:var name="original-context" value="."/>
+                        <xf:action context="xxf:instance('fr-service-request-instance')">
+                            <xf:action>
+                                <xf:var name="value" context="xxf:get-request-attribute('fr-iteration-context')" value="."/>
+                                <xf:setvalue ref="/*/text" value="$value"/>
+                            </xf:action>
+                        </xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-4-id')</xf:action>
+                        <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                        <xf:send submission="my-service-3-submission"/>
+                    </xf:action>
+                    <xf:action if="not($cond1)">
+                        <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model"/>
+                    </xf:action>
+                </xf:action>
+                <xf:action observer="my-service-3-submission" event="xforms-submit-done"
+                           context="xxf:instance('fr-service-response-instance')"
+                           if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-4-id'">
+                    <xf:delete ref="bind(frf:bindId('my-grid-6'))/*"/>
+                    <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model"/>
+                </xf:action>
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id">
+                    <xf:delete ref="bind(frf:bindId('my-grid-7'))/*"/>
+                    <xf:dispatch if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration') = true()"
+                                 name="fr-action-continuation-my-action-6-id" targetid="fr-form-model"/>
+                </xf:action>
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-6-id">
+                    <xf:delete ref="bind(frf:bindId('my-grid-8'))/*"/>
+                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
+                               origin="saxon:parse(xxf:instance('my-service-4-instance'))"/>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-7-id')</xf:action>
+                    <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                    <xf:send submission="my-service-4-submission"/>
+                </xf:action>
+                <xf:action observer="my-service-4-submission" event="xforms-submit-done"
+                           context="xxf:instance('fr-service-response-instance')"
+                           if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-7-id'">
+                    <xf:delete ref="bind(frf:bindId('my-grid-9'))/*"/>
+                </xf:action>
+                <xf:action xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                           xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" event="xforms-submit-error"
+                           observer="my-service-1-submission my-service-2-submission my-service-3-submission my-service-4-submission"
+                           type="xpath">xxf:set-request-attribute('fr-action-error', true()),
+                    process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+                </xf:action>
+
+
+            </xf:model>
+
         </output>
     </test>
 

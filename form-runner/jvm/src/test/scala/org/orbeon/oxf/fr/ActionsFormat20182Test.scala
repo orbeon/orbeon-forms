@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.scalatest.FunSpecLike
 
@@ -26,7 +27,7 @@ class ActionsFormat20182Test
 
   describe("Form Runner actions in 2018.2 format") {
 
-    describe("Binary HTTP service within `fr:data-iterate` sets attachment") {
+    describe("Binary HTTP service within `fr:data-iterate` contionally sets attachment") {
 
       val (processorService, docOpt, _) =
         runFormRunner("tests", "actions-format-20182", "new", document = "", initialize = true)
@@ -37,12 +38,17 @@ class ActionsFormat20182Test
         withTestExternalContext { _ ⇒
           withFormRunnerDocument(processorService, doc) {
             for {
-              (expectedSize, i) ← List(252, 354).zipWithIndex
-              control           = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
-              value             = control.getValue
+              (expectedSizeOpt, i) ← List(Some(252), None, Some(270), None).zipWithIndex
+              control              = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
+              value                = control.getValue
             } locally {
-              assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
-              assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
+              expectedSizeOpt match {
+                case Some(expectedSize) ⇒
+                  assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
+                  assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
+                case None ⇒
+                  assert(value.isBlank)
+              }
             }
           }
         }

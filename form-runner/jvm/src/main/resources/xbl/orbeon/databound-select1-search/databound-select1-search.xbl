@@ -25,6 +25,17 @@
          xmlns:saxon="http://saxon.sf.net/">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fr.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/de.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/sv.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pt.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/it.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/es.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fi.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/nl.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/ru.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pl.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/da.js"/>
     <xbl:binding
         id="fr-databound-select1-search"
         element="
@@ -124,6 +135,7 @@
                             <xf:input ref="@resource">
                                 <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.required',                     '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
@@ -132,11 +144,13 @@
                             <xf:input ref="xf:itemset/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',               '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                         <xh:td>
                             <xf:input ref="@is-last-page">
                                 <xf:label ref="xxf:r('dialog-actions.is-last-page.label', '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                      '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
@@ -145,12 +159,14 @@
                             <xf:input ref="xf:itemset/xf:label/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.item-label.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-label.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                         <xh:td>
                             <xf:input ref="xf:itemset/xf:value/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.item-value.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-value.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>

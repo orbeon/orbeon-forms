@@ -1207,6 +1207,10 @@
             <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.</xpath-errors>
             <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags</lhha-checkbox>
         </messages>
+        <alerts>
+            <required>Value is required</required>
+            <xpath>Incorrect XPath expression</xpath>
+        </alerts>
         <template>
             <untitled-form>Untitled Form</untitled-form>
             <untitled-section>Untitled Section</untitled-section>
@@ -2423,6 +2427,10 @@
             <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>
             <lhha-checkbox>Cochez cette case si vous souhaitez saisir des balises HTML</lhha-checkbox>
         </messages>
+        <alerts>
+            <required>Valeur est requise</required>
+            <xpath>Expression XPath incorrecte</xpath>
+        </alerts>
         <template>
             <untitled-form>Formulaire sans titre</untitled-form>
             <untitled-section>Section sans titre</untitled-section>
@@ -3649,6 +3657,10 @@
             <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
             <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Uten tittel</untitled-form>
             <untitled-section>Uten tittel</untitled-section>
@@ -4874,6 +4886,10 @@
             <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
             <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Новая форма</untitled-form>
             <untitled-section>Новый раздел</untitled-section>
@@ -6092,6 +6108,10 @@
             <xpath-errors>{0,choice,1# Un errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
             <lhha-checkbox>Contrassegna questa casella se vuoi usare tag HTML</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Modulo senza nome</untitled-form>
             <untitled-section>Sezione senza nome</untitled-section>
@@ -7312,6 +7332,10 @@
             <xpath-errors>{0,choice,1#Ein XPath Fehler|1&lt;{0,number,integer} XPath Fehler} im Formular.</xpath-errors>
             <lhha-checkbox>Hier ein Häkchen setzen, falls Sie HTML-Tags verwenden wollen</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Unbenanntes Formular</untitled-form>
             <untitled-section>Unbenannter Abschnitt</untitled-section>
@@ -8532,6 +8556,10 @@
             <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
             <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Nimetön lomake</untitled-form>
             <untitled-section>Nimetön lohko</untitled-section>
@@ -9750,6 +9778,10 @@
             <xpath-errors>Hay {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} en su formulario.</xpath-errors>
             <lhha-checkbox>Marque el checkbox si quiere ingresar etiquetas HTML</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Formulario sin título</untitled-form>
             <untitled-section>Sección sin título</untitled-section>
@@ -10948,6 +10980,10 @@
             <xpath-errors>Er {0,choice,1#is een XPath fout|1&lt;zijn {0,number,integer} XPath fouten} in uw form.</xpath-errors>
             <lhha-checkbox>Activeer deze optie als u HTML tags wilt gebruiken</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Naamloos form</untitled-form>
             <untitled-section>Naamloze sectie</untitled-section>
@@ -12173,6 +12209,10 @@
             <xpath-errors> {0,choice,1#Existe um erro de XPath |1&lt;Existem {0,number,integer} erros de XPath} no seu formulário.</xpath-errors>
             <lhha-checkbox>Seleccione esta checkbox se gostaria introduzir tags de HTML</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Formulário sem título</untitled-form>
             <untitled-section>Secção sem título</untitled-section>
@@ -13399,6 +13439,10 @@
             <xpath-errors>Det finns {0,choice,1#ett XPath-fel|1&lt;{0,number,integer} XPath-fel} i formuläret.</xpath-errors>
             <lhha-checkbox>Kryssa denna ruta om du vill skriva HTML-taggar</lhha-checkbox>
         </messages>
+        <alerts>
+            <required todo="true">[Value is required]</required>
+            <xpath todo="true">[Incorrect XPath expression]</xpath>
+        </alerts>
         <template>
             <untitled-form>Formulär utan titel</untitled-form>
             <untitled-section>Sektion utan titel</untitled-section>

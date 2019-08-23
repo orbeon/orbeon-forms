@@ -44,8 +44,8 @@
 
     <taskdef resource="proguard/ant/task.properties">
         <classpath>
-            <pathelement location="lib_ant/proguard-6.0.3.jar"/>
-            <pathelement location="lib_ant/proguard-annotations-6.0.3.jar"/>
+            <pathelement location="lib_ant/proguard-6.1.1.jar"/>
+            <pathelement location="lib_ant/proguard-annotations-6.1.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -158,10 +158,10 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar
+            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 
@@ -209,10 +209,10 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar
+            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 
@@ -262,10 +262,10 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!exist-dependency-stax-api-1.0.1.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar
+            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 

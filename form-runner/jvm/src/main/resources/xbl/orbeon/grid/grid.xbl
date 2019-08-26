@@ -171,6 +171,8 @@
                                 )
                         )[1]"/>
 
+                <xsl:variable name="has-hard-binding"         select="$is-content-repeat or not($is-repeat) and exists($binding-expression-opt)"/>
+
                 <xsl:variable name="repeat-expression-suffix" select="if ($is-content-repeat) then '/*' else ''"/>
 
                 <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
@@ -194,6 +196,7 @@
                 <xsl:variable name="td-elem"                  select="if ($is-table) then 'xh:td'    else 'xh:div'"/>
 
                 <xsl:template match="/*">
+
                     <xf:group appearance="xxf:internal">
 
                         <xsl:if test="$is-editable">
@@ -201,19 +204,27 @@
                             <xf:var name="grid" value="{$edit-ref}"/>
                         </xsl:if>
 
-                        <xf:var name="binding-or-context">
-                            <xxf:value
-                                value="{if (exists($binding-expression-opt)) then $binding-expression-opt else '.'}"
-                                xxbl:scope="outer"/>
-                        </xf:var>
+                        <xsl:if test="$has-hard-binding">
+                            <xf:var name="hard-binding">
+                                <xxf:value value="({$binding-expression-opt})[1]" xxbl:scope="outer"/>
+                            </xf:var>
+                        </xsl:if>
 
                         <xsl:if test="$is-repeat">
 
+                            <xsl:if test="empty($binding-expression-opt)">
+                                <xsl:message terminate="yes">A binding (`ref` or `bind`) is required when using `repeat="content|true"` for grid with id `<xsl:value-of select="$root/@id"/>`.</xsl:message>
+                            </xsl:if>
+
                             <xsl:choose>
                                 <xsl:when test="$is-content-repeat">
-                                    <xf:var name="repeat-sequence" value="$binding-or-context/*"/>
+                                    <xf:var name="repeat-context"  value="$hard-binding"/>
+                                    <xf:var name="repeat-sequence" value="$repeat-context/*"/>
                                 </xsl:when>
                                 <xsl:otherwise>
+                                    <xf:var name="repeat-context">
+                                        <xxf:value value="." xxbl:scope="outer"/>
+                                    </xf:var>
                                     <xf:var name="repeat-sequence">
                                         <xxf:value value="{$binding-expression-opt}" xxbl:scope="outer"/>
                                     </xf:var>
@@ -235,7 +246,7 @@
                             <!-- NOTE: We need a better way to get the Form Runner mode. -->
                             <xf:var
                                 name="view-mode"
-                                value="xxf:readonly($binding-or-context) or fr:is-readonly-mode()"/>
+                                value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>
 
                             <!-- NOTE: `min="foo"` is taken as no minimum. Dubious but has been like this for a long time. -->
                             <xf:var name="min"    as="xs:integer"  value="(xs:integer(fr:component-param-value('min')   [. castable as xs:integer])[. ge 0], 0)[1]"/>
@@ -272,13 +283,12 @@
                                 </xsl:choose>
 
                                 <!-- Make sure we have stable references -->
-                                <xf:var name="context"  value="$binding-or-context"/>
                                 <xf:var name="items"    value="$repeat-sequence"/>
 
                                 <xf:insert
-                                    context="$context"
+                                    context="$repeat-context"
                                     ref="$items[$p]"
-                                    origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                    origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                     position="after"
                                     xxf:defaults="{$apply-defaults}"/>
 
@@ -328,9 +338,9 @@
                             See also: https://github.com/orbeon/orbeon-forms/issues/1935
                         -->
                         <xsl:element name="{$table-elem}">
-                            <xsl:if test="$is-content-repeat or not($is-repeat) and exists($binding-expression-opt)">
+                            <xsl:if test="$has-hard-binding">
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                <xsl:attribute name="ref">$binding-or-context</xsl:attribute>
+                                <xsl:attribute name="ref">$hard-binding</xsl:attribute>
                             </xsl:if>
 
                             <xsl:variable
@@ -404,13 +414,13 @@
                                             <xsl:if test="$left-column">
                                                 <xf:trigger
                                                     appearance="minimal"
-                                                    ref="$binding-or-context[$can-add]"
+                                                    ref="$repeat-context[$can-add]"
                                                     id="fr-grid-add"
                                                     tabindex="-1"
                                                     xxf:title="{{xxf:r('components.grid.add-another.hint', '|fr-fr-resources|')}}">
                                                     <xf:label><xh:i class="fa fa-fw fa-plus-circle "/></xf:label>
                                                 </xf:trigger>
-                                                <xf:group ref="$binding-or-context[not($can-add)]">
+                                                <xf:group ref="$repeat-context[not($can-add)]">
                                                     <xh:i class="fa fa-fw fa-plus-circle disabled"/>
                                                 </xf:group>
                                             </xsl:if>
@@ -582,7 +592,7 @@
                                             <xsl:otherwise>
                                                 <xf:trigger
                                                     appearance="minimal"
-                                                    ref="$binding-or-context[$can-remove]"
+                                                    ref="$repeat-context[$can-remove]"
                                                     id="fr-grid-remove"
                                                     tabindex="-1"
                                                     xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
@@ -594,7 +604,7 @@
                                                         <xf:property name="row" value="$repeat-position"/>
                                                     </xf:dispatch>
                                                 </xf:trigger>
-                                                <xf:group ref="$binding-or-context[not($can-remove)]">
+                                                <xf:group ref="$repeat-context[not($can-remove)]">
                                                     <xh:i class="fa fa-fw fa-minus-circle disabled"/>
                                                 </xf:group>
                                             </xsl:otherwise>
@@ -811,7 +821,6 @@
                                                         if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = $can-classes">
 
                                                         <!-- Make sure we have stable references -->
-                                                        <xf:var name="context"  value="$binding-or-context"/>
                                                         <xf:var name="items"    value="$repeat-sequence"/>
                                                         <xf:var name="p"        value="xxf:repeat-position()"/>
                                                         <xf:var name="source"   value="$items[$p]"/>
@@ -855,7 +864,7 @@
                                                         <xf:action if="event('xxf:type') = 'fr-move-up'">
 
                                                             <xf:insert
-                                                                context="$context"
+                                                                context="$repeat-context"
                                                                 ref="$items[$p - 1]"
                                                                 origin="$source"
                                                                 position="before"/>
@@ -873,7 +882,7 @@
                                                         <xf:action if="event('xxf:type') = 'fr-move-down'">
 
                                                             <xf:insert
-                                                                context="$context"
+                                                                context="$repeat-context"
                                                                 ref="$items[$p + 1]"
                                                                 origin="$source"
                                                                 position="after"/>
@@ -891,9 +900,9 @@
                                                         <xf:action if="event('xxf:type') = 'fr-insert-above'">
 
                                                             <xf:insert
-                                                                context="$context"
+                                                                context="$repeat-context"
                                                                 ref="$items[$p]"
-                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                                                 position="before"
                                                                 xxf:defaults="{$apply-defaults}"/>
 
@@ -915,9 +924,9 @@
                                                         <xf:action if="event('xxf:type') = 'fr-insert-below'">
 
                                                             <xf:insert
-                                                                context="$context"
+                                                                context="$repeat-context"
                                                                 ref="$items[$p]"
-                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                                                 position="after"
                                                                 xxf:defaults="{$apply-defaults}"/>
 
@@ -943,12 +952,15 @@
                                         </xf:group>
                                     </xf:repeat>
                                 </xsl:when>
-                                <xsl:otherwise>
-                                    <xf:group appearance="xxf:internal" ref="{if (exists($binding-expression-opt)) then $binding-expression-opt else '.'}" xxbl:scope="outer">
+                                <xsl:when test="$has-hard-binding">
+                                    <xf:group appearance="xxf:internal" ref="({$binding-expression-opt})[1]" xxbl:scope="outer">
                                         <xf:group appearance="xxf:internal" xxbl:scope="inner">
                                             <xsl:copy-of select="$maybe-repeated-content"/>
                                         </xf:group>
                                     </xf:group>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:copy-of select="$maybe-repeated-content"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:element><!-- $table-elem -->
@@ -970,11 +982,11 @@
                         <xh:div class="{{'fr-grid-non-empty'[{$grid-has-relevant-control-xpath}]}}" xxbl:scope="outer"/>
 
                         <xsl:if test="$is-repeat and $appearance = 'minimal' and not($readonly)">
-                            <xf:group ref="$binding-or-context[not($view-mode)]" class="fr-grid-bottom-buttons">
+                            <xf:group ref="$repeat-context[not($view-mode)]" class="fr-grid-bottom-buttons">
                                 <xf:trigger
                                     appearance="minimal"
                                     id="fr-grid-add-bottom"
-                                    ref="$binding-or-context[$can-add]"
+                                    ref="$repeat-context[$can-add]"
                                     xxf:title="{{xxf:r('components.grid.add-another.hint',  '|fr-fr-resources|')}}">
                                     <xf:label value="xxf:r('components.grid.add-another.label', '|fr-fr-resources|')"/>
                                 </xf:trigger>
@@ -991,7 +1003,7 @@
                                     <xf:trigger
                                         appearance="minimal"
                                         id="fr-grid-remove-bottom"
-                                        ref="$binding-or-context[$can-remove]"
+                                        ref="$repeat-context[$can-remove]"
                                         xxf:title="{{xxf:r('components.grid.remove.hint',  '|fr-fr-resources|')}}">
                                         <xf:label value="xxf:r('components.grid.remove.label', '|fr-fr-resources|')"/>
                                     </xf:trigger>

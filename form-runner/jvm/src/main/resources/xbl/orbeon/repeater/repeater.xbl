@@ -388,7 +388,7 @@
                                 <xf:var name="fr-repeater-can-remove" xxbl:scope="outer">
                                     <xxf:value
                                         xxbl:scope="inner"
-                                        value="'can-remove' = xxf:split($can-classes)"/>
+                                        value="'can-remove' = $can-classes"/>
                                 </xf:var>
 
                                 <xsl:choose>

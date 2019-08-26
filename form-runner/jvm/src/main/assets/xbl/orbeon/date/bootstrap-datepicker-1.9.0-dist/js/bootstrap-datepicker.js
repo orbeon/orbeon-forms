@@ -1,5 +1,5 @@
 /*!
- * Datepicker for Bootstrap v1.8.0 (https://github.com/uxsolutions/bootstrap-datepicker)
+ * Datepicker for Bootstrap v1.9.0 (https://github.com/uxsolutions/bootstrap-datepicker)
  *
  * Licensed under the Apache License v2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  */
@@ -39,12 +39,6 @@
 	function isValidDate(d) {
 		return d && !isNaN(d.getTime());
 	}
-
-	var filterInt = function(value) {
-        if (/^(-|\+)?(\d+|Infinity)$/.test(value))
-            return Number(value);
-        return NaN;
-    }
 
 	var DateArray = (function(){
 		var extras = {
@@ -95,6 +89,10 @@
 
 	var Datepicker = function(element, options){
 		$.data(element, 'datepicker', this);
+
+		this._events = [];
+		this._secondaryEvents = [];
+
 		this._process_options(options);
 
 		this.dates = new DateArray();
@@ -104,7 +102,7 @@
 		this.element = $(element);
 		this.isInput = this.element.is('input');
 		this.inputField = this.isInput ? this.element : this.element.find('input');
-		this.component = this.element.hasClass('date') ? this.element.find('.add-on, .input-group-addon, .btn') : false;
+		this.component = this.element.hasClass('date') ? this.element.find('.add-on, .input-group-addon, .input-group-append, .input-group-prepend, .btn') : false;
 		if (this.component && this.component.length === 0)
 			this.component = false;
 		this.isInline = !this.component && this.element.is('div');
@@ -314,8 +312,6 @@
 				o.defaultViewDate = UTCToday();
 			}
 		},
-		_events: [],
-		_secondaryEvents: [],
 		_applyEvents: function(evs){
 			for (var i=0, el, ch, ev; i < evs.length; i++){
 				el = evs[i][0];
@@ -471,7 +467,7 @@
 		},
 
 		show: function(){
-			if (this.inputField.prop('disabled') || (this.inputField.prop('readonly') && this.o.enableOnReadonly === false))
+			if (this.inputField.is(':disabled') || (this.inputField.prop('readonly') && this.o.enableOnReadonly === false))
 				return;
 			if (!this.isInline)
 				this.picker.appendTo(this.o.container);
@@ -664,7 +660,6 @@
 				visualPadding = 10,
 				container = $(this.o.container),
 				windowWidth = container.width(),
-				windowHeight = $(window).height(),
 				scrollTop = this.o.container === 'body' ? $(document).scrollTop() : container.scrollTop(),
 				appendOffset = container.offset();
 
@@ -719,11 +714,10 @@
 			// auto y orientation is best-situation: top or bottom, no fudging,
 			// decision based on which shows more of the calendar
 			var yorient = this.o.orientation.y,
-				overflows_top, overflows_bottom;
+				top_overflow;
 			if (yorient === 'auto'){
-				overflows_top    = -scrollTop + top - calendarHeight < 0;
-				overflows_bottom = windowHeight - (top - scrollTop + height + calendarHeight) < 0;
-				yorient = overflows_bottom && ! overflows_top ? 'top' : 'bottom';
+				top_overflow = -scrollTop + top - calendarHeight;
+				yorient = top_overflow < 0 ? 'bottom' : 'top';
 			}
 
 			this.picker.addClass('datepicker-orient-' + yorient);
@@ -970,7 +964,9 @@
 				endMonth = this.o.endDate !== Infinity ? this.o.endDate.getUTCMonth() : Infinity,
 				todaytxt = dates[this.o.language].today || dates['en'].today || '',
 				cleartxt = dates[this.o.language].clear || dates['en'].clear || '',
-				titleFormat = dates[this.o.language].titleFormat || dates['en'].titleFormat,
+        titleFormat = dates[this.o.language].titleFormat || dates['en'].titleFormat,
+        todayDate = UTCToday(),
+        titleBtnVisible = (this.o.todayBtn === true || this.o.todayBtn === 'linked') && todayDate >= this.o.startDate && todayDate <= this.o.endDate && !this.weekOfDateIsDisabled(todayDate),
 				tooltip,
 				before;
 			if (isNaN(year) || isNaN(month))
@@ -979,7 +975,7 @@
 						.text(DPGlobal.formatDate(d, titleFormat, this.o.language));
 			this.picker.find('tfoot .today')
 						.text(todaytxt)
-						.css('display', this.o.todayBtn === true || this.o.todayBtn === 'linked' ? 'table-cell' : 'none');
+            .css('display', titleBtnVisible ? 'table-cell' : 'none');
 			this.picker.find('tfoot .clear')
 						.text(cleartxt)
 						.css('display', this.o.clearBtn === true ? 'table-cell' : 'none');
@@ -1159,12 +1155,12 @@
 					factor *= 10;
 					/* falls through */
 				case 1:
-					prevIsDisabled = Math.floor(year / factor) * factor < startYear;
+					prevIsDisabled = Math.floor(year / factor) * factor <= startYear;
 					nextIsDisabled = Math.floor(year / factor) * factor + factor > endYear;
 					break;
 				case 0:
-					prevIsDisabled = year <= startYear && month < startMonth;
-					nextIsDisabled = year >= endYear && month > endMonth;
+					prevIsDisabled = year <= startYear && month <= startMonth;
+					nextIsDisabled = year >= endYear && month >= endMonth;
 					break;
 			}
 
@@ -1824,35 +1820,6 @@
 			}
 
 			parts = date && date.match(this.nonpunctuation) || [];
-			if (parts.length == 1) {
-			    // Try splitting date without separators
-			    if (date.length == 4) {
-                    parts = [
-                        date.substring(0, 2),
-                        date.substring(2, 4)
-                    ];
-			    } else if (date.length == 6) {
-                    parts = [
-                        date.substring(0, 2),
-                        date.substring(2, 4),
-                        date.substring(4, 6)
-                    ];
-			    } else if (date.length == 8) {
-			        if (format.parts[0].startsWith("y")) {
-                        parts = [
-                            date.substring(0, 4),
-                            date.substring(4, 6),
-                            date.substring(6, 8)
-                        ];
-                    } else {
-                        parts = [
-                            date.substring(0, 2),
-                            date.substring(2, 4),
-                            date.substring(4, 8)
-                        ];
-                    }
-			    }
-			}
 
 			function applyNearbyYear(year, threshold){
 				if (threshold === true)
@@ -1909,56 +1876,37 @@
 					p = parts[i].slice(0, m.length);
 				return m.toLowerCase() === p.toLowerCase();
 			}
-
-			// Give up if we have too many parts
-			if (parts.length > fparts.length)
-			    return undefined;
-
-            var cnt;
-            for (i=0, cnt = parts.length; i < cnt; i++){
-                val = filterInt(parts[i], 10);
-                part = fparts[i];
-                if (isNaN(val)){
-                    switch (part){
-                        case 'MM':
-                            filtered = $(dates[language].months).filter(match_part);
-                            val = $.inArray(filtered[0], dates[language].months) + 1;
-                            break;
-                        case 'M':
-                            filtered = $(dates[language].monthsShort).filter(match_part);
-                            val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
-                            break;
-                    }
-                }
-                parsed[part] = val;
-            }
-
-            var used_setters  = [];
-            var _date, s;
-            for (i=0; i < setters_order.length; i++){
-                s = setters_order[i];
-                if (s in parsed && !isNaN(parsed[s])) {
-                    if (isNaN(parsed[s])) {
-                        return undefined;
-                    } else {
-                        used_setters.push(s);
-                        _date = new Date(date);
-                        setters_map[s](_date, parsed[s]);
-                        if (!isNaN(_date))
-                            date = _date;
-                    }
-                }
-            }
-
-            // Make sure at least the month and day were set to consider this a valid date
-            var month_setters = ['M', 'MM', 'm', 'mm'];
-            var day_setters   = ['d', 'dd'];
-            var month_set = _.intersection(used_setters, month_setters).length != 0;
-            var day_set   = _.intersection(used_setters, day_setters).length   != 0;
-            if (! month_set || ! day_set)
-                return undefined;
-
-            return date;
+			if (parts.length === fparts.length){
+				var cnt;
+				for (i=0, cnt = fparts.length; i < cnt; i++){
+					val = parseInt(parts[i], 10);
+					part = fparts[i];
+					if (isNaN(val)){
+						switch (part){
+							case 'MM':
+								filtered = $(dates[language].months).filter(match_part);
+								val = $.inArray(filtered[0], dates[language].months) + 1;
+								break;
+							case 'M':
+								filtered = $(dates[language].monthsShort).filter(match_part);
+								val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
+								break;
+						}
+					}
+					parsed[part] = val;
+				}
+				var _date, s;
+				for (i=0; i < setters_order.length; i++){
+					s = setters_order[i];
+					if (s in parsed && !isNaN(parsed[s])){
+						_date = new Date(date);
+						setters_map[s](_date, parsed[s]);
+						if (!isNaN(_date))
+							date = _date;
+					}
+				}
+			}
+			return date;
 		},
 		formatDate: function(date, format, language){
 			if (!date)
@@ -2059,7 +2007,7 @@
 
 	/* DATEPICKER VERSION
 	 * =================== */
-	$.fn.datepicker.version = '1.8.0';
+	$.fn.datepicker.version = '1.9.0';
 
 	$.fn.datepicker.deprecated = function(msg){
 		var console = window.console;

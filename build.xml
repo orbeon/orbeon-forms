@@ -157,6 +157,7 @@
             -dontwarn
             -ignorewarnings
             -forceprocessing
+            -optimizations !method/inlining/unique,!method/inlining/short
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
@@ -208,6 +209,7 @@
             -dontwarn
             -ignorewarnings
             -forceprocessing
+            -optimizations !method/inlining/unique,!method/inlining/short
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
@@ -261,6 +263,7 @@
             -dontwarn
             -ignorewarnings
             -forceprocessing
+            -optimizations !method/inlining/unique,!method/inlining/short
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)

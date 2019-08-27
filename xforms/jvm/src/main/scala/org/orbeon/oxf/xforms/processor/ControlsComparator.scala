@@ -455,11 +455,14 @@ class ControlsComparator(
         import io.circe.generic.auto._
         import io.circe.syntax._
 
+        val controls =
+          controlsToInitialize map { case (id, value) ⇒ rpc.Control(namespaceId(document, id), value) }
+
         element(
           "init",
           prefix = "xxf",
           uri    = XXFORMS_NAMESPACE_URI,
-          text   = (controlsToInitialize map (rpc.Control.apply _).tupled).asJson.noSpaces
+          text   = controls.asJson.noSpaces
         )
       }
     }

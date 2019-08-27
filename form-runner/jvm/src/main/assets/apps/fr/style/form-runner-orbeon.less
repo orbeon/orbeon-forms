@@ -32,6 +32,10 @@ body.orbeon { background-color: @frBackground }
         content: "";
     }
 
+    .nav {
+        display: block; // https://github.com/orbeon/orbeon-forms/issues/4165
+    }
+
     .nav > li > span {
         padding: 0;
     }
@@ -79,7 +83,7 @@ body.orbeon { background-color: @frBackground }
 
     .radio, .checkbox {
         margin-top: 0;
-        display: inline;
+        display: inline-block; // https://github.com/orbeon/orbeon-forms/issues/4165
     }
 
     .checkbox input[type = checkbox], .radio input[type = radio] {

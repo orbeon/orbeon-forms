@@ -32,7 +32,7 @@ private class DateCompanion extends XBLCompanion {
 
   def inputEl    : JQuery     = $(containerElem).find("input").first()
   def iOS        : Boolean    = $(dom.document.body).hasClass("xforms-ios")
-  var datePicker : DatePicker = null
+  var datePicker : DatePicker = _
 
   override def init(): Unit = {
     println("date init")
@@ -44,7 +44,7 @@ private class DateCompanion extends XBLCompanion {
     if (iOS) {
       // On iOS, use native date picker
       inputEl.attr("type", "date")
-      inputEl.on("change", () ⇒ onChangeDate())
+      inputEl.on("change", () ⇒ sendValueToServer())
     } else {
       // Initialize bootstrap-datepicker
       val options              = new DatePickerOptions
@@ -56,9 +56,9 @@ private class DateCompanion extends XBLCompanion {
       options.language         = Language.getLang()
       datePicker = inputEl.parent().datepicker(options)
       // Register listeners
-      inputEl.on(EventNames.FocusOut, ()                     ⇒ onFocusOut())
       inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ onKeypress(e))
-      datePicker.onChangeDate(() ⇒ onChangeDate())
+      inputEl.on(EventNames.Change,   ()                     ⇒ updateComponentOnChange())
+      datePicker.onChangeDate(        ()                     ⇒ sendValueToServer())
       Language.onLangChange { newLang ⇒
         datePicker.options.language = newLang
         datePicker.update()
@@ -125,13 +125,17 @@ private class DateCompanion extends XBLCompanion {
     }
   }
 
-  def onChangeDate(): Unit = {
+  // Send the new value to the server when it changes
+  // Called when pressing enter? Or typing a new value?
+  def sendValueToServer(): Unit = {
     val newValue = xformsGetValue()
     DocumentAPI.setValue(containerElem.id, newValue)
   }
 
-  // On `focusout`, update the field value if we have a valid date, say so the value goes from `1/2` to `1/2/2019`
-  def onFocusOut(): Unit =
+  // Force an update of the date picker if we have a valid date, so when users type "1/2", the value
+  // goes "1/2/2019" when the control looses the focus, or users press enter. (I would have thought that
+  // the datepicker control would do this on it own, but apparently it doesn't.)
+  def updateComponentOnChange(): Unit =
     Option(datePicker.getDate).foreach(datePicker.setDate(_))
 
   def onKeypress(event: JQueryEventObject): Unit = {
@@ -163,7 +167,7 @@ private object DatePickerFacade {
     var assumeNearbyYear : Boolean           = false
     var showOnFocus      : Boolean           = true
     var forceParse       : Boolean           = true
-    var datesDisabled    : js.Array[js.Date] = null
+    var datesDisabled    : js.Array[js.Date] = _
     var language         : String            = "en"
   }
 

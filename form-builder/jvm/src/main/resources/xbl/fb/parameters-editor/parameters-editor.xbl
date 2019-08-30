@@ -83,6 +83,24 @@
 
                 <xf:var name="template" value="instance('control-value-template')"/>
 
+                <!-- List of controls computed once, as this is an expensive operation for large forms -->
+                <xf:instance id="controls-label-value-itemset">
+                    <itemset/>
+                </xf:instance>
+
+                <!-- Delay computing the list of controls until we need it -->
+                <xf:action
+                    event="xforms-enabled xforms-readwrite"
+                    observer="control-selector"
+                    if="
+                        exists(fr:param) and
+                        empty(instance('controls-label-value-itemset')/item)
+                    ">
+                    <xf:insert
+                        context="instance('controls-label-value-itemset')"
+                        origin="fbf:getControlsLabelValueItemset()"/>
+                </xf:action>
+
             </xf:model>
         </xbl:implementation>
 
@@ -167,31 +185,14 @@
                                 </xf:input>
                             </xf:case>
                             <xf:case value="'ControlValueParam'">
-                                <xf:var name="current-resources" value="fbf:currentResources()"/>
-                                <fr:dropdown-select1 ref="$current-param/fr:controlName">
+                                <fr:dropdown-select1-search ref="$current-param/fr:controlName" id="control-selector" style="width: 100%">
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
-
-                                    <!--  NOTE: If the form has lots of controls (say, > 1000), showing all controls in the itemset is
-                                          costly (say, takes > 10 seconds). We need something different in this case, like a search
-                                          control. -->
-                                    <xf:itemset ref="for $c in fbf:getAllControlsWithIds()[position() le 50] return frf:controlNameFromId($c/@id)">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label
-                                            value="
-                                                utils:truncateWithEllipsis(
-                                                    concat(
-                                                        $current-resources/*[name() = context()]/label,
-                                                        ' (',
-                                                        context(),
-                                                        ')'
-                                                    ),
-                                                    60,
-                                                    6
-                                                )"/>
-                                        <xf:value value="."/>
+                                    <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                        <xf:label value="@label"/>
+                                        <xf:value value="@value"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </fr:dropdown-select1-search>
                             </xf:case>
                             <xf:case value="'AllControlValuesParam'">
                                 <!-- No configuration -->

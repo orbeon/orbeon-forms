@@ -472,8 +472,21 @@ object FormBuilderXPathApi {
     FormBuilderDocContext().formBuilderModel.get.unsafeGetVariableAsNodeInfo("current-resources")
 
   //@XPathFunction
-  def getAllControlsWithIds: SequenceIterator =
+  def getAllControlsWithIds: Seq[NodeInfo] =
     FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot FormRunner.IsContainer
+
+  //@XPathFunction
+  def getControlsLabelValueItemset: Seq[NodeInfo] = {
+    val resourceMap = currentResources.child(*).map(r ⇒ r.localname → r).toMap
+    getAllControlsWithIds.map { control ⇒
+      val controlId    = control.attValue("id")
+      val controlName  = FormRunner.controlNameFromId(controlId)
+      val controlLabel = resourceMap(controlName).firstChildOpt("label").map(_.getStringValue).getOrElse("")
+      <item
+        label={s"$controlLabel ($controlName)"}
+        value={controlName}/>
+    }.map(elemToNodeInfo)
+  }
 
   //@XPathFunction
   def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] =

@@ -651,10 +651,11 @@
 
     <!-- Reset the displayed page as the iframe might show the result from a previous test -->
     <xf:action type="javascript" ev:event="fb-test-form">
-        var testIframeDoc = ORBEON.jQuery('.fb-test-iframe')[0].contentWindow.document;
-        testIframeDoc.open();
-        testIframeDoc.write("");
-        testIframeDoc.close();
+        var oldIFrame = ORBEON.jQuery('.fb-test-iframe');
+        var newIFrame = ORBEON.jQuery(oldIFrame[0].outerHTML);
+        var iframeContainer = oldIFrame.parent();
+        oldIFrame.remove();
+        iframeContainer.append(newIFrame);
         ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
     </xf:action>
 

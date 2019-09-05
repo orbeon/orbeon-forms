@@ -242,7 +242,7 @@
 
                                 var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
                                 if ($(document.getElementById(event.targetId)).is('.xforms-upload') ||
-                                    serverValue == null                                         ||
+                                    serverValue == null                                             ||
                                     serverValue != event.value) {
 
                                     // Add event

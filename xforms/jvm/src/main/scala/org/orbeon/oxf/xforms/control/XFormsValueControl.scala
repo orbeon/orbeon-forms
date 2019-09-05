@@ -229,11 +229,11 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   final def externalValueOpt = Option(getExternalValue)
 
-  /**
-   * Return the external value ready to be inserted into the client after an Ajax response.
-   */
-  def getRelevantEscapedExternalValue = getExternalValue
-  def getNonRelevantEscapedExternalValue = ""
+  // Return the external value ready to be inserted into the client after an Ajax response.
+  // 2019-09-05: Used only by `xf:output`, `xxf:attribute`, and external LHHA. Otherwise this is the
+  // same as `getExternalValue`,
+  protected def getRelevantEscapedExternalValue: String = getExternalValue
+  protected def getNonRelevantEscapedExternalValue = ""
 
   final def getEscapedExternalValue: String =
     if (isRelevant)

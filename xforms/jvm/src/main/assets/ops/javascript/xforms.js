@@ -2543,7 +2543,11 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         change: function (event) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                if ($(target).is('.xforms-upload')) {
+                if ($(target).is('.xbl-component.xbl-javascript-lifecycle')) {
+                    // We might exclude *all* changes under `.xbl-component` but for now, to be conservative, we
+                    // exclude those that support the JavaScript lifecycle.
+                    // https://github.com/orbeon/orbeon-forms/issues/4169
+                } else if ($(target).is('.xforms-upload')) {
                     // Dispatch change event to upload control
                     ORBEON.xforms.Page.getUploadControl(target).change();
                 } else {

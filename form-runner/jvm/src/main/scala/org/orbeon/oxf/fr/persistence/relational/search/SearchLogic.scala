@@ -16,25 +16,24 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import java.sql.Timestamp
 
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, PermissionsCheck}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchPermissions, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable
-import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 
 trait SearchLogic extends SearchRequest {
 
-  private val SearchOperationsLegacy = List("read", "update", "delete")
   private val SearchOperations       = List(Read, Update, Delete)
 
   private def computePermissions(request: Request, user: Option[Credentials]): SearchPermissions = {
@@ -44,10 +43,6 @@ trait SearchLogic extends SearchRequest {
 
     def hasPermissionCond(cond: String): Boolean =
       formPermissionsElOpt.exists(_.child("permission").child(cond).nonEmpty)
-    def authorizedIf(check: PermissionsCheck): Boolean = {
-      val authorized = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
-      Operations.allowsAny(authorized, SearchOperations)
-    }
 
     SearchPermissions(
       formPermissionsElOpt,

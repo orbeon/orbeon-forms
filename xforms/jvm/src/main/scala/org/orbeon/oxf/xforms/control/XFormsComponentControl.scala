@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, StaticLHHASupport, ValueComponentTrait, ViewTrait}
@@ -28,8 +29,9 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.VirtualNode
+import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
@@ -55,35 +57,85 @@ class XFormsValueComponentControl(
   // Don't expose an external value unless explicitly allowed
   override def handleExternalValue = staticControl.abstractBinding.modeExternalValue
 
-  // See https://github.com/orbeon/orbeon-forms/issues/4041
-  override def getFormattedValue: Option[String] = {
-
-    // TODO: Unclear when we return `None` (no binding, etc.). Right now we flatten.
-    def fromBinding =
-      for {
-        binding              ← staticControl.bindingOpt
-        abstractBinding      = binding.abstractBinding
-        format               ← staticControl.format
-        nestedContainer      ← nestedContainerOpt
-        nestedBindingContext ← bindingContextForChildOpt
-        formatted            ← valueWithSpecifiedFormat(
-            format           = format,
-            namespaceMapping = abstractBinding.namespaceMapping,
-            functionContext  = XFormsFunction.Context(
+  private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) ⇒ Option[String]): Option[String] =
+    for {
+      binding              ← staticControl.bindingOpt
+      abstractBinding      = binding.abstractBinding
+      nestedContainer      ← nestedContainerOpt
+      nestedBindingContext ← bindingContextForChildOpt
+      result               ← eval(
+                               abstractBinding.namespaceMapping,
+                               XFormsFunction.Context(
                                  container         = nestedContainer,
                                  bindingContext    = nestedBindingContext,
                                  sourceEffectiveId = innerRootControl.effectiveId,
                                  modelOpt          = nestedBindingContext.modelOpt,
                                  data              = null
                                )
-          )
-      } yield
-        formatted
+                             )
+    } yield
+      result
+
+  // See https://github.com/orbeon/orbeon-forms/issues/4041
+  override def getFormattedValue: Option[String] = {
+
+    // TODO: Unclear when we return `None` (no binding, etc.). Right now we flatten.
+    def fromBinding =
+      staticControl.format flatMap { formatExpr ⇒
+        evaluateWithContext(
+          (namespaceMapping, functionContext) ⇒
+            valueWithSpecifiedFormat(
+              format           = formatExpr,
+              namespaceMapping = namespaceMapping,
+              functionContext  = functionContext
+            )
+        )
+      }
 
     def fromExternal =
       Option(getExternalValue)
 
     fromBinding orElse valueWithDefaultFormat orElse fromExternal
+  }
+
+  override def evaluateExternalValue(): Unit = {
+
+    def fromBinding =
+      staticControl.abstractBinding.externalValueOpt flatMap { externalValueExpr ⇒
+        evaluateWithContext(
+          (namespaceMapping, functionContext) ⇒
+            evaluateAsString(
+              externalValueExpr,
+              List(stringToStringValue(getValue)),
+              1,
+              namespaceMapping,
+              bindingContext.getInScopeVariables,
+              functionContext
+            )
+        )
+      }
+
+    setExternalValue(fromBinding getOrElse getValue)
+  }
+
+  override def translateExternalValue(externalValue: String): Option[String] = {
+
+    def fromBinding =
+      staticControl.abstractBinding.translateExternalValueOpt flatMap { translateExpr ⇒
+        evaluateWithContext(
+          (namespaceMapping, functionContext) ⇒
+            evaluateAsString(
+              translateExpr,
+              List(externalValue),
+              1,
+              namespaceMapping,
+              bindingContext.getInScopeVariables,
+              functionContext
+            )
+        )
+      }
+
+    fromBinding orElse super.translateExternalValue(externalValue)
   }
 
   // TODO

@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.xbl.NumberDefinitions._
 import org.orbeon.xforms.facade.AjaxServerOps._
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, EventNames}
@@ -24,9 +25,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers
+import scala.util.{Failure, Success}
 
 
 object Number {
+
+  import io.circe.generic.auto._
 
   XBL.declareCompanion(
     "fr|number",
@@ -38,6 +42,8 @@ object Number {
     newXBLCompanion
   )
 
+  val ListenerSuffix = ".number"
+
   private def newXBLCompanion: XBLCompanion =
     new XBLCompanion {
 
@@ -47,7 +53,7 @@ object Number {
 
       var visibleInputElem: html.Input = null
 
-      case class State(serverValue: String, editValue: String, decimalSeparatorChar: Char)
+      type State = NumberValue
 
       var stateOpt: Option[State] = None
 
@@ -58,10 +64,10 @@ object Number {
         companion.visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
 
         // Switch the input type after cleaning up the value for edition
-        $(companion.visibleInputElem).on(s"${EventNames.TouchStart}.number ${EventNames.FocusIn}.number", {
+        $(companion.visibleInputElem).on(s"${EventNames.TouchStart}$ListenerSuffix ${EventNames.FocusIn}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            scribe.debug(EventNames.FocusIn)
+            scribe.debug(s"reacting to event ${e.`type`}")
 
             // Don"t set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state ⇒
@@ -69,20 +75,18 @@ object Number {
                 companion.visibleInputElem.value = state.editValue
             }
 
-            setInputType("number")
+            setInputTypeIfNeeded("number")
           }
         }: js.ThisFunction)
 
         // Restore input type, send the value to the server, and updates value after server response
-        $(companion.visibleInputElem).on(s"${EventNames.FocusOut}.number", {
+        $(companion.visibleInputElem).on(s"${EventNames.FocusOut}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) ⇒ {
 
-            scribe.debug(EventNames.FocusOut)
+            scribe.debug(s"reacting to event ${e.`type`}")
 
-            setInputType("text")
-            sendValueToServer()
-
-            val formId = $(containerElem).parents("form").attr("id").get
+            setInputTypeIfNeeded("text")
+            updateStateAndSendValueToServer()
 
             // Always update visible value with XForms value:
             //
@@ -96,19 +100,23 @@ object Number {
             // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
             // - or it didn't, and we force `updateVisibleValue()` after the response is processed
             //
+            // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
+            // edit value hasn't changed.
+            //
+            val formId = $(containerElem).parents("form").attr("id").get
             AjaxServer.ajaxResponseProcessedForCurrentEventQueueF(formId) foreach { _ ⇒
               updateVisibleValue()
             }
           }
         }: js.ThisFunction)
 
-        $(companion.visibleInputElem).on(s"${EventNames.KeyPress}.number", {
+        $(companion.visibleInputElem).on(s"${EventNames.KeyPress}$ListenerSuffix", {
           (_: html.Element, e: JQueryEventObject) ⇒ {
 
-            scribe.debug(EventNames.KeyPress)
+            scribe.debug(s"reacting to event ${e.`type`}")
 
             if (Set(10, 13)(e.which)) {
-              sendValueToServer()
+              updateStateAndSendValueToServer()
               DocumentAPI.dispatchEvent(containerElem.id, eventName = "DOMActivate")
             }
           }
@@ -127,22 +135,37 @@ object Number {
         companion.visibleInputElem.disabled = readonly
       }
 
+      override def xformsGetValue(): String = {
+
+        import io.circe.syntax._
+
+        val r = stateOpt map (_.asJson.noSpaces) getOrElse ""
+
+        scribe.debug(s"xformsGetValue: `$r`")
+
+        r
+      }
+
+      override def xformsUpdateValue(newValue: String): Unit = {
+
+        import io.circe.parser
+
+        parser.decode[NumberValue](newValue).fold(Failure.apply, Success.apply) foreach { nv ⇒
+
+          scribe.debug(s"updateWithServerValues: `${nv.displayValue}`, `${nv.editValue}`, `${nv.decimalSeparator}`")
+
+          stateOpt = Some(nv)
+          updateVisibleValue()
+
+          // Also update disabled because this might be called upon an iteration being moved, in which
+          // case all the control properties must be updated.
+          visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
+        }
+      }
+
       override def xformsFocus(): Unit = {
         scribe.debug(s"xformsFocus")
         companion.visibleInputElem.focus()
-      }
-
-      // Callback from `number.xbl`
-      def updateWithServerValues(serverValue: String, editValue: String, decimalSeparator: String): Unit = {
-
-        scribe.debug(s"updateWithServerValues: `$serverValue`, `$editValue`, `$decimalSeparator`")
-
-        stateOpt = Some(State(serverValue, editValue, decimalSeparator.headOption getOrElse '.'))
-        updateVisibleValue()
-
-        // Also update disabled because this might be called upon an iteration being moved, in which
-        // case all the control properties must be updated.
-        visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
       }
 
       private object Private {
@@ -152,16 +175,24 @@ object Number {
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
-        // TODO: Can we not send if unchanged?
-        def sendValueToServer(): Unit = {
-          scribe.debug(s"sendValueToServer: `${companion.visibleInputElem.value}`")
-          DocumentAPI.dispatchEvent(
-            targetId   = containerElem.id,
-            eventName  = "fr-set-client-value",
-            properties = js.Dictionary(
-              "value" → companion.visibleInputElem.value
-            )
-          )
+        def updateStateAndSendValueToServer(): Unit = {
+
+          import io.circe.syntax._
+
+          val visibleInputElemValue = companion.visibleInputElem.value
+
+          scribe.debug(s"sendValueToServer 1: `$stateOpt`, $visibleInputElemValue")
+
+          stateOpt foreach { state ⇒
+            if (state.editValue != visibleInputElemValue) {
+              val newState = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue)
+              stateOpt = Some(newState)
+              scribe.debug(s"sendValueToServer: `${newState.asJson.noSpaces}`")
+              DocumentAPI.setValue(companion.containerElem, newState.asJson.noSpaces)
+            } else {
+              updateVisibleValue()
+            }
+          }
         }
 
         def updateVisibleValue(): Unit = {
@@ -173,11 +204,11 @@ object Number {
               if (hasFocus)
                 state.editValue
               else
-                state.serverValue
+                state.displayValue
           }
         }
 
-        def setInputType(typeValue: String): Unit = {
+        def setInputTypeIfNeeded(typeValue: String): Unit = {
 
           // See https://github.com/orbeon/orbeon-forms/issues/2545
           def hasNativeDecimalSeparator(separator: Char): Boolean =
@@ -186,7 +217,7 @@ object Number {
 
           val changeType =
             $("body").is(".xforms-mobile") &&
-              companion.stateOpt.exists(state ⇒ hasNativeDecimalSeparator(state.decimalSeparatorChar))
+              companion.stateOpt.exists(state ⇒ hasNativeDecimalSeparator(state.decimalSeparator))
 
           if (changeType) {
             // With Firefox, changing the type synchronously interferes with the focus

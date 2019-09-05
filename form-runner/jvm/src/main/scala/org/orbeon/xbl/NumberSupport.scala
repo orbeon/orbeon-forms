@@ -25,6 +25,8 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
+import scala.util.{Failure, Success}
+
 case class NumberConfig(
   decimalSeparator    : Char,
   groupingSeparator   : Option[Char],
@@ -178,6 +180,9 @@ trait NumberSupport[Binding] {
 
 object NumberSupportJava extends NumberSupport[Item] {
 
+  import NumberDefinitions._
+  import io.circe.generic.auto._
+
   def getStringValue(binding: Item): String =
     binding.getStringValue
 
@@ -197,31 +202,7 @@ object NumberSupportJava extends NumberSupport[Item] {
     }
 
   //@XPathFunction
-  def getDisplayAndEditValueJava(
-    binding             : Item,
-    decimalSeparator    : String,
-    groupingSeparator   : String,
-    prefix              : String,
-    digitsAfterDecimal  : String,
-    roundWhenFormatting : Boolean,
-    roundWhenStoring    : Boolean
-  ): Array[String] = {
-
-    implicit val params = NumberConfig(
-      decimalSeparator    = decimalSeparator.headOption getOrElse '.',
-      groupingSeparator   = groupingSeparator.headOption,
-      prefix              = prefix,
-      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
-      roundWhenFormatting = roundWhenFormatting,
-      roundWhenStoring    = roundWhenStoring
-    )
-
-    Array(displayValue(binding), editValue(binding.getStringValue))
-  }
-
-  //@XPathFunction
-  def getStorageValueJava(
-    value               : String,
+  def getDisplayValueJava(
     binding             : Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
@@ -240,7 +221,65 @@ object NumberSupportJava extends NumberSupport[Item] {
       roundWhenStoring    = roundWhenStoring
     )
 
-    storageValue(value, binding)
+    displayValue(binding)
+  }
+
+  //@XPathFunction
+  def getExternalValueJava(
+    binding             : Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean
+  ): String = {
+
+    implicit val params = NumberConfig(
+      decimalSeparator    = decimalSeparator.headOption getOrElse '.',
+      groupingSeparator   = groupingSeparator.headOption,
+      prefix              = prefix,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
+      roundWhenFormatting = roundWhenFormatting,
+      roundWhenStoring    = roundWhenStoring
+    )
+
+    import io.circe.syntax._
+
+    NumberValue(
+      displayValue(binding),
+      editValue(binding.getStringValue),
+      params.decimalSeparator
+    ).asJson.noSpaces
+  }
+
+  //@XPathFunction
+  def translateExternalValueJava(
+    externalValue       : String,
+    binding             : Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean
+  ): String = {
+
+    import io.circe.parser
+
+    val editValueFromClient =
+      parser.decode[NumberValue](externalValue).fold(Failure.apply, Success.apply) map (_.editValue) getOrElse ""
+
+    implicit val params = NumberConfig(
+      decimalSeparator    = decimalSeparator.headOption getOrElse '.',
+      groupingSeparator   = groupingSeparator.headOption,
+      prefix              = prefix,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
+      roundWhenFormatting = roundWhenFormatting,
+      roundWhenStoring    = roundWhenStoring
+    )
+
+    storageValue(editValueFromClient, binding)
   }
 
   //@XPathFunction

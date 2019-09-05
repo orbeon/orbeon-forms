@@ -26,14 +26,14 @@
             fr|number,
             xf|input:xxf-type('xs:decimal'),
             xf|input:xxf-type('xs:integer')"
-        xxbl:mode="lhha binding value focus javascript-lifecycle"
-        xxf:external-events="fr-set-client-value DOMActivate"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
+        xxf:external-events="DOMActivate"
         xxbl:label-for="html-input"
         xxbl:format="
             string-join(
                 (
                     fr:component-param-value('prefix'),
-                    NumberSupport:getDisplayAndEditValueJava(
+                    NumberSupport:getDisplayValueJava(
                         xxf:binding('fr-number'),
                         fr:component-param-value('decimal-separator'),
                         fr:component-param-value('grouping-separator'),
@@ -41,10 +41,33 @@
                         fr:component-param-value('digits-after-decimal'),
                         string(fr:component-param-value('round-when-formatting')) = 'true',
                         string(fr:component-param-value('round-when-storing'))    = 'true'
-                    )[1],
+                    ),
                     fr:component-param-value('suffix')
                 ),
                 ' '
+            )"
+
+        xxbl:external-value="
+            NumberSupport:getExternalValueJava(
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
+            )"
+
+        xxbl:translate-external-value="
+            NumberSupport:translateExternalValueJava(
+                .,
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
             )"
     >
 
@@ -339,52 +362,6 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
-
-        <xbl:handlers>
-            <xbl:handler event="fr-set-client-value">
-                <xf:setvalue
-                    ref="xxf:binding('fr-number')"
-                    value="
-                        NumberSupport:getStorageValueJava(
-                            event('value'),
-                            xxf:binding('fr-number'),
-                            fr:component-param-value('decimal-separator'),
-                            fr:component-param-value('grouping-separator'),
-                            fr:component-param-value('prefix'),
-                            fr:component-param-value('digits-after-decimal'),
-                            string(fr:component-param-value('round-when-formatting')) = 'true',
-                            string(fr:component-param-value('round-when-storing'))    = 'true'
-                        )"/>
-            </xbl:handler>
-
-            <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
-            <xbl:handler
-                phase="target"
-                event="xxforms-visible xforms-value-changed xxforms-iteration-moved DOMFocusOut">
-
-                <xf:var
-                    name="display-and-edit-values"
-                    value="
-                        NumberSupport:getDisplayAndEditValueJava(
-                            xxf:binding('fr-number'),
-                            fr:component-param-value('decimal-separator'),
-                            fr:component-param-value('grouping-separator'),
-                            fr:component-param-value('prefix'),
-                            fr:component-param-value('digits-after-decimal'),
-                            string(fr:component-param-value('round-when-formatting')) = 'true',
-                            string(fr:component-param-value('round-when-storing'))    = 'true'
-                        )"/>
-
-                <xf:action type="javascript">
-                    <xf:param name="displayValue"     value="$display-and-edit-values[1]"/>
-                    <xf:param name="editValue"        value="$display-and-edit-values[2]"/>
-                    <xf:param name="decimalSeparator" value="fr:component-param-value('decimal-separator')"/>
-                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.updateWithServerValues(displayValue, editValue, decimalSeparator);</xf:body>
-                </xf:action>
-
-            </xbl:handler>
-
-        </xbl:handlers>
 
         <xbl:template>
 

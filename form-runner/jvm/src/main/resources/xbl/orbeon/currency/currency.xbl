@@ -26,14 +26,14 @@
         element="
             fr|currency,
             xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')"
-        xxbl:mode="lhha binding value focus javascript-lifecycle"
-        xxf:external-events="fr-set-client-value"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
+        xxf:external-events="DOMActivate"
         xxbl:label-for="html-input"
         xxbl:format="
             string-join(
                 (
                     fr:component-param-value('prefix'),
-                    NumberSupport:getDisplayAndEditValueJava(
+                    NumberSupport:getDisplayValueJava(
                         xxf:binding('fr-number'),
                         fr:component-param-value('decimal-separator'),
                         fr:component-param-value('grouping-separator'),
@@ -41,10 +41,33 @@
                         fr:component-param-value('digits-after-decimal'),
                         string(fr:component-param-value('round-when-formatting')) = 'true',
                         string(fr:component-param-value('round-when-storing'))    = 'true'
-                    )[1],
+                    ),
                     fr:component-param-value('suffix')
                 ),
                 ' '
+            )"
+
+        xxbl:external-value="
+            NumberSupport:getExternalValueJava(
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
+            )"
+
+        xxbl:translate-external-value="
+            NumberSupport:translateExternalValueJava(
+                .,
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
             )"
     >
 
@@ -83,8 +106,10 @@
 
                     <xf:action event="xforms-model-construct-done">
                         <xf:action iterate="instance('local')/*">
-                        <xf:var name="c" value="."/>
-                        <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="instance()/@*[name() = name($c)]"/>
                         </xf:action>
                         <!-- Special value to indicate that the default must be used -->
                         <xf:setvalue
@@ -125,6 +150,7 @@
                         <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
                         <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
                         <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
+                        <!-- TODO: Validate that the two separators should be different. -->
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">

@@ -144,30 +144,6 @@ class ClientFormRunnerApiTest extends FunSpec {
         |              </td>
         |            </tr>
         |            <tr class="xforms-repeat-delimiter"></tr>
-        |            <tr class="xforms-repeat-template" id="my-section-control≡my-grid-control≡fr-tr">
-        |              <td id="my-section-control≡my-grid-control≡xf-484" class="fr-repeat-column-left xforms-group">
-        |                <div class="dropdown">
-        |                    <button class="btn btn-mini fr-grid-dropdown-button"
-        |                            aria-label=""
-        |                            aria-expanded="false"
-        |                            id="my-section-control≡my-grid-control≡xf-485">
-        |                        <span class="caret"></span>
-        |                    </button>
-        |                </div>
-        |              </td>
-        |              <td class="fr-grid-td">
-        |                  <span id="my-section-control≡my-grid-control≡name-control" class="fr-grid-1-1 xforms-control xforms-input">
-        |                      <label class="xforms-label" for="my-section-control≡my-grid-control≡name-control≡xforms-input-1"></label>
-        |                      <input id="my-section-control≡my-grid-control≡name-control≡xforms-input-1"
-        |                             type="text"
-        |                             name="my-section-control≡my-grid-control≡name-control≡xforms-input-1"
-        |                             value=""
-        |                             class="xforms-input-input">
-        |                      <span class="xforms-alert"></span>
-        |                      <span class="xforms-hint"></span>
-        |                  </span>
-        |              </td>
-        |            </tr>
         |            <tr id="repeat-end-my-section-control≡my-grid-control≡my-grid-control-repeat" class="xforms-repeat-begin-end"></tr>
         |          </tbody>
         |        </table>

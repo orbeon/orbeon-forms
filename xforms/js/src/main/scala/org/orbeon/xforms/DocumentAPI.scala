@@ -161,8 +161,6 @@ object DocumentAPI {
         }
 
       resolvedControlOpt match {
-        case Some(resolvedControl: html.Element) if Controls.isInRepeatTemplate(resolvedControl) ⇒
-          throw new IllegalArgumentException(s"Control is within a repeat template for id `$resolvedControlId`")
         case Some(resolvedControl: html.Element) ⇒
           resolvedControl
         case _ ⇒

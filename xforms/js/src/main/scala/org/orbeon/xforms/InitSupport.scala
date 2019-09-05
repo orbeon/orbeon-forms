@@ -340,26 +340,23 @@ object InitSupport {
       controls foreach { case rpc.Control(id, valueOpt) ⇒
         Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
           val jControl = $(control)
-          // Exclude controls in repeat templates
-          if (jControl.parents(".xforms-repeat-template").length == 0) {
-            if (XBL.isComponent(control)) {
-              // Custom XBL component initialization
-              for {
-                _     ← Option(XBL.instanceForControl(control))
-                value ← valueOpt
-              } locally {
-                Controls.setCurrentValue(control, value)
-              }
-            } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
-                // Initialized visible dialogs
-                Init._dialog(control)
-            } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
-                // Legacy JavaScript initialization
-                Init._compactSelect(control)
-            } else if (jControl.is(".xforms-range")) {
-                // Legacy JavaScript initialization
-                Init._range(control)
+          if (XBL.isComponent(control)) {
+            // Custom XBL component initialization
+            for {
+              _     ← Option(XBL.instanceForControl(control))
+              value ← valueOpt
+            } locally {
+              Controls.setCurrentValue(control, value)
             }
+          } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+              // Initialized visible dialogs
+              Init._dialog(control)
+          } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+              // Legacy JavaScript initialization
+              Init._compactSelect(control)
+          } else if (jControl.is(".xforms-range")) {
+              // Legacy JavaScript initialization
+              Init._range(control)
           }
         }
       }

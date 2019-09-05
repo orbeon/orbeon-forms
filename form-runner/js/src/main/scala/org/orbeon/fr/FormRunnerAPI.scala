@@ -36,9 +36,6 @@ object FormRunnerAPI {
       // The result must be an `html.Element` already
       case e: html.Element ⇒ e
     } filter {
-      // Exclude template content
-      e ⇒ $(e).parents(".xforms-repeat-template").length == 0
-    } filter {
       // Check the id matches the requested name
       e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray

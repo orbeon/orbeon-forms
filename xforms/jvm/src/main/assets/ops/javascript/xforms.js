@@ -1424,12 +1424,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             }
         },
 
-        isInRepeatTemplate: function (element) {
-            return ORBEON.util.Dom.existsAncestorOrSelf(element, function (node) {
-                return $(node).is('.xforms-repeat-template')
-            });
-        },
-
         /**
          * Updates the value of a control in the UI.
          *

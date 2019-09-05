@@ -27,7 +27,6 @@ object DndRepeat {
 
   val IsRepeatBeginEndSelector   = ".xforms-repeat-begin-end"
   val IsRepeatDelimiterSelector  = ".xforms-repeat-delimiter"
-  val IsRepeatTemplateSelector   = ".xforms-repeat-template"
 
   val IsNotGuSelector            = ":not(.gu-transit):not(.gu-mirror)"
   val IsDndItemSelector          = ".xforms-dnd-item"
@@ -70,7 +69,6 @@ object DndRepeat {
                 (sibling ne null)                &&
                   jSibling.is(IsNotGuSelector)   && (
                     jSibling.is(IsDndItemSelector)                || // regular case
-                    jSibling.is(IsRepeatTemplateSelector)         || // at the end of the repeat
                     jSibling.next().is(IsRepeatDelimiterSelector)    // at the end of the repeat when there is an empty `<span>` (unclear, see Actions Editor)
                   )                              &&
                   ! dragState.exists(_.excludedTargets.exists(_ eq sibling))

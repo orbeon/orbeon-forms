@@ -125,6 +125,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   def storeExternalValue(externalValue: String): Unit =
     if (handleExternalValue)
       doStoreExternalValue(externalValue)
+    else
+      throw new OXFException("operation not allowed")
 
   // Subclasses can override this to translate the incoming external value
   def translateExternalValue(externalValue: String): Option[String] = Option(externalValue)

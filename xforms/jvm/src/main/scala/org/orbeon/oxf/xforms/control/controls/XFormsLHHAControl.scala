@@ -40,8 +40,7 @@ class XFormsLHHAControl(
 
   override type Control <: LHHAAnalysis with ValueControl // Q: How can this compile? We have a class and an abstract class!
 
-  override def storeExternalValue(externalValue: String): Unit =
-    throw new OXFException("operation not allowed")
+  override def handleExternalValue: Boolean = false
 
   // Special evaluation function, as in the case of LHHA, the nested content of the element is a way to evaluate
   // the value.

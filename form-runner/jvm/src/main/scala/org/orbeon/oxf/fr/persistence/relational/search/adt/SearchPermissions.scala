@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
-import org.orbeon.saxon.om.NodeInfo
-
 case class SearchPermissions(
-  formPermissionsElOpt          : Option[NodeInfo],
   formPermissions               : org.orbeon.oxf.fr.permission.Permissions,
   authorizedBasedOnRole         : Boolean,
   authorizedIfUsername          : Option[String],

@@ -28,7 +28,6 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
-import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable
 
@@ -41,19 +40,25 @@ trait SearchLogic extends SearchRequest {
     val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
     val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
 
-    def hasPermissionCond(cond: String): Boolean =
-      formPermissionsElOpt.exists(_.child("permission").child(cond).nonEmpty)
+    def hasPermissionCond(condition: Condition): Boolean =
+      formPermissions match {
+        case UndefinedPermissions ⇒ true
+        case DefinedPermissions(permissionsList) ⇒
+          permissionsList.exists { permission ⇒
+            permission.conditions.contains(condition) &&
+              Operations.allowsAny(permission.operations, SearchOperations)
+          }
+      }
 
     SearchPermissions(
-      formPermissionsElOpt,
       formPermissions,
       authorizedBasedOnRole         = {
         val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
         val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
         Operations.allowsAny(authorizedOperations, SearchOperations)
       },
-      authorizedIfUsername          = hasPermissionCond("owner")       .option(request.username).flatten,
-      authorizedIfGroup             = hasPermissionCond("group-member").option(request.group).flatten,
+      authorizedIfUsername          = hasPermissionCond(Owner).option(request.username).flatten,
+      authorizedIfGroup             = hasPermissionCond(Group).option(request.group).flatten,
       authorizedIfOrganizationMatch = SearchOps.authorizedIfOrganizationMatch(formPermissions, user)
     )
   }

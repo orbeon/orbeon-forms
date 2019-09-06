@@ -820,13 +820,10 @@
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
                         <xxf:control id="my-currency≡xf-18" relevant="false"/>
-                        <xxf:init id="my-currency"/>
+                        <xxf:init id="my-currency">
+                            <xxf:value>{"displayValue":"12.34","editValue":"12.34","decimalSeparator":"."}</xxf:value>
+                        </xxf:init>
                     </xxf:control-values>
-                    <xxf:script name="xf_7bf49dfcd4150b25a37261147c7786f0d4a8da41" target-id="my-currency" observer-id="my-currency">
-                        <xxf:param>12.34</xxf:param>
-                        <xxf:param>12.34</xxf:param>
-                        <xxf:param>.</xxf:param>
-                    </xxf:script>
                     <xxf:focus control-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>

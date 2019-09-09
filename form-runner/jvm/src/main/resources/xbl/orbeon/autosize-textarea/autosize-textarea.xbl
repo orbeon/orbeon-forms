@@ -55,6 +55,7 @@
                     <xsl:attribute name="id">field</xsl:attribute>
                     <xsl:attribute name="ref">xxf:binding('fr-autosize-textarea')</xsl:attribute>
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'xxf:autosize']"/>
+                    <xsl:copy-of select="/*/@xxf:maxlength"/>
                 </xsl:element>
             </xh:span>
         </xbl:template>

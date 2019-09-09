@@ -172,8 +172,8 @@ public class XFormsConstants {
     public static final QName XXBL_MODE_QNAME = QName.apply("mode", XXBL_NAMESPACE);
     public static final QName XXBL_LABEL_FOR_QNAME = QName.apply("label-for", XXBL_NAMESPACE);
     public static final QName XXBL_FORMAT_QNAME = QName.apply("format", XXBL_NAMESPACE);
-    public static final QName XXBL_EXTERNAL_VALUE_QNAME = QName.apply("external-value", XXBL_NAMESPACE);
-    public static final QName XXBL_TRANSLATE_EXTERNAL_VALUE_QNAME = QName.apply("translate-external-value", XXBL_NAMESPACE);
+    public static final QName XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME = QName.apply("serialize-external-value", XXBL_NAMESPACE);
+    public static final QName XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME = QName.apply("deserialize-external-value", XXBL_NAMESPACE);
 
 
     public enum XXBLScope { inner, outer }

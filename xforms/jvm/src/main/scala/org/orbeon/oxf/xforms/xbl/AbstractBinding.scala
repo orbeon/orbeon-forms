@@ -82,10 +82,10 @@ case class AbstractBinding(
   val modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
   val modeHandlers            = ! xblMode("nohandlers")
 
-  val labelFor                 : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
-  val formatOpt                : Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)
-  val externalValueOpt         : Option[String] = bindingElement.attributeValueOpt(XXBL_EXTERNAL_VALUE_QNAME)
-  val translateExternalValueOpt: Option[String] = bindingElement.attributeValueOpt(XXBL_TRANSLATE_EXTERNAL_VALUE_QNAME)
+  val labelFor                   : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
+  val formatOpt                  : Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)
+  val serializeExternalValueOpt  : Option[String] = bindingElement.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME)
+  val deserializeExternalValueOpt: Option[String] = bindingElement.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME)
 
   // Printable name for the binding match
   def debugBindingName = bindingElement.getQualifiedName

@@ -101,11 +101,11 @@ class XFormsValueComponentControl(
   override def evaluateExternalValue(): Unit = {
 
     def fromBinding =
-      staticControl.abstractBinding.externalValueOpt flatMap { externalValueExpr ⇒
+      staticControl.abstractBinding.serializeExternalValueOpt flatMap { serializeExpr ⇒
         evaluateWithContext(
           (namespaceMapping, functionContext) ⇒
             evaluateAsString(
-              externalValueExpr,
+              serializeExpr,
               List(stringToStringValue(getValue)),
               1,
               namespaceMapping,
@@ -121,11 +121,11 @@ class XFormsValueComponentControl(
   override def translateExternalValue(externalValue: String): Option[String] = {
 
     def fromBinding =
-      staticControl.abstractBinding.translateExternalValueOpt flatMap { translateExpr ⇒
+      staticControl.abstractBinding.deserializeExternalValueOpt flatMap { deserializeExpr ⇒
         evaluateWithContext(
           (namespaceMapping, functionContext) ⇒
             evaluateAsString(
-              translateExpr,
+              deserializeExpr,
               List(externalValue),
               1,
               namespaceMapping,

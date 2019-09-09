@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
@@ -47,6 +47,10 @@ class XFormsLHHAHandler(
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
+    // For https://github.com/orbeon/orbeon-forms/issues/3989
+    def mustOmitStaticReadonlyHint(staticLhha: LHHAAnalysis, currentControlOpt: Option[XFormsControl]): Boolean =
+      staticLhha.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControlOpt.orNull)
+
     staticControlOpt match {
       case Some(staticLhha: LHHAAnalysis) if staticLhha.isForRepeat ⇒
 
@@ -56,19 +60,21 @@ class XFormsLHHAHandler(
 
         val currentControl = currentControlOpt getOrElse (throw new IllegalStateException)
 
-        val containerAtts =
-          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
+        if (! mustOmitStaticReadonlyHint(staticLhha, currentControlOpt)) {
+          val containerAtts =
+            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
 
-        withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
-          for {
-            currentLHHAControl ← currentControl.narrowTo[XFormsLHHAControl]
-            externalValue      ← currentLHHAControl.externalValueOpt
-            if externalValue.nonEmpty
-          } locally {
-            if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
-              XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
-            } else {
-              xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
+          withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
+            for {
+              currentLHHAControl ← currentControl.narrowTo[XFormsLHHAControl]
+              externalValue      ← currentLHHAControl.externalValueOpt
+              if externalValue.nonEmpty
+            } locally {
+              if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
+                XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, xformsHandlerContext.findXHTMLPrefix)
+              } else {
+                xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
+              }
             }
           }
         }
@@ -90,35 +96,37 @@ class XFormsLHHAHandler(
             case None                               ⇒ resolveControlOpt(staticLhha.directTargetControl)
           }
 
-        val forEffectiveIdOpt =
-          staticLhha.lhhaType == LHHA.Label option {
-            staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
-              case Some(Left(effectiveTargetControl)) ⇒
-                findTargetControlForEffectiveId(
-                  xformsHandlerContext,
-                  effectiveTargetControl,
-                  XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
-                )
-              case Some(Right(targetPrefixedId)) ⇒
-                Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
-              case None ⇒
-                findTargetControlForEffectiveId(
-                  xformsHandlerContext,
-                  staticLhha.directTargetControl,
-                  XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId)
-                )
+        if (! mustOmitStaticReadonlyHint(staticLhha, effectiveTargetControlOpt)) {
+          val forEffectiveIdOpt =
+            staticLhha.lhhaType == LHHA.Label option {
+              staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
+                case Some(Left(effectiveTargetControl)) ⇒
+                  findTargetControlForEffectiveId(
+                    xformsHandlerContext,
+                    effectiveTargetControl,
+                    XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
+                  )
+                case Some(Right(targetPrefixedId)) ⇒
+                  Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
+                case None ⇒
+                  findTargetControlForEffectiveId(
+                    xformsHandlerContext,
+                    staticLhha.directTargetControl,
+                    XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId)
+                  )
+              }
             }
-          }
 
-        handleLabelHintHelpAlert(
-          lhhaAnalysis             = staticLhha,
-          targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId), // `id` placed on the label itself
-          forEffectiveId           = forEffectiveIdOpt.flatten.orNull,
-          lhha                     = staticLhha.lhhaType,
-          requestedElementNameOpt  = None,
-          controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value
-          isExternal               = true
-        )
+          handleLabelHintHelpAlert(
+            lhhaAnalysis             = staticLhha,
+            targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId), // `id` placed on the label itself
+            forEffectiveId           = forEffectiveIdOpt.flatten.orNull,
+            lhha                     = staticLhha.lhhaType,
+            requestedElementNameOpt  = None,
+            controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?
+            isExternal               = true
+          )
+        }
 
       case _ ⇒ // `None if staticLhha.isLocal && ! staticLhha.isForRepeat`
         // Q: Can this happen? There should always be a static LHHA for the control, right?

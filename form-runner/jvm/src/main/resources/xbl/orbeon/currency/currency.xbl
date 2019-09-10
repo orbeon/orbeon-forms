@@ -48,7 +48,7 @@
             )"
 
         xxbl:serialize-external-value="
-            NumberSupport:getExternalValueJava(
+            NumberSupport:serializeExternalValueJava(
                 xxf:binding('fr-number'),
                 fr:component-param-value('decimal-separator'),
                 fr:component-param-value('grouping-separator'),
@@ -59,7 +59,7 @@
             )"
 
         xxbl:deserialize-external-value="
-            NumberSupport:translateExternalValueJava(
+            NumberSupport:deserializeExternalValueJava(
                 .,
                 xxf:binding('fr-number'),
                 fr:component-param-value('decimal-separator'),

@@ -29,7 +29,7 @@ class JSDateUtilsTest extends FunSpec {
   describe("ISO string conversion to JavaScript date") {
     for ((isoString, expectedDate) ← StringsToDates)
       it(s"must pass for `$isoString`") {
-        assert(isoDateToStringUsingLocalTimezone(isoString).getTime === expectedDate.getTime)
+        assert(isoDateToStringUsingLocalTimezone(isoString) map (_.getTime) contains expectedDate.getTime)
       }
   }
 
@@ -50,7 +50,7 @@ class JSDateUtilsTest extends FunSpec {
       current.setSeconds(0)
       current.setMilliseconds(0)
 
-      assert(isoDateToStringUsingLocalTimezone(dateToISOStringUsingLocalTimezone(current)).getTime === current.getTime)
+      assert(isoDateToStringUsingLocalTimezone(dateToISOStringUsingLocalTimezone(current)) map (_.getTime) contains current.getTime)
     }
   }
 }

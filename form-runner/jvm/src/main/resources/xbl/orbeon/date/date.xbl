@@ -11,13 +11,15 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+<xbl:xbl
+xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava">
 
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js"/>
@@ -35,9 +37,18 @@
     <xbl:binding
         id="fr-date"
         element="fr|date, xf|input:xxf-type('xs:date')"
-        xxbl:mode="lhha binding value focus external-value javascript-lifecycle"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
         xxbl:label-for="input"
-        xxf:external-events="DOMActivate">
+        xxf:external-events="DOMActivate"
+
+        xxbl:serialize-external-value="
+            DateSupport:serializeExternalValueJava(
+                xxf:binding('fr-date'),
+                xxf:property('oxf.xforms.format.input.date')
+            )"
+
+        xxbl:deserialize-external-value="DateSupport:deserializeExternalValueJava(.)"
+    >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
@@ -117,15 +128,6 @@
             </control-details>
         </metadata>
 
-        <xbl:handlers>
-            <xbl:handler event="xxforms-visible xxforms-iteration-moved">
-                <xf:action type="javascript">
-                    <xf:param name="format" value="xxf:property('oxf.xforms.format.input.date')"/>
-                    <xf:body>var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.setFormat(format)</xf:body>
-                </xf:action>
-            </xbl:handler>
-        </xbl:handlers>
-
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/date/date.css"/>
             <xbl:style src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css"/>
@@ -159,18 +161,6 @@
                 value="fr:component-param-value('field-width')"/>
 
             <xf:group ref="$binding[not($view)]">
-
-                <!-- Pass excluded dates from custom MIP to Date.scala -->
-                <xf:var name="excluded-dates" value="xxf:custom-mip($binding, 'excluded-dates')">
-                    <xf:action event="xxforms-visible xforms-value-changed xxforms-iteration-moved" type="javascript">
-                        <xf:param name="excludedDates" value="string($excluded-dates)"/>
-                        <xf:body>
-                            var i = ORBEON.xforms.XBL.instanceForControl(this);
-                            if (i) i.setExcludedDates(excludedDates);
-                        </xf:body>
-                    </xf:action>
-                </xf:var>
-
                 <xh:div class="input-append date fr-field-width-{$field-width}">
                     <!-- Create placeholder from Orbeon Forms input format
                          https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->

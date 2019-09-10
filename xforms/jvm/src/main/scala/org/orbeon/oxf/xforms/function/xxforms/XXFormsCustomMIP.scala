@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
@@ -26,17 +27,20 @@ import org.orbeon.scaxon.Implicits._
 class XXFormsCustomMIP extends XXFormsMIPFunction {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    argument(0).iterate(xpathContext).next() match {
-      case nodeInfo: NodeInfo ⇒
-        // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
-        // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
-        // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
-        val qName = getQNameFromExpression(argument(1))(xpathContext)
-        val name  = Model.buildInternalCustomMIPName(qName)
+    // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
+    // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
+    // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
+    XXFormsCustomMIP.findCustomMip(
+      binding = argument(0).iterate(xpathContext).next(),
+      qName   = getQNameFromExpression(argument(1))(xpathContext)
+    )
+}
 
-        InstanceData.findCustomMip(nodeInfo, name)
-      case _ ⇒
-        // $item is empty or its first item is not a node
-        None
+object XXFormsCustomMIP {
+
+  def findCustomMip(binding: Item, qName: QName): Option[String] =
+    binding match {
+      case nodeInfo: NodeInfo ⇒ InstanceData.findCustomMip(nodeInfo, Model.buildInternalCustomMIPName(qName))
+      case _                  ⇒ None
     }
 }

@@ -13,7 +13,6 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.xbl.NumberDefinitions._
 import org.orbeon.xforms.facade.AjaxServerOps._
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, EventNames}
@@ -25,12 +24,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers
-import scala.util.{Failure, Success}
-
 
 object Number {
-
-  import io.circe.generic.auto._
 
   XBL.declareCompanion(
     "fr|number",
@@ -45,17 +40,20 @@ object Number {
   val ListenerSuffix = ".number"
 
   private def newXBLCompanion: XBLCompanion =
-    new XBLCompanion {
+    new XBLCompanionWithState {
 
       companion ⇒
 
       import Private._
+      import io.circe.generic.auto._
+      import io.circe.{Decoder, Encoder}
+
+      type State = NumberExternalValue
+
+      val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
+      val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
       var visibleInputElem: html.Input = null
-
-      type State = NumberValue
-
-      var stateOpt: Option[State] = None
 
       override def init(): Unit = {
 
@@ -127,7 +125,6 @@ object Number {
       override def destroy(): Unit = {
         $(companion.visibleInputElem).off()
         companion.visibleInputElem = null
-
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
@@ -135,32 +132,17 @@ object Number {
         companion.visibleInputElem.disabled = readonly
       }
 
-      override def xformsGetValue(): String = {
+      override def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
 
-        import io.circe.syntax._
+        val NumberExternalValue(displayValue, editValue, decimalSeparator) = newState
 
-        val r = stateOpt map (_.asJson.noSpaces) getOrElse ""
+        scribe.debug(s"updateWithServerValues: `$displayValue`, `$editValue`, `$decimalSeparator`")
 
-        scribe.debug(s"xformsGetValue: `$r`")
+        updateVisibleValue()
 
-        r
-      }
-
-      override def xformsUpdateValue(newValue: String): Unit = {
-
-        import io.circe.parser
-
-        parser.decode[NumberValue](newValue).fold(Failure.apply, Success.apply) foreach { nv ⇒
-
-          scribe.debug(s"updateWithServerValues: `${nv.displayValue}`, `${nv.editValue}`, `${nv.decimalSeparator}`")
-
-          stateOpt = Some(nv)
-          updateVisibleValue()
-
-          // Also update disabled because this might be called upon an iteration being moved, in which
-          // case all the control properties must be updated.
-          visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
-        }
+        // Also update disabled because this might be called upon an iteration being moved, in which
+        // case all the control properties must be updated.
+        visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
       }
 
       override def xformsFocus(): Unit = {
@@ -175,25 +157,20 @@ object Number {
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
-        def updateStateAndSendValueToServer(): Unit = {
-
-          import io.circe.syntax._
-
-          val visibleInputElemValue = companion.visibleInputElem.value
-
-          scribe.debug(s"sendValueToServer 1: `$stateOpt`, $visibleInputElemValue")
-
+        def updateStateAndSendValueToServer(): Unit =
           stateOpt foreach { state ⇒
-            if (state.editValue != visibleInputElemValue) {
-              val newState = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue)
-              stateOpt = Some(newState)
-              scribe.debug(s"sendValueToServer: `${newState.asJson.noSpaces}`")
-              DocumentAPI.setValue(companion.containerElem, newState.asJson.noSpaces)
-            } else {
+
+            val visibleInputElemValue = companion.visibleInputElem.value
+
+            val stateUpdated =
+              updateStateAndSendValueToServerIfNeeded(
+                newState       = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue),
+                valueFromState = _.editValue
+              )
+
+            if (! stateUpdated)
               updateVisibleValue()
-            }
           }
-        }
 
         def updateVisibleValue(): Unit = {
 

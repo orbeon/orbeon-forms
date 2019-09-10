@@ -16,12 +16,13 @@ package org.orbeon.date
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.scalajs.js
+import scala.util.Try
 
 
 object JSDateUtils {
 
   // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-  def isoDateToStringUsingLocalTimezone(dateString: String): js.Date = {
+  def isoDateToStringUsingLocalTimezone(dateString: String): Option[js.Date] = Try {
 
     // Use `substring` to trim potential timezone
     val dateParts = dateString.substring(0, 10).splitTo[List]("-")
@@ -35,7 +36,7 @@ object JSDateUtils {
       seconds = 0,
       ms      = 0
     )
-  }
+  } toOption
 
   def dateToISOStringUsingLocalTimezone(date: js.Date): String = {
 

@@ -44,8 +44,8 @@ trait NumberSupport[Binding] {
 
   import Private._
 
-  def getStringValue(binding: Binding): String
-  def getDatatypeOpt(binding: Binding): Option[dom.QName]
+  def getStringValue (binding: Binding): String
+  def getDatatypeOpt (binding: Binding): Option[dom.QName]
   def getCustomMipOpt(binding: Binding, name: String): Option[String]
 
   // NOTE: Also return `None` if the `fraction-digits` custom MIP is read and is not an `Int`.
@@ -180,7 +180,6 @@ trait NumberSupport[Binding] {
 
 object NumberSupportJava extends NumberSupport[Item] {
 
-  import NumberDefinitions._
   import io.circe.generic.auto._
 
   def getStringValue(binding: Item): String =
@@ -225,7 +224,7 @@ object NumberSupportJava extends NumberSupport[Item] {
   }
 
   //@XPathFunction
-  def getExternalValueJava(
+  def serializeExternalValueJava(
     binding             : Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
@@ -246,7 +245,7 @@ object NumberSupportJava extends NumberSupport[Item] {
 
     import io.circe.syntax._
 
-    NumberValue(
+    NumberExternalValue(
       displayValue(binding),
       editValue(binding.getStringValue),
       params.decimalSeparator
@@ -254,7 +253,7 @@ object NumberSupportJava extends NumberSupport[Item] {
   }
 
   //@XPathFunction
-  def translateExternalValueJava(
+  def deserializeExternalValueJava(
     externalValue       : String,
     binding             : Item,
     decimalSeparator    : String,
@@ -268,7 +267,7 @@ object NumberSupportJava extends NumberSupport[Item] {
     import io.circe.parser
 
     val editValueFromClient =
-      parser.decode[NumberValue](externalValue).fold(Failure.apply, Success.apply) map (_.editValue) getOrElse ""
+      parser.decode[NumberExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.editValue) getOrElse ""
 
     implicit val params = NumberConfig(
       decimalSeparator    = decimalSeparator.headOption getOrElse '.',

@@ -14,11 +14,8 @@
 package org.orbeon.xbl
 
 
-object NumberDefinitions {
-
-  case class NumberValue(
-    displayValue     : String,
-    editValue        : String,
-    decimalSeparator : Char, // Q: Would prevent characters beyond the basic plane; change?
-  )
-}
+case class NumberExternalValue(
+  displayValue     : String,
+  editValue        : String,
+  decimalSeparator : Char, // Q: Would prevent characters beyond the basic plane; change?
+)

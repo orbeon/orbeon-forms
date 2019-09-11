@@ -163,7 +163,7 @@
                 </xf:action>
 
                 <!-- Date picker -->
-                <xf:input ref="$binding" appearance="minimal"/>
+                <fr:date ref="$binding"/>
             </xf:group>
         </xbl:template>
     </xbl:binding>

@@ -559,7 +559,7 @@
                         bind(
                             frf:bindId('{$right-name}')
                         )/*[$p]"/>
-                
+
                 <xf:setvalue
                     context="$right-context"
                     ref="(.//{@right})[1]"
@@ -671,6 +671,8 @@
         <xsl:copy>
             <xsl:copy-of select="@*"/>
 
+            <xsl:variable name="model-id" select="../@id/string()"/>
+
             <!-- Main event handler to start the action -->
             <xsl:for-each select="xf:action[fr:has-known-action-event(.)][1]">
 
@@ -778,6 +780,9 @@
                     <xsl:variable
                         name="response-actions"
                         select=".//xf:action[p:classes() = $response-action-classes]"/>
+
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/4178 -->
+                    <xf:recalculate model="{$model-id}" xxf:deferred="true"/>
 
                     <xsl:if test="exists($response-actions)">
                         <xsl:for-each select="$response-actions">

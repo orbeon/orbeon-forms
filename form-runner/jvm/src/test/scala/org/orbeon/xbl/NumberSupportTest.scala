@@ -21,8 +21,8 @@ class NumberSupportTest extends AnyFunSpec {
   case class TestNode(value: String, datatype: Option[QName], customMips: Map[String, String])
 
   object TestNumberSupport extends NumberSupport[TestNode] {
-    def getStringValue(binding: TestNode): String                        = binding.value
-    def getDatatypeOpt(binding: TestNode): Option[QName]                 = binding.datatype
+    def getStringValue (binding: TestNode): String                       = binding.value
+    def getDatatypeOpt (binding: TestNode): Option[QName]                = binding.datatype
     def getCustomMipOpt(binding: TestNode, name: String): Option[String] = binding.customMips.get(name)
   }
 

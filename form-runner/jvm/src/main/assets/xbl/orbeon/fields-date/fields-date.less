@@ -1,12 +1,11 @@
 .xbl-fr-fields-date {
 
-    .xforms-control {
-        display: inline;
-        clear: none;
-    }
-
-    .fr-component-group img {
-        vertical-align: middle;
+    .fr-component-group {
+        img { vertical-align: middle; }
+        .xforms-input {
+            display: inline-block;                  // All the inputs in the same line
+            label.xforms-label { display: none; }   // By default, don't show labels
+        }
     }
 
     // For use outside of Form Runner

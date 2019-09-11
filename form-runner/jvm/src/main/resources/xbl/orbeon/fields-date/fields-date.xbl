@@ -129,9 +129,15 @@
                     <xf:var name="title-3"     value="xxf:r('components.date-time.year', '|fr-fr-resources|')"/>
 
                     <!-- navindex is copied to first field, but need one for second field too! -->
-                    <xf:input ref="$ref-1" xxf:title="{$title-1}" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input"/>
-                    <xf:input ref="$ref-2" xxf:title="{$title-2}" class="fr-width-2digits"/>
-                    <xf:input ref="year"   xxf:title="{$title-3}" class="fr-width-4digits"/>
+                    <xf:input ref="$ref-1" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input">
+                        <xf:label value="$title-1"/>
+                    </xf:input>
+                    <xf:input ref="$ref-2" class="fr-width-2digits">
+                        <xf:label value="$title-2"/>
+                    </xf:input>
+                    <xf:input ref="year"  class="fr-width-4digits">
+                        <xf:label value="$title-3"/>
+                    </xf:input>
                 </xf:group>
 
                 <!-- React to update to local values -->

@@ -154,7 +154,7 @@ object DependencyAnalyzer {
 
         val allExplanations = result map explanation mkString "\n"
 
-        Logger.debug(s"topological sort (${result.size}} nodes):\n$allExplanations")
+        Logger.debug(s"topological sort (${result.size} nodes):\n$allExplanations")
       }
 
     // We are only interested in the binds containing the MIP

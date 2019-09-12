@@ -29,8 +29,7 @@
     <xbl:binding
         id="fr-tree-select1"
         element="fr|tree-select1, xf|select1[appearance ~= 'tree']"
-        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
-        xxf:external-events="fr-set-client-value">
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Tree Selector</display-name>

@@ -17,6 +17,7 @@ import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo

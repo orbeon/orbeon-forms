@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._

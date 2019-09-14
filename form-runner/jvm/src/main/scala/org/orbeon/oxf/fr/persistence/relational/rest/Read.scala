@@ -17,17 +17,18 @@ import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.joda.time.DateTime
 import org.orbeon.io.CharsetNames
+import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.permission.Operation.Read
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.util.{DateUtils, NetUtils}
-import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -114,7 +115,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 PermissionsAuthorization.currentUserFromSession,
                 dataUser
               )
-              if (! Operations.allows(authorizedOperations, permission.Read))
+              if (! Operations.allows(authorizedOperations, Read))
                 throw HttpStatusCodeException(StatusCode.Forbidden)
               httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
             }

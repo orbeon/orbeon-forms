@@ -13,20 +13,34 @@
  */
 package org.orbeon.oxf.fr.permission
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
+
 sealed trait                                                        Operations
 case object AnyOperation                                    extends Operations
 case class  SpecificOperations(operations: List[Operation]) extends Operations
 
-sealed trait               Operation { val name : String }
-case object Create extends Operation { val name = "create" }
-case object Read   extends Operation { val name = "read" }
-case object Update extends Operation { val name = "update" }
-case object Delete extends Operation { val name = "delete" }
+sealed abstract class Operation extends EnumEntry with Lowercase
+
+object Operation extends Enum[Operation] {
+
+  val values = findValues
+
+  case object Create extends Operation
+  case object Read extends Operation
+  case object Update extends Operation
+  case object Delete extends Operation
+}
 
 object Operations {
 
-  def All  = List(Create, Read, Update, Delete)
   def None = SpecificOperations(Nil)
+  def All  = List(
+    Operation.Create,
+    Operation.Read,
+    Operation.Update,
+    Operation.Delete
+  )
 
   def parse(stringOperations: List[String]): Operations =
     stringOperations match {
@@ -34,7 +48,7 @@ object Operations {
         AnyOperation
       case _   ⇒
         val operations      = stringOperations.map { operationName ⇒
-          val operationOpt = All.find(_.name == operationName)
+          val operationOpt = All.find(_.entryName == operationName)
           operationOpt.getOrElse(throw new IllegalArgumentException(s"Unknown operation `$operationName`"))
         }
         SpecificOperations(operations)
@@ -45,7 +59,7 @@ object Operations {
       case AnyOperation ⇒
         List("*")
       case SpecificOperations(specificOperations) ⇒
-        specificOperations.map(_.name)
+        specificOperations.map(_.entryName)
      }
 
   def combine(left: Operations, right: Operations): Operations =

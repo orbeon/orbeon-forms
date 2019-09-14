@@ -34,12 +34,11 @@ import scala.collection.mutable
 
 trait SearchLogic extends SearchRequest {
 
-  private val SearchOperations       = List(Read, Update, Delete)
-
   private def computePermissions(request: Request, user: Option[Credentials]): SearchPermissions = {
 
-    val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
-    val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
+    val searchOperations     = request.anyOfOperations.getOrElse(List(Read, Update, Delete))
+    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.app, request.form)
+    val formPermissions      = PermissionsXML.parse(formPermissionsElOpt.orNull)
 
     def hasPermissionCond(condition: Condition): Boolean =
       formPermissions match {
@@ -47,7 +46,7 @@ trait SearchLogic extends SearchRequest {
         case DefinedPermissions(permissionsList) ⇒
           permissionsList.exists { permission ⇒
             permission.conditions.contains(condition) &&
-              Operations.allowsAny(permission.operations, SearchOperations)
+              Operations.allowsAny(permission.operations, searchOperations)
           }
       }
 
@@ -56,7 +55,7 @@ trait SearchLogic extends SearchRequest {
       authorizedBasedOnRole         = {
         val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
         val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
-        Operations.allowsAny(authorizedOperations, SearchOperations)
+        Operations.allowsAny(authorizedOperations, searchOperations)
       },
       authorizedIfUsername          = hasPermissionCond(Owner).option(request.username).flatten,
       authorizedIfGroup             = hasPermissionCond(Group).option(request.group).flatten,

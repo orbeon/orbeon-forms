@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
@@ -39,11 +39,12 @@ trait SearchRequest {
     httpRequest.getRequestPath match {
       case SearchPath(provider, app, form) ⇒
 
-        val searchElement = searchDocument.rootElement
-        val queryEls      = searchElement.child("query").toList
-        val draftsElOpt   = searchElement.child("drafts").headOption
-        val username      = httpRequest.credentials map     (_.username)
-        val group         = httpRequest.credentials flatMap (_.group)
+        val searchElement   = searchDocument.rootElement
+        val queryEls        = searchElement.child("query").toList
+        val draftsElOpt     = searchElement.child("drafts").headOption
+        val username        = httpRequest.credentials map     (_.username)
+        val group           = httpRequest.credentials flatMap (_.group)
+        val operationsElOpt = searchElement.child("operations").headOption
 
         Request(
           provider       = Provider.withName(provider),
@@ -95,7 +96,11 @@ trait SearchRequest {
                       )
                     }
                 }
-            }
+            },
+          anyOfOperations = operationsElOpt.map { operationsEl ⇒
+            val operations: List[String] = operationsEl.attValue("any-of").splitTo[List]()
+            operations.map(Operation.withName)
+          }
         )
     }
   }

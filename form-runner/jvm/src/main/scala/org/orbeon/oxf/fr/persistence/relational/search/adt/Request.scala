@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RequestCommon, Version}
 
 case class Request(
-  provider       : Provider,
-  app            : String,
-  form           : String,
-  version        : Version,
-  username       : Option[String],
-  group          : Option[String],
-  pageSize       : Int,
-  pageNumber     : Int,
-  columns        : List[Column],
-  drafts         : Drafts,
-  freeTextSearch : Option[String]
+  provider        : Provider,
+  app             : String,
+  form            : String,
+  version         : Version,
+  username        : Option[String],
+  group           : Option[String],
+  pageSize        : Int,
+  pageNumber      : Int,
+  columns         : List[Column],
+  drafts          : Drafts,
+  freeTextSearch  : Option[String],
+  anyOfOperations : Option[List[Operation]]
 ) extends
   RequestCommon
 

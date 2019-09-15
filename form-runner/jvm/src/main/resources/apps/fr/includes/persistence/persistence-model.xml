@@ -577,6 +577,7 @@
             <page-size>10</page-size>
             <page-number>1</page-number>
             <lang>en</lang>
+            <operations any-of="update"/>
         </search>
     </xf:instance>
     <xf:instance id="fr-search-response"><dummy/></xf:instance>

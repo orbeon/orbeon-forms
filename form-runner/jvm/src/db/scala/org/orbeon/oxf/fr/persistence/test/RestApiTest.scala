@@ -19,6 +19,7 @@ import org.junit.Test
 import org.orbeon.dom
 import org.orbeon.dom.{Document, DocumentFactory, Text}
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
+import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}

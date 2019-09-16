@@ -253,7 +253,7 @@ class XFormsComponentControl(
       recreateNestedContainer()
 
       if (update)
-        XXFormsDynamicControl.updateDynamicShadowTree(this, dispatchEvents = false)
+        XXFormsDynamicControl.updateDynamicShadowTree(this)
     }
 
     if (Controls.isRestoringDynamicState)

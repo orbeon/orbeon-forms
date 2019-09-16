@@ -22,8 +22,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl}
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XXFormsInitiallyDisabledEvent
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
@@ -247,18 +245,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     container        : XBLContainer,
     containerControl : XFormsContainerControl,
     elementAnalysis  : ElementAnalysis,
-    state            : Option[Map[String, ControlState]],
-    dispatchEvents   : Boolean
-  ): Unit = {
-
+    state            : Option[Map[String, ControlState]]
+  ): Unit =
     Controls.createSubTree(container, _controlIndex, containerControl, elementAnalysis, state)
-
-    if (dispatchEvents) {
-      // NOTE: We dispatch refresh events for the subtree right away, by consistency with repeat iterations. But we
-      // don't really have to do this, we could wait for the following refresh.
-      initializeSubTree(containerControl, includeCurrent = false)
-    }
-  }
 
   // Index a subtree of controls. Also handle special relevance binding events
   def indexSubtree(containerControl: XFormsContainerControl, includeCurrent: Boolean): Unit =

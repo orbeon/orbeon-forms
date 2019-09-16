@@ -273,8 +273,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         container        = childContainer,
         containerControl = this,
         elementAnalysis  = partAnalysis.getTopLevelControls.head,
-        state            = Controls.restoringControls,
-        dispatchEvents   = true
+        state            = Controls.restoringControls
       )
 
     stateToRestore match {
@@ -308,7 +307,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             removeDynamicShadowTree(componentControl)
             createOrUpdateStaticShadowTree(componentControl, Some(elemInSource))
             componentControl.recreateNestedContainer()
-            updateDynamicShadowTree(componentControl, dispatchEvents = true) // could be `dispatchEvents = false`?
+            updateDynamicShadowTree(componentControl)
           }
         case _ ⇒
       }
@@ -442,10 +441,7 @@ object XXFormsDynamicControl {
     componentControl.clearChildren()
   }
 
-  def updateDynamicShadowTree(
-    componentControl        : XFormsComponentControl,
-    dispatchEvents          : Boolean
-  ): Unit = {
+  def updateDynamicShadowTree(componentControl: XFormsComponentControl): Unit = {
 
     val doc             = componentControl.containingDocument
     val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
@@ -455,8 +451,7 @@ object XXFormsDynamicControl {
         container        = componentControl.nestedContainerOpt getOrElse (throw new IllegalStateException),
         containerControl = componentControl,
         elementAnalysis  = templateTree,
-        state            = Controls.restoringControls,
-        dispatchEvents   = dispatchEvents
+        state            = Controls.restoringControls
       )
     }
 

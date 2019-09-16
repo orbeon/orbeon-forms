@@ -63,7 +63,7 @@ trait FileMetadata extends XFormsValueControl {
   def supportedFileMetadata: Seq[String]
 
   // Evaluate all properties
-  def evaluateFileMetadata(relevant: Boolean) =
+  def evaluateFileMetadata(relevant: Boolean): Unit =
     props.values foreach (_.value)
 
   // Mark all properties dirty

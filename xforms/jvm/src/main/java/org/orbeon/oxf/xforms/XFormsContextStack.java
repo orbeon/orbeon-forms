@@ -300,7 +300,7 @@ public class XFormsContextStack {
             final boolean isNewModel;
             if (modelId != null) {
                 final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
-                final XFormsObject o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, Option.<Item>apply(null));
+                final XFormsObject o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, Option.apply(null));
                 if (!(o instanceof XFormsModel)) {
                     // Invalid model id
 

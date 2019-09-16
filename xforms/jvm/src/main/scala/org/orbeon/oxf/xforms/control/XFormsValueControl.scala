@@ -107,12 +107,12 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         null
     )
 
-  protected def markExternalValueDirty(): Unit = {
+  final protected def markExternalValueDirty(): Unit = {
     isExternalValueEvaluated = false
     externalValue = null
   }
 
-  protected def isExternalValueDirty: Boolean =
+  final protected def isExternalValueDirty: Boolean =
     ! isExternalValueEvaluated
 
   override def isValueChangedCommit(): Boolean = {
@@ -121,9 +121,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     result
   }
 
-  // This usually doesn't need to be overridden (only XFormsUploadControl as of 2012-08-15)
-  def storeExternalValue(externalValue: String) =
-    if (handleExternalValue) // Q: Should throw if not allowed?
+  // This usually doesn't need to be overridden (only XFormsUploadControl as of 2012-08-15; 2019-09-04)
+  def storeExternalValue(externalValue: String): Unit =
+    if (handleExternalValue)
       doStoreExternalValue(externalValue)
 
   // Subclasses can override this to translate the incoming external value

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.StringUtils._
@@ -47,10 +47,10 @@ class XFormsOutputControl(
 
   override type Control <: OutputControl
 
-  def supportedFileMetadata = Seq("mediatype", "filename") // could add "state"?
+  def supportedFileMetadata: Seq[String] = Seq("mediatype", "filename") // could add "state"?
 
   // Optional format and mediatype
-  private def format = staticControlOpt flatMap (_.format)
+  private def format: Option[String] = staticControlOpt flatMap (_.format)
 
   // Value attribute
   private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)
@@ -205,7 +205,7 @@ class XFormsOutputControl(
         defaultValue
     }
 
-  override def getRelevantEscapedExternalValue =
+  override def getRelevantEscapedExternalValue: String =
     if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatype exists (_.startsWith("image/")))) {
       val externalValue = getExternalValue
       if (externalValue.nonBlank) {
@@ -223,7 +223,7 @@ class XFormsOutputControl(
       // Return external value as is
       getExternalValue
 
-  override def getNonRelevantEscapedExternalValue =
+  override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
       // Return rewritten URL of dummy image URL
       XFormsUtils.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
@@ -232,15 +232,15 @@ class XFormsOutputControl(
 
   // If we have both @ref and @value, read the type
   // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.
-  override def valueType = super.valueType
+  override def valueType: QName = super.valueType
 
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
   // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
   override def isFocusable: Boolean =
     isRelevant && staticControl.hasLHHA(LHHA.Label)
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
-    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
+  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+    var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
     added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
     added
   }
@@ -256,7 +256,7 @@ class XFormsOutputControl(
       case _ ⇒ false
     }
 
-  override def findAriaByControlEffectiveId =
+  override def findAriaByControlEffectiveId: Option[String] =
     if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) ||
         appearances(XXFORMS_TEXT_APPEARANCE_QNAME)     ||
         (mediatype exists (_.startsWith("image/")))    ||
@@ -274,7 +274,7 @@ class XFormsOutputControl(
 
 object XFormsOutputControl {
 
-  def getExternalValueOrDefault(control: XFormsOutputControl, mediatypeValue: String) =
+  def getExternalValueOrDefault(control: XFormsOutputControl, mediatypeValue: String): String =
     if ((control ne null) && control.isRelevant)
       // Ask control
       control.getExternalValue

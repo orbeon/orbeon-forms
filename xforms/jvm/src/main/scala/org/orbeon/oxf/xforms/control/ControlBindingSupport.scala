@@ -85,11 +85,11 @@ trait ControlBindingSupport {
     // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
     // ensure that the chain of bindings is consistent
     setBindingContext(
-      bindingContext.copy(parent = parentContext),
-      parentContentRelevant,
-      update = true,
-      restoreState = false,
-      None
+      bindingContext = bindingContext.copy(parent = parentContext),
+      parentRelevant = parentContentRelevant,
+      update         = true,
+      restoreState   = false,
+      state          = None
     )
   }
 

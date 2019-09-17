@@ -1104,20 +1104,6 @@
                                         not($separate-toc-mode) and
                                         $current-nav-case-id = '{$static-section-id}-case' and
                                         xxf:repeat-position() = index('{$static-section-id}-repeater-repeat')"/>
-
-                                <xsl:choose>
-                                    <xsl:when test="exists(fr:iteration-label)">
-                                        <xf:var
-                                            name="section-label"
-                                            context="."
-                                            value="xxf:value('{$static-section-id}-repeater-iteration-label', false())[xxf:repeat-position()]"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xf:var
-                                            name="section-label"
-                                            value="concat(xxf:label('{$static-section-id}'), ' ', xxf:repeat-position())"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xf:var
@@ -1130,11 +1116,41 @@
                                     value="
                                         not($separate-toc-mode) and
                                         $current-nav-case-id = '{$static-section-id}-case'"/>
-                                <xf:var
-                                    name="section-label"
-                                    value="xxf:label('{$static-section-id}')"/>
                             </xsl:otherwise>
                         </xsl:choose>
+
+                        <xsl:variable name="section-label-expr" as="xs:string">
+                            <xsl:choose>
+                                <xsl:when test="$use-paging">
+                                    <xsl:choose>
+                                        <xsl:when test="exists(fr:iteration-label)">
+                                            <xsl:value-of select="
+                                                concat(
+                                                    'xxf:value(''',
+                                                    $static-section-id,
+                                                    '-repeater-iteration-label'', false())[xxf:repeat-position()]'
+                                                )"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="
+                                                concat(
+                                                    'concat(xxf:label(''',
+                                                    $static-section-id,
+                                                    '''), '' '', xxf:repeat-position())'
+                                                )"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="
+                                        concat(
+                                            'xxf:label(''',
+                                            $static-section-id,
+                                            ''')'
+                                        )"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
 
                         <xh:li class="{{
                             'disabled'           [not($top-level-section-available)],
@@ -1149,7 +1165,7 @@
 
                             <xf:trigger appearance="minimal">
                                 <xf:label>
-                                    <xf:output value="$section-label">
+                                    <xf:output value="{$section-label-expr}">
                                         <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
                                     </xf:output>
                                     <xh:span class="fr-toc-edit"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
@@ -1178,7 +1194,7 @@
                                                 )"/></xh:span>
                                     </xsl:if>
                                 </xf:label>
-                                <xf:hint value="$section-label">
+                                <xf:hint value="{$section-label-expr}">
                                     <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
                                 </xf:hint>
                                 <!-- DOMActivate handler which depends on `$static-validation-mode` -->

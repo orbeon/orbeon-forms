@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
-import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
@@ -125,17 +125,30 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       val allControls = _controlIndex.effectiveIdsToControls.values
       if (state.isEmpty) {
         // Copy list because it can be modified concurrently as events are being dispatched and handled
-        dispatchRefreshEvents(_controlIndex.effectiveIdsToControls.keysIterator.to[List], isInitial = true)
+        val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.to[List]
+        updateValueControls(controlIds)
+        dispatchRefreshEvents(controlIds, isInitial = true)
       } else {
         // Make sure all control state such as relevance, value changed, etc. does not mark a difference
-        for (control ← allControls)
+        for (control ← allControls) {
+          updateValueControl(control)
           control.commitCurrentUIState()
+        }
       }
 
       debugResults(List("controls created" → allControls.size.toString))
     }
 
-  def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String], isInitial: Boolean): Unit = {
+  def updateValueControls(controlsEffectiveIds: List[String]): Unit =
+    controlsEffectiveIds.iterator flatMap findControl foreach updateValueControl
+
+  def updateValueControl(control: XFormsControl): Unit =
+    control match {
+      case vc: XFormsValueControl if vc.isRelevant ⇒ vc.getValue
+      case _ ⇒
+    }
+
+  def dispatchRefreshEvents(controlsEffectiveIds: List[String], isInitial: Boolean): Unit = {
     withDebug("dispatching refresh events") {
 
       def dispatchRefreshEvents(control: XFormsControl): Unit =
@@ -237,9 +250,6 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
     Controls.createRepeatIterationTree(containingDocument, _controlIndex, repeatControl, iterationIndex)
   }
-
-  def initializeSubTree(containerControl: XFormsContainerControl, includeCurrent: Boolean): Unit =
-    dispatchRefreshEvents(ControlsIterator(containerControl, includeCurrent).map(_.getEffectiveId).to[List], isInitial = true)
 
   def createAndInitializeDynamicSubTree(
     container        : XBLContainer,

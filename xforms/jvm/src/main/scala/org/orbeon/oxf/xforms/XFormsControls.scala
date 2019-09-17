@@ -209,6 +209,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
         resultOpt foreach { case (updater, controlsEffectiveIds) ⇒
           // Dispatch events
+          currentControlTree.updateValueControls(controlsEffectiveIds)
           currentControlTree.dispatchRefreshEvents(controlsEffectiveIds, isInitial = false)
           // Handle focus changes
           Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
@@ -223,6 +224,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   }
 
   // Do a refresh of a subtree of controls starting at the given container control.
+  // This is used by `xf:switch` and `xxf:dialog` as of 2019-09-16.
   def doPartialRefresh(containerControl: XFormsContainerControl): Unit = {
 
     val focusedBeforeOpt = getFocusedControl
@@ -230,7 +232,9 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
     // Update bindings starting at the container control
     val updater = updateSubtreeBindings(containerControl)
 
-    currentControlTree.dispatchRefreshEvents(gatherControlsForRefresh(containerControl), isInitial = false)
+    val controlIds = gatherControlsForRefresh(containerControl)
+    currentControlTree.updateValueControls(controlIds)
+    currentControlTree.dispatchRefreshEvents(controlIds, isInitial = false)
 
     Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
   }

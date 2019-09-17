@@ -61,17 +61,17 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     markExternalValueDirty()
   }
 
-  override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
+  final override def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
     // Evaluate other aspects of the control if necessary
-    super.evaluateImpl(relevant, parentRelevant)
+    super.preEvaluateImpl(relevant, parentRelevant) // 2019-09-13: `super` is a NOP
 
     // Evaluate control values
     if (relevant) {
       // Control is relevant
-      // NOTE: Ugly test on staticControl is to handle the case of xf:output within LHHA
+      // NOTE: Ugly test on staticControl is to handle the case of `xf:output` within LHHA
       if ((_value eq null) || (staticControl eq null) || containingDocument.getXPathDependencies.requireValueUpdate(staticControl, effectiveId)) {
-        evaluateValue()
+        _value = null
         markExternalValueDirty()
       }
     } else {
@@ -85,8 +85,19 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
   }
 
-  def evaluateValue(): Unit =
-    setValue(DataModel.getValue(boundItemOpt))
+  def computeValue: String =
+    boundItemOpt map DataModel.getValue getOrElse (throw new IllegalStateException)
+
+  // Lazily return the control's internal value. Laziness is only allowed during the refresh process, before
+  // events are dispatched. See https://github.com/orbeon/orbeon-forms/issues/4117
+  final def getValue: String = {
+    if (isRelevant && (_value eq null))
+      _value = computeValue
+
+    _value
+  }
+
+  final def isEmptyValue: Boolean = XFormsModelBinds.isEmptyValue(getValue)
 
   def evaluateExternalValue(): Unit =
     setExternalValue(
@@ -197,12 +208,6 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     } yield
       value
   }
-
-  /**
-   * Return the control's internal value.
-   */
-  final def getValue = _value
-  final def isEmptyValue = XFormsModelBinds.isEmptyValue(_value)
 
   /**
    * Return the control's external value is the value as exposed to the UI layer.

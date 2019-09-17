@@ -54,14 +54,21 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   def acceptValue: Option[String] =
     extensionAttributeValue(ACCEPT_QNAME) orElse extensionAttributeValue(MEDIATYPE_QNAME)
 
-  override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
-    super.evaluateImpl(relevant, parentRelevant)
-    evaluateFileMetadata(relevant)
-  }
-
   override def markDirtyImpl(): Unit = {
     super.markDirtyImpl()
     markFileMetadataDirty()
+  }
+
+  override def computeValue: String = {
+
+    val result = super.computeValue
+
+    // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
+    // We need to find a better solution.
+    setValue(result)
+    evaluateFileMetadata(isRelevant)
+
+    result
   }
 
   // NOTE: Perform all actions at target, so that user event handlers are called after these operations.

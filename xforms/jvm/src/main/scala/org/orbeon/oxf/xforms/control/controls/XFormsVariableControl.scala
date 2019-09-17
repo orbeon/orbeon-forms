@@ -65,9 +65,9 @@ class XFormsVariableControl(
     _value = null
   }
 
-  override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
+  override def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
-    super.evaluateImpl(relevant, parentRelevant)
+    super.preEvaluateImpl(relevant, parentRelevant)
 
     if (relevant) {
       // Evaluate variable value if needed if relevant

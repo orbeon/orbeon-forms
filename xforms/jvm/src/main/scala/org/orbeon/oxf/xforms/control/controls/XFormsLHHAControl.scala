@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 
 //
 // Special "control" which represents an LHHA value. This is used only when the LHHA element is not
@@ -45,7 +45,7 @@ class XFormsLHHAControl(
 
   // Special evaluation function, as in the case of LHHA, the nested content of the element is a way to evaluate
   // the value.
-  override def evaluateValue(): Unit = {
+  override def computeValue: String = {
 
     def fromDynamicContent =
       Option(
@@ -60,7 +60,7 @@ class XFormsLHHAControl(
         )
       )
 
-    super.setValue(staticControl.staticValue orElse fromDynamicContent getOrElse "")
+    staticControl.staticValue orElse fromDynamicContent getOrElse ""
   }
 
   override def getRelevantEscapedExternalValue: String =

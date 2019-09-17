@@ -91,11 +91,6 @@ object DataModel {
     case item ⇒ item.getStringValue
   }
 
-  def getValue(item: Option[Item]): String = item match {
-    case None       ⇒ null
-    case Some(item) ⇒ item.getStringValue
-  }
-
   /**
    * Set a value on the instance using a NodeInfo and a value.
    *

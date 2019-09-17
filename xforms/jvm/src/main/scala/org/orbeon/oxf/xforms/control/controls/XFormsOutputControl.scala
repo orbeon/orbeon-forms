@@ -57,29 +57,32 @@ class XFormsOutputControl(
   // TODO: resolve statically
   private val urlNorewrite = XFormsUtils.resolveUrlNorewrite(element)
 
-  override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
-    super.evaluateImpl(relevant, parentRelevant)
-    evaluateFileMetadata(relevant)
-  }
-
   override def markDirtyImpl(): Unit ={
     super.markDirtyImpl()
     markFileMetadataDirty()
   }
 
-  override def evaluateValue(): Unit = {
+  override def computeValue: String = {
+
     val bc = bindingContext
     val value =
       valueAttributeOpt match {
         case Some(valueAttribute) ⇒
-          // Value comes from the XPath expression within the value attribute
+          // Value from the `value` attribute
           evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
         case None ⇒
-          // Get value from single-node binding
-          bc.singleItemOpt map DataModel.getValue
-      }
+          // Value from the binding
+          bc.singleItemOpt map DataModel.getValue // using `singleItemOpt` directly so we can handle the case of a missing binding
+    }
 
-    setValue(value getOrElse "")
+    val result = value getOrElse ""
+
+    // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
+    // We need to find a better solution.
+    setValue(result)
+    evaluateFileMetadata(isRelevant)
+
+    result
   }
 
   override def evaluateExternalValue(): Unit = {

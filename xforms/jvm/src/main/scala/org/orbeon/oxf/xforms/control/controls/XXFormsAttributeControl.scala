@@ -68,8 +68,8 @@ class XXFormsAttributeControl(
   }
 
   // Value comes from the AVT value attribute
-  override def evaluateValue() =
-    super.setValue(Option(evaluateAvt(attributeValue)) getOrElse "")
+  override def computeValue: String =
+    Option(evaluateAvt(attributeValue)) getOrElse ""
 
   override def getRelevantEscapedExternalValue = {
     // Rewrite URI attribute if needed

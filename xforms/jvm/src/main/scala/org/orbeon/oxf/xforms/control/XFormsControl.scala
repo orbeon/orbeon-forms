@@ -199,7 +199,7 @@ class XFormsControl(
 
   // Evaluate the control's value and metadata
   final def evaluate(): Unit =
-    try evaluateImpl(relevant = true, parentRelevant = true)
+    try preEvaluateImpl(relevant = true, parentRelevant = true)
     catch {
       case e: ValidationException ⇒
         throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
@@ -209,7 +209,7 @@ class XFormsControl(
   final def evaluateNonRelevant(parentRelevant: Boolean): Unit = {
     evaluateNonRelevantLHHA()
     evaluateNonRelevantExtensionAttribute()
-    evaluateImpl(relevant = false, parentRelevant = parentRelevant)
+    preEvaluateImpl(relevant = false, parentRelevant = parentRelevant)
   }
 
   // Notify the control that some of its aspects (value, label, etc.) might have changed and require re-evaluation. It
@@ -221,7 +221,7 @@ class XFormsControl(
 
   // Evaluate this control
   // NOTE: LHHA and extension attributes are computed lazily
-  def evaluateImpl(relevant: Boolean, parentRelevant: Boolean) = ()
+  def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean) = ()
 
   /**
    * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls

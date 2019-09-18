@@ -14,15 +14,14 @@
 package org.orbeon.oxf.xforms.control.controls
 
 
-import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsConstants}
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
-import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.helpers.AttributesImpl
 
 /**
  * Represents xf:repeat iteration information.
@@ -47,7 +46,7 @@ class XFormsRepeatIterationControl(
 
   // Initialize based on the effective id
   private var _iterationIndex = XFormsId.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
-  def iterationIndex = _iterationIndex
+  def iterationIndex: Int = _iterationIndex
 
   // Set a new iteration index. This will cause the nested effective ids to update.
   // This is used to "shuffle" around repeat iterations when repeat nodesets change.
@@ -59,15 +58,15 @@ class XFormsRepeatIterationControl(
   }
 
   // Whether this iteration is the repeat's current iteration
-  def isCurrentIteration = iterationIndex == repeat.getIndex
+  def isCurrentIteration: Boolean = iterationIndex == repeat.getIndex
 
   // This iteration's parent repeat control
-  def repeat = parent.asInstanceOf[XFormsRepeatControl]
+  def repeat: XFormsRepeatControl = parent.asInstanceOf[XFormsRepeatControl]
 
   // Does not support refresh events for now (could make sense though)
   override def supportsRefreshEvents = false
   override def isStaticReadonly = false
-  override def valueType = null
+  override def valueType: QName = null
 
   override def supportFullAjaxUpdates = false
 
@@ -121,7 +120,7 @@ class XFormsRepeatIterationControl(
     // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
   }
 
-  override def computeBinding(parentContext: BindingContext) = {
+  override def computeBinding(parentContext: BindingContext): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
     contextStack.pushIteration(iterationIndex)

@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import java.util.{List ⇒ JList}
-
 import org.orbeon.oxf.xml.XMLReceiverHelper
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 trait XFormsContainerControl extends VisitableTrait {
@@ -36,16 +33,16 @@ trait XFormsContainerControl extends VisitableTrait {
   }
 
   // Number of direct children control
-  def getSize = children.size
+  def getSize: Int = children.size
 
   // Set all the direct children at once
-  protected def setChildren(children: mutable.Buffer[XFormsControl]) = {
+  protected def setChildren(children: mutable.Buffer[XFormsControl]): Unit = {
     require(children ne null)
     this._children = children
   }
 
   // Remove all children at once
-  def clearChildren() =
+  def clearChildren(): Unit =
     this._children = null
 
   // Update this control's effective id and its descendants based on the parent's effective id
@@ -81,7 +78,7 @@ trait XFormsContainerControl extends VisitableTrait {
   }
 
   // focus to the first form control in the container that is able to accept focus"
-  override def focusableControls =
+  override def focusableControls: Iterator[XFormsControl] =
     if (isRelevant && hasChildren)
       _children.iterator flatMap (_.focusableControls)
     else

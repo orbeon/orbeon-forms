@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.Item
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -233,10 +233,7 @@ class XFormsRepeatControl(
     *
     * NOTE: The new binding context must have been set on this control before calling.
     */
-  def updateIterations(
-    oldRepeatItems : Seq[Item],
-    isInsertDelete : Boolean
-  ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
+  def updateIterations(oldRepeatItems : Seq[Item]): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
     // NOTE: The following assumes the nodesets have changed
 
@@ -397,15 +394,6 @@ class XFormsRepeatControl(
             val existingIteration = oldChildren(currentOldIndex)
             val newIterationOldIndex = existingIteration.iterationIndex
 
-            def updateBindingsIfNeeded(): Unit = {
-              // NOTE: We used to only update the binding on the iteration itself
-              if (isInsertDelete) {
-                val updater = Controls.updateBindings(existingIteration)
-                if (partialFocusRepeatOption.isEmpty && updater.partialFocusRepeat.isDefined)
-                  partialFocusRepeatOption = updater.partialFocusRepeat
-              }
-            }
-
             if (newIterationOldIndex != repeatIndex) {
               // Iteration index changed
               debug("moving iteration", Seq(
@@ -417,9 +405,6 @@ class XFormsRepeatControl(
               // Set new index
               existingIteration.setIterationIndex(repeatIndex)
 
-              // Update iteration bindings
-              updateBindingsIfNeeded()
-
               // Index iteration
               currentControlTree.indexSubtree(existingIteration, includeCurrent = true)
               updated = true
@@ -427,11 +412,6 @@ class XFormsRepeatControl(
               // Add information for moved iterations
               movedIterationsOldPositions += newIterationOldIndex
               movedIterationsNewPositions += repeatIndex
-            } else {
-              // Iteration index stayed the same
-
-              // Update iteration bindings
-              updateBindingsIfNeeded()
             }
 
             // Add existing iteration

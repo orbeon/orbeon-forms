@@ -1,0 +1,369 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         fr:data-format-version="4.0.0">
+    <xh:head>
+        <xh:title>Travel Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <master-section>
+                        <master-grid>
+                            <master-grid-iteration>
+                                <traveler-name/>
+                                <traveler-birth-date/>
+                            </master-grid-iteration>
+
+                        </master-grid>
+                    </master-section>
+                    <detail-section>
+                        <detail-section-iteration>
+                            <grid-3>
+                                <traveler-name-readonly/>
+                                <traveler-birth-date-readonly/>
+                                <frequent-traveler-number/>
+                                <gender>male</gender>
+                                <meal>none</meal>
+                                <comment/>
+                            </grid-3>
+
+
+
+
+
+
+                        </detail-section-iteration>
+                    </detail-section>
+                    <section-1>
+                        <grid-1>
+                            <control-1/>
+                        </grid-1>
+
+                    </section-1>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="master-section-bind" name="master-section" ref="master-section">
+                    <xf:bind id="master-grid-bind" ref="master-grid" name="master-grid">
+                        <xf:bind id="master-grid-iteration-bind" ref="master-grid-iteration"
+                                 name="master-grid-iteration">
+                            <xf:bind id="traveler-name-bind" ref="traveler-name" name="traveler-name"
+                                     xxf:whitespace="trim"
+                                     required="true()"/>
+                            <xf:bind id="traveler-birth-date-bind" ref="traveler-birth-date"
+                                     name="traveler-birth-date"
+                                     type="xs:date"
+                                     required="true()"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="detail-section-bind" ref="detail-section" name="detail-section">
+                    <xf:bind id="detail-section-iteration-bind" ref="detail-section-iteration"
+                             name="detail-section-iteration">
+                        <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                            <xf:bind id="traveler-name-readonly-bind" ref="traveler-name-readonly"
+                                     name="traveler-name-readonly"
+                                     xxf:whitespace="trim"
+                                     readonly="true()"/>
+                            <xf:bind id="traveler-birth-date-readonly-bind" ref="traveler-birth-date-readonly"
+                                     name="traveler-birth-date-readonly"
+                                     type="xf:date"
+                                     readonly="true()"/>
+                            <xf:bind id="frequent-traveler-number-bind" ref="frequent-traveler-number"
+                                     name="frequent-traveler-number"
+                                     xxf:whitespace="trim"/>
+                            <xf:bind id="gender-bind" ref="gender" name="gender"/>
+                            <xf:bind id="meal-bind" ref="meal" name="meal" required="true()" xxf:default="'none'"/>
+                            <xf:bind id="comment-bind" ref="comment" name="comment"/>
+                        </xf:bind>
+
+
+
+
+
+
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
+                    </xf:bind>
+
+                </xf:bind>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2017.2-SNAPSHOT PE</updated-with-version>
+                    <form-name>travel</form-name>
+                    <title xml:lang="en">Travel Form</title>
+                    <description xml:lang="en">This form showcases Orbeon Forms's support for synchronized master-detail views, with paging and custom repetition labels in the wizard.</description>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+
+
+                    <wizard>true</wizard>
+                    <wizard-mode>strict</wizard-mode>
+                    <data-migration>enabled</data-migration>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-1>
+                            <text xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">&lt;div&gt;You have entered details for all travelers. Congratulations!&lt;/div&gt;</text>
+                        </control-1>
+                        <traveler-name-readonly>
+                            <label>Traveler Full Name</label>
+                            <hint/>
+                        </traveler-name-readonly>
+                        <traveler-birth-date-readonly>
+                            <label>Traveler Birth Date</label>
+                            <hint/>
+                        </traveler-birth-date-readonly>
+                        <frequent-traveler-number>
+                            <label>Frequent Traveler Number</label>
+                            <hint/>
+                        </frequent-traveler-number>
+                        <gender>
+                            <label>Gender</label>
+                            <hint/>
+                            <item>
+                                <label>Male</label>
+                                <hint/>
+                                <value>male</value>
+                            </item>
+                            <item>
+                                <label>Female</label>
+                                <hint/>
+                                <value>female</value>
+                            </item>
+                        </gender>
+                        <meal>
+                            <label>Meal Preference</label>
+                            <hint/>
+                            <item>
+                                <label>None</label>
+                                <value>none</value>
+                            </item>
+                            <item>
+                                <label>Asian Vegetarian</label>
+                                <value>asian-vegetarian</value>
+                            </item>
+                            <item>
+                                <label>Hindu (Indian) vegetarian</label>
+                                <value>hindu-(indian)-vegetarian</value>
+                            </item>
+                            <item>
+                                <label>Vegan (strict) vegetarian</label>
+                                <value>vegan-(strict)-vegetarian</value>
+                            </item>
+                            <item>
+                                <label>Vegetarian lacto-ovo</label>
+                                <value>vegetarian-lacto-ovo</value>
+                            </item>
+                            <item>
+                                <label>Child</label>
+                                <value>child</value>
+                            </item>
+                            <item>
+                                <label>Jain</label>
+                                <value>jain</value>
+                            </item>
+                            <item>
+                                <label>Japanese</label>
+                                <value>japanese</value>
+                            </item>
+                            <item>
+                                <label>Kosher</label>
+                                <value>kosher</value>
+                            </item>
+                            <item>
+                                <label>Muslim</label>
+                                <value>muslim</value>
+                            </item>
+                        </meal>
+                        <traveler-name>
+                            <label>Full Name</label>
+                            <hint/>
+                        </traveler-name>
+                        <traveler-birth-date>
+                            <label>Birth Date</label>
+                            <hint/>
+                        </traveler-birth-date>
+                        <comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </comment>
+                        <master-section>
+                            <label>Travelers</label>
+                        </master-section>
+                        <detail-section>
+                            <label>Traveler Details</label>
+                            <iteration-label>Details for traveler {$traveler-name}</iteration-label>
+                        </detail-section>
+                        <section-1>
+                            <label>Confirmation</label>
+                            <help/>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all"
+                         id="master-grid-template">
+                <master-grid-iteration>
+                    <traveler-name/>
+                    <traveler-birth-date/>
+                </master-grid-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all"
+                         id="detail-section-template">
+                <detail-section-iteration>
+                    <grid-3>
+                        <traveler-name-readonly/>
+                        <traveler-birth-date-readonly/>
+                        <frequent-traveler-number/>
+                        <gender/>
+                        <meal/>
+                        <comment/>
+                    </grid-3>
+                </detail-section-iteration>
+            </xf:instance>
+            <fr:synchronize-repeated-content left="master-grid" right="detail-section" version="2018.2">
+                <fr:map left="traveler-name" right="traveler-name-readonly"/>
+                <fr:map left="traveler-birth-date" right="traveler-birth-date-readonly"/>
+            </fr:synchronize-repeated-content>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="master-section-section" bind="master-section-bind">
+                    <xf:label ref="$form-resources/master-section/label"/>
+                    <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content"
+                             template="instance('master-grid-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="9">
+                            <xf:input id="traveler-name-control" bind="traveler-name-bind">
+                                <xf:label ref="$form-resources/traveler-name/label"/>
+                                <xf:hint ref="$form-resources/traveler-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="3">
+                            <fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="traveler-birth-date-control"
+                                     bind="traveler-birth-date-bind">
+                                <xf:label ref="$form-resources/traveler-birth-date/label"/>
+                                <xf:hint ref="$form-resources/traveler-birth-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:date>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section page-size="1" id="detail-section-section" bind="detail-section-bind"
+                            repeat="content"
+                            min="1"
+                            template="instance('detail-section-template')"
+                            apply-defaults="true"
+                            fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/detail-section/label"/>
+                    <fr:iteration-label ref="$form-resources/detail-section/iteration-label">
+                        <fr:param type="ControlValueParam">
+                            <fr:name>traveler-name</fr:name>
+                            <fr:controlName>traveler-name-readonly</fr:controlName>
+                        </fr:param>
+                    </fr:iteration-label>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="9">
+                            <xf:input id="traveler-name-readonly-control" bind="traveler-name-readonly-bind">
+                                <xf:label ref="$form-resources/traveler-name-readonly/label"/>
+                                <xf:hint ref="$form-resources/traveler-name-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="3">
+                            <fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                     id="traveler-birth-date-readonly-control"
+                                     bind="traveler-birth-date-readonly-bind">
+                                <xf:label ref="$form-resources/traveler-birth-date-readonly/label"/>
+                                <xf:hint ref="$form-resources/traveler-birth-date-readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3">
+                            <xf:input id="frequent-traveler-number-control" bind="frequent-traveler-number-bind">
+                                <xf:label ref="$form-resources/frequent-traveler-number/label"/>
+                                <xf:hint ref="$form-resources/frequent-traveler-number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3">
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="gender-control" bind="gender-bind">
+                                <xf:label ref="$form-resources/gender/label"/>
+                                <xf:hint ref="$form-resources/gender/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/gender/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6" h="1">
+                            <xf:select1 id="meal-control" bind="meal-bind" appearance="dropdown">
+                                <xf:label ref="$form-resources/meal/label"/>
+                                <xf:hint ref="$form-resources/meal/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="$form-resources/meal/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="12">
+                            <xf:textarea id="comment-control" bind="comment-bind">
+                                <xf:label ref="$form-resources/comment/label"/>
+                                <xf:hint ref="$form-resources/comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control"
+                                            bind="control-1-bind">
+                                <fr:text ref="$form-resources/control-1/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

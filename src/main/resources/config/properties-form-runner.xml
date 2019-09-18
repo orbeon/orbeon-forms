@@ -235,6 +235,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="exist"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="exist"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="exist"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
         pdf tiff wizard-prev wizard-next review
@@ -267,6 +268,18 @@
 
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.contact">
         home review pdf delete duplicate import new
+    </property>
+
+    <property as="xs:string" name="oxf.fr.detail.buttons.orbeon.travel">
+        wizard-prev wizard-next pdf save
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.orbeon.travel">
+        fr:is-wizard-last-page()
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.save.enabled.orbeon.travel">
+        fr:is-wizard-last-page()
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>

@@ -1,0 +1,33 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <master-section fr:section-status="changed">
+        <master-grid>
+            <traveler-name>Alice</traveler-name>
+            <traveler-birth-date>1978-07-08</traveler-birth-date>
+        </master-grid>
+        <master-grid>
+            <traveler-name>Bob</traveler-name>
+            <traveler-birth-date>1978-08-15</traveler-birth-date>
+        </master-grid>
+    </master-section>
+    <detail-section fr:section-status="changed">
+        <detail-section-iteration>
+            <traveler-name-readonly>Alice</traveler-name-readonly>
+            <traveler-birth-date-readonly>1978-07-08</traveler-birth-date-readonly>
+            <frequent-traveler-number>T-d79c098200</frequent-traveler-number>
+            <gender>female</gender>
+            <meal>vegetarian-lacto-ovo</meal>
+            <comment>I'd prefer to be seated without a person in the middle.</comment>
+        </detail-section-iteration>
+        <detail-section-iteration>
+            <traveler-name-readonly>Bob</traveler-name-readonly>
+            <traveler-birth-date-readonly>1978-08-15</traveler-birth-date-readonly>
+            <frequent-traveler-number>T-d936a1711c</frequent-traveler-number>
+            <gender>male</gender>
+            <meal>japanese</meal>
+            <comment/>
+        </detail-section-iteration>
+    </detail-section>
+    <section-1 fr:section-status="">
+        <control-1/>
+    </section-1>
+</form>

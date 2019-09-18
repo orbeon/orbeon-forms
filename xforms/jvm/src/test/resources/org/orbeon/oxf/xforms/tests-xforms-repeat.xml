@@ -3303,6 +3303,67 @@
         </output>
     </test>
 
+    <test description="For #4183: Incorrect `xxf:repeat-position()` value just after iteration move" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <value/>
+                                <value/>
+                            </values>
+                        </xf:instance>
+                        <xf:insert
+                            event="xforms-ready"
+                            ref="value[1]"
+                            origin="xf:element('value')"
+                            position="after"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat" ref="value">
+                        <xf:output id="my-output" value="xxf:repeat-position()"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value/>
+                                    <value/>
+                                    <value/>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output⊙1">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙3">
+                            <xxf:value>3</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

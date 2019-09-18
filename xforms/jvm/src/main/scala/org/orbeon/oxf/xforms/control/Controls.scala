@@ -64,11 +64,8 @@ object Controls {
     // This is the context of the iteration
     // buildTree() does a pushBinding(), but that won't change the context (no @ref, etc. on the iteration itself)
     val container = repeatControl.container
-    val bindingContext = {
-      val contextStack = container.getContextStack
-      contextStack.setBinding(repeatControl.bindingContext)
-      contextStack.pushIteration(iterationIndex)
-    }
+    val bindingContext =
+      container.getContextStack.setBinding(repeatControl.bindingContext)
 
     // This has to be the case at this point, otherwise it's a bug in our code
     assert(repeatControl.staticControl.iteration.isDefined)

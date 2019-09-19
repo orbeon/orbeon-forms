@@ -19,7 +19,6 @@ import org.orbeon.builder.facade.JQueryTooltip._
 import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -93,7 +92,7 @@ object ControlLabelHintTextEditor {
         controlAdded.add((containerId: String) ⇒ {
           val container = $(document.getElementById(containerId))
           resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
-          val repeat = container.parents(".fr-repeat").first()
+          val repeat = container.parents(".fr-repeat-single-row").first()
           resourceEditorCurrentLabelHint =
               if (repeat.is("*")) {
                 val column = container.index() + 1

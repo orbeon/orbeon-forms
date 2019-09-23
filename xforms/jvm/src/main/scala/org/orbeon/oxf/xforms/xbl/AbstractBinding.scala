@@ -78,20 +78,22 @@ case class AbstractBinding(
   val modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
   val modeLHHA                = xblMode("lhha")
   val modeFocus               = xblMode("focus")
-  val modeLHHACustom          = modeLHHA && xblMode("custom-lhha")
   val modeItemset             = xblMode("itemset") // NIY as of 2019-05-09
   val modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
   val modeHandlers            = ! xblMode("nohandlers")
 
-  val modeIsLhhaButNotCustom  = modeLHHA && ! modeLHHACustom
-
   // LHHA that are handled the standard way (as opposed to the "custom" way)
-  val standardLhhaAsSeq: Seq[LHHA] = LHHA.values flatMap { lhha ⇒
-    ! (
+  val standardLhhaAsSeq: Seq[LHHA] = {
+
+    val modeLHHACustom = modeLHHA && xblMode("custom-lhha")
+
+    LHHA.values flatMap { lhha ⇒
+      ! (
         modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
-        modeLHHA       &&   xblMode(s"+custom-${lhha.entryName}")
-    ) option
-      lhha
+          modeLHHA     &&   xblMode(s"+custom-${lhha.entryName}")
+        ) option
+        lhha
+    }
   }
 
   val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.to[Set]

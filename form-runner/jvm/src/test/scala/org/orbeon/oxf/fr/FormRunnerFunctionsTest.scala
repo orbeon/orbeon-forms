@@ -170,11 +170,8 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         doc.getControls.getCurrentControlTree.effectiveIdsToControls map
         { case (id, _) ⇒ XFormsId.effectiveIdToAbsoluteId(id) } toList
 
-      val sortStrings =
-        effectiveAbsoluteIds map (ErrorSummary.controlSortString(_, 3))
-
       // Effective sort strings follow document order
-      assert(sortStrings.sorted === sortStrings)
+      assert(effectiveAbsoluteIds.sortBy(ErrorSummary.controlSearchIndexes)(ErrorSummary.IntIteratorOrdering) === effectiveAbsoluteIds)
     }
   }
 }

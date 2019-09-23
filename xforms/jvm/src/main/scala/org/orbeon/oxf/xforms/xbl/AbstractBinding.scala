@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
@@ -81,6 +82,19 @@ case class AbstractBinding(
   val modeItemset             = xblMode("itemset") // NIY as of 2019-05-09
   val modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
   val modeHandlers            = ! xblMode("nohandlers")
+
+  val modeIsLhhaButNotCustom  = modeLHHA && ! modeLHHACustom
+
+  // LHHA that are handled the standard way (as opposed to the "custom" way)
+  val standardLhhaAsSeq: Seq[LHHA] = LHHA.values flatMap { lhha ⇒
+    ! (
+        modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
+        modeLHHA       &&   xblMode(s"+custom-${lhha.entryName}")
+    ) option
+      lhha
+  }
+
+  val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.to[Set]
 
   val labelFor                   : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
   val formatOpt                  : Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)

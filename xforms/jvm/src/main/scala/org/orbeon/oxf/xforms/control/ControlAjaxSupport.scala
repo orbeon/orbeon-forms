@@ -71,13 +71,13 @@ trait ControlAjaxSupport {
   }
 
   // Label, help, hint, alert
-  def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+  final def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
 
     var added = false
 
     for {
       staticLhhaSupport ← staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
-      lhha              ← LHHA.values
+      lhha              ← ajaxLhhaSupport
       // https://github.com/orbeon/orbeon-forms/issues/3836
       // Q: Could we just check `isLocal` instead of `isForRepeat`?
       if staticLhhaSupport.hasLHHANotForRepeat(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)

@@ -29,7 +29,7 @@ class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, eleme
 
   import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl._
 
-  override def lhhaHTMLSupport = TriggerLhhaHtmlSupport
+  override def htmlLhhaSupport = TriggerLhhaHtmlSupport
 
   // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
   //

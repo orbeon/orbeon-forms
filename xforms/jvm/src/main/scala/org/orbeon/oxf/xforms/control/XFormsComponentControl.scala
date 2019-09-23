@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, StaticLHHASupport, ValueComponentTrait, ViewTrait}
+import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
@@ -34,7 +34,6 @@ import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
-import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
 
@@ -493,14 +492,6 @@ class XFormsComponentControl(
   // Get the control at the root of the inner scope of the component
   def innerRootControl: XXFormsComponentRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
 
-  private lazy val handleLHHA =
-    staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
-
-  // Don't add Ajax LHHA for custom-lhha mode
-  override def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean =
-    handleLHHA && super.addAjaxLHHA(attributesImpl, previousControlOpt)
-
-  // Consider LHHA hasn't externally changed for custom-lhha mode
-  override def compareLHHA(other: XFormsControl): Boolean =
-    ! handleLHHA || super.compareLHHA(other)
+  override def ajaxLhhaSupport: Seq[LHHA] = staticControl.abstractBinding.standardLhhaAsSeq
+  override def htmlLhhaSupport: Set[LHHA] = staticControl.abstractBinding.standardLhhaAsSet
 }

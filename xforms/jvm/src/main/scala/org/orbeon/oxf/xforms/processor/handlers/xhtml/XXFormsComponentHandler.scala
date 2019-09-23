@@ -42,9 +42,6 @@ class XXFormsComponentHandler(
   protected override def getContainingElementQName =
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.abstractBinding.containerElementName)
 
-  private lazy val modeIsLhhaButNotCustom =
-    staticControl.abstractBinding.modeLHHA && ! staticControl.abstractBinding.modeLHHACustom
-
   protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
@@ -69,7 +66,7 @@ class XXFormsComponentHandler(
     xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
-    if (modeIsLhhaButNotCustom) // also implied: label is local (from `XFormsControlLifecyleHandler`)
+    if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
@@ -80,9 +77,9 @@ class XXFormsComponentHandler(
         isExternal               = false
       )
 
-  protected override def handleAlert() = if (modeIsLhhaButNotCustom) super.handleAlert()
-  protected override def handleHint()  = if (modeIsLhhaButNotCustom) super.handleHint()
-  protected override def handleHelp()  = if (modeIsLhhaButNotCustom) super.handleHelp()
+  protected override def handleAlert() = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
+  protected override def handleHint()  = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
+  protected override def handleHelp()  = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.

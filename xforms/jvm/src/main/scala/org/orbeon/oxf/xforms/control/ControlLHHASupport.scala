@@ -78,9 +78,9 @@ trait ControlLHHASupport {
         if (part.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
           self match {
             case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert ⇒
-              new MutableAlertProperty(singleNodeControl, lhha, lhhaHTMLSupport(lhha))
+              new MutableAlertProperty(singleNodeControl, lhha, htmlLhhaSupport(lhha))
             case control: XFormsControl if lhha != LHHA.Alert ⇒
-              new MutableLHHProperty(control, lhha, lhhaHTMLSupport(lhha))
+              new MutableLHHProperty(control, lhha, htmlLhhaSupport(lhha))
             case _ ⇒
               NullLHHA
           }
@@ -92,11 +92,11 @@ trait ControlLHHASupport {
     }
   }
 
-  // Whether we support HTML LHHA
-  def lhhaHTMLSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
+  def htmlLhhaSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
+  def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
 
   def compareLHHA(other: XFormsControl) =
-    LHHA.values forall (lhha ⇒ lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
+    ajaxLhhaSupport forall (lhha ⇒ lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
 
   // Convenience accessors
   final def getLabel        = lhhaProperty(LHHA.Label).value()

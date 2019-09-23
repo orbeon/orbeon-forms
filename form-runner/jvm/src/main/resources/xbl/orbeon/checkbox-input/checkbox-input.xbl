@@ -18,14 +18,12 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xbl="http://www.w3.org/ns/xbl"
-    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding
         id="fr-checkbox-input-binding"
         element="fr|checkbox-input, xf|input:xxf-type('xs:boolean')[appearance ~= checkbox]"
-        xxbl:mode="binding value selection"
+        xxbl:mode="lhha custom-lhha -custom-alert binding value selection"
         xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -60,20 +58,17 @@
             <xbl:style src="/xbl/orbeon/checkbox-input/checkbox-input.css"/>
         </xbl:resources>
 
-        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+        <xbl:template>
             <xf:select
                 appearance="full"
                 ref="xxf:binding('fr-checkbox-input-binding')"
                 xbl:attr="xxf:encrypt-item-values"
                 class="xforms-help-popover-control"
-                xsl:version="2.0"
             >
-                <xbl:content includes=":root > xf|help, :root > xf|hint, :root > xf|alert"/>
-                <xf:label xxbl:scope="outer" appearance="xxf:internal">
-                    <xsl:copy-of select="/fr:checkbox-input/xf:label/(@* | node())"/>
-                </xf:label>
+                <xf:hint  mediatype="text/html" value="xxf:hint('fr-checkbox-input-binding')"/>
+                <xf:help  mediatype="text/html" value="xxf:help('fr-checkbox-input-binding')"/>
                 <xf:item>
-                    <xbl:content includes=":root > xf|label"/>
+                    <xf:label mediatype="text/html" value="xxf:label('fr-checkbox-input-binding')"/>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>
                 </xf:item>
                 <xf:setvalue

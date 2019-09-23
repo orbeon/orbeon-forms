@@ -97,57 +97,23 @@ object ErrorSummary {
       case section: XFormsComponentControl if section.localName == "section" ⇒ section
     }
 
-  // Return a sorting string for the given control absolute id, taking repeats into account
-  // TODO: This should be part of the ordering and not converted to a String.
-  def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
+  def controlSearchIndexes(absoluteId: String): Iterator[Int] = {
 
     val effectiveId = XFormsId.absoluteIdToEffectiveId(absoluteId)
     val prefixedId  = XFormsId.getPrefixedId(effectiveId)
 
-    val controlPosition =
-      inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get // argument must be a view control
-
     val repeatsFromLeaf =
       inScopeContainingDocument.getStaticOps.getAncestorRepeats(prefixedId)
 
-    def iterations =
+    val iterations =
       XFormsId.getEffectiveIdSuffixParts(effectiveId)
 
-    // Use arrays indexes to *attempt* to be more efficient
-    // NOTE: Profiler shows that the 2 calls to ofDim take 50% of the method time
-    val result = Array.ofDim[Int](repeatsDepth * 2 + 1)
-
-    locally {
-      var i = (repeatsFromLeaf.size - 1) * 2
-      for (r ← repeatsFromLeaf) {
-        result(i) = r.index
-        i -= 2
+    val repeatsIt =
+      repeatsFromLeaf.reverseIterator map (_.index) zip iterations.iterator flatMap {
+        case (index, iteration) ⇒ Iterator(index, iteration)
       }
-    }
 
-    locally {
-      var i = 1
-      for (iteration ← iterations) {
-        result(i) = iteration
-        i += 2
-      }
-    }
-
-    result(repeatsFromLeaf.size * 2) = controlPosition
-
-    def padWithZeros(i: Int) = {
-      val s    = i.toString
-      val diff = Digits.length - s.length
-
-      if (diff > 0) Digits.substring(0, diff) + s else s
-    }
-
-    val resultString = Array.ofDim[String](result.length)
-
-    for (i ← result.indices)
-      resultString(i) = padWithZeros(result(i))
-
-    resultString mkString "-"
+    repeatsIt ++ Iterator.single(inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get) // argument must be a view control
   }
 
   //@XPathFunction
@@ -335,11 +301,17 @@ object ErrorSummary {
     }
   }
 
+  implicit object IntIteratorOrdering extends Ordering[Iterator[Int]] {
+    def compare(x: Iterator[Int], y: Iterator[Int]): Int =
+      x.zipAll(y, 0, 0) dropWhile { case (a, b) ⇒ a == b } nextOption() match {
+        case Some((a, b)) ⇒ a.compare(b)
+        case None         ⇒ 0
+      }
+  }
+
   private object Private {
 
     val ErrorSummaryIds          = List("error-summary-control-top", "error-summary-control-bottom")
-    val MaxRepeatDepthForSorting = 4       // TODO: This must not be a constant. See `repeatDepthAcrossParts`.
-    val Digits                   = "0" * 5 // TODO: Same.
 
     val ErrorElemName            = "error"
     val IdAttName                = "id"
@@ -350,11 +322,16 @@ object ErrorSummary {
     val SectionNameAttName       = "section-name"
     val RequiredEmptyAttName     = "required-empty"
 
-    implicit object NodeOrdering extends Ordering[dom.Node] {
+    // Needed for `binarySearch` below
+    implicit object ErrorNodeOrdering extends Ordering[dom.Node] {
       def compare(x: dom.Node, y: dom.Node): Int = (x, y) match {
         case (n1: dom.Element, n2: dom.Element) ⇒
-          controlSortString(n1.attributeValue(IdAttName), MaxRepeatDepthForSorting)
-            .compareTo(controlSortString(n2.attributeValue(IdAttName), MaxRepeatDepthForSorting))
+
+          IntIteratorOrdering.compare(
+            x = controlSearchIndexes(n1.attributeValue(IdAttName)),
+            y = controlSearchIndexes(n2.attributeValue(IdAttName))
+          )
+
         case (n1: dom.Namespace, n2: dom.Element)   ⇒ -1                       // all elements are after the namespace nodes
         case (n1: dom.Element,   n2: dom.Namespace) ⇒ +1                       // all elements are after the namespace nodes
         case (n1: dom.Namespace, n2: dom.Namespace) ⇒ n1.uri.compareTo(n2.uri) // predictable order even though they won't be sorted

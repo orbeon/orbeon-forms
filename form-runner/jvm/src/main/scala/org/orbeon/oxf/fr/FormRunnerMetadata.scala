@@ -254,13 +254,8 @@ object FormRunnerMetadata {
     val selectedControls =
       controls.values flatMap (_.narrowTo[XFormsSingleNodeControl]) filter isBoundToFormDataInScope
 
-    val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
-
-    def sortString(control: XFormsControl) =
-      ErrorSummary.controlSortString(control.absoluteId, repeatDepth)
-
     val sortedControls =
-      selectedControls.to[List].sortWith(sortString(_) < sortString(_))
+      selectedControls.to[List].sortBy(c ⇒ ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {
@@ -375,13 +370,8 @@ object FormRunnerMetadata {
         isExcluded     filter
         (c ⇒ isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
 
-    val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
-
-    def sortString(control: XFormsControl) =
-      ErrorSummary.controlSortString(control.absoluteId, repeatDepth)
-
     val sortedControls =
-      selectedControls.to[List].sortWith(sortString(_) < sortString(_))
+      selectedControls.to[List].sortBy(c ⇒ ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {

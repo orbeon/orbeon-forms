@@ -23,7 +23,7 @@ import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
-import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.resources.URLFactory
@@ -440,22 +440,27 @@ trait FormRunnerPersistence {
     formVersion       : Option[String] = None
   ): (Seq[String], Seq[String], Int) = {
 
+    val migratedData = migrate(data)
+
     // Find all instance nodes containing file URLs we need to upload
     val (uploadHolders, beforeURLs, afterURLs) =
-      collectAttachments(data, fromBasePath, toBasePath, forceAttachments)
+      collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
 
-    def saveAllAttachments(): Unit =
-      uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
+    def saveAllAttachments(): Unit = {
+      val holdersAfterURLs = uploadHolders.zip(afterURLs)
+      holdersAfterURLs foreach { case (holder, resource) ⇒
         // Copy holder, so we're not blocked in case there are other background uploads
         val holderCopy = TransformerUtils.extractAsMutableDocument(holder).rootElement
         sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder"       → Some(holderCopy),
-          "resource"     → Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
-          "username"     → username,
-          "password"     → password,
-          "form-version" → formVersion)
+          "holder" → Some(holderCopy),
+          "resource" → Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
+          "username" → username,
+          "password" → password,
+          "form-version" → formVersion
+        )
         )
       }
+    }
 
     def updateAttachmentPaths() =
       uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
@@ -487,7 +492,7 @@ trait FormRunnerPersistence {
 
         // Save and try to retrieve returned version
         for {
-          done     ← saveXmlData(migrate(data)) // https://github.com/orbeon/orbeon-forms/issues/3629
+          done     ← saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
           headers  ← done.headers
           versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
           version  ← versions.headOption

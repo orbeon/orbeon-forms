@@ -14,9 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
@@ -36,60 +34,15 @@ trait FormDefinition {
   ): Seq[IndexedControl] = {
 
     // Controls in the view, with the `fr-summary` or `fr-search` class
-    val indexedControlBindPathHolders = {
-
-      // Support missing `head` and `body` in particular for tests. That just means there is nothing to index.
-      val headOpt = formDoc / "*:html" / "*:head" headOption
-      val bodyOpt = formDoc / "*:html" / "*:body" headOption
-
-      bodyOpt.toList flatMap { body ⇒
-
-        val topLevelOnly =
-          FormRunner.searchControlsTopLevelOnly(
-            body      = body,
-            data      = None,
-            predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
-          )
-
-        val withSectionTemplatesOpt =
-          headOpt map { head ⇒
-            FormRunner.searchControlsUnderSectionTemplates(
-              head      = head,
-              body      = body,
-              data      = None,
-              predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
-            )
-          }
-
-        topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
-      }
-    }
-
-    val (_, migrationOpsToApply) =
-      findMigrationOps(
-        srcVersion = DataFormatVersion.Edge,
-        dstVersion = databaseDataFormatVersion
-      )
-
-    // Find the migration functions once and for all
-    val pathMigrationFunctions =
-      for {
-        metadataElem ← FormRunner.metadataInstanceRootOpt(formDoc).toList
-        ops          ← migrationOpsToApply
-        json         ← findMigrationForVersion(metadataElem, ops.version)
-      } yield
-        ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
+    val indexedControlBindPathHolders =
+      FormRunner.searchControlsInFormByClass(formDoc, ClassesPredicate, databaseDataFormatVersion)
 
     indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) ⇒
-
-      val adjustedBindPathElems =
-        (pathMigrationFunctions.iterator flatMap (_.apply(path)) nextOption()) getOrElse path
-
       IndexedControl(
         name      = FormRunner.getControlName(control),
         inSearch  = control.attClasses(FRSearch),
         inSummary = control.attClasses(FRSummary),
-        xpath     = adjustedBindPathElems map (_.value) mkString "/",
+        xpath     = path map (_.value) mkString "/",
         xsType    = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
         htmlLabel = FormRunner.hasHTMLMediatype(control / (XF → "label")),

@@ -16,12 +16,13 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 
@@ -160,6 +161,61 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   //@XPathFunction
   def isMultipleSelectionControl(localName: String): Boolean =
     localName == "select" || localName.endsWith("-select")
+
+  def searchControlsInFormByClass(
+    formDoc           : DocumentInfo,
+    classes           : Set[String],
+    dataFormatVersion : DataFormatVersion
+  ): Seq[FormRunner.ControlBindPathHoldersResources] = {
+    val headOpt = (formDoc / "*:html" / "*:head").headOption
+    val bodyOpt = (formDoc / "*:html" / "*:body").headOption
+    val controlBindPathHoldersResourcesList =
+      bodyOpt.toList flatMap { body ⇒
+
+        val topLevelOnly =
+          FormRunner.searchControlsTopLevelOnly(
+            body      = body,
+            data      = None,
+            predicate = FormRunner.hasAnyClassPredicate(classes)
+          )
+
+        val withSectionTemplatesOpt =
+          headOpt map { head ⇒
+            FormRunner.searchControlsUnderSectionTemplates(
+              head      = head,
+              body      = body,
+              data      = None,
+              predicate = FormRunner.hasAnyClassPredicate(classes)
+            )
+          }
+
+        topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
+      }
+    dataFormatVersion match {
+      case DataFormatVersion.Edge ⇒ controlBindPathHoldersResourcesList
+      case _                      ⇒
+        val (_, migrationOpsToApply) =
+          findMigrationOps(
+            srcVersion = DataFormatVersion.Edge,
+            dstVersion = dataFormatVersion
+          )
+
+        // Find the migration functions once and for all
+        val pathMigrationFunctions =
+          for {
+            metadataElem ← FormRunner.metadataInstanceRootOpt(formDoc).toList
+            ops          ← migrationOpsToApply
+            json         ← findMigrationForVersion(metadataElem, ops.version)
+          } yield
+            ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
+        controlBindPathHoldersResourcesList map { controlBindPathHoldersResources ⇒
+          val path = controlBindPathHoldersResources.path
+          val adjustedBindPathElems =
+            (pathMigrationFunctions.iterator flatMap (_.apply(path)) nextOption()) getOrElse path
+          controlBindPathHoldersResources.copy(path = adjustedBindPathElems)
+        }
+    }
+  }
 
   def searchControlsTopLevelOnly(
     body      : NodeInfo,

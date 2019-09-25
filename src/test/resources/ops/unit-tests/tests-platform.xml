@@ -32,7 +32,4 @@
     <xi:include href="xinclude/tests-xinclude.xml"/>
     <xi:include href="cache/tests-cache.xml"/>
 
-    <!-- Should ideally run in the XUpdate module -->
-    <xi:include href="tests-xupdate.xml"/>
-
 </tests>

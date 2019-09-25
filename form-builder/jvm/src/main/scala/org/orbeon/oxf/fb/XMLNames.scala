@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI ⇒ XF}
 import org.orbeon.scaxon.SimplePath.Test
 
@@ -30,7 +31,14 @@ object XMLNames {
   val FBResourcesTest   : Test  = FB → "resources"
   val FBDatatypeTest    : Test  = FB → "datatype"
   val FBBindTest        : Test  = FB → "bind"
+
+  val FBRelevantTest    : Test  = FB → "relevant"
+  val FBReadonlyTest    : Test  = FB → "readonly"
+  val FBRequiredTest    : Test  = FB → "required"
   val FBConstraintTest  : Test  = FB → "constraint"
+  val FBCalculateTest   : Test  = FB → "calculate"
+  val FBDefaultTest     : Test  = FB → "default"
+
   val FBEditorsTest     : Test  = FB → "editors"
   val FBDisplayNameTest : Test  = FB → "display-name"
   val FBIconTest        : Test  = FB → "icon"
@@ -46,5 +54,19 @@ object XMLNames {
   val XFRequiredTest    : Test = XF → "required"
 
   // NOTE: `fb:constraint` when annotated and `xf:constraint` when not (eg. coming from a section template)
-  val NestedBindElemTest: Test = FBConstraintTest || XFConstraintTest || XFTypeTest || XFRequiredTest
+  val NestedBindElemTest: Test =
+    FBConstraintTest   ||
+      XFConstraintTest ||
+      XFTypeTest       ||
+      XFRequiredTest
+
+  val FormulaTest: Test =
+    FBConstraintTest               ||
+    FBDefaultTest                  ||
+    FBRelevantTest                 ||
+    FBCalculateTest                ||
+    FBReadonlyTest                 ||
+    FBRequiredTest                 ||
+    XFormsConstants.REQUIRED_QNAME ||
+    XFormsConstants.VALUE_QNAME
 }

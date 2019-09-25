@@ -18,7 +18,7 @@ import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunner, Names, NodeInfoCell}
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -36,10 +36,12 @@ class FormBuilderFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with FunSpecLike
-     with FormBuilderSupport {
+     with FormBuilderSupport
+     with XMLSupport {
 
   val SectionsRepeatsDoc      = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
   val SectionTemplatesDoc     = "oxf:/org/orbeon/oxf/fb/template-with-section-templates.xhtml"
+  val FormulasDoc             = "oxf:/org/orbeon/oxf/fb/template-with-formulas-to-rewrite.xhtml"
 
   val Control1 = "control-1"
   val Control2 = "control-2"
@@ -497,7 +499,73 @@ class FormBuilderFunctionsTest
         }
       }
     }
-
   }
 
+  describe("Renaming of variable references in formulas") {
+
+    import org.orbeon.oxf.xforms.XFormsConstants._
+
+    val RenamedBinds1: NodeInfo =
+      <xf:bind
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+        id="formulas-bind" ref="formulas" name="formulas">
+        <xf:bind id="formulas-grid-bind" ref="formulas-grid" name="formulas-grid">
+          <xf:bind id="calculated-bind" ref="calculated" name="calculated" fb:calculate="concat($qux, $baz, $toto, $gaga)"
+                   fb:readonly="false()"/>
+          <xf:bind id="initial-bind" ref="initial" name="initial" fb:default="concat($qux, $baz, $toto, $gaga)"/>
+          <xf:bind id="readonly-bind" ref="readonly" name="readonly" xxf:whitespace="trim" fb:readonly="$qux = $baz or $qux = $toto"/>
+          <xf:bind id="visibility-bind" ref="visibility" name="visibility" xxf:whitespace="trim"
+                   fb:relevant="$gaga = $toto or $baz = $toto"/>
+          <xf:bind id="control-3-bind" ref="control-3" name="control-3" xxf:whitespace="trim">
+            <fb:constraint id="validation-2-validation" level="warning" value="string-length($qux) lt string-length($baz)"/>
+          </xf:bind>
+          <xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim">
+            <fb:constraint id="validation-1-validation" value="string-length($qux) lt string-length($baz)"/>
+          </xf:bind>
+          <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"
+                   fb:constraint="string-length($qux) lt string-length($baz)"/>
+          <xf:bind id="required-bind" ref="required" name="required" xxf:whitespace="trim" required="xxf:is-blank($baz)"/>
+          <xf:bind id="multiple-bind" ref="multiple" name="multiple" xxf:whitespace="trim" required="xxf:non-blank($qux)"
+                   fb:default="$baz" fb:calculate="$qux" fb:relevant="$qux = '42'" fb:readonly="$toto = 'a' and $gaga = 'b'">
+            <fb:constraint id="validation-5-validation" value="string-length(concat($baz, $gaga)) lt 10"/>
+            <fb:constraint id="validation-6-validation" value="$toto != $gaga"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+
+    val RenamedParams1: NodeInfo =
+      <xf:label
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        ref="$form-resources/label-with-control-ref/label">
+        <fr:param type="ControlValueParam">
+            <fr:name>my-foo</fr:name>
+            <fr:controlName>qux</fr:controlName>
+        </fr:param>
+        <fr:param type="ControlValueParam">
+            <fr:name>my-bar</fr:name>
+            <fr:controlName>baz</fr:controlName>
+        </fr:param>
+      </xf:label>
+
+    it("Must rename variable and control references") {
+      withActionAndFBDoc(FormulasDoc) { implicit ctx ⇒
+
+        FormBuilder.renameControlReferences("foo", "qux")
+        FormBuilder.renameControlReferences("bar", "baz")
+
+        assertXMLElementsIgnoreNamespacesInScope(
+          left  = RenamedBinds1,
+          right = ctx.topLevelBindElem.toList child XFBindTest filter (_.id == "formulas-bind") head
+        )
+
+        assertXMLElementsIgnoreNamespacesInScope(
+          left  = RenamedParams1,
+          right = ctx.bodyElem descendant * filter (_.id == "label-with-control-ref-control") child LABEL_QNAME head
+        )
+      }
+    }
+  }
 }

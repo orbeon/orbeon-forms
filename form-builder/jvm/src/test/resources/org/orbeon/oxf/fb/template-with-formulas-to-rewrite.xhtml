@@ -1,0 +1,387 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <inputs>
+                        <inputs-grid>
+                            <foo/>
+                            <bar/>
+                            <toto/>
+                            <gaga/>
+                        </inputs-grid>
+                    </inputs>
+                    <formulas>
+                        <formulas-grid>
+                            <calculated/>
+                            <initial/>
+                            <readonly/>
+                            <visibility/>
+                            <required/>
+                            <control-1/>
+                            <control-2/>
+                            <control-3/>
+                            <multiple/>
+                        </formulas-grid>
+                    </formulas>
+                    <lhha>
+                        <grid-1>
+                            <label-with-control-ref/>
+                            <label-with-formula/>
+                        </grid-1>
+                    </lhha>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="inputs-bind" name="inputs" ref="inputs">
+                    <xf:bind id="inputs-grid-bind" ref="inputs-grid" name="inputs-grid">
+                        <xf:bind id="foo-bind" name="foo" ref="foo" xxf:whitespace="trim"/>
+                        <xf:bind id="bar-bind" ref="bar" name="bar"/>
+                        <xf:bind id="toto-bind" ref="toto" name="toto"/>
+                        <xf:bind id="gaga-bind" ref="gaga" name="gaga"/>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="formulas-bind" ref="formulas" name="formulas">
+                    <xf:bind id="formulas-grid-bind" ref="formulas-grid" name="formulas-grid">
+                        <xf:bind id="calculated-bind" ref="calculated" name="calculated"
+                                 calculate="concat($foo, $bar, $toto, $gaga)"
+                                 readonly="false()"/>
+                        <xf:bind id="initial-bind" ref="initial" name="initial"
+                                 xxf:default="concat($foo, $bar, $toto, $gaga)"/>
+                        <xf:bind id="readonly-bind" ref="readonly" name="readonly" xxf:whitespace="trim"
+                                 readonly="$foo = $bar or $foo = $toto"/>
+                        <xf:bind id="visibility-bind" ref="visibility" name="visibility" xxf:whitespace="trim"
+                                 relevant="$gaga = $toto or $bar = $toto"/>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3" xxf:whitespace="trim">
+                            <xf:constraint id="validation-2-validation" level="warning"
+                                           value="string-length($foo) lt string-length($bar)"/>
+                        </xf:bind>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim">
+                            <xf:constraint id="validation-1-validation" value="string-length($foo) lt string-length($bar)"/>
+                        </xf:bind>
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"
+                                 constraint="string-length($foo) lt string-length($bar)"/>
+                        <xf:bind id="required-bind" ref="required" name="required" xxf:whitespace="trim"
+                                 required="xxf:is-blank($bar)"/>
+                        <xf:bind id="multiple-bind" ref="multiple" name="multiple" xxf:whitespace="trim"
+                                 required="xxf:non-blank($foo)"
+                                 xxf:default="$bar"
+                                 calculate="$foo"
+                                 relevant="$foo = '42'"
+                                 readonly="$toto = 'a' and $gaga = 'b'">
+                            <xf:constraint id="validation-5-validation" value="string-length(concat($bar, $gaga)) lt 10"/>
+                            <xf:constraint id="validation-6-validation" value="$toto != $gaga"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="lhha-bind" ref="lhha" name="lhha">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="label-with-control-ref-bind" ref="label-with-control-ref"
+                                 name="label-with-control-ref"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="label-with-formula-bind" ref="label-with-formula" name="label-with-formula"
+                                 xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>a</application-name>
+                    <form-name>a</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2019.1-SNAPSHOT PE</created-with-version>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <label-with-control-ref>
+                            <label>Label {$my-foo} and {$my-bar}</label>
+                            <hint/>
+                        </label-with-control-ref>
+                        <label-with-formula>
+                            <label>Label {$my-formula}</label>
+                            <hint/>
+                        </label-with-formula>
+                        <calculated>
+                            <label>Calculated</label>
+                            <hint/>
+                        </calculated>
+                        <initial>
+                            <label>Initial</label>
+                            <hint/>
+                        </initial>
+                        <readonly>
+                            <label>Readonly</label>
+                            <hint/>
+                        </readonly>
+                        <visibility>
+                            <label>Visibility</label>
+                            <hint/>
+                        </visibility>
+                        <required>
+                            <label>Required</label>
+                            <hint/>
+                        </required>
+                        <control-1>
+                            <label>Constraint</label>
+                            <hint/>
+                        </control-1>
+                        <control-2>
+                            <label>Constraint with custom error</label>
+                            <hint/>
+                            <alert>Custom error</alert>
+                        </control-2>
+                        <control-3>
+                            <label>Constraint with custom warning</label>
+                            <hint/>
+                            <alert>Custom warning</alert>
+                        </control-3>
+                        <multiple>
+                            <label>Multiple constraints and others</label>
+                            <hint/>
+                            <alert>Custom error</alert>
+                        </multiple>
+                        <lhha>
+                            <label>LHHA</label>
+                        </lhha>
+                        <inputs>
+                            <label>Inputs</label>
+                        </inputs>
+                        <formulas>
+                            <label>Formulas</label>
+                            <help/>
+                        </formulas>
+                        <foo>
+                            <label>Foo</label>
+                            <hint/>
+
+                        </foo>
+                        <bar>
+                            <label>Bar</label>
+                            <hint/>
+                        </bar>
+                        <toto>
+                            <label>Toto</label>
+                            <hint/>
+                        </toto>
+                        <gaga>
+                            <label>Gaga</label>
+                            <hint/>
+                        </gaga>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="inputs-section" bind="inputs-bind">
+                    <xf:label ref="$form-resources/inputs/label"/>
+                    <fr:grid id="inputs-grid-grid" bind="inputs-grid-bind">
+                        <fr:c y="1" x="1" w="6">
+                                <xf:input id="foo-control" bind="foo-bind">
+                                    <xf:label ref="$form-resources/foo/label"/>
+                                    <xf:hint ref="$form-resources/foo/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:output id="bar-control" bind="bar-bind">
+                                <xf:label ref="$form-resources/bar/label"/>
+                                <xf:hint ref="$form-resources/bar/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:output id="toto-control" bind="toto-bind">
+                                <xf:label ref="$form-resources/toto/label"/>
+                                <xf:hint ref="$form-resources/toto/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:output id="gaga-control" bind="gaga-bind">
+                                <xf:label ref="$form-resources/gaga/label"/>
+                                <xf:hint ref="$form-resources/gaga/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="formulas-section" bind="formulas-bind">
+                    <xf:label ref="$form-resources/formulas/label"/>
+                    <fr:grid id="formulas-grid-grid" bind="formulas-grid-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:output id="calculated-control" bind="calculated-bind">
+                                <xf:label ref="$form-resources/calculated/label"/>
+                                <xf:hint ref="$form-resources/calculated/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:output id="initial-control" bind="initial-bind">
+                                <xf:label ref="$form-resources/initial/label"/>
+                                <xf:hint ref="$form-resources/initial/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input id="readonly-control" bind="readonly-bind">
+                                <xf:label ref="$form-resources/readonly/label"/>
+                                <xf:hint ref="$form-resources/readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="visibility-control" bind="visibility-bind">
+                                <xf:label ref="$form-resources/visibility/label"/>
+                                <xf:hint ref="$form-resources/visibility/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <xf:input id="required-control" bind="required-bind">
+                                <xf:label ref="$form-resources/required/label"/>
+                                <xf:hint ref="$form-resources/required/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
+                            <xf:input id="control-1-control" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="6">
+                            <xf:input id="control-2-control" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$form-resources/control-2/alert" validation="validation-1-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="6">
+                            <xf:input id="control-3-control" bind="control-3-bind">
+                                <xf:label ref="$form-resources/control-3/label"/>
+                                <xf:hint ref="$form-resources/control-3/hint"/>
+                                <xf:alert ref="$form-resources/control-3/alert" validation="validation-2-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="6">
+                            <xf:input id="multiple-control" bind="multiple-bind">
+                                <xf:label ref="$form-resources/multiple/label"/>
+                                <xf:hint ref="$form-resources/multiple/hint"/>
+                                <xf:alert ref="$form-resources/multiple/alert" validation="validation-6-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="5" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="lhha-section" bind="lhha-bind">
+                    <xf:label ref="$form-resources/lhha/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="label-with-control-ref-control" bind="label-with-control-ref-bind">
+                                <xf:label ref="$form-resources/label-with-control-ref/label">
+                                    <fr:param type="ControlValueParam">
+                                        <fr:name>my-foo</fr:name>
+                                        <fr:controlName>foo</fr:controlName>
+                                    </fr:param>
+                                    <fr:param type="ControlValueParam">
+                                        <fr:name>my-bar</fr:name>
+                                        <fr:controlName>bar</fr:controlName>
+                                    </fr:param>
+                                </xf:label>
+                                <xf:hint ref="$form-resources/label-with-control-ref/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="label-with-formula-control" bind="label-with-formula-bind">
+                                <xf:label ref="$form-resources/label-with-formula/label">
+                                    <fr:param type="ExpressionParam">
+                                        <fr:name>my-formula</fr:name>
+                                        <fr:expr>string-join((//foo, //bar), ' - ')</fr:expr>
+
+
+                                    </fr:param>
+                                </xf:label>
+                                <xf:hint ref="$form-resources/label-with-formula/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

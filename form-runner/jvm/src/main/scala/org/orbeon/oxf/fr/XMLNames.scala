@@ -63,6 +63,7 @@ object XMLNames {
   val FRTextQName              : QName     = QName("text",                FRNamespace)
   val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
   val FRParamQName             : QName     = QName("param",               FRNamespace)
+  val FRControlNameQName       : QName     = QName("controlName",         FRNamespace)
 
   val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
 

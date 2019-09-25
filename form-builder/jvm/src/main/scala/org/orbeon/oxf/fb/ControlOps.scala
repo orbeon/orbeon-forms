@@ -22,16 +22,17 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.Whitespace
+import org.orbeon.oxf.util.{Whitespace, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model}
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.functions.DeepEqual
@@ -230,6 +231,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl ⇒
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
       }
+
+      renameControlReferences(oldName, newName)
 
       Rename(oldName, newName)
     }
@@ -809,5 +812,43 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
 
     prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
+  }
+
+  def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {
+
+    // Replace expressions in binds
+    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach { att ⇒
+
+      val xpathString = att.stringValue
+
+      val compiledExpr =
+        XPath.compileExpression(
+          xpathString      = xpathString,
+          namespaceMapping = NamespaceMapping(att.parentUnsafe.namespaceMappings.toMap),
+          locationData     = null,
+          functionLibrary  = inScopeContainingDocument.partAnalysis.staticState.functionLibrary,
+          avt              = false
+        )
+
+      val expr = compiledExpr.expression.getInternalExpression
+
+      if (DependencyAnalyzer.containsVariableReference(expr, oldName)) {
+        XFormsAPI.setvalue(
+          ref   = att,
+          value = xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName")
+        )
+      }
+    }
+
+    // Replace LHHA control references
+    ctx.bodyElem descendant FRParamQName            filter
+    (_.attValue(TYPE_QNAME) == "ControlValueParam") child
+    FRControlNameQName                              filter
+    (_.stringValue == oldName)                      foreach { elem ⇒
+      XFormsAPI.setvalue(
+        ref   = elem,
+        value = newName
+      )
+    }
   }
 }

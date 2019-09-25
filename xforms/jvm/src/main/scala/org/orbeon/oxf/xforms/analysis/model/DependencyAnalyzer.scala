@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.expr.{LocalVariableReference, VariableReference}
+import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableReference}
 import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
@@ -46,22 +46,26 @@ object DependencyAnalyzer {
     ): Option[BindDetails] =
       mipOpt map { mip ⇒
 
-        val compiledExpr = mip.compiledExpression
-        val expr         = compiledExpr.expression.getInternalExpression
+      val compiledExpr = mip.compiledExpression
+      val expr         = compiledExpr.expression.getInternalExpression
 
-        val externalVariableReferenceIt = SaxonUtils.iterateExpressionTree(expr) collect {
-          case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒ vr
-        }
+      val referencedVariableNamesIt = iterateExternalVariableReferences(expr) filter validBindNames
 
-        val referencedVariableNames = (
-          externalVariableReferenceIt
-          map    (_.getBinding.getVariableQName.getLocalName)
-          filter validBindNames
-        )
-
-        BindDetails(staticBind, staticBind.nameOpt, referencedVariableNames.to[Set])
-      }
+      BindDetails(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to[Set])
+    }
   }
+
+  private def iterateExternalVariableReferences(expr: Expression): Iterator[String] =
+    SaxonUtils.iterateExpressionTree(expr) collect {
+      case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒
+        vr.getBinding.getVariableQName.getLocalName
+    }
+
+  def findMissingVariableReferences(expr: Expression, validBindNames: scala.collection.Set[String]): Set[String] =
+    (iterateExternalVariableReferences(expr) filterNot validBindNames).to[Set]
+
+  def containsVariableReference(expr: Expression, name: String): Boolean =
+    iterateExternalVariableReferences(expr) contains name
 
   //
   // Return an evaluation order or a `ValidationException` if there is a cycle.

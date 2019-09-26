@@ -49,6 +49,7 @@ object XMLNames {
   val XFInstanceTest           : Test      = XF → "instance"
   val XFBindTest               : Test      = XF → "bind"
   val XFGroupTest              : Test      = XF → "group"
+  val XFActionTest             : Test      = XF → "action"
 
   val FRMetadata               : Test      = FR → "metadata"
   val FRItemsetId              : Test      = FR → "itemsetid"
@@ -65,8 +66,13 @@ object XMLNames {
   val FRParamQName             : QName     = QName("param",               FRNamespace)
   val FRControlNameQName       : QName     = QName("controlName",         FRNamespace)
 
+  val FRListenerQName          : QName     = QName("listener",            FRNamespace)
+  val FRActionQName            : QName     = QName("action",              FRNamespace)
+
   val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
 
+  val ControlsQName            : QName     = QName("controls")
+  val ControlQName             : QName     = QName("control")
   val RepeatQName              : QName     = QName("repeat")
 
   val XMLLangQName             : QName     = XML_LANG_QNAME

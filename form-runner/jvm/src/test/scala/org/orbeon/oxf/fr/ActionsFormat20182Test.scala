@@ -27,7 +27,7 @@ class ActionsFormat20182Test
 
   describe("Form Runner actions in 2018.2 format") {
 
-    describe("Binary HTTP service within `fr:data-iterate` contionally sets attachment") {
+    describe("Binary HTTP service within `fr:data-iterate` conditionally sets attachment") {
 
       val (processorService, docOpt, _) =
         runFormRunner("tests", "actions-format-20182", "new", document = "", initialize = true)

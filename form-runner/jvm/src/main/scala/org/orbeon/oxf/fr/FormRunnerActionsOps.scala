@@ -273,7 +273,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   }
 
   // All itemset ids referenced either by `@fr:itemsetid` or `@fr:itemsetmap`
-  def itemsetIdsInUse(instance: NodeInfo) = {
+  def itemsetIdsInUse(instance: NodeInfo): Set[String] = {
 
     def attributesValues(test: Test) =
       instance.rootElement descendantOrSelf * att test map (_.stringValue)

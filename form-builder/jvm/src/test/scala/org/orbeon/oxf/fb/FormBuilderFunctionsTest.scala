@@ -507,7 +507,7 @@ class FormBuilderFunctionsTest
     import org.orbeon.oxf.fr.XMLNames._
     import org.orbeon.oxf.xforms.XFormsConstants._
 
-    it("must rename variable and LHHA references") {
+    describe("Variable and LHHA references") {
       withActionAndFBDoc(FormulasDoc) { implicit ctx ⇒
 
         val RenamedBinds: NodeInfo =
@@ -558,15 +558,19 @@ class FormBuilderFunctionsTest
         FormBuilder.renameControlReferences("foo", "qux")
         FormBuilder.renameControlReferences("bar", "baz")
 
-        assertXMLElementsIgnoreNamespacesInScope(
-          left  = RenamedBinds,
-          right = ctx.topLevelBindElem.toList child XFBindTest filter (_.id == "formulas-bind") head
-        )
+        it("must rename references from variables") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left  = RenamedBinds,
+            right = ctx.topLevelBindElem.toList child XFBindTest filter (_.id == "formulas-bind") head
+          )
+        }
 
-        assertXMLElementsIgnoreNamespacesInScope(
-          left  = RenamedParams,
-          right = ctx.bodyElem descendant * filter (_.id == "label-with-control-ref-control") child LABEL_QNAME head
-        )
+        it("must rename references from LHHA") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left  = RenamedParams,
+            right = ctx.bodyElem descendant * filter (_.id == "label-with-control-ref-control") child LABEL_QNAME head
+          )
+        }
       }
     }
 

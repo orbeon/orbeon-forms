@@ -39,6 +39,8 @@ object XMLNames {
   val FBCalculateTest   : Test  = FB → "calculate"
   val FBDefaultTest     : Test  = FB → "default"
 
+  val FBActionTest      : Test  = FB → "action"
+
   val FBEditorsTest     : Test  = FB → "editors"
   val FBDisplayNameTest : Test  = FB → "display-name"
   val FBIconTest        : Test  = FB → "icon"

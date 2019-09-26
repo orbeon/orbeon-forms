@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.UndoAction._
+import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
@@ -816,7 +817,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {
 
-    // Replace expressions in binds
+    def updateNode(newValue: String)(node: NodeInfo): Unit =
+      XFormsAPI.setvalue(node, newValue)
+
+    def findNewActions: Seq[NodeInfo] =
+      ctx.modelElem child FRActionQName
+
+    def findLegacyActions: Seq[NodeInfo] =
+      ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
+
+    // Replace formulas in binds
     ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach { att ⇒
 
       val xpathString = att.stringValue
@@ -832,23 +842,57 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       val expr = compiledExpr.expression.getInternalExpression
 
-      if (DependencyAnalyzer.containsVariableReference(expr, oldName)) {
-        XFormsAPI.setvalue(
-          ref   = att,
-          value = xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName")
-        )
-      }
+      if (DependencyAnalyzer.containsVariableReference(expr, oldName))
+        updateNode(xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName"))(att)
     }
 
     // Replace LHHA control references
-    ctx.bodyElem descendant FRParamQName            filter
-    (_.attValue(TYPE_QNAME) == "ControlValueParam") child
-    FRControlNameQName                              filter
-    (_.stringValue == oldName)                      foreach { elem ⇒
-      XFormsAPI.setvalue(
-        ref   = elem,
-        value = newName
-      )
+    ctx.bodyElem descendant FRParamQName              filter
+      (_.attValue(TYPE_QNAME) == "ControlValueParam") child
+      FRControlNameQName                              filter
+      (_.stringValue == oldName)                      foreach
+      updateNode(newName)
+
+    // Update new actions
+
+    // `fr:action//(@control | @repeat)`
+    findNewActions descendant *     att
+      (ControlQName || RepeatQName) filter
+      (_.stringValue == oldName)    foreach
+      updateNode(newName)
+
+    // `fr:listener/@controls`
+    ctx.modelElem child FRListenerQName att ControlsQName foreach { att ⇒
+
+      val newTokens = att.stringValue.splitTo[List]() map {
+        case `oldName` ⇒ newName
+        case other     ⇒ other
+      }
+
+      updateNode(newTokens mkString " ")(att)
     }
+
+    // Update legacy actions
+    val legacyActions = findLegacyActions
+
+    findControlIdByName(ctx.bodyElem, oldName) foreach { oldControlId ⇒
+
+      val newControlId = newName + oldControlId.substringAfter(oldName)
+
+      // `<xf:action event="xforms-value-changed" ev:observer="foo-control" if="true()">`
+      legacyActions                     child
+        XFActionTest                    att
+        "observer"                      filter // when using a String we match on any namespace (for better or for worse)
+        (_.stringValue == oldControlId) foreach
+        updateNode(newControlId)
+    }
+
+    // `<xf:var name="control-name" value="'foo'"/>`
+    legacyActions                            descendant
+      XFORMS_VAR_QNAME                       filter
+      (_.attValue("name") == "control-name") att
+      VALUE_QNAME                            filter
+      (_.stringValue == s"'$oldName'")       foreach
+      updateNode(s"'$newName'")
   }
 }

@@ -846,11 +846,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         updateNode(xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName"))(att)
     }
 
-    // Replace LHHA control references
-    ctx.bodyElem descendant FRParamQName              filter
-      (_.attValue(TYPE_QNAME) == "ControlValueParam") child
-      FRControlNameQName                              filter
-      (_.stringValue == oldName)                      foreach
+    // Replace references in templates, including email templates
+    List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamQName filter
+      (_.attValue(TYPE_QNAME) == "ControlValueParam")                child
+      FRControlNameQName                                             filter
+      (_.stringValue == oldName)                                     foreach
       updateNode(newName)
 
     // Update new actions

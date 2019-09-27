@@ -555,6 +555,32 @@ class FormBuilderFunctionsTest
             </fr:param>
           </xf:label>
 
+        val RenamedEmail: NodeInfo =
+          <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <subject>
+              <template xml:lang="en">Subject: {{$my-foo}} with {{$my-bar}}</template>
+              <fr:param type="ControlValueParam">
+                <fr:name>my-foo</fr:name>
+                <fr:controlName>qux</fr:controlName>
+              </fr:param>
+              <fr:param type="ControlValueParam">
+                <fr:name>my-bar</fr:name>
+                <fr:controlName>baz</fr:controlName>
+              </fr:param>
+            </subject>
+            <body>
+              <template xml:lang="en" mediatype="text/html">&lt;div&gt;Body: {{$her-foo}} with {{$her-bar}}&lt;/div&gt;</template>
+              <fr:param type="ControlValueParam">
+                <fr:name>her-foo</fr:name>
+                <fr:controlName>qux</fr:controlName>
+              </fr:param>
+              <fr:param type="ControlValueParam">
+                <fr:name>her-bar</fr:name>
+                <fr:controlName>baz</fr:controlName>
+              </fr:param>
+            </body>
+          </email>
+
         FormBuilder.renameControlReferences("foo", "qux")
         FormBuilder.renameControlReferences("bar", "baz")
 
@@ -569,6 +595,13 @@ class FormBuilderFunctionsTest
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedParams,
             right = ctx.bodyElem descendant * filter (_.id == "label-with-control-ref-control") child LABEL_QNAME head
+          )
+        }
+
+        it("must rename references from email templates") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left  = RenamedEmail,
+            right = ctx.metadataRootElem descendant "email" head
           )
         }
       }

@@ -291,17 +291,6 @@
             <param-value>true</param-value>
         </init-param>
     </servlet>
-    <!-- Uncomment this for the eXist WebDAV support -->
-    <!--
-    <servlet>
-        <servlet-name>exist-webdav-servlet</servlet-name>
-        <servlet-class>org.exist.http.servlets.WebDAVServlet</servlet-class>
-        <init-param>
-            <param-name>authentication</param-name>
-            <param-value>basic</param-value>
-        </init-param>
-    </servlet>-->
-    <!-- End eXist WebDAV support -->
     <servlet-mapping>
         <servlet-name>orbeon-main-servlet</servlet-name>
         <url-pattern>/</url-pattern>
@@ -321,13 +310,6 @@
         <url-pattern>/exist/xmlrpc/*</url-pattern>
     </servlet-mapping>-->
     <!-- End eXist XMLRPC support -->
-    <!-- Uncomment this for the eXist WebDAV support -->
-    <!--
-    <servlet-mapping>
-        <servlet-name>exist-webdav-servlet</servlet-name>
-        <url-pattern>/exist/webdav/*</url-pattern>
-    </servlet-mapping>-->
-    <!-- End eXist WebDAV support -->
     <!-- Uncomment this for the relational persistence, and change oracle if necessary -->
     <!--
     <resource-ref>

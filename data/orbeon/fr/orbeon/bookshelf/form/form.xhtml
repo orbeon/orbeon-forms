@@ -28,7 +28,7 @@
                 </xs:element>
                 <xs:complexType name="details">
                     <xs:sequence>
-                        <xs:element name="grid-1">
+                        <xs:element name="details-grid">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="title" type="xs:string"/>
@@ -41,7 +41,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element name="grid-2">
+                        <xs:element name="review-grid">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="review" type="xs:string"/>
@@ -121,7 +121,7 @@
             <xf:instance id="fr-form-instance" xxf:validation="strict" xxf:index="id">
                 <form>
                     <details>
-                        <grid-1>
+                        <details-grid>
                             <title/>
                             <author/>
                             <image filename="" mediatype="" size=""/>
@@ -129,10 +129,10 @@
                             <link/>
                             <rating/>
                             <publication-year/>
-                        </grid-1>
-                        <grid-2>
+                        </details-grid>
+                        <review-grid>
                             <review/>
-                        </grid-2>
+                        </review-grid>
                     </details>
                     <notes>
                         <note>
@@ -143,9 +143,12 @@
                     </notes>
                 </form>
             </xf:instance>
-            <xf:bind id="fr-form-binds" ref=".">
-                <xf:bind id="details-bind" name="details" ref="details">
-                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="details-bind" ref="details">
+                    <xf:bind id="review-grid-bind" ref="review-grid" name="review-grid">
+                        <xf:bind id="review-bind" name="review" ref="review"/>
+                    </xf:bind>
+                    <xf:bind id="details-grid-bind" ref="details-grid" name="details-grid">
                         <xf:bind id="title-bind" name="title" ref="title" required="true()" xxf:whitespace="trim"/>
                         <xf:bind id="author-bind" name="author" ref="author" required="true()" xxf:whitespace="trim"/>
                         <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
@@ -153,9 +156,6 @@
                         <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
                         <xf:bind id="rating-bind" name="rating" ref="rating"/>
                         <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year" xxf:whitespace="trim"/>
-                    </xf:bind>
-                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
-                        <xf:bind id="review-bind" name="review" ref="review"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="notes-bind" name="notes" ref="notes">
@@ -166,7 +166,7 @@
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
-            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>bookshelf</form-name>
@@ -193,16 +193,16 @@
                     </library-versions>
                     <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <migration version="4.8.0">[{ "path": "notes/note", "iteration-name": "note-iteration" }]</migration>
-                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"review"}],"topLevel":true}]}</migration>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"details-grid"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"review-grid"},"afterElem":{"value":"details-grid"},"content":[{"value":"review"}],"topLevel":true}]}</migration>
                 </metadata>
             </xf:instance>
-            <xf:instance id="fr-form-attachments">
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
-            <xf:instance id="fr-form-resources">
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
                         <details>
@@ -447,7 +447,7 @@
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="3" id="grid-1-grid" bind="grid-1-bind">
+                    <fr:grid columns="3" id="details-grid-grid" bind="details-grid-bind">
                         <fr:c y="1" x="1" w="4">
                             <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
                                 <xf:label ref="$form-resources/title/label"/>
@@ -517,7 +517,7 @@
                             </xf:input>
                         </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1" id="grid-2-grid" bind="grid-2-bind">
+                    <fr:grid columns="1" id="review-grid-grid" bind="review-grid-bind">
                         <fr:c y="1" x="1" w="12">
                             <fr:tinymce id="review-control" bind="review-bind">
                                 <xf:label ref="$form-resources/review/label"/>

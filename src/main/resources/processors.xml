@@ -292,16 +292,6 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:xupdate">
-        <instantiation name="oxf:trax">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.oxf.transformer.xupdate.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-
     <processor name="oxf:xinclude">
         <class name="org.orbeon.oxf.processor.xinclude.XIncludeProcessor"/>
     </processor>

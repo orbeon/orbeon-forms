@@ -1,22 +1,8 @@
-<xh:html
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
-    xmlns:exf="http://www.exforms.org/exf/1-0"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:saxon="http://saxon.sf.net/"
-    xmlns:sql="http://orbeon.org/oxf/xml/sql"
-    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+<xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:xpath-analysis="true">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model" xxf:help-tooltip="false" xxf:xpath-analysis="true">
+            <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
                 <xs:element name="form">
                     <xs:complexType>
@@ -66,6 +52,8 @@
                         <xs:element name="note-text" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
+
+                <!-- Type for image -->
                 <xs:complexType name="image">
                     <xs:simpleContent>
                         <xs:extension base="xs:anyURI">
@@ -75,6 +63,8 @@
                         </xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>
+
+                <!-- Type for rating -->
                 <xs:simpleType name="rating">
                     <xs:restriction base="xs:string">
                         <xs:enumeration value=""/>
@@ -85,6 +75,8 @@
                         <xs:enumeration value="5"/>
                     </xs:restriction>
                 </xs:simpleType>
+
+                <!-- Type for publication year -->
                 <xs:simpleType name="publication-year">
                     <xs:union>
                         <xs:simpleType>
@@ -100,6 +92,8 @@
                         </xs:simpleType>
                     </xs:union>
                 </xs:simpleType>
+
+                <!-- Type for language -->
                 <xs:simpleType name="language">
                     <xs:restriction base="xs:string">
                         <xs:enumeration value=""/>
@@ -112,8 +106,11 @@
                         <xs:enumeration value="zh"/>
                     </xs:restriction>
                 </xs:simpleType>
+
+                <!-- Type for link -->
                 <xs:simpleType name="link">
                     <xs:restriction base="xs:string">
+                        <!-- Approximative regexp for HTTP URLs -->
                         <xs:pattern value="(https?\://([^/?#]+)(/([^?#]*)(\?([^?#]+))?(#(.*))?)?)?"/>
                     </xs:restriction>
                 </xs:simpleType>
@@ -166,6 +163,8 @@
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
+
+            <!-- Metadata -->
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
@@ -188,20 +187,23 @@
                             </fr:param>
                         </subject>
                     </email>
-                    <library-versions>
-                        <orbeon>1</orbeon>
-                    </library-versions>
                     <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <migration version="4.8.0">[{ "path": "notes/note", "iteration-name": "note-iteration" }]</migration>
                     <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"details-grid"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"review-grid"},"afterElem":{"value":"details-grid"},"content":[{"value":"review"}],"topLevel":true}]}</migration>
                 </metadata>
             </xf:instance>
+
+            <!-- Attachments -->
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
+                    <!-- Fix this once we have proper template -->
+                    <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
+
+            <!-- XForms instance containing all the resources -->
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">

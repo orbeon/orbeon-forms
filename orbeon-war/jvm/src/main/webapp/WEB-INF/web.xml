@@ -318,7 +318,7 @@
     <!--
     <servlet-mapping>
         <servlet-name>exist-xmlrpc-servlet</servlet-name>
-        <url-pattern>/exist/xmlrpc</url-pattern>
+        <url-pattern>/exist/xmlrpc/*</url-pattern>
     </servlet-mapping>-->
     <!-- End eXist XMLRPC support -->
     <!-- Uncomment this for the eXist WebDAV support -->

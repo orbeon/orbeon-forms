@@ -1,4 +1,4 @@
-<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.8.0">
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Surely You're Joking, Mr. Feynman!</title>
         <author>Richard Feynman</author>

@@ -21,14 +21,26 @@
 
                 <xs:complexType name="details">
                     <xs:sequence>
-                        <xs:element name="title" type="xs:string"/>
-                        <xs:element name="author" type="xs:string"/>
-                        <xs:element name="language" type="language"/>
-                        <xs:element name="link" type="link"/>
-                        <xs:element name="rating" type="rating"/>
-                        <xs:element name="publication-year" type="publication-year"/>
-                        <xs:element name="review" type="xs:string"/>
-                        <xs:element name="image" type="image"/>
+                        <xs:element name="details-grid">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="title" type="xs:string"/>
+                                    <xs:element name="author" type="xs:string"/>
+                                    <xs:element name="image" type="image"/>
+                                    <xs:element name="language" type="language"/>
+                                    <xs:element name="link" type="link"/>
+                                    <xs:element name="rating" type="rating"/>
+                                    <xs:element name="publication-year" type="publication-year"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="review-grid">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="review" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
 
@@ -114,7 +126,6 @@
 
             </xs:schema>
 
-            <!-- Instance that contains all the books -->
             <xf:instance id="fr-form-instance" xxf:validation="strict" xxf:index="id">
                 <form>
                     <details>
@@ -137,7 +148,7 @@
                 </form>
             </xf:instance>
 
-            <xf:bind id="fr-form-binds" ref=".">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="details-bind" ref="details">
                     <xf:bind id="title-bind" name="title" ref="title" required="true()"
                              xxf:whitespace="trim"/>
@@ -161,7 +172,7 @@
             </xf:bind>
 
             <!-- Metadata -->
-            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>bookshelf</form-name>
@@ -187,7 +198,7 @@
             </xf:instance>
 
             <!-- Attachments -->
-            <xf:instance id="fr-form-attachments">
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <!-- Fix this once we have proper template -->
@@ -197,7 +208,7 @@
             </xf:instance>
 
             <!-- XForms instance containing all the resources -->
-            <xf:instance id="fr-form-resources">
+            <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
                         <details>
@@ -448,7 +459,7 @@
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="3" id="grid-1-grid">
+                    <fr:grid columns="3" id="details-grid-grid">
                         <fr:c y="1" x="1" w="4">
                                 <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
                                     <xf:label ref="$form-resources/title/label"/>
@@ -466,7 +477,7 @@
                                 </xf:input>
                             </fr:c>
                         <fr:c y="1" x="9" h="3" w="4">
-                                <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
+                                <fr:image-attachment id="image-control" bind="image-bind" class="fr-attachment">
                                     <xf:label ref="$form-resources/image/label"/>
                                     <xf:hint ref="$form-resources/image/hint"/>
                                     <xf:help ref="$form-resources/image/help"/>
@@ -499,13 +510,11 @@
                                 </xf:input>
                             </fr:c>
                         <fr:c y="3" x="1" w="4">
-                                <xf:select1 id="rating-control" bind="rating-bind" class="fr-width-5em"
-                                        appearance="full xxf:horizontal">
+                            <xf:select1 id="rating-control" bind="rating-bind" appearance="full xxf:horizontal">
                                     <xf:label ref="$form-resources/rating/label"/>
                                     <xf:hint ref="$form-resources/rating/hint"/>
                                 <xf:help ref="$form-resources/rating/help"/>
                                     <xf:alert ref="$form-resources/rating/alert"/>
-
                                     <xf:itemset ref="$form-resources/rating/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
@@ -513,7 +522,7 @@
                                 </xf:select1>
                             </fr:c>
                         <fr:c y="3" x="5" w="4">
-                                <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
+                                <xf:input id="publication-year-control" bind="publication-year-bind">
                                     <xf:label ref="$form-resources/publication-year/label"/>
                                     <xf:hint ref="$form-resources/publication-year/hint"/>
                                     <xf:help ref="$form-resources/publication-year/help"/>
@@ -521,7 +530,7 @@
                                 </xf:input>
                             </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1" id="grid-2-grid">
+                    <fr:grid columns="1" id="review-grid-grid" bind="review-grid-bind">
                         <fr:c y="1" x="1" w="12">
                                 <fr:tinymce id="review-control" bind="review-bind">
                                     <xf:label ref="$form-resources/review/label"/>
@@ -535,9 +544,7 @@
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
-                    <fr:grid repeat="content" bind="note-bind" id="note-grid"
-                             template="instance('note-template')"
-                             min="0">
+                    <fr:grid repeat="content" bind="note-bind" id="note-grid" template="instance('note-template')" min="0">
                         <fr:c y="1" x="1" w="12">
                                 <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
                                     <xf:label ref="$form-resources/note-text/label"/>

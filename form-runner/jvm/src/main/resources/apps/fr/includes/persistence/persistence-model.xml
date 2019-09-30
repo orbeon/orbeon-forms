@@ -260,19 +260,23 @@
 
                 <xf:action if="not($is-singleton)">
 
-                    <!-- Do we have drafts for documents that were never saved? -->
-                    <xf:action context="instance('fr-search-request')/drafts">
-                        <xf:insert   context="." origin="xf:attribute('for-never-saved-document', 'true')"/>
-                        <xf:setvalue context="." value="'only'"/>
-                    </xf:action>
-                    <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
-                    <xf:var name="drafts-found" value="count(instance('fr-search-response')/document)"/>
+                    <!-- Do we have updatable drafts for documents that were never saved? -->
+                    <xf:action if="$autosave-enabled">
+                        <xf:insert
+                            context="instance('fr-search-request')"
+                            origin="
+                                xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only')),
+                                xf:element('operations', xf:attribute('any-of', 'update'))
+                            "/>
+                        <xf:send  submission="fr-search-submission"/>
+                        <xf:var name="drafts-found" value="count(instance('fr-search-response')/document)"/>
 
-                    <!-- Remember to show the dialog upon xforms-ready -->
-                    <xf:setvalue
-                        if="$drafts-found > 0"
-                        ref="instance('fr-persistence-instance')/initial-dialog-to-show"
-                        value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
+                        <!-- Remember to show the dialog upon xforms-ready -->
+                        <xf:setvalue
+                            if="$drafts-found > 0"
+                            ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                            value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
+                    </xf:action>
 
                 </xf:action>
 
@@ -573,11 +577,9 @@
     </xf:submission>
     <xf:instance id="fr-search-request">
         <search>
-            <drafts/>
             <page-size>10</page-size>
             <page-number>1</page-number>
             <lang>en</lang>
-            <operations any-of="update"/>
         </search>
     </xf:instance>
     <xf:instance id="fr-search-response"><dummy/></xf:instance>

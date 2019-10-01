@@ -35,7 +35,7 @@ trait PartEventHandlerAnalysis {
 
   // Scripts
   private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
-  def scriptsByPrefixedId = _scriptsByPrefixedId
+  def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
   private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
   def uniqueJsScripts = _uniqueJsScripts
 
@@ -96,11 +96,11 @@ trait PartEventHandlerAnalysis {
           elem.getStringValue
 
       StaticScript(
-        analysis.prefixedId,
-        scriptType,
-        body,
-        params.to[List],
-        shareableByDigest
+        prefixedId        = analysis.prefixedId,
+        scriptType        = scriptType,
+        body              = body,
+        params            = params.to[List],
+        shareableByDigest = shareableByDigest
       )
     }
 

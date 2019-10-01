@@ -37,14 +37,14 @@ import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsUploadControl}
+import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvents}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, UrlType, XFormsModelSubmission}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.xforms.Constants
 
 import scala.collection.JavaConverters._
@@ -90,9 +90,9 @@ object XFormsServer {
 
         locally {
           val activeSubmissionOpt = Option(containingDocument.getClientActiveSubmissionFirstPass)
-          val loads = containingDocument.getLoadsToRun.asScala
+          val portletLoadOpt      = containingDocument.getLoadsToRun.asScala find (isPortletLoadMatch(containingDocument, _))
 
-          if (activeSubmissionOpt.isDefined || loads.nonEmpty) {
+          if (activeSubmissionOpt.isDefined || portletLoadOpt.nonEmpty) {
             val eventsDocument = dom.Document()
             val eventsElement  = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
 
@@ -105,7 +105,7 @@ object XFormsServer {
             }
 
             // Check for `xxforms-load` event (for portlet mode only!)
-            loads find (isPortletLoadMatch(containingDocument, _)) foreach { load ⇒
+            portletLoadOpt foreach { load ⇒
               // We need to submit the event so that the portlet can load the new path
               val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
 
@@ -304,7 +304,6 @@ object XFormsServer {
         val errors = containingDocument.getServerErrors.asScala
         if (errors.nonEmpty)
           XFormsError.outputAjaxErrors(errors)
-
       }
       xmlReceiver.endPrefixMapping("xxf")
     }

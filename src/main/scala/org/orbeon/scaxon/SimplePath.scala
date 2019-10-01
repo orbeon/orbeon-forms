@@ -149,6 +149,7 @@ object SimplePath {
 
     def attValue(attName: String)  = /@(attName).stringValue
     def attValue(attName: QName)   = /@(attName).stringValue
+    def attValue(test: Test)       = /@(test).stringValue
     def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
     def attTokens(attName: QName)  = stringOptionToSet(Some(attValue(attName)))
     def attClasses = attTokens("class")
@@ -166,6 +167,12 @@ object SimplePath {
       case Seq() ⇒ None
       case s     ⇒ Some(s.stringValue)
     }
+
+    def attValueOpt(test: Test) = /@(test) match {
+      case Seq() ⇒ None
+      case s     ⇒ Some(s.stringValue)
+    }
+
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
       case Seq() ⇒ None
       case s     ⇒ Some(s.stringValue) filter (_.nonBlank)

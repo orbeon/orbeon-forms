@@ -55,27 +55,26 @@ object XMLNames {
   val FRItemsetId              : Test      = FR → "itemsetid"
   val FRItemsetMap             : Test      = FR → "itemsetmap"
 
-  val FRNamespace              : Namespace = Namespace(FRPrefix, FR)
+  val FRItemsetMapTest         : Test     = FR → "itemsetmap"
+  val FRParamTest              : Test     = FR → "param"
+  val FRControlNameTest        : Test     = FR → "controlName"
 
-  val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
-  val FRItemsetMapQName        : QName     = QName("itemsetmap",          FRNamespace)
-  val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
-  val GridQName                : QName     = QName("grid",                FRNamespace)
-  val FRTextQName              : QName     = QName("text",                FRNamespace)
-  val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
-  val FRParamQName             : QName     = QName("param",               FRNamespace)
-  val FRControlNameQName       : QName     = QName("controlName",         FRNamespace)
+  val FRListenerTest           : Test      = FR → "listener"
+  val FRActionTest             : Test      = FR → "action"
 
-  val FRListenerQName          : QName     = QName("listener",            FRNamespace)
-  val FRActionQName            : QName     = QName("action",              FRNamespace)
+  val ControlsTest             : Test      = QName("controls")
+  val ControlTest              : Test      = QName("control")
+  val RepeatTest               : Test      = QName("repeat")
 
-  val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
-
-  val ControlsQName            : QName     = QName("controls")
-  val ControlQName             : QName     = QName("control")
-  val RepeatQName              : QName     = QName("repeat")
-
-  val XMLLangQName             : QName     = XML_LANG_QNAME
+  val XMLLangQName             : QName     = XML_LANG_QNAME//both
 
   val FRContainerTest = FRSectionTest || FRGridTest
+
+  val FRNamespace              : Namespace = Namespace(FRPrefix, FR)
+
+  val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
+  val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
+  val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
+  val FRTextQName              : QName     = QName("text",                FRNamespace)
+  val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
 }

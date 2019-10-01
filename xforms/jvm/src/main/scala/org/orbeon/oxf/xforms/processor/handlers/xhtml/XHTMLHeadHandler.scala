@@ -151,7 +151,7 @@ class XHTMLHeadHandler(
         ) foreach
           writeContent
 
-        findScriptInvocations(containingDocument) foreach
+        findOtherScriptInvocations(containingDocument) foreach
           writeContent
 
         List(

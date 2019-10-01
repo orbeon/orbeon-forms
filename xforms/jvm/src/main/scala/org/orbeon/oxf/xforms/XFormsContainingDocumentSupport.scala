@@ -668,7 +668,7 @@ trait ContainingDocumentClientState {
     val response = externalContext.getResponse
 
     val scripts =
-      ScriptBuilder.findScriptInvocations(this).toList :::
+      ScriptBuilder.findOtherScriptInvocations(this).toList :::
       ScriptBuilder.findConfigurationProperties(
         this,
         URLRewriterUtils.isResourcesVersioned,

@@ -149,7 +149,7 @@
 
                 <!-- On save, copy permissions from UI representation to metadata
                      - to test from the browser, after opening the dialog, run:
-                       ORBEON.xforms.Document.dispatchEvent({targetId: 'fb-permissions$save-trigger', eventName: 'fr-test'}) -->
+                       ORBEON.xforms.Document.dispatchEvent({targetId: 'fb-permissions-dialog≡save-trigger', eventName: 'fr-test'}) -->
                 <xf:action event="DOMActivate fr-test" observer="save-trigger">
                     <!-- Reset permissions element -->
                     <xf:delete ref="$metadata/permissions"/>
@@ -192,8 +192,12 @@
                         </xf:action>
 
                         <!-- Log metadata permissions -->
-                        <xf:load if="event('xxf:type') = 'fr-test'" resource="javascript:console.log(ORBEON.jQuery.parseXML(unescape('{encode-for-uri(saxon:serialize($metadata/permissions, 'xml'))}')))"/>
-
+                        <xf:action type="javascript" if="event('xxf:type') = 'fr-test'">
+                            <xf:param name="xml" value="saxon:serialize($metadata/permissions, 'xml')"/>
+                            <xf:body>
+                                console.log(ORBEON.jQuery.parseXML(unescape(xml)));
+                            </xf:body>
+                        </xf:action>
                     </xf:action>
                 </xf:action>
 

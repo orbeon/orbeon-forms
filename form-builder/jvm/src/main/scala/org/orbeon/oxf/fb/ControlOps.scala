@@ -842,7 +842,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       val expr = compiledExpr.expression.getInternalExpression
 
-      if (DependencyAnalyzer.containsVariableReference(expr, oldName))
+      if (xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName))
         updateNode(xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName"))(att)
     }
 

@@ -306,10 +306,12 @@
             </xf:send>
         </xf:action>
         <xf:action if="not($draft-requested)">
-            <xf:action context="instance('fr-search-request')/drafts">
-                <xf:insert   context="." origin="xf:attribute('for-document-id', $document)"/>
-                <xf:setvalue context="." value="'only'"/>
-            </xf:action>
+            <xf:insert
+                context="instance('fr-search-request')"
+                origin="
+                    xf:element('drafts', (xf:attribute('for-document-id', $document), 'only')),
+                    xf:element('operations', xf:attribute('any-of', 'update'))
+                "/>
             <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
             <xf:var name="draft-found" value="exists(instance('fr-search-response')/document)"/>
 

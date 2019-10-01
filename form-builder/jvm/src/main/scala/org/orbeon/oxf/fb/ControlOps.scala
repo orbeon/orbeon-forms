@@ -620,7 +620,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   }
 
   def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
-    lhhatNodes child FRParamQName
+    lhhatNodes child FRParamTest
 
   private def setControlLHHATParams(
     controlName : String,
@@ -821,7 +821,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       XFormsAPI.setvalue(node, newValue)
 
     def findNewActions: Seq[NodeInfo] =
-      ctx.modelElem child FRActionQName
+      ctx.modelElem child FRActionTest
 
     def findLegacyActions: Seq[NodeInfo] =
       ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
@@ -847,22 +847,22 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Replace references in templates, including email templates
-    List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamQName filter
-      (_.attValue(TYPE_QNAME) == "ControlValueParam")                child
-      FRControlNameQName                                             filter
-      (_.stringValue == oldName)                                     foreach
+    List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamTest filter
+      (_.attValue(TYPE_QNAME) == "ControlValueParam")               child
+      FRControlNameTest                                             filter
+      (_.stringValue == oldName)                                    foreach
       updateNode(newName)
 
     // Update new actions
 
     // `fr:action//(@control | @repeat)`
-    findNewActions descendant *     att
-      (ControlQName || RepeatQName) filter
-      (_.stringValue == oldName)    foreach
+    findNewActions descendant *   att
+      (ControlTest || RepeatTest) filter
+      (_.stringValue == oldName)  foreach
       updateNode(newName)
 
     // `fr:listener/@controls`
-    ctx.modelElem child FRListenerQName att ControlsQName foreach { att ⇒
+    ctx.modelElem child FRListenerTest att ControlsTest foreach { att ⇒
 
       val newTokens = att.stringValue.splitTo[List]() map {
         case `oldName` ⇒ newName

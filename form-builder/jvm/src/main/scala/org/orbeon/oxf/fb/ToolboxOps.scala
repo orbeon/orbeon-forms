@@ -205,7 +205,7 @@ object ToolboxOps {
         }</fr:section>
 
       val newSectionElem       = insert(into = into, after = after.toList, origin = sectionTemplate).head
-      val newNestedGridElemOpt = newSectionElem child GridQName headOption
+      val newNestedGridElemOpt = newSectionElem child FRGridTest headOption
 
       // Create and insert holders
       val resourceHolder = {

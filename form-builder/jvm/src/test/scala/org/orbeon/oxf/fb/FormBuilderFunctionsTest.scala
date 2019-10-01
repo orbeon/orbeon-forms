@@ -749,14 +749,14 @@ class FormBuilderFunctionsTest
         it("must rename references from listeners") {
           assertXMLElementsIgnoreNamespacesInScope(
             left = RenamedListener,
-            right = ctx.modelElem child FRListenerQName head
+            right = ctx.modelElem child FRListenerTest head
           )
         }
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
             left = RenamedAction,
-            right = ctx.modelElem child FRActionQName head
+            right = ctx.modelElem child FRActionTest head
           )
         }
       }

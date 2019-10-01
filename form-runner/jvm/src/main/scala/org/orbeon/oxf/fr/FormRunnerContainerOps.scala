@@ -35,15 +35,15 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     IsGrid(node) || IsSection(node)
 
   def isContentRepeat(node: NodeInfo): Boolean =
-    isRepeatable(node) && node.attValue(RepeatQName) == RepeatContentToken
+    isRepeatable(node) && node.attValue(RepeatTest) == RepeatContentToken
 
   def isLegacyRepeat(node: NodeInfo): Boolean =
     ! isContentRepeat(node) &&
     isRepeatable(node)      && (
-      node.attValue(RepeatQName) == LegacyRepeatContentToken ||
-      node.att("minOccurs").nonEmpty                         ||
-      node.att("maxOccurs").nonEmpty                         ||
-      node.att("min").nonEmpty                               ||
+      node.attValue(RepeatTest) == LegacyRepeatContentToken ||
+      node.att("minOccurs").nonEmpty                        ||
+      node.att("maxOccurs").nonEmpty                        ||
+      node.att("min").nonEmpty                              ||
       node.att("max").nonEmpty
     )
 

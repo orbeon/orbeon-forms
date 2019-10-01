@@ -246,9 +246,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     import XMLNames._
 
     val allMappings =
-      startNode ancestor *              flatMap
-      (_ attValueOpt FRItemsetMapQName) flatMap
-      decodeSimpleQuery                 keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
+      startNode ancestor *             flatMap
+      (_ attValueOpt FRItemsetMapTest) flatMap
+      decodeSimpleQuery                keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
       (_._1)
 
     if (allMappings.isEmpty) {

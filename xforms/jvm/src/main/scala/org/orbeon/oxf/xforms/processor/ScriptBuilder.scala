@@ -238,7 +238,7 @@ object ScriptBuilder {
         dialogControl
 
     val javascriptLoads =
-      containingDocument.getLoadsToRun.asScala filter (_.resource.startsWith("javascript:"))
+      containingDocument.getLoadsToRun.asScala filter (_.isJavaScript)
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||

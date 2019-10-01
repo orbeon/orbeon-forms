@@ -215,7 +215,7 @@ object XFormsLoadAction {
 
     // Force no progress indication if this is a JavaScript URL
     val effectiveIsShowProgress =
-      if (externalURL.startsWith("javascript:"))
+      if (externalURL.trim.startsWith("javascript:"))
         false
       else
         isShowProgress

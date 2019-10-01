@@ -116,7 +116,9 @@ object XFormsContainingDocumentSupport {
 
 case class Message(message: String, level: String)
 
-case class Load(resource: String, target: Option[String], urlType: UrlType, isReplace: Boolean, isShowProgress: Boolean)
+case class Load(resource: String, target: Option[String], urlType: UrlType, isReplace: Boolean, isShowProgress: Boolean) {
+  def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
+}
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
   extends XBLContainer(

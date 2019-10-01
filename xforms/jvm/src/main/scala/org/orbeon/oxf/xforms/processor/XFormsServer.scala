@@ -245,15 +245,16 @@ object XFormsServer {
             if (messages.nonEmpty)
               outputMessagesInfo(messages)
 
-            // Output loads
-            val loads = containingDocument.getLoadsToRun.asScala
-            if (loads.nonEmpty)
-              outputLoadsInfo(containingDocument, loads)
+            // `javascript:` loads only
+            outputLoadsInfo(
+              doc   = containingDocument,
+              loads = containingDocument.getLoadsToRun.asScala filterNot (isPortletLoadMatch(containingDocument, _)) filter (_.isJavaScript)
+            )
 
-            // Output scripts
-            val scripts = containingDocument.getScriptsToRun.asScala
-            if (scripts.nonEmpty)
-              outputScriptInvocations(containingDocument, scripts)
+            outputScriptInvocations(
+              doc               = containingDocument,
+              scriptInvocations = containingDocument.getScriptsToRun.asScala
+            )
 
             // Output focus instruction
             locally {
@@ -297,6 +298,11 @@ object XFormsServer {
                 NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
 
+            // Non-`javascript:` loads only
+            outputLoadsInfo(
+              doc   = containingDocument,
+              loads = containingDocument.getLoadsToRun.asScala filterNot (isPortletLoadMatch(containingDocument, _)) filterNot (_.isJavaScript)
+            )
           }
         }
 
@@ -459,11 +465,11 @@ object XFormsServer {
         )
 
     def outputLoadsInfo(
-      containingDocument : XFormsContainingDocument,
-      loads              : Seq[Load])(implicit
-      xmlReceiver        : XMLReceiver)
+      doc         : XFormsContainingDocument,
+      loads       : Seq[Load])(implicit
+      xmlReceiver : XMLReceiver)
     : Unit =
-      for (load ← loads if ! isPortletLoadMatch(containingDocument, load))
+      for (load ← loads)
         element(
           localName = "load",
           prefix    = "xxf",
@@ -479,10 +485,8 @@ object XFormsServer {
       doc               : XFormsContainingDocument,
       scriptInvocations : Seq[ScriptInvocation])(implicit
       receiver          : XMLReceiver
-    ): Unit = {
-
-      for (script ← scriptInvocations) {
-
+    ): Unit =
+      for (script ← scriptInvocations)
         withElement(
           "script",
           prefix = "xxf",
@@ -504,8 +508,6 @@ object XFormsServer {
             )
           }
         }
-      }
-    }
 
     def outputFocusInfo(
       containingDocument      : XFormsContainingDocument,

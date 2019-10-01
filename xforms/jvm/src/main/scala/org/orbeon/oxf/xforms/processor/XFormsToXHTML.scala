@@ -69,7 +69,7 @@ object XFormsToXHTML {
     XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
 
       val nonJavaScriptLoads =
-        containingDocument.getLoadsToRun.asScala filterNot (_.resource.startsWith("javascript:"))
+        containingDocument.getLoadsToRun.asScala filterNot (_.isJavaScript)
 
       if (containingDocument.isGotSubmissionReplaceAll) {
         // 1. Got a submission with replace="all"

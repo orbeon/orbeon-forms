@@ -112,8 +112,10 @@
                     <xf:case value="'current-user'">
                         <xh:div>
                             <xf:output value="$fr-resources/detail/lease/current-user-left"/>
+                            <!-- Make `fr:countdown` non-relevant if this case isn't shown, as it expects a valid `lease-end-time` -->
+                            <xf:var name="countdown-relevant" value="$lease-state-elem = 'current-user'"/>
                             <fr:countdown
-                                ref="$persistence-instance/lease-end-time"
+                                ref="$persistence-instance/lease-end-time[$countdown-relevant]"
                                 alert-threshold-ref="$persistence-instance/lease-alert-threshold">
                                 <xf:action
                                     event="fr-countdown-ended"

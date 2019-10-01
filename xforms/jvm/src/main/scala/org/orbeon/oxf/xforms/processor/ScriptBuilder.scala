@@ -224,7 +224,7 @@ object ScriptBuilder {
     s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData(${quoteString(jsonString)})}).call(this);"""
   }
 
-  def findScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
+  def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
     val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)

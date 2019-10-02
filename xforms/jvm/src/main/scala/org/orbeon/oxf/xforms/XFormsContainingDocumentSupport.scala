@@ -738,7 +738,7 @@ case class DelayedEvent(
   def toServerEvent(currentTime: Long): rpc.ServerEvent =
     rpc.ServerEvent(
       delay        = time - currentTime,
-      discardable  = false,
+      discardable  = discardable,
       showProgress = showProgress,
       event        = asEncodedDocument
     )

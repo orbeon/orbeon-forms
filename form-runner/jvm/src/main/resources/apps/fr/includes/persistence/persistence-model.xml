@@ -954,19 +954,28 @@
         </xf:action>
     </xf:action>
 
-    <xf:action event="maybe-autosave" if="$autosave-elem/status = 'dirty'">
-        <xf:var name="delay"         value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
-        <xf:var name="autosave-time" value="xs:dateTime($autosave-elem/change-timestamp) + $delay"/>
-        <xf:var name="autosave-now"  value="$autosave-time le current-dateTime()"/>
+    <xf:action event="maybe-autosave">
+        <xf:var
+            name="do-autosave"
+            value="
+                $autosave-elem/status = 'dirty' and
+                $persistence-instance/lease-owned-by-current-user = 'true'
+            "/>
+        <xf:action if="$do-autosave">
+            <xf:var name="delay"         value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
+            <xf:var name="autosave-time" value="xs:dateTime($autosave-elem/change-timestamp) + $delay"/>
+            <xf:var name="autosave-now"  value="$autosave-time le current-dateTime()"/>
 
-        <xf:action if="$autosave-now" type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'autosave')</xf:action>
-        <!-- Ideally we'd like delay = $wait, but it would require converting an xs:dateTimeDuration in ms -->
-        <xf:dispatch
-            if="not($autosave-now)"
-            name="maybe-autosave"
-            targetid="fr-persistence-model"
-            delay="{$autosave-delay}"
-            xxf:show-progress="false"/>
+            <xf:action if="$autosave-now" type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'autosave')</xf:action>
+
+            <!-- Ideally we'd like delay = $wait, but it would require converting an xs:dateTimeDuration in ms -->
+            <xf:dispatch
+                if="not($autosave-now)"
+                name="maybe-autosave"
+                targetid="fr-persistence-model"
+                delay="{$autosave-delay}"
+                xxf:show-progress="false"/>
+        </xf:action>
     </xf:action>
 
     <!-- Handler for missing attachments, see https://github.com/orbeon/orbeon-forms/issues/1529 -->

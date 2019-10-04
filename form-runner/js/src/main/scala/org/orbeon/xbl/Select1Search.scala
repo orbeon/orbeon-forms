@@ -91,7 +91,6 @@ private class Select1SearchCompanion extends XBLCompanion {
     val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
     val label = selectedOption.text
     val value = selectedOption.value
-    org.scalajs.dom.console.log("saving ", label, value)
     DocumentAPI.dispatchEvent(
       targetId = containerElem.id,
       eventName = "fr-change",

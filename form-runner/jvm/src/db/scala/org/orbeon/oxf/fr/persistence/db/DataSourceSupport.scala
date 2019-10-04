@@ -14,9 +14,8 @@
 package org.orbeon.oxf.fr.persistence.db
 
 import java.sql.Connection
-import java.util.logging.Logger
-import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
+import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 import org.apache.commons.dbcp2.BasicDataSource
 import org.orbeon.oxf.util.CoreUtils._
 
@@ -52,7 +51,7 @@ object DataSourceSupport {
       try {
         ic.createSubcontext(name)
       } catch {
-        case e: NameAlreadyBoundException ⇒ // ignore
+        case _: NameAlreadyBoundException ⇒ // ignore
       }
 
     new InitialContext                                         |!>
@@ -64,15 +63,15 @@ object DataSourceSupport {
     originalProperties
   }
 
-  private def clearInitialContextForJDBC(originalProperties: List[(String, Option[String])]) =
+  private def clearInitialContextForJDBC(originalProperties: List[(String, Option[String])]): Unit =
     originalProperties foreach {
       case (name, Some(value)) ⇒ System.setProperty(name, value)
       case (name, None)        ⇒ System.clearProperty(name)
     }
 
   class TestDataSource(dsd: DatasourceDescriptor) extends BasicDataSource {
-    override def getConnection(): Connection = {
-      val connection = super.getConnection()
+    override def getConnection: Connection = {
+      val connection = super.getConnection
       connection.createStatement.execute(dsd.switchDB)
       connection
     }

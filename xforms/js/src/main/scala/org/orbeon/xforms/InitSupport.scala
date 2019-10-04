@@ -316,11 +316,11 @@ object InitSupport {
 
       val parentToChildren = m.Map[String, js.Array[String]]()
 
-       childToParentMap foreach { case (child, parent) ⇒
-         Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-           parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-         }
-       }
+      childToParentMap foreach { case (child, parent) ⇒
+        Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+          parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
+        }
+      }
 
       parentToChildren
     }
@@ -329,14 +329,6 @@ object InitSupport {
 
       val childToParent    = parseRepeatTree(repeatTreeString)
       val childToParentMap = childToParent.toMap
-
-      val parentToChildren = m.Map[String, js.Array[String]]()
-
-      childToParentMap foreach { case (child, parent) ⇒
-        Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
-          parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
-        }
-      }
 
       (childToParentMap.toJSDictionary, createParentToChildrenMap(childToParentMap).toJSDictionary)
     }

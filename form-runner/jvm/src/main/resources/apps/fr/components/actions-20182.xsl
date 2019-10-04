@@ -708,6 +708,7 @@
         <xf:action>
             <xf:var name="value"     value="xxf:instance('fr-service-response-instance')/string()"/>
             <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
+            <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
 
             <!-- Will run only if needed, right? -->
             <xf:rebuild/>
@@ -721,6 +722,9 @@
                 <xf:setvalue
                     ref="image/@mediatype, ./@mediatype"
                     value="$mediatype"/>
+                <xf:setvalue
+                    ref="image/@size, ./@size"
+                    value="$size"/>
             </xf:action>
 
         </xf:action>

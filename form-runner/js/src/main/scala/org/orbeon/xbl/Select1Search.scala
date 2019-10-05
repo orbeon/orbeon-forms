@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.xbl.Select2.toJQuerySelect2
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI}
+import org.orbeon.xforms.{$, DocumentAPI, ServerValueStore}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -35,9 +35,10 @@ private class Select1SearchCompanion extends XBLCompanion {
   val DataInitialLabel          = "data-initial-label"
   val DataInitialValue          = "data-initial-value"
 
-  def jContainer : JQuery      = $(containerElem)
-  def jSelect    : JQuery      = jContainer.find("select")
-  def htmlSelect : html.Select = jSelect.get(0).asInstanceOf[dom.html.Select]
+  def jContainer    : JQuery      = $(containerElem)
+  def jXFormsSelect : JQuery      = jContainer.find(".xforms-select1")
+  def jSelect       : JQuery      = jXFormsSelect.find("select")
+  def htmlSelect    : html.Select = jSelect.get(0).asInstanceOf[dom.html.Select]
 
   override def init(): Unit = {
 
@@ -45,6 +46,9 @@ private class Select1SearchCompanion extends XBLCompanion {
     val performsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
 
     def initOrUpdatePlaceholder() {
+
+      // Store server value for the dropdown on initialization, as a workaround to #4198
+      ServerValueStore.set(jXFormsSelect.attr("id").get, htmlSelect.value)
 
       if (performsSearch) {
         val initialLabel = elementWithData.attr(DataInitialLabel).get

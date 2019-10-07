@@ -1190,6 +1190,7 @@
             <default>Use default</default>
             <full>Full</full>
             <natural>Natural</natural>
+            <learn-settings-below>Learn more about the settings below</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -2410,6 +2411,7 @@
             <default>Défaut</default>
             <full>Espace disponible</full>
             <natural>Naturel</natural>
+            <learn-settings-below>Plus d'information à propos des configurations ci-dessous</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
@@ -3640,6 +3642,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
@@ -4869,6 +4872,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>
@@ -6091,6 +6095,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Sei sicuro di voler cancellare la sezione attuale?</delete-section>
@@ -7314,6 +7319,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
@@ -8539,6 +8545,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
@@ -9761,6 +9768,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Está seguro de eliminar la Sección actual?</delete-section>
@@ -10963,6 +10971,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Weet u zeker dat u de huidige sectie wilt verwijderen?</delete-section>
@@ -12192,6 +12201,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
@@ -13422,6 +13432,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Bekräfta att du vill ta bort denna sektion</delete-section>

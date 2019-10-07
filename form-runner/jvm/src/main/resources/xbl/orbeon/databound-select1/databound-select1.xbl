@@ -74,6 +74,16 @@
                 <fr:grid>
                     <xh:tr>
                         <xh:td colspan="2">
+                            <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
+                            <xh:a
+                                href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
+                                target="_blank">
+                                <xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
+                            </xh:a>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="2">
                             <xf:input ref="@resource">
                                 <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>

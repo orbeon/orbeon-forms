@@ -147,7 +147,7 @@ private class Select1SearchCompanion extends XBLCompanion {
 private object Select2 {
 
   implicit def toJQuerySelect2(jQuery: JQuery): JQuerySelect2 =
-      jQuery.asInstanceOf[JQuerySelect2]
+    jQuery.asInstanceOf[JQuerySelect2]
 
   @js.native
   trait JQuerySelect2 extends JQuery {

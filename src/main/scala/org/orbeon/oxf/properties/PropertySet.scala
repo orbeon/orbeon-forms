@@ -21,8 +21,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -163,9 +163,6 @@ class PropertySet {
 
     result.toList
   }
-
-  // 2017-07-06: 1 Java caller.
-  def getPropertiesStartsWith(name: String): ju.List[String] = propertiesStartsWith(name).asJava
 
   private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
 

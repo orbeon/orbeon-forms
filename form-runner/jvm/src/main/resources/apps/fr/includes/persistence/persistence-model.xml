@@ -807,7 +807,7 @@
             <data-status>clean</data-status>
             <autosave>
                 <status>clean</status>
-                <change-timestamp/>
+                <autosave-timestamp/>
             </autosave>
             <!-- Success or error message to display -->
             <message/>
@@ -935,7 +935,6 @@
             <xf:setvalue ref="$persistence-instance/data-safe-override"   value="'false'"/>
             <xf:action if="$autosave-enabled">
                 <xf:setvalue ref="$autosave-elem/status"                  value="'dirty'"/>
-                <xf:setvalue ref="$autosave-elem/change-timestamp"        value="current-dateTime()"/>
                 <xf:dispatch
                     name="maybe-autosave"
                     targetid="fr-persistence-model"
@@ -958,23 +957,46 @@
         <xf:var
             name="do-autosave"
             value="
-                $autosave-elem/status = 'dirty' and
+                $autosave-elem/status                             = 'dirty' and
                 $persistence-instance/lease-owned-by-current-user = 'true'
             "/>
         <xf:action if="$do-autosave">
-            <xf:var name="delay"         value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
-            <xf:var name="autosave-time" value="xs:dateTime($autosave-elem/change-timestamp) + $delay"/>
-            <xf:var name="autosave-now"  value="$autosave-time le current-dateTime()"/>
+            <xf:var
+                name="delay"
+                value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
+            <xf:var
+                name="do-autosave-now"
+                value="
+                    (: We've never autosaved before :)
+                    $autosave-elem/autosave-timestamp = '' or
+                    (: Enough time has passed since the last autosave :)
+                    xs:dateTime($autosave-elem/autosave-timestamp) + $delay le current-dateTime()
+                "/>
 
-            <xf:action if="$autosave-now" type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'autosave')</xf:action>
+            <xf:action if="$do-autosave-now">
+                <xf:setvalue ref="$autosave-elem/autosave-timestamp" value="current-dateTime()"/>
+                <xf:action type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'autosave')</xf:action>
+            </xf:action>
 
-            <!-- Ideally we'd like delay = $wait, but it would require converting an xs:dateTimeDuration in ms -->
-            <xf:dispatch
-                if="not($autosave-now)"
-                name="maybe-autosave"
-                targetid="fr-persistence-model"
-                delay="{$autosave-delay}"
-                xxf:show-progress="false"/>
+            <xf:action if="not($do-autosave-now)">
+                <xf:var
+                    name="autosave-timestamp"
+                    value="xs:dateTime($autosave-elem/autosave-timestamp)"/>
+                <xf:var
+                    name="wait-duration"
+                    value="($autosave-timestamp + $delay) - current-dateTime()"/>
+                <xf:var name="wait-milliseconds" value="
+                    (
+                        minutes-from-duration($wait-duration) * 60 +
+                        seconds-from-duration($wait-duration)
+                    ) * 1000"/>
+                <xf:dispatch
+                    if="not($autosave-now)"
+                    name="maybe-autosave"
+                    targetid="fr-persistence-model"
+                    delay="{$wait-milliseconds}"
+                    xxf:show-progress="false"/>
+            </xf:action>
         </xf:action>
     </xf:action>
 

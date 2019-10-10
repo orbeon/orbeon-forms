@@ -57,7 +57,7 @@ private class DateCompanion extends XBLCompanionWithState {
     if (iOS) {
       // On iOS, use native date picker
       inputEl.attr("type", "date")
-      inputEl.on("change", () ⇒ updateStateAndSendValueToServer())
+      inputEl.on("change", () ⇒ onDateSelectedUpdateStateAndSendValueToServer())
     } else {
       // Initialize bootstrap-datepicker
       val options              = new DatePickerOptions
@@ -70,8 +70,8 @@ private class DateCompanion extends XBLCompanionWithState {
       datePicker = inputEl.parent().datepicker(options)
       // Register listeners
       inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ onKeypress(e))
-      inputEl.on(EventNames.Change,   ()                     ⇒ updateComponentOnInputChange())
-      datePicker.onChangeDate(        ()                     ⇒ updateStateAndSendValueToServer())
+      inputEl.on(EventNames.Change,   ()                     ⇒ onInputChangeUpdateDatePicker())
+      datePicker.onChangeDate(        ()                     ⇒ onDateSelectedUpdateStateAndSendValueToServer())
       Language.onLangChange { newLang ⇒
         datePicker.options.language = newLang
         datePicker.update()
@@ -132,8 +132,7 @@ private class DateCompanion extends XBLCompanionWithState {
       inputEl.prop("value").asInstanceOf[String]
 
     // Send the new value to the server when it changes
-    // Called when pressing enter? Or typing a new value?
-    def updateStateAndSendValueToServer(): Unit =
+    def onDateSelectedUpdateStateAndSendValueToServer(): Unit =
       stateOpt foreach { state ⇒
 
         val valueFromUI =
@@ -150,12 +149,13 @@ private class DateCompanion extends XBLCompanionWithState {
           newState       = state.copy(value = valueFromUI),
           valueFromState = _.value
         )
+        org.scalajs.dom.console.log("onDatePickerChangeUpdateStateAndSendValueToServer")
       }
 
     // Force an update of the date picker if we have a valid date, so when users type "1/2", the value
     // goes "1/2/2019" when the control looses the focus, or users press enter. (I would have thought that
     // the datepicker control would do this on it own, but apparently it doesn't.)
-    def updateComponentOnInputChange(): Unit =
+    def onInputChangeUpdateDatePicker(): Unit =
       Option(datePicker.getDate) match {
         case Some(date) ⇒ datePicker.setDate(date)
         case None       ⇒ datePicker.clearDates()
@@ -163,7 +163,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
     def onKeypress(e: JQueryEventObject): Unit =
       if (Set(10, 13)(e.which)) {
-        updateStateAndSendValueToServer()
+        onDateSelectedUpdateStateAndSendValueToServer()
         DocumentAPI.dispatchEvent(containerElem.id, eventName = "DOMActivate")
       }
   }

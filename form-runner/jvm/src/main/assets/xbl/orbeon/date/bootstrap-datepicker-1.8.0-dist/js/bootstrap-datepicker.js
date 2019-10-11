@@ -1460,8 +1460,10 @@
 					}
 					break;
 				case 13: // enter
-					if (!this.o.forceParse)
-						break;
+				    // The following 2 lines are commented so users can select a date by pressing
+				    // enter even when `forceParse` is disabled
+					//if (!this.o.forceParse)
+					//	break;
 					focusDate = this.focusDate || this.dates.get(-1) || this.viewDate;
 					if (this.o.keyboardNavigation) {
 						this._toggle_multidate(focusDate);

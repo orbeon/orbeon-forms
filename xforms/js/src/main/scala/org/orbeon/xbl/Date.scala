@@ -73,6 +73,7 @@ private class DateCompanion extends XBLCompanionWithState {
       inputEl.on(EventNames.Change,   ()                     ⇒ onInputChangeUpdateDatePicker())
       datePicker.onChangeDate(        ()                     ⇒ onDateSelectedUpdateStateAndSendValueToServer())
       datePicker.onHide(              ()                     ⇒ { inputEl.focus() }) // Set focus back on field when done with the picker
+      datePicker.onShow(              ()                     ⇒ { inputEl.focus() }) // For date picker to be usable with the keyboard
       Language.onLangChange { newLang ⇒
         datePicker.options.language = newLang
         datePicker.update()
@@ -200,6 +201,7 @@ private object DatePickerFacade {
   implicit class DatePickerOps(val datePicker: DatePicker) extends AnyVal {
     def onChangeDate(f: js.Function0[Unit]) : Unit              = datePicker.on("changeDate", f)
     def onHide      (f: js.Function0[Unit]) : Unit              = datePicker.on("hide", f)
+    def onShow      (f: js.Function0[Unit]) : Unit              = datePicker.on("show", f)
     def getDate                             : js.Date           = datePicker.datepicker("getDate").asInstanceOf[js.Date]
     def setDate(date: js.Date)              : Unit              = datePicker.datepicker("setDate", date)
     def clearDates()                        : Unit              = datePicker.datepicker("clearDates", Nil)

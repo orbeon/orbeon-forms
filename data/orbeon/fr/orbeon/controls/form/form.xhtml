@@ -1031,7 +1031,7 @@
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
                     <xf:label ref="$form-resources/selection-controls/label"/>
                     <fr:grid columns="3" id="grid-5-grid" bind="grid-5-bind">
-                        <fr:c y="1" x="1" w="3">
+                        <fr:c y="1" x="1" w="4">
                             <xf:select1 bind="static-dropdown-bind" id="static-dropdown-control" appearance="dropdown">
                                 <xf:label ref="$form-resources/static-dropdown/label"/>
                                 <xf:hint ref="$form-resources/static-dropdown/hint"/>
@@ -1042,7 +1042,7 @@
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="4" y="1" w="3" h="1"/>
+                        <fr:c x="5" y="1" w="2" h="1"/>
                         <fr:c x="7" y="1" w="4" h="1">
                             <xf:select1 bind="control-1-bind" id="control-1-control" appearance="search">
                                 <xf:label ref="$form-resources/control-1/label"/>
@@ -1055,8 +1055,11 @@
                             </xf:select1>
                         </fr:c>
                         <fr:c x="11" y="1" w="2" h="1"/>
-                        <fr:c x="1" y="2" w="3">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-data-dropdown-bind">
+                        <fr:c x="1" y="2" w="4">
+                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control"
+                                                  appearance="minimal"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="dynamic-data-dropdown-bind">
                                 <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
                                 <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1066,9 +1069,16 @@
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
-                        <fr:c x="4" y="2" w="3" h="1"/>
+                        <fr:c x="5" y="2" w="2" h="1"/>
                         <fr:c x="7" y="2" w="4">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="control-2-bind" ref="" service-performs-search="false" service-supports-paging="false" is-last-page="">
+                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-2-control"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="control-2-bind"
+                                                  ref=""
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
                                 <xf:label ref="$form-resources/control-2/label"/>
                                 <xf:hint ref="$form-resources/control-2/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1079,7 +1089,7 @@
                             </fr:databound-select1>
                         </fr:c>
                         <fr:c x="11" y="2" w="2" h="1"/>
-                        <fr:c y="3" x="1" w="6">
+                        <fr:c y="3" x="1" w="4">
                             <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
                                 <xf:label ref="$form-resources/checkboxes/label"/>
                                 <xf:hint ref="$form-resources/checkboxes/hint"/>
@@ -1089,7 +1099,8 @@
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c y="3" x="7" w="6">
+                        <fr:c x="5" y="3" w="2" h="1"/>
+                        <fr:c y="3" x="7" w="4">
                             <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
                                 <xf:label ref="$form-resources/multiple-list/label"/>
                                 <xf:hint ref="$form-resources/multiple-list/hint"/>
@@ -1100,7 +1111,8 @@
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c y="4" x="1" w="6">
+                        <fr:c x="11" y="3" w="2" h="1"/>
+                        <fr:c y="4" x="1" w="4">
                             <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
                                 <xf:label ref="$form-resources/radio-buttons/label"/>
                                 <xf:hint ref="$form-resources/radio-buttons/hint"/>
@@ -1110,8 +1122,10 @@
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c y="4" x="7" w="6">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control" bind="open-select1-bind">
+                        <fr:c x="5" y="4" w="2" h="1"/>
+                        <fr:c y="4" x="7" w="4">
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control"
+                                             bind="open-select1-bind">
                                 <xf:label ref="$form-resources/open-select1/label"/>
                                 <xf:hint ref="$form-resources/open-select1/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1121,6 +1135,7 @@
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
+                        <fr:c x="11" y="4" w="2" h="1"/>
                         <fr:c y="5" x="1" w="6">
                             <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
                                 <xf:label ref="$form-resources/yesno-input/label"/>

@@ -92,7 +92,7 @@ object XFormsServer {
           val activeSubmissionOpt = Option(containingDocument.getClientActiveSubmissionFirstPass)
           val portletLoadOpt      = containingDocument.getLoadsToRun.asScala find (isPortletLoadMatch(containingDocument, _))
 
-          if (activeSubmissionOpt.isDefined || portletLoadOpt.nonEmpty) {
+          if (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) {
             val eventsDocument = dom.Document()
             val eventsElement  = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
 

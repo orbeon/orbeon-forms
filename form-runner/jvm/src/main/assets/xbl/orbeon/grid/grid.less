@@ -78,6 +78,13 @@
 
     .xbl-fr-grid {
 
+        // https://github.com/orbeon/orbeon-forms/issues/4213
+        .fr-grid-td {
+            .input-prepend, .input-append {
+                display: flex;
+            }
+        }
+
         .fr-table {
             max-width: 100%;
             background-color: @tableBackground;

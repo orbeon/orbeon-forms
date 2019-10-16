@@ -59,11 +59,11 @@ case class UploadProgress(
 )
 
 trait MultipartLifecycle {
-  def fieldReceived(name: String, value: String)         : Unit
-  def fileItemStarting(name: String, fileItem: FileItem) : Option[MaximumSize]
-  def updateProgress(b: Array[Byte], off: Int, len: Int) : Unit
-  def fileItemState(state: UploadState)                  : Unit
-  def interrupted()                                      : Unit
+  def fieldReceived(fieldName: String, value: String)         : Unit
+  def fileItemStarting(fieldName: String, fileItem: FileItem) : Option[MaximumSize]
+  def updateProgress(b: Array[Byte], off: Int, len: Int)      : Unit
+  def fileItemState(state: UploadState)                       : Unit
+  def interrupted()                                           : Unit
 }
 
 object Multipart {

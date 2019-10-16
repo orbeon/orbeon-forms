@@ -141,9 +141,9 @@ object UploaderServer {
       uploadContext  = trustedUploadContext,
       lifecycleOpt   = Some(
         new UploadProgressMultipartLifecycle(request.contentLengthOpt, trustedUploadContext.getInputStream, session) {
-          def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes) =
+          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): (MaximumSize, AllowedMediatypes) =
             withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) {
-              _.getUploadConstraintsForControl(controlName)
+              _.getUploadConstraintsForControl(controlEffectiveId)
             }
         }
       ),
@@ -178,8 +178,8 @@ object UploaderServer {
     private var progressOpt : Option[UploadProgress] = None
     private var fileScanOpt : Option[FileScan]       = None
 
-    def fieldReceived(name: String, value: String): Unit =
-      if (name == "$uuid") {
+    def fieldReceived(fieldName: String, value: String): Unit =
+      if (fieldName == "$uuid") {
         require(value ne null)
         require(uuidOpt.isEmpty, "more than one document UUID provided")
 
@@ -189,10 +189,10 @@ object UploaderServer {
     // Session keys created, for cleanup
     val sessionKeys = m.ListBuffer[String]()
 
-    def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes)
+    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): (MaximumSize, AllowedMediatypes)
 
     // Can throw
-    def fileItemStarting(name: String, fileItem: FileItem): Option[MaximumSize] = {
+    def fileItemStarting(fieldName: String, fileItem: FileItem): Option[MaximumSize] = {
 
       val uuid =
         uuidOpt getOrElse (throw new IllegalStateException("missing document UUID"))
@@ -201,7 +201,7 @@ object UploaderServer {
         throw new IllegalStateException("more than one file provided")
 
       val (maxUploadSizeForControl, allowedMediatypeRangesForControl) =
-        getUploadConstraintsForControl(uuid, name)
+        getUploadConstraintsForControl(uuid, fieldName)
 
       val headersOpt =
         for {
@@ -227,9 +227,9 @@ object UploaderServer {
         // So that the XFCD is aware of progress information
         // Do this before checking size so that we can report the interrupted upload
         locally {
-          val progress = UploadProgress(name, untrustedExpectedSizeOpt)
+          val progress = UploadProgress(fieldName, untrustedExpectedSizeOpt)
 
-          val newSessionKey = getProgressSessionKey(uuid, name)
+          val newSessionKey = getProgressSessionKey(uuid, fieldName)
           sessionKeys += newSessionKey
           session.setAttribute(newSessionKey, progress)
 

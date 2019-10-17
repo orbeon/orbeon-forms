@@ -309,7 +309,10 @@
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >
         xf:show("fr-clear-confirm-dialog")
         then suspend
-        then xf:dispatch(name = "fr-clear", targetid = "fr-persistence-model")
+        then reset-form-data
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.reset-form-data.*.*" >
+        xf:dispatch(name = "fr-clear", targetid = "fr-persistence-model")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.close.*.*">
         relinquish-lease

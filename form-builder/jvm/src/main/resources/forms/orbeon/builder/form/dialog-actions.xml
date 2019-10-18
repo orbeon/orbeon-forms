@@ -135,7 +135,7 @@
 
                                 </xf:select1>
 
-                                <fr:dropdown-select1 ref="$observer[. != 'fr-form-model']" class="fb-action-control">
+                                <xf:select1 ref="$observer[. != 'fr-form-model']" appearance="search" class="fb-action-control">
                                     <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                     <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
@@ -156,7 +156,7 @@
                                         <xf:value value="@id"/>
                                     </xf:itemset>
                                     <xf:alert/>
-                                </fr:dropdown-select1>
+                                </xf:select1>
 
                                 <xf:select1 ref="$event" appearance="dropdown" class="fb-action-event">
                                     <xf:itemset
@@ -258,7 +258,8 @@
 
                             <xh:div class="fb-action-options">
 
-                                <fr:dropdown-select1
+                                <xf:select1
+                                    appearance="search"
                                     ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                     class="fb-action-option-2-col-span-1">
                                     <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
@@ -280,7 +281,7 @@
                                                 )"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </xf:select1>
 
                                 <xf:input
                                     ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"
@@ -357,7 +358,8 @@
 
                             <xh:div class="fb-action-options">
 
-                                <fr:dropdown-select1
+                                <xf:select1
+                                    appearance="search"
                                     ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                     class="fb-action-option-2-col-span-1">
                                     <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
@@ -379,7 +381,7 @@
                                                 )"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </xf:select1>
 
                                 <xf:input
                                     ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]"
@@ -497,7 +499,8 @@
 
                             <xf:switch caseref="@class">
                                 <xf:case value="'fr-set-control-value-action'">
-                                    <fr:dropdown-select1
+                                    <xf:select1
+                                        appearance="search"
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/destination-control/label" class="xforms-hidden"/>
@@ -514,7 +517,7 @@
                                                     )"/>
                                             <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                         </xf:itemset>
-                                    </fr:dropdown-select1>
+                                    </xf:select1>
                                     <xf:textarea
                                         ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]"
                                         incremental="true"
@@ -524,7 +527,8 @@
                                 </xf:case>
                                 <xf:case value="'fr-itemset-action'">
                                     <!-- Only list selection controls -->
-                                    <fr:dropdown-select1
+                                    <xf:select1
+                                        appearance="search"
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         id="fb-actions-control"
                                         class="fb-action-option-3-col-span-1">
@@ -534,7 +538,7 @@
                                             <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                             <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                         </xf:itemset>
-                                    </fr:dropdown-select1>
+                                    </xf:select1>
                                     <xh:div class="fb-action-option-3-col-span-1">
                                         <xf:textarea ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]" id="fb-actions-items" incremental="true" class="fb-action-xpath">
                                             <xf:label ref="$form-resources/dialog-actions/items/label" appearance="minimal"/>

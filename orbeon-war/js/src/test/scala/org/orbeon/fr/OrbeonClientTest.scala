@@ -42,7 +42,7 @@ class OrbeonClientTest extends AsyncFunSpec {
   val LocalResourcesDir   = "$BASE_DIRECTORY/orbeon-war/js/src/test/resources"
   val ImageTomcatDir      = "/usr/local/tomcat"
   val ImageResourcesDir   = s"$ImageTomcatDir/webapps/orbeon/WEB-INF/resources"
-  val TomcatImageName     = "tomcat:8.0"
+  val TomcatImageName     = "tomcat:8.5-jdk8-openjdk-slim"
   val HAProxyImageName    = "haproxy:1.7"
 
   case class OrbeonWindow(window: Window, documentAPI: facade.DocumentTrait, ajaxServerAPI: facade.AjaxServerTrait)

@@ -66,16 +66,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     httpClient,
     useShortNamespaces
   ) {
-
-    override def decodeURL(encoded: String): String = {
-
+    override def decodeURL(encoded: String): String =
       if (settings.keepParams.nonEmpty) {
         val (path, originalParams) = splitQueryDecodeParams(super.decodeURL(encoded))
         recombineQuery(path, originalParams.iterator ++ keepFromPortalQueryIt(request, settings.keepParams))
       } else {
         super.decodeURL(encoded)
       }
-    }
   }
 
   // For BufferedPortlet

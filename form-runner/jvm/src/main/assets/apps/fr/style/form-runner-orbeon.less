@@ -49,6 +49,8 @@ body.orbeon { background-color: @frBackground }
 
     #xforms-form { // id because Liferay uses an id too
 
+        overflow-x: scroll; // so that we don't go over the portlet boundary (for the Summary page which is not yet responsive)
+
         .row {
             margin-left: -20px;
             margin-right: -20px;
@@ -74,6 +76,10 @@ body.orbeon { background-color: @frBackground }
             .input-append .add-on,
             .input-prepend .add-on {
             box-sizing: content-box; // Bootstrap 2 default (Liferay uses Bootstrap 3 which changes that)
+        }
+
+        .container, .container-fluid {
+            padding: 0;
         }
 
         .navbar-inverse .navbar-inner {

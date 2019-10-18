@@ -91,13 +91,13 @@ class OrbeonClientTest extends AsyncFunSpec {
         |--name $containerName
         |--network=$OrbeonDockerNetwork
         |-it
-        |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon
-        |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml
-        |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml
-        |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml
-        |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml
-        |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml
-        |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh
+        |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
+        |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
+        |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml:delegated
+        |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml:delegated
+        |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml:delegated
+        |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
+        |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh:delegated
         |-p $port:8080""".stripMargin,
       checkImageRunning
     )
@@ -223,12 +223,12 @@ class OrbeonClientTest extends AsyncFunSpec {
             s"""
               |--name TomcatA
               |-it
-              |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon
-              |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml
-              |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml
-              |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml
-              |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml
-              |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml
+              |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
+              |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
+              |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml:delegated
+              |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml:delegated
+              |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml:delegated
+              |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
               |-p 8888:8080""".stripMargin,
             checkImageRunning = true
           )
@@ -273,7 +273,7 @@ class OrbeonClientTest extends AsyncFunSpec {
               |--name OrbeonHAProxy
               |--network=orbeon_test_nw
               |-it
-              |-v $LocalResourcesDir/haproxy:/usr/local/etc/haproxy:ro
+              |-v $LocalResourcesDir/haproxy:/usr/local/etc/haproxy:delegated
               |-p 8080:8080
             """.stripMargin,
             checkImageRunning = true

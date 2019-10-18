@@ -1968,8 +1968,12 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         },
 
+        _gotLoad: function() {
+            return document.readyState == "complete";
+        },
+
         _delayingUntilLoad: function (f) {
-            var delaying = document.readyState != "complete";
+            var delaying = ! ORBEON.xforms.Controls._gotLoad();
             if (delaying) window.addEventListener("load", f);
             return delaying;
         },
@@ -1980,9 +1984,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
          */
         setFocus: function setFocus(controlId) {
 
-            // Wait until `load` event, as dialog in control the control is present might not be visible until then
-            if (ORBEON.xforms.Controls._delayingUntilLoad(_.partial(setFocus, controlId)))
+            // Wait until `load` event to set focus, as dialog in control the control is present might not be visible until then
+            // And on mobile, don't set the focus on page load, as a heuristic to avoid showing the soft keyboard on page load
+            if (! ORBEON.xforms.Controls._gotLoad()) {
+                if (! bowser.mobile)
+                    ORBEON.xforms.Controls._delayingUntilLoad(_.partial(setFocus, controlId));
                 return;
+            }
 
             // Don't bother focusing if the control is already focused. This also prevents issues with maskFocusEvents,
             // whereby maskFocusEvents could be set to true below, but then not cleared back to false if no focus event

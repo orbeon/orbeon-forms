@@ -1,12 +1,12 @@
 <form>
     <applicant>
-        <name>Barack Obama</name>
+        <name>Benjamin Franklin</name>
         <business-name>Federal government of the United States</business-name>
     </applicant>
     <classification>
         <federal-tax-classification>7</federal-tax-classification>
         <llc-classification>p</llc-classification>
-        <other-classification>Defies classification</other-classification>
+        <other-classification>Polymath</other-classification>
         <exempt-payee>true</exempt-payee>
     </classification>
     <address-account>

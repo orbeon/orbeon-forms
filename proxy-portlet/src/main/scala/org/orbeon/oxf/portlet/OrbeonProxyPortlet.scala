@@ -423,7 +423,7 @@ private[portlet] object OrbeonProxyPortlet {
 
   val FormRunnerHomePathRegex     : Regex = """/fr/(\?(.*))?""".r
   val FormRunnerPathRegex         : Regex = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
-  val FormRunnerDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
+  val FormRunnerDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(new|edit|view|pdf)/([^/?]+)?(\?(.*))?""".r
 
   def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
     try body

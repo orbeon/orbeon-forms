@@ -210,7 +210,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   describe("The test server") {
 
-    ignore("starts and stop an image") {
+    it("starts and stop an image") {
 
       // NOTE: `--rm` works with Docker 17.06.0-ce, but not with Docker 1.12.3 used on Travis, where if we
       // use that we get "Conflicting options: --rm and -d".
@@ -261,7 +261,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   describe("The replication setup") {
 
-    ignore("can connect to Orbeon Forms via the HAProxy container") {
+    it("can connect to Orbeon Forms via the HAProxy container") {
       async {
 
         await(createNetworkIfNeeded())

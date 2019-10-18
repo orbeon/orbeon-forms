@@ -1105,9 +1105,9 @@
                     value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
 
                 <fr:grid>
-                    <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
-                        <xh:tr>
-                            <xh:td>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
                                 <xf:select1 ref="instance()/current-remote-server">
                                     <xf:label ref="$fr-resources/home/labels/remote-server"/>
                                     <xf:itemset ref="instance()/remote-servers/remote-server">
@@ -1115,9 +1115,9 @@
                                         <xf:value ref="position()"/>
                                     </xf:itemset>
                                 </xf:select1>
-                            </xh:td>
-                        </xh:tr>
-                    </xf:group>
+                            </xf:group>
+                        </xh:td>
+                    </xh:tr>
                     <xh:tr>
                         <xh:td>
                             <xf:input ref="$remote-server/username">

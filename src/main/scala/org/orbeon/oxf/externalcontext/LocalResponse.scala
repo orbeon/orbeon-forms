@@ -39,7 +39,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     StreamedContent(
       inputStream   = getInputStream,
       contentType   = Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType),
-      contentLength = Headers.firstLongHeaderIgnoreCase(responseHeaders, Headers.ContentLength),
+      contentLength = Headers.firstNonNegativeLongHeaderIgnoreCase(responseHeaders, Headers.ContentLength),
       title         = None
     )
   }

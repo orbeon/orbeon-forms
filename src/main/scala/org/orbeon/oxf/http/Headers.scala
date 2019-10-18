@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.http
 
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.{DateUtils, NumericUtils}
 
 import scala.collection.breakOut
 
@@ -131,8 +131,8 @@ object Headers {
       case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
     }
 
-  def firstLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
-    firstItemIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
+  def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
+    firstItemIgnoreCase(headers, name) flatMap NumericUtils.parseLong filter (_ >= 0L)
 
   def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)

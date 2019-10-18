@@ -213,7 +213,7 @@ object UploaderServer {
 
       // Handle max size
       locally {
-        // This is `None` with Chrome and Firefox at least
+        // This is `None` with Chrome and Firefox at least (2019-10-18: confirmed at least for Chrome)
         val untrustedPartContentLengthOpt =
           for {
             headers             ← headersOpt

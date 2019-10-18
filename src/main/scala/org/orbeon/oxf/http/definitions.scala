@@ -56,7 +56,7 @@ object StreamedContent {
     StreamedContent(
       inputStream   = inputStream,
       contentType   = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
-      contentLength = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
+      contentLength = Headers.firstNonNegativeLongHeaderIgnoreCase(headers, Headers.ContentLength),
       title         = title
     )
 

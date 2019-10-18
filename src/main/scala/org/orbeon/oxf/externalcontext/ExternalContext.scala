@@ -97,7 +97,7 @@ object ExternalContext {
     def getFirstParamAsString(name: String): Option[String] = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
     def getFirstHeader(name: String): Option[String]        = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
     def sessionOpt: Option[Session]                         = Option(getSession(create = false))
-    lazy val contentLengthOpt: Option[Long]                 = getFirstHeader(Headers.ContentLength) flatMap NumericUtils.parseLong filter (_ >= 0L)
+    lazy val contentLengthOpt: Option[Long]                 = Headers.firstNonNegativeLongHeaderIgnoreCase(getHeaderValuesMap.asScala, Headers.ContentLength)
   }
 
   trait Rewriter extends URLRewriter {

@@ -84,8 +84,12 @@ class Upload {
   @JSExport
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
-      case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); scribe.debug("cancel")
-      case _ if self._yuiProgressBar ne null ⇒ self._yuiProgressBar.set("value", 10 + 110 * received / expected); scribe.debug(s"update progress ${100 * received / expected}")
+      case "interrupted"                     ⇒
+        UploaderClient.cancel(doAbort = true, XXFormsUploadError)
+        scribe.debug("cancel")
+      case _ if self._yuiProgressBar ne null ⇒
+        self._yuiProgressBar.set("value", 10 + 110 * received / expected)
+        scribe.debug(s"update progress ${100 * received / expected}")
       case _ ⇒
     }
 

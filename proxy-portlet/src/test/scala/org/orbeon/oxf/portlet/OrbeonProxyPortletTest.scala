@@ -49,7 +49,10 @@ class OrbeonProxyPortletTest extends FunSpec {
       s"/$Versioned../${optionalPath}apps/fr/style/bootstrap/img/glyphicons-halflings.png",
 
       s"/fr/service/acme/sales/pdf/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.pdf",
-      s"/fr/service/acme/sales/tiff/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.tiff"
+      s"/fr/service/acme/sales/tiff/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.tiff",
+
+      s"/fr/orbeon/bookshelf/pdf/fd5dfce7a236758e72910d333bf832f8?fr-language=fr&",
+      s"/fr/orbeon/bookshelf/tiff/fd5dfce7a236758e72910d333bf832f8?fr-language=fr&"
     )
   }
 

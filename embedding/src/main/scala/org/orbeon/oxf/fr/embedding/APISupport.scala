@@ -331,6 +331,20 @@ object APISupport {
           )
         )
         |
+        # PDF/TIFF resource paths
+        (?:
+          /fr/
+          [^/^.]+
+          /
+          [^/^.]+
+          /
+          (?:
+            pdf|tiff
+          )
+          /
+          [^/^.]+
+        )
+        |
         # Other asset paths
         (?:
           # Optional versioned resources token

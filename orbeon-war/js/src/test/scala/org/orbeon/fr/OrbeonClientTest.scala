@@ -35,15 +35,21 @@ import scala.util.{Success, Try}
 
 class OrbeonClientTest extends AsyncFunSpec {
 
-  val OrbeonServer1Url  = "http://localhost:8888/orbeon"
-  val OrbeonServer2Url  = "http://localhost:8889/orbeon"
-  val OrbeonHAProxyUrl  = "http://localhost:8080/orbeon"
+  val Server1ExternalPort = 8888
+  val Server2ExternalPort = 8889
+  val HAProxyExternalPort = 8800
+
+  val OrbeonServer1Url    = s"http://localhost:$Server1ExternalPort/orbeon"
+  val OrbeonServer2Url    = s"http://localhost:$Server2ExternalPort/orbeon"
+  val OrbeonHAProxyUrl    = s"http://localhost:$HAProxyExternalPort/orbeon"
 
   val LocalResourcesDir   = "$BASE_DIRECTORY/orbeon-war/js/src/test/resources"
   val ImageTomcatDir      = "/usr/local/tomcat"
   val ImageResourcesDir   = s"$ImageTomcatDir/webapps/orbeon/WEB-INF/resources"
   val TomcatImageName     = "tomcat:8.5-jdk8-openjdk-slim"
   val HAProxyImageName    = "haproxy:1.7"
+
+  val CookieTimeout       = 60.seconds
 
   case class OrbeonWindow(window: Window, documentAPI: facade.DocumentTrait, ajaxServerAPI: facade.AjaxServerTrait)
 
@@ -189,7 +195,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   // NOTE: While we retry new server sessions may be created if we hit another server
   def waitForServerCookie(serverPrefix: String): Future[Try[String]] =
-    eventuallyAsTry(interval = 5.seconds, timeout = 120.seconds) {
+    eventuallyAsTry(interval = 5.seconds, timeout = CookieTimeout) {
       simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res ⇒
 
         // https://github.com/hmil/RosHTTP/issues/68
@@ -208,60 +214,12 @@ class OrbeonClientTest extends AsyncFunSpec {
       }
     }
 
-  describe("The test server") {
-
-    it("starts and stop an image") {
-
-      // NOTE: `--rm` works with Docker 17.06.0-ce, but not with Docker 1.12.3 used on Travis, where if we
-      // use that we get "Conflicting options: --rm and -d".
-
-      async {
-
-        await {
-          runContainer(
-            TomcatImageName,
-            s"""
-              |--name TomcatA
-              |-it
-              |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
-              |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
-              |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml:delegated
-              |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml:delegated
-              |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml:delegated
-              |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
-              |-p 8888:8080""".stripMargin,
-            checkImageRunning = true
-          )
-        }
-
-        val documentResult = {
-
-          val window =
-            await {
-              eventually(interval = 5.seconds, timeout = 120.seconds) {
-                loadDocumentViaJSDOM(s"$OrbeonServer1Url/xforms-espresso/")
-              }
-            }
-
-            val e = window.document.querySelector(".xforms-form")
-            Success(e.getAttribute("class"))
-          }
-
-        await(removeContainerByImage(TomcatImageName))
-
-        assert(
-          documentResult.toOption map
-            StringUtils.stringToSet exists
-            (s ⇒ s.contains(Constants.FormClass) && ! s.contains(Constants.InitiallyHiddenClass))
-        )
-      }
-    }
-
-  }
-
   describe("The replication setup") {
 
-    it("can connect to Orbeon Forms via the HAProxy container") {
+    // In this test, we simulate two browser windows. The first one accesses the first server via HAProxy. Then the
+    // second server is started, and the second window is loaded and accesses the second server. Stopping either of
+    // the servers keeps the system working.
+    it("handles failover via HAProxy when one or the other server is stopped") {
       async {
 
         await(createNetworkIfNeeded())
@@ -274,59 +232,71 @@ class OrbeonClientTest extends AsyncFunSpec {
               |--network=orbeon_test_nw
               |-it
               |-v $LocalResourcesDir/haproxy:/usr/local/etc/haproxy:delegated
-              |-p 8080:8080
+              |-p $HAProxyExternalPort:8080
             """.stripMargin,
             checkImageRunning = true
           ) {
             async {
 
-              // Start image A
-              val tryContainerIdA =
-                await(runContainerByImageName("TomcatA", 8888, checkImageRunning = true))
+              val (containerIdA, windowA) =
+                locally {
+                  // Start image A
+                  val tryContainerIdA =
+                    await(runContainerByImageName("TomcatA", Server1ExternalPort, checkImageRunning = true))
 
-              assert(tryContainerIdA.isSuccess)
+                  assert(tryContainerIdA.isSuccess)
 
-              val containerIdA = tryContainerIdA.get.head
+                  val containerIdA = tryContainerIdA.get.head
 
-              // Wait for a successful request to image A
-              val s1Cookie = await(waitForServerCookie("s1"))
-              assert(s1Cookie.isSuccess)
+                  // Wait for a successful request to image A
+                  val s1Cookie = await(waitForServerCookie("s1"))
+                  assert(s1Cookie.isSuccess)
 
-              val windowA =
-                OrbeonWindow(await(loadDocumentViaJSDOM(s"$OrbeonHAProxyUrl/xforms-espresso/", s1Cookie.toOption)))
+                  val windowA =
+                    OrbeonWindow(await(loadDocumentViaJSDOM(s"$OrbeonHAProxyUrl/xforms-espresso/", s1Cookie.toOption)))
 
-              // Test that XForms page on TomcatA works
-              await(updateWindowsAndAssert(List(windowA), 1))
-              await(updateWindowsAndAssert(List(windowA), 2))
+                  await(updateWindowsAndAssert(List(windowA), 1))
+                  await(updateWindowsAndAssert(List(windowA), 2))
 
-              // Start image B
-              val tryContainerIdB =
-                await(runContainerByImageName("TomcatB", 8889, checkImageRunning = false))
+                  (containerIdA, windowA)
+                }
 
-              assert(tryContainerIdB.isSuccess)
-              val containerIdB = tryContainerIdB.get.head
+              val (containerIdB, windowB) =
+                locally {
+                  // Start image B
+                  val tryContainerIdB =
+                    await(runContainerByImageName("TomcatB", Server2ExternalPort, checkImageRunning = false))
 
-              // Wait for a successful request to TomcatB
-              val s2Cookie = await(waitForServerCookie("s2"))
-              assert(s2Cookie.isSuccess)
+                  assert(tryContainerIdB.isSuccess)
+                  val containerIdB = tryContainerIdB.get.head
 
-              val windowB =
-                OrbeonWindow(await(loadDocumentViaJSDOM(s"$OrbeonHAProxyUrl/xforms-espresso/", s2Cookie.toOption)))
+                  // Wait for a successful request to TomcatB
+                  // We expect `s2` because haproxy rounds robin the requests
+                  val s2Cookie = await(waitForServerCookie("s2"))
+                  assert(s2Cookie.isSuccess)
 
-              await(updateWindowsAndAssert(List(windowB), 1))
-              await(updateWindowsAndAssert(List(windowB), 2))
+                  val windowB =
+                    OrbeonWindow(await(loadDocumentViaJSDOM(s"$OrbeonHAProxyUrl/xforms-espresso/", s2Cookie.toOption)))
+
+                  await(updateWindowsAndAssert(List(windowB), 1))
+                  await(updateWindowsAndAssert(List(windowB), 2))
+
+                  (containerIdB, windowB)
+                }
 
               // Shutdown image A
               await(removeContainerByIdAndWait(containerIdA))
 
               // Update windows
+              // In both cases, both windows must still work and work off the previous state
               await(updateWindowsAndAssert(List(windowA, windowB), 3))
 
               // Start image A again
-              await(runContainerByImageName("TomcatA", 8888, checkImageRunning = false))
+              await(runContainerByImageName("TomcatA", Server1ExternalPort, checkImageRunning = false))
               assert(await(waitForServerCookie("s1")).isSuccess)
 
               // Update windows
+              // In both cases, both windows must still work and work off the previous state
               await(updateWindowsAndAssert(List(windowA, windowB), 4))
 
               // Shutdown image B
@@ -334,6 +304,7 @@ class OrbeonClientTest extends AsyncFunSpec {
               await(removeContainerByIdAndWait(containerIdB))
 
               // Update windows
+              // In both cases, both windows must still work and work off the previous state
               await(updateWindowsAndAssert(List(windowA, windowB), 5))
 
               windowA.window.close()
@@ -350,5 +321,4 @@ class OrbeonClientTest extends AsyncFunSpec {
       }
     }
   }
-
 }

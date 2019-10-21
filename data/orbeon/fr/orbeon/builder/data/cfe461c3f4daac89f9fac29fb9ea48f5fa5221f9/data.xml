@@ -83,7 +83,7 @@
                             <xf:bind id="frequent-traveler-number-bind" ref="frequent-traveler-number"
                                      name="frequent-traveler-number"
                                      xxf:whitespace="trim"/>
-                            <xf:bind id="gender-bind" ref="gender" name="gender"/>
+                            <xf:bind id="gender-bind" ref="gender" name="gender" required="true()"/>
                             <xf:bind id="meal-bind" ref="meal" name="meal" required="true()" xxf:default="'none'"/>
                             <xf:bind id="comment-bind" ref="comment" name="comment"/>
                         </xf:bind>

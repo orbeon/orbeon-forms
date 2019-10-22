@@ -219,7 +219,7 @@ class OrbeonClientTest extends AsyncFunSpec {
     // In this test, we simulate two browser windows. The first one accesses the first server via HAProxy. Then the
     // second server is started, and the second window is loaded and accesses the second server. Stopping either of
     // the servers keeps the system working.
-    it("handles failover via HAProxy when one or the other server is stopped") {
+    ignore("handles failover via HAProxy when one or the other server is stopped") {
       async {
 
         await(createNetworkIfNeeded())

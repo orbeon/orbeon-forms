@@ -124,6 +124,7 @@
                         <resource xml:lang="nl"><date>Datum</date>     <time>Tijd</time></resource>
                         <resource xml:lang="sv"><date>Datum</date>     <time>Tid</time></resource>
                         <resource xml:lang="pt"><date>Data</date>      <time>Hora</time></resource>
+                        <resource xml:lang="pl"><date>Data</date>      <time>Godzina</time></resource>
                     </resources>
                 </xf:instance>
                 <xf:instance id="i">

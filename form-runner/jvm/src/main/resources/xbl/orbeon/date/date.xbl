@@ -140,6 +140,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                         <resource xml:lang="en"><format>MDY</format></resource>
                         <resource xml:lang="fr"><format>MJA</format></resource>
                         <resource xml:lang="de"><format>MTJ</format></resource>
+                        <resource xml:lang="pl"><format>YMD</format></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

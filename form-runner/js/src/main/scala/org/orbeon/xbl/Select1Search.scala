@@ -62,18 +62,19 @@ private class Select1SearchCompanion extends XBLCompanion {
         }
       }
 
-      jSelect.select2(new Select2.Options {
-        val placeholder =
-          new Select2.Option {
-            val id   = "0"
-            val text = elementWithData.attr(DataPlaceholder).get
-          }
-        val ajax =
-          if (performsSearch)
-            Select2Ajax
-          else
-            js.undefined
-      })
+      val options = new Select2.Options
+      options.placeholder =
+        new Select2.Option {
+          val id   = "0"
+          val text = elementWithData.attr(DataPlaceholder).get
+        }
+      options.ajax =
+        if (performsSearch)
+          Select2Ajax
+        else
+          null
+      options.allowClear = true
+      jSelect.select2(options)
       if (performsSearch)
         jSelect.on("change", onChange _)
     }
@@ -154,9 +155,10 @@ private object Select2 {
     def select2(options: Options): Unit = js.native
   }
 
-  trait Options extends js.Object {
-    val placeholder : Option
-    val ajax        : js.UndefOr[Ajax]
+  class Options extends js.Object {
+    var placeholder : Option  = _
+    var ajax        : Ajax    = _
+    var allowClear  : Boolean = false
   }
 
   trait Option extends js.Object {

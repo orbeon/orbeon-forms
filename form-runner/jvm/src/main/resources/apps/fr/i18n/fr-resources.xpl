@@ -19,9 +19,15 @@
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
+    <!-- Support XInclude in resources -->
+    <p:processor name="oxf:xinclude">
+        <p:input name="config" href="resources.xml"/>
+        <p:output name="data" id="resources"/>
+    </p:processor>
+
     <!-- Resources -->
     <p:processor name="fr:resources-patcher">
-        <p:input name="data" href="resources.xml"/>
+        <p:input name="data" href="#resources"/>
         <p:input name="instance" href="#instance"/>
         <!-- Dependency on overridden properties so stylesheet runs again when properties change -->
         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>

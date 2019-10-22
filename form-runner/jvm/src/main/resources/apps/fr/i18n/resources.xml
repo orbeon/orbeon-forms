@@ -5607,4 +5607,473 @@
             </login-error>
         </authentication>
     </resource>
+    <resource xml:lang="pl">
+        <common>
+            <formats>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
+                <day-this-year>[Y01]-[M01]-[D01]</day-this-year>
+                <short-date>[Y01]-[M01]-[D01]</short-date>
+            </formats>
+        </common>
+        <buttons>
+            <create>&lt;i class="fa fa-fw fa-plus"/&lt; Utwórz</create>
+            <view>&lt;i class="fa fa-fw fa-eye"/&lt; Podgląd</view>
+            <approve>&lt;i class="icon-ok-circle"/&lt; Akceptuj</approve>
+            <reject>&lt;i class="icon-ban-circle"/&lt; Odrzuć</reject>
+
+            <home>&lt;i class="fa fa-fw fa-home"/&lt; Home</home>
+            <review>&lt;i class="fa fa-fw fa-eye"/&lt; Przeglądaj</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"/&lt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"/&lt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"/&lt; Usuń</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"/&lt; Importuj</import>
+            <new>&lt;i class="fa fa-fw fa-plus"/&lt; Nowy</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"/&lt; Duplikuj</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Zapisz</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Złóż</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</edit>
+            <send>&lt;i class="icon-arrow-right"/&lt; Wyślij</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"/&lt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"/&lt; Zweryfikuj</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&lt; Złóż</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&lt; Przeglądaj</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&lt; Wyślij</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="fa fa-fw fa-list"/&lt; Podsumowanie</summary>
+            <close>&lt;i class="fa fa-fw fa-times"/&lt; Zamknij</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"/&lt; Wyczyść</clear>
+            <cancel>Anuluj</cancel>
+            <save-locally>Zapisz lokalnie</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/></collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/></expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&lt; Następna sekcja</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&lt; Poprzednia sekcja</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&lt; Zawartość</wizard-toc>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Wyczyść i zamknij</submit-dialog-clear>
+            <submit-dialog-keep>Zachowaj zawartość i zamknij</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Zamknij okno</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Przeglądaj</validation-dialog-review>
+            <validation-dialog-continue>Kontynuuj</validation-dialog-continue>
+
+            <test>&lt;i class="fa fa-fw fa-cog"/&lt; Testuj</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"/&lt; Publikuj</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"/&lt; Zapisz i publikuj</save-publish>
+
+            <yes>&lt;i class="fa fa-fw fa-check"/&lt; Tak</yes>
+            <no>&lt;i class="fa fa-fw fa-times"/&lt; Nie</no>
+            <ok>OK</ok>
+            <previous>Poprzedni</previous>
+            <next>Następny</next>
+        </buttons>
+        <components>
+            <labels>
+                <open-section>Pokaż sekcję</open-section>
+                <close-section>Ukryj sekcję</close-section>
+                <section-name>Nazwa sekcji</section-name>
+                <yes>Tak</yes>
+                <no>Nie</no>
+                <other>inne</other>
+            </labels>
+            <grid>
+                <menu>Menu</menu>
+                <insert-above>Wstaw powyżej</insert-above>
+                <insert-below>Wstaw poniżej</insert-below>
+                <move-up>Przesuń w górę</move-up>
+                <move-down>Przesuń w dół</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
+                <remove>
+                    <label>Usuń linię</label>
+                    <hint>Usuń linię z powtarzanej siatki</hint>
+                </remove>
+                <add-another>
+                    <label>Dodaj kolejną linię</label>
+                    <hint>Dodaj kolejną linię do powtarzanej siatki</hint>
+                </add-another>
+            </grid>
+            <section>
+                <remove>
+                    <label>Usuń powtórzenie</label>
+                    <hint>Usuń powtórzenie z powtarzającej się sekcji</hint>
+                </remove>
+                <add-another>
+                    <label>Dodaj kolejne powtórzenie</label>
+                    <hint>Dodaj kolejne powtórzenie do powtarzanej sekcji</hint>
+                </add-another>
+            </section>
+            <date-time>
+                <year>Rok</year>
+                <month>Miesiąc</month>
+                <day>Dzień</day>
+            </date-time>
+            <wizard>
+                <errors>Błędy</errors>
+                <incomplete>Niedokończony</incomplete>
+                <complete>Ukończony</complete>
+                <not-started>Nierozpoczęty</not-started>
+                <edit>Edytuj</edit>
+            </wizard>
+            <error-summary>
+                <show-more>Pokaż więcej</show-more>
+                <show-less>Pokaż mniej</show-less>
+            </error-summary>
+        </components>
+        <untitled-form>Bez tytułu</untitled-form>
+        <errors>
+            <summary-title>Twój formularz {1,choice,
+                0#nie zawiera komunikatów błędów i ostrzeżeń.|
+                1#zawiera następujące elementy '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'|
+                1&lt;zawiera następujące elementy '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Błąd|1#Ostrzeżenie|2#Komunikat informacyjny|3#Komunikat}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Błąd|1#Ostrzeżenie|2#Komunikat informacyjny|3#Komunikat}' - }{2}</form-title>
+            <none>Brak błędów w formularzu</none>
+            <unsaved>Niezachowane zmiany</unsaved>
+            <canvas-not-supported>Aby móc dodać adnotacje do pliku graficznego twoja przeglądarka musi wspierać HTML5 canvas</canvas-not-supported>
+        </errors>
+        <email>
+            <subject>Potwierdzenie formularza Orbeon Forms</subject>
+            <body>W załączniku znajduje się formularz w formacie PDF i XML.</body>
+            <na>Nie dotyczy</na>
+            <iteration>Iteracja {$iteracja}</iteration>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[Y]-[M]-[D] </date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[Y]-[M]-[D] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Podsumowanie</summary-title>
+                <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
+                <created>Utworzony</created>
+                <last-modified>Zmodyfikowany</last-modified>
+                <selected>Wybrany</selected>
+                <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
+                <toc>Spis treści</toc>
+                <description>Opis</description>
+                <help>Pomoc</help>
+                <error-count>Błąd w Twoim formularzu</error-count>
+                <errors-count>Błędy/-ów w Twoim formularzu</errors-count>
+            </titles>
+            <search>
+                <search>Szukaj</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"/&lt; Wyszukaj formularze</search-forms>
+                <show-options>Pokaż opcje wyszukiwania</show-options>
+                <close-options>Zamknij opcje wyszukiwania</close-options>
+            </search>
+            <paging>
+                <to>do</to>
+                <of>z</of>
+            </paging>
+            <messages>
+                <no-form-found>Nie znaleziono formularzy.</no-form-found>
+                <delete-confirmation>Czy jesteś pewien, że chcesz usunąć wybrany/-e fomularz/-e? Po usunięciu zapisanego dokumentu, powiązane szkice również zostaną usunięte.</delete-confirmation>
+                <version>Wersja formularza {0,number,integer}</version>
+            </messages>
+            <labels>
+                <draft>Szkic</draft>
+                <read-only>Tylko do odczytu</read-only>
+                <language-choice>Wybierz język</language-choice>
+                <form-choice>Wybierz formularz</form-choice>
+                <free-search>Wyszukiwanie pełnotekstowe</free-search>
+                <any>[Dowolny]</any>
+                <script>Pełna wersja</script>
+                <refresh>Odśwież</refresh>
+                <close-box>[zamknij]</close-box>
+                <help-back>Wstecz</help-back>
+                <goto-content>Idź do treści</goto-content>
+            </labels>
+            <formats>
+                <date>[Y]-[M]-[D]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[Y]-[M]-[D] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[Y]-[M]-[D] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Formularz został zapisany pomyślnie!</save-success>
+                <save-draft-success>Szkic został pomyślnie zapisany.</save-draft-success>
+                <email-success>Email został pomyślnie wysłany.</email-success>
+                <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
+                <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
+                <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
+                <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
+                <clear-confirm-message>Czy jesteś pewien, że chcesz wyczyścić wszystkie pola na tej stronie? Twoje dane zostaną utraceone, jeśli nie zostały wcześniej zapisane.</clear-confirm-message>
+                <error-dialog-title>Nie można ukończyć akcji.</error-dialog-title>
+                <confirmation-dialog-title>Potwierdzenie</confirmation-dialog-title>
+                <confirmation-dialog-message>Czy kontynuować? Wysłanego formularza nie można poprawić.</confirmation-dialog-message>
+                <submit-dialog-title>Formularz złożony</submit-dialog-title>
+                <submit-dialog-message>Twój formularz został złożony, dziękuję.</submit-dialog-message>
+                <validation-dialog-title>Przegląd komunikatów walidacji</validation-dialog-title>
+                <validation-dialog-message>Twój formularz {1,choice,
+                    0#nie zawiera błędów|
+                    1#zawiera 1 lub więcej '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}. Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Kliknij tutaj, by otworzyć dokument. Dane wprowadzone przez Ciebie będą zaprezentowane w takiej formie, w jakiej je zapisałeś.</saved-locally-open>
+                <upload-in-progress>Trwa wgrywanie plików. Spróbuj ponownie, gdy wgrywanie plików zakończy się lub zostanie anulowane.</upload-in-progress>
+                <upload-start>Wgrywanie pliku/-ów rozpoczęło się</upload-start>
+                <upload-cancel>Wgrywanie pliku/-ów zostało anulowane przez użytkownika</upload-cancel>
+                <upload-done>Wgrywanie pliku/-ów zostało zakończone</upload-done>
+                <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
+                <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0,number,integer} bajtów, a rozmiar otrzymanego pliku to {1,number,integer} bajtów.</upload-error-size>
+                <upload-error-mediatype>Wgrany plik jest niewłaściwego typu.</upload-error-mediatype>
+                <upload-error-file-scan>Przesłany plik został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{0}”.</upload-error-file-scan>
+                <lost-attachments>Niektóre załączniki zostały utracone z powodu problemu z serwerem. Sprawdź wszystkie załączniki i prześlij je ponownie w razie potrzeby.</lost-attachments>
+            </messages>
+            <draft-singleton>
+                <found-draft>Znaleziono szkic</found-draft>
+                <found-drafts>Znaleziono szkice</found-drafts>
+                <found-draft-for-document>Po zapisaniu tego dokumentu został wykonany autozapis szkicu. Dokument może wymagać dodatkowej pracy. Czy chcesz otworzyć zapisany dokument, czy zapisany automatycznie szkic?</found-draft-for-document>
+                <found-draft-for-never-saved>Szkic tego formularza został automatycznie zapisany. Czy chcesz zacząć wypełnianie formularza od początku czy chcesz edytować zapisany szkic?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Dla tego formularza zostało zapisanych kilka szkiców. Czy chcesz zacząć wypełnianie formularza od początku czy chcesz zobaczyć zapisane szkice (i wtedy wyedytować jeden z nich)?</found-drafts-for-never-saved>
+                <open-saved>Otwórz zapisany dokument</open-saved>
+                <open-draft>Otwórz automatycznie zapisany szkic</open-draft>
+                <view-drafts>Przeglądaj automatycznie zapisane szkice</view-drafts>
+                <start-new>Zacznij wypełnianie od początku</start-new>
+                <multiple-docs-title>Znaleziono istniejące dane formularza</multiple-docs-title>
+                <multiple-docs-explanation>Nie możesz utworzyć nowego formularza dla tej definicji, ale możesz wyedytować istniejący.</multiple-docs-explanation>
+                <multiple-docs-view-data>Podgląd istniejącej zawartości formularza</multiple-docs-view-data>
+            </draft-singleton>
+            <labels>
+                <language-choice>Język</language-choice>
+                <errors>Podsumowanie błędów</errors>
+                <check-errors-in-form>Ten formularz zawiera błędy</check-errors-in-form>
+                <error-details>Podgląd szczegółów błędu</error-details>
+                <confirm>Potwierdź</confirm>
+                <alert>Brakująca lub niepoprawna wartość</alert>
+                <captcha-label>Captcha</captcha-label>
+                <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    To jest podgląd Twoich danych w trybie tylko do odczytu.
+                </explanation>
+            </view>
+            <lease>
+                <renew-lease-title>Czy przedłużyć możliwość edycji?</renew-lease-title>
+                <renew-lease-message>Twoje uprawnienie do edycji wkrótce wygaśnie. Czy chcesz je przedłużyć?</renew-lease-message>
+                <current-user-left>Posiadasz uprawnienie do edycji na kolejne </current-user-left>
+                <current-user-right>.</current-user-right>
+                <relinquished>Uprawnienie do edycji wygasło. Jeśli nadal chcesz edytować dokument spróbuj uzyskać je ponownie.</relinquished>
+                <other-user>Użytkownik o nazwie "{0}" aktualnie posiada prawo edycji.</other-user>
+                <relinquish>Odblokuj dokument do edycji dla innych użytkowników.</relinquish>
+                <renew>Przedłuż swoje prawo do edycji dokumentu.</renew>
+                <try-acquire>Spróbuj uzyskać prawo do edycji dokumentu.</try-acquire>
+            </lease>
+        </detail>
+        <save-locally>
+            <dialog-title>Zapisz lokalnie</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Kliknij na przycisk "Zapisz" poniżej, aby zapisać dane formularza w postaci pliku HTML na swoim komputerze.
+                    </p>
+                    <p>
+                        Aby otworzyć ponownie otworzyć Twój formularz:
+                    </p>
+                    <ul>
+                        <li>Otwórz plik HTML w swojej przeglądarce (poprzez kliknięcie na plik lub upuszczenie pliku w oknie przeglądarki).</li>
+                        <li>Kliknij na przycisk "Otwórz", który będzie wyświetlony, aby zatwierdzić otwieranie pliku.</li>
+                    </ul>
+                    <p>
+                        <b>OSTRZEŻENIE:</b> Dane w zapisanym na dysku formularzu nie są zapisane na serwerze. Jeśli skasujesz plik na dysku, dane zostaną utracone.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner Home</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Cofnij publikację</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publikuj</publish>
+                <cancel>Anuluj</cancel>
+                <connect>Połącz</connect>
+                <select>Wybierz</select>
+                <operation>Operacja</operation>
+                <reindex>Reindeksuj bazę(-y) danych</reindex>
+                <stop-reindex>Zatrzymaj reindeksację</stop-reindex>
+                <all>Wszystkie</all>
+                <none>Żadne</none>
+                <unpublished-local>Nieopublikowane lokalne formularze</unpublished-local>
+                <published-local>Opublikowane lokalne formularze</published-local>
+                <unpublished-remote>Nieopublikowane zdalne formularze</unpublished-remote>
+                <published-remote>Opublikowane zdalne formularze</published-remote>
+                <newer-local>Formularze, które są lokalnie w nowszej wersji</newer-local>
+                <newer-remote>Formularze, które są zdalnie w nowszej wersji</newer-remote>
+                <publish-local>Publikuj lokalne formularze</publish-local>
+                <unpublish-local>Cofnij publikację lokalnych formularzy</unpublish-local>
+                <publish-remote>Publikuj zdalne formularze</publish-remote>
+                <unpublish-remote>Cofnij publikację zdalnych formularzy</unpublish-remote>
+                <push-to-remote>Zapisz na zdalny serwer</push-to-remote>
+                <pull-from-remote>Pobierz ze zdalnego serwera</pull-from-remote>
+                <navigate-summary>Przejdź do podsumowania</navigate-summary>
+                <navigate-new>Przejdź do nowych</navigate-new>
+                <upgrade-local>Aktualizuj lokalne definicje formularzy</upgrade-local>
+                <upgrade-remote>Aktualizuj zdalne definicje formularzy</upgrade-remote>
+                <reencrypt>Ponownie zaszyfruj definicje formularzy</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
+            </buttons>
+            <titles>
+                <publish-confirmation>Potwierdź publikację/cofnięcie publikacji formularza</publish-confirmation>
+                <credentials>Dane dostępowe do zdalnego serwera</credentials>
+                <status>Status</status>
+                <app>Aplikacja</app>
+                <form>Formularz</form>
+                <title>Tytuł</title>
+                <view>Podgląd</view>
+                <new>Nowy</new>
+                <local>Lokalny</local>
+                <remote>Zdalny</remote>
+                <form-identification>Identyfikacja formularza</form-identification>
+                <last-modified>Zmodyfikowany</last-modified>
+                <reindexing-confirmation>Potwierdź reindeksację</reindexing-confirmation>
+                <reencrypt-confirmation>Potwierdź ponowne szyfrowanie</reencrypt-confirmation>
+            </titles>
+            <messages>
+                <no-forms>Nie masz dostępu do wdrożonych formularzy.</no-forms>
+                <publish-confirmation>Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
+                <reindexing-confirmation>W trakcie reindeksacji niektóre funkcje, jak strony podsumowań Form Runner'a, mogą nie działać prawidłowo. Z tego powodu rekomendujemy, abyś wykonywał reindeksowanie, kiedy system jest offline. Czy jesteś pewien, że chcesz kontynuować reindeksację?</reindexing-confirmation>
+                <reencrypt-confirmation>Zalecamy ponowne szyfrowanie, gdy system jest w trybie offline. Czy na pewno chcesz kontynuować ponowne szyfrowanie?</reencrypt-confirmation>
+            </messages>
+            <labels>
+                <available>Dostępny</available>
+                <unavailable>Niedostępny</unavailable>
+                <library>Biblioteka</library>
+                <newer>Nowszy</newer>
+                <remote-server>Zdalny serwer</remote-server>
+                <username>Użytkownik</username>
+                <password>Hasło</password>
+                <reindexing-generic>Reindeksacja &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+                <reindexing-provider>Reindeksacja {0} ({1,number}/{2,number})</reindexing-provider>
+                <reindexing-stopping>Zatrzymywanie operacji reindeksowania &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+                <reindexing-finished>Operacja reindeksowania została zakończona</reindexing-finished>
+                <reencrypt-state>Ponowne szyfrowanie {0,number}/{1,number}</reencrypt-state>
+                <reencrypt-started>Rozpoczęto ponowne szyfrowanie</reencrypt-started>
+                <reencrypt-finished>Ponowne szyfrowanie zakończone</reencrypt-finished>
+            </labels>
+        </home>
+        <import>
+            <form-version>
+                <label>Wersja formularza</label>
+                <alert>Brakująca wersja formularza</alert>
+            </form-version>
+            <application-name>
+                <label>Nazwa aplikacji</label>
+            </application-name>
+            <form-name>
+                <label>Nazwa formularza</label>
+            </form-name>
+            <version-comment>
+                <label>Komentarz do wersji</label>
+            </version-comment>
+            <upload>
+                <label>Wrzucić plik</label>
+            </upload>
+            <file>
+                <label>Plik Excel z danymi do importu</label>
+                <hint>Plik musi być w formacie Excel 2007 (.xlsx)</hint>
+                <alert>Brakujący plik</alert>
+            </file>
+            <validation>
+                <label>Walidacja</label>
+                <alert>Rozpocznij walidację przed przejściem do importu</alert>
+            </validation>
+            <start-validation>
+                <label>Rozpocznij walidację</label>
+            </start-validation>
+            <total>Całkowity</total>
+            <valid>Ważny</valid>
+            <invalid>Nieważny</invalid>
+            <imported>Importowany</imported>
+            <skipped>Pominięto</skipped>
+            <eta>ETA</eta>
+            <cancel-validation>
+                <label>Anuluj walidację</label>
+            </cancel-validation>
+            <validation-canceled>Walidacja została anulowana.</validation-canceled>
+            <import>
+                <label>Import</label>
+            </import>
+            <existing-records>
+                <label>Istniejące rekordy bazy danych</label>
+                <item id="0">Zapisz</item>
+                <item id="1">Usuń</item>
+            </existing-records>
+            <invalid-data>
+                <label>Rejestruj nieprawidłowe dane</label>
+                <item id="0">Pomiń</item>
+                <item id="1">Import</item>
+            </invalid-data>
+            <start-import>
+                <label>Rozpocznij import</label>
+            </start-import>
+            <cancel-import>
+                <label>Anuluj import</label>
+            </cancel-import>
+            <import-canceled>Import został anulowany.</import-canceled>
+            <start-over>
+                <label>Zacznij od nowa</label>
+            </start-over>
+            <existing-records-message>
+                {0,choice,1#Istnieje|1&lt;Istnieją} {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} w bazie danych dla wersji {3} dla fołrmularza {1}/{2}.
+            </existing-records-message>
+            <eta-message>
+                {0,choice,0#|0&lt;{0, number, integer} godziny} {1,choice,0#|0&lt;{1, number, integer} minuty} {2,choice,0#|0&lt;{2, number, integer} sekundy}
+            </eta-message>
+            <invalid-records-message>
+                {0,number,integer} {1,number,integer} {1,choice,1#dokument|1&lt;dokumenty} {0,choice,1#jest nieprawidłowy|1&lt;są nieprawidłowe}.
+            </invalid-records-message>
+            <valid-records-message>
+                {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} {0,choice,1#został zatwierdzony i zostanie zaimportowany|1&lt;zostały zatwierdzone i zostaną zaimportowane}.
+            </valid-records-message>
+            <import-complete-message>
+                Import {0,number,integer} {0,choice,1#dokumentu|1&lt;dokumentów} jest gotowy. {1,number,integer} {1,choice,1#nieprawidłowy dokument był pominięty|1&lt;nieprawidłowe dokumenty były pominiete}.
+            </import-complete-message>
+            <na>Nie dotyczy</na>
+        </import>
+        <authentication>
+            <menu>
+                <logged-in-as>zalogowany jako {0}</logged-in-as>
+                <logout>Wyloguj</logout>
+                <login>Zaloguj Się</login>
+                <register>Zarejestruj Się</register>
+            </menu>
+            <login>
+                <title>Form Runner Login</title>
+                <username>Nazwa Użytkownika</username>
+                <password>Password</password>
+                <login>Hasło</login>
+            </login>
+            <logout-done>
+                <title>Form Runner Wyloguj</title>
+                <message>Jesteś wylogowany.</message>
+            </logout-done>
+            <login-error>
+                <title>Form Runner Błąd logowania</title>
+                <unrecognized>Wprowadzona nazwa użytkownika lub hasło nie zostały rozpoznane.</unrecognized>
+                <try-again>Proszę spróbuj ponownie.</try-again>
+            </login-error>
+        </authentication>
+    </resource>
 </resources>

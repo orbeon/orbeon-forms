@@ -167,7 +167,24 @@
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
             <xf:action event="fr-summary-create">
-                <xf:load resource="/fr/{$app}/{$form}/new?form-version={fr:form-version()}"/>
+                <xf:var
+                    name="form-version-property"
+                    value="xxf:property(string-join(('oxf.fr.summary.new.form-version', $app, $form), '.'))"/>
+                <xf:var
+                    name="form-version-param"
+                    value="
+                        if ($form-version-property = 'latest') then
+                            ''
+                        else
+                            concat(
+                                '?form-version=',
+                                if ($form-version-property castable as xs:integer) then
+                                    $form-version-property
+                                else
+                                    fr:form-version()
+                            )
+                    "/>
+                <xf:load resource="/fr/{$app}/{$form}/new{$form-version-param}"/>
             </xf:action>
 
             <xf:action event="fr-summary-view" if="$selection-is-one-document">

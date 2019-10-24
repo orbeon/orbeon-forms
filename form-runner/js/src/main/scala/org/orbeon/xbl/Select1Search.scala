@@ -13,6 +13,7 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.jquery._
 import org.orbeon.xbl.Select2.toJQuerySelect2
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, ServerValueStore}
@@ -35,52 +36,53 @@ private class Select1SearchCompanion extends XBLCompanion {
   val DataInitialLabel          = "data-initial-label"
   val DataInitialValue          = "data-initial-value"
 
-  def jContainer    : JQuery      = $(containerElem)
-  def jXFormsSelect : JQuery      = jContainer.find(".xforms-select1")
-  def jSelect       : JQuery      = jXFormsSelect.find("select")
-  def htmlSelect    : html.Select = jSelect.get(0).asInstanceOf[dom.html.Select]
+  override def init(): Unit =
+    for {
+      jContainer        ← $(containerElem).headJQuery
+      jXFormsSelect     ← jContainer.find(".xforms-select1").headJQuery
+      (select, jSelect) ← jXFormsSelect.find("select").headElemJQuery
+      htmlSelect        = select.asInstanceOf[dom.html.Select]
+    } locally {
 
-  override def init(): Unit = {
+      val elementWithData = jContainer.children(s"[$DataPlaceholder]")
+      val performsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
 
-    val elementWithData = jContainer.children(s"[$DataPlaceholder]")
-    val performsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
+      def initOrUpdatePlaceholder(): Unit = {
 
-    def initOrUpdatePlaceholder() {
+        // Store server value for the dropdown on initialization, as a workaround to #4198
+        ServerValueStore.set(jXFormsSelect.attr("id").get, htmlSelect.value)
 
-      // Store server value for the dropdown on initialization, as a workaround to #4198
-      ServerValueStore.set(jXFormsSelect.attr("id").get, htmlSelect.value)
-
-      if (performsSearch) {
-        val initialLabel = elementWithData.attr(DataInitialLabel).get
-        val initialValue = elementWithData.attr(DataInitialValue).get
-        if (initialValue != "") {
-          val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
-          initialOption.text     = initialLabel
-          initialOption.value    = initialValue
-          initialOption.selected = true
-          htmlSelect.appendChild(initialOption)
+        if (performsSearch) {
+          val initialLabel = elementWithData.attr(DataInitialLabel).get
+          val initialValue = elementWithData.attr(DataInitialValue).get
+          if (initialValue.nonEmpty) {
+            val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
+            initialOption.text     = initialLabel
+            initialOption.value    = initialValue
+            initialOption.selected = true
+            htmlSelect.appendChild(initialOption)
+          }
         }
+
+        jSelect.select2(new Select2.Options {
+          val placeholder: Select2.Option =
+            new Select2.Option {
+              val id   = "0"
+              val text = elementWithData.attr(DataPlaceholder).get
+            }
+          val ajax =
+            if (performsSearch)
+              Select2Ajax
+            else
+              js.undefined
+        })
+        if (performsSearch)
+          jSelect.on("change", onChange(htmlSelect) _)
       }
 
-      jSelect.select2(new Select2.Options {
-        val placeholder =
-          new Select2.Option {
-            val id   = "0"
-            val text = elementWithData.attr(DataPlaceholder).get
-          }
-        val ajax =
-          if (performsSearch)
-            Select2Ajax
-          else
-            js.undefined
-      })
-      if (performsSearch)
-        jSelect.on("change", onChange _)
+      initOrUpdatePlaceholder()
+      onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
     }
-
-    initOrUpdatePlaceholder()
-    onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
-  }
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: JQuery, attributeName: String, listener: () ⇒ Unit) {
@@ -91,7 +93,7 @@ private class Select1SearchCompanion extends XBLCompanion {
     ))
   }
 
-  private def onChange(event: JQueryEventObject): Unit = {
+  private def onChange(htmlSelect: html.Select)(event: JQueryEventObject): Unit = {
     val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
     val label = selectedOption.text
     val value = selectedOption.value
@@ -192,5 +194,4 @@ private object Select2 {
       failure : js.Function0[Unit]
     ): Unit
   }
-
 }

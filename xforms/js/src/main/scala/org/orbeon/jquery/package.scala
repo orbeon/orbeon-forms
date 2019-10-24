@@ -13,10 +13,12 @@
  */
 package org.orbeon
 
+import org.scalajs.dom.html
 import org.scalajs.jquery.{JQuery, JQueryEventObject, JQueryStatic}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
+import org.orbeon.oxf.util.CoreUtils._
 
 
 package object jquery {
@@ -31,6 +33,10 @@ package object jquery {
         selector = selector,
         handler  = ((e: JQueryEventObject) ⇒ asJsAny(handler(e))): js.Function1[JQueryEventObject, js.Any]
       )
+
+    def headElem      : Option[html.Element]           = j.length > 0 option j(0)
+    def headJQuery    : Option[JQuery]                 = j.length > 0 option j.first()
+    def headElemJQuery: Option[(html.Element, JQuery)] = j.length > 0 option (j(0), j.first())
   }
 
   implicit class JqueryStaticOps(val j: JQueryStatic) extends AnyVal {

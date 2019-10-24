@@ -99,8 +99,8 @@ private class Select1SearchCompanion extends XBLCompanion {
     val label = selectedOption.text
     val value = selectedOption.value
     DocumentAPI.dispatchEvent(
-      targetId = containerElem.id,
-      eventName = "fr-change",
+      targetId   = containerElem.id,
+      eventName  = "fr-change",
       properties = js.Dictionary(
         "fr-label" → label,
         "fr-value" → value

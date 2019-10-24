@@ -38,21 +38,16 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
         final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
 
-        // Resolve as service URL
-        // NOTE: BaseSubmission.getAbsoluteSubmissionURL() supports resource URLs and norewrite. Should we?
-        final String resolvedResourceURI = XFormsUtils.resolveServiceURL(actionInterpreter.containingDocument(), actionElement,
-                resourceURI, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.remove(resolvedResourceURI, null, true, indentedLogger);
-            XFormsServerSharedInstancesCache.remove(resolvedResourceURI, null, false, indentedLogger);
+            XFormsServerSharedInstancesCache.remove(resourceURI, null, true, indentedLogger);
+            XFormsServerSharedInstancesCache.remove(resourceURI, null, false, indentedLogger);
         } else {
             // Just remove instances matching both @resource and @xinclude
             final boolean handleXInclude = Boolean.valueOf(handleXIncludeString);
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.remove(resolvedResourceURI, null, handleXInclude, indentedLogger);
+            XFormsServerSharedInstancesCache.remove(resourceURI, null, handleXInclude, indentedLogger);
         }
     }
 }

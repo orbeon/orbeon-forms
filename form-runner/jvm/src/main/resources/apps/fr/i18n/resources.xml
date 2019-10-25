@@ -335,6 +335,7 @@
                 <upgrade-local>Upgrade local form definitions</upgrade-local>
                 <upgrade-remote>Upgrade remote form definitions</upgrade-remote>
                 <reencrypt>Re-encrypt form definitions</reencrypt>
+                <reload-resources>Reload resources</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Confirm Form Availability Change</publish-confirmation>
@@ -805,6 +806,7 @@
                 <upgrade-local>Mettre à jour les formulaires locaux</upgrade-local>
                 <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
                 <reencrypt>Réencrypter les formulaires</reencrypt>
+                <reload-resources>Recharger les resources</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>
@@ -1261,6 +1263,7 @@
                 <upgrade-local>Actualizar Formularios locales</upgrade-local>
                 <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
@@ -1716,6 +1719,7 @@
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -2169,6 +2173,7 @@
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -2635,6 +2640,7 @@
                 <upgrade-local>Aggiorna le definizioni dei moduli locali</upgrade-local>
                 <upgrade-remote>Aggiorna le definizioni dei moduli remoti</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
@@ -3101,6 +3107,7 @@
                 <upgrade-local>Lokale Formulardefinition aktualisieren</upgrade-local>
                 <upgrade-remote>Formulardefinition auf Remote-System aktualisieren</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">Veröffentlichen/Verbergen bestätigen</publish-confirmation>
@@ -3567,6 +3574,7 @@
                 <upgrade-local>Päivitä paikallisen lomakkeen määritykset</upgrade-local>
                 <upgrade-remote>Päivitä etälomakkeen määritykset</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
@@ -4033,6 +4041,7 @@
                 <upgrade-local>Uppgradera lokala formulärdefinitioner</upgrade-local>
                 <upgrade-remote>Uppgradera formulärdefinitioner på servern</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
@@ -4498,6 +4507,7 @@
                 <upgrade-local>Upgrade lokale formdefinities</upgrade-local>
                 <upgrade-remote>Upgrade externe formdefinities</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
@@ -4963,6 +4973,7 @@
                 <upgrade-local>Actualizar definições de formulário local</upgrade-local>
                 <upgrade-remote>Actualizar definições de formulário remoto</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>
@@ -5416,6 +5427,7 @@
                 <upgrade-local>Opgrader lokal blanket-definitioner</upgrade-local>
                 <upgrade-remote>Opgrader remote blanket-definitioner</upgrade-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
             <titles>
                 <publish-confirmation>Bekræft blanket-offentliggørelse/afpublisering</publish-confirmation>

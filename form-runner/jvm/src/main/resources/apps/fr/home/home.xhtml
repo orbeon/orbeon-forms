@@ -725,6 +725,19 @@
                                         <xf:label ref="$fr-resources/home/buttons/upgrade-remote"/>
                                     </xf:trigger>
                                 </li>
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-upgrade-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-upgrade-action" id="fr-reload-resources-button">
+                                        <xf:label ref="$fr-resources/home/buttons/reload-resources"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:action iterate="$selection">
+                                                <xf:var name="app"  value="xxf:split(., '/')[1]"/>
+                                                <xf:var name="form" value="xxf:split(., '/')[2]"/>
+                                                <xxf:invalidate-instance resource="/fr/service/i18n/fr-resources/{$app}/{$form}"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </li>
                             </ul>
                         </div>
 

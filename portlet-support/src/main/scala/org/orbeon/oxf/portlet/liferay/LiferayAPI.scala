@@ -136,5 +136,4 @@ trait LiferayAPI {
   private[liferay] type CompanyFacade = {
     def getAuthType     : String
   }
-
 }

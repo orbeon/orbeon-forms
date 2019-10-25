@@ -119,7 +119,6 @@ object Number {
             }
           }
         }: js.ThisFunction)
-
       }
 
       override def destroy(): Unit = {

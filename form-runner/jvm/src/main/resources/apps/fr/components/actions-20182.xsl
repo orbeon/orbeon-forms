@@ -25,7 +25,6 @@
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
     <xsl:variable name="continuation-key">fr-action-continuation-id</xsl:variable>
-    <xsl:variable name="is-last-iteration-key">fr-action-continuation-is-last-iteration</xsl:variable>
     <xsl:variable name="continuation-event-prefix">fr-action-continuation-</xsl:variable>
 
     <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
@@ -81,6 +80,11 @@
     <xsl:function name="fr:build-context-param" as="xs:string">
         <xsl:param name="elem" as="element()"/>
         <xsl:value-of select="concat('fr-iteration-context-', count($elem/ancestor-or-self::fr:data-iterate))"/>
+    </xsl:function>
+
+    <xsl:function name="fr:build-is-last-iteration-param" as="xs:string">
+        <xsl:param name="elem" as="element()"/>
+        <xsl:value-of select="concat('fr-action-continuation-is-last-iteration-', count($elem/ancestor-or-self::fr:data-iterate))"/>
     </xsl:function>
 
     <xsl:function name="fr:continuation-id" as="xs:string">
@@ -201,7 +205,7 @@
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
-            if="xxf:get-request-attribute('{$is-last-iteration-key}') = true()"
+            if="xxf:get-request-attribute('{fr:build-is-last-iteration-param(.)}') = true()"
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
         </xf:dispatch>
@@ -246,9 +250,10 @@
             <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
             <!-- Reset global state-->
             <xf:action type="xpath">
-                xxf:set-request-attribute('fr-action-source',                         event('action-source')),
-                xxf:set-request-attribute('fr-action-error',                          false()),
-                xxf:set-request-attribute('fr-action-continuation-is-last-iteration', false())
+                xxf:set-request-attribute('fr-action-source',                                                               event('action-source')),
+                xxf:set-request-attribute('fr-action-error',                                                                false()),
+                for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-action-continuation-is-last-iteration-', $i), ()),
+                for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-iteration-context-', $i),                     ())
             </xf:action>
 
             <xsl:for-each-group
@@ -444,7 +449,7 @@
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
                     <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
-                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last())</xf:action>
                         <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)</xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>

@@ -70,11 +70,17 @@
     </xsl:function>
 
     <xsl:function name="fr:build-context-att" as="attribute()?">
+        <xsl:param name="elem"    as="element()"/>
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-             <xsl:attribute name="context">xxf:get-request-attribute('fr-iteration-context')</xsl:attribute>
+             <xsl:attribute name="context">xxf:get-request-attribute('<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
          </xsl:if>
+    </xsl:function>
+
+    <xsl:function name="fr:build-context-param" as="xs:string">
+        <xsl:param name="elem" as="element()"/>
+        <xsl:value-of select="concat('fr-iteration-context-', count($elem/ancestor-or-self::fr:data-iterate))"/>
     </xsl:function>
 
     <xsl:function name="fr:continuation-id" as="xs:string">
@@ -343,7 +349,6 @@
     </xsl:template>
 
     <xsl:template match="fr:service-call" mode="within-action-2018.2">
-
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
@@ -379,7 +384,7 @@
                                     name="value"
                                     context="$original-context"
                                     value="{$value}">
-                                    <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
+                                    <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
                                 </xf:var>
                             </xsl:when>
                         </xsl:choose>
@@ -427,9 +432,9 @@
     </xsl:template>
 
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
-
+        <xsl:variable name="data-iterate-elem" select="."/>
         <xf:action iterate="{@ref}">
-            <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
+            <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
             <xsl:for-each-group
@@ -440,7 +445,7 @@
                 <xsl:if test="$group-position = 1">
                     <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
                         <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
-                        <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
+                        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)</xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
                 </xsl:if>
@@ -460,7 +465,7 @@
         <xsl:variable name="var-name"                 select="concat('cond', $if-position-within-block + 1)"/>
 
         <xf:var name="{$var-name}" value="{@condition}">
-            <xsl:copy-of select="fr:build-context-att(@expression-context)"/>
+            <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
         </xf:var>
         <xf:action if="${$var-name}">
             <xsl:for-each-group
@@ -622,7 +627,7 @@
                     name="response-items"
                     context="$items-expr-context"
                     value="{$items-expr}">
-                    <xsl:copy-of select="fr:build-context-att($context)"/>
+                    <xsl:copy-of select="fr:build-context-att(., $context)"/>
                 </xf:var>
 
                 <xf:insert

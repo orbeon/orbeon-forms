@@ -306,7 +306,7 @@
                     <xf:action iterate="/response/row">
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
                             <xf:action>
                                 <xf:var
                                     name="container"
@@ -436,7 +436,7 @@
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
 
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() = last())</xf:action>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
 
                             <xf:action xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" type="xpath">
                                 process:runProcessByName('oxf.fr.detail.process', 'acme-process')
@@ -643,7 +643,7 @@
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration', position() =
                                 last())
                             </xf:action>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context', .)</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
                             <xf:delete ref="bind(frf:bindId('my-grid-3'))/*"/>
                             <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                        origin="saxon:parse(xxf:instance('my-service-2-instance'))"/>
@@ -665,7 +665,7 @@
                         <xf:var name="original-context" value="."/>
                         <xf:action context="xxf:instance('fr-service-request-instance')">
                             <xf:action>
-                                <xf:var name="value" context="xxf:get-request-attribute('fr-iteration-context')" value="."/>
+                                <xf:var name="value" context="xxf:get-request-attribute('fr-iteration-context-1')" value="."/>
                                 <xf:setvalue ref="/*/text" value="$value"/>
                             </xf:action>
                         </xf:action>

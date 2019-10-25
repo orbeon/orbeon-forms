@@ -260,15 +260,15 @@
                 <!-- This handles only the execution of the initial actions up to before the first continuation -->
                 <xsl:if test="$group-position = 1">
 
-                    <xsl:variable name="current-group"   select="current-group()"/>
-                    <xsl:variable name="nested-elem-opt" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element()*"/>
+                    <xsl:variable name="current-group"         select="current-group()"/>
+                    <xsl:variable name="nested-grouping-elems" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element()*"/>
 
                     <!-- NOTE: To handle more nesting, this might have to be updated. -->
 
                     <!-- Going into a nested construct boundary. The content of the nested construct is handled separately so remove it. :) -->
                     <xsl:variable
                         name="group-content"
-                        select="$current-group except $nested-elem-opt/fr:*"/>
+                        select="$current-group except $nested-grouping-elems/fr:*"/>
 
                     <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                         <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
@@ -290,15 +290,15 @@
 
             <xsl:if test="$group-position gt 1">
 
-                <xsl:variable name="current-group"    select="current-group()"/>
-                <xsl:variable name="nested-elem-opt" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element(*)*"/>
+                <xsl:variable name="current-group"         select="current-group()"/>
+                <xsl:variable name="nested-grouping-elems" select="$current-group[self::fr:data-iterate | self::fr:if]" as="element(*)*"/>
 
                 <!-- NOTE: To handle more nesting, this might have to be updated. -->
 
                 <!-- Going into a nested construct boundary. The content of the nested construct is handled separately so remove it. :) -->
                 <xsl:variable
                     name="group-content"
-                    select="$current-group except $nested-elem-opt/fr:*"/>
+                    select="$current-group except $nested-grouping-elems/fr:*"/>
 
                 <!-- Use `preceding::` so that `fr:service-call` nested in preceding iterations are found too -->
                 <xsl:variable

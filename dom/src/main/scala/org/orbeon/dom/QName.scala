@@ -6,7 +6,7 @@ import java.{util ⇒ ju}
 
 object QName {
 
-  implicit class QNameOps(val q: QName) extends AnyVal {
+  implicit class QNameOps(private val q: QName) extends AnyVal {
 
     // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
     def uriQualifiedName: String =

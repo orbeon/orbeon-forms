@@ -32,7 +32,7 @@ import scala.scalajs.js
 // Allows form authors to move the grid cell walls to resize cells
 object GridWallDnD {
 
-  private implicit class CellBlockOps(val cell: Block) extends AnyVal {
+  private implicit class CellBlockOps(private val cell: Block) extends AnyVal {
     def x          : Int          = cell.el.attr("data-fr-x").get.toInt
     def y          : Int          = cell.el.attr("data-fr-y").get.toInt
     def w          : Int          = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)

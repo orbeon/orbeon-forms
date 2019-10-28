@@ -68,7 +68,7 @@ object FutureUtils {
     result
   }
 
-  implicit class FutureOps[T](val f: Future[T]) extends AnyVal {
+  implicit class FutureOps[T](private val f: Future[T]) extends AnyVal {
     def toTry(implicit executor: ExecutionContext): Future[Try[T]] =
       f map Success.apply recover PartialFunction(Failure.apply)
   }

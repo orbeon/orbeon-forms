@@ -33,7 +33,7 @@ object TryUtils {
     case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t))
   }
 
-  implicit class TryOps[U](val t: Try[U]) extends AnyVal {
+  implicit class TryOps[U](private val t: Try[U]) extends AnyVal {
 
     def onFailure(f: PartialFunction[Throwable, Any]): Try[U] =
       t recoverWith new OnFailurePF(f)

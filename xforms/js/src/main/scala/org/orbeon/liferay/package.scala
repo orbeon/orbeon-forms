@@ -40,7 +40,7 @@ package object liferay {
     def extend(): Unit = js.native
   }
 
-  implicit class LiferayOps(val liferay: Liferay) extends AnyVal {
+  implicit class LiferayOps(private val liferay: Liferay) extends AnyVal {
 
     def allPortletsReadyF: Future[Unit] = {
       val promise = Promise[Unit]()

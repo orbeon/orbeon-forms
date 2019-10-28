@@ -198,7 +198,7 @@ private object DatePickerFacade {
     var language         : String            = "en"
   }
 
-  implicit class DatePickerOps(val datePicker: DatePicker) extends AnyVal {
+  implicit class DatePickerOps(private val datePicker: DatePicker) extends AnyVal {
     def onChangeDate(f: js.Function0[Unit]) : Unit              = datePicker.on("changeDate", f)
     def onHide      (f: js.Function0[Unit]) : Unit              = datePicker.on("hide", f)
     def onShow      (f: js.Function0[Unit]) : Unit              = datePicker.on("show", f)

@@ -6,7 +6,7 @@ import org.orbeon.io.{IOUtils, StringBuilderWriter}
 
 object Node {
 
-  implicit class NodeOps(val n: Node) extends AnyVal {
+  implicit class NodeOps(private val n: Node) extends AnyVal {
 
     def serializeToString(format: OutputFormat = XMLWriter.DefaultFormat): String =
       IOUtils.useAndClose(new StringBuilderWriter) { writer ⇒

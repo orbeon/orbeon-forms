@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 object CoreUtils {
 
-  implicit class PipeOps[A](val a: A) extends AnyVal {
+  implicit class PipeOps[A](private val a: A) extends AnyVal {
     // Pipe operator
     def pipe[B] (f: A ⇒ B) = f(a)
     def |>  [B] (f: A ⇒ B) = pipe(f)
@@ -24,13 +24,13 @@ object CoreUtils {
     def |!>    [B](f: A ⇒ B): A = kestrel(f)
   }
 
-  implicit class OptionOps[A](val a: Option[A]) extends AnyVal {
+  implicit class OptionOps[A](private val a: Option[A]) extends AnyVal {
     // Kestrel / K Combinator (known as tap in Ruby/Underscore)
     def |!>[B](f: A ⇒ B): Option[A] = { a foreach f; a }
   }
 
   // Extensions on Boolean
-  implicit class BooleanOps(val b: Boolean) extends AnyVal {
+  implicit class BooleanOps(private val b: Boolean) extends AnyVal {
     def option[A](a: ⇒ A)             : Option[A]   = if (b) Option(a)   else None
     def flatOption[A](a: ⇒ Option[A]) : Option[A]   = if (b) a           else None
     def string(s: ⇒ String)           : String      = if (b) s           else ""

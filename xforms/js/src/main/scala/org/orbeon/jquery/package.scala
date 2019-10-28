@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CoreUtils._
 
 package object jquery {
 
-  implicit class JqueryOps(val j: JQuery) extends AnyVal {
+  implicit class JqueryOps(private val j: JQuery) extends AnyVal {
 
     @inline private def asJsAny(body: ⇒ Any): js.Any = { body; () }
 
@@ -39,7 +39,7 @@ package object jquery {
     def headElemJQuery: Option[(html.Element, JQuery)] = j.length > 0 option (j(0), j.first())
   }
 
-  implicit class JqueryStaticOps(val j: JQueryStatic) extends AnyVal {
+  implicit class JqueryStaticOps(private val j: JQueryStatic) extends AnyVal {
 
     // Expose jQuery's `$(function)` as a `Future`
     def readyF(implicit executor: ExecutionContext): Future[Unit] =

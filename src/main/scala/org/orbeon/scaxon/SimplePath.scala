@@ -115,7 +115,7 @@ object SimplePath {
   val Node      : Test = new NodeKindTestBase(Type.NODE)
 
   // Operations on NodeInfo
-  implicit class NodeInfoOps(val nodeInfo: NodeInfo) extends AnyVal {
+  implicit class NodeInfoOps(private val nodeInfo: NodeInfo) extends AnyVal {
 
     def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
     def !==(s: String) = ! ===(s)
@@ -311,7 +311,7 @@ object SimplePath {
   }
 
   // Operations on sequences of NodeInfo
-  implicit class NodeInfoSeqOps(val seq: Seq[NodeInfo]) extends AnyVal {
+  implicit class NodeInfoSeqOps(private val seq: Seq[NodeInfo]) extends AnyVal {
 
     // Semantic is the same as XPath: at least one value must match
     def ===(s: String) = seq exists (_ === s)

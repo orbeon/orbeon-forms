@@ -50,7 +50,7 @@ trait Drake extends js.Any {
 }
 
 object Drake {
-  implicit class DrakeOps(val drake: Drake) extends AnyVal {
+  implicit class DrakeOps(private val drake: Drake) extends AnyVal {
     def onDrag   (callback: (Element, Element)                   ⇒ Any): Unit = drake.on("drag",    callback)
     def onDragend(callback: (Element)                            ⇒ Any): Unit = drake.on("dragend", callback)
     def onDrop   (callback: (Element, Element, Element, Element) ⇒ Any): Unit = drake.on("drop",    callback)

@@ -50,7 +50,7 @@ object StringUtils {
   def trimAllToNull(s: String)  = s.trimAllToNull
   def trimAllToOpt(s: String)   = s.trimAllToOpt
 
-  implicit class StringOps(val s: String) extends AnyVal {
+  implicit class StringOps(private val s: String) extends AnyVal {
 
     /*
      * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
@@ -224,7 +224,7 @@ object StringUtils {
     }
   }
 
-  implicit class CharSequenceOps(val cs: CharSequence) extends AnyVal {
+  implicit class CharSequenceOps(private val cs: CharSequence) extends AnyVal {
 
     def iterateCodePoints: Iterator[Int] = new CodePointsIterator(cs)
 

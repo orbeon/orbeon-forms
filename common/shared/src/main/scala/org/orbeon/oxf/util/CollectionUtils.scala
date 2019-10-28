@@ -36,7 +36,7 @@ object CollectionUtils {
   }
 
   // Extensions on Iterator[T]
-  implicit class IteratorWrapper[T](val i: Iterator[T]) extends AnyVal {
+  implicit class IteratorWrapper[T](private val i: Iterator[T]) extends AnyVal {
     def nextOption(): Option[T] = i.hasNext option i.next()
     def lastOption(): Option[T] = {
       var n = nextOption()
@@ -89,7 +89,7 @@ object CollectionUtils {
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
   def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T ⇒ t }
 
-  implicit class IterableLikeOps[A, Repr](val t: IterableLike[A, Repr]) extends AnyVal {
+  implicit class IterableLikeOps[A, Repr](private val t: IterableLike[A, Repr]) extends AnyVal {
 
     def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
@@ -135,11 +135,11 @@ object CollectionUtils {
     }
   }
 
-  implicit class IntArrayOps(val a: Array[Int]) extends AnyVal {
+  implicit class IntArrayOps(private val a: Array[Int]) extends AnyVal {
     def codePointsToString = new String(a, 0, a.length)
   }
 
-  implicit class IntIteratorOps(val i: Iterator[Int]) extends AnyVal {
+  implicit class IntIteratorOps(private val i: Iterator[Int]) extends AnyVal {
     def codePointsToString = {
       val a = i.to[Array]
       new String(a, 0, a.length)
@@ -150,7 +150,7 @@ object CollectionUtils {
   case object InsertBefore extends InsertPosition
   case object InsertAfter  extends InsertPosition
 
-  implicit class VectorOps[T](val values: Vector[T]) extends AnyVal {
+  implicit class VectorOps[T](private val values: Vector[T]) extends AnyVal {
 
     def insertAt(index: Int, value: T, position: InsertPosition): Vector[T] =
       position match {

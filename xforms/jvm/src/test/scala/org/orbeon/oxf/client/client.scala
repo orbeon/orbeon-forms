@@ -140,7 +140,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   // - removeFocus
 
   // Extension methods on Element
-  implicit class ElementOps(val e: STElement) {
+  implicit class ElementOps(private val e: STElement) {
 
     def classes = e.attribute("class") map stringToSet getOrElse Set()
 
@@ -173,11 +173,11 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   def moveToWebElement(e: WebElement) =
     new Actions(webDriver).moveToElement(e).build().perform()
 
-  implicit class TextfieldOps(val textfield: TextField) {
+  implicit class TextfieldOps(private val textfield: TextField) {
     def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
   }
 
-  implicit class SingleSelOps(val singleSel: SingleSel) {
+  implicit class SingleSelOps(private val singleSel: SingleSel) {
     def selectByVisibleText(text: String): Unit =
       new Select(singleSel.underlying).selectByVisibleText(text)
     def labels: List[String] =

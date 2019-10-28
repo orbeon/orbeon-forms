@@ -22,7 +22,7 @@ object PathUtils {
     def decode(s: String): String
   }
 
-  implicit class PathOps(val s: String) extends AnyVal {
+  implicit class PathOps(private val s: String) extends AnyVal {
     def dropTrailingSlash = if (s.isEmpty || s.last != '/')  s else s.init
     def dropStartingSlash = if (s.isEmpty || s.head != '/')  s else s.tail
     def appendSlash       = if (s.nonEmpty && s.last == '/') s else s + '/'

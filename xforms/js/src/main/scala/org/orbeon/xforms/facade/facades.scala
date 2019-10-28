@@ -86,7 +86,7 @@ object AjaxServer extends AjaxServerTrait {
 
 object AjaxServerOps {
 
-  implicit class AjaxServerOps(val ajaxServer: AjaxServerTrait) extends AnyVal {
+  implicit class AjaxServerOps(private val ajaxServer: AjaxServerTrait) extends AnyVal {
 
     def ajaxResponseReceivedF: Future[Unit] = {
 

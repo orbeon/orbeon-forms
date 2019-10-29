@@ -489,15 +489,18 @@
     <xsl:template match="fr:repeat-clear" mode="within-action-2018.2">
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
-        <xf:delete ref="bind(frf:bindId('{$repeat-name}'))/*"/>
+        <xf:action type="xpath">
+            frf:repeatClear('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, true())"/>')
+        </xf:action>
 
     </xsl:template>
 
     <xsl:template match="fr:repeat-add-iteration" mode="within-action-2018.2">
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
-        <xsl:variable name="at"          select="@at/string()"   as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"     as="xs:string"/>
 
         <!-- TODO -->
         <xsl:variable name="apply-defaults" select="true()"/>
@@ -505,33 +508,8 @@
         <!-- NOTE: We might like to support `after-current | before-current`, for for that we need the `index()` function which
              needs a repeat id, and we don't have it right now. -->
 
-        <xf:action>
-            <xf:var
-                name="container"
-                value="bind(frf:bindId('{$repeat-name}'))"/>
-            <xf:var
-                name="repeat-template"
-                value="instance(frf:templateId('{$repeat-name}'))"/>
-            <xf:insert
-                context="$container"
-                ref="*[{
-                    if ($at = 'end') then
-                        'last()'
-                    else if ($at = 'start') then
-                        '1'
-                    else if ($at castable as xs:integer) then
-                        $at
-                    else
-                        error()
-                }]"
-                origin="frf:updateTemplateFromInScopeItemsetMaps($container, $repeat-template)"
-                position="{
-                    if ($at = 'start') then
-                        'before'
-                    else
-                        'after'
-                }"
-                xxf:defaults="{$apply-defaults}"/>
+        <xf:action type="xpath">
+            frf:repeatAddIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>', <xsl:value-of select="$apply-defaults"/>())
         </xf:action>
 
     </xsl:template>
@@ -539,24 +517,10 @@
     <xsl:template match="fr:repeat-remove-iteration" mode="within-action-2018.2">
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
-        <xsl:variable name="at"          select="@at/string()"   as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"     as="xs:string"/>
 
-        <xf:action>
-            <xf:var
-                name="container"
-                value="bind(frf:bindId('{$repeat-name}'))"/>
-            <xf:delete
-                context="$container"
-                ref="*[{
-                    if ($at = 'end') then
-                        'last()'
-                    else if ($at = 'start') then
-                        '1'
-                    else if ($at castable as xs:integer) then
-                        $at
-                    else
-                        error()
-                }]"/>
+        <xf:action type="xpath">
+            frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>')
         </xf:action>
 
     </xsl:template>
@@ -786,6 +750,11 @@
 
         </xf:action>
 
+    </xsl:template>
+
+    <xsl:template match="fr:alert" mode="within-action-2018.2">
+        <xsl:variable name="message" select="@message/string()" as="xs:string"/>
+        <xf:message><xsl:value-of select="$message"/></xf:message>
     </xsl:template>
 
 </xsl:stylesheet>

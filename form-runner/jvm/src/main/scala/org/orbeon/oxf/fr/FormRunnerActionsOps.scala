@@ -13,17 +13,20 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel, XFormsModelBase}
+import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -295,4 +298,137 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       if (! metadataElem.hasChildElement)
         XFormsAPI.delete(metadataElem)
     }
+
+  // Candidate for Scala 3 enums!
+  sealed trait PositionType
+  object PositionType {
+    case object Start            extends PositionType
+    case object End              extends PositionType
+    case object None             extends PositionType
+    case class  Specific(p: Int) extends PositionType
+
+    def fromString(s: String): PositionType =
+      s match {
+        case "start"  ⇒ Start
+        case "end"    ⇒ End
+        case "none"   ⇒ None
+        case maybeInt ⇒ maybeInt.toIntOpt map Specific.apply getOrElse (throw new IllegalArgumentException(maybeInt))
+      }
+
+    def asString(p: PositionType): String =
+      p match {
+        case Start       ⇒ "start"
+        case End         ⇒ "end"
+        case None        ⇒ "none"
+        case Specific(i) ⇒ i.toString
+      }
+  }
+
+  private def findChildElemAtPosition(contextElem: NodeInfo, position: PositionType): Option[NodeInfo] = {
+    val children = contextElem child *
+    position match {
+      case PositionType.Start       ⇒ children.headOption
+      case PositionType.End         ⇒ children.lastOption
+      case PositionType.None        ⇒ None
+      case PositionType.Specific(i) ⇒ children.lift(i - 1)
+    }
+  }
+
+  private def findInsertDeleteElem(containerDetailsString: String): Option[(NodeInfo, String, PositionType)] = {
+
+    def processOne(startElem: NodeInfo, name: String, isRepeat: Boolean, position: PositionType): Option[NodeInfo] = {
+      val childOpt = (startElem child name).headOption
+      if (isRepeat)
+        childOpt flatMap (findChildElemAtPosition(_, position))
+      else
+        childOpt
+    }
+
+    val containerDetails =
+      containerDetailsString.splitTo[List]().grouped(3).to[List] map {
+        case name :: isRepeat :: position :: Nil ⇒ (name, isRepeat.toBoolean, PositionType.fromString(position))
+        case _                                   ⇒ throw new IllegalArgumentException
+      }
+
+    val parentContextElemOpt =
+      containerDetails.init.foldLeft(formInstance.rootElement.some) {
+        case (Some(elem), (name, isRepeat, position)) ⇒ processOne(elem, name, isRepeat, position)
+        case (None, _) ⇒ None
+      }
+
+    parentContextElemOpt flatMap { parentContextElem ⇒
+      val (repeatName, _, position) = containerDetails.last
+      (parentContextElem child repeatName).headOption map
+        (repeatContextElem ⇒ (repeatContextElem, repeatName, position))
+    }
+  }
+
+  //@XPathFunction
+  def repeatAddIteration(containerDetailsString: String, applyDefaults: Boolean): Unit =
+    for {
+      (repeatContextElem, repeatName, position) ← findInsertDeleteElem(containerDetailsString)
+      templateInstance                          ← topLevelInstance(Names.FormModel, templateId(repeatName))
+      repeatTemplate                            = templateInstance.rootElement
+    } locally {
+      XFormsAPI.insert(
+        origin = updateTemplateFromInScopeItemsetMaps(startNode = repeatContextElem, template = repeatTemplate),
+        into   = repeatContextElem,
+        before = if (position == PositionType.Start) findChildElemAtPosition(repeatContextElem, position).toList else Nil,
+        after  = findChildElemAtPosition(repeatContextElem, position).toList
+      )
+    }
+
+  //@XPathFunction
+  def repeatRemoveIteration(containerDetailsString: String): Unit =
+    for {
+      (repeatContextElem, _, position) ← findInsertDeleteElem(containerDetailsString)
+    } locally {
+      XFormsAPI.delete(ref = findChildElemAtPosition(repeatContextElem, position).toList)
+    }
+
+  //@XPathFunction
+  def repeatClear(containerDetailsString: String): Unit =
+    for {
+      (repeatContextElem, _, _) ← findInsertDeleteElem(containerDetailsString)
+    } locally {
+      XFormsAPI.delete(ref = repeatContextElem child *)
+    }
+
+  // This function gathers information from the source of the form definition which are harder to obtain at
+  // runtime when actually running the `fr:repeat-add-iteration` and other similar actions.
+  //@XPathFunction
+  def findContainerDetailsCompileTime(
+    inDoc                     : NodeInfo,
+    repeatedGridOrSectionName : String,
+    atOrNull                  : String,
+    lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
+  ): SequenceIterator = {
+
+    val namesWithIsRepeat =
+      FormRunner.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
+        (FormRunner.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
+        (e ⇒ (FormRunner.controlNameFromId(e.id), FormRunner.isRepeat(e)))
+
+    val repeatDepth = namesWithIsRepeat count (_._2)
+
+    val positionsIt = {
+
+      val tokens    = atOrNull.trimAllToEmpty.splitTo[List]()
+      val maxTokens = if (lastIsNone) repeatDepth - 1 else repeatDepth
+
+      if (tokens.size > maxTokens)
+        throw new IllegalArgumentException(s"too many `at` tokens (`${tokens.mkString(" ")}`) specified for control `$repeatedGridOrSectionName`")
+
+      val positionsWithPadding =
+        (tokens map PositionType.fromString).reverse.padTo(maxTokens, PositionType.End).reverse :::
+          (lastIsNone list PositionType.None)
+
+      positionsWithPadding.iterator
+    }
+
+    namesWithIsRepeat.reverseIterator flatMap {
+      case (name, isRepeat @ true)  ⇒ List(name, isRepeat.toString, PositionType.asString(positionsIt.next()))
+      case (name, isRepeat @ false) ⇒ List(name, isRepeat.toString, "none")
+    }
+  }
 }

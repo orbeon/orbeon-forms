@@ -57,7 +57,7 @@
                         value="$model/fb:instance[@id = concat($submission-name, '-instance')]/*"/>
 
                     <xf:var
-                        name="local-has-body"
+                        name="local-has-request-body"
                         value="not($submission/@method = ('get', 'delete'))"/>
 
                     <!--<xf:message value="saxon:serialize($submission, 'xml')"/>-->
@@ -67,7 +67,7 @@
                     <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
                     <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
 
-                    <xf:action if="not($local-has-body)">
+                    <xf:action if="not($local-has-request-body)">
                         <xf:var
                             name="body"
                             value="saxon:parse($instance-body-string)"/>
@@ -84,7 +84,7 @@
                                     )"/>
 
                     </xf:action>
-                    <xf:action if="$local-has-body">
+                    <xf:action if="$local-has-request-body">
                         <xf:setvalue
                             ref="$request/body"
                             value="$instance-body-string"/>
@@ -242,7 +242,7 @@
 
                     <!-- Set instance document -->
                     <xf:action context="$model/fb:instance[@id = $instance-id]">
-                        <xf:action if="not($has-body)">
+                        <xf:action if="not($has-request-body)">
                             <xf:var
                                 name="body"
                                 value="
@@ -260,7 +260,7 @@
                                 value="saxon:serialize($body, xxf:instance('fr-xsl-output-instance'))"/>
 
                         </xf:action>
-                        <xf:action if="$has-body">
+                        <xf:action if="$has-request-body">
                             <xf:setvalue ref="*" value="$request/body"/>
                         </xf:action>
                     </xf:action>
@@ -337,9 +337,9 @@
 
                 <xf:var name="i" value="instance()"/>
 
-                <xf:var name="request"  value="$i/request"/>
-                <xf:var name="response" value="$i/response"/>
-                <xf:var name="has-body" value="not($request/method = ('get', 'delete'))"/>
+                <xf:var name="request"          value="$i/request"/>
+                <xf:var name="response"         value="$i/response"/>
+                <xf:var name="has-request-body" value="not($request/method = ('get', 'delete'))"/>
 
                 <xf:instance id="modified">
                     <modified/>
@@ -402,8 +402,8 @@
 
                         <xf:bind
                             ref="serialization"
-                            calculate="if ($has-body) then . else if (exists($param-names)) then 'application/x-www-form-urlencoded' else 'none'"
-                            readonly="not($has-body)"/>
+                            calculate="if ($has-request-body) then . else if (exists($param-names)) then 'application/x-www-form-urlencoded' else 'none'"
+                            readonly="not($has-request-body)"/>
 
                         <!-- Compute mediatype based on SOAP or serialization -->
                         <xf:bind
@@ -429,7 +429,7 @@
                         <xf:bind
                             ref="body"
                             type="xxf:xml"
-                            required="$has-body"
+                            required="$has-request-body"
                         />
                         <xf:bind
                             name="param-names"
@@ -484,7 +484,7 @@
                 <!-- Submission to test a service -->
                 <xf:submission id="fb-test-service-submission"
                     ref="
-                        if ($has-body) then
+                        if ($has-request-body) then
                             saxon:parse($request/body)/*
                         else
                             xf:element(
@@ -496,7 +496,7 @@
                                     )
                             )"
                     method="{$request/method}"
-                    serialization="{if ($has-body) then $request/serialization else 'application/x-www-form-urlencoded'}"
+                    serialization="{if ($has-request-body) then $request/serialization else 'application/x-www-form-urlencoded'}"
                     resource="{xxf:evaluate-avt($request/resource)}"
                     mediatype="{$request/mediatype}"
                     replace="none"
@@ -578,7 +578,7 @@
                                     <xh:td>
                                         <xf:select1 ref="$request/serialization">
                                             <xf:label ref="$resources/dialog-http-services/serialization/label"/>
-                                            <xf:itemset ref=".[not($has-body)]">
+                                            <xf:itemset ref=".[not($has-request-body)]">
                                                 <xf:label>None</xf:label>
                                                 <xf:value>none</xf:value>
                                             </xf:itemset>
@@ -600,7 +600,7 @@
                                 <xh:tr>
                                     <xh:td colspan="2">
 
-                                        <xf:group ref="$request/body[not($has-body)]" appearance="xxf:fieldset">
+                                        <xf:group ref="$request/body[not($has-request-body)]" appearance="xxf:fieldset">
                                             <xf:label value="xxf:r('dialog-http-services.url-parameters.label', '|fr-form-resources|')"/>
                                             <fr:grid
                                                 ref="$request/params"
@@ -623,7 +623,7 @@
                                             </fr:grid>
                                         </xf:group>
 
-                                        <xf:textarea ref="$request/body[$has-body]" id="fb-service-body" incremental="true" class="fb-service-request-body">
+                                        <xf:textarea ref="$request/body[$has-request-body]" id="fb-service-body" incremental="true" class="fb-service-request-body">
                                             <xf:label ref="$resources/dialog-http-services/request-body/label"/>
                                             <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>

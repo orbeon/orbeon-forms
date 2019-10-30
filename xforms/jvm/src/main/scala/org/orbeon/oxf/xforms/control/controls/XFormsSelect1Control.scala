@@ -125,7 +125,7 @@ class XFormsSelect1Control(
     itemset.allItemsIterator find (_.value == internalValue)
   }
 
-  override def translateExternalValue(externalValue: String) = {
+  override def translateExternalValue(externalValue: String): Option[String] = {
 
     val existingValue = getValue
 

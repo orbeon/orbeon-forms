@@ -50,7 +50,7 @@ class XFormsSelectControl(
    * - Itemset values which are in the list of tokens are merged with the bound control's value.
    * - Itemset values which are not in the list of tokens are removed from the bound control's value.
    */
-  override def translateExternalValue(externalValue: String) = {
+  override def translateExternalValue(externalValue: String): Option[String] = {
 
     val existingValues = valueAsLinkedSet(getValue)
     val itemsetValues  = mutable.LinkedHashSet(getItemset.allItemsIterator map (_.value) toList: _*)

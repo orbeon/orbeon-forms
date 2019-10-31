@@ -531,7 +531,7 @@
     <xsl:template match="fr:repeat-add-iteration" mode="within-action-2018.2">
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
-        <xsl:variable name="at"          select="@at/string()"     as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
         <!-- TODO -->
         <xsl:variable name="apply-defaults" select="true()"/>
@@ -548,7 +548,7 @@
     <xsl:template match="fr:repeat-remove-iteration" mode="within-action-2018.2">
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
-        <xsl:variable name="at"          select="@at/string()"     as="xs:string"/>
+        <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
         <xf:action type="xpath">
             frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>')

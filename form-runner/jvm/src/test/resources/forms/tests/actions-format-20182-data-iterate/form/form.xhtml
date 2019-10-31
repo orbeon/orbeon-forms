@@ -1,0 +1,246 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Issue #4204</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <prizes>
+                        <prizes-iteration>
+                            <grid-1>
+                                <year/>
+                                <category/>
+                            </grid-1>
+                            <laureates>
+                                <laureates-iteration>
+                                    <firstname/>
+                                    <surname/>
+                                    <motivation/>
+                                </laureates-iteration>
+                            </laureates>
+                        </prizes-iteration>
+
+
+                    </prizes>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="prizes-bind" name="prizes" ref="prizes">
+                    <xf:bind id="prizes-iteration-bind" ref="prizes-iteration" name="prizes-iteration">
+                        <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                            <xf:bind id="year-bind" name="year" ref="year" xxf:whitespace="trim" readonly="true()"/>
+                            <xf:bind id="category-bind" ref="category" name="category" xxf:whitespace="trim"
+                                     readonly="true()"/>
+                        </xf:bind>
+                        <xf:bind id="laureates-bind" ref="laureates" name="laureates">
+                            <xf:bind id="laureates-iteration-bind" ref="laureates-iteration"
+                                     name="laureates-iteration">
+                                <xf:bind id="firstname-bind" ref="firstname" name="firstname" xxf:whitespace="trim"
+                                         readonly="true()"/>
+                                <xf:bind id="surname-bind" ref="surname" name="surname" xxf:whitespace="trim"
+                                         readonly="true()"/>
+                                <xf:bind id="motivation-bind" ref="motivation" name="motivation" xxf:whitespace="trim"
+                                         readonly="true()"/>
+                            </xf:bind>
+                        </xf:bind>
+                    </xf:bind>
+
+
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>4204</form-name>
+                    <title xml:lang="en">Issue #4204</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2019.1-SNAPSHOT PE</created-with-version>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <firstname>
+                            <label>First Name</label>
+                            <hint/>
+                        </firstname>
+                        <surname>
+                            <label>Surname</label>
+                            <hint/>
+                        </surname>
+                        <motivation>
+                            <label>Motivation</label>
+                            <hint/>
+                        </motivation>
+                        <prizes>
+                            <label>Nobel prizes</label>
+                        </prizes>
+                        <year>
+                            <label>Year</label>
+                            <hint/>
+
+                        </year>
+                        <category>
+                            <label>Category</label>
+                            <hint/>
+                        </category>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="prizes-template">
+                <prizes-iteration>
+                    <grid-1>
+                        <year/>
+                        <category/>
+                    </grid-1>
+                    <laureates>
+                        <laureates-iteration>
+                            <firstname/>
+                            <surname/>
+                            <motivation/>
+                        </laureates-iteration>
+                    </laureates>
+                </prizes-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="laureates-template">
+                <laureates-iteration>
+                    <firstname/>
+                    <surname/>
+                    <motivation/>
+                </laureates-iteration>
+            </xf:instance>
+
+            <xf:instance id="get-nobel-prizes-instance" class="fr-service"
+                         xxf:exclude-result-prefixes="#all">
+                        <body xmlns:ct="java:org.orbeon.oxf.util.ContentTypes"
+                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">&lt;params/&gt;</body>
+                    </xf:instance>
+            <xf:submission id="get-nobel-prizes-submission" class="fr-service"
+                           resource="https://api.nobelprize.org/v1/prize.json?year=2018"
+                           method="get"
+                           serialization="none"
+                           mediatype=""/>
+
+            <fr:listener version="2018.2" events="form-load-after-controls" actions="my-action"/>
+
+            <fr:action name="my-action" version="2018.2">
+
+                <fr:service-call service="get-nobel-prizes"/>
+                <fr:repeat-clear repeat="prizes"/>
+
+                <fr:data-iterate ref="/*/prizes/_">
+                    <fr:repeat-add-iteration repeat="prizes" at="end"/>
+                    <fr:control-setvalue value="year" control="year" at="end"/>
+                    <fr:control-setvalue value="category" control="category" at="end"/>
+                    <fr:repeat-clear repeat="laureates"/>
+                    <fr:data-iterate ref="laureates/_">
+                        <fr:repeat-add-iteration repeat="laureates"/>
+                        <fr:control-setvalue value="firstname" control="firstname" at="end"/>
+                        <fr:control-setvalue value="surname" control="surname" at="end"/>
+                        <fr:control-setvalue value="motivation" control="motivation" at="end"/>
+                    </fr:data-iterate>
+
+                </fr:data-iterate>
+
+            </fr:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section readonly="true" id="prizes-section" bind="prizes-bind" repeat="content" min="1"
+                            template="instance('prizes-template')"
+                            apply-defaults="true"
+                            fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/prizes/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="2">
+                                <xf:input id="year-control" bind="year-bind">
+                                    <xf:label ref="$form-resources/year/label"/>
+                                    <xf:hint ref="$form-resources/year/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="3" w="5">
+                            <xf:input id="category-control" bind="category-bind">
+                                <xf:label ref="$form-resources/category/label"/>
+                                <xf:hint ref="$form-resources/category/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="8" y="1" w="5" h="1"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="laureates-grid" bind="laureates-bind" repeat="content"
+                             min="1"
+                             template="instance('laureates-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="3">
+                            <xf:input id="firstname-control" bind="firstname-bind">
+                                <xf:label ref="$form-resources/firstname/label"/>
+                                <xf:hint ref="$form-resources/firstname/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="4" y="1" w="3">
+                            <xf:input id="surname-control" bind="surname-bind">
+                                <xf:label ref="$form-resources/surname/label"/>
+                                <xf:hint ref="$form-resources/surname/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="1">
+                            <xf:input id="motivation-control" bind="motivation-bind">
+                                <xf:label ref="$form-resources/motivation/label"/>
+                                <xf:hint ref="$form-resources/motivation/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

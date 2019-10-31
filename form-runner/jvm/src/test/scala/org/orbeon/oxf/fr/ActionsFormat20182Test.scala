@@ -17,6 +17,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.xforms.XFormsId
 import org.scalatest.FunSpecLike
 
 class ActionsFormat20182Test
@@ -83,6 +84,36 @@ class ActionsFormat20182Test
           withFormRunnerDocument(processorService, doc) {
             assert("21" == resolveObject[XFormsValueControl]("my-result-1-control").get.getValue)
             assert("22" == resolveObject[XFormsValueControl]("my-result-2-control").get.getValue)
+          }
+        }
+      }
+    }
+
+    describe("#4204: nested `fr:data-iterate`") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "actions-format-20182-data-iterate", "new", document = "", initialize = true)
+
+      val doc = docOpt.get
+
+      it("must check the resulting iteration sizes") {
+        withTestExternalContext { _ ⇒
+          withFormRunnerDocument(processorService, doc) {
+
+            def assertCount(controlName: String, size: Int): Unit = {
+              val controlNodes =
+                FormRunner.resolveTargetRelativeToActionSourceFromControlsOpt(
+                  container              = doc,
+                  actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(Names.FormModel),
+                  targetControlName      = controlName,
+                  followIndexes          = false
+                ).toList.flatten
+
+              assert(size == controlNodes.size)
+            }
+
+            assertCount("year", 6)
+            assertCount("firstname", 13)
           }
         }
       }

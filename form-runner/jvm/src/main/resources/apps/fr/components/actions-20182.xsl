@@ -308,17 +308,19 @@
                 <!-- Use `preceding::` so that `fr:service-call` nested in preceding iterations are found too -->
                 <xsl:variable
                     name="preceding-delimiter"
-                    select="preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker', 'if-end-marker')][1]"/>
+                    select="$current-group[1]/preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker', 'if-end-marker')][1]"/>
 
                 <xsl:variable
                     name="preceding-service-name-opt"
                     select="$preceding-delimiter/self::fr:service-call/@service/string()" as="xs:string?"/>
                 <xsl:variable
                     name="current-continuation-id"
-                    select="concat($action-name, '-', $group-position,    '-id')"/>
+                    select="concat($action-name, '-', $group-position, '-id')"/>
 
                 <xsl:choose>
                     <xsl:when test="exists($preceding-service-name-opt)">
+                        <!-- This means that the last group/continuation block ended with a service call. The continuation reacts
+                             to the service completing successfully, and evaluates in the context of the service response. -->
                         <xf:action
                             observer="{$preceding-service-name-opt}-submission"
                             event="xforms-submit-done"
@@ -334,9 +336,33 @@
                         </xf:action>
                     </xsl:when>
                     <xsl:otherwise>
+                        <!-- This means the last group/continuation block ended with the end of an `<fr:data-iterate>` or an
+                             `<fr:if>` block. The continuation reacts to an explicit event dispatch and evaluates in the context
+                             of the preceding service call or enclosing iteration, whichever comes first. -->
                         <xf:action
                             observer="fr-form-model"
                             event="{$continuation-event-prefix}{$current-continuation-id}">
+
+                            <xsl:variable
+                                name="context-changing-elem-opt"
+                                select="
+                                    reverse(
+                                        $current-group[1]/ancestor-or-self::fr:*/(self::fr:*, preceding-sibling::fr:*)
+                                    )[
+                                        local-name() = 'service-call' or
+                                        local-name() = 'data-iterate' and exists(. intersect $current-group[1]/ancestor::fr:*)
+                                    ][1]"/>
+
+                            <xsl:attribute
+                                name="context"
+                                select="
+                                    if (exists($context-changing-elem-opt/self::fr:service-call)) then
+                                        'xxf:instance(''fr-service-response-instance'')'
+                                    else if (exists($context-changing-elem-opt/self::fr:data-iterate)) then
+                                        concat('xxf:get-request-attribute(''', fr:build-context-param($context-changing-elem-opt), ''')')
+                                    else
+                                        'instance(''fr-form-instance'')'
+                                "/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>

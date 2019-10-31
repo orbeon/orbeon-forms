@@ -318,7 +318,7 @@
                     </xf:action>
 
                </xf:action>
-               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-4-id">
+               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-4-id" context="xxf:instance('fr-service-response-instance')">
                     <xf:action type="xpath">frf:repeatClear('my-section false none my-grid true none')</xf:action>
                     <xf:action iterate="/response/row">
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
@@ -422,7 +422,7 @@
                         </xf:action>
                     </xf:action>
                 </xf:action>
-                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id">
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id"  context="xxf:instance('fr-service-response-instance')">
                     <xf:action type="xpath">frf:repeatRemoveIteration('my-section false none my-grid true start')</xf:action>
                     <xf:action iterate="/response/row[exists(foo)]">
                         <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
@@ -472,7 +472,8 @@
                 </xf:action>
                 <xf:action
                     observer="fr-form-model"
-                    event="fr-action-continuation-my-action-7-id">
+                    event="fr-action-continuation-my-action-7-id"
+                    context="xxf:instance('fr-service-response-instance')">
 
                      <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                          process:runProcessByName('oxf.fr.detail.process', 'summary')
@@ -549,7 +550,7 @@
                        <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model"/>
                    </xf:action>
                </xf:action>
-               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-2-id">
+               <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-2-id" context="instance('fr-form-instance')">
                    <xf:message>3</xf:message>
                </xf:action>
 
@@ -669,12 +670,12 @@
                     <xf:message>6</xf:message>
                     <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model"/>
                 </xf:action>
-                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id">
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id" context="xxf:instance('fr-service-response-instance')">
                     <xf:message>7</xf:message>
                     <xf:dispatch if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration-1') = true()"
                                  name="fr-action-continuation-my-action-6-id" targetid="fr-form-model"/>
                 </xf:action>
-                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-6-id">
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-6-id" context="xxf:instance('fr-service-response-instance')">
                     <xf:message>8</xf:message>
                     <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                origin="saxon:parse(xxf:instance('my-service-4-instance'))"/>
@@ -804,7 +805,7 @@
                         </xf:action>
                     </xf:action>
                 </xf:action>
-                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-3-id">
+                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-3-id" context="xxf:get-request-attribute('fr-iteration-context-1')">
                     <xf:action>
                         <xf:var name="value" value="."/>
                         <xf:rebuild/>

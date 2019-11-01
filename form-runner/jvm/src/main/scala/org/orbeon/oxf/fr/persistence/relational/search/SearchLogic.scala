@@ -108,7 +108,7 @@ trait SearchLogic extends SearchRequest {
         // Build SQL and create statement
         val sql = {
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
-          val rowNumSQL            = Provider.rowNumSQL(request.provider, connection, tableAlias = "c")
+          val rowNumSQL            = Provider.rowNumSQL(request.provider, connection, tableAlias = "d")
           val rowNumCol            = rowNumSQL.col
           val rowNumOrderBy        = rowNumSQL.orderBy
           val rowNumTable          = rowNumSQL.table match {
@@ -126,16 +126,21 @@ trait SearchLogic extends SearchRequest {
              |FROM
              |    (
              |        SELECT
-             |            c.*,
+             |            d.*,
              |            $rowNumCol
              |        FROM
-             |            $rowNumTable
              |            (
-             |                $innerSQL
-             |            ) s
-             |        INNER JOIN
-             |            orbeon_i_current c
-             |            ON c.data_id = s.data_id
+             |                SELECT
+             |                    c.*
+             |                FROM
+             |                    $rowNumTable
+             |                    (
+             |                        $innerSQL
+             |                    ) s
+             |                INNER JOIN
+             |                    orbeon_i_current c
+             |                    ON c.data_id = s.data_id
+             |            ) d
              |        $rowNumOrderBy
              |    ) c
              | LEFT JOIN

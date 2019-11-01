@@ -34,8 +34,6 @@
                                 </laureates-iteration>
                             </laureates>
                         </prizes-iteration>
-
-
                     </prizes>
                 </form>
             </xf:instance>
@@ -61,8 +59,6 @@
                             </xf:bind>
                         </xf:bind>
                     </xf:bind>
-
-
                 </xf:bind>
             </xf:bind>
 
@@ -104,7 +100,6 @@
                         <year>
                             <label>Year</label>
                             <hint/>
-
                         </year>
                         <category>
                             <label>Category</label>
@@ -151,11 +146,8 @@
             <fr:listener version="2018.2" events="form-load-after-controls" actions="my-action"/>
 
             <fr:action name="my-action" version="2018.2">
-
                 <fr:service-call service="get-nobel-prizes"/>
-                <fr:repeat-clear repeat="prizes"/>
-
-                <fr:data-iterate ref="/*/prizes/_">
+                <fr:repeat-clear repeat="prizes"/><fr:data-iterate ref="/*/prizes/_">
                     <fr:repeat-add-iteration repeat="prizes" at="end"/>
                     <fr:control-setvalue value="year" control="year" at="end"/>
                     <fr:control-setvalue value="category" control="category" at="end"/>
@@ -166,9 +158,7 @@
                         <fr:control-setvalue value="surname" control="surname" at="end"/>
                         <fr:control-setvalue value="motivation" control="motivation" at="end"/>
                     </fr:data-iterate>
-
                 </fr:data-iterate>
-
             </fr:action>
         </xf:model>
     </xh:head>

@@ -252,7 +252,7 @@ trait FormRunnerBaseOps {
   def canUpdate: Boolean = authorizedOperations intersect UpdateOps nonEmpty
   def canDelete: Boolean = authorizedOperations intersect DeleteOps nonEmpty
 
-  private def documentMetadataDate(name: String) =
+  private def documentMetadataDate(name: String): Option[Long] =
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
   def documentCreatedDate: Option[Long] = documentMetadataDate(Headers.Created)
@@ -261,10 +261,13 @@ trait FormRunnerBaseOps {
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
 
-  def metadataElemValueOpt(name: String): Option[String] =
-    metadataInstance       map
-    (_.rootElement)        flatMap
-    (_.elemValueOpt(name))
+  def optionFromMetadataOrProperties(
+    metadataInstanceRootElem : NodeInfo,
+    featureName              : String)(implicit
+    p                        : FormRunnerParams
+  ): Option[String] =
+    metadataInstanceRootElem.elemValueOpt(featureName) orElse
+    formRunnerProperty(s"oxf.fr.detail.$featureName")
 
   def formTitleFromMetadata: Option[String] = {
 

@@ -93,6 +93,20 @@ trait FormRunnerPDF {
      } orNull
   }
 
+  //@XPathFunction
+  def optionFromMetadataOrPropertiesXPath(
+    metadataInstanceRootElem : NodeInfo,
+    featureName              : String,
+    app                      : String,
+    form                     : String,
+    mode                     : String
+  ): Option[String] =
+    FormRunner.optionFromMetadataOrProperties(
+      metadataInstanceRootElem = metadataInstanceRootElem,
+      featureName              = featureName)(
+      p                        = FormRunnerParams(app, form, 1, None, mode)
+    )
+
   import URLFinder._
 
   // Add http/https/mailto hyperlinks to a plain string

@@ -169,9 +169,9 @@ object SimpleDataMigration {
         if (FormRunner.isDesignTime)
           DataMigrationBehavior.Disabled
         else
-          FormRunner.metadataElemValueOpt(DataMigrationFeatureName) orElse
-          formRunnerProperty(DataMigrationPropertyName)             flatMap
-          DataMigrationBehavior.withNameOption                      getOrElse
+          FormRunner.metadataInstance map (_.rootElement)                          flatMap
+          (FormRunner.optionFromMetadataOrProperties(_, DataMigrationFeatureName)) flatMap
+          DataMigrationBehavior.withNameOption                                     getOrElse
           DataMigrationBehavior.Disabled
 
       def isFeatureEnabled =

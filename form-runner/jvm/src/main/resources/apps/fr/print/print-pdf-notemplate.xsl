@@ -23,9 +23,15 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-    <xsl:variable name="app" select="doc('input:parameters')/*/app/string()"/>
-    <xsl:variable name="form" select="doc('input:parameters')/*/form/string()"/>
-    <xsl:variable name="hyperlinks" select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
+    <xsl:variable name="app"              select="doc('input:parameters')/*/app/string()"/>
+    <xsl:variable name="form"             select="doc('input:parameters')/*/form/string()"/>
+    <xsl:variable name="mode"             select="doc('input:parameters')/*/mode/string()"/>
+    <xsl:variable name="hyperlinks"       select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
+
+    <!-- MAYBE: Support URL parameters as well for #4206. Should they be trusted? -->
+    <xsl:variable name="metadata"         select="frf:metadataInstanceRootOpt(doc('input:xforms'))"/>
+    <xsl:variable name="page-orientation" select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
+    <xsl:variable name="page-size"        select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-size',        $app, $form, $mode)"/>
 
     <!--
         Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
@@ -38,6 +44,18 @@
 
     <!-- While we are at it filter out scripts as they won't be used -->
     <xsl:template match="*:script | *:noscript" mode="#all"/>
+
+    <xsl:template match="xh:html/xh:head" mode="#all">
+        <head>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <!-- https://github.com/orbeon/orbeon-forms/issues/4206 -->
+            <style type="text/css">
+                @page {
+                    size: <xsl:value-of select="string-join(($page-size, $page-orientation), ' ')"/>;
+                }
+            </style>
+        </head>
+    </xsl:template>
 
     <!-- https://github.com/orbeon/orbeon-forms/issues/3096 -->
     <xsl:template

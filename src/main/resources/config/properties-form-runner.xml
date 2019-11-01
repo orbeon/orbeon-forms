@@ -159,6 +159,9 @@
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.quality.*.*"                 value="0.8"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
+    <property as="xs:string"  name="oxf.fr.detail.rendered-page-orientation.*.*"                value="portrait"/>
+    <property as="xs:string"  name="oxf.fr.detail.rendered-page-size.*.*"                       value="letter"/>
+
     <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
         concat(
             fr:form-title(),

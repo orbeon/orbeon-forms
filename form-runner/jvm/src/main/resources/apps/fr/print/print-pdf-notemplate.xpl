@@ -51,10 +51,11 @@
 
     <!-- Prepare XHTML before conversion to PDF -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config" href="print-pdf-notemplate.xsl"/>
-        <p:input name="data" href="#rewritten-data"/>
-        <p:input name="request" href="#request"/>
+        <p:input name="config"     href="print-pdf-notemplate.xsl"/>
+        <p:input name="data"       href="#rewritten-data"/>
+        <p:input name="request"    href="#request"/>
         <p:input name="parameters" href="#parameters"/>
+        <p:input name="xforms"     href="#xforms"/>
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 

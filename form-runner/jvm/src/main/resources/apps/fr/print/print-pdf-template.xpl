@@ -60,6 +60,7 @@
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript"/>
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
+                <!-- 2019-11-01: PDF template doesn't use Flying Saucer so above comment doesn't make sense? -->
                 <xsl:template match="*:form">
                     <xsl:copy>
                         <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
@@ -67,6 +68,7 @@
                     </xsl:copy>
                 </xsl:template>
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
+                <!-- 2019-11-01: PDF template doesn't use Flying Saucer so above comment doesn't make sense? -->
                 <xsl:template match="*">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>

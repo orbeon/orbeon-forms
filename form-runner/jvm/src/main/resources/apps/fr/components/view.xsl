@@ -469,7 +469,6 @@
     </xsl:template>
 
     <xsl:template match="fr:language-selector">
-        <!-- Switch language -->
         <xf:group xxf:element="div" model="fr-form-model" class="fr-language-choice">
             <!-- Put default language first, then other languages -->
             <xf:var

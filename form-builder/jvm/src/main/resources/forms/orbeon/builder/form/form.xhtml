@@ -60,6 +60,14 @@
                             <xh:a tabindex="-1" href="http://doc.orbeon.com/form-builder/" target="_blank">Form Builder User Guide</xh:a>
                         </xh:li>
                         <xh:li>
+                            <xf:select1 bind="page-layout-bind" appearance="bootstrap" id="fr-width-selector-select">
+                                <xf:itemset ref="xxf:resource-elements('form-builder-page-layout.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then 'fixed' else 'fluid'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:li>
+                        <xh:li>
                             <fr:language-selector/>
                         </xh:li>
                     </xh:ul>
@@ -115,7 +123,6 @@
 
         <xh:div class="fb-main">
             <xh:div class="fb-main-inner">
-
                 <xh:div class="navbar navbar-inverse">
                     <xh:div class="navbar-inner">
                         <xh:div class="container">
@@ -192,9 +199,9 @@
                     </xh:div>
                 </xh:div>
 
-                <xh:div class="container">
+                <xh:div class="container{if (bind('page-layout-bind') != 'fixed') then '-fluid' else ''}">
 
-                    <xh:div class="row">
+                    <xh:div class="row{if (bind('page-layout-bind') != 'fixed') then '-fluid' else ''}">
                         <xh:div class="span12">
 
                         <!--

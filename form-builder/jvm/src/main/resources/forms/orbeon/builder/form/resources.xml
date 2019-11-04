@@ -306,6 +306,10 @@
         <or>
             <label>or</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">Fixed View</item>
+            <item id="1">Fluid View</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -1526,6 +1530,10 @@
         <or>
             <label>ou</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">Vue fixe</item>
+            <item id="1">Vue fluide</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -2729,6 +2737,10 @@
         <or>
             <label>eller</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -3960,6 +3972,10 @@
         <or>
             <label>или</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -5191,6 +5207,10 @@
         <or>
             <label>o</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -6414,6 +6434,10 @@
         <or>
             <label>oder</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -7640,6 +7664,10 @@
         <or>
             <label>tai</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -8863,6 +8891,10 @@
         <or>
             <label>o</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -10087,6 +10119,10 @@
         <or>
             <label>of</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -11290,6 +11326,10 @@
         <or>
             <label>ou</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>
@@ -12520,6 +12560,10 @@
         <or>
             <label>eller</label>
         </or>
+        <form-builder-page-layout>
+            <item id="0">[Fixed View]</item>
+            <item id="1">[Fluid View]</item>
+        </form-builder-page-layout>
         <components>
             <parameters-editor>
                 <name>

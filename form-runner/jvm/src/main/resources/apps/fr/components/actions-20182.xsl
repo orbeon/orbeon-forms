@@ -463,7 +463,17 @@
     </xsl:template>
 
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+
         <xsl:variable name="data-iterate-elem" select="."/>
+
+        <xf:action if="empty({@ref})">
+            <xf:dispatch
+                name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
+                targetid="fr-form-model">
+        </xf:dispatch>
+        </xf:action>
         <xf:action iterate="{@ref}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
 

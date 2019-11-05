@@ -613,8 +613,6 @@
             <!-- TODO: could use a native function for this -->
             <dialogs-open>0</dialogs-open>
 
-            <page-layout>fixed</page-layout>
-
             <!-- XPath errors -->
             <rr>calculate</rr>
             <calculate-errors>0</calculate-errors>
@@ -633,8 +631,6 @@
         <xf:bind ref="section-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
         <xf:bind ref="grid-trigger"     readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
         <xf:bind ref="control-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
-
-        <xf:bind ref="page-layout" id="page-layout-bind"/>
 
         <!-- Sum calculate and validate MIP error counts -->
         <xf:bind ref="xpath-errors" calculate="../calculate-errors + ../validate-errors"/>

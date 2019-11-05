@@ -93,6 +93,30 @@
                     ref="$i/data-migration"
                     value="(event('data-migration')[. = ('enabled', 'disabled', 'error')], 'default')[1]"/>
 
+                <xf:action iterate="'rendered-page-orientation', 'rendered-page-size'">
+                    <xf:var name="n" value="."/>
+                    <xf:setvalue
+                        ref="$i/*[name() = $n]"
+                        value="
+                            (
+                                event($n)[
+                                    . = xxf:resource-elements(
+                                        concat(
+                                            'dialog-form-settings.',
+                                            $n,
+                                            '.item'
+                                        ),
+                                        '|fr-form-resources|'
+                                    )/@id
+                                ],
+                                'default'
+                            )[1]"/>
+                </xf:action>
+
+                <xf:setvalue
+                    ref="$i/html-page-layout"
+                    value="(event('html-page-layout')[. = ('fixed', 'fluid')], 'default')[1]"/>
+
                 <xf:setvalue
                     ref="$i/analysis-calculate"
                     value="(event('analysis-calculate')[. = ('true', 'false')], 'default')[1]"/>
@@ -280,6 +304,9 @@
                     <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
+                    <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
+                    <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
+                    <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
 
                     <xf:property
@@ -340,6 +367,9 @@
                         <wizard-mode/>
                         <wizard-subsections-nav/>
                         <wizard-subsections-toc/>
+                        <rendered-page-orientation/>
+                        <rendered-page-size/>
+                        <html-page-layout/>
                         <attachment-max-size/>
                         <attachment-max-size-aggregate/>
                         <attachment-mediatypes/>
@@ -771,6 +801,21 @@
                                 <fr:grid>
                                     <xh:tr>
                                         <xh:td>
+                                            <xf:select1 ref="html-page-layout" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/html-page-layout/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/html-page-layout/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/html-page-layout/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="
+                                                             if (@id = 1) then 'fixed'
+                                                        else if (@id = 2) then 'fluid'
+                                                        else                   'default'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
                                             <xf:select1 ref="wizard" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard/hint"/>
@@ -821,6 +866,37 @@
                                                         else if (@id = 2) then 'all'
                                                         else if (@id = 3) then 'none'
                                                         else                   'default'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+                            </fr:tab>
+
+                            <fr:tab class="fb-dialog-form-settings-pdf-options" visible="$is-form-settings">
+                                <fr:label value="$resources/dialog-form-settings/pdf-options"/>
+
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="rendered-page-orientation" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/rendered-page-orientation/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/rendered-page-orientation/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/rendered-page-orientation/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="@id"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="rendered-page-size" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/rendered-page-size/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/rendered-page-size/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/rendered-page-size/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="@id"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>

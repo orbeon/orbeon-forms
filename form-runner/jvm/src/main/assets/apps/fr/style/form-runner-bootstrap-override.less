@@ -35,6 +35,10 @@ body.orbeon {
         border-radius: 0;
     }
 
+    .row-fluid [class*="span"] {
+        min-height: 1px; // Bootstrap has 30px, which is different from `.row` where it is 1px
+    }
+
     .navbar-inverse {
         .navbar-inner {
             #gradient > .vertical(@gray, @grayDarker);

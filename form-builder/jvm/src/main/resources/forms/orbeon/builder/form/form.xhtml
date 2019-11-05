@@ -61,7 +61,7 @@
                         </xh:li>
                         <xh:li>
                             <xf:select1 bind="page-layout-bind" appearance="bootstrap" id="fr-width-selector-select">
-                                <xf:itemset ref="xxf:resource-elements('form-builder-page-layout.item')">
+                                <xf:itemset ref="xxf:resource-elements('form-builder-page-layout.item', '|fr-form-resources|')">
                                     <xf:label ref="."/>
                                     <xf:value ref="if (@id = 0) then 'fixed' else 'fluid'"/>
                                 </xf:itemset>
@@ -212,7 +212,7 @@
                             <xh:a name="fr-form"/>
 
                             <xf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
-                            
+
 <!--                            &lt;!&ndash; Cut/copy/paste/undo/redo &ndash;&gt;-->
 <!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>-->
 <!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>-->
@@ -562,6 +562,17 @@
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('data-migration', event('data-migration'))"/>
+
+                                        <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout'">
+                                            <xf:var name="n" value="."/>
+                                            <xf:delete
+                                                ref="bind(concat($n, '-bind'))"/>
+                                            <xf:insert
+                                                if="not(event($n) = 'default')"
+                                                context="bind('metadata-bind')"
+                                                ref="*"
+                                                origin="xf:element($n, event($n))"/>
+                                        </xf:action>
 
                                         <xf:delete
                                             bind="analysis-calculate-bind"/>

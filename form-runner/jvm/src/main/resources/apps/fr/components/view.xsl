@@ -29,10 +29,13 @@
         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
         xmlns:d="DAV:">
 
-    <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
-    <xsl:variable name="fluid"          select="$view/@fluid = 'true'"/>
-    <xsl:variable name="body"           select="($view/fr:body, $view)[1]"           as="element()?"/>
-    <xsl:variable name="custom-buttons" select="$view/fr:buttons"                    as="element()*"/>
+    <xsl:variable name="metadata"         select="frf:metadataInstanceRootOpt($fr-form-model)"/>
+    <xsl:variable name="page-orientation" select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode)"/>
+
+    <xsl:variable name="view"             select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
+    <xsl:variable name="fluid"            select="$view/@fluid = 'true' or $page-orientation = 'fluid'"/>
+    <xsl:variable name="body"             select="($view/fr:body, $view)[1]"           as="element()?"/>
+    <xsl:variable name="custom-buttons"   select="$view/fr:buttons"                    as="element()*"/>
 
     <!-- Template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(*)*">

@@ -336,7 +336,8 @@
             <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
             <options>Form Options</options>
-            <wizard-options>Wizard Options</wizard-options>
+            <wizard-options>View Options</wizard-options>
+            <pdf-options>PDF Options</pdf-options>
             <control-settings>Control Settings</control-settings>
             <about>About this Form</about>
             <stats>Form Statistics</stats>
@@ -408,6 +409,29 @@
                 <item id="2">Disabled</item>
                 <item id="3">Raise an error</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label>PDF page orientation</label>
+                <hint/>
+                <item id="default">Use property</item>
+                <item id="portrait">Portrait</item>
+                <item id="landscape">Landscape</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label>PDF page size</label>
+                <hint/>
+                <item id="default">Use property</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter">Letter</item>
+                <item id="a4">A4</item>
+                <item id="legal">Legal</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label>Browser page layout</label>
+                <hint>Whether the form take a fixed or fluid width</hint>
+                <item id="0">Use property</item>
+                <item id="1">Fixed width</item>
+                <item id="2">Fluid width</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label>Automatic Calculations Dependencies</label>
                 <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -1560,7 +1584,8 @@
             <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
             <options>Options</options>
-            <wizard-options>Options wizard</wizard-options>
+            <wizard-options>Options de la vue</wizard-options>
+            <pdf-options>Options PDF</pdf-options>
             <control-settings>Options contrôles</control-settings>
             <about>Au sujet de ce formulaire</about>
             <stats>Statistiques</stats>
@@ -1632,6 +1657,29 @@
                 <item id="2">Désactivée</item>
                 <item id="3">Produit une erreur</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label>Orientation de page PDF</label>
+                <hint/>
+                <item id="default">Utiliser la propriété</item>
+                <item id="portrait">Portrait</item>
+                <item id="landscape">Paysage</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label>Taille de page PDF</label>
+                <hint/>
+                <item id="default">Utiliser la propriété</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter">Letter</item>
+                <item id="a4">A4</item>
+                <item id="legal">Legal</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label>Mise en page dans le navigateur</label>
+                <hint>Montrer le formulaire en largeur fixe ou fluide dans le navigateur</hint>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Largeur fixe</item>
+                <item id="2">Largeur fluide</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label>Dépendances automatiques des formules de calculs</label>
                 <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>
@@ -2767,7 +2815,8 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form settings]</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats todo="true">[Form Statistics]</stats>
@@ -2839,6 +2888,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -4002,7 +4074,8 @@
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form Settings]</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats todo="true">[Form statistics]</stats>
@@ -4074,6 +4147,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -5237,7 +5333,8 @@
             <save-as>Salva con nome…</save-as>
             <open><label>Impostazioni modulo</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Statistiche del modulo</stats>
@@ -5309,6 +5406,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -6464,7 +6584,8 @@
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
             <options>Formular</options>
-            <wizard-options>Wizard</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings>Steuerelement</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Statistiken</stats>
@@ -6536,6 +6657,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label>Abhängigkeiten automatisch ermitteln</label>
                 <hint>Definiert die Auswertungsreihenfolge von "Berechneten Werten" und "Initialen Werten" automatisch</hint>
@@ -7694,7 +7838,8 @@
             <save-as>Tallenna nimellä</save-as>
             <open><label>Lomakeasetukset</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Lomatilastot</stats>
@@ -7766,6 +7911,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -8921,7 +9089,8 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configuración del Formulario</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Estadísticas del Formulario</stats>
@@ -8993,6 +9162,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -10149,7 +10341,8 @@
             <save-as>Bewaar als…</save-as>
             <open><label>Form-instellingen</label></open>
             <options>Form opties</options>
-            <wizard-options>Wizard opties</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Form-statistieken</stats>
@@ -10221,6 +10414,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label>Automatische afhankelijkheid calculatie</label>
                 <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>
@@ -11356,7 +11572,8 @@
             <save-as>Guardar como…</save-as>
             <open><label>Configurações do Formulário</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Estatística do Formulário</stats>
@@ -11428,6 +11645,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
@@ -12590,7 +12830,8 @@
             <save-as>Spara som…</save-as>
             <open><label>Inställningar för formulär</label></open>
             <options todo="true">[Form Options]</options>
-            <wizard-options todo="true">[Wizard Options]</wizard-options>
+            <wizard-options todo="true">[View Options]</wizard-options>
+            <pdf-options todo="true">[PDF Options]</pdf-options>
             <control-settings todo="true">[Control Settings]</control-settings>
             <about todo="true">[About this Form]</about>
             <stats>Formulärstatistik</stats>
@@ -12662,6 +12903,29 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <rendered-page-orientation>
+                <label todo="true">[PDF page orientation]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <item id="portrait" todo="true">[Portrait]</item>
+                <item id="landscape" todo="true">[Landscape]</item>
+            </rendered-page-orientation>
+            <rendered-page-size>
+                <label todo="true">[PDF page size]</label>
+                <hint/>
+                <item id="default" todo="true">[Use property]</item>
+                <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
+                <item id="letter" todo="true">[Letter]</item>
+                <item id="a4" todo="true">[A4]</item>
+                <item id="legal" todo="true">[Legal]</item>
+            </rendered-page-size>
+            <html-page-layout>
+                <label todo="true">[Browser page layout]</label>
+                <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Fixed width]</item>
+                <item id="2" todo="true">[Fluid width]</item>
+            </html-page-layout>
             <analysis-calculate>
                 <label todo="true">[Automatic Calculations Dependencies]</label>
                 <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>

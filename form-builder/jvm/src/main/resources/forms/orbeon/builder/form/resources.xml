@@ -1580,7 +1580,7 @@
             </wizard-mode>
             <wizard-subsections-nav>
                 <label>Navigation des sous-sections</label>
-                <hint>Est-ce que le wizard permet la navigation des sections et grilles sous les sections au sommet</hint>
+                <hint>Permettre la navigation des sections et grilles sous les sections au sommet</hint>
             </wizard-subsections-nav>
             <wizard-subsections-toc>
                 <label>Table des matières pour les sous-sections du wizard</label>

@@ -958,7 +958,8 @@
             name="do-autosave"
             value="
                 $autosave-elem/status                             = 'dirty' and
-                $persistence-instance/lease-owned-by-current-user = 'true'
+                $persistence-instance/lease-owned-by-current-user = 'true'  and
+                $persistence-instance/initial-dialog-to-show      = ''
             "/>
         <xf:action if="$do-autosave">
             <xf:var

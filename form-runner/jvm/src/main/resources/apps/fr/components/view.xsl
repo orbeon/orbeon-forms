@@ -92,7 +92,13 @@
         <xf:var name="persistence-instance"    value="xxf:instance('fr-persistence-instance')"/>
         <xf:var name="lease-enabled"           value="$persistence-instance/lease-enabled = 'true'"/>
         <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
-        <xf:var name="show-form-data"          value="not($lease-enabled) or  $lease-state-elem = 'current-user'"/>
+        <xf:var name="show-form-data"          value="
+            not(
+                (: Hide form controls as we're asking users whether to use a draft :)
+                $persistence-instance/initial-dialog-to-show != '' or
+                (: Hide form controls if the lease is enabled and we failed to acquire the lease :)
+                ($lease-enabled and $lease-state-elem = 'current-user')
+            )"/>
 
         <xf:group
             ref="if ($lease-enabled) then . else ()"
@@ -860,7 +866,13 @@
                 </xh:span>
             </xsl:when>
             <xsl:when test="not($hide-buttons-bar)">
-                <xf:group model="fr-form-model" class="fr-buttons">
+                <xf:var
+                    name="hide-buttons-bar"
+                    value="xxf:instance('fr-persistence-instance')/initial-dialog-to-show != ''"/>
+                <xf:group
+                    model="fr-form-model"
+                    class="fr-buttons"
+                    ref=".[not($hide-buttons-bar)]">
 
                     <xf:var name="buttons-property-override"  value="'{$buttons-property}'"/>
                     <xf:var name="highlight-primary-override" value="'{$highlight-primary}'"/>

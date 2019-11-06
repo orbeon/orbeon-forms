@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.xforms.XFormsId;
+import scala.Option;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -163,10 +164,10 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
                 // issue a warning
                 {
-                    final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmissionFirstPass();
-                    if (p.isDeferredSubmission() && existingSubmission != null) {
+                    final Option<XFormsModelSubmission> existingSubmission = containingDocument.getClientActiveSubmissionFirstPass();
+                    if (p.isDeferredSubmission() && existingSubmission.isDefined()) {
                         indentedLogger.logWarning("", "another submission requiring a second pass already exists",
-                                "existing submission", existingSubmission.getEffectiveId(),
+                                "existing submission", existingSubmission.get().getEffectiveId(),
                                 "new submission", this.getEffectiveId());
                         return;
                     }

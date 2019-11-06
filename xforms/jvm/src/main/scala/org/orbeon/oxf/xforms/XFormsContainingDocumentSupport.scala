@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.http.Headers
@@ -42,16 +43,16 @@ import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMe
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.UrlType
+import org.orbeon.oxf.xforms.submission.{UrlType, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 import org.orbeon.xforms.{Constants, rpc}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.{immutable ⇒ i, mutable ⇒ m}
 import scala.reflect.ClassTag
 
 object XFormsContainingDocumentSupport {
@@ -152,6 +153,13 @@ trait ContainingDocumentTransientState {
 
   private var transientState = Map.empty[String, Any]
 
+  private var activeSubmissionFirstPass: Option[XFormsModelSubmission] = None
+  private var nonJavaScriptLoadsToRun: Vector[Load] = Vector.empty
+  private var scriptsToRun: Vector[Load Either ScriptInvocation] = Vector.empty
+
+  private def throwConflict(locationData: LocationData): Nothing =
+    throw new ValidationException("Unable to run a two-pass submission and `xf:load` within a same action sequence.", locationData)
+
   def setTransientState[T](name: String, value: T): Unit =
     transientState += name → value
 
@@ -161,8 +169,46 @@ trait ContainingDocumentTransientState {
   def removeTransientState(name: String): Unit =
     transientState -= name
 
-  def clearTransientState(): Unit =
+  def clearTransientState(): Unit = {
     transientState = Map.empty
+
+    activeSubmissionFirstPass foreach (_.clearActiveSubmissionParameters())
+    activeSubmissionFirstPass = None
+
+    nonJavaScriptLoadsToRun     = Vector.empty
+    scriptsToRun   = Vector.empty
+  }
+
+  def setActiveSubmissionFirstPass(submission: XFormsModelSubmission): Unit = {
+
+    activeSubmissionFirstPass foreach
+      (_ ⇒ throw new ValidationException("There is already an active submission.", submission.getLocationData))
+
+    if (nonJavaScriptLoadsToRun.nonEmpty)
+      throwConflict(submission.getLocationData)
+
+    activeSubmissionFirstPass = Some(submission)
+  }
+
+  def getClientActiveSubmissionFirstPass: Option[XFormsModelSubmission] = activeSubmissionFirstPass
+
+  def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
+    scriptsToRun :+= Right(scriptInvocation)
+
+  def getScriptsToRun: i.Seq[Load Either ScriptInvocation] = scriptsToRun
+
+  def addLoadToRun(load: Load): Unit =
+    activeSubmissionFirstPass match {
+      case Some(s) ⇒
+        throwConflict(s.getLocationData)
+      case None ⇒
+        if (load.isJavaScript)
+          scriptsToRun :+= Left(load)
+        else
+          nonJavaScriptLoadsToRun :+= load
+    }
+
+  def getNonJavaScriptLoadsToRun: i.Seq[Load] = nonJavaScriptLoadsToRun
 }
 
 trait ContainingDocumentUpload {
@@ -286,7 +332,7 @@ trait ContainingDocumentProperties {
   }
 
   private object Memo {
-    private val cache = collection.mutable.Map.empty[String, Any]
+    private val cache = m.Map.empty[String, Any]
 
     private def memo[T](name: String, get: ⇒ T) =
       cache.getOrElseUpdate(name, get).asInstanceOf[T]
@@ -424,7 +470,7 @@ private object ContainingDocumentProperties {
 trait ContainingDocumentLogging {
 
   private final val indentation = new IndentedLogger.Indentation
-  private final val loggersMap = mutable.HashMap[String, IndentedLogger]()
+  private final val loggersMap = m.HashMap[String, IndentedLogger]()
 
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
     loggersMap.getOrElseUpdate(loggingCategory,
@@ -565,7 +611,7 @@ trait ContainingDocumentDelayedEvents {
 
   self: XBLContainer ⇒
 
-  private val _delayedEvents = ListBuffer[DelayedEvent]()
+  private val _delayedEvents = m.ListBuffer[DelayedEvent]()
 
   // Schedule an event for delayed execution, following xf:dispatch/@delay semantics
   def addDelayedEvent(

@@ -361,40 +361,40 @@
                                 <data type="string"/>
                             </element>
                         </zeroOrMore>
-                        <!-- Only for `javascript:` loads -->
                         <zeroOrMore>
-                            <element name="xxf:load">
-                                <attribute name="resource"/>
-                                <attribute name="show">
-                                    <choice>
-                                        <value>replace</value>
-                                        <value>new</value>
-                                    </choice>
-                                </attribute>
-                                <optional>
-                                    <attribute name="target"/>
-                                </optional>
-                                <optional>
-                                    <attribute name="show-progress">
+                            <choice>
+                                <!-- Only for `javascript:` loads -->
+                                <element name="xxf:load">
+                                    <attribute name="resource"/>
+                                    <attribute name="show">
                                         <choice>
-                                            <value>true</value>
-                                            <value>false</value>
+                                            <value>replace</value>
+                                            <value>new</value>
                                         </choice>
                                     </attribute>
-                                </optional>
-                            </element>
-                        </zeroOrMore>
-                        <zeroOrMore>
-                            <element name="xxf:script">
-                                <attribute name="name"/>
-                                <attribute name="target-id"/>
-                                <attribute name="observer-id"/>
-                                <zeroOrMore>
-                                    <element name="xxf:param">
-                                        <data type="string"/>
-                                    </element>
-                                </zeroOrMore>
-                            </element>
+                                    <optional>
+                                        <attribute name="target"/>
+                                    </optional>
+                                    <optional>
+                                        <attribute name="show-progress">
+                                            <choice>
+                                                <value>true</value>
+                                                <value>false</value>
+                                            </choice>
+                                        </attribute>
+                                    </optional>
+                                </element>
+                                <element name="xxf:script">
+                                    <attribute name="name"/>
+                                    <attribute name="target-id"/>
+                                    <attribute name="observer-id"/>
+                                    <zeroOrMore>
+                                        <element name="xxf:param">
+                                            <data type="string"/>
+                                        </element>
+                                    </zeroOrMore>
+                                </element>
+                            </choice>
                         </zeroOrMore>
                         <optional>
                             <choice>

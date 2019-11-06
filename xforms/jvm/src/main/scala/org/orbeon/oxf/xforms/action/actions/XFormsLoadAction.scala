@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.UrlType
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.{Load, XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 
 
@@ -220,12 +220,6 @@ object XFormsLoadAction {
       else
         isShowProgress
 
-    containingDocument.addLoadToRun(
-      externalURL,
-      target.orNull,
-      urlType,
-      doReplace,
-      effectiveIsShowProgress
-    )
+    containingDocument.addLoadToRun(Load(externalURL, target, urlType, doReplace, effectiveIsShowProgress))
   }
 }

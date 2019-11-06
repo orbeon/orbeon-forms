@@ -211,7 +211,7 @@ object ScriptBuilder {
           } yield
             delayedEvent.toServerEvent(currentTime),
         userScripts =
-          for (script ← containingDocument.getScriptsToRun.asScala.to[List])
+          for (script ← containingDocument.getScriptsToRun.to[List] collect { case Right(s) ⇒ s })
             yield
               rpc.UserScript(
                 functionName = script.script.shared.clientName,
@@ -238,7 +238,7 @@ object ScriptBuilder {
         dialogControl
 
     val javascriptLoads =
-      containingDocument.getLoadsToRun.asScala filter (_.isJavaScript)
+      containingDocument.getScriptsToRun collect { case Left(l) ⇒ l }
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||

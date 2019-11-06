@@ -89,8 +89,8 @@ object XFormsServer {
         var submissionServerEventsOpt: Option[String] = None
 
         locally {
-          val activeSubmissionOpt = Option(containingDocument.getClientActiveSubmissionFirstPass)
-          val portletLoadOpt      = containingDocument.getLoadsToRun.asScala find (isPortletLoadMatch(containingDocument, _))
+          val activeSubmissionOpt = containingDocument.getClientActiveSubmissionFirstPass
+          val portletLoadOpt      = containingDocument.getNonJavaScriptLoadsToRun find (isPortletLoadMatch(containingDocument, _))
 
           if (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) {
             val eventsDocument = dom.Document()
@@ -245,16 +245,11 @@ object XFormsServer {
             if (messages.nonEmpty)
               outputMessagesInfo(messages)
 
-            // `javascript:` loads only
-            outputLoadsInfo(
-              doc   = containingDocument,
-              loads = containingDocument.getLoadsToRun.asScala filterNot (isPortletLoadMatch(containingDocument, _)) filter (_.isJavaScript)
-            )
-
-            outputScriptInvocations(
-              doc               = containingDocument,
-              scriptInvocations = containingDocument.getScriptsToRun.asScala
-            )
+            // `javascript:` loads only and regular scripts
+            containingDocument.getScriptsToRun foreach {
+              case Left(load)              ⇒ outputLoad(containingDocument, load)
+              case Right(scriptInvocation) ⇒ outputScriptInvocation(containingDocument, scriptInvocation)
+            }
 
             // Output focus instruction
             locally {
@@ -293,16 +288,14 @@ object XFormsServer {
             // Check if we need to tell the client to perform a form submission
             if (requireClientSubmission)
               outputSubmissionInfo(
-                Option(containingDocument.getClientActiveSubmissionFirstPass),
+                containingDocument.getClientActiveSubmissionFirstPass,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,
                 NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
 
             // Non-`javascript:` loads only
-            outputLoadsInfo(
-              doc   = containingDocument,
-              loads = containingDocument.getLoadsToRun.asScala filterNot (isPortletLoadMatch(containingDocument, _)) filterNot (_.isJavaScript)
-            )
+            containingDocument.getNonJavaScriptLoadsToRun filterNot (isPortletLoadMatch(containingDocument, _)) foreach
+              (load ⇒ outputLoad(containingDocument, load))
           }
         }
 
@@ -464,49 +457,47 @@ object XFormsServer {
           text      = message.message
         )
 
-    def outputLoadsInfo(
+    def outputLoad(
       doc         : XFormsContainingDocument,
-      loads       : Seq[Load])(implicit
+      load        : Load)(implicit
       xmlReceiver : XMLReceiver)
     : Unit =
-      for (load ← loads)
-        element(
-          localName = "load",
-          prefix    = "xxf",
-          uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
-          atts      =
-            ("resource" → load.resource)                          ::
-            (load.target.toList map ("target" → _))               :::
-            ("show" → (if (load.isReplace) "replace" else "new")) ::
-            (! load.isShowProgress list ("show-progress" → "false"))
-        )
+      element(
+        localName = "load",
+        prefix    = "xxf",
+        uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+        atts      =
+          ("resource" → load.resource)                          ::
+          (load.target.toList map ("target" → _))               :::
+          ("show" → (if (load.isReplace) "replace" else "new")) ::
+          (! load.isShowProgress list ("show-progress" → "false"))
+      )
 
-    def outputScriptInvocations(
-      doc               : XFormsContainingDocument,
-      scriptInvocations : Seq[ScriptInvocation])(implicit
-      receiver          : XMLReceiver
+    def outputScriptInvocation(
+      doc              : XFormsContainingDocument,
+      scriptInvocation : ScriptInvocation)(implicit
+      receiver         : XMLReceiver
     ): Unit =
-      for (script ← scriptInvocations)
-        withElement(
-          "script",
-          prefix = "xxf",
-          uri    = XXFORMS_NAMESPACE_URI,
-          atts   = List(
-            "name"        → script.script.shared.clientName,
-            "target-id"   → XFormsUtils.namespaceId(doc, script.targetEffectiveId),
-            "observer-id" → XFormsUtils.namespaceId(doc, script.observerEffectiveId)
-          )
-        ) {
+      withElement(
+        "script",
+        prefix = "xxf",
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List(
+          "name"        → scriptInvocation.script.shared.clientName,
+          "target-id"   → XFormsUtils.namespaceId(doc, scriptInvocation.targetEffectiveId),
+          "observer-id" → XFormsUtils.namespaceId(doc, scriptInvocation.observerEffectiveId)
+        )
+      ) {
 
-          for (value ← script.paramValues) {
-            element(
-              "param",
-              prefix = "xxf",
-              uri    = XXFORMS_NAMESPACE_URI,
-              atts   = Nil,
-              text   = value
-            )
-          }
+        for (value ← scriptInvocation.paramValues) {
+          element(
+            "param",
+            prefix = "xxf",
+            uri    = XXFORMS_NAMESPACE_URI,
+            atts   = Nil,
+            text   = value
+          )
+        }
         }
 
     def outputFocusInfo(

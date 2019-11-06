@@ -24,8 +24,6 @@ import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
 
-import scala.collection.JavaConverters._
-
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
  * translation from the source XForms + XHTML.
@@ -69,7 +67,7 @@ object XFormsToXHTML {
     XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
 
       val nonJavaScriptLoads =
-        containingDocument.getLoadsToRun.asScala filterNot (_.isJavaScript)
+        containingDocument.getNonJavaScriptLoadsToRun
 
       if (containingDocument.isGotSubmissionReplaceAll) {
         // 1. Got a submission with replace="all"

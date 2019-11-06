@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.logging.LifecycleLogger;
@@ -32,8 +31,6 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
-import org.orbeon.oxf.xforms.submission.UrlType;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -84,14 +81,11 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     private Set<String> pendingUploads;
 
     // Client state
-    private XFormsModelSubmission activeSubmissionFirstPass;
     private Callable<SubmissionResult> replaceAllCallable;
     private boolean gotSubmissionReplaceAll;
     private boolean gotSubmissionRedirect;
 
     private List<Message> messagesToRun;
-    private List<Load> loadsToRun;
-    private List<ScriptInvocation> scriptsToRun;
     private List<ServerError> serverErrors;
 
     private String helpEffectiveControlId;
@@ -395,13 +389,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         return null;
     }
 
-    /**
-     * Return the active submission if any or null.
-     */
-    public XFormsModelSubmission getClientActiveSubmissionFirstPass() {
-        return activeSubmissionFirstPass;
-    }
-
     public Callable<SubmissionResult> getReplaceAllCallable() {
         return replaceAllCallable;
     }
@@ -415,18 +402,11 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         assert response == null;
         assert uriResolver == null;
 
-        if (this.activeSubmissionFirstPass != null) {
-            this.activeSubmissionFirstPass.clearActiveSubmissionParameters();
-            this.activeSubmissionFirstPass = null;
-        }
-
         this.replaceAllCallable = null;
         this.gotSubmissionReplaceAll = false;
         this.gotSubmissionRedirect = false;
 
         this.messagesToRun = null;
-        this.loadsToRun = null;
-        this.scriptsToRun = null;
         this.helpEffectiveControlId = null;
 
         this.clearAllDelayedEvents();
@@ -438,24 +418,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
 
         if (this.controlsStructuralChanges != null)
             this.controlsStructuralChanges.clear();
-    }
-
-    /**
-     * Add a two-pass submission.
-     *
-     * This can be called with a non-null value at most once.
-     */
-    public void setActiveSubmissionFirstPass(XFormsModelSubmission submission) {
-        if (this.activeSubmissionFirstPass != null)
-            throw new ValidationException("There is already an active submission.", submission.getLocationData());
-
-        if (loadsToRun != null)
-            throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", submission.getLocationData());
-
-        // NOTE: It seems reasonable to run scripts, messages, focus, and help up to the point where the submission takes place.
-
-        // Remember submission
-        this.activeSubmissionFirstPass = submission;
     }
 
     public void setReplaceAllCallable(Callable<SubmissionResult> callable) {
@@ -501,49 +463,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     public List<Message> getMessagesToRun() {
         if (messagesToRun != null)
             return messagesToRun;
-        else
-            return Collections.emptyList();
-    }
-
-    public void addScriptToRun(ScriptInvocation scriptInvocation) {
-        if (scriptsToRun == null)
-            scriptsToRun = new ArrayList<ScriptInvocation>();
-
-        scriptsToRun.add(scriptInvocation);
-    }
-
-    public List<ScriptInvocation> getScriptsToRun() {
-        if (scriptsToRun != null)
-            return scriptsToRun;
-        else
-            return Collections.emptyList();
-    }
-
-    /**
-     * Add an XForms load to send to the client.
-     */
-    public void addLoadToRun(
-        String resource,
-        String targetOrNull,
-        UrlType urlType,
-        boolean isReplace,
-        boolean isShowProgress
-    ) {
-
-        if (activeSubmissionFirstPass != null)
-            throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());
-
-        if (loadsToRun == null)
-            loadsToRun = new ArrayList<Load>();
-        loadsToRun.add(new Load(resource, scala.Option.apply(targetOrNull), urlType, isReplace, isShowProgress));
-    }
-
-    /**
-     * Return the list of loads to send to the client, null if none.
-     */
-    public List<Load> getLoadsToRun() {
-        if (loadsToRun != null)
-            return loadsToRun;
         else
             return Collections.emptyList();
     }

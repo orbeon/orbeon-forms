@@ -69,7 +69,7 @@ object XFormsSetindexAction {
 
     // "This XForms Action begins by invoking the deferred update behavior."
     // See also `synchronizeAndRefreshIfNeeded`
-    if (interpreter.isDeferredUpdates(actionElement))
+    if (interpreter.mustHonorDeferredUpdateFlags(actionElement))
       interpreter.containingDocument.synchronizeAndRefresh()
 
     // Find repeat control

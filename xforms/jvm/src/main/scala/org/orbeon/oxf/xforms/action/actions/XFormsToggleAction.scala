@@ -30,8 +30,7 @@ class XFormsToggleAction extends XFormsAction {
     resolveControlAvt("case")(actionContext) match {
       case Some(caseControl: XFormsCaseControl) ⇒
         // Perform the actual toggle action
-        val deferred = interpreter.isDeferredUpdates(actionElement)
-        XFormsToggleAction.toggle(caseControl, deferred)
+        XFormsToggleAction.toggle(caseControl, interpreter.mustHonorDeferredUpdateFlags(actionElement))
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

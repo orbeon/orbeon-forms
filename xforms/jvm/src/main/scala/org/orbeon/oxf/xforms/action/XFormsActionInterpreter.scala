@@ -62,7 +62,7 @@ class XFormsActionInterpreter(
     container.getPartAnalysis.scopeForPrefixedId(getActionPrefixedId(actionElement))
 
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
-  def isDeferredUpdates(actionElement: Element): Boolean =
+  def mustHonorDeferredUpdateFlags(actionElement: Element): Boolean =
     if (actionXPathContext.getCurrentBindingContext.singleItemOpt.isDefined)
       !("false" == resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME))
     else

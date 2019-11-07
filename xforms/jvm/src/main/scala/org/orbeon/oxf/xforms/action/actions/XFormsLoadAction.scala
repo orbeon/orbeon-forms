@@ -70,7 +70,7 @@ class XFormsLoadAction extends XFormsAction {
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
           isShowProgress     = isShowProgress,
-          deferred           = interpreter.isDeferredUpdates(actionElem)
+          deferred           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
         )
       case None ⇒
         actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
@@ -87,7 +87,7 @@ class XFormsLoadAction extends XFormsAction {
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
                   isShowProgress     = isShowProgress,
-                  deferred           = interpreter.isDeferredUpdates(actionElem)
+                  deferred           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
                 )
               case None ⇒
                 if (interpreter.indentedLogger.isDebugEnabled)

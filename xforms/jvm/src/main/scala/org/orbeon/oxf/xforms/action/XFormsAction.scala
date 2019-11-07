@@ -94,7 +94,7 @@ abstract class XFormsAction extends Logging {
     resolveStringAVT(att)(context) map (_ == "true") getOrElse default
 
   def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
-    if (context.interpreter.isDeferredUpdates(context.element))
+    if (context.interpreter.mustHonorDeferredUpdateFlags(context.element))
       context.containingDocument.synchronizeAndRefresh()
 }
 

@@ -13,32 +13,29 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.dom.{Namespace, QName}
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 
 trait ActionTrait extends SimpleElementAnalysis {
 
   import ActionTrait._
 
-  private def find(qNames: Seq[QName]) = qNames.iterator map element.attributeValue find (_ ne null)
+  private def find(qNames: Seq[QName]): Option[String] = qNames.iterator map element.attributeValue find (_ ne null)
 
-  val ifCondition     = find(IfQNames)
-  val whileCondition  = find(WhileQNames)
-  val iterate         = find(IterateQNames)
-
-  def ifConditionJava    = ifCondition.orNull
-  def whileConditionJava = whileCondition.orNull
-  def iterateJava        = iterate.orNull
+  val ifCondition   : Option[String] = find(IfQNames)
+  val whileCondition: Option[String] = find(WhileQNames)
+  val iterate       : Option[String] = find(IterateQNames)
 }
 
 private object ActionTrait {
 
-  val Namespaces           = Seq(Namespace.EmptyNamespace, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
+  val Namespaces: Seq[Namespace] = Seq(Namespace.EmptyNamespace, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
+
   def makeQName(s: String) = QName(s, _: Namespace)
 
-  val IfQNames      = Namespaces map makeQName("if")
-  val WhileQNames   = Namespaces map makeQName("while")
-  val IterateQNames = Namespaces map makeQName("iterate")
+  val IfQNames      : Seq[QName] = Namespaces map makeQName("if")
+  val WhileQNames   : Seq[QName] = Namespaces map makeQName("while")
+  val IterateQNames : Seq[QName] = Namespaces map makeQName("iterate")
 }

@@ -67,8 +67,8 @@ object XPath {
   // Compiled expression with source information
   case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
-  def makeStringExpression(expression: String)  =  "string((" + expression + ")[1])"
-  def makeBooleanExpression(expression: String) =  "boolean(" + expression + ")"
+  def makeStringExpression(expression: String): String =  "string((" + expression + ")[1])"
+  def makeBooleanExpression(expression: String): String =  "boolean(" + expression + ")"
 
   private val GlobalNamePool = new NamePool
 

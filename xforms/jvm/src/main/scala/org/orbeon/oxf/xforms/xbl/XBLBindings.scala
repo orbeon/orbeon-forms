@@ -59,7 +59,7 @@ class XBLBindings(
   if (partAnalysis ne null) // for unit test which passes null in!
     metadata.extractInlineXBL(inlineXBL, partAnalysis.startScope)
 
-  private val logShadowTrees = false // whether to log shadow trees as they are built
+  private val logShadowTrees = XFormsProperties.getDebugLogging.contains("analysis-xbl-tree")
 
   /*
    * Notes about id generation

@@ -94,14 +94,15 @@
         <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
         <xf:var name="show-form-data"          value="
             (: No draft dialog is showing :)
-            $persistence-instance/initial-dialog-to-show = '' and
+            $persistence-instance/found-document-message-to-show = '' and
             (: Either we don't need a lease or we have the lease :)
             (not($lease-enabled) or $lease-state-elem = 'current-user')
         "/>
 
+        <!-- Lease message -->
         <xf:group
             ref="if ($lease-enabled) then . else ()"
-            class="alert alert-info fr-lease"
+            class="alert alert-info fr-top-alert"
             xxf:element="div"
         >
             <xh:i class="fa fa-lock" aria-hidden="true"/>
@@ -115,7 +116,7 @@
                 </fr:positive-choice>
             </fr:alert-dialog>
 
-            <xh:div class="fr-lease-message">
+            <xh:div>
                 <xf:switch caseref="$lease-state-elem">
                     <xf:case value="'current-user'">
                         <xh:div>
@@ -158,38 +159,114 @@
                         "/>
                     </xf:case>
                 </xf:switch>
+                <xh:div class="fr-top-alert-buttons">
+                    <xf:switch caseref="
+                            if ($lease-state-elem = 'current-user')
+                            then 'has-lease'
+                            else 'does-not-have-lease'">
+                        <xf:case value="'has-lease'">
+                            <xf:trigger class="xforms-trigger-appearance-modal">
+                                <xf:label ref="$fr-resources/detail/lease/relinquish"/>
+                                <xf:action event="DOMActivate" type="xpath">
+                                    xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger class="xforms-trigger-appearance-modal">
+                                <xf:label ref="$fr-resources/detail/lease/renew"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:send submission="fr-acquire-lease-submission"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+                        <xf:case value="'does-not-have-lease'">
+                            <xf:trigger class="xforms-trigger-appearance-modal">
+                                <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
+                                    <xf:send submission="fr-acquire-lease-submission"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+                    </xf:switch>
+                </xh:div>
             </xh:div>
+        </xf:group>
 
-            <xh:div class="fr-lease-buttons">
-                <xf:switch caseref="
-                        if ($lease-state-elem = 'current-user')
-                        then 'has-lease'
-                        else 'does-not-have-lease'">
-                    <xf:case value="'has-lease'">
-                        <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label ref="$fr-resources/detail/lease/relinquish"/>
-                            <xf:action event="DOMActivate" type="xpath">
-                                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
-                            </xf:action>
-                        </xf:trigger>
-                        <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label ref="$fr-resources/detail/lease/renew"/>
-                            <xf:action event="DOMActivate">
-                                <xf:send submission="fr-acquire-lease-submission"/>
-                            </xf:action>
-                        </xf:trigger>
-                    </xf:case>
-                    <xf:case value="'does-not-have-lease'">
-                        <xf:trigger class="xforms-trigger-appearance-modal">
-                            <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
-                            <xf:action event="DOMActivate">
-                                <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
-                                <xf:send submission="fr-acquire-lease-submission"/>
-                            </xf:action>
-                        </xf:trigger>
-                    </xf:case>
-                </xf:switch>
-            </xh:div>
+        <!-- Found document messages -->
+        <xf:group
+            ref="if ($persistence-instance/found-document-message-to-show != '') then . else ()"
+            class="alert alert-info fr-top-alert"
+            xxf:element="div"
+        >
+            <xh:i class="fa fa-file-o" aria-hidden="true"/>
+            <xf:switch caseref="$persistence-instance/found-document-message-to-show">
+                <xf:case value="'found-draft-for-document'">
+                    <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
+                    <xh:div class="fr-top-alert-buttons">
+                        <xf:group>
+                            <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
+                                <xf:send event="DOMActivate" submission="fr-get-document-submission">
+                                    <xf:property name="data-or-draft" value="'data'"/>
+                                </xf:send>
+                            </xf:trigger>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
+                                <xf:send event="DOMActivate" submission="fr-get-document-submission">
+                                    <xf:property name="data-or-draft" value="'draft'"/>
+                                </xf:send>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+                </xf:case>
+                <xf:case value="'found-draft-for-never-saved'">
+                    <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-never-saved"/>
+                    <xh:div class="fr-top-alert-buttons">
+                        <xf:group>
+                            <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
+                            </xf:trigger>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
+                                    <xf:send event="DOMActivate" submission="fr-get-document-submission">
+                                        <xf:property name="data-or-draft" value="'draft'"/>
+                                    </xf:send>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+                </xf:case>
+                <xf:case value="'found-drafts-for-never-saved'">
+                    <xf:output value="$fr-resources/detail/draft-singleton/found-drafts-for-never-saved"/>
+                    <xh:div class="fr-top-alert-buttons">
+                        <xf:group>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
+                                <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            </xf:trigger>
+                            <xf:trigger xxf:modal="true">
+                                <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>
+                                <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/summary?drafts-for-never-saved-document=true" model="fr-persistence-model"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+                </xf:case>
+                <xf:case value="'found-multiple-docs-for-singleton'">
+                    <xf:output value="$fr-resources/detail/draft-singleton/multiple-docs-explanation"/>
+                    <xh:div class="fr-top-alert-buttons">
+                        <xf:group>
+                            <xf:trigger xxf:modal="true">
+                                <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
+                                <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/summary" model="fr-persistence-model"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+                </xf:case>
+            </xf:switch>
         </xf:group>
 
         <!--
@@ -643,7 +720,6 @@
 
         <!-- Misc standard dialogs -->
         <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"            xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/draft-singleton-dialogs.xhtml" xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml"       xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/apps/fr/includes/validation-dialog.xhtml"       xxi:omit-xml-base="true"/>
 
@@ -867,7 +943,7 @@
             <xsl:when test="not($hide-buttons-bar)">
                 <xf:var
                     name="hide-buttons-bar"
-                    value="xxf:instance('fr-persistence-instance')/initial-dialog-to-show != ''"/>
+                    value="xxf:instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
                 <xf:group
                     model="fr-form-model"
                     class="fr-buttons"

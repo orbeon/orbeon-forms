@@ -252,7 +252,7 @@
                     </xf:action>
                     <xf:action if="count($existing-docs) > 1">
                         <xf:setvalue
-                            ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                            ref="instance('fr-persistence-instance')/found-document-message-to-show"
                             value="'found-multiple-docs-for-singleton'"/>
                     </xf:action>
 
@@ -274,7 +274,7 @@
                         <!-- Remember to show the dialog upon xforms-ready -->
                         <xf:setvalue
                             if="$drafts-found > 0"
-                            ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                            ref="instance('fr-persistence-instance')/found-document-message-to-show"
                             value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
                     </xf:action>
 
@@ -318,7 +318,7 @@
             <!-- Remember to show the dialog upon xforms-ready -->
             <xf:setvalue
                 if="$draft-found"
-                ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                ref="instance('fr-persistence-instance')/found-document-message-to-show"
                 value="'found-draft-for-document'"/>
 
             <!-- Otherwise just load the data -->
@@ -338,10 +338,7 @@
     <!-- 3. Maybe show drafts dialog and check form permissions for detail modes -->
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home'))">
 
-        <xf:var name="show-drafts-dialog" value="instance('fr-persistence-instance')/initial-dialog-to-show != ''"/>
-
-        <!-- Show initial dialog if needed -->
-        <xxf:show if="$show-drafts-dialog" dialog="{instance('fr-persistence-instance')/initial-dialog-to-show}"/>
+        <xf:var name="show-drafts-dialog" value="instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
 
         <xf:action if="not($show-drafts-dialog)">
 
@@ -800,7 +797,7 @@
     <xf:instance id="fr-persistence-instance">
         <save xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
-            <initial-dialog-to-show/>
+            <found-document-message-to-show/>
             <!-- Initial data status -->
             <initial-data-status>clean</initial-data-status>
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
@@ -959,7 +956,7 @@
             value="
                 $autosave-elem/status                             = 'dirty' and
                 $persistence-instance/lease-owned-by-current-user = 'true'  and
-                $persistence-instance/initial-dialog-to-show      = ''
+                $persistence-instance/found-document-message-to-show      = ''
             "/>
         <xf:action if="$do-autosave">
             <xf:var

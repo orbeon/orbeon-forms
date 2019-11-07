@@ -167,8 +167,11 @@
                         <xf:case value="'has-lease'">
                             <xf:trigger class="xforms-trigger-appearance-modal">
                                 <xf:label ref="$fr-resources/detail/lease/relinquish"/>
-                                <xf:action event="DOMActivate" type="xpath">
-                                    xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                    <xf:action type="xpath">
+                                        xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
+                                    </xf:action>
                                 </xf:action>
                             </xf:trigger>
                             <xf:trigger class="xforms-trigger-appearance-modal">

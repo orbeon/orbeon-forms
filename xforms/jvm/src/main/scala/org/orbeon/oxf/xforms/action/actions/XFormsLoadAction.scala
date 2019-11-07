@@ -69,7 +69,8 @@ class XFormsLoadAction extends XFormsAction {
           target             = targetOpt,
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
-          isShowProgress     = isShowProgress
+          isShowProgress     = isShowProgress,
+          deferred           = interpreter.isDeferredUpdates(actionElem)
         )
       case None ⇒
         actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
@@ -85,7 +86,8 @@ class XFormsLoadAction extends XFormsAction {
                   target             = targetOpt,
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
-                  isShowProgress     = isShowProgress
+                  isShowProgress     = isShowProgress,
+                  deferred           = interpreter.isDeferredUpdates(actionElem)
                 )
               case None ⇒
                 if (interpreter.indentedLogger.isDebugEnabled)
@@ -127,8 +129,12 @@ object XFormsLoadAction {
     target             : Option[String],
     urlType            : UrlType,
     urlNorewrite       : Boolean,
-    isShowProgress     : Boolean
+    isShowProgress     : Boolean,
+    deferred           : Boolean
   ): Unit = {
+
+    if (deferred)
+      containingDocument.synchronizeAndRefresh()
 
     val externalURL =
       if (value.startsWith("#") || urlNorewrite) {

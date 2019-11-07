@@ -354,7 +354,7 @@ object XFormsAPI {
       (XXFormsHideAction.hideDialog(_, properties = properties))
 
   // xf:load
-  def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
+  def load(url: String, target: Option[String] = None, progress: Boolean = true, deferred: Boolean = true): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument = inScopeContainingDocument,
       currentElem        = None,
@@ -363,7 +363,8 @@ object XFormsAPI {
       target             = target,
       urlType            = UrlType.Render,
       urlNorewrite       = false,
-      isShowProgress     = false
+      isShowProgress     = false,
+      deferred           = deferred
     )
 
   // xf:setfocus

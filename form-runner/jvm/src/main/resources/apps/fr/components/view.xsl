@@ -93,12 +93,11 @@
         <xf:var name="lease-enabled"           value="$persistence-instance/lease-enabled = 'true'"/>
         <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
         <xf:var name="show-form-data"          value="
-            not(
-                (: Hide form controls as we're asking users whether to use a draft :)
-                $persistence-instance/initial-dialog-to-show != '' or
-                (: Hide form controls if the lease is enabled and we failed to acquire the lease :)
-                ($lease-enabled and $lease-state-elem = 'current-user')
-            )"/>
+            (: No draft dialog is showing :)
+            $persistence-instance/initial-dialog-to-show = '' and
+            (: Either we don't need a lease or we have the lease :)
+            (not($lease-enabled) or $lease-state-elem = 'current-user')
+        "/>
 
         <xf:group
             ref="if ($lease-enabled) then . else ()"

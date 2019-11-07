@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.externalcontext.ExternalContext;
@@ -25,21 +24,22 @@ import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
-import org.orbeon.oxf.xforms.state.*;
+import org.orbeon.oxf.xforms.state.ControlState;
+import org.orbeon.oxf.xforms.state.DynamicState;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
-import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import scala.collection.Seq;
 
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.locks.Lock;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an XForms containing document.
@@ -81,14 +81,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     private Set<String> pendingUploads;
 
     // Client state
-    private Callable<SubmissionResult> replaceAllCallable;
-    private boolean gotSubmissionReplaceAll;
-    private boolean gotSubmissionRedirect;
-
-    private List<Message> messagesToRun;
-    private List<ServerError> serverErrors;
-
-    private String helpEffectiveControlId;
     private Set<String> controlsStructuralChanges;
 
     private final XPathDependencies xpathDependencies;
@@ -389,10 +381,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         return null;
     }
 
-    public Callable<SubmissionResult> getReplaceAllCallable() {
-        return replaceAllCallable;
-    }
-
     /**
      * Clear current client state.
      */
@@ -402,116 +390,13 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         assert response == null;
         assert uriResolver == null;
 
-        this.replaceAllCallable = null;
-        this.gotSubmissionReplaceAll = false;
-        this.gotSubmissionRedirect = false;
-
-        this.messagesToRun = null;
-        this.helpEffectiveControlId = null;
-
         this.clearAllDelayedEvents();
-
-        this.serverErrors = null;
 
         clearRequestStats();
         clearTransientState();
 
         if (this.controlsStructuralChanges != null)
             this.controlsStructuralChanges.clear();
-    }
-
-    public void setReplaceAllCallable(Callable<SubmissionResult> callable) {
-        this.replaceAllCallable = callable;
-    }
-
-    public void setGotSubmission() {}
-
-    public void setGotSubmissionReplaceAll() {
-        if (this.gotSubmissionReplaceAll)
-            throw new OXFException("Unable to run a second submission with replace=\"all\" within a same action sequence.");
-
-        this.gotSubmissionReplaceAll = true;
-    }
-
-    public boolean isGotSubmissionReplaceAll() {
-        return gotSubmissionReplaceAll;
-    }
-
-    public void setGotSubmissionRedirect() {
-        if (this.gotSubmissionRedirect)
-            throw new OXFException("Unable to run a second submission with replace=\"all\" redirection within a same action sequence.");
-
-        this.gotSubmissionRedirect = true;
-    }
-
-    public boolean isGotSubmissionRedirect() {
-        return gotSubmissionRedirect;
-    }
-
-    /**
-     * Add an XForms message to send to the client.
-     */
-    public void addMessageToRun(String message, String level) {
-        if (messagesToRun == null)
-            messagesToRun = new ArrayList<Message>();
-        messagesToRun.add(new Message(message, level));
-    }
-
-    /**
-     * Return the list of messages to send to the client, null if none.
-     */
-    public List<Message> getMessagesToRun() {
-        if (messagesToRun != null)
-            return messagesToRun;
-        else
-            return Collections.emptyList();
-    }
-
-    /**
-     * Tell the client that help must be shown for the given effective control id.
-     *
-     * This can be called several times, but only the last control id is remembered.
-     *
-     * @param effectiveControlId
-     */
-    public void setClientHelpEffectiveControlId(String effectiveControlId) {
-        this.helpEffectiveControlId = effectiveControlId;
-    }
-
-    /**
-     * Return the effective control id of the control to help for, or null.
-     */
-    public String getClientHelpControlEffectiveId() {
-
-        if (helpEffectiveControlId == null)
-            return null;
-
-        final XFormsControl xformsControl = getControlByEffectiveId(helpEffectiveControlId);
-        // It doesn't make sense to tell the client to show help for an element that is non-relevant, but we allow readonly
-        if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
-            final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
-            if (xformsSingleNodeControl.isRelevant())
-                return helpEffectiveControlId;
-            else
-                return null;
-        } else {
-            return null;
-        }
-    }
-
-    public void addServerError(ServerError serverError) {
-        final int maxErrors = getShowMaxRecoverableErrors();
-        if (maxErrors > 0) {
-            if (serverErrors == null)
-                serverErrors = new ArrayList<ServerError>();
-
-            if (serverErrors.size() < maxErrors)
-                serverErrors.add(serverError);
-        }
-    }
-
-    public List<ServerError> getServerErrors() {
-        return serverErrors != null ? serverErrors : Collections.<ServerError>emptyList();
     }
 
     public Set<String> getControlsStructuralChanges() {
@@ -693,39 +578,5 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
      */
     public boolean isUploadPendingFor(XFormsUploadControl uploadControl) {
         return (pendingUploads != null) && pendingUploads.contains(uploadControl.getUploadUniqueId());
-    }
-
-    /**
-     * Called when this document is added to the document cache.
-     */
-    public void added() {
-        XFormsStateManager.instance().onAddedToCache(getUUID());
-    }
-
-    /**
-     * Called when somebody explicitly removes this document from the document cache.
-     */
-    public void removed() {
-        // WARNING: This can be called while another threads owns this document lock
-        XFormsStateManager.instance().onRemovedFromCache(getUUID());
-    }
-
-    /**
-     * Called by the cache to check that we are ready to be evicted from cache.
-     *
-     * @return lock or null in case session just expired
-     */
-    public Lock getEvictionLock() {
-        return XFormsStateManager.getDocumentLockOrNull(getUUID());
-    }
-
-    /**
-     * Called when cache expires this document from the document cache.
-     */
-    public void evicted() {
-        // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains
-        // the lock on the document first and will not evict us if we have the lock. This means that this will be called
-        // only if no thread is dealing with this document.
-        XFormsStateManager.instance().onEvictedFromCache(this);
     }
 }

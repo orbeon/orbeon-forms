@@ -47,7 +47,6 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.xforms.Constants
 
-import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -241,7 +240,7 @@ object XFormsServer {
 
             // TODO: the following should be ordered in the order they were requested
             // Output messages to display
-            val messages = containingDocument.getMessagesToRun.asScala
+            val messages = containingDocument.getMessagesToRun
             if (messages.nonEmpty)
               outputMessagesInfo(messages)
 
@@ -281,7 +280,7 @@ object XFormsServer {
             }
 
             // Output help instruction
-            Option(containingDocument.getClientHelpControlEffectiveId) foreach { helpControlEffectiveId ⇒
+            containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId ⇒
               outputHelpInfo(containingDocument, helpControlEffectiveId)
             }
 
@@ -300,7 +299,7 @@ object XFormsServer {
         }
 
         // Output errors
-        val errors = containingDocument.getServerErrors.asScala
+        val errors = containingDocument.getServerErrors
         if (errors.nonEmpty)
           XFormsError.outputAjaxErrors(errors)
       }
@@ -701,7 +700,7 @@ class XFormsServer extends ProcessorImpl {
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequence) {
-                  Option(containingDocument.getReplaceAllCallable) match {
+                  containingDocument.getReplaceAllCallable match {
                     case None ⇒
                       xmlReceiverOpt match {
                         case Some(xmlReceiver) ⇒

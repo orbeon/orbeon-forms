@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms
 
+import java.util.concurrent.Callable
+import java.util.concurrent.locks.Lock
 import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.http.Headers
@@ -34,7 +36,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -43,12 +45,12 @@ import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMe
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{UrlType, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
-import org.orbeon.xforms.{Constants, rpc}
+import org.orbeon.xforms.Constants
+import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -115,12 +117,6 @@ object XFormsContainingDocumentSupport {
   }
 }
 
-case class Message(message: String, level: String)
-
-case class Load(resource: String, target: Option[String], urlType: UrlType, isReplace: Boolean, isShowProgress: Boolean) {
-  def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
-}
-
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
   extends XBLContainer(
     _effectiveId         = Constants.DocumentId,
@@ -140,7 +136,7 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     with ContainingDocumentDelayedEvents
     with ContainingDocumentClientState
     with XFormsDocumentLifecycle
-    with Cacheable
+    with ContainingDocumentCacheable
     with XFormsObject {
 
   self: XFormsContainingDocument ⇒
@@ -151,64 +147,127 @@ trait ContainingDocumentTransientState {
 
   import CollectionUtils._
 
-  private var transientState = Map.empty[String, Any]
+  def getShowMaxRecoverableErrors: Int
+  def findControlByEffectiveId(effectiveId: String): Option[XFormsControl]
 
-  private var activeSubmissionFirstPass: Option[XFormsModelSubmission] = None
-  private var nonJavaScriptLoadsToRun: Vector[Load] = Vector.empty
-  private var scriptsToRun: Vector[Load Either ScriptInvocation] = Vector.empty
+  private class TransientState {
+
+    var byName                   : Map[String, Any] = Map.empty[String, Any]
+
+    var activeSubmissionFirstPass: Option[XFormsModelSubmission] = None
+    var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
+    var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
+
+    var replaceAllCallable       : Option[Callable[SubmissionResult]] = None
+    var gotSubmissionReplaceAll  : Boolean = false
+    var gotSubmissionRedirect    : Boolean = false
+
+    var messagesToRun            : Vector[Message] = Vector.empty
+    var serverErrors             : Vector[ServerError] = Vector.empty
+
+    var helpEffectiveControlId   : Option[String] = None
+  }
+
+  private var transientState: TransientState = new TransientState
 
   private def throwConflict(locationData: LocationData): Nothing =
     throw new ValidationException("Unable to run a two-pass submission and `xf:load` within a same action sequence.", locationData)
 
   def setTransientState[T](name: String, value: T): Unit =
-    transientState += name → value
+    transientState.byName += name → value
 
   def getTransientState[T: ClassTag](name: String): Option[T] =
-    transientState.get(name) flatMap collectByErasedType[T]
+    transientState.byName.get(name) flatMap collectByErasedType[T]
 
   def removeTransientState(name: String): Unit =
-    transientState -= name
+    transientState.byName -= name
 
   def clearTransientState(): Unit = {
-    transientState = Map.empty
-
-    activeSubmissionFirstPass foreach (_.clearActiveSubmissionParameters())
-    activeSubmissionFirstPass = None
-
-    nonJavaScriptLoadsToRun     = Vector.empty
-    scriptsToRun   = Vector.empty
+    transientState.activeSubmissionFirstPass foreach (_.clearActiveSubmissionParameters())
+    transientState = new TransientState
   }
 
   def setActiveSubmissionFirstPass(submission: XFormsModelSubmission): Unit = {
 
-    activeSubmissionFirstPass foreach
+    transientState.activeSubmissionFirstPass foreach
       (_ ⇒ throw new ValidationException("There is already an active submission.", submission.getLocationData))
 
-    if (nonJavaScriptLoadsToRun.nonEmpty)
+    if (transientState.nonJavaScriptLoadsToRun.nonEmpty)
       throwConflict(submission.getLocationData)
 
-    activeSubmissionFirstPass = Some(submission)
+    transientState.activeSubmissionFirstPass = Some(submission)
   }
 
-  def getClientActiveSubmissionFirstPass: Option[XFormsModelSubmission] = activeSubmissionFirstPass
+  def getClientActiveSubmissionFirstPass: Option[XFormsModelSubmission] = transientState.activeSubmissionFirstPass
 
   def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
-    scriptsToRun :+= Right(scriptInvocation)
+    transientState.scriptsToRun :+= Right(scriptInvocation)
 
-  def getScriptsToRun: i.Seq[Load Either ScriptInvocation] = scriptsToRun
+  def getScriptsToRun: i.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
-    activeSubmissionFirstPass match {
+    transientState.activeSubmissionFirstPass match {
       case Some(s) ⇒
         throwConflict(s.getLocationData)
       case None ⇒
         if (load.isJavaScript)
-          scriptsToRun :+= Left(load)
+          transientState.scriptsToRun :+= Left(load)
         else
-          nonJavaScriptLoadsToRun :+= load
+          transientState.nonJavaScriptLoadsToRun :+= load
     }
 
-  def getNonJavaScriptLoadsToRun: i.Seq[Load] = nonJavaScriptLoadsToRun
+  def getNonJavaScriptLoadsToRun: i.Seq[Load] = transientState.nonJavaScriptLoadsToRun
+
+  def getReplaceAllCallable: Option[Callable[SubmissionResult]] = transientState.replaceAllCallable
+
+  def setReplaceAllCallable(callable: Callable[SubmissionResult]): Unit =
+    transientState.replaceAllCallable = Option(callable)
+
+  def setGotSubmission(): Unit = ()
+
+  def setGotSubmissionReplaceAll(): Unit = {
+    if (transientState.gotSubmissionReplaceAll)
+      throw new OXFException("Unable to run a second submission with `replace=\"all\"` within a same action sequence.")
+    transientState.gotSubmissionReplaceAll = true
+  }
+
+  def isGotSubmissionReplaceAll: Boolean = transientState.gotSubmissionReplaceAll
+
+  def setGotSubmissionRedirect(): Unit = {
+    if (transientState.gotSubmissionRedirect)
+      throw new OXFException("Unable to run a second submission with `replace=\"all\"` redirection within a same action sequence.")
+    transientState.gotSubmissionRedirect = true
+  }
+
+  def isGotSubmissionRedirect: Boolean = transientState.gotSubmissionRedirect
+
+  // Add an XForms message to send to the client.
+  def addMessageToRun(message: String, level: String): Unit =
+    transientState.messagesToRun :+= Message(message, level)
+
+  def getMessagesToRun: i.Seq[Message] = transientState.messagesToRun
+
+  def addServerError(serverError: ServerError): Unit = {
+    val maxErrors = getShowMaxRecoverableErrors
+    if (maxErrors > 0 && transientState.serverErrors.size < maxErrors)
+      transientState.serverErrors :+= serverError
+  }
+
+  def getServerErrors: i.Seq[ServerError] = transientState.serverErrors
+
+  // Tell the client that help must be shown for the given effective control id.
+  // This can be called several times, but only the last control id is remembered.
+  def setClientHelpEffectiveControlId(effectiveControlId: String): Unit =
+    transientState.helpEffectiveControlId = Option(effectiveControlId)
+
+  def getClientHelpControlEffectiveId: Option[String] =
+    for {
+      controlId         ← transientState.helpEffectiveControlId
+      xformsControl     ← findControlByEffectiveId(controlId)
+      singleNodeControl ← xformsControl.narrowTo[XFormsSingleNodeControl]
+      if singleNodeControl.isRelevant
+    } yield
+      controlId
 }
 
 trait ContainingDocumentUpload {
@@ -738,54 +797,24 @@ trait ContainingDocumentClientState {
     _initialClientScript = None
 }
 
-case class DelayedEvent(
-  eventName         : String,
-  targetEffectiveId : String,
-  bubbles           : Boolean,
-  cancelable        : Boolean,
-  time              : Long,
-  discardable       : Boolean, // whether the client can discard the event past the delay (see AjaxServer.js)
-  showProgress      : Boolean  // whether to show the progress indicator when submitting the event
-) {
+trait ContainingDocumentCacheable extends Cacheable {
 
-  private def asEncodedDocument: String = {
+  self: XFormsContainingDocument ⇒
 
-    import org.orbeon.oxf.xml.Dom4j._
+  def added(): Unit =
+    XFormsStateManager.instance.onAddedToCache(getUUID)
 
-    XFormsUtils.encodeXML(
-      <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-        <xxf:event
-          name={eventName}
-          source-control-id={targetEffectiveId}
-          bubbles={bubbles.toString}
-          cancelable={cancelable.toString}/>
-      </xxf:events>,
-      false
-    )
-  }
+  // WARNING: This can be called while another threads owns this document lock
+  def removed(): Unit =
+    XFormsStateManager.instance.onRemovedFromCache(getUUID)
 
-  def writeAsSAX(currentTime: Long)(implicit receiver: XMLReceiver): Unit = {
+  // Return lock or `null` in case session just expired
+  def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(getUUID)
 
-    import XMLReceiverSupport._
-
-    element(
-      localName = "server-events",
-      prefix    = "xxf",
-      uri       = XXFORMS_NAMESPACE_URI,
-      atts      = List(
-        "delay"         → (time - currentTime).toString,
-        "discardable"   → discardable.toString,
-        "show-progress" → showProgress.toString
-      ),
-      text      = asEncodedDocument
-    )
-  }
-
-  def toServerEvent(currentTime: Long): rpc.ServerEvent =
-    rpc.ServerEvent(
-      delay        = time - currentTime,
-      discardable  = discardable,
-      showProgress = showProgress,
-      event        = asEncodedDocument
-    )
+  // Called when cache expires this document from the document cache.
+  // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains
+  // the lock on the document first and will not evict us if we have the lock. This means that this will be called
+  // only if no thread is dealing with this document.
+  def evicted(): Unit =
+    XFormsStateManager.instance.onEvictedFromCache(self)
 }

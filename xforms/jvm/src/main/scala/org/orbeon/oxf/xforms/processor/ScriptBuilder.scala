@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.xforms.{EventNames, rpc}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 object ScriptBuilder {
@@ -226,9 +225,9 @@ object ScriptBuilder {
 
   def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
-    val errorsToShow      = containingDocument.getServerErrors.asScala
+    val errorsToShow      = containingDocument.getServerErrors
     val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
-    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.level == "modal")
+    val messagesToRun     = containingDocument.getMessagesToRun filter (_.level == "modal")
 
     val dialogsToOpen =
       for {

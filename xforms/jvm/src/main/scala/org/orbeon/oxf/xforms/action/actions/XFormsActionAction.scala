@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -38,9 +39,9 @@ class XFormsActionAction extends XFormsAction {
 
     def hasClientRepresentation(observer: XFormsEventTarget) =
       observer match {
-        case c: XFormsVariableControl ⇒ false
+        case _: XFormsVariableControl ⇒ false
         case c: XFormsControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) ⇒ false
-        case c ⇒ true
+        case _ ⇒ true
       }
 
     def firstClientRepresentation(observer: XFormsEventTarget) =
@@ -85,16 +86,16 @@ class XFormsActionAction extends XFormsAction {
 
           val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 
-          Option(partAnalysis.getControlAnalysis(childPrefixedId)) match {
+          partAnalysis.findControlAnalysis(childPrefixedId) match {
             case Some(variable: VariableAnalysisTrait) ⇒
               // Scope variable
               contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
               variablesCount += 1
-            case Some(action) ⇒
+            case Some(action: ActionTrait) ⇒
               // Run child action
               // NOTE: We execute children actions even if they happen to have `observer` or `target` attributes.
               actionInterpreter.runAction(action)
-            case None ⇒
+            case _ ⇒
               throw new IllegalStateException
           }
         }

@@ -136,11 +136,6 @@ abstract class ElementAnalysis(
   val bind = element.attributeValueOpt(XFormsConstants.BIND_QNAME)
   val value = element.attributeValueOpt(XFormsConstants.VALUE_QNAME)
 
-  def modelJava = model map (_.staticId) orNull
-  def contextJava = context.orNull
-  def refJava = ref.orNull
-  def bindJava = bind.orNull
-
   // Other
   def hasBinding = ref.isDefined || bind.isDefined
   val bindingXPathEvaluations = (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place

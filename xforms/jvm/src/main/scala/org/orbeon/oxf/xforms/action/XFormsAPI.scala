@@ -46,9 +46,9 @@ object XFormsAPI {
   private val actionInterpreterDyn  = new DynamicVariable[XFormsActionInterpreter]
 
   // Every block of action must be run within this
-  def withScalaAction[T](interpreter: XFormsActionInterpreter)(body: ⇒ T): T = {
+  def withScalaAction[T](interpreter: XFormsActionInterpreter)(body: XFormsActionInterpreter ⇒ T): T = {
     actionInterpreterDyn.withValue(interpreter) {
-      body
+      body(interpreter)
     }
   }
 

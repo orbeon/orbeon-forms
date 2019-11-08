@@ -108,10 +108,10 @@ case class AbstractBinding(
 
   // CSS classes to put in the markup
   val cssClasses: String =
-    "xbl-component"                                           ::
-    (cssName                  map ("xbl-" +) toList)          :::
-    (modeFocus               list "xbl-focusable")            :::
-    (modeJavaScriptLifecycle list "xbl-javascript-lifecycle") :::
+    "xbl-component"                                            ::
+    (cssName.toList           map  ("xbl-" +))                 :::
+    (modeFocus                list "xbl-focusable")            :::
+    (modeJavaScriptLifecycle  list "xbl-javascript-lifecycle") :::
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
   val allowedExternalEvents: Set[String] =

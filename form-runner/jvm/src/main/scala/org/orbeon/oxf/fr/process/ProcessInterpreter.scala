@@ -69,7 +69,7 @@ trait ProcessInterpreter extends Logging {
 
     import org.orbeon.oxf.util.DynamicVariable
 
-    val StandardActions = Map[String, Action](
+    val StandardActions: Map[String, Action] = Map(
       "success"  → trySuccess,
       "failure"  → tryFailure,
       "process"  → tryProcess,
@@ -101,7 +101,7 @@ trait ProcessInterpreter extends Logging {
     }
 
     // Return a process string which contains the continuation of the process after the current action
-    def serializeContinuation = {
+    def serializeContinuation: String = {
 
       val process = processStackDyn.value.get
 
@@ -369,16 +369,16 @@ object ProcessInterpreter {
 
   type ActionParams = Map[Option[String], String]
 
-  def paramByName(params: ActionParams, name: String) =
+  def paramByName(params: ActionParams, name: String): Option[String] =
     params.get(Some(name))
 
-  def booleanParamByName(params: ActionParams, name: String, default: Boolean) =
+  def booleanParamByName(params: ActionParams, name: String, default: Boolean): Boolean =
     params.get(Some(name)) map (_ == "true") getOrElse default
 
-  def paramByNameOrDefault(params: ActionParams, name: String) =
+  def paramByNameOrDefault(params: ActionParams, name: String): Option[String] =
     params.get(Some(name)) orElse params.get(None)
 
-  def requiredParamByName(params: ActionParams, action: String, name: String) =
+  def requiredParamByName(params: ActionParams, action: String, name: String): String =
     params.getOrElse(Some(name), missingArgument(action, name))
 
   // TODO: Obtain action name automatically.

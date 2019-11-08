@@ -821,9 +821,9 @@
 
     </xsl:template>
 
-    <!-- Error summary UI -->
-    <xsl:template match="fr:error-summary" name="fr-error-summary">
-        <xsl:param name="position" select="@position" as="xs:string"/>
+    <!-- Error summary added by Form Runner -->
+    <xsl:template match="fr:error-summary[@position]">
+        <xsl:variable name="position" select="@position" as="xs:string"/>
 
         <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
              doesn't work with "section templates". We now use the observer mechanism of fr:error-summary -->

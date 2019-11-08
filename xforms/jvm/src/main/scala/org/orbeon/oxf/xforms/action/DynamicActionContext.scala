@@ -30,6 +30,4 @@ case class DynamicActionContext(
   def containingDocument = interpreter.containingDocument
   def bindingContext     = interpreter.actionXPathContext.getCurrentBindingContext
   def partAnalysis       = container.getPartAnalysis
-
-  def logger             = interpreter.indentedLogger
 }

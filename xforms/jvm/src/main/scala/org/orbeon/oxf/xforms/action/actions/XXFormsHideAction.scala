@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
@@ -21,7 +22,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
  * Extension xxf:hide action.
  */
 class XXFormsHideAction extends XFormsAction {
-  override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter   = actionContext.interpreter
     val actionElement = actionContext.element
@@ -32,14 +33,10 @@ class XXFormsHideAction extends XFormsAction {
       case Some(targetDialog: XFormsEventTarget) ⇒
         XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionElement))
       case _ ⇒
-        val indentedLogger = interpreter.indentedLogger
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug(
-            "xxf:hide",
-            "dialog does not refer to an existing xxf:dialog element, ignoring action",
-            "dialog id",
-            actionContext.element.attributeValue("dialog")
-          )
+        debug(
+          "xxf:hide: dialog does not refer to an existing xxf:dialog element, ignoring action",
+          List("dialog id" → actionContext.element.attributeValue("dialog"))
+        )
     }
   }
 }

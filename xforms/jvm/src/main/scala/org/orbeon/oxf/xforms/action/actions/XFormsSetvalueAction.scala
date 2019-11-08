@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -27,14 +28,13 @@ import scala.util.{Failure, Success, Try}
  */
 class XFormsSetvalueAction extends XFormsAction {
 
-  override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val actionInterpreter = actionContext.interpreter
     val actionElement = actionContext.element
 
-    implicit val indentedLogger = actionInterpreter.indentedLogger
-    val containingDocument      = actionInterpreter.containingDocument
-    val contextStack            = actionInterpreter.actionXPathContext
+    val containingDocument = actionInterpreter.containingDocument
+    val contextStack       = actionInterpreter.actionXPathContext
 
     val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 

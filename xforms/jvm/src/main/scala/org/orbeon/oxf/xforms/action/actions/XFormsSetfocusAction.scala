@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
@@ -28,7 +29,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
  */
 class XFormsSetfocusAction extends XFormsAction {
 
-  override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     // "This XForms Action begins by invoking the deferred update behavior."
     synchronizeAndRefreshIfNeeded(context)

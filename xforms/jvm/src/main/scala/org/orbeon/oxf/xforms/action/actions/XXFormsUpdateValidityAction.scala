@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFormsSingleNodeControl}
@@ -22,7 +23,7 @@ import scala.collection.compat._
 
 class XXFormsUpdateValidityAction extends XFormsAction {
 
-  override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     implicit val cxt = context
 

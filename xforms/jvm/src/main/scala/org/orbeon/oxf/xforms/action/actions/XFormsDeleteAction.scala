@@ -34,9 +34,7 @@ class XFormsDeleteAction extends XFormsAction {
 
   import XFormsDeleteAction._
 
-  override def execute(actionContext: DynamicActionContext): Unit = {
-
-    implicit val indentedLogger = actionContext.logger
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val atAttributeOpt     = actionContext.element.attributeValueOpt("at")
     val collectionToUpdate = actionContext.interpreter.actionXPathContext.getCurrentBindingContext.nodeset.asScala

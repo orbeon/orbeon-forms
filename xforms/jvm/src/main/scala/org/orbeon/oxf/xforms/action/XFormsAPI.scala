@@ -103,10 +103,12 @@ object XFormsAPI {
   // - None        if the control is not found
   // - Some(0)     if the control is non-relevant or doesn't have any iterations
   // - Some(index) otherwise, where index is the control's new index
-  def setindex(repeatStaticId: String, index: Int) =
-    actionInterpreterDyn.value map
-      { interpreter ⇒ XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index) } collect
-        { case newIndex if newIndex >= 0 ⇒ newIndex }
+  def setindex(repeatStaticId: String, index: Int): Option[Int] =
+    actionInterpreterDyn.value map { interpreter ⇒
+      XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index)(interpreter.indentedLogger)
+    } collect {
+      case newIndex if newIndex >= 0 ⇒ newIndex
+    }
 
   // xf:insert
   // @return the inserted nodes

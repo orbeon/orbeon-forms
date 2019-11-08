@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.action.XFormsAction
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.saxon.om.Item
 
 /**
  * 10.1.10 The send Element
  */
 class XFormsSendAction extends XFormsAction {
-  override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
+
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
+
+    val interpreter   = actionContext.interpreter
+    val actionElement = actionContext.element
 
     // Find submission object
     val submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME)
@@ -37,24 +37,22 @@ class XFormsSendAction extends XFormsAction {
       throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 
     // Resolve AVT
-    val resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, submissionId)
+    val resolvedSubmissionStaticId = interpreter.resolveAVTProvideValue(actionElement, submissionId)
 
     if (resolvedSubmissionStaticId eq null)
       return
 
     // Find actual target
-    val submission = actionInterpreter.resolveObject(actionElement, resolvedSubmissionStaticId)
+    val submission = interpreter.resolveObject(actionElement, resolvedSubmissionStaticId)
 
     if (submission.isInstanceOf[XFormsModelSubmission]) {
       // Dispatch event to submission object
-      val newEvent = new XFormsSubmitEvent(submission.asInstanceOf[XFormsEventTarget], XFormsAction.eventProperties(actionInterpreter, actionElement))
+      val newEvent = new XFormsSubmitEvent(submission.asInstanceOf[XFormsEventTarget], XFormsAction.eventProperties(interpreter, actionElement))
       Dispatch.dispatchEvent(newEvent)
     } else {
       // "If there is a null search result for the target object and the source object is an XForms action such as
       // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-      val indentedLogger = actionInterpreter.indentedLogger
-      if (indentedLogger.isDebugEnabled)
-        indentedLogger.logDebug("xf:send", "submission does not refer to an existing xf:submission element, ignoring action", "submission id", submissionId)
+      warn("xf:send: submission does not refer to an existing xf:submission element, ignoring action", List("submission id" → submissionId))
     }
   }
 }

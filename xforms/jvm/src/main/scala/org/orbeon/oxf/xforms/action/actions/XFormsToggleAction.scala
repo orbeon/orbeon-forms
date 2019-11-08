@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.xforms.action.{XFormsAPI, DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.control.Focus
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 
@@ -21,10 +22,10 @@ import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
  * 9.2.3 The toggle Element
  */
 class XFormsToggleAction extends XFormsAction {
-  override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter        = actionContext.interpreter
-    val actionElement      = actionContext.element
+    val interpreter   = actionContext.interpreter
+    val actionElement = actionContext.element
 
     // Find case control
     resolveControlAvt("case")(actionContext) match {
@@ -34,9 +35,10 @@ class XFormsToggleAction extends XFormsAction {
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-        val indentedLogger = interpreter.indentedLogger
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug("xf:toggle", "case does not refer to an existing xf:case element, ignoring action", "case id", actionContext.element.attributeValue("case"))
+        debug(
+          "xf:toggle: case does not refer to an existing xf:case element, ignoring action",
+          List("case id" → actionContext.element.attributeValue("case"))
+        )
     }
   }
 }

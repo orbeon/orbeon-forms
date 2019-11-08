@@ -13,12 +13,13 @@
 */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsContainerControl, XFormsControl}
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
-  override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val visited = resolveBooleanAVT("visited", default = true)(context)
     val recurse = resolveBooleanAVT("recurse", default = false)(context)

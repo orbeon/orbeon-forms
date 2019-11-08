@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.{Logging, XPathCache}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -31,7 +31,7 @@ abstract class XFormsAction extends Logging {
 
   // Execute the action with the given context
   // By default, run the legacy execute()
-  def execute(actionContext: DynamicActionContext): Unit =
+  def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit =
     execute(
       actionContext.interpreter,
       actionContext.analysis.element,
@@ -54,16 +54,17 @@ abstract class XFormsAction extends Logging {
     val interpreter = context.interpreter
     val element = context.element
 
+    import interpreter.indentedLogger
+
     resolveStringAVT(attName)(context) match {
       case Some(resolvedAvt) ⇒
 
         resolveControl(resolvedAvt) match {
           case Some(control) ⇒ Some(control)
           case _ ⇒
-            implicit val indentedLogger = interpreter.indentedLogger
             debug(
               "attribute does not refer to an existing control",
-              Seq(
+              List(
                 "attribute"      → attName,
                 "value"          → element.attributeValue("control"),
                 "resolved value" → resolvedAvt

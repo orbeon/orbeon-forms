@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XFormsRevalidateEvent}
@@ -54,7 +55,7 @@ class XFormsRevalidateAction  extends RRRAction with XFormsRevalidateFunctions
 // Common functionality
 trait RRRAction extends XFormsAction with RRRFunctions {
 
-  override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter = context.interpreter
     val modelOpt    = interpreter.actionXPathContext.getCurrentBindingContext.modelOpt

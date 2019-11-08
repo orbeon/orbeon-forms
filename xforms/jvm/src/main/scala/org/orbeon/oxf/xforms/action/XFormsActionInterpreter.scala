@@ -34,6 +34,8 @@ import org.orbeon.xforms.XFormsId
 import scala.collection.JavaConverters._
 import scala.util.control.{Breaks, NonFatal}
 
+import org.orbeon.oxf.util.Logging._
+
 // Execute a top-level XForms action and the included nested actions if any.
 class XFormsActionInterpreter(
   val container          : XBLContainer,
@@ -45,7 +47,9 @@ class XFormsActionInterpreter(
 ) {
 
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
-  val indentedLogger    : IndentedLogger           = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
+
+  implicit val indentedLogger: IndentedLogger =
+    containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
 
   def getNamespaceMappings(actionElement: Element): NamespaceMapping =
     container.getNamespaceMappings(actionElement)
@@ -170,47 +174,40 @@ class XFormsActionInterpreter(
         conditionOrBreak(whileIterationAttribute, "while")
 
         // We are executing the action
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.startHandleOperation(
-            "interpreter",
-            "executing",
-            "action name", actionQName.qualifiedName,
-            "while iteration", whileIterationAttribute map (_ ⇒ whileIteration.toString) orNull
+        withDebug(
+          "executing",
+          ("action name" → actionQName.qualifiedName) ::
+          (whileIterationAttribute.nonEmpty list ("while iteration" → whileIteration.toString))
+        ) {
+
+          // Get action and execute it
+          val dynamicActionContext = DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem)
+
+          // Push binding excluding excluding @context and @model
+          // NOTE: If we repeat, re-evaluate the action binding.
+          // For example:
+          //
+          //   <xf:delete ref="/*/foo[1]" while="/*/foo"/>
+          //
+          // In this case, in the second iteration, xf:repeat must find an up-to-date nodeset!
+          actionXPathContext.pushBinding(
+            actionAnalysis.refJava,
+            null,
+            null,
+            null,
+            actionAnalysis.bindJava,
+            actionAnalysis.element,
+            actionAnalysis.namespaceMapping,
+            getSourceEffectiveId(actionAnalysis.element),
+            actionAnalysis.scope,
+            false
           )
 
-        // Get action and execute it
-        val dynamicActionContext = DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem)
+          XFormsActions.getAction(actionQName).execute(dynamicActionContext)
 
-        // Push binding excluding excluding @context and @model
-        // NOTE: If we repeat, re-evaluate the action binding.
-        // For example:
-        //
-        //   <xf:delete ref="/*/foo[1]" while="/*/foo"/>
-        //
-        // In this case, in the second iteration, xf:repeat must find an up-to-date nodeset!
-        actionXPathContext.pushBinding(
-          actionAnalysis.refJava,
-          null,
-          null,
-          null,
-          actionAnalysis.bindJava,
-          actionAnalysis.element,
-          actionAnalysis.namespaceMapping,
-          getSourceEffectiveId(actionAnalysis.element),
-          actionAnalysis.scope,
-          false
-        )
+          actionXPathContext.popBinding()
+        }
 
-        XFormsActions.getAction(actionQName).execute(dynamicActionContext)
-
-        actionXPathContext.popBinding()
-
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.endHandleOperation(
-            "action name",
-            actionQName.qualifiedName,
-            "while iteration", whileIterationAttribute map (_ ⇒ whileIteration.toString) orNull
-          )
         // Stop if there is no iteration
         if (whileIterationAttribute.isEmpty)
           break()
@@ -238,8 +235,7 @@ class XFormsActionInterpreter(
 
     // Don't evaluate the condition if the context has gone missing
     if (contextNodeset.size == 0) { //  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
-      if (indentedLogger.isDebugEnabled)
-        indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "missing context")
+      debug("not executing", List("action name" → actionName, "condition type" → conditionType, "reason" → "missing context"))
       return false
     }
     val conditionResult =
@@ -252,15 +248,15 @@ class XFormsActionInterpreter(
 
     if (! conditionResult.get(0).asInstanceOf[BooleanValue].effectiveBooleanValue) {
       // Don't execute action
-      if (indentedLogger.isDebugEnabled)
-        indentedLogger.logDebug(
-          "interpreter",
-          "not executing",
-          "action name", actionName,
-          "condition type", conditionType,
-          "reason", "condition evaluated to `false`",
-          "condition", conditionAttribute
+      debug(
+        "not executing",
+        List(
+          "action name"    → actionName,
+          "condition type" → conditionType,
+          "reason"         → "condition evaluated to `false`",
+          "condition"      → conditionAttribute
         )
+      )
       false
     } else {
        true

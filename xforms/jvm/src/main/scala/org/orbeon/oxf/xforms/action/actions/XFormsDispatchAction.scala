@@ -14,28 +14,23 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.apache.commons.lang3.StringUtils.isNotBlank
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
-import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.saxon.om.Item
 
 import scala.util.Try
 
 
 class XFormsDispatchAction extends XFormsAction {
 
-  override def execute(
-    actionInterpreter    : XFormsActionInterpreter,
-    actionElement        : Element,
-    actionScope          : Scope,
-    hasOverriddenContext : Boolean,
-    overriddenContext    : Item
-  ): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
+
+    val interpreter   = actionContext.interpreter
+    val actionElement = actionContext.element
 
     // Mandatory attribute
     val newEventNameAttributeValue =
@@ -49,24 +44,24 @@ class XFormsDispatchAction extends XFormsAction {
       (throw new OXFException("Missing mandatory targetid attribute on xf:dispatch element."))
 
     val resolvedNewEventName =
-      Option(actionInterpreter.resolveAVTProvideValue(actionElement, newEventNameAttributeValue)) getOrElse (return)
+      Option(interpreter.resolveAVTProvideValue(actionElement, newEventNameAttributeValue)) getOrElse (return)
 
     val resolvedNewEventTargetStaticId =
-      Option(actionInterpreter.resolveAVTProvideValue(actionElement, newEventTargetIdValue)) getOrElse (return)
+      Option(interpreter.resolveAVTProvideValue(actionElement, newEventTargetIdValue)) getOrElse (return)
 
     // Optional attributes
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventBubbles =
-      (Option(actionInterpreter.resolveAVT(actionElement, "bubbles")) getOrElse true.toString).toBoolean
+      (Option(interpreter.resolveAVT(actionElement, "bubbles")) getOrElse true.toString).toBoolean
 
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventCancelable =
-      (Option(actionInterpreter.resolveAVT(actionElement, "cancelable")) getOrElse true.toString).toBoolean
+      (Option(interpreter.resolveAVT(actionElement, "cancelable")) getOrElse true.toString).toBoolean
 
     val resolvedDelayOpt =
-      Option(actionInterpreter.resolveAVT(actionElement, "delay")) filter
+      Option(interpreter.resolveAVT(actionElement, "delay")) filter
       isNotBlank                  flatMap // "The default is the empty string, which indicates no delay"
       (s ⇒ Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
       (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
@@ -74,14 +69,14 @@ class XFormsDispatchAction extends XFormsAction {
     // Whether to allow duplicates by name/targetid if the event has a non-negative delay
     // See https://github.com/orbeon/orbeon-forms/issues/3208.
     val allowDuplicates =
-      actionInterpreter.resolveAVT(actionElement, XXFORMS_ALLOW_DUPLICATES_QNAME) == true.toString
+      interpreter.resolveAVT(actionElement, XXFORMS_ALLOW_DUPLICATES_QNAME) == true.toString
 
     // Whether to tell the client to show a progress indicator when sending this event
     val showProgress =
-      actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != false.toString
+      interpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != false.toString
 
     // Find actual target
-    actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
+    interpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
       case xformsEventTarget: XFormsEventTarget ⇒
         // Execute the dispatch proper
         XFormsDispatchAction.dispatch(
@@ -89,7 +84,7 @@ class XFormsDispatchAction extends XFormsAction {
           target          = xformsEventTarget,
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
-          properties      = XFormsAction.eventProperties(actionInterpreter, actionElement),
+          properties      = XFormsAction.eventProperties(interpreter, actionElement),
           delayOpt        = resolvedDelayOpt,
           showProgress    = showProgress,
           allowDuplicates = allowDuplicates
@@ -97,9 +92,7 @@ class XFormsDispatchAction extends XFormsAction {
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-        val indentedLogger = actionInterpreter.indentedLogger
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logWarning("xf:dispatch", "cannot find target, ignoring action", "target id", resolvedNewEventTargetStaticId)
+        warn("xf:dispatch: cannot find target, ignoring action", List("target id" → resolvedNewEventTargetStaticId))
     }
   }
 }

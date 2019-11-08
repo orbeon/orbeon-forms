@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
 import org.orbeon.oxf.xforms.analysis._
@@ -26,7 +27,7 @@ import org.orbeon.oxf.xml.Dom4j
  */
 class XFormsActionAction extends XFormsAction {
 
-  override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val actionInterpreter = actionContext.interpreter
     val actionElement     = actionContext.element

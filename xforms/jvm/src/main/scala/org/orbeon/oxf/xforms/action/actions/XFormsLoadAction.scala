@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.UrlType
@@ -29,7 +29,7 @@ class XFormsLoadAction extends XFormsAction {
 
   import XFormsLoadAction._
 
-  override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter = actionContext.interpreter
     val actionElem  = actionContext.analysis.element

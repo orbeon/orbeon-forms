@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
@@ -22,12 +24,13 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 
+
 /**
  * 9.3.7 The setindex Element
  */
 class XFormsSetindexAction extends XFormsAction {
 
-  override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter = context.interpreter
     val element = context.analysis.element
@@ -62,10 +65,9 @@ object XFormsSetindexAction {
     interpreter    : XFormsActionInterpreter,
     actionElement  : Element,
     repeatStaticId : String,
-    index          : Int
+    index          : Int)(implicit
+    logger         : IndentedLogger
   ): Int = {
-
-    val indentedLogger = interpreter.indentedLogger
 
     // "This XForms Action begins by invoking the deferred update behavior."
     // See also `synchronizeAndRefreshIfNeeded`
@@ -78,10 +80,11 @@ object XFormsSetindexAction {
 
         val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl ⇒ repeat }
 
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug("xf:setindex", "setting index upon xf:setindex",
-            "old index", repeatControl map (_.getIndex.toString) orNull,
-            "new index", index.toString)
+        debug(
+          "xf:setindex: setting index upon xf:setindex",
+          ("new index" → index.toString) ::
+          (repeatControl.toList map (c ⇒ "old index" → c.getIndex.toString))
+        )
 
         val focusedBeforeOpt = interpreter.containingDocument.getControls.getFocusedControl
 
@@ -98,13 +101,10 @@ object XFormsSetindexAction {
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action
         // such as dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug(
-            "xf:setindex",
-            "index does not refer to an existing xf:repeat element, ignoring action",
-            "repeat id", repeatStaticId
-          )
-
+        debug(
+          "xf:setindex: index does not refer to an existing xf:repeat element, ignoring action",
+          List("repeat id" → repeatStaticId)
+        )
         -1
     }
   }

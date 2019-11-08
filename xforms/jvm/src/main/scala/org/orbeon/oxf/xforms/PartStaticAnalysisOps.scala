@@ -31,6 +31,7 @@ trait PartStaticAnalysisOps {
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getControlAnalysis(prefixedId: String): ElementAnalysis
+  def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
   def scopeForPrefixedId(prefixedId: String): Scope
   def searchResolutionScopeByPrefixedId(prefixedId: String): Scope
 }

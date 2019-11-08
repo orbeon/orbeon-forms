@@ -18,8 +18,10 @@ import java.{util ⇒ ju}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
+import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
@@ -34,22 +36,18 @@ import org.orbeon.xforms.XFormsId
 import scala.collection.JavaConverters._
 import scala.util.control.{Breaks, NonFatal}
 
-import org.orbeon.oxf.util.Logging._
-
 // Execute a top-level XForms action and the included nested actions if any.
 class XFormsActionInterpreter(
   val container          : XBLContainer,
-  val actionXPathContext : XFormsContextStack,
   val outerActionElement : Element,
-  handlerEffectiveId : String,
+  val handlerEffectiveId : String,
   val event              : XFormsEvent,
-  val eventObserver      : XFormsEventTarget
+  val eventObserver      : XFormsEventTarget)(implicit
+  val actionXPathContext : XFormsContextStack,
+  val indentedLogger     : IndentedLogger
 ) {
 
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
-
-  implicit val indentedLogger: IndentedLogger =
-    containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
 
   def getNamespaceMappings(actionElement: Element): NamespaceMapping =
     container.getNamespaceMappings(actionElement)
@@ -61,91 +59,81 @@ class XFormsActionInterpreter(
   def getActionPrefixedId(actionElement: Element): String =
     container.getFullPrefix + getActionStaticId(actionElement)
 
+  private def getActionStaticId(actionElement: Element): String =
+    XFormsUtils.getElementId(actionElement) ensuring (_ ne null)
+
   def getActionScope(actionElement: Element): Scope =
     container.getPartAnalysis.scopeForPrefixedId(getActionPrefixedId(actionElement))
 
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
   def mustHonorDeferredUpdateFlags(actionElement: Element): Boolean =
-    if (actionXPathContext.getCurrentBindingContext.singleItemOpt.isDefined)
-      !("false" == resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME))
-    else
-      true
+    actionXPathContext.getCurrentBindingContext.singleItemOpt.isEmpty ||
+      resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
 
-  def runAction(actionAnalysis: ElementAnalysis): Unit = {
-
-    val actionElement = actionAnalysis.element
-    val actionTrait = actionAnalysis.asInstanceOf[ActionTrait]
-
+  def runAction(staticAction: ActionTrait): Unit =
     try {
 
-      val ifConditionAttribute      = actionTrait.ifCondition
-      val whileIterationAttribute   = actionTrait.whileCondition
-      val iterateIterationAttribute = actionTrait.iterate
+      val iterateIterationAttribute = staticAction.iterate
 
       // Push `@iterate` (if present) within the `@model` and `@context` context
       // TODO: function context
-      actionXPathContext.pushBinding(
-        iterateIterationAttribute.orNull,
-        actionAnalysis.contextJava,
-        null,
-        actionAnalysis.modelJava,
-        null,
-        actionElement,
-        actionAnalysis.namespaceMapping,
-        getSourceEffectiveId(actionElement),
-        actionAnalysis.scope,
-        false
-      )
+      withBinding(
+        ref                            = iterateIterationAttribute,
+        context                        = staticAction.context,
+        modelId                        = staticAction.model map (_.staticId),
+        bindId                         = None,
+        bindingElement                 = staticAction.element,
+        bindingElementNamespaceMapping = staticAction.namespaceMapping,
+        sourceEffectiveId              = getSourceEffectiveId(staticAction.element),
+        scope                          = staticAction.scope,
+        handleNonFatal                 = false
+      ) {
 
-      // NOTE: At this point, the context has already been set to the current action element
-      iterateIterationAttribute match {
-        case Some(_) ⇒
-          // Gotta iterate
-
-          // NOTE: It's not 100% how @context and @iterate should interact here. Right now @iterate overrides @context,
-          // i.e. @context is evaluated first, and @iterate sets a new context for each iteration
-          val currentNodeset = actionXPathContext.getCurrentBindingContext.nodeset.asScala
-          for ((overriddenContextNodeInfo, zeroBasedIndex) ← currentNodeset.iterator.zipWithIndex) {
-
-            actionXPathContext.pushIteration(zeroBasedIndex + 1)
-
-            runSingleIteration(
-              actionAnalysis          = actionAnalysis,
-              actionQName             = actionElement.getQName,
-              ifConditionAttribute    = ifConditionAttribute,
-              whileIterationAttribute = whileIterationAttribute,
-              hasOverriddenContext    = true,
-              contextItem             = overriddenContextNodeInfo
-            )
-
-            actionXPathContext.popBinding()
-          }
-        case None ⇒
-          // Do a single iteration run (but this may repeat over the @while condition!)
+        def runSingle(hasOverriddenContext: Boolean, contextItem: Item): Unit =
           runSingleIteration(
-            actionAnalysis          = actionAnalysis,
-            actionQName             = actionElement.getQName,
-            ifConditionAttribute    = ifConditionAttribute,
-            whileIterationAttribute = whileIterationAttribute,
-            hasOverriddenContext    = actionXPathContext.getCurrentBindingContext.hasOverriddenContext,
-            contextItem             = actionXPathContext.getCurrentBindingContext.contextItem)
-      }
+            actionAnalysis          = staticAction,
+            actionQName             = staticAction.element.getQName,
+            ifConditionAttribute    = staticAction.ifCondition,
+            whileIterationAttribute = staticAction.whileCondition,
+            hasOverriddenContext    = hasOverriddenContext,
+            contextItem             = contextItem
+          )
 
-      // Restore
-      actionXPathContext.popBinding
+        // NOTE: At this point, the context has already been set to the current action element.
+        iterateIterationAttribute match {
+          case Some(_) ⇒
+            // Gotta iterate
+
+            // It's not 100% clear how `@context` and `@iterate` should interact here. Right now `@iterate` overrides `@context`,
+            // i.e. `@context` is evaluated first, and `@iterate` sets a new context for each iteration.
+            val currentNodeset = actionXPathContext.getCurrentBindingContext.nodeset.asScala
+            for ((overriddenContextNodeInfo, zeroBasedIndex) ← currentNodeset.iterator.zipWithIndex)
+              withIteration(zeroBasedIndex + 1) {
+                runSingle(
+                  hasOverriddenContext = true,
+                  contextItem          = overriddenContextNodeInfo
+                )
+              }
+          case None ⇒
+            // Do a single iteration run (but this may repeat over the `@while` condition!)
+            runSingle(
+              hasOverriddenContext = actionXPathContext.getCurrentBindingContext.hasOverriddenContext,
+              contextItem          = actionXPathContext.getCurrentBindingContext.contextItem
+            )
+        }
+      }
     } catch {
       case NonFatal(t) ⇒
         throw OrbeonLocationException.wrapException(
           t,
           new ExtendedLocationData(
-            actionElement.getData.asInstanceOf[LocationData],
-            "running XForms action",
-            actionElement,
-            Array[String]("action name", actionElement.getQName.qualifiedName)
+            locationData = staticAction.element.getData.asInstanceOf[LocationData],
+            description  = "running XForms action",
+            element      = staticAction.element,
+            params       = Array[String]("action name", staticAction.element.getQName.qualifiedName)
           )
         )
     }
-  }
 
   private def runSingleIteration(
     actionAnalysis          : ElementAnalysis,
@@ -158,8 +146,8 @@ class XFormsActionInterpreter(
 
     var whileIteration = 1
 
-    val processBreaks = new Breaks
-    import processBreaks._
+    val actionBreaks = new Breaks
+    import actionBreaks._
 
     tryBreakable {
       while (true) {
@@ -179,33 +167,27 @@ class XFormsActionInterpreter(
           ("action name" → actionQName.qualifiedName) ::
           (whileIterationAttribute.nonEmpty list ("while iteration" → whileIteration.toString))
         ) {
-
-          // Get action and execute it
-          val dynamicActionContext = DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem)
-
-          // Push binding excluding excluding @context and @model
+          // Push binding excluding excluding `@context` and `@model`
           // NOTE: If we repeat, re-evaluate the action binding.
           // For example:
           //
-          //   <xf:delete ref="/*/foo[1]" while="/*/foo"/>
+          //     <xf:delete ref="/*/foo[1]" while="/*/foo"/>
           //
-          // In this case, in the second iteration, xf:repeat must find an up-to-date nodeset!
-          actionXPathContext.pushBinding(
-            actionAnalysis.refJava,
-            null,
-            null,
-            null,
-            actionAnalysis.bindJava,
-            actionAnalysis.element,
-            actionAnalysis.namespaceMapping,
-            getSourceEffectiveId(actionAnalysis.element),
-            actionAnalysis.scope,
-            false
-          )
-
-          XFormsActions.getAction(actionQName).execute(dynamicActionContext)
-
-          actionXPathContext.popBinding()
+          // In this case, in the second iteration, `xf:delete` must find an up-to-date binding!
+          withBinding(
+            ref                            = actionAnalysis.ref,
+            context                        = None,
+            modelId                        = None,
+            bindId                         = actionAnalysis.bind,
+            bindingElement                 = actionAnalysis.element,
+            bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
+            sourceEffectiveId              = getSourceEffectiveId(actionAnalysis.element),
+            scope                          = actionAnalysis.scope,
+            handleNonFatal                 = false,
+          ) {
+            XFormsActions.getAction(actionQName)
+              .execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
+          }
         }
 
         // Stop if there is no iteration
@@ -264,6 +246,7 @@ class XFormsActionInterpreter(
   }
 
   // Evaluate an expression as a string. This returns "" if the result is an empty sequence.
+  // TODO: Pass `DynamicActionContext`.
   def evaluateAsString(
     actionElement   : Element,
     nodeset         : ju.List[Item],
@@ -288,6 +271,7 @@ class XFormsActionInterpreter(
     if (result ne null) result else ""
   }
 
+  // TODO: Pass `DynamicActionContext`.
   def evaluateKeepItems(
     actionElement   : Element,
     nodeset         : ju.List[Item],
@@ -309,6 +293,7 @@ class XFormsActionInterpreter(
 
   // Resolve a value which may be an AVT.
   // Return the resolved attribute value, null if the value is null or if the XPath context item is missing.
+  // TODO: Pass `DynamicActionContext`.
   def resolveAVTProvideValue(actionElement: Element, attributeValue: String): String = {
 
     if (attributeValue eq null)
@@ -344,10 +329,12 @@ class XFormsActionInterpreter(
   }
 
   // Resolve the value of an attribute which may be an AVT.
+  // TODO: Pass `DynamicActionContext`.
   def resolveAVT(actionElement: Element, attributeName: QName): String =
     resolveAVTProvideValue(actionElement, actionElement.attributeValue(attributeName))
 
   // Resolve the value of an attribute which may be an AVT.
+  // TODO: Pass `DynamicActionContext`.
   def resolveAVT(actionElement: Element, attributeName: String): String =
     actionElement.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionElement, _)) orNull
 
@@ -365,7 +352,4 @@ class XFormsActionInterpreter(
       }
     } orNull
   }
-
-  private def getActionStaticId(actionElement: Element): String =
-    XFormsUtils.getElementId(actionElement) ensuring (_ ne null)
 }

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
+import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
@@ -50,7 +50,7 @@ class EventHandlerImpl(
 ) with EventHandler
   with Logging {
 
-  self ⇒
+  self: ActionTrait ⇒
 
   import EventHandlerImpl._
 
@@ -275,9 +275,18 @@ class EventHandlerImpl(
 
     if (handlerIsRelevant || isIfNonRelevant) {
       try {
-        val actionInterpreter = new XFormsActionInterpreter(container, xpathContext, element, handlerEffectiveId, event, eventObserver)
-        XFormsAPI.withScalaAction(actionInterpreter) {
-          actionInterpreter.runAction(self)
+        XFormsAPI.withScalaAction(
+          new XFormsActionInterpreter(
+            container           = container,
+            outerActionElement  = element,
+            handlerEffectiveId  = handlerEffectiveId,
+            event               = event,
+            eventObserver       = eventObserver)(
+            actionXPathContext  = xpathContext,
+            indentedLogger      = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
+          )
+        ) {
+          _.runAction(self)
         }
       } catch {
         case NonFatal(t) ⇒

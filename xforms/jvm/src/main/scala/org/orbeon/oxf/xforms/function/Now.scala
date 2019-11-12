@@ -25,7 +25,6 @@ class Now extends XFormsFunction with RuntimeDependentFunction {
       stringArgumentOpt(0)(context) match {
         case Some("test") ⇒ DateTimeValue.makeDateTimeValue("2004-12-31T12:00:00.000Z").asAtomic.asInstanceOf[DateTimeValue]
         case _ ⇒
-          val now = new GregorianCalendar
           new DateTimeValue(new GregorianCalendar(TimeZone.getTimeZone("UTC")), true)
       }
     new StringValue(value.getStringValue)

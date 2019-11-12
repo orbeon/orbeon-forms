@@ -59,15 +59,17 @@
                 xmlns:fri="java:org.orbeon.oxf.fr.FormRunnerImport"
             >
                 <!-- Fixed documents -->
-                <xsl:variable name="workbook"       select="doc(/*/file[@name = 'xl/workbook.xml'])"            as="document-node()"/>
-                <xsl:variable name="rels"           select="doc(/*/file[@name = 'xl/_rels/workbook.xml.rels'])" as="document-node()"/>
-                <xsl:variable name="strings"        select="doc(/*/file[@name = 'xl/sharedStrings.xml'])"       as="document-node()"/>
-                <xsl:variable name="styles"         select="doc(/*/file[@name = 'xl/styles.xml'])"              as="document-node()"/>
+                <xsl:variable name="workbook"         select="doc(/*/file[@name = 'xl/workbook.xml'])"            as="document-node()"/>
+                <xsl:variable name="rels"             select="doc(/*/file[@name = 'xl/_rels/workbook.xml.rels'])" as="document-node()"/>
+                <xsl:variable name="strings"          select="doc(/*/file[@name = 'xl/sharedStrings.xml'])"       as="document-node()"/>
+                <xsl:variable name="styles"           select="doc(/*/file[@name = 'xl/styles.xml'])"              as="document-node()"/>
 
                 <!-- Open first sheet -->
-                <xsl:variable name="sheet-rid"      select="$workbook/*/ms-main:sheets/ms-main:sheet[1]/@ms-orels:id" as="xs:string"/>
-                <xsl:variable name="sheet-filename" select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target" as="xs:string"/>
-                <xsl:variable name="sheet"          select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
+                <xsl:variable name="sheet-rid"        select="$workbook/*/ms-main:sheets/ms-main:sheet[1]/@ms-orels:id" as="xs:string"/>
+                <xsl:variable name="sheet-filename"   select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target" as="xs:string"/>
+                <xsl:variable name="sheet"            select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
+
+                <xsl:variable name="use1904windowing" select="$workbook/*/ms-main:workbookPr/@date1904 = '1'" as="xs:boolean"/>
 
                 <xsl:variable name="builtin-formats" as="element()+">
                     <numFmt numFmtId="0" formatCode="general"/>
@@ -149,7 +151,7 @@
                                             else if (@t = 'inlineStr') then
                                                 $c/ms-main:is
                                             else if ($type = ('datetime', 'date', 'time')) then
-                                                fri:convertDateTime($v, $type)
+                                                fri:convertDateTime($v, $type, $use1904windowing)
                                             else
                                                 $v"/>
                                 </c>

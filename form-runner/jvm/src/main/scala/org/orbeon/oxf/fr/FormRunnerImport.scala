@@ -33,13 +33,13 @@ object FormRunnerImport {
     else
       ExcelDateUtils.analyzeFormatType(formatIndex, formatString).entryName
 
-  def convertDateTime(value: String, formatType: String): String = {
+  def convertDateTime(value: String, formatType: String, use1904windowing: Boolean): String = {
 
     val dateOpt =
       Try(value.toDouble).toOption flatMap { double ⇒
         ExcelDateUtils.getJavaDate(
           date             = double,
-          use1904windowing = false,
+          use1904windowing = use1904windowing,
           tz               = ju.TimeZone.getTimeZone("UTC"),
           locale           = ju.Locale.getDefault,
           roundSeconds     = true

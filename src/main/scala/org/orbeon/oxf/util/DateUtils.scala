@@ -31,6 +31,7 @@ object DateUtils {
   val DateTime   = ISODateTimeFormat.dateTime.withZoneUTC
 
   // Date format without timezone
+  // 2019-11-12: Used only by `PEVersion`
   val DateNoZone = ISODateTimeFormat.date
 
   // RFC 1123 format

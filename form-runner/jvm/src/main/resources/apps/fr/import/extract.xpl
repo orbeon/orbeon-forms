@@ -48,7 +48,10 @@
                 <xsl:variable name="sheet-filename"   select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target"  as="xs:string"/>
                 <xsl:variable name="sheet"            select="doc(/*/file[@name = concat('xl/', $sheet-filename)])"     as="document-node()"/>
 
-                <xsl:variable name="use1904windowing" select="$workbook/*/ms-main:workbookPr/@date1904 = '1'" as="xs:boolean"/>
+                <xsl:variable
+                    name="use1904windowing"
+                    select="$workbook/*/ms-main:workbookPr/@date1904 = ('1', 'on', 'true')"
+                    as="xs:boolean"/>
 
                 <xsl:variable name="builtin-formats" as="element()+">
                     <numFmt numFmtId="0" formatCode="general"/>

@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 import org.joda.time.format.ISODateTimeFormat
 import org.orbeon.oxf.fr.excel.ExcelDateUtils
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.util.Try
 
@@ -33,7 +34,7 @@ object FormRunnerImport {
     else
       ExcelDateUtils.analyzeFormatType(formatIndex, formatString).entryName
 
-  def convertDateTime(value: String, formatType: String, use1904windowing: Boolean): String = {
+  def convertDateTime(value: String, formatTypeString: String, use1904windowing: Boolean): String = {
 
     val dateOpt =
       Try(value.toDouble).toOption flatMap { double ⇒
@@ -46,17 +47,29 @@ object FormRunnerImport {
         )
       }
 
+    val formatType = FormatType.withNameInsensitive(formatTypeString)
+
     def formatter =
-      FormatType.withNameInsensitive(formatType) match {
+      formatType match {
         case FormatType.DateTime ⇒ DateTimeFormatter
         case FormatType.Date     ⇒ DateFormatter
         case FormatType.Time     ⇒ TimeFormatter
-        case FormatType.Other    ⇒ throw new IllegalArgumentException(formatType)
+        case FormatType.Other    ⇒ throw new IllegalArgumentException(formatTypeString)
       }
 
     def removeTrailingZIfPresent(s: String) =
       if (s.last == 'Z') s.init else s
 
-    dateOpt map (_.getTime) map formatter.print map removeTrailingZIfPresent orNull
+    def removeTrailingMillisIfPresent(s: String) =
+      formatType match {
+        case FormatType.DateTime | FormatType.Time ⇒ s.trimSuffixIfPresent(".000")
+        case _ ⇒ s
+      }
+
+    dateOpt                         map
+      (_.getTime)                   map
+      formatter.print               map
+      removeTrailingZIfPresent      map
+      removeTrailingMillisIfPresent orNull
   }
 }

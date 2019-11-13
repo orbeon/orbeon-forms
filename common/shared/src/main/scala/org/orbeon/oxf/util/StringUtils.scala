@@ -209,6 +209,12 @@ object StringUtils {
       else
         ""
     }
+
+    def trimSuffixIfPresent(suffix: String): String =
+      if (s.endsWith(suffix))
+        s.substring(0, s.length - suffix.length)
+      else
+        s
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

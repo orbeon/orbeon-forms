@@ -76,15 +76,15 @@
                 </row>
                 <row>
                     <c r="B" type="string">Time</c>
-                    <c r="C" type="time">14:00:00.000</c>
+                    <c r="C" type="time">14:00:00</c>
                 </row>
                 <row>
                     <c r="B" type="string">Date and time</c>
-                    <c r="C" type="datetime">2019-11-12T02:00:00.000</c>
+                    <c r="C" type="datetime">2019-11-12T02:00:00</c>
                 </row>
                 <row>
                     <c r="B" type="string">Duration</c>
-                    <c r="C" type="time">04:31:27.000</c>
+                    <c r="C" type="time">04:31:27</c>
                 </row>
                 <row>
                     <c r="B" type="string">ISO date</c>
@@ -154,15 +154,15 @@
                 </row>
                 <row>
                     <c r="B" type="string">Time</c>
-                    <c r="C" type="time">14:00:00.000</c>
+                    <c r="C" type="time">14:00:00</c>
                 </row>
                 <row>
                     <c r="B" type="string">Date and time</c>
-                    <c r="C" type="datetime">2019-11-12T02:00:00.000</c>
+                    <c r="C" type="datetime">2019-11-12T02:00:00</c>
                 </row>
                 <row>
                     <c r="B" type="string">Duration</c>
-                    <c r="C" type="time">04:31:27.000</c>
+                    <c r="C" type="time">04:31:27</c>
                 </row>
                 <row>
                     <c r="B" type="string">ISO date</c>

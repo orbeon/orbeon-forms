@@ -1,0 +1,175 @@
+<!--
+    Copyright (C) 2019 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group
+    description="Excel"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <test description="Extract data formats with 1900 windowing" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="rows"/>
+
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>Excel file with formats (1900 windowing).xlsx</url>
+                            <content-type>multipart/x-zip</content-type>
+                            <cache-control><use-local-cache>false</use-local-cache></cache-control>
+                            <mode>binary</mode>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="zip"/>
+                </p:processor>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="file"   href="#zip"/>
+                    <p:output name="rows"   ref="rows"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="rows">
+            <rows>
+                <row>
+                    <c r="B" type="string">Number</c>
+                    <c r="C" type="number">42</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Percent</c>
+                    <c r="C" type="number">0.5</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Scientific</c>
+                    <c r="C" type="number">1E+40</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Accounting</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Financial</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Currency</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Currency (rounded)</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Date</c>
+                    <c r="C" type="date">2019-11-12</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Time</c>
+                    <c r="C" type="time">14:00:00.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Date and time</c>
+                    <c r="C" type="datetime">2019-11-12T02:00:00.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Duration</c>
+                    <c r="C" type="time">04:31:27.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">ISO date</c>
+                    <c r="C" type="date">2019-11-12</c>
+                </row>
+            </rows>
+        </output>
+    </test>
+
+    <test description="Extract data formats with 1904 windowing" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="rows"/>
+
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>Excel file with formats (1904 windowing).xlsx</url>
+                            <content-type>multipart/x-zip</content-type>
+                            <cache-control><use-local-cache>false</use-local-cache></cache-control>
+                            <mode>binary</mode>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="zip"/>
+                </p:processor>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="file"   href="#zip"/>
+                    <p:output name="rows"   ref="rows"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="rows">
+            <rows>
+                <row>
+                    <c r="B" type="string">Number</c>
+                    <c r="C" type="number">42</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Percent</c>
+                    <c r="C" type="number">0.5</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Scientific</c>
+                    <c r="C" type="number">1E+40</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Accounting</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Financial</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Currency</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Currency (rounded)</c>
+                    <c r="C" type="number">12345.67</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Date</c>
+                    <c r="C" type="date">2019-11-12</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Time</c>
+                    <c r="C" type="time">14:00:00.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Date and time</c>
+                    <c r="C" type="datetime">2019-11-12T02:00:00.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">Duration</c>
+                    <c r="C" type="time">04:31:27.000</c>
+                </row>
+                <row>
+                    <c r="B" type="string">ISO date</c>
+                    <c r="C" type="date">2019-11-12</c>
+                </row>
+            </rows>
+        </output>
+    </test>
+
+</group>

@@ -18,4 +18,5 @@
     <xi:include href="tests-email.xml"/>
     <xi:include href="tests-xpath-functions.xml"/>
     <xi:include href="tests-actions.xml"/>
+    <xi:include href="tests-excel.xml"/>
 </tests>

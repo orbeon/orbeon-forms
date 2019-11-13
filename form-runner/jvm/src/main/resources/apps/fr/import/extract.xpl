@@ -45,8 +45,8 @@
 
                 <!-- Open first sheet -->
                 <xsl:variable name="sheet-rid"        select="$workbook/*/ms-main:sheets/ms-main:sheet[1]/@ms-orels:id" as="xs:string"/>
-                <xsl:variable name="sheet-filename"   select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target" as="xs:string"/>
-                <xsl:variable name="sheet"            select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
+                <xsl:variable name="sheet-filename"   select="$rels/*/ms-prels:Relationship[@Id = $sheet-rid]/@Target"  as="xs:string"/>
+                <xsl:variable name="sheet"            select="doc(/*/file[@name = concat('xl/', $sheet-filename)])"     as="document-node()"/>
 
                 <xsl:variable name="use1904windowing" select="$workbook/*/ms-main:workbookPr/@date1904 = '1'" as="xs:boolean"/>
 

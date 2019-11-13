@@ -92,13 +92,6 @@ object ExcelDateUtils {
       calendar
     }
 
-  def getJavaCalendarUTC(
-    date              : Double,
-    use1904windowing  : Boolean,
-    locale            : ju.Locale
-  ): Option[ju.Calendar] =
-    getJavaCalendar(date, use1904windowing, TimezoneUtc, locale, roundSeconds = false)
-
   def analyzeFormatType(formatIndex: Int, formatString: String): FormatType = {
 
     def removeSimpleSequences(s: String): String = {
@@ -223,37 +216,6 @@ object ExcelDateUtils {
     )
   }
 
-  def internalGetExcelDate(
-    year             : Int,
-    dayOfYear        : Int,
-    hour             : Int,
-    minute           : Int,
-    second           : Int,
-    milliSecond      : Int,
-    use1904windowing : Boolean
-  ): Option[Double] =
-    (! use1904windowing && year >= 1900) || (use1904windowing && year >= 1904) option {
-
-    // Because of daylight time saving we cannot use
-    //
-    //     date.getTime() - calStart.getTimeInMillis()
-    //
-    // as the difference in milliseconds between 00:00 and 04:00
-    // can be 3, 4 or 5 hours but Excel expects it to always
-    // be 4 hours.
-    //
-    // E.g. 2004-03-28 04:00 CEST - 2004-03-28 00:00 CET is 3 hours
-    // and 2004-10-31 04:00 CET - 2004-10-31 00:00 CEST is 5 hours
-
-    val fraction = (((hour * 60.0 + minute) * 60.0 + second) * 1000.0 + milliSecond) / MillisecondsPerDay
-    var value = fraction + absoluteDay(year, dayOfYear, use1904windowing)
-    if (! use1904windowing && value >= 60)
-      value += 1
-    else if (use1904windowing)
-      value -= 1
-    value
-  }
-
   def findInternalFormat(formatIndex: Int): Option[(FormatType, String)] =
     BuiltinFormats.get(formatIndex)
 
@@ -279,9 +241,9 @@ object ExcelDateUtils {
 
     val RemovePatterns: List[Pattern] =
       List(
-        "^\\[DBNum(1|2|3)\\]", // could be a Chinese date
-        "^\\[\\$\\-.*?\\]",
-        "^\\[[a-zA-Z]+\\]"
+        """^\[DBNum(1|2|3)\]""", // could be a Chinese date
+        """^\[\$\-.*?\]""",
+        """^\[[a-zA-Z]+\]"""
       ) map
         Pattern.compile
 
@@ -360,6 +322,37 @@ object ExcelDateUtils {
       val yr1 = yr - 1
       val leapDays = yr1 / 4
       365 * (yr - (if (use1904windowing) 1904 else 1900)) + leapDays
+    }
+
+    def internalGetExcelDate(
+      year             : Int,
+      dayOfYear        : Int,
+      hour             : Int,
+      minute           : Int,
+      second           : Int,
+      milliSecond      : Int,
+      use1904windowing : Boolean
+    ): Option[Double] =
+      (! use1904windowing && year >= 1900) || (use1904windowing && year >= 1904) option {
+
+      // Because of daylight time saving we cannot use
+      //
+      //     date.getTime() - calStart.getTimeInMillis()
+      //
+      // as the difference in milliseconds between 00:00 and 04:00
+      // can be 3, 4 or 5 hours but Excel expects it to always
+      // be 4 hours.
+      //
+      // E.g. 2004-03-28 04:00 CEST - 2004-03-28 00:00 CET is 3 hours
+      // and 2004-10-31 04:00 CET - 2004-10-31 00:00 CEST is 5 hours
+
+      val fraction = (((hour * 60.0 + minute) * 60.0 + second) * 1000.0 + milliSecond) / MillisecondsPerDay
+      var value = fraction + absoluteDay(year, dayOfYear, use1904windowing)
+      if (! use1904windowing && value >= 60)
+        value += 1
+      else if (use1904windowing)
+        value -= 1
+      value
     }
   }
 }

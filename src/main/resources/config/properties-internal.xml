@@ -176,6 +176,10 @@
     <property as="xs:string"  name="oxf.fr.pdf.format.input-string">
         (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-input']/input)[1]/@value/string()
     </property>
+    <!-- https://github.com/orbeon/orbeon-forms/issues/4272 -->
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-time-string">
+        (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-input' and tokenize(@class, '\s+') = 'xforms-type-time']/input)[1]/@value/string()
+    </property>
     <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime">
         string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')
     </property>
@@ -255,6 +259,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-phone.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-yesno-input.*"                  value="select-value"/>

@@ -156,7 +156,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     public static String getLHHACId(XFormsContainingDocument containingDocument, String controlEffectiveId, String suffix) {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
-        return XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
+        return XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR() + suffix));
     }
 
     protected static Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames, HandlerContext xformsHandlerContext) {

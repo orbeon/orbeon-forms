@@ -32,7 +32,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
@@ -600,9 +599,9 @@ trait ContainingDocumentRequest {
 
         _deploymentType =
           rendererDeploymentType match {
-            case "separate"   ⇒ DeploymentType.separate
-            case "integrated" ⇒ DeploymentType.integrated
-            case _            ⇒ DeploymentType.standalone
+            case "separate"   ⇒ DeploymentType.Separate
+            case "integrated" ⇒ DeploymentType.Integrated
+            case _            ⇒ DeploymentType.Standalone
           }
 
         // Try to get request context path
@@ -627,7 +626,7 @@ trait ContainingDocumentRequest {
         _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
       case None ⇒
         // Special case when we run outside the context of a request
-        _deploymentType = DeploymentType.standalone
+        _deploymentType = DeploymentType.Standalone
         _requestContextPath = ""
         _requestPath = "/"
         _requestHeaders = Map.empty
@@ -647,8 +646,8 @@ trait ContainingDocumentRequest {
     dynamicState.deploymentType match {
       case Some(_) ⇒
         // Normal case where information below was previously serialized
-        _deploymentType             = DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
-        _requestContextPath         = dynamicState.decodeRequestContextPathJava
+        _deploymentType             = (dynamicState.deploymentType map DeploymentType.withNameInsensitive orNull)
+        _requestContextPath         = dynamicState.requestContextPath.orNull
         _requestPath                = dynamicState.decodeRequestPathJava
         _requestHeaders             = dynamicState.requestHeaders.toMap
         _isEmbedded                 = isEmbeddedFromHeaders(_requestHeaders)

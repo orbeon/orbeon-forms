@@ -263,11 +263,11 @@ case class BindingContext(
               case Some(defaultInstance) ⇒
                 ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[Item])
               case None ⇒
-                XFormsConstants.EMPTY_ITEM_LIST
+                ju.Collections.emptyList[Item]
             }
         }
       case None ⇒
-        XFormsConstants.EMPTY_ITEM_LIST
+        ju.Collections.emptyList[Item]
   }
 
   class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {

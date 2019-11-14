@@ -46,7 +46,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "button");
 
         // Output xxf:* extension attributes
-        triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+        triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());
 
         // xhtml:a
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();

@@ -127,7 +127,7 @@ class XBLBindings(
         rawShadowTree,
         newInnerScope,
         outerScope,
-        XXBLScope.inner,
+        XXBLScope.Inner,
         newInnerScope,
         hasFullUpdate(rawShadowTree),
         ignoreRoot = true
@@ -135,7 +135,7 @@ class XBLBindings(
 
     // Annotate event handlers and implementation models
     def annotateByElement(element: Element) =
-      annotateSubtreeByElement(boundElement, element, newInnerScope, outerScope, XXBLScope.inner, newInnerScope)
+      annotateSubtreeByElement(boundElement, element, newInnerScope, outerScope, XXBLScope.Inner, newInnerScope)
 
     val annotatedHandlers = abstractBinding.handlers      map annotateByElement
     val annotatedModels   = abstractBinding.modelElements map annotateByElement
@@ -287,7 +287,7 @@ class XBLBindings(
                 rawTree        = globalDocument,
                 innerScope     = topLevelScopeForGlobals,
                 outerScope     = topLevelScopeForGlobals,
-                startScope     = XXBLScope.inner,
+                startScope     = XXBLScope.Inner,
                 containerScope = topLevelScopeForGlobals,
                 hasFullUpdate  = hasFullUpdate(globalDocument),
                 ignoreRoot     = true
@@ -410,7 +410,7 @@ class XBLBindings(
       if (staticId ne null) {
         val prefixedId = prefix + staticId
         if (metadata.getNamespaceMapping(prefixedId).isDefined) {
-          val scope = if (currentScope == XXBLScope.inner) innerScope else outerScope
+          val scope = if (currentScope == XXBLScope.Inner) innerScope else outerScope
 
           // Enforce constraint that mapping must be unique
           if (scope.contains(staticId))

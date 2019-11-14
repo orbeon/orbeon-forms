@@ -486,7 +486,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventTarget {
         try {
             schemaValidator();
         } catch (Exception e) {
-            final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
+            final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME());
             Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, schemaAttribute, e));
         }
 

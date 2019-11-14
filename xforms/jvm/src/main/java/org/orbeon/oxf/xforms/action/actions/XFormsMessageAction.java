@@ -39,15 +39,15 @@ public class XFormsMessageAction extends XFormsAction {
 
     static {
         // Standard levels
-        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODAL_LEVEL_QNAME, "");
-        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODELESS_LEVEL_QNAME, "");
-        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_EPHEMERAL_LEVEL_QNAME, "");
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODAL_LEVEL_QNAME(), "");
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODELESS_LEVEL_QNAME(), "");
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_EPHEMERAL_LEVEL_QNAME(), "");
 
         // Extension levels
-        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME, "");
-        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME, "");
-        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME, "");
-        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME, "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME(), "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME(), "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME(), "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME(), "");
 
         SUPPORTED_APPEARANCES.putAll(LOG_APPEARANCES);
     }
@@ -61,14 +61,14 @@ public class XFormsMessageAction extends XFormsAction {
             final String levelAttribute;
             final QName levelQName;
             {
-                final String tempLevelAttribute = actionElement.attributeValue(XFormsConstants.LEVEL_QNAME);
+                final String tempLevelAttribute = actionElement.attributeValue(XFormsConstants.LEVEL_QNAME());
                 if (tempLevelAttribute == null) {
                     // "The default is "modal" if the attribute is not specified."
-                    levelQName = XFormsConstants.XFORMS_MODAL_LEVEL_QNAME;
+                    levelQName = XFormsConstants.XFORMS_MODAL_LEVEL_QNAME();
                     levelAttribute = levelQName.localName();
                 } else {
                     levelAttribute = tempLevelAttribute;
-                    levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, XFormsConstants.LEVEL_QNAME);
+                    levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, XFormsConstants.LEVEL_QNAME());
                 }
             }
 
@@ -93,13 +93,13 @@ public class XFormsMessageAction extends XFormsAction {
                 // Special log appearance
 
                 final IndentedLogger indentedLogger = containingDocument.indentedLogger();
-                if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME().equals(levelQName)) {
                     indentedLogger.logDebug("xf:message", messageValue);
-                } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME().equals(levelQName)) {
                     indentedLogger.logInfo("xf:message", messageValue);
-                } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME().equals(levelQName)) {
                     indentedLogger.logWarning("xf:message", messageValue);
-                } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME().equals(levelQName)) {
                     indentedLogger.logError("xf:message", messageValue);
                 }
 

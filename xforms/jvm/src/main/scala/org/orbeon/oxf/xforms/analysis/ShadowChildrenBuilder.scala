@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.{ComponentControl, LHHA}
-import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.XFormsConstants.{FOR_QNAME, XXBLScope}
+import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
+import org.orbeon.oxf.xforms.XXBLScope
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.Dom4j
 
 trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
 
@@ -49,7 +50,7 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         child,              // child tree to annotate
         innerScope,         // handler's inner scope is the same as the component's
         outerScope,         // handler's outer scope is the same as the component's
-        if (scope == innerScope) XXBLScope.inner else XXBLScope.outer,
+        if (scope == innerScope) XXBLScope.Inner else XXBLScope.Outer,
         binding.innerScope  // handler is within the current component (this determines the prefix of ids)
       )
     }

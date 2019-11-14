@@ -72,7 +72,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         }
 
         // Separate deployment not supported for portlet local submission as callee is a servlet, not a portlet!
-        if (! containingDocument().getDeploymentType().equals(XFormsConstants.DeploymentType.separate)) {
+        if (! containingDocument().getDeploymentType().equals(XFormsConstants.SeparateDeploymentTypeJava())) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "deployment type is not separate");
@@ -214,7 +214,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final String effectiveResource;
         if (! isNorewrite) {
             // Must rewrite
-            if (! containingDocument.getDeploymentType().equals(XFormsConstants.DeploymentType.separate)) {
+            if (! containingDocument.getDeploymentType().equals(XFormsConstants.SeparateDeploymentTypeJava())) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
                 isContextRelative = true;
                 effectiveResource = resource;

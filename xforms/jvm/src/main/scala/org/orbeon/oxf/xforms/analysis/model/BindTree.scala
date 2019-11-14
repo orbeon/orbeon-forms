@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -80,7 +80,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
         Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
         model.scope,
         model.scope,
-        XXBLScope.inner,
+        XXBLScope.Inner,
         model.containerScope,
         hasFullUpdate = false,
         ignoreRoot = false)

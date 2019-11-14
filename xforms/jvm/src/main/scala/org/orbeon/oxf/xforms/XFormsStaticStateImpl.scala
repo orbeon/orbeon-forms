@@ -303,14 +303,14 @@ object XFormsStaticStateImpl {
     metadata                     = metadata,
     templateUnderConstructionOpt = Some(AnnotatedTemplate(template)),
     baseURI                      = ".",
-    startScope                   = XXBLScope.inner,
+    startScope                   = XXBLScope.Inner,
     isTopLevel                   = startScope.isTopLevelScope,
     outputSingleTemplate         = false
   ) {
 
     override def getPrefixedId(staticId: String) = prefix + staticId
 
-    override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope): Unit = {
+    override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XXBLScope): Unit = {
       val staticId = attributes.getValue("id")
       if (staticId ne null) {
         val prefixedId = prefix + staticId

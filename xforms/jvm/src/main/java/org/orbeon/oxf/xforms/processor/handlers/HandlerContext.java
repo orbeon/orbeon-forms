@@ -230,7 +230,7 @@ public class HandlerContext {
 
     public void pushComponentContext(String prefixedId) {
 
-        final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
+        final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR();
 
         if (componentContextStack == null)
             componentContextStack = new Stack<>();
@@ -276,8 +276,8 @@ public class HandlerContext {
 
         // Create postfix depending on whether we are appending to an existing postfix or not
         final String newIdPostfix = (currentIdPostfix.length() == 0)
-                ? "" + XFormsConstants.REPEAT_SEPARATOR + iteration
-                : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iteration;
+                ? "" + XFormsConstants.REPEAT_SEPARATOR() + iteration
+                : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR() + iteration;
 
         if (repeatContextStack == null)
             repeatContextStack = new Stack<>();

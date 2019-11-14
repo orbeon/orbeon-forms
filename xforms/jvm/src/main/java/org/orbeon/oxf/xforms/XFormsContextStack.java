@@ -27,7 +27,8 @@ import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -245,11 +246,11 @@ public class XFormsContextStack {
     public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
         // TODO: move away from element and use static analysis information
         pushBinding(
-            bindingElement.attributeValue(XFormsConstants.REF_QNAME),
-            bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME),
-            bindingElement.attributeValue(XFormsConstants.NODESET_QNAME),
-            bindingElement.attributeValue(XFormsConstants.MODEL_QNAME),
-            bindingElement.attributeValue(XFormsConstants.BIND_QNAME),
+            bindingElement.attributeValue(XFormsConstants.REF_QNAME()),
+            bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME()),
+            bindingElement.attributeValue(XFormsConstants.NODESET_QNAME()),
+            bindingElement.attributeValue(XFormsConstants.MODEL_QNAME()),
+            bindingElement.attributeValue(XFormsConstants.BIND_QNAME()),
             bindingElement,
             container.getNamespaceMappings(bindingElement),
             sourceEffectiveId,
@@ -347,7 +348,7 @@ public class XFormsContextStack {
                         // This can happen e.g. if a nested bind is within a bind with an empty nodeset
 
                         bind = null;
-                        newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                        newNodeset = java.util.Collections.emptyList();
                         hasOverriddenContext = false;
                         contextItem = null;
                         isNewBind = true;
@@ -361,7 +362,7 @@ public class XFormsContextStack {
 
                         // Default to an empty binding
                         bind = null;
-                        newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                        newNodeset = java.util.Collections.emptyList();
                         hasOverriddenContext = false;
                         contextItem = null;
                         isNewBind = true;
@@ -499,7 +500,7 @@ public class XFormsContextStack {
                                 } catch (Exception e) {
                                     if (handleNonFatal) {
                                         XFormsError.handleNonFatalXPathError(container, e);
-                                        result = XFormsConstants.EMPTY_ITEM_LIST;
+                                        result = java.util.Collections.emptyList();
                                     } else {
                                         throw e;
                                     }
@@ -508,7 +509,7 @@ public class XFormsContextStack {
                             newNodeset = result;
                         } else {
                             // Otherwise we consider we can't evaluate
-                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                            newNodeset = java.util.Collections.emptyList();
                         }
 //                    }
 

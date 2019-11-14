@@ -55,20 +55,20 @@ public class XFormsInsertAction extends XFormsAction {
 
         final String atAttribute = actionElement.attributeValue("at");
         final String originAttribute = actionElement.attributeValue("origin");
-        final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
+        final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME());
 
         // Extension: allow position to be an AVT
         final String resolvedPositionAttribute = actionInterpreter.resolveAVT(actionElement, "position");
 
         // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
-        final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME));
+        final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME()));
 
-        final boolean updateRepeats = ! "false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME));
+        final boolean updateRepeats = ! "false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME()));
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
             final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
-            collectionToBeUpdated = currentBindingContext.newBind() ? currentBindingContext.nodeset() : XFormsConstants.EMPTY_ITEM_LIST;
+            collectionToBeUpdated = currentBindingContext.newBind() ? currentBindingContext.nodeset() : java.util.Collections.emptyList();
         }
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 

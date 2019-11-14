@@ -13,12 +13,33 @@
  */
 package org.orbeon.oxf.xforms
 
+import enumeratum.{Enum, EnumEntry}
+import enumeratum.EnumEntry.Lowercase
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.submission.UrlType
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 import org.orbeon.xforms.rpc
+
+sealed trait XXBLScope extends EnumEntry with Lowercase
+object XXBLScope extends Enum[XXBLScope] {
+
+  val values = findValues
+
+  case object Inner extends  XXBLScope
+  case object Outer extends  XXBLScope
+}
+
+sealed trait DeploymentType extends EnumEntry with Lowercase
+object DeploymentType extends Enum[DeploymentType] {
+
+  val values = findValues
+
+  case object Separate    extends  DeploymentType
+  case object Integrated  extends  DeploymentType
+  case object Standalone  extends  DeploymentType
+}
 
 trait XFormsObject {
   def getEffectiveId: String

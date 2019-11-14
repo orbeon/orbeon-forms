@@ -21,7 +21,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsUtils, XXBLScope}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.XMLConstants._
@@ -263,7 +263,7 @@ class XFormsExtractor(
       // xxbl:scope
       val newScope =
         Option(attributes.getValue(XXBL_SCOPE_QNAME.namespace.uri, XXBL_SCOPE_QNAME.localName)) match {
-          case Some(xblScopeAttribute) ⇒ XXBLScope.valueOf(xblScopeAttribute)
+          case Some(xblScopeAttribute) ⇒ XXBLScope.withName(xblScopeAttribute)
           case None                    ⇒ parentElementDetails.scope
         }
 

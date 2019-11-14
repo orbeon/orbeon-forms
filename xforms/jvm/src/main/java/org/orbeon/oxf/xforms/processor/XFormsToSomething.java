@@ -21,7 +21,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.util.WhitespaceMatching;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.IdGenerator;
@@ -35,7 +38,6 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.SAXException;
 import scala.Option;
@@ -362,7 +364,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                             metadata,
                             scala.Option.<AnnotatedTemplate>apply(template),
                             ".",
-                            XFormsConstants.XXBLScope.inner,
+                            XFormsConstants.InnerScopeJava(),
                             true,
                             false
                         ),

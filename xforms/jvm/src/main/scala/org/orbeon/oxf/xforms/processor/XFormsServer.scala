@@ -650,7 +650,7 @@ class XFormsServer extends ProcessorImpl {
                 }
 
                 // Set deployment mode into request (useful for epilogue)
-                request.getAttributesMap.put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.name)
+                request.getAttributesMap.put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.entryName)
               }
 
               // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In

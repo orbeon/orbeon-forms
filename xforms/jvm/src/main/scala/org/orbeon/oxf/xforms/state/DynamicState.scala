@@ -54,8 +54,6 @@ case class DynamicState(
   def decodeControls               = fromByteSeq[List[ControlState]](controls)
 
   // For Java callers
-  def decodeDeploymentTypeJava     = deploymentType.orNull
-  def decodeRequestContextPathJava = requestContextPath.orNull
   def decodeRequestPathJava        = requestPath.orNull
   def decodeContainerTypeJava      = containerType.orNull
   def decodeContainerNamespaceJava = containerNamespace.orNull

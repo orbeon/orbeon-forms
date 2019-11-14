@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import java.util
-import java.util.Collections
+import java.{util ⇒ ju}
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
@@ -233,9 +232,9 @@ class XFormsActionInterpreter(
     // Execute condition relative to the overridden context if it exists, or the in-scope context if not
     val (contextNodeset, contextPosition) =
       if (contextItem ne null)
-        (Collections.singletonList(contextItem), 1)
+        (ju.Collections.singletonList(contextItem), 1)
       else
-        (XFormsConstants.EMPTY_ITEM_LIST, 0)
+        (ju.Collections.emptyList[Item], 0)
 
     // Don't evaluate the condition if the context has gone missing
     if (contextNodeset.size == 0) { //  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
@@ -271,7 +270,7 @@ class XFormsActionInterpreter(
   // Evaluate an expression as a string. This returns "" if the result is an empty sequence.
   def evaluateAsString(
     actionElement   : Element,
-    nodeset         : util.List[Item],
+    nodeset         : ju.List[Item],
     position        : Int,
     xpathExpression : String
   ): String = {
@@ -295,10 +294,10 @@ class XFormsActionInterpreter(
 
   def evaluateKeepItems(
     actionElement   : Element,
-    nodeset         : util.List[Item],
+    nodeset         : ju.List[Item],
     position        : Int,
     xpathExpression : String
-  ): util.List[Item] =
+  ): ju.List[Item] =
     XPathCache.evaluateKeepItems(
       contextItems       = nodeset,
       contextPosition    = position,

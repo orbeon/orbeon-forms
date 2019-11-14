@@ -148,7 +148,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             handleAriaByAtts(containerAttributes);
             if (xformsControl != null)
                 xformsControl.addExtensionAttributesExceptClassAndAcceptForHandler
-                        (containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+                        (containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());
 
             if (isHTMLDisabled(xformsControl))
                 outputDisabledAttribute(containerAttributes);
@@ -556,7 +556,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (! itemAttributes.isEmpty()) {
             for (final Tuple2<QName, String> nameValue: itemAttributes) {
                 final QName attributeQName = nameValue._1();
-                if (!attributeQName.equals(XFormsConstants.CLASS_QNAME)) { // class is handled separately
+                if (!attributeQName.equals(XFormsConstants.CLASS_QNAME())) { // class is handled separately
                     final String attributeName = Itemset.getAttributeName(attributeQName);
                     spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, nameValue._2());
                 }
@@ -580,7 +580,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     public static String getItemId(String effectiveId, String itemIndex) {
         return XFormsId.appendToEffectiveId(
             effectiveId,
-            "" + XFormsConstants.COMPONENT_SEPARATOR + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex
+            "" + XFormsConstants.COMPONENT_SEPARATOR() + XFormsConstants.COMPONENT_SEPARATOR() + "e" + itemIndex
         );
     }
 

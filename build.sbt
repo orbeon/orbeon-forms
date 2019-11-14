@@ -8,10 +8,25 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
-val ScalaJsDomVersion             = "0.9.6"
-val ScalaJsJQueryVersion          = "0.9.2"
+// Scala libraries
+val ScalaJsDomVersion             = "0.9.7"
+val ScalaJsJQueryVersion          = "0.9.5"
+val CirceVersion                  = "0.12.3"
+val EnumeratumVersion             = "1.5.13"
+val EnumeratumCirceVersion        = "1.5.22"
+val ScalaXmlVersion               = "1.2.0"
+val ScalaAsyncVersion             = "0.10.0"
+val ScalaLoggingVersion           = "3.9.2"
+val ScribeVersion                 = "2.7.10"
+val PerfolationVersion            = "1.1.5"
+val Parboiled1Version             = "1.3.1"
+val SprayJsonVersion              = "1.3.5"
+val AutowireVersion               = "0.2.6"
+val SbinaryVersion                = "0.5.0"
+val RosHttpVersion                = "2.1.0"
+
+// Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val CirceVersion                  = "0.11.1"
 val JodaConvertVersion            = "1.2"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
@@ -19,19 +34,16 @@ val Slf4jVersion                  = "1.7.25"
 val HttpComponentsVersion         = "4.3.5"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
-val EnumeratumVersion             = "1.5.13"
-val AutowireVersion               = "0.2.6"
-val ScalaXmlVersion               = "1.1.1"
 val FlyingSaucerVersion           = "9.1.18"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
-  "com.beachape"                %% "enumeratum-circe"               % EnumeratumVersion,
-  "org.parboiled"               %% "parboiled-scala"                % "1.1.8",
-  "org.scala-sbt"               %% "sbinary"                        % "0.5.0",
-  "io.spray"                    %% "spray-json"                     % "1.3.2",
+  "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
+  "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
+  "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
+  "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
-  "com.typesafe.scala-logging"  %% "scala-logging"                  % "3.9.0",
+  "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "joda-time"                   %  "joda-time"                      % "2.1",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
   "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5
@@ -98,7 +110,8 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // "ThisBuild is a Scope encompassing all projects"
-scalaVersion                in ThisBuild := "2.12.8"
+scalaVersion                in ThisBuild := "2.12.10"
+//scalaVersion                in ThisBuild := "2.13.1"
 organization                in ThisBuild := "org.orbeon"
 version                     in ThisBuild := orbeonVersionFromProperties.value
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
@@ -296,8 +309,8 @@ lazy val commonSettings = Seq(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalactic" %%% "scalactic" % "3.0.0" % Test,
-    "org.scalatest" %%% "scalatest" % "3.0.0" % Test
+    "org.scalactic" %%% "scalactic" % "3.0.8" % Test,
+    "org.scalatest" %%% "scalatest" % "3.0.8" % Test
   ),
 
   // This is so that assets added to JAR files are made available to dependent projects.
@@ -371,7 +384,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(
     name := "orbeon-common",
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
-    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumVersion
+    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion
   )
   .jvmSettings(
     (unmanagedJars in Compile) := myFindUnmanagedJars(
@@ -380,11 +393,11 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (includeFilter in unmanagedJars).value,
       (excludeFilter in unmanagedJars).value
     ),
-    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % "provided"
+    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % "0.9.7"        % "provided"
+    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % ScalaAsyncVersion % Provided
   )
 
 lazy val commonJVM = common.jvm
@@ -565,8 +578,8 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     name := "orbeon-xforms",
 
     libraryDependencies += "com.lihaoyi" %%% "autowire"    % AutowireVersion,
-    libraryDependencies += "com.outr"    %%% "scribe"      % "2.7.1",
-    libraryDependencies += "com.outr"    %%% "perfolation" % "1.1.0", // to avoid dependency on `scala-java-locales`
+    libraryDependencies += "com.outr"    %%% "scribe"      % ScribeVersion,
+    libraryDependencies += "com.outr"    %%% "perfolation" % PerfolationVersion, // to avoid dependency on `scala-java-locales`
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -602,7 +615,7 @@ lazy val xformsJS: Project = xforms.js
       "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape" %%% "enumeratum-circe" % EnumeratumVersion
+      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -719,8 +732,8 @@ lazy val orbeonWarJS = orbeonWar.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "fr.hmil"                %%% "roshttp"        % "2.0.2" % Test,
-      "org.scala-lang.modules" %%  "scala-async"    % "0.9.7" % "provided"
+      "fr.hmil"                %%% "roshttp"        % RosHttpVersion    % Test,
+      "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided
     ),
 
     parallelExecution               in Test := false,

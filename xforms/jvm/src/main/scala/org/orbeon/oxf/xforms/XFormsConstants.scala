@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.{util ⇒ ju}
-
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.xforms.EventNames
 
 // Constants useful for the XForms engine.
@@ -35,40 +32,45 @@ object XFormsConstants {
   val SeparateDeploymentTypeJava = DeploymentType.Separate
   val StandaloneDeploymentTypeJava = DeploymentType.Standalone
 
-  val ALLOWED_XXFORMS_ELEMENTS = new ju.HashSet[String]
-  val ALLOWED_EXFORMS_ELEMENTS = new ju.HashSet[String]
-  val ALLOWED_XBL_ELEMENTS = new ju.HashSet[String]
-  val LABEL_HINT_HELP_ALERT_ELEMENT = new ju.HashSet[String]
-
   // TODO: Keeping this static list is not ideal
-  locally {
-    ALLOWED_XXFORMS_ELEMENTS.add("dialog")
-    ALLOWED_XXFORMS_ELEMENTS.add("var")
-    ALLOWED_XXFORMS_ELEMENTS.add("variable")
-    ALLOWED_XXFORMS_ELEMENTS.add("sequence")
-    ALLOWED_XXFORMS_ELEMENTS.add("value")
-    ALLOWED_XXFORMS_ELEMENTS.add("attribute")
-    ALLOWED_XXFORMS_ELEMENTS.add("text")
-    ALLOWED_XXFORMS_ELEMENTS.add("context")
-    ALLOWED_XXFORMS_ELEMENTS.add("size") //xf:upload/xxf:size
-    ALLOWED_XXFORMS_ELEMENTS.add("dynamic")
-    ALLOWED_XXFORMS_ELEMENTS.add("param")
-    ALLOWED_XXFORMS_ELEMENTS.add("body")
+  val AllowedXXFormsElements =
+    Set(
+      "dialog",
+      "var",
+      "variable",
+      "sequence",
+      "value",
+      "attribute",
+      "text",
+      "context",
+      "size", //xf:upload/xxf:size
+      "dynamic",
+      "param",
+      "body"
+    )
 
-    ALLOWED_EXFORMS_ELEMENTS.add("variable")
+  val AllowedEXFormElements =
+    Set(
+      "variable"
+    )
 
-    ALLOWED_XBL_ELEMENTS.add("xbl")
-    ALLOWED_XBL_ELEMENTS.add("binding")
-    ALLOWED_XBL_ELEMENTS.add("handlers")
-    ALLOWED_XBL_ELEMENTS.add("handler") // just for the case of top-level <xbl:handler>
-    ALLOWED_XBL_ELEMENTS.add("implementation")
-    ALLOWED_XBL_ELEMENTS.add("template")
+  val AllowedXBLElements =
+    Set(
+      "xbl",
+      "binding",
+      "handlers",
+      "handler", // just for the case of top-level <xbl:handler>
+      "implementation",
+      "template"
+    )
 
-    LABEL_HINT_HELP_ALERT_ELEMENT.add("label")
-    LABEL_HINT_HELP_ALERT_ELEMENT.add("hint")
-    LABEL_HINT_HELP_ALERT_ELEMENT.add("help")
-    LABEL_HINT_HELP_ALERT_ELEMENT.add("alert")
-  }
+  val LHHAElements =
+    Set(
+      "label",
+      "hint",
+      "help",
+      "alert"
+    )
 
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
@@ -372,8 +374,8 @@ object XFormsConstants {
   val XFORMS_STRING_QNAME = QName("string", XFORMS_NAMESPACE)
   val XFORMS_BASE64BINARY_QNAME = QName("base64Binary", XFORMS_NAMESPACE)
 
-  val XS_STRING_EXPLODED_QNAME = Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME)
-  val XFORMS_STRING_EXPLODED_QNAME = Dom4jUtils.qNameToExplodedQName(XFORMS_STRING_QNAME)
+  val XS_STRING_EXPLODED_QNAME = XMLConstants.XS_STRING_QNAME.clarkName
+  val XFORMS_STRING_EXPLODED_QNAME = XFORMS_STRING_QNAME.clarkName
 
   val XXFORMS_EVENT_MODE_QNAME = QName("events-mode", XXFORMS_NAMESPACE)
   val XXFORMS_VALIDATION_MODE_QNAME = QName("validation-mode", XXFORMS_NAMESPACE)

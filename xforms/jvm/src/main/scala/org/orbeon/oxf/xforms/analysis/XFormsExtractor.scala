@@ -330,19 +330,19 @@ class XFormsExtractor(
 
       // TODO: Just warn?
       if (isXXForms) {
-        if (! ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
+        if (! AllowedXXFormsElements(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
           throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
       } else if (isEXForms) {
-        if (! ALLOWED_EXFORMS_ELEMENTS.contains(localname))
+        if (! AllowedEXFormElements(localname))
           throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", LocationData.createIfPresent(locator))
       } else if (isXBL) {
-        if (! ALLOWED_XBL_ELEMENTS.contains(localname))
+        if (! AllowedXBLElements(localname))
           throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", LocationData.createIfPresent(locator))
       }
 
       // Preserve as is the content of labels, etc., instances, and schemas
       if (! inLHHA) {
-        if (LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname) && isXForms) { // LHHA may contain XHTML
+        if (LHHAElements(localname) && isXForms) { // LHHA may contain XHTML
           inLHHA                       = true
           preserveOrLHHAOrForeignLevel = level
         } else if (

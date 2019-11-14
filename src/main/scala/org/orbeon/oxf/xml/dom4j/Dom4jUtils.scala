@@ -579,6 +579,7 @@ object Dom4jUtils {
     result.getDocument
   }
 
+  // 2019-11-14: Only used by processor/pipeline Java code
   def qNameToExplodedQName(qName: QName): String =
     if (qName eq null) null else qName.clarkName
 

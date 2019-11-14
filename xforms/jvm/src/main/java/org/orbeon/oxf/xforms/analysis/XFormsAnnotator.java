@@ -354,7 +354,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other xf: check for labels, xf:instance, and xs:schema
                 if (stackElement.isXForms()) {
-                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT().contains(localname); // labels, etc. may contain XHTML
+                    inLHHA = XFormsConstants.LHHAElements().contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA || "instance".equals(localname)) {                                  // xf:instance
                         inPreserve = true;
                         preserveLevel = level;
@@ -368,7 +368,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // At the top-level: check for labels and xbl:xbl
                 final boolean isXBLXBL = stackElement.isXBL() && "xbl".equals(localname);
                 if (stackElement.isXForms()) {
-                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT().contains(localname); // labels, etc. may contain XHTML
+                    inLHHA = XFormsConstants.LHHAElements().contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA) {
                         inPreserve = true;
                         preserveLevel = level;

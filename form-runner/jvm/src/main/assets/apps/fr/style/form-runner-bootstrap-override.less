@@ -13,15 +13,17 @@
 @import (reference) "form-runner-common";
 
 body.orbeon {
-  margin: 0;
-  font-family: @baseFontFamily;
-  font-size: @frFontSize;         // Use our own preferred font size
-  line-height: @baseLineHeight;
-  color: @textColor;
-  background-color: @bodyBackground;
+    margin: 0;
+    background-color: @bodyBackground;
 }
 
 .orbeon {
+    font-family: @baseFontFamily;
+    font-size: @frFontSize;         // Use our own preferred font size
+    line-height: @baseLineHeight;
+    color: @textColor;
+    position: relative; // For correct positioning of the date picker
+
     label, button, .btn  {
         font-size: @frLabelSize;
     }

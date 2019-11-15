@@ -67,6 +67,7 @@ private class DateCompanion extends XBLCompanionWithState {
       options.showOnFocus      = false
       options.forceParse       = false
       options.language         = Language.getLang()
+      options.container        = ".orbeon"
       datePicker = inputEl.parent().datepicker(options)
       // Register listeners
       inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ onKeypress(e))
@@ -196,6 +197,7 @@ private object DatePickerFacade {
     var forceParse       : Boolean           = true
     var datesDisabled    : js.Array[js.Date] = _
     var language         : String            = "en"
+    var container        : String            = _
   }
 
   implicit class DatePickerOps(private val datePicker: DatePicker) extends AnyVal {

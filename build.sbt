@@ -144,12 +144,12 @@ lazy val scala213 = "2.13.1"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // "ThisBuild is a Scope encompassing all projects"
-scalaVersion                in ThisBuild := scala212
-organization                in ThisBuild := "org.orbeon"
-version                     in ThisBuild := orbeonVersionFromProperties.value
-orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
-orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
-historyPath                 in ThisBuild := Some((target in LocalRootProject).value / ".history")
+ThisBuild / scalaVersion                := scala212
+ThisBuild / organization                := "org.orbeon"
+ThisBuild / version                     := orbeonVersionFromProperties.value
+ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
+ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
+ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
 
 traceLevel in ThisBuild := 0
 
@@ -266,14 +266,14 @@ def jUnitTestOptions =
   List(
     libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
 
-    testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((baseDirectory in ThisBuild).value): _*),
-    testOptions       in Test          += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
-    testOptions       in Test          += Tests.Filter(s => s.endsWith("Test")),
-    testOptions       in Test          += Tests.Filter(s => s.endsWith("Test") && ! s.contains("ClientTest")),
-    parallelExecution in Test          := false,
-    fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
-    javaOptions       in Test          ++= testJavaOptions((baseDirectory in ThisBuild).value),
-    baseDirectory     in Test          := Path.absolute(baseDirectory.value / "..")
+    Test / testOptions                 += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((ThisBuild / baseDirectory).value): _*),
+    Test / testOptions                 += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
+    Test / testOptions                 += Tests.Filter(s => s.endsWith("Test")),
+    Test / testOptions                 += Tests.Filter(s => s.endsWith("Test") && ! s.contains("ClientTest")),
+    Test / parallelExecution           := false,
+    Test / fork                        := true, // "By default, tests executed in a forked JVM are executed sequentially"
+    Test / javaOptions                 ++= testJavaOptions((ThisBuild / baseDirectory).value),
+    Test / baseDirectory               := Path.absolute(baseDirectory.value / "..")
   )
 
 lazy val DebugTest         = config("debug-test") extend Test
@@ -282,32 +282,32 @@ lazy val DebugDatabaseTest = config("debug-db")   extend Test
 
 lazy val unmanagedJarsSettings = Seq(
 
-  unmanagedBase                      := (baseDirectory in ThisBuild).value / "lib",
+  unmanagedBase                      := (ThisBuild / baseDirectory).value / "lib",
 
-  (unmanagedJars in Runtime)         := myFindUnmanagedJars(
+  (Runtime / unmanagedJars)         := myFindUnmanagedJars(
     Runtime,
     unmanagedBase.value,
-    (includeFilter in unmanagedJars).value,
-    (excludeFilter in unmanagedJars).value
+    (unmanagedJars / includeFilter).value,
+    (unmanagedJars / excludeFilter).value
   ),
 
-  (unmanagedJars in Compile)         := (unmanagedJars in Runtime).value ++ myFindUnmanagedJars(
+  (Compile/ unmanagedJars)         := (Runtime / unmanagedJars).value ++ myFindUnmanagedJars(
     Compile,
     unmanagedBase.value,
-    (includeFilter in unmanagedJars).value,
-    (excludeFilter in unmanagedJars).value
+    (unmanagedJars / includeFilter).value,
+    (unmanagedJars / excludeFilter).value
   ) ++ myFindUnmanagedJars(
     Provided,
     unmanagedBase.value,
-    (includeFilter in unmanagedJars).value,
-    (excludeFilter in unmanagedJars).value
+    (unmanagedJars / includeFilter).value,
+    (unmanagedJars / excludeFilter).value
   ),
 
-  (unmanagedJars in Test)             := (unmanagedJars in Compile).value ++ myFindUnmanagedJars(
+  (Test / unmanagedJars)             := (Compile / unmanagedJars).value ++ myFindUnmanagedJars(
     Test,
     unmanagedBase.value,
-    (includeFilter in unmanagedJars).value,
-    (excludeFilter in unmanagedJars).value
+    (unmanagedJars / includeFilter).value,
+    (unmanagedJars / excludeFilter).value
   )
 )
 
@@ -352,8 +352,8 @@ lazy val commonSettings = Seq(
   // Without this, only classes and resources are made available.
   exportJars := true,
 
-  copyJarToExplodedWar := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains, matchRawJarName = true),
-  copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains, matchRawJarName = true)
+  copyJarToExplodedWar := copyJarFile((Compile / packageBin).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains, matchRawJarName = true),
+  copyJarToLiferayWar  := copyJarFile((Compile / packageBin).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains, matchRawJarName = true)
 ) ++ unmanagedJarsSettings
 
 lazy val commonScalaJvmSettings = Seq(
@@ -366,11 +366,11 @@ lazy val commonScalaJvmSettings = Seq(
 
 lazy val commonScalaJsSettings = Seq(
 
-  skip in packageJSDependencies  := false,
+  packageJSDependencies / skip    := false,
   scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
 
-  scalaJSUseMainModuleInitializer in Compile := true,
-  scalaJSUseMainModuleInitializer in Test    := false,
+  Compile / scalaJSUseMainModuleInitializer := true,
+  Test    / scalaJSUseMainModuleInitializer := false,
 
   scalacOptions ++= {
     if (scalaJSVersion.startsWith("0.6."))
@@ -389,21 +389,21 @@ lazy val assetsSettings = Seq(
   JsEngineKeys.engineType               := JsEngineKeys.EngineType.Node,
 
   // Less
-  includeFilter in (Assets, LessKeys.less) := "*.less",
-  LessKeys.compress in Assets              := false,
+  Assets / LessKeys.less / includeFilter   := "*.less",
+  Assets / LessKeys.compress               := false,
 
   // Uglify
-  pipelineStages             in Assets  := Seq(uglify),
+  Assets / pipelineStages                  := Seq(uglify),
 
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
   // NOTE: The default `excludeFilter in uglify` explicitly excludes files under `resourceDirectory in Assets`.
-  includeFilter              in uglify  := (includeFilter in uglify).value && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
-  excludeFilter              in uglify  := (excludeFilter in uglify).value || HiddenFileFilter || "*-debug.js",
-  UglifyKeys.compressOptions            := Seq("warnings=false"),
+  uglify / includeFilter                   := (uglify / includeFilter).value && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
+  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js", // || ((baseDirectory).value / "src" ** "codemirror-*" / "bin"),
+  uglifyCompressOptions                    := Seq("warnings=false"),
 
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
   // Also filter out a few things.
-  WebKeys.exportedMappings   in Assets := {
+  Assets / WebKeys.exportedMappings        := {
 
     val FullWebJarPrefix = s"${org.webjars.WebJarAssetLocator.WEBJARS_PATH_PREFIX}/${moduleName.value}/${version.value}/"
 
@@ -415,7 +415,7 @@ lazy val assetsSettings = Seq(
       ext != "" && ext != "less" && path.startsWith(FullWebJarPrefix)
     }
 
-    (WebKeys.exportedMappings in Assets).value collect {
+    (Assets / WebKeys.exportedMappings).value collect {
       case (file, path) if includePath(path) => file -> path.substring(FullWebJarPrefix.length)
     }
   }
@@ -435,11 +435,11 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   )
   .jvmSettings(commonScalaJvmSettings)
   .jvmSettings(
-    (unmanagedJars in Compile) := myFindUnmanagedJars(
+    (Compile / unmanagedJars) := myFindUnmanagedJars(
       Runtime,
       unmanagedBase.value,
-      (includeFilter in unmanagedJars).value,
-      (excludeFilter in unmanagedJars).value
+      (unmanagedJars / includeFilter).value,
+      (unmanagedJars / excludeFilter).value
     ),
     libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided,
     libraryDependencies += "org.slf4j"              %  "slf4j-api"     % Slf4jVersion,
@@ -534,11 +534,11 @@ lazy val formRunnerJVM = formRunner.jvm
   .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(
-    sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
-    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
+    DebugTest / sourceDirectory         := (Test / sourceDirectory).value,
+    DebugTest / javaOptions             += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
 
-    sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
-    javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+    DebugDatabaseTest / sourceDirectory := (DatabaseTest / sourceDirectory).value,
+    DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
@@ -553,7 +553,7 @@ lazy val formRunnerJVM = formRunner.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formRunnerJS).value.data, FormRunnerResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerJS / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar)
   )
 
 lazy val formRunnerJS = formRunner.js
@@ -574,20 +574,20 @@ lazy val formRunnerJS = formRunner.js
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
     // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
-    unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
+    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsJS/ baseDirectory).value),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fastOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fastOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
       FormRunnerResourcesPathInWar
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fullOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fullOptJS).value.data,
+      (ThisBuild/ baseDirectory).value,
       FormRunnerResourcesPathInWar
     )
   )
@@ -612,7 +612,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data, FormBuilderResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fullOptJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
@@ -632,19 +632,19 @@ lazy val formBuilderJS = formBuilder.js
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    Test / jsDependencies += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
-    test in Test := {},
+    Test / test := {},
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fastOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fastOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
       FormBuilderResourcesPathInWar
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fullOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fullOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
       FormBuilderResourcesPathInWar
     )
   )
@@ -680,11 +680,11 @@ lazy val xformsJVM = xforms.jvm
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided,
 
     // Because `Assets` doesn't check the `shared` directory
-    unmanagedResourceDirectories in Assets += sharedAssetsDir(baseDirectory.value),
+    Assets / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in xformsJS).value.data, XFormsResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsJS/ Compile / fullOptJS).value.data, XFormsResourcesPathInWar)
   )
 
 lazy val xformsJS = xforms.js
@@ -704,21 +704,21 @@ lazy val xformsJS = xforms.js
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
-    unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),
+    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
 
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
 //    jsEnv                         := NodeJSEnv().value,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fastOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fastOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
       XFormsResourcesPathInWar
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (fullOptJS in Compile).value.data,
-      (baseDirectory in ThisBuild).value,
+      (Compile / fullOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
       XFormsResourcesPathInWar
     )
   )
@@ -770,9 +770,9 @@ lazy val nodeFacades = (project in file("node-facades"))
   .settings(
     name := "orbeon-node-facades",
 
-    parallelExecution               in Test := false,
-    scalaJSUseMainModuleInitializer in Test := false,
-    jsEnv                           in Test := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+    Test / parallelExecution                := false,
+    Test / scalaJSUseMainModuleInitializer  := false,
+    Test / jsEnv                            := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
 
     scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
   )
@@ -837,11 +837,12 @@ lazy val core = (project in file("src"))
 
     crossScalaVersions                 := Nil,
     defaultConfiguration               := Some(Compile),
-    sourceDirectory in ThisProject     := baseDirectory.value // until we have a more standard layout
+
+    ThisProject / sourceDirectory      := baseDirectory.value // until we have a more standard layout
   )
   .settings(jUnitTestOptions: _*)
   .settings(
-    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
+    DebugTest / javaOptions            += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
     libraryDependencies                ++= CoreLibraryDependencies
   )
 
@@ -885,7 +886,7 @@ lazy val orbeonWarJS = orbeonWar.js
     buildInfoPackage               := "org.orbeon.fr",
     buildInfoObject                := "TestParametersFromSbt",
     buildInfoKeys                  := Seq[BuildInfoKey](
-      "baseDirectory" -> (baseDirectory  in ThisBuild).value.getAbsolutePath
+      "baseDirectory" -> (ThisBuild / baseDirectory).value.getAbsolutePath
     ),
 
     libraryDependencies            ++= Seq(
@@ -895,13 +896,15 @@ lazy val orbeonWarJS = orbeonWar.js
       "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided
     ),
 
-    parallelExecution               in Test := false,
-    scalaJSUseMainModuleInitializer in Test := false,
-    jsEnv                           in Test := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+    Test / parallelExecution                := false,
+    Test / scalaJSUseMainModuleInitializer  := false,
+    Test / jsEnv                            := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
     scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
 
-    testOptions                     in Test +=
-      Tests.Setup(() => OrbeonSupport.dummyDependency((Keys.`package` in orbeonWarJVM).value))
+    Test / testOptions                      += {
+      val packageFile = (orbeonWarJVM / Keys.`package`).value
+      Tests.Setup(() => OrbeonSupport.dummyDependency(packageFile))
+    }
   )
 
 
@@ -926,7 +929,7 @@ lazy val root = (project in file("."))
   )
   .settings(
     // TEMP: override so that root project doesn't search under src
-    sourceDirectory in ThisProject     := baseDirectory.value / "root", // until we have a more standard layout
-    publishArtifact                    := false,
-    crossScalaVersions                 := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
+    ThisProject / sourceDirectory := baseDirectory.value / "root", // until we have a more standard layout
+    publishArtifact               := false,
+    crossScalaVersions            := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
   )

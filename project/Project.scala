@@ -1,9 +1,27 @@
 package org.orbeon.sbt
 
-import sbt.FileFunction.cached
 import sbt.FilesInfo.{exists, lastModified}
 import sbt.Keys._
-import sbt._
+import sbt.{Def, _}
+
+object Compat {
+
+  import sbt._
+  import sbt.Keys._
+  import sbt.util.CacheStoreFactory
+  import sbt.util.FileInfo.Style
+  import sbt.util.FileFunction.UpdateFunction
+  import OrbeonWebappPlugin.autoImport.webappPrepare
+  import sbt.util.CacheImplicits._
+
+  def cached(storeFactory: CacheStoreFactory, inStyle: Style, outStyle: Style)(action: UpdateFunction): Set[File] => Set[File] =
+    FileFunction.cached(
+      storeFactory = storeFactory,
+      inStyle      = inStyle,
+      outStyle     = outStyle)(
+      action       = action
+    )
+}
 
 object OrbeonSupport {
 
@@ -55,7 +73,7 @@ object OrbeonSupport {
           ! excludes(sourceJarName)                    &&
           (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
         println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
-        IO.copy(List(sourceJarFile -> targetJarFile), overwrite = false, preserveLastModified = false)
+        IO.copy(List(sourceJarFile -> targetJarFile), overwrite = false, preserveLastModified = false, preserveExecutable = true)
         Some(targetJarFile)
       } else {
         None
@@ -69,9 +87,13 @@ object OrbeonWebappPlugin {
 
   import OrbeonSupport._
 
-  lazy val webappPrepare       = taskKey[Seq[(File, String)]]("prepare webapp contents for packaging")
-  lazy val webappPostProcess   = taskKey[File => Unit]("additional task after preparing the webapp")
-  lazy val webappWebInfClasses = settingKey[Boolean]("use WEB-INF/classes instead of WEB-INF/lib")
+  object autoImport {
+    lazy val webappPrepare       = taskKey[Seq[(File, String)]]("prepare webapp contents for packaging")
+    lazy val webappPostProcess   = taskKey[File => Unit]("additional task after preparing the webapp")
+    lazy val webappWebInfClasses = settingKey[Boolean]("use WEB-INF/classes instead of WEB-INF/lib")
+  }
+
+  import autoImport._
 
   def projectSettings: Seq[Setting[_]] =
     Seq(
@@ -80,14 +102,14 @@ object OrbeonWebappPlugin {
       webappPrepare                    := webappPrepareTask.value,
       webappPostProcess                := { _ => () },
       webappWebInfClasses              := false,
-      watchSources                     ++= ((sourceDirectory in webappPrepare).value ** "*").get
+      watchSources ++= ((sourceDirectory in webappPrepare).value ** "*").get
     ) ++
       Defaults.packageTaskSettings(Keys.`package`, webappPrepare)
 
-  private def webappPrepareTask = Def.task {
+  private def webappPrepareTask: Def.Initialize[Task[Seq[(File, String)]]] = Def.task {
 
     def cacheify(name: String, dest: File => Option[File], in: Set[File]): Set[File] =
-      cached(streams.value.cacheDirectory / "xsbt-orbeon-web-plugin" / name)(lastModified, exists)({
+      Compat.cached(streams.value.cacheStoreFactory /  "xsbt-orbeon-web-plugin" / name, lastModified, exists)({
         (inChanges, outChanges) =>
           // toss out removed files
           for {
@@ -109,26 +131,22 @@ object OrbeonWebappPlugin {
     val webappSrcDir = (sourceDirectory in webappPrepare).value
     val webappTarget = (target in webappPrepare).value
 
-    val isDevelopmentMode = webappSrcDir.getAbsolutePath.equals(webappTarget.getAbsolutePath)
-
     val classpath    = (fullClasspath in Runtime).value
     val webInfDir    = webappTarget / "WEB-INF"
     val webappLibDir = webInfDir / "lib"
 
-    if (! isDevelopmentMode) {
-      cacheify(
-        "webapp",
-        { in =>
-          for {
-            f <- Some(in)
-            if !f.isDirectory
-            r <- IO.relativizeFile(webappSrcDir, f)
-          } yield
-            IO.resolve(webappTarget, r)
-        },
-        (webappSrcDir ** "*").get.toSet
-      )
-    }
+    cacheify(
+      "webapp",
+      { in =>
+        for {
+          f <- Some(in)
+          if ! f.isDirectory
+          r <- IO.relativizeFile(webappSrcDir, f)
+        } yield
+          IO.resolve(webappTarget, r)
+      },
+      (webappSrcDir ** "*").get.toSet
+    )
 
     val thisArtifact = (packagedArtifact in (Compile, packageBin)).value._1
 
@@ -180,13 +198,9 @@ object OrbeonWebappPlugin {
       notCompiled.map(_._1.data).to[Set] -- providedJars
     )
 
-    if (isDevelopmentMode) {
-      streams.value.log.info("starting server in development mode, postProcess not available!")
-    } else {
-      webappPostProcess.value(webappTarget)
-    }
+    webappPostProcess.value(webappTarget)
 
-    (webappTarget ** "*") pair (relativeTo(webappTarget) | flat)
+    (webappTarget ** "*") pair (Path.relativeTo(webappTarget) | Path.flat)
   }
 
 }

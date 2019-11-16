@@ -350,7 +350,6 @@ lazy val assetsSettings = Seq(
   LessKeys.compress in Assets              := false,
 
   // Uglify
-  // NOTE: `sbt-coffeescript` is not `pipelineStages`-aware.
   pipelineStages             in Assets  := Seq(uglify),
 
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
@@ -523,7 +522,7 @@ lazy val formBuilder = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTyp
   )
 
 lazy val formBuilderJVM = formBuilder.jvm
-  .enablePlugins(SbtCoffeeScript, SbtWeb)
+  .enablePlugins(SbtWeb)
   .dependsOn(
     commonJVM,
     formRunnerJVM % "test->test;compile->compile",
@@ -661,7 +660,7 @@ lazy val nodeFacades = (project in file("node-facades"))
   )
 
 lazy val core = (project in file("src"))
-  .enablePlugins(BuildInfoPlugin, SbtCoffeeScript, SbtWeb)
+  .enablePlugins(BuildInfoPlugin, SbtWeb)
   .dependsOn(commonJVM, dom.jvm)
   .configs(DebugTest)
   .settings(commonSettings: _*)

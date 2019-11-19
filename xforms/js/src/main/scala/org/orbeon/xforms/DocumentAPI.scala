@@ -74,9 +74,6 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
   // These are used in `AjaxServer`
   val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", false)
   val showProgress: Boolean = checkArg[Boolean]("showProgress", true)
-
-  // 2019-11-18: Wondering what this is for! This is not used in our code or in the doc. Remove?
-  AjaxServer.eventCreated.fire(this)
 }
 
 @JSExportTopLevel("ORBEON.xforms.Document")

@@ -65,7 +65,6 @@ object Init extends InitTrait
 @js.native
 trait AjaxServerTrait extends js.Object {
   def handleResponseAjax(o: XMLHttpRequest)                               : Unit           = js.native
-  def eventCreated                                                        : JQueryCallback = js.native
   def beforeSendingEvent                                                  : JQueryCallback = js.native
   def ajaxResponseReceived                                                : JQueryCallback = js.native
   def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native

@@ -13,7 +13,8 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.YUICustomEvent
+import org.orbeon.xforms.{AjaxServerEvent, YUICustomEvent}
+import org.scalajs.dom
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
 import org.scalajs.jquery.JQueryCallback
@@ -63,10 +64,11 @@ object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {
-  def handleResponseAjax(o: XMLHttpRequest)                                : Unit           = js.native
-  def beforeSendingEvent                                                   : JQueryCallback = js.native
-  def ajaxResponseReceived                                                 : JQueryCallback = js.native
-  def fireEvents(events: js.Array[AjaxServer.Event], incremental: Boolean) : Unit           = js.native
+  def handleResponseAjax(o: XMLHttpRequest)                               : Unit           = js.native
+  def eventCreated                                                        : JQueryCallback = js.native
+  def beforeSendingEvent                                                  : JQueryCallback = js.native
+  def ajaxResponseReceived                                                : JQueryCallback = js.native
+  def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native
 
   def createDelayedServerEvent(
     serverEvents : String,
@@ -79,10 +81,7 @@ trait AjaxServerTrait extends js.Object {
 
 @js.native
 @JSGlobal("ORBEON.xforms.server.AjaxServer")
-object AjaxServer extends AjaxServerTrait {
-  @js.native
-  class Event(args: js.Any*) extends js.Object
-}
+object AjaxServer extends AjaxServerTrait
 
 object AjaxServerOps {
 
@@ -179,9 +178,10 @@ object XBL extends js.Object {
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
-  def setCurrentValue(control: html.Element, newControlValue: String) : Unit               = js.native
-  def getCurrentValue(elem: html.Element)                             : js.UndefOr[String] = js.native
-  def setFocus(controlId: String)                                     : Unit               = js.native
+  def setCurrentValue(control: html.Element, newControlValue: String): Unit                  = js.native
+  def getCurrentValue(elem: html.Element)                            : js.UndefOr[String]    = js.native
+  def setFocus(controlId: String)                                    : Unit                  = js.native
+  def getForm(control: dom.Element)                                  : js.UndefOr[html.Form] = js.native
 }
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object

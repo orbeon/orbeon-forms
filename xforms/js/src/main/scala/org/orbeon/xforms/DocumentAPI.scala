@@ -22,13 +22,70 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
 
+
+private object AjaxServerEvent {
+  val ParamNames = List("form", "targetId", "value", "eventName", "bubbles", "cancelable", "ignoreErrors", "showProgress")
+}
+
+@JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
+class AjaxServerEvent(args: js.Any*) extends js.Object {
+
+  require(args.nonEmpty)
+
+  // Normalize parameters:
+  //
+  // - The "older" version had "n" parameters.
+  // - The "newer" version had a single parameter which is an object.
+  //
+  private val argsDict =
+    if (args.length > 1)
+      js.Dictionary(AjaxServerEvent.ParamNames.zip(args): _*)
+    else
+      args.head.asInstanceOf[js.Dictionary[js.Any]]
+
+  import scala.reflect.ClassTag
+
+  private def checkT[T: ClassTag](v: Any): Option[T] = v match { case t: T ⇒ Some(t); case _ ⇒ None }
+
+  private def checkArg[T: ClassTag](name: String, default: ⇒ T): T =
+    argsDict.get(name).flatMap(checkT[T](_)).getOrElse(default)
+
+  val targetId : String = checkArg[String]("targetId",  throw new IllegalArgumentException("targetId"))
+  val eventName: String = checkArg[String]("eventName", throw new IllegalArgumentException("eventName"))
+
+  val form: html.Form =
+    checkArg[html.Form](
+      "form",
+      Option(dom.document.getElementById(targetId)) flatMap
+        (e ⇒ Controls.getForm(e).toOption)          getOrElse
+        (throw new IllegalArgumentException("form"))
+    )
+
+  val properties: js.Object = checkArg[js.Object]("properties", new js.Object)
+
+  // 2019-11-18: unclear if these are used
+  val bubbles   : Boolean = checkArg[Boolean]("bubbles", true)
+  val cancelable: Boolean = checkArg[Boolean]("cancelable", true)
+  val incremental: Boolean = checkArg[Boolean]("incremental", false)
+
+  // 2019-11-18: One caller passes `value`, which is not documented. Shouldn't be part of this API. Fix this.
+  val value: String = checkArg[String]("value", null)
+
+  // These are used in `AjaxServer`
+  val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", false)
+  val showProgress: Boolean = checkArg[Boolean]("showProgress", true)
+
+  // 2019-11-18: Wondering what this is for! This is not used in our code or in the doc. Remove?
+  AjaxServer.eventCreated.fire(this)
+}
+
 @JSExportTopLevel("ORBEON.xforms.Document")
 object DocumentAPI {
 
   import Private._
 
   // Dispatch an event
-  // NOTE: This doesn't support all parameters.
+  // NOTE: This doesn"t support all parameters.
   // Which should be deprecated, this or the other `dispatchEvent()`?
   @JSExport
   def dispatchEvent(
@@ -76,7 +133,7 @@ object DocumentAPI {
     eventDynamic.targetId = adjustedTargetId
 
     AjaxServer.fireEvents(
-      js.Array(new AjaxServer.Event(eventDynamic)),
+      js.Array(new AjaxServerEvent(eventDynamic)),
       incremental = eventDynamic.incremental.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
     )
   }
@@ -110,7 +167,7 @@ object DocumentAPI {
     Controls.setCurrentValue(control, newStringValue)
 
     // And also fire server event
-    val event = new AjaxServer.Event(
+    val event = new AjaxServerEvent(
       new js.Object {
         val targetId  = control.id
         val eventName = "xxforms-value"

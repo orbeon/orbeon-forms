@@ -55,7 +55,7 @@ object UploaderClient {
       currentEventOpt foreach { processingEvent ⇒
         AjaxServer.fireEvents(
           js.Array(
-            new AjaxServer.Event(
+            new AjaxServerEvent(
               new js.Object {
                 val targetId     = processingEvent.upload.container.id
                 val eventName    = EventNames.XXFormsUploadProgress
@@ -82,7 +82,7 @@ object UploaderClient {
 
       AjaxServer.fireEvents(
         js.Array(
-          new AjaxServer.Event(
+          new AjaxServerEvent(
             new js.Object {
               val targetId  = processingEvent.upload.container.id
               val eventName = event
@@ -154,7 +154,7 @@ object UploaderClient {
         // Tell server we're starting uploads
         AjaxServer.fireEvents(
           js.Array(
-            new AjaxServer.Event(
+            new AjaxServerEvent(
               new js.Object {
                 val targetId     = currentEvent.upload.container.id
                 val eventName    = EventNames.XXFormsUploadStart

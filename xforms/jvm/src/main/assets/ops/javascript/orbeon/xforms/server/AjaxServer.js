@@ -130,6 +130,7 @@
         });
     };
 
+    AjaxServer.eventCreated = $.Callbacks();
     AjaxServer.beforeSendingEvent = $.Callbacks();
     AjaxServer.ajaxResponseReceived = $.Callbacks();
 

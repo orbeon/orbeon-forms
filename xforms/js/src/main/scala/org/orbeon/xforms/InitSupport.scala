@@ -171,7 +171,7 @@ object InitSupport {
             uuid
           case StateResult.Restore(uuid) ⇒
             AjaxServer.fireEvents(
-              events      = js.Array(new AjaxServer.Event(formElem, null, null, EventNames.XXFormsAllEventsRequired)),
+              events      = js.Array(new AjaxServerEvent(formElem, null, null, EventNames.XXFormsAllEventsRequired)),
               incremental = false
             )
             uuid

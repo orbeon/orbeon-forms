@@ -22,5 +22,20 @@ import scala.scalajs.js
 object Support {
 
   def formElemOrDefaultForm(formElem: js.UndefOr[html.Form]): html.Form =
-    formElem getOrElse $(dom.document.forms).filter(".xforms-form")(0).asInstanceOf[html.Form]
+    formElem getOrElse getFirstForm
+
+  def getFirstForm: html.Form =
+    $(dom.document.forms).filter(".xforms-form")(0).asInstanceOf[html.Form]
+
+  def adjustIdNamespace(
+    formElem : js.UndefOr[html.Form],
+    targetId : String
+  ): (html.Element, String) = {
+
+    val form   = Support.formElemOrDefaultForm(formElem)
+    val formId = form.id
+
+    // See comment on `namespaceIdIfNeeded`
+    form → Page.namespaceIdIfNeeded(formId, targetId)
+  }
 }

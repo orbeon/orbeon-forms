@@ -24,6 +24,13 @@ object EventNames {
   val XXFormsUploadError       = Prefix + "error"
 
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
+  val XXFormsServerEvents      = "xxforms-server-events"
+  val XXFormsValue             = "xxforms-value"
+  val XXFormsRpcRequest        = "xxforms-rpc-request"
+  val XXFormsDnD               = "xxforms-dnd"
+
+  val XFormsFocus              = "xforms-focus"
+
   val Change                   = "change"
   val KeyPress                 = "keypress"
   val KeyDown                  = "keydown"
@@ -32,6 +39,7 @@ object EventNames {
   val FocusIn                  = "focusin"
   val FocusOut                 = "focusout"
   val DOMContentLoaded         = "DOMContentLoaded"
+  val DOMActivate              = "DOMActivate"
 
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"

@@ -13,15 +13,13 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.xforms
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI}
-import org.scalajs.jquery.JQuery
+import org.orbeon.xforms.{$, AjaxServerEvent}
 import org.scalajs.dom.document
+import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
-
 object WPaint {
 
   XBL.declareCompanion(
@@ -95,11 +93,13 @@ object WPaint {
       // Send the image data from wPaint to the server, which will put it in <annotation>
       private def sendAnnotationToServer(): Unit = {
         val annotationImgData = wpaintElC.asInstanceOf[Dynamic].wPaint("image")
-        DocumentAPI.dispatchEvent(new js.Object {
-          val targetId = containerElem.id
-          val eventName = "fr-update-annotation"
-          val properties = new js.Object { val value = annotationImgData }
-        })
+        AjaxServerEvent.dispatchEvent(
+          AjaxServerEvent(
+            eventName  = "fr-update-annotation",
+            targetId   = containerElem.id,
+            properties = Map("value" → annotationImgData.toString)
+          )
+        )
       }
     }
   )

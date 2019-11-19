@@ -18,7 +18,7 @@ import enumeratum._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.facade.Utils
-import org.orbeon.xforms.{$, DocumentAPI}
+import org.orbeon.xforms.{$, AjaxServerEvent}
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
@@ -157,10 +157,12 @@ trait GridSectionMenus {
   }
 
   def dispatchActionEvent(op: Operation, currentComponentId: String, currentIteration: Int): Unit =
-    DocumentAPI.dispatchEvent(
-      targetId   = currentComponentId,
-      eventName  = s"fr-${op.entryName}",
-      properties = js.Dictionary("row" → currentIteration.toString)
+    AjaxServerEvent.dispatchEvent(
+      AjaxServerEvent(
+        eventName  = s"fr-${op.entryName}",
+        targetId   = currentComponentId,
+        properties = Map("row" → currentIteration.toString)
+      )
     )
 
   private object Util {

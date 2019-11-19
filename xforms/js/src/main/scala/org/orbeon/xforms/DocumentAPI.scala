@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import io.circe.generic.auto._
-import org.orbeon.xforms.facade.{AjaxServer, Controls}
+import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -22,117 +22,49 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
 
-
-private object AjaxServerEvent {
-  val ParamNames = List("form", "targetId", "value", "eventName", "bubbles", "cancelable", "ignoreErrors", "showProgress")
-}
-
-@JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
-class AjaxServerEvent(args: js.Any*) extends js.Object {
-
-  require(args.nonEmpty)
-
-  // Normalize parameters:
-  //
-  // - The "older" version had "n" parameters.
-  // - The "newer" version had a single parameter which is an object.
-  //
-  private val argsDict =
-    if (args.length > 1)
-      js.Dictionary(AjaxServerEvent.ParamNames.zip(args): _*)
-    else
-      args.head.asInstanceOf[js.Dictionary[js.Any]]
-
-  import scala.reflect.ClassTag
-
-  private def checkT[T: ClassTag](v: Any): Option[T] = v match { case t: T ⇒ Some(t); case _ ⇒ None }
-
-  private def checkArg[T: ClassTag](name: String, default: ⇒ T): T =
-    argsDict.get(name).flatMap(checkT[T](_)).getOrElse(default)
-
-  val targetId : String = checkArg[String]("targetId",  throw new IllegalArgumentException("targetId"))
-  val eventName: String = checkArg[String]("eventName", throw new IllegalArgumentException("eventName"))
-
-  val form: html.Form =
-    checkArg[html.Form](
-      "form",
-      Option(dom.document.getElementById(targetId)) flatMap
-        (e ⇒ Controls.getForm(e).toOption)          getOrElse
-        (throw new IllegalArgumentException("form"))
-    )
-
-  val properties: js.Object = checkArg[js.Object]("properties", new js.Object)
-
-  // 2019-11-18: unclear if these are used
-  val bubbles   : Boolean = checkArg[Boolean]("bubbles", true)
-  val cancelable: Boolean = checkArg[Boolean]("cancelable", true)
-  val incremental: Boolean = checkArg[Boolean]("incremental", false)
-
-  // 2019-11-18: One caller passes `value`, which is not documented. Shouldn't be part of this API. Fix this.
-  val value: String = checkArg[String]("value", null)
-
-  // These are used in `AjaxServer`
-  val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", false)
-  val showProgress: Boolean = checkArg[Boolean]("showProgress", true)
-}
-
 @JSExportTopLevel("ORBEON.xforms.Document")
 object DocumentAPI {
 
   import Private._
 
+  // Dispatch an event defined by the properties on a JavaScript object
+  // This is the method we document officially as of 2015-10 for JavaScript callers.
+  // Q: Can we type `eventObject`?
+  @JSExport
+  def dispatchEvent(eventObject: js.Dictionary[js.Any]): Unit =
+    AjaxServerEvent.dispatchEvent(new AjaxServerEvent(eventObject))
+
   // Dispatch an event
-  // NOTE: This doesn"t support all parameters.
-  // Which should be deprecated, this or the other `dispatchEvent()`?
+  // We do NOT document this as of 2015-10 for JavaScript callers. This should be
+  // considered a backward compatibility method for older JavaScript code. It doesn't
+  // support all the parameters.
+  @deprecated("use `dispatchEvent(eventObject: js.Object)` instead", "Orbeon Forms 2016.1")
   @JSExport
   def dispatchEvent(
     targetId     : String,
     eventName    : String,
-    formElem     : js.UndefOr[html.Element]          = js.undefined,
+    formElem     : js.UndefOr[html.Form]             = js.undefined,
     bubbles      : js.UndefOr[Boolean]               = js.undefined,
     cancelable   : js.UndefOr[Boolean]               = js.undefined,
     incremental  : js.UndefOr[Boolean]               = js.undefined,
     ignoreErrors : js.UndefOr[Boolean]               = js.undefined,
-    properties   : js.UndefOr[js.Dictionary[String]] = js.undefined
+    properties   : js.UndefOr[js.Dictionary[js.Any]] = js.undefined
   ): Unit = {
 
-    val eventObject  = new js.Object
-    val eventDynamic = eventObject.asInstanceOf[js.Dynamic]
+    // `targetId` can be null for `xxforms-all-events-required` and `xxforms-server-events`
+    require(eventName ne null)
 
-    eventDynamic.targetId  = targetId
-    eventDynamic.eventName = eventName
+    val eventObject  = js.Dictionary.empty[js.Any]
 
-    formElem     foreach (eventDynamic.form         = _)
-    bubbles      foreach (eventDynamic.bubbles      = _)
-    cancelable   foreach (eventDynamic.cancelable   = _)
-    incremental  foreach (eventDynamic.incremental  = _)
-    ignoreErrors foreach (eventDynamic.ignoreErrors = _)
-    properties   foreach (eventDynamic.properties   = _)
+    eventObject += "eventName" → eventName
+    eventObject += "targetId"  → targetId
+
+    formElem     foreach (v ⇒ eventObject += "form"         → v)
+    incremental  foreach (v ⇒ eventObject += "incremental"  → v)
+    ignoreErrors foreach (v ⇒ eventObject += "ignoreErrors" → v)
+    properties   foreach (v ⇒ eventObject += "properties"   → v)
 
     dispatchEvent(eventObject)
-  }
-
-  // Dispatch an event defined by an object
-  // NOTE: Use the first XForms form on the page when no form is provided.
-  // TODO: Can we type `eventObject`?
-  @JSExport
-  def dispatchEvent(eventObject: js.Object): Unit = {
-
-    val eventDynamic = eventObject.asInstanceOf[js.Dynamic]
-
-    val (resolvedForm, adjustedTargetId) =
-      adjustIdNamespace(
-        eventDynamic.form.asInstanceOf[html.Form],
-        eventDynamic.targetId.asInstanceOf[String]
-      )
-
-    eventDynamic.form     = resolvedForm
-    eventDynamic.targetId = adjustedTargetId
-
-    AjaxServer.fireEvents(
-      js.Array(new AjaxServerEvent(eventDynamic)),
-      incremental = eventDynamic.incremental.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
-    )
   }
 
   // Return the value of an XForms control
@@ -164,15 +96,13 @@ object DocumentAPI {
     Controls.setCurrentValue(control, newStringValue)
 
     // And also fire server event
-    val event = new AjaxServerEvent(
-      new js.Object {
-        val targetId  = control.id
-        val eventName = "xxforms-value"
-        val value     = newStringValue
-      }
+    AjaxServerEvent.dispatchEvent(
+      AjaxServerEvent(
+        eventName  = EventNames.XXFormsValue,
+        targetId   = control.id,
+        properties = Map("value" → newStringValue)
+      )
     )
-
-    AjaxServer.fireEvents(js.Array(event), incremental = false)
   }
 
   @JSExport
@@ -184,22 +114,15 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     Controls.setFocus(control.id)
-    dispatchEvent(targetId = control.id, eventName = "xforms-focus")
+    AjaxServerEvent.dispatchEvent(
+      AjaxServerEvent(
+        eventName = EventNames.XFormsFocus,
+        targetId  = control.id
+      )
+    )
   }
 
   private object Private {
-
-    def adjustIdNamespace(
-      formElem : js.UndefOr[html.Form],
-      targetId : String
-    ): (html.Element, String) = {
-
-      val form   = Support.formElemOrDefaultForm(formElem)
-      val formId = form.id
-
-      // See comment on `namespaceIdIfNeeded`
-      form → Page.namespaceIdIfNeeded(formId, targetId)
-    }
 
     def findControlOrThrow(
       controlIdOrElem : String | html.Element,
@@ -209,7 +132,7 @@ object DocumentAPI {
       val (resolvedControlId, resolvedControlOpt) =
         (controlIdOrElem: Any) match {
           case givenControlId: String ⇒
-            givenControlId → Option(dom.document.getElementById(adjustIdNamespace(formElem, givenControlId)._2))
+            givenControlId → Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
           case givenElement: html.Element ⇒
             givenElement.id → Some(givenElement)
         }

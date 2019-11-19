@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
-import org.orbeon.xforms.{$, DocumentAPI, Support, XFormsId}
+import org.orbeon.xforms.{$, AjaxServerEvent, Support, XFormsId}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -49,16 +49,20 @@ object FormRunnerWizardAPI {
   def focus(
     controlName   : String,
     repeatIndexes : js.UndefOr[js.Array[Int]] = js.undefined
-  ): Unit =
-    DocumentAPI.dispatchEvent(new js.Object {
+  ): Unit = {
 
-      val targetId  = "fr-view-component"
-      val eventName = "fr-wizard-focus"
+    // Separate variable due to type inference fail when put inline below
+    val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
 
-      val properties = new js.Object {
-        val `fr-control-name`  : String = controlName
-        val `fr-repeat-indexes`: String = repeatIndexes map (_.mkString(" ")) getOrElse ""
-      }
-    })
-
+    AjaxServerEvent.dispatchEvent(
+      AjaxServerEvent(
+        eventName  = "fr-wizard-focus",
+        targetId   = "fr-view-component",
+        properties = Map(
+          "fr-control-name"   → controlName,
+          "fr-repeat-indexes" → indexesString
+        )
+      )
+    )
+  }
 }

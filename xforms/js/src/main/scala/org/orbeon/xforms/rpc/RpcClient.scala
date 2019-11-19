@@ -15,10 +15,9 @@ package org.orbeon.xforms.rpc
 
 import io.circe.parser._
 import io.circe.{Decoder, Encoder, Json}
-import org.orbeon.xforms.{Constants, DocumentAPI}
+import org.orbeon.xforms.{AjaxServerEvent, Constants, EventNames}
 
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.js
 import scala.scalajs.js.URIUtils
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
@@ -41,13 +40,15 @@ object RpcClient
     lastSequenceNumber += 1
     val id = lastSequenceNumber
 
-    DocumentAPI.dispatchEvent(
-      targetId   = Constants.DocumentId,
-      eventName  = "xxforms-rpc-request",
-      properties = js.Dictionary(
-        "id"   → id.toString,
-        "path" → pathValue,
-        "args" → argsValue
+    AjaxServerEvent.dispatchEvent(
+      AjaxServerEvent(
+        eventName  = EventNames.XXFormsRpcRequest,
+        targetId   = Constants.DocumentId,
+        properties = Map(
+          "id"   → id,
+          "path" → pathValue,
+          "args" → argsValue
+        )
       )
     )
 

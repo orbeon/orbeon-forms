@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.xforms.EventNames
 
 trait IndexableBinding {
   def selectors        : List[Selector]
@@ -117,7 +118,7 @@ case class AbstractBinding(
   val allowedExternalEvents: Set[String] =
     attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
     (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
-    (if (modeExternalValue) List(XXFORMS_VALUE) else Nil)
+    (if (modeExternalValue) List(EventNames.XXFormsValue) else Nil)
 
   // Constant instance DocumentInfo by model and instance index
   // We use the indexes because at this time, no id annotation has taken place yet

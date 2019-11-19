@@ -135,7 +135,7 @@ class XFormsRepeatControl(
 
   def doDnD(dndEvent: XXFormsDndEvent): Unit = {
 
-    require(staticControl.isDnD, s"attempt to process `xxforms-dnd` event on non-DnD-enabled control `$effectiveId`")
+    require(staticControl.isDnD, s"attempt to process `${dndEvent.name}` event on non-DnD-enabled control `$effectiveId`")
 
     // Get all repeat iteration details
     val dndStart = dndEvent.getDndStart.splitTo[List]("-")

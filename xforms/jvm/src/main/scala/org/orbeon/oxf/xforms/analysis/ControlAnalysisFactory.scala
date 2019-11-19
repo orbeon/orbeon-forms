@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.expr.StringLiteral
+import org.orbeon.xforms.EventNames
 
 object ControlAnalysisFactory {
 
@@ -31,7 +32,7 @@ object ControlAnalysisFactory {
   type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
   private val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE)
-  private val ValueExternalEvents   = TriggerExternalEvents + XXFORMS_VALUE
+  private val ValueExternalEvents   = TriggerExternalEvents + EventNames.XXFormsValue
 
   // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
   private val UploadExternalEvents  = Set(

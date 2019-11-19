@@ -25,9 +25,8 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyGetter
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event._
+import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
@@ -35,7 +34,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms.{Constants, EventNames}
 import org.scalatest.mockito.MockitoSugar
 
 import scala.reflect.ClassTag
@@ -132,7 +131,7 @@ trait XFormsSupport extends MockitoSugar {
     getObject(controlEffectiveId) match {
       case c: XFormsControl ⇒
         ControlsIterator(c, includeSelf = true) collectFirst {
-          case vc: XFormsValueControl if vc.allowExternalEvent(XXFORMS_VALUE) ⇒  vc
+          case vc: XFormsValueControl if vc.allowExternalEvent(EventNames.XXFormsValue) ⇒  vc
         } foreach process
       case _ ⇒
     }

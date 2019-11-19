@@ -14,9 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.xbl.DndRepeat._
-import org.orbeon.xforms
-import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
+import org.orbeon.xforms.{$, AjaxServerEvent, EventNames}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -123,15 +122,15 @@ object Tabbable {
                 // Thinking this should instead block input, but only after a while show a modal screen.
                 // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
 
-                 xforms.DocumentAPI.dispatchEvent(
-                  new js.Object {
-                    val targetId  = repeatId
-                    val eventName = "xxforms-dnd"
-                    val properties = new js.Object {
-                      val `dnd-start` = dndStart + 1
-                      val `dnd-end`   = dndEnd + 1
-                    }
-                  }
+                AjaxServerEvent.dispatchEvent(
+                  AjaxServerEvent(
+                    eventName  = EventNames.XXFormsDnD,
+                    targetId   = repeatId,
+                    properties = Map(
+                      "dnd-start" → (dndStart + 1),
+                      "dnd-end"   → (dndEnd + 1)
+                    )
+                  )
                 )
               }
             }

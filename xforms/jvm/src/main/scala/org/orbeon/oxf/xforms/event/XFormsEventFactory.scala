@@ -92,7 +92,7 @@ object XFormsEventFactory {
     XXFORMS_VALUE_CHANGED       → (new XXFormsValueChangedEvent(_, _)),
     XFORMS_DELETE               → (new XFormsDeleteEvent(_, _)),
     XXFORMS_REPLACE             → (new XXFormsReplaceEvent(_, _)),
-    XXFORMS_VALUE               → (new XXFormsValueEvent(_, _))
+    EventNames.XXFormsValue     → (new XXFormsValueEvent(_, _))
   )
 
   // Create an event

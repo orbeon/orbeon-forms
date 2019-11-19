@@ -30,7 +30,6 @@ public class XFormsEvents {
     // Other custom events
     public static final String XXFORMS_STATE_RESTORED = "xxforms-state-restored";
     public static final String XXFORMS_SESSION_HEARTBEAT = "xxforms-session-heartbeat";
-    public static final String XXFORMS_SERVER_EVENTS = "xxforms-server-events";
     public static final String XXFORMS_POLL = "xxforms-poll";
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
     public static final String XXFORMS_LOAD = "xxforms-load";
@@ -53,8 +52,6 @@ public class XFormsEvents {
 
     public static final String XXFORMS_VALID = "xxforms-valid";
     public static final String XXFORMS_INVALID = "xxforms-invalid";
-
-    public static final String XXFORMS_VALUE = "xxforms-value";
 
     public static final String XXFORMS_VALUE_CHANGED = "xxforms-value-changed";
     public static final String XXFORMS_NODESET_CHANGED = "xxforms-nodeset-changed";

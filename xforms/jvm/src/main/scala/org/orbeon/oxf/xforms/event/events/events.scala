@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.xforms.EventNames
 
 class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_STATE_RESTORED, target, properties, bubbles = false, cancelable = false) {
@@ -90,7 +91,7 @@ class XFormsLinkExceptionEvent(target: XFormsEventTarget, properties: PropertyGe
 }
 
 class XXFormsValueEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_VALUE, target, properties, bubbles = false, cancelable = false) {
+  extends XFormsEvent(EventNames.XXFormsValue, target, properties, bubbles = false, cancelable = false) {
 
   def this(target: XFormsEventTarget, value: String) =
     this(target, Map("value" → Option(value)))

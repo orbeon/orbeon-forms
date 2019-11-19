@@ -53,17 +53,12 @@ object UploaderClient {
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(Properties.delayBeforeUploadProgressRefresh.get()) {
       currentEventOpt foreach { processingEvent ⇒
-        AjaxServer.fireEvents(
-          js.Array(
-            new AjaxServerEvent(
-              new js.Object {
-                val targetId     = processingEvent.upload.container.id
-                val eventName    = EventNames.XXFormsUploadProgress
-                val showProgress = false
-              }
-            )
-          ),
-          incremental = false
+        AjaxServerEvent.dispatchEvent(
+          AjaxServerEvent(
+            eventName    = EventNames.XXFormsUploadProgress,
+            targetId     = processingEvent.upload.container.id,
+            showProgress = false
+          )
         )
         askForProgressUpdate()
       }
@@ -73,25 +68,18 @@ object UploaderClient {
   // `UploadServer` as it can't know about other controls being "uploaded" at the same time. Indeed, we can have
   // uploads for multiple files at the same time, and for each one of the them, we want to clear the upload field,
   // and switch back to the empty state so users can again select a file to upload.
-  def cancel(doAbort: Boolean, event: String): Unit = {
+  def cancel(doAbort: Boolean, eventName: String): Unit = {
 
     if (doAbort)
       yuiConnectionOpt foreach (YUIConnect.abort(_))
 
     currentEventOpt foreach { processingEvent ⇒
-
-      AjaxServer.fireEvents(
-        js.Array(
-          new AjaxServerEvent(
-            new js.Object {
-              val targetId  = processingEvent.upload.container.id
-              val eventName = event
-            }
+      AjaxServerEvent.dispatchEvent(
+          AjaxServerEvent(
+            eventName = eventName,
+            targetId  = processingEvent.upload.container.id
           )
-        ),
-        incremental = false
       )
-
       processingEvent.upload.clear()
       processingEvent.upload.setState("empty")
     }
@@ -152,17 +140,12 @@ object UploaderClient {
         currentEvent.upload.setState("progress")
 
         // Tell server we're starting uploads
-        AjaxServer.fireEvents(
-          js.Array(
-            new AjaxServerEvent(
-              new js.Object {
-                val targetId     = currentEvent.upload.container.id
-                val eventName    = EventNames.XXFormsUploadStart
-                val showProgress = false
-              }
-            )
-          ),
-          incremental = false
+        AjaxServerEvent.dispatchEvent(
+          AjaxServerEvent(
+            eventName    = EventNames.XXFormsUploadStart,
+            targetId     = currentEvent.upload.container.id,
+            showProgress = false
+          )
         )
 
         import org.scalajs.dom.ext._

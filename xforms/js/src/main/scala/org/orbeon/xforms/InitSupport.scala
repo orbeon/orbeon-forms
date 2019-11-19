@@ -170,9 +170,11 @@ object InitSupport {
           case StateResult.Uuid(uuid) ⇒
             uuid
           case StateResult.Restore(uuid) ⇒
-            AjaxServer.fireEvents(
-              events      = js.Array(new AjaxServerEvent(formElem, null, null, EventNames.XXFormsAllEventsRequired)),
-              incremental = false
+            AjaxServerEvent.dispatchEvent(
+              AjaxServerEvent(
+                eventName = EventNames.XXFormsAllEventsRequired,
+                form      = formElem
+              )
             )
             uuid
           case StateResult.Reload ⇒
@@ -382,14 +384,15 @@ object InitSupport {
         val callback: js.Function = (e: dom.KeyboardEvent, combo: String) ⇒ {
 
           val properties =
-            Map(KeyTextPropertyName → keyText) ++
-              (modifiers map (_ ⇒ KeyModifiersPropertyName → modifierString))
+            Map(KeyTextPropertyName → (keyText: js.Any)) ++
+              (modifiers map (_ ⇒ KeyModifiersPropertyName → (modifierString: js.Any)))
 
-          DocumentAPI.dispatchEvent(
-            targetId    = observer,
-            eventName   = e.`type`,
-            incremental = false,
-            properties  = properties.toJSDictionary
+          AjaxServerEvent.dispatchEvent(
+            AjaxServerEvent(
+              eventName   = e.`type`,
+              targetId    = observer,
+              properties  = properties
+            )
           )
 
           if (modifiers.nonEmpty)

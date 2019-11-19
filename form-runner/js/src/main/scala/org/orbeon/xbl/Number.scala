@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.AjaxServerOps._
 import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI, EventNames}
+import org.orbeon.xforms.{$, AjaxServerEvent, DocumentAPI, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
@@ -115,7 +115,12 @@ object Number {
 
             if (Set(10, 13)(e.which)) {
               updateStateAndSendValueToServer()
-              DocumentAPI.dispatchEvent(containerElem.id, eventName = "DOMActivate")
+              AjaxServerEvent.dispatchEvent(
+                AjaxServerEvent(
+                  eventName = EventNames.DOMActivate,
+                  targetId  = containerElem.id
+                )
+              )
             }
           }
         }: js.ThisFunction)

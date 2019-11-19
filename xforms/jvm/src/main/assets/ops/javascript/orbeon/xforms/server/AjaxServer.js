@@ -126,7 +126,7 @@
     AjaxServer._debugEventQueue = function() {
         ORBEON.util.Utils.logMessage("Event queue:");
         _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
-            ORBEON.util.Utils.logMessage(" " + eventIndex + " - name: " + event.eventName + " | targetId: " + event.targetId + " | value: " + event.value);
+            ORBEON.util.Utils.logMessage(" " + eventIndex + " - name: " + event.eventName + " | targetId: " + event.targetId);
         });
     };
 
@@ -235,6 +235,9 @@
                     _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
                         // Proceed with this event only if this is not one of the event we filter
                         if (event.eventName == "xxforms-value") {
+
+                            var eventValue = event.properties.value;
+
                             // Value change is handled specially as values are collapsed
 
                             if (seenControlValue[event.targetId] == null) {
@@ -243,20 +246,20 @@
                                 var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
                                 if ($(document.getElementById(event.targetId)).is('.xforms-upload') ||
                                     serverValue == null                                             ||
-                                    serverValue != event.value) {
+                                    serverValue != eventValue) {
 
                                     // Add event
                                     seenControlValue[event.targetId] = event;
-                                    ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
+                                    ORBEON.xforms.ServerValueStore.set(event.targetId, eventValue);
                                     newEvents.push(event);
                                 }
                             } else {
                                 // Have seen this control already in current block of events
 
                                 // Keep latest value
-                                seenControlValue[event.targetId].value = event.value;
+                                seenControlValue[event.targetId].value = eventValue;
                                 // Update server value
-                                ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
+                                ORBEON.xforms.ServerValueStore.set(event.targetId, eventValue);
                             }
                         } else if (event.eventName == "xxforms-upload-progress") {
                             // Collapse multiple upload progress requests only sending the one for the latest control
@@ -396,16 +399,7 @@
                             if (event.targetId != null)
                                 requestDocumentString.push(' source-control-id="' + ORBEON.xforms.Page.deNamespaceIdIfNeeded(formID, event.targetId) + '"');
                             requestDocumentString.push('>');
-                            if (event.value != null) {
-                                // When the range is used we get an int here when the page is first loaded
-                                if (typeof event.value == "string") {
-                                    event.value = event.value.replace(XFORMS_REGEXP_AMPERSAND, "&amp;");
-                                    event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
-                                    event.value = event.value.replace(XFORMS_REGEXP_CLOSE_ANGLE, "&gt;");
-                                    event.value = event.value.replace(XFORMS_REGEXP_INVALID_XML_CHAR, "");
-                                }
-                                requestDocumentString.push(event.value);
-                            } else if (! _.isEmpty(event.properties)) {
+                            if (! _.isEmpty(event.properties)) {
                                 // Only add properties when we don't have a value (in the future, the value should be
                                 // sent in a sub-element, so both a value and properties can be sent for the same event)
                                 requestDocumentString.push('\n');
@@ -414,7 +408,7 @@
                                     var propertyParts = [
                                         indent + indent + indent,
                                         '<xxf:property name="' + ORBEON.common.MarkupUtils.escapeXMLForAttribute(name) + '">',
-                                        ORBEON.common.MarkupUtils.escapeXMLMinimal(value),
+                                        ORBEON.common.MarkupUtils.escapeXMLMinimal(value).replace(XFORMS_REGEXP_INVALID_XML_CHAR, ""),
                                         '</xxf:property>\n'
                                     ];
                                     _.each(propertyParts, function(part) { requestDocumentString.push(part); });

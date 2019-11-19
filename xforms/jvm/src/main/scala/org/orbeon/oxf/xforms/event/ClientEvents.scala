@@ -34,7 +34,7 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.xforms.{EventNames, XFormsId}
 
 // Process events sent by the client, including sorting, filtering, and security
@@ -60,8 +60,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     val bubbles           = attributeValue("bubbles")    != "false" // default is true
     val cancelable        = attributeValue("cancelable") != "false" // default is true
 
-    lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Option(e.getText)) } toMap
-    lazy val value        = if (properties.nonEmpty) "" else element.getText // for now we don't support both a value and properties
+    lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Some(e.getText)) } toMap
+    lazy val valueOpt     = properties.get("value").flatten
   }
 
   def extractLocalEvents(actionElement: Element): List[LocalEvent] =
@@ -93,8 +93,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       // Gather all events including decoding action server events
       globalServerEvents ++ (
         clientEvents flatMap {
-          case event if event.name == XXFORMS_SERVER_EVENTS ⇒ decodeServerEvents(event.value)
-          case event                                        ⇒ List(event)
+          case event if event.name == EventNames.XXFormsServerEvents ⇒ event.valueOpt.toList flatMap decodeServerEvents
+          case event                                                 ⇒ List(event)
         }
       )
     }
@@ -127,7 +127,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // beforehand.
         (events ++ DummyEvent).sliding(2).toList flatMap {
           case List(a, b) ⇒
-            if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
+            if (a.name != EventNames.XXFormsValue || new EventGroupingKey(a) != new EventGroupingKey(b))
               safelyCreateAndMapEvent(doc, a)
             else
               None
@@ -146,7 +146,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Set of all control ids for which we got value events
     val valueChangeControlIdsAndValues = allClientAndServerEvents collect {
-      case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId → e.value
+      case e if e.name == EventNames.XXFormsValue ⇒ e.targetEffectiveId → e.valueOpt.get
     }
 
     // Last focus/blur event received from the client
@@ -497,7 +497,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         } yield
           attributeName → Option(attributeValue)
 
-      def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
+      def eventValue = eventName == EventNames.XXFormsValue list ("value" → event.valueOpt)
 
       Some(
         XFormsEventFactory.createEvent(

@@ -17,12 +17,12 @@ import java.io.{OutputStream, PrintWriter}
 import java.{util ⇒ ju}
 
 import javax.portlet._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
@@ -32,17 +32,12 @@ class PortletEmbeddingContext(
   context            : PortletContext,
   request            : PortletRequest,
   response           : PortletResponse,
-  val httpClient     : HttpClient,
-  useShortNamespaces : Boolean
+  val httpClient     : HttpClient
 ) extends EmbeddingContext {
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
 
-  val namespace: String =
-    if (useShortNamespaces)
-      BufferedPortlet.shortIdNamespace(response.getNamespace, context) ensuring (_ ne null)
-    else
-      response.getNamespace
+  val namespace: String = response.getNamespace
 
   def getSessionAttribute   (name: String)               : Option[AnyRef] = Option(session.getAttribute(name))
   def setSessionAttribute   (name: String, value: AnyRef): Unit           = session.setAttribute(name, value)
@@ -55,14 +50,12 @@ class PortletEmbeddingContextWithResponse(
   context            : PortletContext,
   request            : PortletRequest,
   response           : MimeResponse,
-  httpClient         : HttpClient,
-  useShortNamespaces : Boolean
+  httpClient         : HttpClient
 ) extends PortletEmbeddingContext(
   context,
   request,
   response,
-  httpClient,
-  useShortNamespaces
+  httpClient
 ) with EmbeddingContextWithResponse {
 
   def writer                    : PrintWriter  = response.getWriter
@@ -225,41 +218,4 @@ object BufferedPortlet {
   val PathParameter: String = PathParameterName
   val MethodParameter       = "orbeon.method"
   val ResponseSessionKey    = "org.orbeon.oxf.response"
-
-  // Immutable portletNamespace → idNamespace information stored in the portlet context
-  private object NamespaceMappings {
-    private def newId(seq: Int) = "o" + seq
-    def apply(portletNamespace: String): NamespaceMappings = NamespaceMappings(0, Map(portletNamespace → newId(0)))
-  }
-
-  private case class NamespaceMappings(private val last: Int, map: Map[String, String]) {
-    def next(key: String) = NamespaceMappings(last + 1, map + (key → NamespaceMappings.newId(last + 1)))
-  }
-
-  // Return the short id namespace for this portlet. The idea of this is that portal-provided namespaces are large,
-  // and since the XForms engine produces lots of ids, the DOM size increases a lot. All we want really are unique ids
-  // in the DOM, so we make up our own short prefixes, hope they don't conflict within anything, and we map the portal
-  // namespaces to our short ids.
-  def shortIdNamespace(portletNamespace: String, portletContext: PortletContext): String =
-    // PLT.10.1: "There is one instance of the PortletContext interface associated with each portlet application
-    // deployed into a portlet container." In order for multiple Orbeon portlets to not walk on each other, we
-    // synchronize.
-    portletContext.synchronized {
-
-      val IdNamespacesSessionKey = "org.orbeon.oxf.id-namespaces"
-
-      // Get or create NamespaceMappings
-      val mappings = Option(portletContext.getAttribute(IdNamespacesSessionKey).asInstanceOf[NamespaceMappings]) getOrElse {
-        val newMappings = NamespaceMappings(portletNamespace)
-        portletContext.setAttribute(IdNamespacesSessionKey, newMappings)
-        newMappings
-      }
-
-      // Get or create specific mapping portletNamespace → idNamespace
-      mappings.map.getOrElse(portletNamespace, {
-        val newMappings = mappings.next(portletNamespace)
-        portletContext.setAttribute(IdNamespacesSessionKey, newMappings)
-        newMappings.map(portletNamespace)
-      })
-    }
 }

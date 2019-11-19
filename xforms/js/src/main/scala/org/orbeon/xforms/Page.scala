@@ -36,10 +36,9 @@ object Page {
   def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
     getForm(formId).serverEventInput.value = if (serverEventsValue ne null) serverEventsValue else ""
 
-  // Handle the case where the id is already prefixed. This is not great as we don't know for sure
-  // whether the control starts with a short namespace, e.g. `o0`, `o1`, etc. Short namespaces are
-  // disabled by default which mitigates this problem. As of 2019-01-09 this can be a problem only
-  // for one caller of this API.
+  // Handle the case where the id is already prefixed. As of 2019-01-09 this can be a problem only
+  // for one caller of this API. Short namespaces are removed as of Orbeon Forms 2019.2 so the potential
+  // for conflict is lowered.
   @JSExport
   def namespaceIdIfNeeded(formId: String, id: String): String = {
     val ns = getForm(formId).ns

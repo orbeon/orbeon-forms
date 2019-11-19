@@ -43,7 +43,6 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     forwardParams      : Set[String],
     forwardProperties  : Map[String, String], // lowercase name → original name
     keepParams         : Set[String],
-    useShortNamespaces : Boolean,
     resourcesRegex     : String,
     httpClient         : HttpClient
    ) {
@@ -57,14 +56,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     context            : PortletContext,
     request            : PortletRequest,
     response           : MimeResponse,
-    httpClient         : HttpClient,
-    useShortNamespaces : Boolean
+    httpClient         : HttpClient
   ) extends PortletEmbeddingContextWithResponse(
     context,
     request,
     response,
-    httpClient,
-    useShortNamespaces
+    httpClient
   ) {
     override def decodeURL(encoded: String): String =
       if (settings.keepParams.nonEmpty) {
@@ -89,7 +86,6 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         forwardParams      = stringToSet(config.getInitParameter("forward-parameters")),
         forwardProperties  = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
         keepParams         = stringToSet(config.getInitParameter("keep-parameters")),
-        useShortNamespaces = config.getInitParameter("use-short-namespaces") != "false",
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
       )
@@ -138,8 +134,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           getPortletContext,
           request,
           response,
-          settings.httpClient,
-          settings.useShortNamespaces
+          settings.httpClient
         )
 
         bufferedRender(
@@ -173,8 +168,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           getPortletContext,
           request,
           response,
-          settings.httpClient,
-          settings.useShortNamespaces
+          settings.httpClient
         )
         bufferedProcessAction(
           request,
@@ -195,8 +189,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           getPortletContext,
           request,
           response,
-          settings.httpClient,
-          settings.useShortNamespaces
+          settings.httpClient
         )
 
         APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePathRegex) match {

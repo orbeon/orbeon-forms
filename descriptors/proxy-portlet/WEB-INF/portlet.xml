@@ -12,10 +12,6 @@
             <value>http://localhost:8080/orbeon/</value>
         </init-param>
         <init-param>
-            <name>use-short-namespaces</name>
-            <value>false</value>
-        </init-param>
-        <init-param>
             <name>enable-url-parameters</name>
             <value>false</value>
         </init-param>

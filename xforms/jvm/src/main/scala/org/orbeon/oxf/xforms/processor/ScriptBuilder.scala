@@ -194,7 +194,7 @@ object ScriptBuilder {
           for {
             (id, valueOpt) ← controlsToInitialize
           } yield
-            rpc.Control(id, valueOpt),
+            rpc.Control(namespaceId(containingDocument, id), valueOpt),
         listeners =
           (
             for {

@@ -151,9 +151,16 @@
 
                                 </xsl:element>
 
-                                <!-- Can't make switch non-relevant at runtime as we depend on relevance for validation:
-                                     https://github.com/orbeon/orbeon-forms/issues/927 -->
-                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="{$editable}">
+                                <!--
+                                    We can't make switch non-relevant at runtime as we depend on relevance for validation:
+
+                                        https://github.com/orbeon/orbeon-forms/issues/927
+
+                                    But we can use a full update to dynamically send the markup as needed:
+
+                                        https://github.com/orbeon/orbeon-forms/issues/4271
+                                -->
+                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="{$editable}" xxf:update="{'full'[not($editable)]}">
                                     <!-- Closed section -->
                                     <xf:case id="case-closed" selected="{{not($initially-open)}}"/>
                                     <!-- Open section -->

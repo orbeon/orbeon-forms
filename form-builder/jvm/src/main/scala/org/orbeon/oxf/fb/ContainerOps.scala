@@ -394,10 +394,12 @@ trait ContainerOps extends ControlOps {
     val inDoc       = startBindElem.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
+    val allControlsByName = getAllControlsWithIds(inDoc) map (c ⇒ controlNameFromId(c.id) → c) toMap
+
     def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
 
       val controlName    = getBindNameOrEmpty(bind)
-      val controlElemOpt = findControlByName(inDoc, controlName)
+      val controlElemOpt = allControlsByName.get(controlName)
 
       // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470
       def fromNonStandardRef =

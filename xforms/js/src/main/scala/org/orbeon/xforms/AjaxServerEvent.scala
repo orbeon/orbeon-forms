@@ -125,14 +125,13 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
 
     (formOpt, targetIdOpt) match {
       case (Some(form), None) if eventName == XXFormsAllEventsRequired || eventName == XXFormsServerEvents ⇒
-        form → null
+        form → null // change `targetId` to `targetIdOpt` once `AjaxServer` is converted to Scala
       case (Some(_), None) ⇒
         throw new IllegalArgumentException("targetId")
       case (None, Some(targetId)) ⇒
         Option(dom.document.getElementById(targetId)) flatMap (e ⇒ Controls.getForm(e).toOption) match {
           case Some(form) ⇒
-            // TODO: namespace must match!
-            form → targetId
+            form → targetId // here we could check that the namespaces match!
           case None ⇒
             Support.getFirstForm → targetId
         }
@@ -151,4 +150,6 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
   val incremental : Boolean = checkArg[Boolean]("incremental",  DefaultIncremental)  // passed separately to `fireEvents()`
   val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", DefaultIgnoreErrors) // used by `AjaxServer`
   val showProgress: Boolean = checkArg[Boolean]("showProgress", DefaultShowProgress) // used by `AjaxServer`
+
+  scribe.debug(s"event: eventName = $eventName`, targetId = `$targetId`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/" }`")
 }

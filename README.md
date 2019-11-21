@@ -22,7 +22,9 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
-- [Orbeon Forms 2019.1](https://blog.orbeon.com/2019/10/orbeon-forms-20191.html)
+- [Orbeon Forms 2018.2.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2018.2.4)
+- [Orbeon Forms 2019.1](https://doc.orbeon.com/release-notes/orbeon-forms-2019.1)
+- [Orbeon Forms 2018.2.3 PE](https://blog.orbeon.com/2019/05/orbeon-forms-201823-pe.html)
 - [Orbeon Forms 2018.2.2 PE](https://blog.orbeon.com/2019/03/orbeon-forms-201822-pe.html)
 - [Orbeon Forms 2018.2.1 PE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-pe.html)
 - [Orbeon Forms 2018.2.1 CE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-ce.html)

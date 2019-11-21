@@ -64,7 +64,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       FRResourceElemLocalNamesToQNames.keys +
       "itemset"
 
-  private def controlLHHATQName(lhhaName: String): QName =
+  def controlLHHATQName(lhhaName: String): QName =
     FRResourceElemLocalNamesToQNames.get(lhhaName)         orElse
     (LHHA.withNameOption(lhhaName) map LHHA.QNameForValue) getOrElse
     (throw new IllegalArgumentException(lhhaName))
@@ -741,20 +741,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     } else
       Nil
-  }
-
-  def removeLHHAElementAndResources(
-    controlName : String,
-    lhhaName    : String)(implicit
-    ctx         : FormBuilderDocContext
-  ): Seq[NodeInfo] = {
-
-    val control = findControlByName(ctx.formDefinitionRootElem, controlName).get
-
-    val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(controlName, lhhaName))
-    val removedLHHA    = delete(control child controlLHHATQName(lhhaName))
-
-    removedHolders ++ removedLHHA
   }
 
   // Build an effective id for a given static id or return null (the empty sequence)

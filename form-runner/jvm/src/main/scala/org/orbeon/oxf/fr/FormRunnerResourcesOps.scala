@@ -43,11 +43,18 @@ trait FormRunnerResourcesOps {
 
   // Same as above but doesn't require a Form Builder context
   // NOTE: Support an entirely missing resources instance (for tests).
+  // TODO: Migrate to `findResourceHoldersWithLangUseDocUseContext`.
   def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
     resourcesInstanceRootElemOpt(inDoc)             orElse
       resourcesInstanceDocFromUrlOpt(inDoc)         map
       (findResourceHoldersWithLang(controlName, _)) getOrElse
       Nil
+
+  def findResourceHoldersWithLangUseDocUseContext(
+    controlName : String)(implicit
+    ctx         : FormRunnerDocContext
+  ): Seq[(String, NodeInfo)] =
+    findResourceHoldersWithLang(controlName, ctx.resourcesRootElem)
 
   // Find control resource holders with their language
   def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =

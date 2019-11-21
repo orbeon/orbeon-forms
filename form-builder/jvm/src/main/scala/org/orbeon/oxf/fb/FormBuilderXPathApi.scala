@@ -19,6 +19,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
+import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
@@ -177,8 +178,16 @@ object FormBuilderXPathApi {
     FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
 
     // If an optional element turns out to be empty, then remove it
-    if (isOptionalLHHAT && hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhht))
-      FormBuilder.removeLHHAElementAndResources(controlName, lhht)
+    if (isOptionalLHHAT) {
+
+      val (doDelete, holders) =
+        holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, FormBuilder.getControlLhhat(controlName, lhht).toList, lhht)
+
+      if (doDelete) {
+        delete(holders)
+        delete(findControlByName(ctx.formDefinitionRootElem, controlName).toList child controlLHHATQName(lhht))
+      }
+    }
   }
 
   // Set the control's items for all languages
@@ -277,15 +286,16 @@ object FormBuilderXPathApi {
 
     val lhha = LHHA.Help
 
-    val allHelpElements =
-      ctx.formDefinitionRootElem.root descendant LHHA.QNameForValue(lhha) map
+    val lhhaTest: Test = LHHA.QNameForValue(lhha)
+
+    val allHelpElementsWithControlNames =
+      ctx.bodyElem descendant lhhaTest map
       (lhhaElem ⇒ lhhaElem → lhhaElem.attValue("ref")) collect
       { case (lhhaElem, HelpRefMatcher(controlName)) ⇒ lhhaElem → controlName }
 
     val allUnneededHolders =
-      allHelpElements collect {
-        case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(controlName, lhha.entryName) ⇒
-           lhhaHoldersForAllLangsUseDoc(controlName, lhha.entryName) :+ lhhaElement
+      allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) ⇒
+        holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)._2
       }
 
     allUnneededHolders.flatten

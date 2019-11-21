@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -264,30 +263,32 @@ trait ResourcesOps extends BaseOps {
     } yield
       holder
 
-  def lhhaHoldersForAllLangsUseDoc(
-    controlName : String,
-    lhhaName    : String)(implicit
-    ctx         : FormBuilderDocContext
-  ): Seq[NodeInfo] =
-    for {
-      (_, controlHolder) ← findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName)
-      lhhaHolder         ← controlHolder child lhhaName
-    } yield
-      lhhaHolder
-
-  // NOTE: Also return `false` if there are any children `fr:param`.
-  def hasBlankOrMissingLHHAForAllLangsUseDoc(
-    controlName : String,
-    lhhaName    : String)(implicit
-    ctx         : FormBuilderDocContext
-  ): Boolean = {
+  // NOTE: Also return `Nil` if there are any children `fr:param`.
+  def holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(
+    controlName  : String,
+    lhhaElements : Seq[NodeInfo],
+    lhhaName     : String)(implicit
+    ctx          : FormBuilderDocContext
+  ): (Boolean, Seq[NodeInfo]) = {
 
     val hasParams =
-      FormBuilder.lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhhaName)).nonEmpty
+      lhhaElements exists (e ⇒ FormBuilder.lhhatChildrenParams(e).nonEmpty)
 
-    ! hasParams && {
-      findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName) forall
-        { case (_, holder) ⇒ (holder child lhhaName stringValue).isBlank }
+    if (hasParams) {
+      false → Nil
+    } else {
+
+      val holders = findResourceHoldersWithLangUseDocUseContext(controlName)
+
+      val allBlankOrMissing =
+        holders forall { case (_, controlHolder) ⇒ (controlHolder child lhhaName stringValue).isBlank }
+
+      true → (
+        if (allBlankOrMissing)
+          holders flatMap (_._2 child lhhaName)
+        else
+          Nil
+      )
     }
   }
 }

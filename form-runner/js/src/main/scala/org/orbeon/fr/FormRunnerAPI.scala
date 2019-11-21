@@ -15,12 +15,13 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.xforms.{$, AjaxServerEvent, Support, XFormsId}
-import org.scalajs.dom.html
+import org.scalajs.dom
+import org.scalajs.dom.ext._
+import org.scalajs.dom.{XMLHttpRequest, html}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-
 @JSExportTopLevel("ORBEON.fr.API")
 @JSExportAll
 object FormRunnerAPI {
@@ -39,6 +40,54 @@ object FormRunnerAPI {
       // Check the id matches the requested name
       e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray
+  }
+
+  def embedForm(
+    container   : html.Element,
+    context     : String,
+    app         : String,
+    form        : String,
+    action      : String,
+    documentId  : String,
+    queryString : String
+  ): Unit = {
+    val xhr = new XMLHttpRequest()
+    xhr.open(
+      method = "GET",
+      url = s"$context/fr/$app/$form/$action?orbeon-embeddable=true"
+    )
+    xhr.onload = { (_) ⇒
+      if (xhr.status == 200) {
+
+        // Find scripts we already have in the page, so not to include the same script more than once
+        val existingScripts =
+          dom.document.head
+            .querySelectorAll("script")
+            .map(_.asInstanceOf[html.Script])
+            .map(_.src)
+
+        // Insert HTML and find scripts
+        container.innerHTML = xhr.responseText
+        val innerScriptElements =
+          container
+            .querySelectorAll("script")
+            .map(_.asInstanceOf[html.Script])
+
+        // Add new scripts to the `<head>`
+        innerScriptElements.foreach { innerScriptElement: html.Script ⇒
+          val src = innerScriptElement.src
+          if (! existingScripts.contains(src)) {
+            val headScript =
+              dom.document
+                .createElement("script")
+                .asInstanceOf[html.Script]
+            headScript.src = innerScriptElement.src
+            dom.document.head.appendChild(headScript)
+          }
+        }
+      }
+    }
+    xhr.send()
   }
 }
 

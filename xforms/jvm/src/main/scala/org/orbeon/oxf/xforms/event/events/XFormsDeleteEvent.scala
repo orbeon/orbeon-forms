@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction.DeletionDescriptor
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.saxon.om.NodeInfo
 
 class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -26,15 +26,14 @@ class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(
     target              : XFormsEventTarget,
     deletionDescriptors : Seq[DeletionDescriptor],
-    deleteIndexOpt      : Option[Int],
-    updateRepeats       : Boolean
+    deleteIndexOpt      : Option[Int]
   ) = {
     this(
       target,
       Map(
         "deleted-nodes"   → Option(deletionDescriptors map (_.nodeInfo)),
         "delete-location" → deleteIndexOpt,
-        "update-repeats"  → Some(updateRepeats)
+        "update-repeats"  → Some(false)
       )
     )
     _deletionDescriptorsOpt = Option(deletionDescriptors)

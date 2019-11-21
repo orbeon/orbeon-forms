@@ -136,7 +136,8 @@ object MigrationOps48 extends MigrationOps {
 
         delete(
           ref        = container,
-          doDispatch = false)
+          doDispatch = false
+        )
     }
 
     result

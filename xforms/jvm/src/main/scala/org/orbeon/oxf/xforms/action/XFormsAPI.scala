@@ -149,8 +149,7 @@ object XFormsAPI {
   // xf:delete
   def delete(
     ref           : Seq[NodeInfo],
-    doDispatch    : Boolean = true,
-    updateRepeats : Boolean = true
+    doDispatch    : Boolean = true
   ): Seq[NodeInfo] =
     if (ref.nonEmpty) {
       val action = actionInterpreterDyn.value
@@ -160,8 +159,7 @@ object XFormsAPI {
           containingDocument = action map (_.containingDocument) orNull,
           collectionToUpdate = ref,
           deleteIndexOpt     = None,
-          doDispatch         = doDispatch,
-          updateRepeats      = updateRepeats)(
+          doDispatch         = doDispatch)(
           indentedLogger     = action map (_.indentedLogger) orNull
         )
 

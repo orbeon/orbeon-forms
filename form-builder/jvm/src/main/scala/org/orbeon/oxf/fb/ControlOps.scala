@@ -656,8 +656,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     if (changed) {
-      XFormsAPI.delete(ref = existingParams, updateRepeats = false)
-      XFormsAPI.insert(into = lhhaNodes, after = lhhaNodes / *, origin = params, updateRepeats = false)
+      XFormsAPI.delete(ref = existingParams)
+      XFormsAPI.insert(into = lhhaNodes, after = lhhaNodes / *, origin = params)
     }
 
     changed

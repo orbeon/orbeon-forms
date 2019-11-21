@@ -169,8 +169,7 @@ class XFormsRepeatControl(
           containingDocument = containingDocument,
           collectionToUpdate = sourceItems,
           deleteIndexOpt     = Some(requestedSourceIndex),
-          doDispatch         = false, // don't dispatch event because one call to updateRepeatNodeset() is enough
-          updateRepeats      = false  // meaningless if `doDispatch == false`
+          doDispatch         = false // don't dispatch event because one call to updateRepeatNodeset() is enough
         )
       deletionDescriptors.head.nodeInfo // above deletes exactly one node
     }

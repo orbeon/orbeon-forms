@@ -73,15 +73,11 @@ class XFormsDeleteAction extends XFormsAction {
             None
         }
 
-      val updateRepeats =
-        actionContext.interpreter.resolveAVT(actionContext.element, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME) != "false"
-
       doDelete(
         containingDocument = actionContext.containingDocument,
         collectionToUpdate = collectionToUpdate,
         deleteIndexOpt     = deleteIndexOpt,
-        doDispatch         = true,
-        updateRepeats      = updateRepeats
+        doDispatch         = true
       )
     } else {
       // "The delete action is terminated with no effect if the Sequence Binding is expressed and the Sequence Binding
@@ -106,8 +102,7 @@ object XFormsDeleteAction extends Logging {
   def doDeleteOne(
     containingDocument : XFormsContainingDocument,
     nodeInfo           : NodeInfo,
-    doDispatch         : Boolean,
-    updateRepeats      : Boolean)(implicit
+    doDispatch         : Boolean)(implicit
     indentedLogger     : IndentedLogger
   ): Option[DeletionDescriptor] = {
 
@@ -117,8 +112,7 @@ object XFormsDeleteAction extends Logging {
       containingDocument = containingDocument,
       collectionToUpdate = List(nodeInfo),
       deleteIndexOpt     = Some(1),
-      doDispatch         = doDispatch,
-      updateRepeats      = updateRepeats
+      doDispatch         = doDispatch
     ).headOption
   }
 
@@ -126,8 +120,7 @@ object XFormsDeleteAction extends Logging {
     containingDocument : XFormsContainingDocument,
     collectionToUpdate : Seq[Item],
     deleteIndexOpt     : Option[Int],
-    doDispatch         : Boolean,
-    updateRepeats      : Boolean)(implicit
+    doDispatch         : Boolean)(implicit
     indentedLogger     : IndentedLogger
   ): List[DeletionDescriptor] = {
 
@@ -166,7 +159,7 @@ object XFormsDeleteAction extends Logging {
 
           // "4. If the delete is successful, the event xforms-delete is dispatched."
           if (doDispatch)
-            Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt, updateRepeats))
+            Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt))
         }
       }
 

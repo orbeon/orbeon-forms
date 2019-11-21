@@ -200,7 +200,7 @@ object ErrorSummary {
 
       case (Some(currentError), _, _) ⇒
 
-        XFormsAPI.delete(ref = currentError, updateRepeats = false)
+        XFormsAPI.delete(currentError)
 
         if ((currentError attValue LevelAttName) == ErrorLevel.entryName)
           updateValidStatusByScanning()
@@ -279,10 +279,7 @@ object ErrorSummary {
       }
 
     // Remove affected errors from instance
-    XFormsAPI.delete(
-      ref           = affectedErrors map (_._1),
-      updateRepeats = false
-    )
+    XFormsAPI.delete(affectedErrors map (_._1))
 
     // Reinsert updated errors
     affectedErrors foreach { case (e, updatedId) ⇒

@@ -301,8 +301,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           XFormsDeleteAction.doDeleteOne(
             containingDocument = containingDocument,
             nodeInfo           = destinationNodeInfo,
-            doDispatch         = true,
-            updateRepeats      = true
+            doDispatch         = true
           )
 
           // Update model instance

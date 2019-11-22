@@ -48,8 +48,8 @@ object FormRunnerAPI {
     app         : String,
     form        : String,
     action      : String,
-    documentId  : String,
-    queryString : String
+    documentId  : js.UndefOr[String],
+    queryString : js.UndefOr[String]
   ): Unit = {
     val xhr = new XMLHttpRequest()
     xhr.open(

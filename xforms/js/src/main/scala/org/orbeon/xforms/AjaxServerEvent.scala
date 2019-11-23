@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import cats.syntax.option._
 import io.circe.generic.auto._
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.facade.{AjaxServer, Controls}
@@ -118,29 +119,29 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
       throw new IllegalArgumentException("eventName")
     )
 
-  val (form: html.Form, targetId: String) = {
+  val (form: html.Form, targetIdOpt: Option[String]) = {
 
     val formOpt     = checkArgOpt[html.Form]("form")
     val targetIdOpt = checkArgOpt[String]("targetId")
 
     (formOpt, targetIdOpt) match {
       case (Some(form), None) if eventName == XXFormsAllEventsRequired || eventName == XXFormsServerEvents ⇒
-        form → null // change `targetId` to `targetIdOpt` once `AjaxServer` is converted to Scala
+        form → None
       case (Some(_), None) ⇒
         throw new IllegalArgumentException("targetId")
       case (None, Some(targetId)) ⇒
         Option(dom.document.getElementById(targetId)) flatMap (e ⇒ Controls.getForm(e).toOption) match {
           case Some(form) ⇒
-            form → targetId // here we could check that the namespaces match!
+            form → targetId.some // here we could check that the namespaces match!
           case None ⇒
-            Support.getFirstForm → targetId
+            Support.getFirstForm → targetId.some
         }
       case (Some(form), Some(targetId)) ⇒
-        form → Support.adjustIdNamespace(form, targetId)._2
+        form → Support.adjustIdNamespace(form, targetId)._2.some
     }
   }
 
-  val properties: js.Dictionary[js.Any] = {
+  var properties: js.Dictionary[js.Any] = {
     // Use `js.Object` as `ClassTag` doesn't support `js.Dictionary`
     val dict = checkArg[js.Object]("properties", new js.Object).asInstanceOf[js.Dictionary[js.Any]]
     dict ++= checkArgOpt[String]("value") map (v ⇒ "value" → (v: js.Any)) // `value` is now a property
@@ -151,5 +152,5 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
   val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", DefaultIgnoreErrors) // used by `AjaxServer`
   val showProgress: Boolean = checkArg[Boolean]("showProgress", DefaultShowProgress) // used by `AjaxServer`
 
-  scribe.debug(s"event: eventName = $eventName`, targetId = `$targetId`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/" }`")
+  scribe.debug(s"event: eventName = $eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/" }`")
 }

@@ -24,6 +24,7 @@ object EventNames {
   val XXFormsUploadError       = Prefix + "error"
 
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
+  val XXFormsSessionHeartbeat  = "xxforms-session-heartbeat"
   val XXFormsServerEvents      = "xxforms-server-events"
   val XXFormsValue             = "xxforms-value"
   val XXFormsRpcRequest        = "xxforms-rpc-request"

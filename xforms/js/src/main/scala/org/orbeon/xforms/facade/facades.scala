@@ -68,6 +68,7 @@ trait AjaxServerTrait extends js.Object {
   def beforeSendingEvent                                                  : JQueryCallback = js.native
   def ajaxResponseReceived                                                : JQueryCallback = js.native
   def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native
+  def asyncAjaxRequest()                                                  : Unit           = js.native
 
   def createDelayedServerEvent(
     serverEvents : String,
@@ -127,11 +128,17 @@ object AjaxServerOps {
 @js.native
 object Globals extends js.Object {
   var loadingOtherPage           : Boolean                     = js.native
-  val eventQueue                 : js.Array[js.Any]            = js.native
-  val requestInProgress          : Boolean                     = js.native
+  var eventQueue                 : js.Array[AjaxServerEvent]   = js.native
+  var requestInProgress          : Boolean                     = js.native
   val dialogs                    : js.Dictionary[js.Dynamic]   = js.native
   var lastDialogZIndex           : Int                         = js.native
   var topLevelListenerRegistered : Boolean                     = js.native
+  var executeEventFunctionQueued : Int                         = js.native
+  var requestForm                : html.Form                   = js.native
+  var requestIgnoreErrors        : Boolean                     = js.native
+  var requestTryCount            : Int                         = js.native
+  var requestDocument            : String                      = js.native
+  var changedIdsRequest          : js.Dictionary[Int]          = js.native
 }
 
 @js.native
@@ -222,6 +229,9 @@ object Properties extends js.Object {
   val revisitHandling                  : Property[String]  = js.native
   val sessionHeartbeat                 : Property[Boolean] = js.native
   val sessionHeartbeatDelay            : Property[Int]     = js.native
+
+  val clientEventsFilter               : Property[String]  = js.native
+  val clientEventMode                  : Property[String]  = js.native
 }
 
 @js.native

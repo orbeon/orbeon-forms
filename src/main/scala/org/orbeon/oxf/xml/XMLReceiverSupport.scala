@@ -23,7 +23,7 @@ trait XMLReceiverSupport {
 
   support ⇒
 
-  def withDocument[T](body: ⇒ T)(implicit receiver: XMLReceiver) = {
+  def withDocument[T](body: ⇒ T)(implicit receiver: XMLReceiver): T = {
     receiver.startDocument()
     val result = body
     receiver.endDocument()
@@ -75,7 +75,7 @@ trait XMLReceiverSupport {
   ): Unit =
     receiver.endElement(uri, localName, XMLUtils.buildQName(prefix, localName))
 
-  def text(text: String)(implicit receiver: XMLReceiver) =
+  def text(text: String)(implicit receiver: XMLReceiver): Unit =
     if (text.nonEmpty) {
       val chars = text.toCharArray
       receiver.characters(chars, 0, chars.length)

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
-import org.orbeon.oxf.util.MarkupUtils
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel.Reason
@@ -78,13 +78,13 @@ object ServerError {
   def errorsAsHTMLElem(errors: TraversableOnce[ServerError]): Elem =
     <ul>{
       for (error ← errors)
-        yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
     }</ul>
 
   def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]): Elem =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
       for (error ← errors)
-        yield <li>{MarkupUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
     }</ul>
 }
 

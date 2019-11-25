@@ -263,17 +263,17 @@ class SharedUtilsTest extends FunSpec {
 
     for ((left, right) ← expected)
       it(s"must escape with `$left`") {
-        assert(right === escapeXMLMinimal(left))
+        assert(right === left.escapeXmlMinimal)
       }
 
     for ((left, right) ← expected)
       it(s"must unescape with `$left`") {
-        assert(left === unescapeXMLMinimal(right))
+        assert(left === right.unescapeXmlMinimal)
       }
 
     for ((left, _) ← expected)
       it(s"must roundtrip with `$left`") {
-        assert(left === unescapeXMLMinimal(escapeXMLMinimal(left)))
+        assert(left === left.escapeXmlMinimal.unescapeXmlMinimal)
       }
   }
 
@@ -286,7 +286,7 @@ class SharedUtilsTest extends FunSpec {
 
     for ((left, right) ← expected)
       it(s"must escape with `$left`") {
-        assert(right === escapeXMLForAttribute(left))
+        assert(right === left.escapeXmlForAttribute)
       }
   }
 
@@ -298,7 +298,7 @@ class SharedUtilsTest extends FunSpec {
 
     for ((left, right) ← expected)
       it(s"must escape with `$left`") {
-        assert(right === normalizeSerializedHTML(left))
+        assert(right === left.normalizeSerializedHtml)
       }
   }
 }

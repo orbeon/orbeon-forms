@@ -14,9 +14,10 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.apache.log4j.Level
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties
@@ -60,11 +61,11 @@ private object SubmitResponseEvent {
       sb.append("<headers>")
       for ((name, values) ← headers) {
         sb.append("<header><name>")
-        sb.append(MarkupUtils.escapeXMLMinimal(name))
+        sb.append(name.escapeXmlMinimal)
         sb.append("</name>")
         for (value ← values) {
           sb.append("<value>")
-          sb.append(MarkupUtils.escapeXMLMinimal(value))
+          sb.append(value.escapeXmlMinimal)
           sb.append("</value>")
         }
         sb.append("</header>")

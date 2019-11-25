@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.util.MarkupUtils._
+
 object URLFinder {
 
   def replaceWithHyperlink  (s: String) = s"""<a href="${adjustProtocol(s)}">$s</a>"""
@@ -29,13 +31,13 @@ object URLFinder {
       val before = currentMatch.before
       val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
 
-      sb append MarkupUtils.escapeXMLForAttribute(precedingUnmatched.toString)
-      sb append replace(MarkupUtils.escapeXMLForAttribute(currentMatch.toString))
+      sb append precedingUnmatched.toString.escapeXmlForAttribute
+      sb append replace(currentMatch.toString.escapeXmlForAttribute)
 
       afterPreviousMatch = currentMatch.end
     }
 
-    sb append MarkupUtils.escapeXMLForAttribute(s.substring(afterPreviousMatch))
+    sb append s.substring(afterPreviousMatch).escapeXmlForAttribute
     sb append "</span>"
 
     sb.toString

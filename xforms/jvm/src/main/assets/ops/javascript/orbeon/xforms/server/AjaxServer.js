@@ -805,9 +805,9 @@
                                 // Utility function to generate an option
                                 function generateOption(label, value, clazz, selectedValues) {
                                     var selected = _.contains(selectedValues, value);
-                                    return '<option value="' + ORBEON.common.MarkupUtils.escapeXMLForAttribute(value) + '"'
+                                    return '<option value="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(value) + '"'
                                             + (selected ? ' selected="selected"' : '')
-                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXMLForAttribute(clazz) + '"' : '')
+                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(clazz) + '"' : '')
                                             + '>' + label + '</option>';
                                 }
 
@@ -828,8 +828,8 @@
                                         if (inOptgroup) // nested optgroups are not allowed, close the old one
                                             sb[sb.length] = '</optgroup>';
                                         // open optgroup
-                                        sb[sb.length] = '<optgroup label="' + ORBEON.common.MarkupUtils.escapeXMLForAttribute(itemElement.label) + '"'
-                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXMLForAttribute(clazz) + '"' : '')
+                                        sb[sb.length] = '<optgroup label="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(itemElement.label) + '"'
+                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(clazz) + '"' : '')
                                             + '">';
                                         inOptgroup = true;
                                         // add subitems
@@ -976,9 +976,9 @@
                             } else {
                                 var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                 if (currentValue != null) {
-                                    previousServerValue = previousServerValue == null ? null : ORBEON.common.MarkupUtils.normalizeSerializedHTML(previousServerValue);
-                                    currentValue    = ORBEON.common.MarkupUtils.normalizeSerializedHTML(currentValue);
-                                    newControlValue = ORBEON.common.MarkupUtils.normalizeSerializedHTML(newControlValue);
+                                    previousServerValue = previousServerValue == null ? null : ORBEON.common.MarkupUtils.normalizeSerializedHtml(previousServerValue);
+                                    currentValue    = ORBEON.common.MarkupUtils.normalizeSerializedHtml(currentValue);
+                                    newControlValue = ORBEON.common.MarkupUtils.normalizeSerializedHtml(newControlValue);
 
                                     var doUpdate =
                                         // If this was an input that was recreated because of a type change, we always set its value
@@ -2049,10 +2049,10 @@
 
                         // Create HTML with message
                         details += "<li>" + message;
-                        if (file) details += " in " + ORBEON.common.MarkupUtils.escapeXMLMinimal(file);
-                        if (line) details += " line " + ORBEON.common.MarkupUtils.escapeXMLMinimal(line);
-                        if (col) details += " column " + ORBEON.common.MarkupUtils.escapeXMLMinimal(col);
-                        if (exception) details += " (" + ORBEON.common.MarkupUtils.escapeXMLMinimal(exception) + ")";
+                        if (file) details += " in " + ORBEON.common.MarkupUtils.escapeXmlMinimal(file);
+                        if (line) details += " line " + ORBEON.common.MarkupUtils.escapeXmlMinimal(line);
+                        if (col) details += " column " + ORBEON.common.MarkupUtils.escapeXmlMinimal(col);
+                        if (exception) details += " (" + ORBEON.common.MarkupUtils.escapeXmlMinimal(exception) + ")";
                         details += "</li>";
                     });
                     details += "</ul>";

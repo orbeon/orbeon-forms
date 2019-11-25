@@ -17,7 +17,8 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Logging, MarkupUtils, NetUtils}
+import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.{Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
@@ -279,7 +280,7 @@ object XFormsControl {
       private var isStartElement = false
 
       override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
-        sb.append(MarkupUtils.escapeXMLMinimal(new String(chars, start, length))) // NOTE: not efficient to create a new String here
+        sb.append(new String(chars, start, length).escapeXmlMinimal) // NOTE: not efficient to create a new String here
         isStartElement = false
       }
 

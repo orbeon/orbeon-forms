@@ -17,53 +17,69 @@ import java.{lang ⇒ jl}
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.common.MarkupUtils")
+@JSExportTopLevel("ORBEON.common.MarkupUtils") // AjaxServer.js/xforms.js, remove when possible
 object MarkupUtils {
 
-  @JSExport
-  def escapeXMLMinimal(s: String): String =
-    replace(
+  @JSExport // AjaxServer.js/xforms.js, remove when possible
+  def escapeXmlMinimal(s: String): String = s.escapeXmlMinimal
+
+  @JSExport // AjaxServer.js, remove when possible
+  def escapeXmlForAttribute(s: String): String = s.escapeXmlForAttribute
+
+  @JSExport // AjaxServer.js, remove when possible
+  def normalizeSerializedHtml(s: String): String = s.normalizeSerializedHtml
+
+  // Java callers, remove when possible
+  def unescapeXmlMinimal(s: String): String = s.unescapeXmlMinimal
+
+  implicit class MarkupStringOps(private val s: String) extends AnyVal {
+
+    def escapeXmlMinimal: String =
       replace(
         replace(
-          s,
-          "&", // first, so we don't replace the `&` in the subsequent character entity references
-          "&amp;"
+          replace(
+            s,
+            "&", // first, so we don't replace the `&` in the subsequent character entity references
+            "&amp;"
+          ),
+          "<",
+          "&lt;"
         ),
-        "<",
-        "&lt;"
-      ),
-      ">",
-      "&gt;" // because the sequence `]]>` is not allowed
-    )
+        ">",
+        "&gt;" // because the sequence `]]>` is not allowed
+      )
 
-  @JSExport
-  def escapeXMLForAttribute(s: String): String =
-    replace(
-      escapeXMLMinimal(s),
-      "\"",
-      "&quot;"
-    )
+    def escapeXmlForAttribute: String =
+      replace(
+        s.escapeXmlMinimal,
+        "\"",
+        "&quot;"
+      )
 
-  def unescapeXMLMinimal(s: String): String =
-    replace(
+    def removeInvalidXmlCharacters: String =
+      RemoveDisallowedXmlCharactersRegex.pattern.matcher(s).replaceAll("")
+
+    def unescapeXmlMinimal: String =
       replace(
         replace(
-          s,
-          "&amp;",
-          "&"
+          replace(
+            s,
+            "&amp;",
+            "&"
+          ),
+          "&lt;",
+          "<"
         ),
-        "&lt;",
-        "<"
-      ),
-      "&gt;",
-      ">"
-    )
+        "&gt;",
+        ">"
+      )
+
+    def normalizeSerializedHtml: String =
+      CrRegex.replaceAllIn(s, "")
+  }
 
   private val CrRegex = """\r""".r
-
-  @JSExport
-  def normalizeSerializedHTML(s: String): String =
-    CrRegex.replaceAllIn(s, "")
+  private val RemoveDisallowedXmlCharactersRegex = """[\x00-\x08\x0B\x0C\x0E-\x1F]""".r
 
   private def replace(text: String, searchString: String, replacement: String): String = {
 

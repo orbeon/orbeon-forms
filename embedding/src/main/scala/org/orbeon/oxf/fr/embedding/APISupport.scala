@@ -19,6 +19,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
@@ -26,10 +27,10 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{ContentTypes, MarkupUtils, PathUtils}
+import org.orbeon.oxf.util.{ContentTypes, PathUtils}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -239,7 +240,7 @@ object APISupport {
 
         def decodeURL(encoded: String) = {
           val decodedURL = ctx.decodeURL(encoded)
-          if (encodeForXML) MarkupUtils.escapeXMLMinimal(decodedURL) else decodedURL
+          if (encodeForXML) decodedURL.escapeXmlMinimal else decodedURL
         }
 
         decodeWSRPContent(

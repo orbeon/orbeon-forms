@@ -27,6 +27,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
@@ -155,7 +156,7 @@ object FormRunnerPersistence {
         for {
           (name, value) ← headers
         } yield
-          <header><name>{MarkupUtils.escapeXMLMinimal(name)}</name><value>{MarkupUtils.escapeXMLMinimal(value)}</value></header>
+          <header><name>{name.escapeXmlMinimal}</name><value>{value.escapeXmlMinimal}</value></header>
       }</headers>.toString
 
     // Convert to TinyTree

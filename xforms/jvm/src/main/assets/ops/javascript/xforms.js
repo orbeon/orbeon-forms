@@ -1740,7 +1740,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         setHelpMessage: function (control, message) {
             // We escape the value because the help element is a little special, containing escaped HTML
-            message = ORBEON.common.MarkupUtils.escapeXMLMinimal(message);
+            message = ORBEON.common.MarkupUtils.escapeXmlMinimal(message);
             ORBEON.xforms.Controls._setMessage(control, "help", message); // uses `innerHTML`
             ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
         },

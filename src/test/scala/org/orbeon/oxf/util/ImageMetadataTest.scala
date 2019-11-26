@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.util
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.junit.Test
 import org.orbeon.oxf.resources.URLFactory
 import ImageMetadata._
 import org.orbeon.saxon.value.Int64Value
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class ImageMetadataTest extends ResourceManagerTestBase with AssertionsForJUnit {
 

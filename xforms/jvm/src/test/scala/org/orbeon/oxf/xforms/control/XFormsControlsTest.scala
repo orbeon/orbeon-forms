@@ -20,7 +20,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.helpers.AttributesImpl
 
 class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit {

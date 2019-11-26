@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class StringReplacerTest extends AssertionsForJUnit {
 

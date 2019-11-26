@@ -19,7 +19,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 

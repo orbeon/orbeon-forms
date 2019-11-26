@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._

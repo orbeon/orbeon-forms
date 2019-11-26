@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.resources.handler
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.scalatestplus.junit.AssertionsForJUnit
 
 
 class DataURLDecoderTest extends AssertionsForJUnit {

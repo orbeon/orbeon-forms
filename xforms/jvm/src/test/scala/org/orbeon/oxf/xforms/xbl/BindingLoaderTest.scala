@@ -18,7 +18,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable

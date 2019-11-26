@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.client.fb
 
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
 import org.orbeon.oxf.common.Version

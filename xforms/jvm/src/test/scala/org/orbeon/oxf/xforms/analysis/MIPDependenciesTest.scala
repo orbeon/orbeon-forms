@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.Version
 import org.junit._
-import org.scalatest.junit._
+import org.scalatestplus.junit._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 

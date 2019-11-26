@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 // Test organization-related code used by the REST API
 class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {

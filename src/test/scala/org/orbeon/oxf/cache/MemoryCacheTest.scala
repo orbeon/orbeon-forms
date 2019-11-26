@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.cache
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import java.util.concurrent.locks.{ReentrantLock, Lock}
 import collection.JavaConverters._
 import concurrent.{Await, Future}
 import concurrent.duration._
 import concurrent.ExecutionContext.Implicits.global
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class MemoryCacheTest extends AssertionsForJUnit {
 

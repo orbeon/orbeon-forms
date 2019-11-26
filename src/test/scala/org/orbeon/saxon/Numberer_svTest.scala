@@ -2,7 +2,7 @@ package org.orbeon.saxon
 
 import org.orbeon.saxon.number.{AbstractNumberer, Numberer_sv}
 import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 /**
  * Tests for numberer class for the Swedish language.

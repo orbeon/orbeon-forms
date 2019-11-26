@@ -13,7 +13,8 @@
   */
 package org.orbeon.xforms
 
-import org.scalatest.AsyncFunSpec
+
+import org.scalatest.funspec.AsyncFunSpec
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 

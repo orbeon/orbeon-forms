@@ -15,7 +15,7 @@ package org.orbeon.oxf.client.fr
 
 import org.junit.Test
 import org.orbeon.oxf.client.FormRunnerOps
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 trait WPaint extends AssertionsForJUnit with FormRunnerOps {
 

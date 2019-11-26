@@ -14,13 +14,13 @@
 package org.orbeon.oxf.controller
 
 import org.orbeon.oxf.http.Headers._
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.mockito.MockitoSugar
 import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext}
 
 import collection.JavaConverters._
+import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatestplus.mockito.MockitoSugar
 
 class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
 

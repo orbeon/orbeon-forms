@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.xforms.XFormsId
 
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 object XFormsStaticStateTest {
 

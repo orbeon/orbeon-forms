@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 

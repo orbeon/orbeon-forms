@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class WhitespaceTest extends DocumentTestBase with AssertionsForJUnit {
 

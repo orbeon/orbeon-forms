@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

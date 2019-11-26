@@ -14,8 +14,8 @@
 package org.orbeon.oxf.resources
 
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.scalatestplus.junit.AssertionsForJUnit
 
 
 class URLFactoryTest extends ResourceManagerTestBase with AssertionsForJUnit {

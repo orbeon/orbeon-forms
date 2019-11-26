@@ -32,7 +32,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Random
 import scala.xml.Elem

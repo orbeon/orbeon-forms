@@ -22,11 +22,11 @@ import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatestplus.mockito.MockitoSugar
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

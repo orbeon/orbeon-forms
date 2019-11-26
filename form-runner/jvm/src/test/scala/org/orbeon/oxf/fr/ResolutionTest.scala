@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.Value
 import org.orbeon.scaxon.Implicits._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 

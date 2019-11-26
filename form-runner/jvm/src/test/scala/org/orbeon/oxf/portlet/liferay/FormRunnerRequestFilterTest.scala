@@ -24,7 +24,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.FunSpecLike
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.TreeMap

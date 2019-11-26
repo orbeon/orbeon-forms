@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.event.ClientEvents
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 

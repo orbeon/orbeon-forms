@@ -21,7 +21,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 /**
  * Test the DDL we provide to create and update databases.

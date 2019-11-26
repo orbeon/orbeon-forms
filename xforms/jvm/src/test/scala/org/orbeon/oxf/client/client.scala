@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.selenium.WebBrowser
+import org.scalatestplus.selenium.WebBrowser
 import org.scalatest.time._
 
 import scala.collection.JavaConverters._

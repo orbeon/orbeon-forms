@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 // As of 2012-07-05, this tests a minimal subset of BinaryTextXMLReceiver only. We should test more combinations of
 // the input parameters.

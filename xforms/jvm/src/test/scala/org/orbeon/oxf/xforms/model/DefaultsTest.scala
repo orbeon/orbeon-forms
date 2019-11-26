@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.language.postfixOps
 

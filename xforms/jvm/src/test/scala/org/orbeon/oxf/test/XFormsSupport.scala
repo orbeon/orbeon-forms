@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.xforms.{Constants, EventNames}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.reflect.ClassTag
 

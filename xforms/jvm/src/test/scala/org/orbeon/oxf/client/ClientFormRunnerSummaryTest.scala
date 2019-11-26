@@ -14,7 +14,7 @@
 package org.orbeon.oxf.client
 
 import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientFormRunnerSummaryTest extends AssertionsForJUnit with FormRunnerOps {
 

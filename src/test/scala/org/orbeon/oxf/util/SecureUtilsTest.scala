@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import java.security.SecureRandom
 import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.scalatestplus.junit.AssertionsForJUnit
 
 // NOTE: hmac is tested via XFormsUploadControlTest
 class SecureUtilsTest extends ResourceManagerTestBase with AssertionsForJUnit {

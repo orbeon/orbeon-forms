@@ -18,7 +18,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 

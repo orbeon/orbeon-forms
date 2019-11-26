@@ -15,7 +15,7 @@ package org.orbeon.oxf.client.fb
 
 import org.junit.Test
 import org.orbeon.oxf.client.{XFormsOps, FormBuilderOps}
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientNewFormParamsTest extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 

@@ -932,8 +932,8 @@
          -->
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="plate⊙3">777</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="leased⊙3">leased</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="plate⊙3"><xxf:property name="value">777</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="leased⊙3"><xxf:property name="value">leased</xxf:property></xxf:event>
             </xxf:action>
         </input>
         <input name="controls">
@@ -1035,12 +1035,12 @@
          -->
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="input1">888</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="input2">Good value 2</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="input3">Good value 3</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="input1">42</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="input2">Bad value 2</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="input3">Bad value 3</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">888</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input2"><xxf:property name="value">Good value 2</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input3"><xxf:property name="value">Good value 3</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">42</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input2"><xxf:property name="value">Bad value 2</xxf:property></xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input3"><xxf:property name="value">Bad value 3</xxf:property></xxf:event>
             </xxf:action>
         </input>
         <input name="controls">

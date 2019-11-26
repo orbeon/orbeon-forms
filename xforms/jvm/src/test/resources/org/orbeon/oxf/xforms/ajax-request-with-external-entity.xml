@@ -16,6 +16,6 @@
     <xxf:uuid>9C5314A6-4AFD-2889-C972-EFDBBB4C30E5</xxf:uuid>
     <xxf:sequence>2</xxf:sequence>
     <xxf:action>
-        <xxf:event name="xxforms-value" source-control-id="my-input">The external entity should be missing: &foobar;</xxf:event>
+        <xxf:event name="xxforms-value" source-control-id="my-input"><xxf:property name="value">The external entity should be missing: &foobar;</xxf:property></xxf:event>
     </xxf:action>
 </xxf:event-request>

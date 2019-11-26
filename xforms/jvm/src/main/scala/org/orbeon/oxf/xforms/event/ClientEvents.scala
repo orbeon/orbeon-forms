@@ -62,6 +62,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Some(e.getText)) } toMap
     lazy val valueOpt     = properties.get("value").flatten
+    lazy val serverEventsValue = element.getText
   }
 
   def extractLocalEvents(actionElement: Element): List[LocalEvent] =
@@ -93,7 +94,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       // Gather all events including decoding action server events
       globalServerEvents ++ (
         clientEvents flatMap {
-          case event if event.name == EventNames.XXFormsServerEvents ⇒ event.valueOpt.toList flatMap decodeServerEvents
+          case event if event.name == EventNames.XXFormsServerEvents ⇒ decodeServerEvents(event.serverEventsValue)
           case event                                                 ⇒ List(event)
         }
       )

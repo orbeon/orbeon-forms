@@ -1039,7 +1039,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="approvalStatus-input⊙2">bbb</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="approvalStatus-input⊙2"><xxf:property name="value">bbb</xxf:property></xxf:event>
             </xxf:action>
         </input>
         <input name="controls">

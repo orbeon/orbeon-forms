@@ -437,7 +437,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="id123">Hello!</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="id123"><xxf:property name="value">Hello!</xxf:property></xxf:event>
                 <xxf:event name="DOMActivate" source-control-id="id124"/>
             </xxf:action>
         </input>
@@ -1136,7 +1136,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="input1">true</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">true</xxf:property></xxf:event>
             </xxf:action>
         </input>
         <input name="controls">

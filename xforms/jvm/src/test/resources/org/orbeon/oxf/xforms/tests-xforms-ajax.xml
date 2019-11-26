@@ -185,7 +185,7 @@
                             <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
                             <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
                             <xxf:action>
-                                <xxf:event name="xxforms-value" source-control-id="input1">true</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">true</xxf:property></xxf:event>
                             </xxf:action>
                         </xxf:event-request>
                     </p:input>
@@ -201,7 +201,7 @@
                             <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
                             <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
                             <xxf:action>
-                                <xxf:event name="xxforms-value" source-control-id="input1">false</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">false</xxf:property></xxf:event>
                             </xxf:action>
                         </xxf:event-request>
                     </p:input>
@@ -217,7 +217,7 @@
                             <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
                             <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
                             <xxf:action>
-                                <xxf:event name="xxforms-value" source-control-id="input1">true</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">true</xxf:property></xxf:event>
                             </xxf:action>
                         </xxf:event-request>
                     </p:input>
@@ -396,14 +396,14 @@
                             <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
 
                             <xxf:action>
-                                <xxf:event name="xxforms-value" source-control-id="input">1</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">1</xxf:property></xxf:event>
                                 <xxf:event name="DOMActivate" source-control-id="trigger1"/>
                                 <xxf:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxf:server-events>
-                                                <xxf:event name="xxforms-value" source-control-id="input">2</xxf:event>
-                                                <xxf:event name="xxforms-value" source-control-id="input">3</xxf:event>
+                                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">2</xxf:property></xxf:event>
+                                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">3</xxf:property></xxf:event>
                                                 <xxf:event name="DOMActivate" source-control-id="trigger2"/>
                                             </xxf:server-events>
                                         </xsl:document>
@@ -412,14 +412,14 @@
                                         xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
                                         select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
                                 </xxf:event>
-                                <xxf:event name="xxforms-value" source-control-id="input">4</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">4</xxf:property></xxf:event>
                                 <xxf:event name="DOMActivate" source-control-id="trigger3"/>
                                 <xxf:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxf:server-events>
-                                                <xxf:event name="xxforms-value" source-control-id="input">5</xxf:event>
-                                                <xxf:event name="xxforms-value" source-control-id="input">6</xxf:event>
+                                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">5</xxf:property></xxf:event>
+                                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">6</xxf:property></xxf:event>
                                                 <xxf:event name="DOMActivate" source-control-id="trigger4"/>
                                             </xxf:server-events>
                                         </xsl:document>
@@ -428,7 +428,7 @@
                                         xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
                                         select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
                                 </xxf:event>
-                                <xxf:event name="xxforms-value" source-control-id="input">7</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">7</xxf:property></xxf:event>
                                 <xxf:event name="DOMActivate" source-control-id="trigger5"/>
                             </xxf:action>
                         </xxf:event-request>
@@ -643,7 +643,7 @@
                             <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
                             <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
                             <xxf:action>
-                                <xxf:event name="xxforms-value" source-control-id="input2">42</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input2"><xxf:property name="value">42</xxf:property></xxf:event>
                             </xxf:action>
                         </xxf:event-request>
                     </p:input>
@@ -660,7 +660,7 @@
                             <xsl:copy-of select="/*/*[2]//xxf:dynamic-state"/>
                             <xxf:action>
                                 <!-- Just to force re-evaluation of the model1 variable  -->
-                                <xxf:event name="xxforms-value" source-control-id="input1">cat</xxf:event>
+                                <xxf:event name="xxforms-value" source-control-id="input1"><xxf:property name="value">cat</xxf:property></xxf:event>
                             </xxf:action>
                         </xxf:event-request>
                     </p:input>

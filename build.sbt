@@ -8,22 +8,25 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
-// Scala libraries
+// Scala libraries for Scala.js only
 val ScalaJsDomVersion             = "0.9.7"
 val ScalaJsJQueryVersion          = "0.9.5"
+val ScribeVersion                 = "2.7.10"
+val PerfolationVersion            = "1.1.5"
+
+// Shared Scala libraries
+val ScalatTestVersion             = "3.0.8"
 val CirceVersion                  = "0.12.3"
 val EnumeratumVersion             = "1.5.13"
 val EnumeratumCirceVersion        = "1.5.22"
 val ScalaXmlVersion               = "1.2.0"
 val ScalaAsyncVersion             = "0.10.0"
-val ScalaLoggingVersion           = "3.9.2"
-val ScribeVersion                 = "2.7.10"
-val PerfolationVersion            = "1.1.5"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.5"
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.0"
 val RosHttpVersion                = "2.1.0"
+val ScalaLoggingVersion           = "3.9.2"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
@@ -307,8 +310,8 @@ lazy val commonSettings = Seq(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalactic" %%% "scalactic" % "3.0.8" % Test,
-    "org.scalatest" %%% "scalatest" % "3.0.8" % Test
+    "org.scalactic" %%% "scalactic" % ScalatTestVersion % Test,
+    "org.scalatest" %%% "scalatest" % ScalatTestVersion % Test
   ),
 
   // This is so that assets added to JAR files are made available to dependent projects.

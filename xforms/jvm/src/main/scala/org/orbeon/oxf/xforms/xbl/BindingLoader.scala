@@ -58,7 +58,7 @@ trait BindingLoader extends Logging {
         val urlMappings = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
-          stringToSet(property.value.toString) map
+          property.value.toString.tokenizeToSet map
             (Dom4jUtils.extractTextValueQName(property.namespaces.asJava, _, true))
 
         def pathsForQNames(qNames: Set[QName]) =

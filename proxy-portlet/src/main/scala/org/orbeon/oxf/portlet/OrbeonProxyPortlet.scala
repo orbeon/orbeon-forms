@@ -82,10 +82,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     super.init(config)
     settingsOpt = Some(
       PortletSettings(
-        forwardHeaders     = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
-        forwardParams      = stringToSet(config.getInitParameter("forward-parameters")),
-        forwardProperties  = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
-        keepParams         = stringToSet(config.getInitParameter("keep-parameters")),
+        forwardHeaders     = config.getInitParameter("forward-headers").tokenizeToSet.map(name ⇒ name.toLowerCase → name)(breakOut),
+        forwardParams      = config.getInitParameter("forward-parameters").tokenizeToSet,
+        forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.map(name ⇒ name.toLowerCase → name)(breakOut),
+        keepParams         = config.getInitParameter("keep-parameters").tokenizeToSet,
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
       )

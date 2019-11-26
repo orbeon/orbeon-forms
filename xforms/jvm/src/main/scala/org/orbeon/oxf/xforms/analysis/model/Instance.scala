@@ -161,7 +161,7 @@ trait InstanceMetadata {
     Option(username) map (Credentials(_, password, preemptiveAuth, domain)) orNull
   }
 
-  val excludeResultPrefixes: Set[String] = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))
+  val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
 
   // Inline root element if any
   private val root = Dom4j.elements(element) headOption

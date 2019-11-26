@@ -70,7 +70,7 @@ class XFormsStaticStateImpl(
   // Properties
   // These are `lazy val`s because they depend on the default model being found, which is done when
   // the `PartAnalysisImpl` is created above. Yes, this is tricky and not ideal.
-  lazy val allowedExternalEvents   = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
+  lazy val allowedExternalEvents   = staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY).tokenizeToSet
   lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
   lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),     P.XPATH_ANALYSIS_PROPERTY)
   lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)

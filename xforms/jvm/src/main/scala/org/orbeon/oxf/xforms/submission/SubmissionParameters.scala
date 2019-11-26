@@ -161,7 +161,7 @@ object SubmissionParameters {
       if (serialize)
         staticSubmission.avtXxfAnnotateOpt flatMap
           stringAvtTrimmedOpt              map
-          stringToSet                      getOrElse
+          (_.tokenizeToSet)                getOrElse
           Set.empty
       else
         Set.empty

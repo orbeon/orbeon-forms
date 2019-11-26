@@ -150,8 +150,8 @@ object SimplePath {
     def attValue(attName: String)  = /@(attName).stringValue
     def attValue(attName: QName)   = /@(attName).stringValue
     def attValue(test: Test)       = /@(test).stringValue
-    def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
-    def attTokens(attName: QName)  = stringOptionToSet(Some(attValue(attName)))
+    def attTokens(attName: String) = attValue(attName).tokenizeToSet
+    def attTokens(attName: QName)  = attValue(attName).tokenizeToSet
     def attClasses = attTokens("class")
     def id = attValue("id")
     def hasId = att("id").nonEmpty && attValue("id").trimAllToEmpty != ""

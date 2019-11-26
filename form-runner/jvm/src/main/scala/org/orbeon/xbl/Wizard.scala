@@ -69,7 +69,7 @@ object Wizard {
         instance ← model.findInstance("available-top-level-sections")
         root     = instance.rootElement
       } yield
-        stringToSet(root.stringValue)
+        root.stringValue.tokenizeToSet
 
     resultOpt getOrElse (throw new IllegalStateException)
   }

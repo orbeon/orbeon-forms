@@ -142,7 +142,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   // Extension methods on Element
   implicit class ElementOps(private val e: STElement) {
 
-    def classes = e.attribute("class") map stringToSet getOrElse Set()
+    def classes = e.attribute("class") map (_.tokenizeToSet) getOrElse Set()
 
     def tabOut(wait: Boolean = true) = insertFieldText(Keys.TAB)
 

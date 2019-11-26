@@ -60,11 +60,11 @@ class SharedUtilsTest extends FunSpec {
     assert("43" === (42 |> inc |> (_.toString)))
   }
 
-  describe("The `stringToSet()` function") {
-    assert(Set()                     == stringToSet(""))
-    assert(Set()                     == stringToSet("  "))
-    assert(Set("GET")                == stringToSet(" GET "))
-    assert(Set("GET", "POST", "PUT") == stringToSet(" GET  POST  PUT "))
+  describe("The `tokenizeToSet()` function") {
+    assert(Set()                     == "".tokenizeToSet)
+    assert(Set()                     == "  ".tokenizeToSet)
+    assert(Set("GET")                == " GET ".tokenizeToSet)
+    assert(Set("GET", "POST", "PUT") == " GET  POST  PUT ".tokenizeToSet)
   }
 
   describe("The `splitQuery()` function") {

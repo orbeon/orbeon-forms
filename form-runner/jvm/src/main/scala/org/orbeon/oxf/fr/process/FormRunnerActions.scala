@@ -355,7 +355,7 @@ trait FormRunnerActions {
           FormRunnerActionsSupport.updateUriWithParams(
             processParams       = SendProcessParams,
             uri                 = uri,
-            requestedParamNames = stringOptionToSet(findParamValue("parameters")).to[List]
+            requestedParamNames = findParamValue("parameters").toList flatMap (_.splitTo[List]())
           )
 
         val propertiesAsPairs =

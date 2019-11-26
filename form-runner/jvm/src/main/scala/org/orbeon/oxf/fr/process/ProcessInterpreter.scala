@@ -286,7 +286,7 @@ trait ProcessInterpreter extends Logging {
   def tryRollback(params: ActionParams): Try[Any] =
     Try {
 
-      val tokens = paramByNameOrDefault(params, "changes") map stringToSet getOrElse Set.empty
+      val tokens = paramByNameOrDefault(params, "changes") map (_.tokenizeToSet) getOrElse Set.empty
 
       if (tokens != Set("in-memory-form-data"))
         throw new IllegalArgumentException(s"""`rollback` action must have a `changes = "in-memory-form-data"` parameter""")

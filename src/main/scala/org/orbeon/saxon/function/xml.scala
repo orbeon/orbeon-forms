@@ -15,7 +15,7 @@ package org.orbeon.saxon.function
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.StringUtils.stringToSet
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
@@ -46,7 +46,7 @@ protected trait ClassSupport extends DefaultFunctionSupport {
         val classCode = xpathContext.getNamePool.allocate("", "", "class")
         val value     = node.getAttributeValue(classCode)
 
-        stringToSet(value)
+        value.tokenizeToSet
       case _ ⇒
         Set.empty
     }

@@ -526,11 +526,11 @@ object ElementAnalysis {
   /**
    * Get the value of an attribute containing a space-separated list of tokens as a set.
    */
-  def attSet(element: Element, qName: QName) =
-    stringOptionToSet(Option(element.attributeValue(qName)))
+  def attSet(element: Element, qName: QName): Set[String] =
+    element.attributeValue(qName).tokenizeToSet
 
-  def attSet(element: Element, name: String) =
-    stringOptionToSet(element.attributeValueOpt(name))
+  def attSet(element: Element, name: String): Set[String] =
+    element.attributeValue(name).tokenizeToSet
 
   /**
    * Get the value of an attribute containing a space-separated list of QNames as a set.

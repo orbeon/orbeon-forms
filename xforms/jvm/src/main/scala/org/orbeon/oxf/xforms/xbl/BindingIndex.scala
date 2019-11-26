@@ -119,7 +119,7 @@ object BindingIndex {
     def attValueMatches(attDesc: BindingAttributeDescriptor, attValue: String) = attDesc.predicate match {
       //case "" ⇒ // TODO: attribute existence (fix parser).
       case "="  ⇒ attValue == attDesc.value
-      case "~=" ⇒ stringToSet(attValue)(attDesc.value)
+      case "~=" ⇒ attValue.tokenizeToSet.contains(attDesc.value)
       case "|=" ⇒ attValue == attDesc.value || attValue.startsWith(attDesc.value + '-')
       case "^=" ⇒ attDesc.value != "" && attValue.startsWith(attDesc.value)
       case "$=" ⇒ attDesc.value != "" && attValue.endsWith(attDesc.value)

@@ -22,10 +22,8 @@ import scala.util.Try
 @JSExportTopLevel("ORBEON.common.StringUtils")
 object StringUtils {
 
-  // Convert a string of tokens to a set
   // TODO: Move to StringOps.
-  def stringToSet(s: String)               = s.splitTo[Set]()
-  def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
+  def stringOptionToSet(s: Option[String]): Set[String] = s map (_.tokenizeToSet) getOrElse Set.empty[String]
 
   @JSExport
   def endsWith(s: String, suffix: String): Boolean =
@@ -116,6 +114,8 @@ object StringUtils {
       }
       builder.result()
     }
+
+    def tokenizeToSet: Set[String] = splitTo[Set]()
 
     private def isNonBreakingSpace(c: Int) =
       c == '\u00A0' || c == '\u2007' || c == '\u202F'

@@ -504,7 +504,7 @@ object PageFlowControllerProcessor {
 
       def methodAttributeFn(attName: String) = att(e, attName) map {
         case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
-        case att                            ⇒ stringToSet(att) map HttpMethod.withNameInsensitive
+        case att                            ⇒ att.tokenizeToSet map HttpMethod.withNameInsensitive
       }
 
       def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods

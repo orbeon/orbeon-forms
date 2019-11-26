@@ -15,7 +15,8 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.0.8"
+val ScalatTestVersion             = "3.1.0-RC3"
+val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.12.3"
 val EnumeratumVersion             = "1.5.13"
 val EnumeratumCirceVersion        = "1.5.22"
@@ -310,8 +311,8 @@ lazy val commonSettings = Seq(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalactic" %%% "scalactic" % ScalatTestVersion % Test,
-    "org.scalatest" %%% "scalatest" % ScalatTestVersion % Test
+    "org.scalactic"     %%% "scalactic"             % ScalatTestVersion    % Test,
+    "org.scalatest"     %%% "scalatest"             % ScalatTestVersion    % Test
   ),
 
   // This is so that assets added to JAR files are made available to dependent projects.
@@ -321,6 +322,14 @@ lazy val commonSettings = Seq(
   copyJarToExplodedWar := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains, matchRawJarName = true),
   copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains, matchRawJarName = true)
 ) ++ unmanagedJarsSettings
+
+lazy val commonScalaJvmSettings = Seq(
+  libraryDependencies ++= Seq(
+    "org.scalatestplus" %%% "scalatestplus-junit"   % ScalaTestPlusVersion % Test,
+    "org.scalatestplus" %%% "scalatestplus-mockito" % ScalaTestPlusVersion % Test,
+    "org.scalatestplus" %%% "scalatestplus-selenium" % ScalaTestPlusVersion % Test
+  )
+)
 
 lazy val commonScalaJsSettings = Seq(
 
@@ -386,6 +395,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
     libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion
   )
+  .jvmSettings(commonScalaJvmSettings)
   .jvmSettings(
     (unmanagedJars in Compile) := myFindUnmanagedJars(
       Runtime,
@@ -465,6 +475,7 @@ lazy val formRunnerJVM = formRunner.jvm
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
   .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings): _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(
     sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
@@ -529,6 +540,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     formRunnerJVM % "test->test;compile->compile",
     core          % "test->test;compile->compile"
   )
+  .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(assetsSettings: _*)
   .settings(
@@ -595,6 +607,7 @@ lazy val xformsJVM = xforms.jvm
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
+  .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(
 
@@ -665,6 +678,7 @@ lazy val core = (project in file("src"))
   .dependsOn(commonJVM, dom.jvm)
   .configs(DebugTest)
   .settings(commonSettings: _*)
+  .settings(commonScalaJvmSettings)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(assetsSettings: _*)
   .settings(

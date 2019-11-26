@@ -208,8 +208,6 @@ def testJavaOptions(buildBaseDirectory: File) =
     "-Djava.awt.headless=true",
     "-Xms256m",
     "-Xmx2G",
-    // Unneeded with Java 8
-    "-XX:MaxPermSize=512m",
     // Some code uses the default time zone, which might different on different system, so we need to set it explicitly
     "-Duser.timezone=America/Los_Angeles",
     "-Doxf.resources.common.min-reload-interval=50",

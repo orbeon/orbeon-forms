@@ -586,7 +586,7 @@
                         <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true" taskname="tomcat">
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <jvmarg value="-Dcatalina.base=test/catalina_base"/>
-                            <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -XX:MaxPermSize=256m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>
+                            <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>
                             <jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=61155"/>
                         </java>
                         <delete dir="test/catalina_base/work"/>

@@ -37,7 +37,7 @@ object DockerSupport {
   implicit def executionContext: ExecutionContext =
     scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-  def replacePaths(s: String) =
+  def replacePaths(s: String): String =
     s.replaceAllLiterally("$BASE_DIRECTORY", BaseDirectory).replaceAllLiterally("$HOME", OS.homedir())
 
   def withInfo[T](message: ⇒ String)(body: ⇒ T): T =
@@ -53,11 +53,12 @@ object DockerSupport {
     val replacedCmd    = replacePaths(cmd)
     val replacedParams = replacePaths(params).trim.replaceAllLiterally("\n", " ")
 
-    println(s"trying to run execFileSync: $replacedCmd $replacedParams")
-    (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {
-      case v: String      ⇒ v
-      case v: node.Buffer ⇒ v.toString()
-      case v              ⇒ throw new IllegalStateException
+    withInfo(s"trying to run execFileSync: $replacedCmd $replacedParams") {
+      (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {
+        case v: String      ⇒ v
+        case v: node.Buffer ⇒ v.toString()
+        case _              ⇒ throw new IllegalStateException
+      }
     }
   }
 
@@ -79,10 +80,9 @@ object DockerSupport {
   }
 
   // Return existing container ids or new container id
-  def runContainer(image: String, params: String, checkImageRunning: Boolean) = async {
+  def runContainer(image: String, params: String, checkImageRunning: Boolean): Future[Success[List[String]]] = async {
 
     await(waitUntilImageAvailable(image))
-
     val existingContainerIdsOpt =
       if (! checkImageRunning)
         None

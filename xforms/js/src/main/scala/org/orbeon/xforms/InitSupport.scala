@@ -72,13 +72,13 @@ object InitSupport {
     }
   }
 
-  def atLeastDomInteractiveF: Future[Unit] = {
+  def atLeastDomInteractiveF(doc: html.Document): Future[Unit] = {
 
-    scribe.debug(s"document state is `${dom.document.readyState}`")
+    scribe.debug(s"document state is `${doc.readyState}`")
 
     val promise = Promise[Unit]()
 
-    if (dom.document.readyState == EventNames.InteractiveReadyState || dom.document.readyState == EventNames.CompleteReadyState) {
+    if (doc.readyState == EventNames.InteractiveReadyState || doc.readyState == EventNames.CompleteReadyState) {
 
       // Because yes, the document is interactive, but JavaScript placed after us might not have run yet.
       // Although if we do everything in an async way, that should be changed.
@@ -90,11 +90,11 @@ object InitSupport {
 
       lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) ⇒ {
         scribe.debug(s"$DOMContentLoaded handler called")
-        dom.document.removeEventListener(DOMContentLoaded, contentLoaded)
+        doc.removeEventListener(DOMContentLoaded, contentLoaded)
         promise.success(())
       }
 
-      dom.document.addEventListener(DOMContentLoaded, contentLoaded)
+      doc.addEventListener(DOMContentLoaded, contentLoaded)
     }
 
     promise.future

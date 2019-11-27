@@ -17,16 +17,16 @@ import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
-import org.orbeon.node
 import org.orbeon.oxf.util.FutureUtils._
-import org.orbeon.xforms.facade
 import org.orbeon.xforms.facade.AjaxServerOps._
+import org.orbeon.xforms.{InitSupport, facade}
+import org.scalajs.dom
 import org.scalajs.dom.raw.Window
 import org.scalatest.funspec.AsyncFunSpec
 
 import scala.async.Async._
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.|
@@ -127,74 +127,40 @@ class OrbeonClientTest extends AsyncFunSpec {
   def loadDocumentViaJSDOM(
     urlToLoad     : String,
     sessionCookie : Option[String] = None
-  ): Future[Window] = {
+  ): Future[dom.Window] = {
 
-    def jsdomF = {
+    val myCookieJar = new CookieJar
 
-      val promise = Promise[Window]()
-
-      new JSDOM("", new js.Object {
-
-        val url            = urlToLoad
-
-        val headers        = new js.Object {
-          val `Accept`          = "*/*"
-          val `Accept-Language` = "en"
-          val `Accept-Encoding` = "gzip, deflate"
-          val `Cookie`          = sessionCookie getOrElse js.undefined
-        }
-
-        val cookie         = sessionCookie.to[js.Array] // map(_.replaceAllLiterally("; HttpOnly", "")).
-        val cookieJar      = new CookieJar
-        val virtualConsole = new VirtualConsole().sendTo(g.console.asInstanceOf[js.Object])
-
-        val features = new js.Object {
-          val FetchExternalResources   = js.Array("script")
-          val ProcessExternalResources = js.Array("script")
-          val SkipExternalResources    = false
-        }
-
-        // `resourceLoader` appears to be used only for sub-resources and not the initial documentat.
-        val resourceLoader: js.Function2[js.Object, js.Function2[node.Error, String, Any], Any] =
-          (resource: js.Object, callback: js.Function2[node.Error, String, Any]) ⇒ {
-            val resourceDyn = resource.asInstanceOf[js.Dynamic]
-            resourceDyn.defaultFetch(callback)
-          }
-
-        val done: js.Function2[js.Any, Window, Any] =
-          (err: js.Any, window: Window) ⇒
-            if (err == null)
-              promise.success(window)
-            else
-              promise.failure(new RuntimeException(s"Error creating JSDOM instance: $err"))
-      })
-
-      promise.future
+    sessionCookie foreach { cookie ⇒
+      myCookieJar.setCookieSync(cookie, OrbeonHAProxyUrl)
     }
 
-    // Here we first try to load the content with `simpleServerRequest` so that allows us to
-    // determine a success status code. JSDOM doesn't support detecting that, and a 404 page will
-    // load just find and will create a DOM if it has any HTML content. So we do this first, and
-    // if that works we reload via JSDOM. We could pass the HTML so we don't have to do 2 requests,
-    // but, JSDOM's `html` property doesn't seem to allow setting a base URL, and then scripts fail
-    // to load. If there was a solution to that problem, we could just pass the HTML received in
-    // the first response.
+    val options = new js.Object {
 
-//    async {
-//      val res = await(simpleServerRequest(urlToLoad, sessionCookie))
-//      await(jsdomF(res.body))
-//    }
+      val referrer             = OrbeonHAProxyUrl
+      val includeNodeLocations = false
+      val storageQuota         = 10000000
+      val pretendToBeVisual    = true
 
-    jsdomF filter { window ⇒
-      window.document.querySelector(".orbeon") ne null
+      val cookieJar            = myCookieJar
+      val virtualConsole       = new VirtualConsole().sendTo(g.console.asInstanceOf[js.Object])
+
+      val resources            = "usable"
+      val runScripts           = "dangerously" // "outside-only"
     }
 
-//    simpleServerRequest(urlToLoad) flatMap (_ ⇒ jsdomF)
+    for {
+      jsdom ← JSDOMSupport.fromUrlF(urlToLoad, options)
+      _     ← InitSupport.atLeastDomInteractiveF(jsdom.window.document)
+      if jsdom.window.document.querySelector(".orbeon") ne null // this will throw if not satisfied
+    } yield
+      jsdom.window
   }
 
   // NOTE: While we retry new server sessions may be created if we hit another server
   def waitForServerCookie(serverPrefix: String): Future[Try[String]] =
     eventuallyAsTry(interval = 5.seconds, timeout = CookieTimeout) {
+
       simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res ⇒
 
         // https://github.com/hmil/RosHTTP/issues/68

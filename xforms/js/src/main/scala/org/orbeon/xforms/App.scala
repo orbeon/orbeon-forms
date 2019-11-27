@@ -13,6 +13,8 @@
  */
 package org.orbeon.xforms
 
+import org.scalajs.dom
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
@@ -31,7 +33,7 @@ trait App {
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    InitSupport.atLeastDomInteractiveF flatMap (_ ⇒ InitSupport.liferayF) onComplete {
+    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ ⇒ InitSupport.liferayF) onComplete {
       case Success(_) ⇒
         scribe.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()

@@ -13,17 +13,55 @@
   */
 package org.orbeon.fr
 
+import org.scalajs.dom
+
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.JSImport
+import scala.scalajs.js.{Thenable, UndefOr, |}
 
 @js.native
 @JSImport("jsdom", "JSDOM")
-class JSDOM(html: String, config: js.Object) extends js.Object
+class JSDOM(html: String, option: js.Object) extends js.Object {
+  val window        : dom.Window     = js.native
+  val virtualConsole: VirtualConsole = js.native
+  val cookieJar     : CookieJar      = js.native
+  def serialize     : String         = js.native
+}
+
+@js.native
+@JSImport("jsdom", "JSDOM")
+object JSDOM extends js.Object {
+  def fromURL(url: String, options: js.Object): js.Promise[JSDOM] = js.native
+}
+
+object JSDOMSupport {
+  def fromUrlF(url: String, options: js.Object): Future[JSDOM] = {
+    val promise = Promise[JSDOM]()
+    JSDOM.fromURL(url, options).`then`[Unit](
+      { v: JSDOM ⇒
+        promise.success(v)
+        (): Unit | Thenable[Unit]
+      },
+      js.defined { e: scala.Any ⇒
+        promise.failure(new RuntimeException(e.toString))
+        (): Unit | Thenable[Unit]
+      }
+    )
+    promise.future
+  }
+}
 
 @js.native
 @JSImport("jsdom", "CookieJar")
-class CookieJar extends js.Object
+class CookieJar extends js.Object {
+  def setCookieSync(cookie: String, currentUrl: String, options: js.UndefOr[js.Object] = js.undefined): Unit = js.native
+  def getCookiesSync(currentUrl: String, options: js.UndefOr[js.Object] = js.undefined): js.Array[Cookie] = js.native
+}
+
+@js.native
+@JSImport("jsdom", "Cookie")
+class Cookie extends js.Object
 
 @js.native
 @JSImport("jsdom", "VirtualConsole")

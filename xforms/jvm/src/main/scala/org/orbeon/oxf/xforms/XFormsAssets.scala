@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StringUtils._
 import spray.json._
 
 case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
@@ -32,7 +33,7 @@ object AssetPath {
 
   def minFromFull(full: String): String =
     findExtension(full) match {
-      case Some(ext) ⇒ full.substring(0, full.size - ext.size - 1) + ".min." + ext
+      case Some(ext) ⇒ full.substring(0, full.length - ext.length - 1) + ".min." + ext
       case None      ⇒ throw new IllegalArgumentException
     }
 }
@@ -41,9 +42,49 @@ object XFormsAssets {
 
   val AssetsBaselineProperty = "oxf.xforms.assets.baseline"
 
-  private def assetsFromJSON(json: JsValue): XFormsAssets = {
+  def updateAssets(assets: XFormsAssets, excludesProp: String, updatesProp: String): XFormsAssets = {
 
-    def collectFullMin(key: String, fields: Map[String, JsValue]) =
+    def maybeRemoveOne(assets: XFormsAssets, path: String): XFormsAssets =
+      assets.copy(css = assets.css.filter(_.full != path), js = assets.js.filter(_.full != path))
+
+    def maybeAddOne(assets: XFormsAssets, path: String): XFormsAssets = {
+
+      val isCss = path.endsWith(".css")
+
+      val existingItems  = if (isCss) assets.css else assets.js
+
+      (! existingItems.exists(_.full == path)) option (existingItems :+ AssetPath(path, None)) match {
+        case Some(newItems) if isCss ⇒ assets.copy(css = newItems)
+        case Some(newItems)          ⇒ assets.copy(js = newItems)
+        case None                    ⇒ assets
+      }
+    }
+
+    def maybeAddOrRemoveOne(assets: XFormsAssets, update: String): XFormsAssets =
+      if (update.startsWith("-"))
+        maybeRemoveOne(assets, update.tail)
+      else if (update.startsWith("+"))
+        maybeAddOne(assets, update.tail)
+      else
+        maybeAddOne(assets, update)
+
+    val allUpdates =
+      (excludesProp.splitTo[List]() map ("-" + _)) ::: updatesProp.splitTo[List]()
+
+    allUpdates.foldLeft(assets)(maybeAddOrRemoveOne)
+  }
+
+  def fromJsonString(json: String): XFormsAssets =
+    fromJson(json.parseJson)
+
+  def fromJSONProperty: XFormsAssets =
+    Properties.instance.getPropertySet
+      .getPropertyOrThrow(AssetsBaselineProperty)
+      .associatedValue(v ⇒ fromJsonString(v.value.toString))
+
+  private def fromJson(json: JsValue): XFormsAssets = {
+
+    def collectFullMin(key: String, fields: Map[String, JsValue]): Vector[AssetPath] =
       fields.get(key) match {
         case Some(JsArray(values)) ⇒
           values collect { case JsObject(fields) ⇒
@@ -65,14 +106,5 @@ object XFormsAssets {
 
       case _ ⇒ throw new IllegalArgumentException
     }
-  }
-
-  def assetsFromString(json: String): XFormsAssets = assetsFromJSON(json.parseJson)
-
-  private def properties = Properties.instance.getPropertySet
-
-  def fromJSONProperty: XFormsAssets = {
-    val property = properties.getPropertyOrThrow(AssetsBaselineProperty)
-    property.associatedValue(v ⇒ assetsFromString(v.value.toString))
   }
 }

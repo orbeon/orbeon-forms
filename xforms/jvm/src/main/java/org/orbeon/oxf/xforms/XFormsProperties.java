@@ -131,6 +131,7 @@ public class XFormsProperties {
     public static final String SANITIZE_PROPERTY = "sanitize";
 
     public static final String ASSETS_BASELINE_EXCLUDES_PROPERTY = "assets.baseline.excludes";
+    public static final String ASSETS_BASELINE_UPDATES_PROPERTY = "assets.baseline.updates";
     public static final String INLINE_RESOURCES_PROPERTY = "inline-resources";
 
     public static class PropertyDefinition {

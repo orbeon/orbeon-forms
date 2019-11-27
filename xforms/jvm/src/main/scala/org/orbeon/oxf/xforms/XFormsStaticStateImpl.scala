@@ -77,15 +77,12 @@ class XFormsStaticStateImpl(
   lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
   lazy val isInlineResources       = staticBooleanProperty(P.INLINE_RESOURCES_PROPERTY)
 
-  lazy val assets: XFormsAssets = {
-
-    val excludesProp = staticStringProperty(P.ASSETS_BASELINE_EXCLUDES_PROPERTY)
-
-    def update(assets: XFormsAssets, exclude: String): XFormsAssets =
-      assets.copy(css = assets.css.filter(_.full != exclude), js = assets.js.filter(_.full != exclude))
-
-    excludesProp.splitTo[List]().foldLeft(XFormsAssets.fromJSONProperty)(update)
-  }
+  lazy val assets: XFormsAssets =
+    XFormsAssets.updateAssets(
+      XFormsAssets.fromJSONProperty,
+      staticStringProperty(P.ASSETS_BASELINE_EXCLUDES_PROPERTY),
+      staticStringProperty(P.ASSETS_BASELINE_UPDATES_PROPERTY)
+    )
 
   private def loadClass[T : ClassTag](propertyName: String): Option[T] =
     staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap trimAllToOpt match {

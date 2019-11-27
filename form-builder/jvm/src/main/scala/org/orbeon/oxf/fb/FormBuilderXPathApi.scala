@@ -293,12 +293,9 @@ object FormBuilderXPathApi {
       (lhhaElem ⇒ lhhaElem → lhhaElem.attValue("ref")) collect
       { case (lhhaElem, HelpRefMatcher(controlName)) ⇒ lhhaElem → controlName }
 
-    val allUnneededHolders =
-      allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) ⇒
-        holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)._2
-      }
-
-    allUnneededHolders.flatten
+    allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) ⇒
+      holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)._2 :+ lhhaElement
+    }
   }
 
   //@XPathFunction

@@ -23,14 +23,14 @@ import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
 import org.orbeon.oxf.test.ResourceManagerSupport
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
-class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLike with MockitoSugar {
+class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {
 
   describe("The portlet filter's `amendRequest()` function") {
 

@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.xml.Elem
 
-class XBLTransformerTest extends FunSpec with XMLSupport {
+class XBLTransformerTest extends AnyFunSpec with XMLSupport {
 
   describe("Conversion of CSS to XPath") {
 

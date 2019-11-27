@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class DateUtilsTest extends FunSpec {
+class DateUtilsTest extends AnyFunSpec {
 
   describe("Date parsing") {
 

@@ -22,14 +22,14 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.{Failure, Success}
 
 class GridDataMigrationTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormBuilderSupport
      with XMLSupport {
 

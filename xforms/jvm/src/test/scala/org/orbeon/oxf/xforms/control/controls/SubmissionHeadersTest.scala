@@ -17,12 +17,12 @@ import org.orbeon.dom
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class SubmissionHeadersTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Submission headers") {
 

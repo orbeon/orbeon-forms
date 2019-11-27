@@ -19,9 +19,9 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class BindingIndexTest extends FunSpec {
+class BindingIndexTest extends AnyFunSpec {
 
   case class TestBinding(
     selectors        : List[Selector],

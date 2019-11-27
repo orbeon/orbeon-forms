@@ -13,11 +13,11 @@
   */
 package org.orbeon.dom
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.JavaConverters._
 
-class DOMTest extends FunSpec {
+class DOMTest extends AnyFunSpec {
 
   val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
   val XF = Namespace("xf", "http://www.w3.org/2002/xforms")

@@ -23,14 +23,14 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsStaticStateImpl, XFormsUtil
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.JavaConverters._
 
 class XFormsAnnotatorTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   private val xmlDoc = elemToDom4j(
     <xh:html xmlns:xf="http://www.w3.org/2002/xforms"

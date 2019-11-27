@@ -16,10 +16,10 @@ package org.orbeon.fr
 import org.orbeon.xforms.{$, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class ClientFormRunnerApiTest extends FunSpec {
+class ClientFormRunnerApiTest extends AnyFunSpec {
 
   describe("the `findControlsByName` function") {
 

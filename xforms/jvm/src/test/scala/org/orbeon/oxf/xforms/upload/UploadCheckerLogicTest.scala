@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.upload
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class UploadCheckerLogicTest extends FunSpec {
+class UploadCheckerLogicTest extends AnyFunSpec {
 
   case class TestUploadCheckerLogic(
     controlIdToMaxSize             : Map[String, Long],

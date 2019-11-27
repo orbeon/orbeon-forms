@@ -20,12 +20,12 @@ import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class XFormsStateManagerTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   import Private._
 

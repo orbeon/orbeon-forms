@@ -31,12 +31,12 @@ import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
 import org.scalactic.Equality
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.{mutable ⇒ m}
 
 
-class MultipartTest extends ResourceManagerSupport with FunSpecLike {
+class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
   val rm = ResourceManagerWrapper.instance
 

@@ -23,12 +23,12 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class SimpleDataMigrationTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport
      with XMLSupport {
 

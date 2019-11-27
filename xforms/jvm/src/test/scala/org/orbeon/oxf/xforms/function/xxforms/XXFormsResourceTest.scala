@@ -19,9 +19,9 @@ import org.orbeon.saxon.function.ProcessTemplate
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class XXFormsResourceTest extends FunSpec {
+class XXFormsResourceTest extends AnyFunSpec {
 
   describe("The `pathFromTokens()` function") {
 

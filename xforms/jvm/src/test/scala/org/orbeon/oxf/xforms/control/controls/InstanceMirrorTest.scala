@@ -18,12 +18,12 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class InstanceMirrorTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Mirror in same part") {
     it(s"must handle updates") {

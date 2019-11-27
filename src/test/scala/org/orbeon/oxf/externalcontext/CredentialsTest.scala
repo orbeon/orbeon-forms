@@ -17,10 +17,10 @@ import org.orbeon.oxf.externalcontext.Credentials._
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 import spray.json.DeserializationException
 
-class CredentialsTest extends FunSpec with XMLSupport {
+class CredentialsTest extends AnyFunSpec with XMLSupport {
 
   val TestCredentials =
     Credentials(

@@ -18,12 +18,12 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class ErrorSummaryTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("fr:error-summary") {
 

@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class ItemsetActionTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport {
 
   describe("Form Runner itemset actions") {

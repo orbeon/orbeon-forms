@@ -22,14 +22,14 @@ import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.Try
 
 class VersionTest
   extends ResourceManagerTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Product configuration") {
     it(s"must pass for edition `${Version.Edition}`") {

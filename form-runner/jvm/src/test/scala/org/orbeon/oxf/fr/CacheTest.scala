@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.TestHttpClient.{CacheEvent, StaticState}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class CacheTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport{
 
   describe("Form Runner static cache") {

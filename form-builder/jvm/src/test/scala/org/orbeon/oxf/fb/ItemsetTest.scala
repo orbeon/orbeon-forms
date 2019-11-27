@@ -22,14 +22,14 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.xml.Elem
 
 class ItemsetTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormBuilderSupport {
 
   val ItemsetsDoc = "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"

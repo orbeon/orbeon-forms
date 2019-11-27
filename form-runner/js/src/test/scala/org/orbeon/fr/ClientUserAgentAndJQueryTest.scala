@@ -15,11 +15,11 @@ package org.orbeon.fr
 
 import org.orbeon.xforms._
 import org.scalajs.dom
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.scalajs.js
 
-class ClientUserAgentAndJQueryTest extends FunSpec {
+class ClientUserAgentAndJQueryTest extends AnyFunSpec {
 
   describe("The environment's user agent string") {
     val userAgent = dom.window.navigator.userAgent

@@ -15,12 +15,12 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class SynchronizeRepeatedContentTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport {
 
   val BobValue   = "Bob"

@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl}
 import org.orbeon.xforms.Constants
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class DatasetsTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport
      with XFormsSupport {
 

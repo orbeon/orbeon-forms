@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceManagerTestBase, XFormsSupport}
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class XFormsResourceServerTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with XFormsSupport {
 
   describe("The `proxyURI` function") {

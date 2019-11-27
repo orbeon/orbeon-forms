@@ -18,9 +18,9 @@ import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.oxf.fr.Cell
 import org.orbeon.xforms._
 import org.scalajs.dom
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class ClientGridTest extends FunSpec {
+class ClientGridTest extends AnyFunSpec {
 
   describe("The `spaceToExtendCell()` function") {
 

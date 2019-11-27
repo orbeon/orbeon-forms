@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable
 
@@ -35,7 +35,7 @@ import scala.collection.mutable
 class FormBuilderFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormBuilderSupport
      with XMLSupport {
 

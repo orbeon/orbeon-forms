@@ -20,12 +20,12 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class WizardTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport
      with XFormsSupport {
 

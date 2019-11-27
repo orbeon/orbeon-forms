@@ -15,12 +15,12 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class CSSRewriterTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Rewriting CSS") {
 

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.ContentTypes._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class ContentTypesTest extends FunSpec {
+class ContentTypesTest extends AnyFunSpec {
 
   describe("The isXMLContentType method") {
     it("must handle spaces and parameters") {

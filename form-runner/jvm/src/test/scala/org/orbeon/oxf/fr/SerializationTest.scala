@@ -17,12 +17,12 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceMa
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class SerializationTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Issue #2197: Restore ids of bound controls") {
 

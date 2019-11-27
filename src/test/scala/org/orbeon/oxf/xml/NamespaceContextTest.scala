@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xml
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class NamespaceContextTest extends FunSpec {
+class NamespaceContextTest extends AnyFunSpec {
 
   describe("Basic nesting") {
 

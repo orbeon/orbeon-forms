@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.Document
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class SubmissionUtilsTest extends FunSpec {
+class SubmissionUtilsTest extends AnyFunSpec {
 
   describe("`application/x-www-form-urlencoded` serialization") {
 

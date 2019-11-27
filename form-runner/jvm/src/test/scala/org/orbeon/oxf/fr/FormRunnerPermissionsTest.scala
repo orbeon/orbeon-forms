@@ -17,9 +17,9 @@ import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRo
 import org.orbeon.oxf.fr.permission.Operation.{Create, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class FormRunnerPermissionsTest extends FunSpec {
+class FormRunnerPermissionsTest extends AnyFunSpec {
 
   val guest =
     Credentials(

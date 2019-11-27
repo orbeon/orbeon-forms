@@ -15,9 +15,9 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.util.StringUtils._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class FormRunnerActionsTest extends FunSpec{
+class FormRunnerActionsTest extends AnyFunSpec{
 
   describe("URL update when sending or changing mode") {
 

@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
 import org.parboiled.errors.ParsingException
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable.ListBuffer
 import scala.util.{Success, Try}
@@ -30,7 +30,7 @@ import scala.util.{Success, Try}
 class SimpleProcessTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   val ConstantProcessId = "9fbcdd2e3caf46045e2d545c26d54ffd5b241e97"
 

@@ -23,14 +23,14 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.JavaConverters._
 
 class FormRunnerFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Persistence headers") {
 

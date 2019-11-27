@@ -13,10 +13,10 @@
   */
 package org.orbeon.xforms
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class XFormsIdTest extends FunSpec {
+class XFormsIdTest extends AnyFunSpec {
 
   describe("extracting id parts") {
 

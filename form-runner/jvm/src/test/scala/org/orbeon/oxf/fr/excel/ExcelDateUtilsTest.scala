@@ -20,10 +20,10 @@ import java.{util ⇒ ju}
 
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.CoreUtils._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 // ORBEON: Moved subset of original Apache POI class to Scala.
-class ExcelDateUtilsTest extends FunSpecLike {
+class ExcelDateUtilsTest extends AnyFunSpecLike {
 
   val TimeZoneUtc   = ju.TimeZone.getTimeZone("UTC")
   val DefaultLocale = ju.Locale.getDefault
@@ -166,7 +166,7 @@ class ExcelDateUtilsTest extends FunSpecLike {
           assert(formatType == ExcelDateUtils.analyzeFormatType(formatId, format))
         }
     }
-    
+
     describe("Invalid dates formats") {
       for (format ← List("yyyy*mm*dd", "0.0", "0.000", "0%", "0.0%", "[]Foo", "[BLACK]0.00%", "[ms]", "[Mh]", ""))
         it(s"`$format`") {

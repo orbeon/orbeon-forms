@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr.persistence.test
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
-class LockInfoTest extends FunSpecLike {
+class LockInfoTest extends AnyFunSpecLike {
 
   describe("Dealing with `d:lockinfo` documents") {
     it("can parse what we serialized") {

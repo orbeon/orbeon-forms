@@ -15,10 +15,10 @@ package org.orbeon.datatypes
 
 import org.orbeon.datatypes.Mediatype.TypeOrSubtype.SpecificType
 import org.orbeon.datatypes.MediatypeRange.{SingletonMediatypeRange, WildcardMediatypeRange, WildcardTypeMediatypeRange}
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class MediatypeTest extends FunSpec {
+class MediatypeTest extends AnyFunSpec {
 
   val DisallowedChars               = """()<>@,;:\"/[]?=é天\u007F\u0000\u0010 """.to[List]
   val MediatypesWithDisallowedChars = DisallowedChars map (char ⇒ s"application/fo${char}o")

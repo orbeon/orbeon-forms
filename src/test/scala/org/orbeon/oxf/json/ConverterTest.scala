@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.{Dom4j, SAXStore, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.NodeConversions._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 import spray.json._
 
 import scala.language.postfixOps
@@ -179,7 +179,7 @@ object ConverterTest {
     Dom4j.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 }
 
-class ConverterTest extends FunSpecLike with XMLSupport {
+class ConverterTest extends AnyFunSpecLike with XMLSupport {
 
   import ConverterTest._
   import org.orbeon.scaxon.SimplePath.{Test ⇒ _, _}

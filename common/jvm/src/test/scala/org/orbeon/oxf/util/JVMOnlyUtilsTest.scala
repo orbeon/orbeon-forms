@@ -15,9 +15,9 @@ package org.orbeon.oxf.util
 
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class JVMOnlyUtilsTest extends FunSpec {
+class JVMOnlyUtilsTest extends AnyFunSpec {
 
   describe("The `useAndClose()` function") {
 

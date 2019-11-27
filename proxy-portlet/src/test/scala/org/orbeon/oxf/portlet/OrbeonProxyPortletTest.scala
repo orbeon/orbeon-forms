@@ -14,10 +14,10 @@
 package org.orbeon.oxf.portlet
 
 import org.orbeon.oxf.fr.embedding.APISupport
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
-class OrbeonProxyPortletTest extends FunSpec {
+class OrbeonProxyPortletTest extends AnyFunSpec {
 
   import APISupport._
 

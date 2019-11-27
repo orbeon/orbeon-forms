@@ -15,11 +15,11 @@ package org.orbeon.oxf.portlet
 
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.JavaConverters._
 
-class WSRP2UtilsTest extends FunSpec {
+class WSRP2UtilsTest extends AnyFunSpec {
 
   describe("The `decodeQueryStringPortlet()` function") {
 

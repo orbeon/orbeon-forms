@@ -18,11 +18,11 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
 
-class SharedUtilsTest extends FunSpec {
+class SharedUtilsTest extends AnyFunSpec {
 
   describe("The `dropTrailingSlash()` function") {
     assert("/a" === "/a/".dropTrailingSlash)

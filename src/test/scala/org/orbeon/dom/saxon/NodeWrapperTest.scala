@@ -17,9 +17,9 @@ import org.orbeon.dom
 import org.orbeon.dom.{DocumentFactory, Namespace, Text}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.SiblingCountingNode
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class NodeWrapperTest extends FunSpec {
+class NodeWrapperTest extends AnyFunSpec {
 
   val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
   val XF = Namespace("xf", "http://www.w3.org/2002/xforms")

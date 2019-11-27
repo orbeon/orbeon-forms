@@ -17,9 +17,9 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class FormBuilderPermissionsTest extends FunSpec {
+class FormBuilderPermissionsTest extends AnyFunSpec {
 
   describe("The `formBuilderPermissions()` function") {
 

@@ -14,11 +14,11 @@
 package org.orbeon.date
 
 import org.orbeon.date.JSDateUtils._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.scalajs.js
 
-class JSDateUtilsTest extends FunSpec {
+class JSDateUtilsTest extends AnyFunSpec {
 
   val StringsToDates = List(
     "2032-05-29" → new js.Date(2032,  4, 29, 0, 0, 0, 0),

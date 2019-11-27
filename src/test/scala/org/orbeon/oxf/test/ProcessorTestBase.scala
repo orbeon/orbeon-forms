@@ -34,6 +34,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.{FunSpec, FunSpecLike}
 
 import scala.util.control.NonFatal
@@ -44,9 +45,8 @@ abstract class ProcessorTestBase(
   sessionCreated   : Session ⇒ Any = _ ⇒ (),
   sessionDestroyed : Session ⇒ Any = _ ⇒ ()
 )
-  extends FunSpec
+  extends AnyFunSpec
      with ResourceManagerSupport
-     with FunSpecLike
      with XMLSupport {
 
   case class TestDescriptor(

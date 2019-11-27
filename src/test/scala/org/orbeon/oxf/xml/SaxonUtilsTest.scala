@@ -16,9 +16,9 @@ package org.orbeon.oxf.xml
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class SaxonUtilsTest extends FunSpec {
+class SaxonUtilsTest extends AnyFunSpec {
 
   describe("The `makeNCName` function") {
 

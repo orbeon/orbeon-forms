@@ -21,14 +21,14 @@ import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents._
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 
 
 class ExtractorTest
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike {
+     with AnyFunSpecLike {
 
   describe("Undeclared prefix after state deserialization #1897") {
 

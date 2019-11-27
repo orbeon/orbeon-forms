@@ -14,9 +14,9 @@
 package org.orbeon.xbl
 
 import org.orbeon.dom.QName
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
-class NumberSupportTest extends FunSpec {
+class NumberSupportTest extends AnyFunSpec {
 
   case class TestNode(value: String, datatype: Option[QName], customMips: Map[String, String])
 

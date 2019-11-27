@@ -18,12 +18,12 @@ import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.xforms.XFormsId
-import org.scalatest.FunSpecLike
+import org.scalatest.funspec.AnyFunSpecLike
 
 class ActionsFormat20182Test
   extends DocumentTestBase
      with ResourceManagerSupport
-     with FunSpecLike
+     with AnyFunSpecLike
      with FormRunnerSupport {
 
   describe("Form Runner actions in 2018.2 format") {

@@ -267,6 +267,7 @@ public class XFormsProperties {
             new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY                   , false,                          false),
             new PropertyDefinition(SANITIZE_PROPERTY                             , "",                             false),
             new PropertyDefinition(ASSETS_BASELINE_EXCLUDES_PROPERTY             , "",                             false),
+            new PropertyDefinition(ASSETS_BASELINE_UPDATES_PROPERTY              , "",                             false),
             new PropertyDefinition(INLINE_RESOURCES_PROPERTY                     , false,                          false),
 
             // Properties to propagate to the client

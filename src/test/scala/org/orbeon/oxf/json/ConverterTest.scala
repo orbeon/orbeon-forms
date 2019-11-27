@@ -172,10 +172,10 @@ object ConverterTest {
 
   val ExpectedJsonToXml = XFormsJsonToXml ++ AdditionalJsonToXml
 
-  /*@XPathFunctions*/ def expectedJsonStrings = ExpectedJsonToXml map (_._1)
-  /*@XPathFunctions*/ def expectedXmlStrings  = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
+  /*@XPathFunctions*/ def expectedJsonStrings: List[String] = ExpectedJsonToXml map (_._1)
+  /*@XPathFunctions*/ def expectedXmlStrings: List[DocumentInfo] = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
 
-  /*@XPathFunctions*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo) =
+  /*@XPathFunctions*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Boolean =
     Dom4j.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 }
 

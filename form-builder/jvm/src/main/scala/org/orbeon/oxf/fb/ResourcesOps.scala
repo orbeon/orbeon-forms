@@ -285,7 +285,7 @@ trait ResourcesOps extends BaseOps {
 
       true → (
         if (allBlankOrMissing)
-          holders flatMap (_._2 child lhhaName)
+          holders flatMap { case (_, controlHolder) ⇒ controlHolder child lhhaName}
         else
           Nil
       )

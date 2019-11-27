@@ -24,10 +24,6 @@ var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
-var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
-var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
-var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
-var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", "g");
 
 (function() {
 

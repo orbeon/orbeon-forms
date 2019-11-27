@@ -23,8 +23,8 @@ class ClientUserAgentAndJQueryTest extends FunSpec {
 
   describe("The environment's user agent string") {
     val userAgent = dom.window.navigator.userAgent
-    it("must be the Node.js one") {
-      assert(userAgent contains "Node.js")
+    it("must be the Node.js/jsdom one") {
+      assert(userAgent contains "jsdom")
     }
   }
 
@@ -37,5 +37,4 @@ class ClientUserAgentAndJQueryTest extends FunSpec {
       assert(jQueryVersion.startsWith("1."))
     }
   }
-
 }

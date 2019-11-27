@@ -14,12 +14,19 @@
 package org.orbeon.fr
 
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.JSImport
 
 @js.native
-@JSImport("jsdom", JSImport.Namespace)
-object JSDOM extends js.Object {
-  def env(config: js.Object) : js.Any    = js.native
-  def createVirtualConsole() : js.Object = js.native
-  def createCookieJar()      : js.Object = js.native
+@JSImport("jsdom", "JSDOM")
+class JSDOM(html: String, config: js.Object) extends js.Object
+
+@js.native
+@JSImport("jsdom", "CookieJar")
+class CookieJar extends js.Object
+
+@js.native
+@JSImport("jsdom", "VirtualConsole")
+class VirtualConsole extends js.Object {
+  def sendTo(anyConsole: js.Object, options: UndefOr[Nothing] = js.undefined): VirtualConsole = js.native
 }

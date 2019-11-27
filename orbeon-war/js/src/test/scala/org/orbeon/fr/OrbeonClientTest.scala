@@ -19,11 +19,10 @@ import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.node
 import org.orbeon.oxf.util.FutureUtils._
-import org.orbeon.oxf.util.StringUtils
+import org.orbeon.xforms.facade
 import org.orbeon.xforms.facade.AjaxServerOps._
-import org.orbeon.xforms.{Constants, facade}
 import org.scalajs.dom.raw.Window
-import org.scalatest.AsyncFunSpec
+import org.scalatest.funspec.AsyncFunSpec
 
 import scala.async.Async._
 import scala.concurrent.duration._
@@ -31,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.|
-import scala.util.{Success, Try}
+import scala.util.Try
 
 class OrbeonClientTest extends AsyncFunSpec {
 
@@ -134,7 +133,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
       val promise = Promise[Window]()
 
-      JSDOM.env(new js.Object {
+      new JSDOM("", new js.Object {
 
         val url            = urlToLoad
 
@@ -146,8 +145,8 @@ class OrbeonClientTest extends AsyncFunSpec {
         }
 
         val cookie         = sessionCookie.to[js.Array] // map(_.replaceAllLiterally("; HttpOnly", "")).
-        val cookieJar      = JSDOM.createCookieJar()
-        val virtualConsole = JSDOM.createVirtualConsole().asInstanceOf[js.Dynamic].sendTo(g.console)
+        val cookieJar      = new CookieJar
+        val virtualConsole = new VirtualConsole().sendTo(g.console.asInstanceOf[js.Object])
 
         val features = new js.Object {
           val FetchExternalResources   = js.Array("script")

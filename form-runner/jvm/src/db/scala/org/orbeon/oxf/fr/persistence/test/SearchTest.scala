@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.{POST, PUT}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
-import org.scalatest.{BeforeAndAfterAll, FunSpecLike}
+import org.scalatest.funspec.AnyFunSpecLike
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class SearchTest

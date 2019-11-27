@@ -81,7 +81,7 @@
             select="
                 p:split(
                     normalize-space(
-                        p:property(string-join(('oxf.fr', $name, 'uri', $app, $form), '.'))
+                        p:property(string-join(('oxf.fr', $name, $app, $form), '.'))
                     )
                 )"/>
 
@@ -90,7 +90,7 @@
                 select="
                     p:split(
                         normalize-space(
-                            p:property(string-join(('oxf.fr', if ($is-detail) then 'detail' else 'summary', $name, 'uri', $app, $form), '.'))
+                            p:property(string-join(('oxf.fr', if ($is-detail) then 'detail' else 'summary', $name, $app, $form), '.'))
                         )
                     )"/>
         </xsl:if>
@@ -99,11 +99,15 @@
     <xsl:variable
         name="css-uri"
         as="xs:string*"
-        select="fr:get-uris-from-properties('css'), fr:get-uris-from-properties('css.custom')"/>
+        select="fr:get-uris-from-properties('css.uri'), fr:get-uris-from-properties('css.custom.uri')"/>
     <xsl:variable
         name="js-uri"
         as="xs:string*"
-        select="fr:get-uris-from-properties('js'), fr:get-uris-from-properties('js.custom')"/>
+        select="fr:get-uris-from-properties('js.uri'), fr:get-uris-from-properties('js.custom.uri')"/>
+    <xsl:variable
+        name="assets-baseline-updates"
+        as="xs:string*"
+        select="fr:get-uris-from-properties('assets.baseline.updates')"/>
 
     <xsl:variable
         name="label-appearance"
@@ -467,7 +471,7 @@
             xxf:xpath-analysis="true"
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"
-            xxf:assets.baseline.excludes="/ops/javascript/scalajs/orbeon-xforms.js"
+            xxf:assets.baseline.updates="{$assets-baseline-updates}"
             xxf:upload.max-size-aggregate-expression="
                 sum(
                     xxf:instance('fr-form-instance')//*[

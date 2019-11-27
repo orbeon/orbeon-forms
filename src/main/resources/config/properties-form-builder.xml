@@ -14,25 +14,6 @@
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <property as="xs:string"  name="oxf.fr.detail.css.uri.orbeon.builder">
-        /apps/fr/style/form-runner-common.css
-        /apps/fr/style/form-runner-base.css
-        /apps/fr/style/form-runner-orbeon.css
-        /forms/orbeon/builder/resources/form-builder.css
-    </property>
-
-    <!-- Override this so that `orbeon-form-runner.js` is not included -->
-    <property as="xs:string"  name="oxf.fr.js.uri.orbeon.builder"/>
-
-    <!-- Re-add `orbeon-form-runner.js` for the Form Builder Summary page -->
-    <property as="xs:string"  name="oxf.fr.summary.js.uri.orbeon.builder">
-        /apps/fr/resources/scalajs/orbeon-form-runner.js
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.detail.js.uri.orbeon.builder">
-        /forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
-    </property>
-
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/text-controls.xbl
         oxf:/forms/orbeon/builder/xbl/text-input.xbl

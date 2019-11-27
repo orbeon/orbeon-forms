@@ -148,15 +148,14 @@
 
     <!-- ==== Internal Form Runner properties ===================================================================== -->
 
-    <!-- CSS/JavaScript for the whole of Form Runner -->
-    <property as="xs:string"  name="oxf.fr.css.uri.*.*">
-        /apps/fr/style/form-runner-common.css
-        /apps/fr/style/form-runner-base.css
-        /apps/fr/style/form-runner-orbeon.css
-    </property>
-    <!-- WARNING: Check `properties-form-builder.xml` for overrides when changing this. -->
-    <property as="xs:string"  name="oxf.fr.js.uri.*.*">
-        /apps/fr/resources/scalajs/orbeon-form-runner.js
+    <!-- CSS/JavaScript update to the Form Runner baseline -->
+    <property as="xs:string"  name="oxf.fr.assets.baseline.updates.*.*">
+        +/apps/fr/style/form-runner-common.css
+        +/apps/fr/style/form-runner-base.css
+        +/apps/fr/style/form-runner-orbeon.css
+
+        -/ops/javascript/scalajs/orbeon-xforms.js
+        +/apps/fr/resources/scalajs/orbeon-form-runner.js
     </property>
 
     <!-- Additional CSS/JavaScript for the detail page -->
@@ -385,5 +384,14 @@
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.orbeon.builder"         value="full"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"      value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                 value=""/>
+
+    <!-- CSS/JavaScript update to the Form Builder baseline on the detail page only.
+         This applies subsequently to `oxf.fr.assets.baseline.updates`. -->
+    <property as="xs:string"  name="oxf.fr.detail.assets.baseline.updates.orbeon.builder">
+        +/forms/orbeon/builder/resources/form-builder.css
+
+        -/apps/fr/resources/scalajs/orbeon-form-runner.js
+        +/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
+    </property>
 
 </properties>

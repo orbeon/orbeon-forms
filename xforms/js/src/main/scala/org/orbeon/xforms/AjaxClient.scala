@@ -56,7 +56,7 @@ object AjaxClient {
   private object Private {
 
     val EventsToFilterOut: Set[String] = Properties.clientEventsFilter.get().splitTo[Set]()
-    val Indent = " " * 4
+    val Indent: String = " " * 4
 
     def findEventsToProcess: Option[(NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent])] = {
 
@@ -212,7 +212,7 @@ object AjaxClient {
       newLine()
 
       // Start request
-      requestDocumentString.append("""<xxf:event-request xmlns:xxf="http://orbeon.org/oxf/xml/xforms">""");
+      requestDocumentString.append("""<xxf:event-request xmlns:xxf="http://orbeon.org/oxf/xml/xforms">""")
       newLine()
 
       // Add form UUID

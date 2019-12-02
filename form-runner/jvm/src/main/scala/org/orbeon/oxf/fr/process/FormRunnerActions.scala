@@ -92,7 +92,7 @@ trait FormRunnerActions {
       ensureDataCalculationsAreUpToDate()
 
       val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
-      val controlId = paramByNameOrDefault(params, "control") getOrElse "fr-view-component"
+      val controlId = paramByName(params, "control") getOrElse "fr-view-component"
 
       // In case of explicit validation mode
       if (formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {

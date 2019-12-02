@@ -15,13 +15,12 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import org.orbeon.oxf.fr.persistence.http.HttpCall._
-import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
-import org.orbeon.oxf.http.HttpMethod.{POST, PUT}
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
+import org.orbeon.oxf.fr.persistence.relational.Version.Specific
+import org.orbeon.oxf.http.HttpMethod.POST
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
-import org.scalatest.funspec.AnyFunSpecLike
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.scalatest.funspec.AnyFunSpecLike
 
 class SearchTest
     extends DocumentTestBase

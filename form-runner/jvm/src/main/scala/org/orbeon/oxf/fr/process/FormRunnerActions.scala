@@ -92,7 +92,7 @@ trait FormRunnerActions {
       ensureDataCalculationsAreUpToDate()
 
       val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
-      val controlId = paramByName(params, "control") getOrElse "fr-view-component"
+      val controlId = paramByName(params, "control") getOrElse Names.ViewComponent
 
       // In case of explicit validation mode
       if (formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
@@ -110,7 +110,7 @@ trait FormRunnerActions {
 
   def tryUpdateCurrentWizardPageValidity(params: ActionParams): Try[Any] =
     Try {
-      dispatch(name = "fr-update-validity", targetId = "fr-view-component")
+      dispatch(name = "fr-update-validity", targetId = Names.ViewComponent)
     }
 
   // It makes sense to update all calculations as needed before saving data

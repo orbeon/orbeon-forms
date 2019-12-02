@@ -13,7 +13,7 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.fr.ControlOps
+import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms.{$, AjaxServerEvent, Support, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
@@ -106,7 +106,7 @@ object FormRunnerWizardAPI {
     AjaxServerEvent.dispatchEvent(
       AjaxServerEvent(
         eventName  = "fr-wizard-focus",
-        targetId   = "fr-view-component",
+        targetId   = Names.ViewComponent,
         properties = Map(
           "fr-control-name"   → controlName,
           "fr-repeat-indexes" → indexesString

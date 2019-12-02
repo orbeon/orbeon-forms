@@ -49,10 +49,10 @@ class WizardTest
             resolveObject[XFormsInputControl](staticId, container = doc).get.effectiveId
 
           def doNext() =
-            XFormsAPI.dispatch(name = "fr-next", targetId = "fr-view-component")
+            XFormsAPI.dispatch(name = "fr-next", targetId = Names.ViewComponent)
 
           def doPrev() =
-            XFormsAPI.dispatch(name = "fr-prev", targetId = "fr-view-component")
+            XFormsAPI.dispatch(name = "fr-prev", targetId = Names.ViewComponent)
 
           def assertIsFirstPage() = {
             assert(  Wizard.isWizardFirstPage)

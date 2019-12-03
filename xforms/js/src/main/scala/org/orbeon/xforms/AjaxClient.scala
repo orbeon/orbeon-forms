@@ -42,7 +42,7 @@ object AjaxClient {
 
     Globals.executeEventFunctionQueued -= 1
 
-    if (! Globals.requestInProgress && Globals.eventQueue.length > 0 && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
+    if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
       findEventsToProcess match {
         case Some((events, currentForm, remainingEvents)) ⇒
           // Remove from this list of ids that changed the id of controls for
@@ -90,7 +90,7 @@ object AjaxClient {
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasEventsToProcess")
   def hasEventsToProcess(): Boolean =
-    Globals.requestInProgress || Globals.eventQueue.length > 0
+    Globals.requestInProgress || Globals.eventQueue.nonEmpty
 
   // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
   // a maximum delay.
@@ -118,7 +118,7 @@ object AjaxClient {
 
     // Store the time of the first event to be sent in the queue
     val currentTime = new js.Date().getTime()
-    if (Globals.eventQueue.length == 0)
+    if (Globals.eventQueue.isEmpty)
       Globals.eventsFirstEventTime = currentTime
 
     // Store events to fire

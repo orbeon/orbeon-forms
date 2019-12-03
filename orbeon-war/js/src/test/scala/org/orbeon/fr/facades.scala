@@ -15,10 +15,9 @@ package org.orbeon.fr
 
 import org.scalajs.dom
 
-import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.JSImport
-import scala.scalajs.js.{Thenable, UndefOr, |}
 
 @js.native
 @JSImport("jsdom", "JSDOM")
@@ -33,23 +32,6 @@ class JSDOM(html: String, option: js.Object) extends js.Object {
 @JSImport("jsdom", "JSDOM")
 object JSDOM extends js.Object {
   def fromURL(url: String, options: js.Object): js.Promise[JSDOM] = js.native
-}
-
-object JSDOMSupport {
-  def fromUrlF(url: String, options: js.Object): Future[JSDOM] = {
-    val promise = Promise[JSDOM]()
-    JSDOM.fromURL(url, options).`then`[Unit](
-      { v: JSDOM ⇒
-        promise.success(v)
-        (): Unit | Thenable[Unit]
-      },
-      js.defined { e: scala.Any ⇒
-        promise.failure(new RuntimeException(e.toString))
-        (): Unit | Thenable[Unit]
-      }
-    )
-    promise.future
-  }
 }
 
 @js.native

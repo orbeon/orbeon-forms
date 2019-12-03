@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.{ConnectCallbackArgument, Events, Globals, Properties}
+import org.orbeon.xforms.facade.{ConnectCallbackArgument, Events, Properties}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal

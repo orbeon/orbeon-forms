@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.EventNames.{DOMActivate, XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Globals, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.html
 

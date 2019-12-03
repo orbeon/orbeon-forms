@@ -18,7 +18,7 @@ import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
-import org.orbeon.xforms.facade.{Events, Globals}
+import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 

@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.jquery._
-import org.orbeon.xforms.facade.{Globals, Utils}
+import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject

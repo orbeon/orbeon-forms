@@ -22,7 +22,6 @@ object XFormsApp extends App {
 
   // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
   def onOrbeonApiLoaded(): Unit = {
-    Init.initializeGlobals() // should go away in the future
     Upload
     xbl.Date
   }

@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.{AjaxServerEvent, YUICustomEvent}
+import org.orbeon.xforms.{AjaxServerEvent, Globals, YUICustomEvent}
 import org.scalajs.dom
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
@@ -125,25 +125,6 @@ object AjaxServerOps {
       result.future
     }
   }
-}
-
-@JSGlobal("ORBEON.xforms.Globals")
-@js.native
-object Globals extends js.Object {
-  var loadingOtherPage           : Boolean                     = js.native
-  var eventQueue                 : js.Array[AjaxServerEvent]   = js.native
-  var eventsFirstEventTime       : Double                      = js.native
-  var lastEventSentTime          : Double                      = js.native
-  var requestInProgress          : Boolean                     = js.native
-  val dialogs                    : js.Dictionary[js.Dynamic]   = js.native
-  var lastDialogZIndex           : Int                         = js.native
-  var topLevelListenerRegistered : Boolean                     = js.native
-  var executeEventFunctionQueued : Int                         = js.native
-  var requestForm                : html.Form                   = js.native
-  var requestIgnoreErrors        : Boolean                     = js.native
-  var requestTryCount            : Int                         = js.native
-  var requestDocument            : String                      = js.native
-  var changedIdsRequest          : js.Dictionary[Int]          = js.native
 }
 
 @js.native

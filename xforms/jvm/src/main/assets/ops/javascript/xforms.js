@@ -2867,7 +2867,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if ($(node).is('.xforms-activable')) {
                     var form = ORBEON.xforms.Controls.getForm(node);
                     var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
-                    ORBEON.xforms.server.AjaxServer.fireEvents([event]);
+                    ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
                     break;
                 }
 
@@ -2884,7 +2884,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                             targetId += targetId.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                             targetId += delimiterCount;
                             var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
-                            ORBEON.xforms.server.AjaxServer.fireEvents([event]);
+                            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
                             foundRepeatBegin = true;
                             break;
                         } else if ($(sibling).is('.xforms-repeat-delimiter')) {
@@ -3288,51 +3288,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
     };
 
     ORBEON.xforms.Init = {
-
-        initializeGlobals: function () {
-
-            _.extend(ORBEON.xforms.Globals, {
-                // Browser detection
-                renderingEngineTridentOrZero: YAHOO.env.ua.ie, // One usage left to check as of 2019-01-04.
-
-                // Other
-                eventQueue: [],                      // Events to be sent to the server
-                eventsFirstEventTime: 0,             // Time when the first event in the queue was added
-
-                requestForm: null,                   // HTML for the request currently in progress
-                requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
-                requestInProgress: false,            // Indicates whether an Ajax request is currently in process
-                requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
-                requestTryCount: 0,                  // How many attempts to run the current Ajax request we have done so far
-                executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
-                maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
-                maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
-                currentFocusControlId: null,         // Id of the control that got the focus last
-                currentFocusControlElement: null,    // Element for the control that got the focus last
-                htmlAreaNames: [],                   // Names of the HTML editors, which we need to reenable them on Firefox
-                yuiCalendar: null,                   // Reusable calendar widget
-                tooltipLibraryInitialized: false,
-                changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
-                loadingOtherPage: false,             // Flag set when loading other page that prevents the loading indicator to disappear
-                activeControl: null,                 // The currently active control, used to disable hint
-                dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-                hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
-                alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
-                helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
-                debugDiv: null,                      // Points to the div when debug messages are displayed
-                lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
-                sliderYui: {},                       // Maps slider id to the YUI object for that slider
-                lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
-
-
-                modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
-                modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
-
-                changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
-                topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
-                        ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
-            });
-        },
 
         // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.
         _range: function (range) {

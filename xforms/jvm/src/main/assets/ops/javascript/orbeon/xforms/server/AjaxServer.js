@@ -69,7 +69,7 @@
         var timerId = window.setTimeout(function () {
             var event = new AjaxServer.Event(document.getElementById(formID), null,
                     serverEvents, "xxforms-server-events", null, null, null, showProgress);
-            AjaxServer.fireEvents([event]);
+            AjaxServer.fireEvents([event], false);
         }, delay);
         // Save timer id for this discardable timer
         if (discardable)
@@ -444,7 +444,7 @@
                                 });
 
                                 // Set content of select element
-                                if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
+                                if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
 
                                     // TODO: Check if this is still the case with IE11, the only version Orbeon Forms supports
                                     // as of Orbeon Forms 2018.2.

@@ -52,9 +52,7 @@ package object liferay {
       liferay.Session.toOption foreach (_.extend())
   }
 
-  @JSExportTopLevel("ORBEON.xforms.LiferaySupport")
   object LiferaySupport {
-    @JSExport
     def extendSession(): Unit =
       dom.window.Liferay.toOption foreach (_.extendSession())
   }

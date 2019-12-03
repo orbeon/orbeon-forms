@@ -33,6 +33,10 @@ object YUIConnect extends js.Object {
     secureUri       : Boolean
   ): Unit = js.native
 
+  def setDefaultPostHeader(b: Boolean): Unit = js.native
+
+  def initHeader(label: String, value: String, isDefault: Boolean): Unit = js.native
+
   def asyncRequest(
     method          : String,
     uri             : String,
@@ -60,7 +64,9 @@ trait CustomEvent extends js.Object {
 }
 
 trait YUICallback extends js.Object {
-  val upload   : js.Function
+  var timeout  : js.UndefOr[Int]         = js.undefined
+  val upload   : js.UndefOr[js.Function] = js.undefined
+  val success  : js.UndefOr[js.Function] = js.undefined
   val failure  : js.Function
   val argument : js.Object
 }

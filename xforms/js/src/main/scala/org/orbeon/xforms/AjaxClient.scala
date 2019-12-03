@@ -17,6 +17,7 @@ import java.{lang ⇒ jl}
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -25,9 +26,12 @@ import org.orbeon.xforms.facade.{AjaxServer, Globals, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
+import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
+import scala.scalajs.js.timers
+import scala.util.control.NonFatal
 
 object AjaxClient {
 
@@ -53,10 +57,110 @@ object AjaxClient {
       }
   }
 
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.asyncAjaxRequest")
+  def asyncAjaxRequest(): Unit =
+    try {
+      Globals.requestTryCount += 1
+      YUIConnect.setDefaultPostHeader(false)
+      YUIConnect.initHeader("Content-Type", "application/xml", isDefault = false)
+      val requestFormId = Globals.requestForm.id
+      val callback = new YUICallback {
+        override val success  = (AjaxServer.handleResponseAjax _: js.Function)
+        val failure  = AjaxServer.handleFailureAjax _
+        val argument = new js.Object {
+          val formId = requestFormId
+        }
+      }
+      setTimeoutOnCallback(callback)
+      YUIConnect.asyncRequest(
+        method   = "POST",
+        uri      = Page.getForm(requestFormId).xformsServerPath,
+        callback = callback,
+        postData = Globals.requestDocument
+      )
+    } catch {
+      case NonFatal(t) ⇒
+        Globals.requestInProgress = false
+        AjaxServer.exceptionWhenTalkingToServer(t, Globals.requestForm.id)
+    }
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent")
+  def eventQueueHasShowProgressEvent(): Boolean =
+    Globals.eventQueue exists (_.showProgress)
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasEventsToProcess")
+  def hasEventsToProcess(): Boolean =
+    Globals.requestInProgress || Globals.eventQueue.length > 0
+
+  // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
+  // a maximum delay.
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.retryRequestAfterDelay")
+  def retryRequestAfterDelay(requestFunction: js.Function0[js.Any]): Unit = {
+    val delay = Math.min(Properties.retryDelayIncrement.get() * (Globals.requestTryCount - 1), Properties.retryMaxDelay.get())
+    if (delay == 0)
+      requestFunction()
+    else
+      timers.setTimeout(delay.millis)(requestFunction())
+  }
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
+  def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean): Unit = {
+
+    // https://github.com/orbeon/orbeon-forms/issues/4023
+    LiferaySupport.extendSession()
+
+    // We do not filter events when the modal progress panel is shown.
+    //      It is tempting to filter all the events that happen when the modal progress panel is shown.
+    //      However, if we do so we would loose the delayed events that become mature when the modal
+    //      progress panel is shown. So we either need to make sure that it is not possible for the
+    //      browser to generate events while the modal progress panel is up, or we need to filter those
+    //      event before this method is called.
+
+    // Store the time of the first event to be sent in the queue
+    val currentTime = new js.Date().getTime()
+    if (Globals.eventQueue.length == 0)
+      Globals.eventsFirstEventTime = currentTime
+
+    // Store events to fire
+    events foreach { event ⇒
+      if (! event.targetIdOpt.contains("")) // Q: Why do we check this? We expect `None` or `Some(targetId)`
+        Globals.eventQueue.push(event)
+    }
+
+    // Fire them with a delay to give us a change to aggregate events together
+    Globals.executeEventFunctionQueued += 1
+    if (incremental && !(currentTime - Globals.eventsFirstEventTime > Properties.delayBeforeIncrementalRequest.get())) {
+      // After a delay (e.g. 500 ms), run `executeNextRequest()` and send queued events to server
+      // if there are no other `executeNextRequest()` that have been added to the queue after this
+      // request.
+      timers.setTimeout(Properties.delayBeforeIncrementalRequest.get().millis) {
+        executeNextRequest(bypassRequestQueue = false)
+      }
+    } else {
+      // After a very short delay (e.g. 20 ms), run `executeNextRequest()` and force queued events
+      // to be sent to the server, even if there are other `executeNextRequest()` queued.
+      // The small delay is here so we don't send multiple requests to the server when the
+      // browser gives us a sequence of events (e.g. focus out, change, focus in).
+      timers.setTimeout(Properties.internalShortDelay.get().millis) {
+        executeNextRequest(bypassRequestQueue = true)
+      }
+    }
+    Globals.lastEventSentTime = new js.Date().getTime()
+  }
+
   private object Private {
 
     val EventsToFilterOut: Set[String] = Properties.clientEventsFilter.get().splitTo[Set]()
     val Indent: String = " " * 4
+
+    def debugEventQueue(): Unit =
+      println(s"Event queue: ${Globals.eventQueue mkString ", "}")
+
+    def setTimeoutOnCallback(callback: YUICallback): Unit = {
+      val ajaxTimeout = Properties.delayBeforeAjaxTimeout.get()
+      if (ajaxTimeout != -1)
+        callback.timeout = ajaxTimeout
+    }
 
     def findEventsToProcess: Option[(NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent])] = {
 

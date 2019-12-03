@@ -64,7 +64,10 @@ object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {
+
+  def exceptionWhenTalkingToServer(throwable: Throwable, formId: String)  : Unit           = js.native
   def handleResponseAjax(o: XMLHttpRequest)                               : Unit           = js.native
+  def handleFailureAjax(o: XMLHttpRequest)                                : Unit           = js.native
   def beforeSendingEvent                                                  : JQueryCallback = js.native
   def ajaxResponseReceived                                                : JQueryCallback = js.native
   def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native
@@ -129,6 +132,8 @@ object AjaxServerOps {
 object Globals extends js.Object {
   var loadingOtherPage           : Boolean                     = js.native
   var eventQueue                 : js.Array[AjaxServerEvent]   = js.native
+  var eventsFirstEventTime       : Double                      = js.native
+  var lastEventSentTime          : Double                      = js.native
   var requestInProgress          : Boolean                     = js.native
   val dialogs                    : js.Dictionary[js.Dynamic]   = js.native
   var lastDialogZIndex           : Int                         = js.native
@@ -225,6 +230,9 @@ object Properties extends js.Object {
   val delayBeforeIncrementalRequest    : Property[Int]     = js.native
   val delayBeforeUploadProgressRefresh : Property[Int]     = js.native
   val delayBeforeDisplayLoading        : Property[Int]     = js.native
+  val delayBeforeAjaxTimeout           : Property[Int]     = js.native
+  val retryDelayIncrement              : Property[Int]     = js.native
+  val retryMaxDelay                    : Property[Int]     = js.native
   val internalShortDelay               : Property[Double]  = js.native
   val revisitHandling                  : Property[String]  = js.native
   val sessionHeartbeat                 : Property[Boolean] = js.native

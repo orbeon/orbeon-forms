@@ -79,7 +79,7 @@ object AjaxServerEvent {
     )
 
   def dispatchEvent(event: AjaxServerEvent): Unit =
-    AjaxServer.fireEvents(
+    AjaxClient.fireEvents(
       events      = js.Array(event),
       incremental = event.incremental
     )
@@ -152,5 +152,8 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
   val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", DefaultIgnoreErrors) // used by `AjaxServer`
   val showProgress: Boolean = checkArg[Boolean]("showProgress", DefaultShowProgress) // used by `AjaxServer`
 
-  scribe.debug(s"event: eventName = $eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/" }`")
+  scribe.debug(toString)
+
+  override def toString =
+    s"AjaxServerEvent(eventName = `$eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/"}`)"
 }

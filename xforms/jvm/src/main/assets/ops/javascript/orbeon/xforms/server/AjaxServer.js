@@ -62,53 +62,6 @@
         }
     };
 
-    AjaxServer.fireEvents = function(events, incremental) {
-
-        // https://github.com/orbeon/orbeon-forms/issues/4023
-        ORBEON.xforms.LiferaySupport.extendSession();
-
-        // We do not filter events when the modal progress panel is shown.
-        //      It is tempting to filter all the events that happen when the modal progress panel is shown.
-        //      However, if we do so we would loose the delayed events that become mature when the modal
-        //      progress panel is shown. So we either need to make sure that it is not possible for the
-        //      browser to generate events while the modal progress panel is up, or we need to filter those
-        //      event before this method is called.
-
-        // Store the time of the first event to be sent in the queue
-        var currentTime = new Date().getTime();
-        if (ORBEON.xforms.Globals.eventQueue.length == 0)
-            ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
-
-        // Store events to fire
-        _.each(events, function(event) {
-            if (event.targetId != "")
-                ORBEON.xforms.Globals.eventQueue.push(event);
-        });
-
-        // Fire them with a delay to give us a change to aggregate events together
-        ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        if (incremental && ! (currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                             ORBEON.util.Properties.delayBeforeIncrementalRequest.get())) {
-            // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
-            // if there are no other executeNextRequest() that have been added to the queue after this
-            // request.
-            window.setTimeout(
-                function() { AjaxServer.executeNextRequest(false); },
-                ORBEON.util.Properties.delayBeforeIncrementalRequest.get()
-            );
-        } else {
-            // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
-            // to be sent to the server, even if there are other executeNextRequest() queued.
-            // The small delay is here so we don't send multiple requests to the server when the
-            // browser gives us a sequence of events (e.g. focus out, change, focus in).
-            window.setTimeout(
-                function() { AjaxServer.executeNextRequest(true); },
-                ORBEON.util.Properties.internalShortDelay.get()
-            );
-        }
-        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
-    };
-
     /**
      * Create a timer which after the specified delay will fire a server event.
      */
@@ -123,56 +76,8 @@
             ORBEON.xforms.Page.getForm(formID).addDiscardableTimerId(timerId);
     };
 
-    AjaxServer._debugEventQueue = function() {
-        ORBEON.util.Utils.logMessage("Event queue:");
-        _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
-            ORBEON.util.Utils.logMessage(" " + eventIndex + " - name: " + event.eventName + " | targetId: " + event.targetId);
-        });
-    };
-
     AjaxServer.beforeSendingEvent = $.Callbacks();
     AjaxServer.ajaxResponseReceived = $.Callbacks();
-
-    AjaxServer.setTimeoutOnCallback = function(callback) {
-        var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
-        if (ajaxTimeout != -1)
-            callback.timeout = ajaxTimeout;
-    };
-
-    AjaxServer.asyncAjaxRequest = function() {
-        try {
-            ORBEON.xforms.Globals.requestTryCount++;
-            YAHOO.util.Connect.setDefaultPostHeader(false);
-            YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-            var formId = ORBEON.xforms.Globals.requestForm.id;
-            var callback = {
-                success: AjaxServer.handleResponseAjax,
-                failure: AjaxServer.handleFailureAjax,
-                argument: { formId: formId }
-            };
-            AjaxServer.setTimeoutOnCallback(callback);
-            YAHOO.util.Connect.asyncRequest(
-                "POST",
-                ORBEON.xforms.Page.getForm(formId).xformsServerPath,
-                callback,
-                ORBEON.xforms.Globals.requestDocument
-            );
-        } catch (e) {
-            ORBEON.xforms.Globals.requestInProgress = false;
-            AjaxServer.exceptionWhenTalkingToServer(e, formID);
-        }
-    };
-
-    /**
-     * Retry after a certain delay which increases with the number of consecutive failed request, but which
-     * never exceeds a maximum delay.
-     */
-    AjaxServer.retryRequestAfterDelay = function(requestFunction) {
-        var delay = Math.min(ORBEON.util.Properties.retryDelayIncrement.get() * (ORBEON.xforms.Globals.requestTryCount - 1),
-                ORBEON.util.Properties.retryMaxDelay.get());
-        if (delay == 0) requestFunction();
-        else window.setTimeout(requestFunction, delay);
-    };
 
     /**
      * Unless we get a clear indication from the server that an error occurred, we retry to send the request to
@@ -297,14 +202,6 @@
             // panel until they have been processed, i.e. the request sending the server events returns.
             function doHideProgressDialog() {
 
-                return ! (eventQueueHasShowProgressEvent()
-                          || serverSaysToKeepModelProgressPanelDisplayed());
-
-                function eventQueueHasShowProgressEvent() {
-                    return _.some(ORBEON.xforms.Globals.eventQueue,
-                                  function(event) { return event.showProgress == true; });
-                }
-
                 /**
                  * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
                  * window and for which the user didn't specify xxf:show-progress="false".
@@ -328,6 +225,9 @@
                     }
                     return false;
                 }
+
+                return ! (ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent()
+                        || serverSaysToKeepModelProgressPanelDisplayed());
             }
 
             if (doHideProgressDialog()) {

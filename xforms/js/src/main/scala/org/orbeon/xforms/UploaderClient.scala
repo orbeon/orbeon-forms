@@ -199,7 +199,7 @@ object UploaderClient {
               "POST",
               Page.getForm(currentEvent.form.id).xformsServerUploadPath,
               new YUICallback {
-                val upload: js.Function = uploadSuccess _
+                override val upload = (uploadSuccess _: js.Function)
                 // Failure isn't called; instead we detect if an upload is interrupted through
                 // `progress-state="interrupted"` in the Ajax response.
                 val failure: js.Function = () ⇒ ()

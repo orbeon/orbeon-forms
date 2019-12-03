@@ -1196,7 +1196,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
 
                 function checkAjaxReceived() {
-                    if (ORBEON.xforms.Globals.requestInProgress || ORBEON.xforms.Globals.eventQueue.length > 0) {
+                    if (ORBEON.xforms.server.AjaxServer.hasEventsToProcess()) {
                         // Wait another 100 ms
                         setTimeout(checkAjaxReceived, 100);
                     } else {

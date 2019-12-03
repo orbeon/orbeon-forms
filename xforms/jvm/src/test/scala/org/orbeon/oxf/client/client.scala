@@ -62,7 +62,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     }
 
   def waitForAjaxResponse() = eventually {
-    assert(executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0").asInstanceOf[Boolean])
+    assert(executeScript("return ! (ORBEON.xforms.server.AjaxServer.hasEventsToProcess()))").asInstanceOf[Boolean])
   }
 
   def withAjaxAction[T](wait: Boolean = true)(body: ⇒ T) = {

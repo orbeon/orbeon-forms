@@ -17,7 +17,7 @@ import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms.{$, AjaxServerEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxServerEvent, EventNames}
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -70,7 +70,7 @@ object LabelEditor {
 
     def showLabelEditor(clickInterceptor: JQuery): Unit = {
 
-      if (Globals.eventQueue.length > 0 || Globals.requestInProgress) {
+      if (AjaxClient.hasEventsToProcess) {
 
         // If we have a request in progress or events in the queue, try this again later
         js.timers.setTimeout(Properties.internalShortDelay.get()) {

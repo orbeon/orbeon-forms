@@ -33,6 +33,7 @@ object Globals {
   var requestDocument             : String                    = ""                           // the last Ajax request, so we can resend it if necessary
   var requestTryCount             : Int                       = 0                            // how many attempts to run the current Ajax request we have done so far
   var executeEventFunctionQueued  : Int                       = 0                            // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
+
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : js.Object                 = null                         // id of the control that got the focus last

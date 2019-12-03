@@ -24,14 +24,17 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.EventNames.{DOMActivate, XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.experimental._
+import org.scalajs.dom.{DOMParser, Node, html}
 
 import scala.concurrent.duration._
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.timers
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 object AjaxClient {
 
@@ -60,24 +63,50 @@ object AjaxClient {
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.asyncAjaxRequest")
   def asyncAjaxRequest(): Unit =
     try {
+
       Globals.requestTryCount += 1
-      YUIConnect.setDefaultPostHeader(false)
-      YUIConnect.initHeader("Content-Type", "application/xml", isDefault = false)
+
       val requestFormId = Globals.requestForm.id
-      val callback = new YUICallback {
-        override val success  = (AjaxServer.handleResponseAjax _: js.Function)
-        val failure  = AjaxServer.handleFailureAjax _
-        val argument = new js.Object {
-          val formId = requestFormId
-        }
+
+      val fetchPromise =
+        Fetch.fetch(
+          Page.getForm(requestFormId).xformsServerPath,
+          new RequestInit {
+            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
+            var body           : js.UndefOr[BodyInit]           = Globals.requestDocument
+            var headers        : js.UndefOr[HeadersInit]        = js.Dictionary("Content-Type" → "application/xml")
+            var referrer       : js.UndefOr[String]             = js.undefined
+            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
+            var mode           : js.UndefOr[RequestMode]        = js.undefined
+            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
+            var cache          : js.UndefOr[RequestCache]       = js.undefined
+            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
+            var integrity      : js.UndefOr[String]             = js.undefined
+            var keepalive      : js.UndefOr[Boolean]            = js.undefined
+            var signal         : js.UndefOr[AbortSignal]        = js.undefined
+            var window         : js.UndefOr[Null]               = null
+          }
+        )
+
+      val responseF =
+        for {
+          response ← fetchPromise.toFuture
+          text     ← response.text().toFuture
+        } yield
+          new js.Object {
+            val status: Int = response.status
+            val responseText: String = text
+            val responseXML: Node = stringToDom(text)
+            val argument: js.Object = new js.Object {
+              val formId = requestFormId
+            }
+          }
+
+      // TODO: Determine whether we should call `handleFailureAjax` or `exceptionWhenTalkingToServer` when the `Future` fails.
+      responseF.onComplete {
+        case Success(o) ⇒ AjaxServer.handleResponseAjax(o)            // includes 404 or 500 etc.
+        case Failure(_) ⇒ AjaxServer.handleFailureAjax(new js.Object) // network failure/anything preventing the request from completing
       }
-      setTimeoutOnCallback(callback)
-      YUIConnect.asyncRequest(
-        method   = "POST",
-        uri      = Page.getForm(requestFormId).xformsServerPath,
-        callback = callback,
-        postData = Globals.requestDocument
-      )
     } catch {
       case NonFatal(t) ⇒
         Globals.requestInProgress = false
@@ -156,11 +185,15 @@ object AjaxClient {
     def debugEventQueue(): Unit =
       println(s"Event queue: ${Globals.eventQueue mkString ", "}")
 
-    def setTimeoutOnCallback(callback: YUICallback): Unit = {
-      val ajaxTimeout = Properties.delayBeforeAjaxTimeout.get()
-      if (ajaxTimeout != -1)
-        callback.timeout = ajaxTimeout
-    }
+    def stringToDom(xmlString: String): dom.Node =
+      try {
+        (new DOMParser).parseFromString(xmlString, "application/xml")
+      } catch {
+        case NonFatal(_) ⇒
+          // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
+          // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
+          dom.document.createElement("parsererror")
+      }
 
     def findEventsToProcess: Option[(NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent])] = {
 
@@ -299,7 +332,7 @@ object AjaxClient {
       // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
       Page.getForm(currentFormId).loadingIndicator.setNextConnectShow(showProgress)
 
-      AjaxServer.asyncAjaxRequest()
+      asyncAjaxRequest()
     }
 
     // NOTE: Later we can switch this to an automatically-generated protocol

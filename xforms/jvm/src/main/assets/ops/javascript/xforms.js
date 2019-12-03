@@ -228,19 +228,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             stringToDom: function(xmlString) {
-                if (document.implementation.createDocument) {
-                    try {
-                        return (new DOMParser()).parseFromString(xmlString, "application/xml");
-                    } catch (ex) {
-                        // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
-                        // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
-                        return document.createElement("parsererror");
-                    }
-                } else if (window.ActiveXObject) {
-                    var dom = new ActiveXObject("Microsoft.XMLDOM");
-                    dom.async = "false";
-                    dom.loadXML(xmlString);
-                    return dom;
+                try {
+                    return (new DOMParser()).parseFromString(xmlString, "application/xml");
+                } catch (ex) {
+                    // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
+                    // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
+                    return document.createElement("parsererror");
                 }
                 return null;
             },

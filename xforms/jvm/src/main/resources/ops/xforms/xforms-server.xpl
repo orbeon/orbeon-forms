@@ -77,35 +77,18 @@
                 <p:output name="data" id="xforms-response"/>
             </p:processor>
 
-            <!-- Embed XForms Server response within an HTML envelope -->
-            <p:processor name="oxf:unsafe-xslt">
-                <p:input name="data" href="#xforms-response"/>
-                <p:input name="config">
-                    <xsl:stylesheet version="2.0" xmlns:saxon="http://saxon.sf.net/">
-                        <xsl:output name="xml" method="xml" omit-xml-declaration="yes" indent="no"/>
-                        <xsl:template match="/">
-                            <html>
-                                <head/>
-                                <body>
-                                    <xsl:value-of select="saxon:serialize(/, 'xml')"/>
-                                </body>
-                            </html>
-                        </xsl:template>
-                    </xsl:stylesheet>
-                </p:input>
-                <p:output name="data" id="html-response"/>
-            </p:processor>
-
-            <!-- Send HTML response -->
-            <p:processor name="oxf:html-converter">
+            <p:processor name="oxf:xml-converter">
                 <p:input name="config">
                     <config>
-                        <version>5.0</version>
+                        <method>xml</method>
+                        <omit-xml-declaration>true</omit-xml-declaration>
+                        <content-type>application/xml</content-type>
+                        <version>1.0</version>
                         <encoding>UTF-8</encoding>
                         <indent>false</indent>
                     </config>
                 </p:input>
-                <p:input name="data" href="#html-response"/>
+                <p:input name="data" href="#xforms-response"/>
                 <p:output name="data" id="converted"/>
             </p:processor>
             <p:processor name="oxf:http-serializer">

@@ -66,11 +66,23 @@ object Init extends InitTrait
 trait AjaxServerTrait extends js.Object {
 
   def exceptionWhenTalkingToServer(throwable: Throwable, formId: String)  : Unit           = js.native
-  def handleResponseAjax(o: js.Object)                                    : Unit           = js.native
-  def handleFailureAjax(o: js.Object)                                     : Unit           = js.native
   def beforeSendingEvent                                                  : JQueryCallback = js.native
   def ajaxResponseReceived                                                : JQueryCallback = js.native
   def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native
+
+  def handleResponseAjax(
+    responseText                 : String,
+    responseXml                  : dom.Node,
+    formId                       : String,
+    isResponseToBackgroundUpload : Boolean
+  ): Unit = js.native
+
+  def handleFailureAjax(
+    status                       : js.UndefOr[Int],
+    responseText                 : js.UndefOr[String],
+    responseXml                  : js.UndefOr[dom.Node],
+    formId                       : String
+  ): Unit = js.native
 
   def createDelayedServerEvent(
     serverEvents : String,

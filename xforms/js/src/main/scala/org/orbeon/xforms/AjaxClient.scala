@@ -25,7 +25,7 @@ import org.orbeon.xforms.EventNames.{DOMActivate, XXFormsUploadProgress, XXForms
 import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
-import org.scalajs.dom.{DOMParser, Node, html}
+import org.scalajs.dom.{Node, html}
 
 import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -93,19 +93,19 @@ object AjaxClient {
           response ← fetchPromise.toFuture
           text     ← response.text().toFuture
         } yield
-          new js.Object {
-            val status: Int = response.status
-            val responseText: String = text
-            val responseXML: Node = stringToDom(text)
-            val argument: js.Object = new js.Object {
-              val formId = requestFormId
-            }
-          }
+          (
+            response.status,
+            text,
+            Support.stringToDom(text)
+          )
 
       // TODO: Determine whether we should call `handleFailureAjax` or `exceptionWhenTalkingToServer` when the `Future` fails.
+      // TODO: Check `status`.
       responseF.onComplete {
-        case Success(o) ⇒ AjaxServer.handleResponseAjax(o)            // includes 404 or 500 etc.
-        case Failure(_) ⇒ AjaxServer.handleFailureAjax(new js.Object) // network failure/anything preventing the request from completing
+        case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
+          AjaxServer.handleResponseAjax(responseText, responseXml, requestFormId, isResponseToBackgroundUpload = false)
+        case Failure(_) ⇒ // network failure/anything preventing the request from completing
+          AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, requestFormId)
       }
     } catch {
       case NonFatal(t) ⇒
@@ -184,16 +184,6 @@ object AjaxClient {
 
     def debugEventQueue(): Unit =
       println(s"Event queue: ${Globals.eventQueue mkString ", "}")
-
-    def stringToDom(xmlString: String): dom.Node =
-      try {
-        (new DOMParser).parseFromString(xmlString, "application/xml")
-      } catch {
-        case NonFatal(_) ⇒
-          // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
-          // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
-          dom.document.createElement("parsererror")
-      }
 
     def findEventsToProcess: Option[(NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent])] = {
 

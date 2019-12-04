@@ -13,7 +13,6 @@
   */
 package org.orbeon.xforms
 
-import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
@@ -26,30 +25,6 @@ import scala.scalajs.js.|
 @JSGlobal("YAHOO.util.Connect")
 @js.native
 object YUIConnect extends js.Object {
-
-  def setForm(
-    formId          : html.Form | String,
-    isUpload        : Boolean,
-    secureUri       : Boolean
-  ): Unit = js.native
-
-  def setDefaultPostHeader(b: Boolean): Unit = js.native
-
-  def initHeader(label: String, value: String, isDefault: Boolean): Unit = js.native
-
-  def asyncRequest(
-    method          : String,
-    uri             : String,
-    callback        : YUICallback,
-    postData        : js.UndefOr[String]              = js.undefined
-  ): js.Object = js.native
-
-  def abort(
-    o               : js.Object,
-    callback        : js.UndefOr[YUICallback]         = js.undefined,
-    isTimeout       : js.UndefOr[Boolean]             = js.undefined
-  ): Boolean = js.native
-
   val startEvent    : CustomEvent = js.native
   val failureEvent  : CustomEvent = js.native
 }

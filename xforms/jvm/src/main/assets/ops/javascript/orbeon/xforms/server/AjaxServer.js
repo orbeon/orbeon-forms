@@ -101,13 +101,11 @@
      *
      *      https://github.com/orbeon/orbeon-forms/issues/2074
      */
-    AjaxServer.handleFailureAjax = function(o) {
-        var formID = ORBEON.xforms.Globals.requestForm.id;
-
-        if (o.responseXML &&
-            o.responseXML.documentElement &&
-            o.responseXML.documentElement.tagName == "error" && // don't catch <parsererror>
-            o.status != 503) {                                  // 503 is specifically sent to trigger a retry
+    AjaxServer.handleFailureAjax = function(status, responseText, responseXML, formID) {
+        if (responseXML &&
+            responseXML.documentElement &&
+            responseXML.documentElement.tagName == "error" && // don't catch <parsererror>
+            status != 503) {                                  // 503 is specifically sent to trigger a retry
 
             // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
             // we show an error to users.
@@ -119,13 +117,13 @@
 
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
-            var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
-            var body = ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0];
+            var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "title", null)[0]);
+            var body = ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "body", null)[0];
             var detailsFromBody = body != null ? ORBEON.util.Dom.getStringValue(body) : null;
             AjaxServer.showError(title, detailsFromBody, formID);
         } else {
             var loginRegexp = ORBEON.util.Properties.loginPageDetectionRegexp.get();
-            if (loginRegexp != '' && new RegExp(loginRegexp).test(o.responseText)) {
+            if (loginRegexp != '' && new RegExp(loginRegexp).test(responseText)) {
 
                 // It seems we got a login page back, so display dialog and reload form
                 var dialogEl = $('#' + formID + ' .xforms-login-detected-dialog');
@@ -152,40 +150,9 @@
         }
     };
 
-    AjaxServer.handleResponseAjax = function(o) {
+    AjaxServer.handleResponseAjax = function(responseText, responseXML, formID, isResponseToBackgroundUpload) {
 
-        var responseXML                  = o.responseXML;
-        var responseXmlIsHTML            = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
-        var formID                       = o.argument.formId;
-        var isResponseToBackgroundUpload = o.responseText && (! responseXML || responseXmlIsHTML);
-
-        if (isResponseToBackgroundUpload) {
-            // Background uploads
-            //      In this case, the server sends a xxf:event-response embedded in an HTML document:
-            //      <!DOCTYPE HTML><html><body>&lt;xxf:event-response ... </body></html>
-            //      When it happens, responseXML may be the HTML document, so we also test on the root element being 'html'
-            //      But, surprisingly, responseText only contains the text inside the body, i.e. &lt;xxf:event-response ...
-            //      So here we "unescape" the text inside <body>
-            // HOWEVER: If, by any chance, there is some trailing stuff after the closing </html>, as in
-            //      </xhtml><script/>, then, with FF and IE, we get &lt;/xxf:event-response&gt;<script/> and then
-            //      XML parsing fails. Some company proxies might insert scripts this way, so we better make sure
-            //      to parse only xxf:event-response.
-            var fragment =
-                o.responseText.substring(
-                    o.responseText.indexOf("&lt;xxf:event-response"),
-                    o.responseText.indexOf("&lt;/xxf:event-response&gt;") + "&lt;/xxf:event-response&gt;".length);
-            var xmlString = fragment.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-            responseXML = ORBEON.util.Dom.stringToDom(xmlString);
-        } else {
-            // Regular Ajax response
-
-            // For IE, don't rely on the browser's XML parsing, as IE8 and IE9 doesn't preserve white spaces (but IE10+ does)
-            // See https://github.com/orbeon/orbeon-forms/issues/682
-            if (o.responseText && _.isObject(window.ActiveXObject))
-                responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
-        }
-
-        if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+        if (responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
             // Everything is fine with the response
 
@@ -238,7 +205,7 @@
             // Reset changes, as changes are included in this bach of events
             ORBEON.xforms.Globals.changedIdsRequest = {};
             // Notify listeners that we are done processing this request
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(o.argument);
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(formID);
             // Go ahead with next request, if any
             ORBEON.xforms.Globals.requestDocument = "";
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
@@ -248,7 +215,7 @@
             // Consider this a failure
             // As if the server returned an error code (5xx), in particular used by the loading indicator
             YAHOO.util.Connect.failureEvent.fire();
-            AjaxServer.handleFailureAjax(o);
+            AjaxServer.handleFailureAjax(500, responseText, responseXML, formID);
         }
     };
 

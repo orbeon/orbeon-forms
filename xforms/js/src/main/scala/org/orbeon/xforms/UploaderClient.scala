@@ -13,12 +13,17 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.{AjaxServer, ConnectCallbackArgument, Properties}
+import cats.syntax.option._
+import org.orbeon.xforms.facade.{AjaxServer, Properties}
+import org.scalajs.dom
+import org.scalajs.dom.experimental._
+import org.scalajs.dom.ext._
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.XMLHttpRequest
 
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.util.{Failure, Success}
 
 case class UploadEvent(form: html.Form, upload: Upload)
 
@@ -36,8 +41,8 @@ object UploaderClient {
   // remaining events.
   def continueWithRemainingEvents(): Unit = {
     currentEventOpt foreach (_.upload.uploadDone())
-    yuiConnectionOpt = None
     currentEventOpt = None
+    currentAbortControllerOpt = None
     if (remainingEvents.isEmpty) {
       executionQueuePromiseOpt.foreach (_.success(()))
       executionQueuePromiseOpt = None
@@ -71,7 +76,7 @@ object UploaderClient {
   def cancel(doAbort: Boolean, eventName: String): Unit = {
 
     if (doAbort)
-      yuiConnectionOpt foreach (YUIConnect.abort(_))
+      currentAbortControllerOpt foreach (_.abort())
 
     currentEventOpt foreach { processingEvent ⇒
       AjaxServerEvent.dispatchEvent(
@@ -90,127 +95,105 @@ object UploaderClient {
   private object Private {
 
     // While an upload is in progress:
-    var currentEventOpt          : Option[UploadEvent]   = None // event for the field being uploaded
-    var remainingEvents          : List[UploadEvent]     = Nil  // events for the fields that are left to be uploaded
-    var yuiConnectionOpt         : Option[js.Object]     = None // connection object
+    var currentEventOpt          : Option[UploadEvent]     = None // event for the field being uploaded
+    var remainingEvents          : List[UploadEvent]       = Nil  // events for the fields that are left to be uploaded
+    var currentAbortControllerOpt: Option[AbortController] = None
 
     var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
 
-    // Method called by YUI when the upload ends successfully.
-    def uploadSuccess(xhr: XMLHttpRequest): Unit = {
-
-      // uploadSuccess can be called:
-      // - on all browsers when the file is too large, and the server returns an error HTML page, instead of a
-      //   xxf:event-response wrapped in an <html><body>
-      // - on IE 7 and IE 8 in IE 7 mode when the upload is interrupted, say because of a connection issue (in that
-      //   case o.responseText is undefined or null)
-      // In both cases, we don't want to process the body as an Ajax response, as this could lead to errors.
-
-      (xhr.responseText: js.UndefOr[String]).toOption match {
-        case Some(text) if (text ne null) && text.startsWith("&lt;xxf:event-response") ⇒
-          // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-          currentEventOpt foreach (_.upload.clear())
-          // The Ajax response typically contains information about each file (name, size, etc)
-          AjaxServer.handleResponseAjax(xhr)
-          // Are we done, or do we still need to handle events for other forms?
-          continueWithRemainingEvents()
-        case _ ⇒
-          cancel(doAbort = false, EventNames.XXFormsUploadError)
-      }
-    }
-
     def asyncUploadRequestSetPromise(events: List[UploadEvent]): Future[Unit] = {
       val promise = Promise[Unit]()
-      executionQueuePromiseOpt = Some(promise)
+      executionQueuePromiseOpt = promise.some
       asyncUploadRequest(events)
       promise.future
     }
 
     // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
     // the upload can be done.
-    def asyncUploadRequest(events: List[UploadEvent]): Unit = events match {
+    // TODO: use NEL
+    def asyncUploadRequest(events: List[UploadEvent]): Unit = {
 
-      case Nil ⇒ throw new IllegalArgumentException
-      case currentEvent :: tail ⇒
+      val currentEvent = events.head
 
-        currentEventOpt = Some(currentEvent)
-        remainingEvents = tail
+      currentEventOpt = currentEvent.some
+      remainingEvents = events.tail
+      val controller = new AbortController
+      currentAbortControllerOpt = controller.some
 
-        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-        currentEvent.upload.setState("progress")
+      // Switch the upload to progress state, so users can't change the file and know the upload is in progress
+      currentEvent.upload.setState("progress")
 
-        // Tell server we're starting uploads
-        AjaxServerEvent.dispatchEvent(
-          AjaxServerEvent(
-            eventName    = EventNames.XXFormsUploadStart,
-            targetId     = currentEvent.upload.container.id,
-            showProgress = false
-          )
+      // Tell server we're starting uploads
+      AjaxServerEvent.dispatchEvent(
+        AjaxServerEvent(
+          eventName    = EventNames.XXFormsUploadStart,
+          targetId     = currentEvent.upload.container.id,
+          showProgress = false
+        )
+      )
+
+      def isUuidInput (e: html.Input) = e.name == "$uuid"
+      def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+
+      val uuidInput =
+        currentEvent.form.elements.iterator collect { case e: html.Input ⇒ e } filter isUuidInput toList
+
+      val uploadElem =
+        currentEvent.form.elements.iterator collect { case e: html.Input ⇒ e } filter isThisUpload toList
+
+      val data = new dom.FormData
+      data.append(uuidInput.head.name,   uuidInput.head.value)
+      data.append(uploadElem.head.name,  uploadElem.head.files(0))
+
+      val fetchPromise =
+        Fetch.fetch(
+          Page.getForm(currentEvent.form.id).xformsServerUploadPath,
+          new RequestInit {
+            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
+            var body           : js.UndefOr[BodyInit]           = data
+            var headers        : js.UndefOr[HeadersInit]        = js.undefined // set automatically via the `FormData`
+            var referrer       : js.UndefOr[String]             = js.undefined
+            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
+            var mode           : js.UndefOr[RequestMode]        = js.undefined
+            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
+            var cache          : js.UndefOr[RequestCache]       = js.undefined
+            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
+            var integrity      : js.UndefOr[String]             = js.undefined
+            var keepalive      : js.UndefOr[Boolean]            = js.undefined
+            var signal         : js.UndefOr[AbortSignal]        = controller.signal
+            var window         : js.UndefOr[Null]               = null
+          }
         )
 
-        import org.scalajs.dom.ext._
-
-        val newlyDisabledElems: List[html.Element] = {
-
-          def isUuidInput      (e: html.Input)   = e.name == "$uuid"
-          def isThisUpload     (e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
-          def isFieldset       (e: html.Element) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
-
-          def isDisabled(e: html.Element) = e match {
-            case e: html.Select   ⇒ e.disabled
-            case e: html.Button   ⇒ e.disabled
-            case e: html.Input    ⇒ e.disabled
-            case e: html.TextArea ⇒ e.disabled
-            case e: html.FieldSet ⇒ e.disabled
-            case e: html.OptGroup ⇒ e.disabled
-            case _                ⇒ false
-          }
-
-          def mustDisableElem  (e: html.Element) = ! isThisUpload(e) && ! isFieldset(e) && ! isDisabled(e)
-          def mustDisableInput (e: html.Input)   = ! isUuidInput(e) && mustDisableElem(e)
-
-          def mustDisableFilter(e: html.Element) = e match {
-            case e: html.Input ⇒ mustDisableInput(e)
-            case e             ⇒ mustDisableElem(e)
-          }
-
-          currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter toList
-        }
-
-        def setDisabled(e: html.Element, value: Boolean): Unit =
-          e match {
-            case e: html.Select   ⇒ e.disabled = value
-            case e: html.Button   ⇒ e.disabled = value
-            case e: html.Input    ⇒ e.disabled = value
-            case e: html.TextArea ⇒ e.disabled = value
-            case e: html.FieldSet ⇒ e.disabled = value
-            case e: html.OptGroup ⇒ e.disabled = value
-            case _                ⇒
-          }
-
-        newlyDisabledElems foreach (setDisabled(_, value = true))
-
-        // Trigger actual upload through a form POST and start asking server for progress
-        YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)
-
-        yuiConnectionOpt =
-          Some(
-            YUIConnect.asyncRequest(
-              "POST",
-              Page.getForm(currentEvent.form.id).xformsServerUploadPath,
-              new YUICallback {
-                override val upload = (uploadSuccess _: js.Function)
-                // Failure isn't called; instead we detect if an upload is interrupted through
-                // `progress-state="interrupted"` in the Ajax response.
-                val failure: js.Function = () ⇒ ()
-                val argument = new ConnectCallbackArgument(formId = currentEvent.form.id, isUpload = true)
-              }
-            )
+      val responseF =
+        for {
+          response ← fetchPromise.toFuture
+          text     ← response.text().toFuture
+        } yield
+          (
+            response.status,
+            text,
+            Support.stringToDom(text)
           )
 
-        askForProgressUpdate()
+      askForProgressUpdate()
 
-        newlyDisabledElems foreach (setDisabled(_, value = false))
+      // TODO: Determine whether we should call `handleFailureAjax` or `exceptionWhenTalkingToServer` when the `Future` fails.
+      // TODO: Check `status`.
+      responseF.onComplete {
+        case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
+          if ((responseText ne null) && responseText.startsWith("<xxf:event-response")) {
+            // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+            currentEvent.upload.clear()
+            // The Ajax response typically contains information about each file (name, size, etc)
+            AjaxServer.handleResponseAjax(responseText, responseXml, currentEvent.form.id, isResponseToBackgroundUpload = true)
+            // Are we done, or do we still need to handle events for other forms?
+            continueWithRemainingEvents()
+          }
+        case Failure(_) ⇒ // network failure/anything preventing the request from completing
+          cancel(doAbort = false, EventNames.XXFormsUploadError)
+          AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, currentEvent.form.id)
+      }
     }
   }
 }

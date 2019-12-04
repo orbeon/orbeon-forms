@@ -14,9 +14,11 @@
 package org.orbeon.xforms
 
 import org.scalajs.dom
+import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.util.control.NonFatal
 
 
 object Support {
@@ -38,4 +40,14 @@ object Support {
     // See comment on `namespaceIdIfNeeded`
     form → Page.namespaceIdIfNeeded(formId, targetId)
   }
+
+  def stringToDom(xmlString: String): dom.Node =
+    try {
+      (new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)
+    } catch {
+      case NonFatal(_) ⇒
+        // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
+        // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
+        dom.document.createElement("parsererror")
+    }
 }

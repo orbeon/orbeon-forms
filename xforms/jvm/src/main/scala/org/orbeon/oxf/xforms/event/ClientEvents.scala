@@ -62,7 +62,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Some(e.getText)) } toMap
     lazy val valueOpt     = properties.get("value").flatten
-    lazy val serverEventsValue = element.getText
+    lazy val serverEventsValue = properties.get("value").flatten getOrElse element.getText // global vs. inline server events don't have the same format
   }
 
   def extractLocalEvents(actionElement: Element): List[LocalEvent] =

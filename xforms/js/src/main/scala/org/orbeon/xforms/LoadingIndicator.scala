@@ -78,11 +78,11 @@ class LoadingIndicator extends js.Object{
 
   // Actually shows the loading indicator (no delay or counter)
   // NOTE: Called externally from AjaxServer.
-  def show() =
+  def show(): Unit =
     NProgress.start()
 
   // Actually hides the loading indicator (no counter)
-  private def hide() =
+  private def hide(): Unit =
     if (! Globals.loadingOtherPage)
       NProgress.done()
 

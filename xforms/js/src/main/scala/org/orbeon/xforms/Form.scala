@@ -36,6 +36,8 @@ class Form(
   private var discardableTimerIds: List[Int] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
 
+  // Q: Shouldn't we have a single loading indicator per `Page`, and not per form? The Ajax event queue supports multiple forms,
+  // for example, and it is global.
   val loadingIndicator = new LoadingIndicator
 
   def addDiscardableTimerId(id: Int): Unit =

@@ -14,8 +14,10 @@
 package org.orbeon.xforms
 
 
+import cats.data.NonEmptyList
 import org.scalatest.funspec.AsyncFunSpec
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 class ExecutionQueueTest extends AsyncFunSpec {
@@ -28,20 +30,19 @@ class ExecutionQueueTest extends AsyncFunSpec {
 
     it("must eventually execute") {
 
-      val result = Promise[List[String]]()
+      val result = Promise[NonEmptyList[String]]()
 
-      def execute(events: List[String]): Future[Unit] = {
+      def execute(events: NonEmptyList[String]): Future[Unit] = {
         result.success(events)
         Future(())
       }
 
       val eq = new ExecutionQueue(execute)
 
-      eq.add("foo", 1, ExecutionWait.MaxWait)
-      eq.add("bar", 10, ExecutionWait.MaxWait)
+      eq.add("foo", 1.millis, ExecutionWait.MaxWait)
+      eq.add("bar", 10.millis, ExecutionWait.MaxWait)
 
-      result.future map (r ⇒ assert("bar" :: "foo" :: Nil === r))
+      result.future map (r ⇒ assert(("bar" :: "foo" :: Nil) === r.toList))
     }
   }
-
 }

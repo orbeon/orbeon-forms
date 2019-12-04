@@ -19,6 +19,7 @@ import org.orbeon.xforms.facade.{Events, Properties}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
+import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
@@ -72,7 +73,7 @@ class Upload {
     scribe.debug("change → queueing")
     UploaderClient.uploadEventQueue.add(
       UploadEvent(getAncestorForm, self),
-      Properties.delayBeforeIncrementalRequest.get(),
+      Properties.delayBeforeIncrementalRequest.get().millis,
       ExecutionWait.MinWait
     )
   }

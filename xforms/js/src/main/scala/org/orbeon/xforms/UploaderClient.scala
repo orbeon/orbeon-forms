@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
@@ -43,11 +44,14 @@ object UploaderClient {
     currentEventOpt foreach (_.upload.uploadDone())
     currentEventOpt = None
     currentAbortControllerOpt = None
-    if (remainingEvents.isEmpty) {
-      executionQueuePromiseOpt.foreach (_.success(()))
-      executionQueuePromiseOpt = None
-    } else
-      asyncUploadRequest(remainingEvents)
+
+    NonEmptyList.fromList(remainingEvents) match {
+      case Some(nel) ⇒
+        asyncUploadRequest(nel)
+      case None ⇒
+        executionQueuePromiseOpt.foreach (_.success(()))
+        executionQueuePromiseOpt = None
+    }
   }
 
   // While there is a file upload going, this method runs at a regular interval and keeps asking the server for
@@ -101,7 +105,7 @@ object UploaderClient {
 
     var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
 
-    def asyncUploadRequestSetPromise(events: List[UploadEvent]): Future[Unit] = {
+    def asyncUploadRequestSetPromise(events: NonEmptyList[UploadEvent]): Future[Unit] = {
       val promise = Promise[Unit]()
       executionQueuePromiseOpt = promise.some
       asyncUploadRequest(events)
@@ -110,8 +114,7 @@ object UploaderClient {
 
     // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
     // the upload can be done.
-    // TODO: use NEL
-    def asyncUploadRequest(events: List[UploadEvent]): Unit = {
+    def asyncUploadRequest(events: NonEmptyList[UploadEvent]): Unit = {
 
       val currentEvent = events.head
 
@@ -191,6 +194,7 @@ object UploaderClient {
             continueWithRemainingEvents()
           }
         case Failure(_) ⇒ // network failure/anything preventing the request from completing
+          // NOTE: can be an `AbortError` (to verify)
           cancel(doAbort = false, EventNames.XXFormsUploadError)
           AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, currentEvent.form.id)
       }

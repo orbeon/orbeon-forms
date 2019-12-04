@@ -13,9 +13,12 @@
   */
 package org.orbeon.xforms
 
+import cats.data.NonEmptyList
 import enumeratum._
 
 import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 sealed abstract class ExecutionWait extends EnumEntry
@@ -29,8 +32,8 @@ object ExecutionWait extends Enum[ExecutionWait] {
 }
 
 // Handle a queue of events to which events can be added, and where after a certain delay all the events are
-// executed at once. Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
-class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
+// executed at once.
+class ExecutionQueue[T](execute: NonEmptyList[T] ⇒ Future[Unit]) {
 
   import Private._
 
@@ -38,11 +41,11 @@ class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
   //
   // a. If waitType is MinWait, after the specified delay unless another event is added to the queue before that.
   // b. If waitType is MaxWait, after the specified delay.
-  def add(event: T, waitMs: Int, waitType: ExecutionWait): Unit = {
+  def add(event: T, wait: FiniteDuration, waitType: ExecutionWait): Unit = {
     events ::= event
     if (! waitingCompletion) {
       delayFunctions += 1
-      js.timers.setTimeout(waitMs) {
+      js.timers.setTimeout(wait) {
         delayFunctions -= 1
         if ((waitType == ExecutionWait.MaxWait || delayFunctions == 0) && ! waitingCompletion)
           executeEvents()
@@ -58,12 +61,10 @@ class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
 
     // Call the `execute` function to run the events queued up so far.
     def executeEvents(): Unit =
-      if (events.nonEmpty) {
-        waitingCompletion = true
-        val localEvents = events
-        events = Nil
+      NonEmptyList.fromList(events) foreach { localEvents ⇒
 
-        import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+        waitingCompletion = true
+        events = Nil
 
         execute(localEvents) onComplete { _ ⇒
           waitingCompletion = false

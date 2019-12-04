@@ -36,6 +36,9 @@ class Form(
   private var discardableTimerIds: List[Int] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
 
+  // https://github.com/orbeon/orbeon-forms/issues/4286
+  var isFormDataSafe: Boolean = false
+
   // Q: Shouldn't we have a single loading indicator per `Page`, and not per form? The Ajax event queue supports multiple forms,
   // for example, and it is global.
   val loadingIndicator = new LoadingIndicator

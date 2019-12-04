@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.{ControlOps, Names}
-import org.orbeon.xforms.{$, AjaxServerEvent, Support, XFormsId}
+import org.orbeon.xforms.{$, AjaxServerEvent, Page, Support, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.{XMLHttpRequest, html}
@@ -41,6 +41,11 @@ object FormRunnerAPI {
       e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray
   }
+
+  def isFormDataSafe(
+    formElem    : js.UndefOr[html.Form] = js.undefined
+  ): Boolean =
+    Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
 
   def embedForm(
     container   : html.Element,

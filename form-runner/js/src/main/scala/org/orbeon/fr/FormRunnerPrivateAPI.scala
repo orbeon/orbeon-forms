@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.xforms.$
+import org.orbeon.xforms.{$, Page}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.raw.HTMLFormElement
@@ -37,7 +37,11 @@ object FormRunnerPrivateAPI {
 
   private val NewPathSuffix = "/new"
 
-  def setDataStatus(safe: Boolean): Unit =
+  def setDataStatus(uuid: String, safe: Boolean): Unit = {
+
+    // https://github.com/orbeon/orbeon-forms/issues/4286
+    Page.findFormByUuid(uuid) foreach (_.isFormDataSafe = safe)
+
     if (safe)
       $(global).off(
         ListenerEvents
@@ -47,6 +51,7 @@ object FormRunnerPrivateAPI {
         ListenerEvents,
         ((_: JQueryEventObject) ⇒ Message): js.Function
       )
+  }
 
   def submitLogin(
     username    : String,

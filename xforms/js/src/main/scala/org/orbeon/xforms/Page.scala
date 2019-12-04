@@ -23,14 +23,19 @@ object Page {
 
   import Private._
 
-  def setForm(id: String, form: Form): Unit =
-    forms += id → form
+  def setForm(namespacedFormId: String, form: Form): Unit = {
+    forms       += namespacedFormId → form
+    formsByUuid += form.uuid → form
+  }
 
   def countInitializedForms: Int = forms.size
 
+  def findFormByUuid(uuid: String): Option[Form] =
+    formsByUuid.get(uuid)
+
   @JSExport
-  def getForm(id: String): Form =
-    forms.getOrElse(id, throw new IllegalArgumentException(s"form `$id` not found"))
+  def getForm(namespacedFormId: String): Form =
+    forms.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
 
   @JSExport
   def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
@@ -89,7 +94,8 @@ object Page {
 
     case class ConstructorPredicate(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean)
 
-    var forms = Map[String, Form]()
+    var forms       = Map[String, Form]()
+    var formsByUuid = Map[String, Form]()
 
     var controlConstructors: List[ConstructorPredicate] = Nil
     var idToControl = Map[String, Upload]()

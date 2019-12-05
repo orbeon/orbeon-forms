@@ -39,6 +39,8 @@ val HttpComponentsVersion         = "4.3.5"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 val FlyingSaucerVersion           = "9.1.18"
+val JavaMailVersion               = "1.6.2"
+val JavaActivationVersion         = "1.2.1"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -62,7 +64,9 @@ val CoreLibraryDependencies = Seq(
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.4.0",  // 1.5.1
-  "javax.activation"            % "activation"                      % "1.1.1",
+  "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
+  "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
+  "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.0",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,

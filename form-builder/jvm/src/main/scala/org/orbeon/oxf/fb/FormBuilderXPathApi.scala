@@ -294,7 +294,14 @@ object FormBuilderXPathApi {
       { case (lhhaElem, HelpRefMatcher(controlName)) ⇒ lhhaElem → controlName }
 
     allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) ⇒
-      holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)._2 :+ lhhaElement
+
+      val (doDelete, holders) =
+        holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)
+
+      if (doDelete)
+        holders :+ lhhaElement
+      else
+        Nil
     }
   }
 

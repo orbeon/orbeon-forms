@@ -283,7 +283,7 @@ trait ResourcesOps extends BaseOps {
       val allBlankOrMissing =
         holders forall { case (_, controlHolder) ⇒ (controlHolder child lhhaName stringValue).isBlank }
 
-      true → (
+      allBlankOrMissing → (
         if (allBlankOrMissing)
           holders flatMap { case (_, controlHolder) ⇒ controlHolder child lhhaName}
         else

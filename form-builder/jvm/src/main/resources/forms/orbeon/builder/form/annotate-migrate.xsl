@@ -37,7 +37,7 @@
         name="instance"
         select="fbf:findDataInstanceElem(/)"/>
 
-    <!-- All unneeded help elements -->
+    <!-- All unneeded help elements AND resources -->
     <xsl:variable
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
         name="unneeded-elements"
@@ -227,6 +227,8 @@
     <xsl:template match="xf:help[generate-id() = $unneeded-elements]"
                   mode="within-body"/>
 
+    <xsl:template match="help[generate-id() = $unneeded-elements]"
+                  mode="within-model"/>
     <!-- `origin` → `template` on `fr:grid` and `fr:section` -->
     <xsl:template match="fr:grid/@origin | fr:section/@origin"
                   mode="within-body">

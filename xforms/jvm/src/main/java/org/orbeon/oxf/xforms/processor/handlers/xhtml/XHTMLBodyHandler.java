@@ -129,7 +129,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         {
             // Only for 2-pass submission
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$uuid", "value", containingDocument.getUUID()
+                    "type", "hidden", "name", Constants.UuidFieldName(), "value", containingDocument.getUUID()
             });
 
             // NOTE: we don't need $sequence here as HTML form posts are either:

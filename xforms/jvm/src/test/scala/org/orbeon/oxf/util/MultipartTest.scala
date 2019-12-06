@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.Reason.SizeReason
 import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
+import org.orbeon.xforms.Constants
 import org.scalactic.Equality
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -100,8 +101,8 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustSucceedWithLimits = List(-1L, 8326L, 10000L)
 
     val expectedPairs = List(
-      "$uuid"   → UUID,
-      FieldName → FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables)
+      Constants.UuidFieldName → UUID,
+      FieldName               → FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables)
     )
 
     for (limit ← MustSucceedWithLimits) {
@@ -144,7 +145,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustFailWithLimits = List(0, 4097, 8000)// NOTE: any value under 4096 is the same as 4096 (buffer size)
 
     val expectedPairs = List(
-      "$uuid" → UUID
+      Constants.UuidFieldName → UUID
     )
 
     for (limit ← MustFailWithLimits) {

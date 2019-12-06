@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
+import org.orbeon.xforms.Constants
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
@@ -179,7 +180,7 @@ object UploaderServer {
     private var fileScanOpt : Option[FileScan]       = None
 
     def fieldReceived(fieldName: String, value: String): Unit =
-      if (fieldName == "$uuid") {
+      if (fieldName == Constants.UuidFieldName) {
         require(value ne null)
         require(uuidOpt.isEmpty, "more than one document UUID provided")
 

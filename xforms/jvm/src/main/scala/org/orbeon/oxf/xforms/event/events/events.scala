@@ -114,25 +114,25 @@ object XXFormsLoadEvent {
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadStartEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_UPLOAD_START, target, properties, bubbles = true, cancelable = true) {
+  extends XFormsEvent(EventNames.XXFormsUploadStart, target, properties, bubbles = true, cancelable = true) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadProgressEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_UPLOAD_PROGRESS, target, properties, bubbles = false, cancelable = true) {
+  extends XFormsEvent(EventNames.XXFormsUploadProgress, target, properties, bubbles = false, cancelable = true) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadCancelEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_UPLOAD_CANCEL, target, properties, bubbles = true, cancelable = true) {
+  extends XFormsEvent(EventNames.XXFormsUploadCancel, target, properties, bubbles = true, cancelable = true) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_UPLOAD_DONE, target, properties, bubbles = true, cancelable = true) {
+  extends XFormsEvent(EventNames.XXFormsUploadDone, target, properties, bubbles = true, cancelable = true) {
 
   // These properties come from the client
   def file          = property[String]("file").get
@@ -143,14 +143,14 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
 
 object XXFormsUploadDoneEvent {
   val StandardProperties = Map(
-    XXFORMS_UPLOAD_DONE → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    EventNames.XXFormsUploadDone → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
   )
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(
-    name         = XXFORMS_UPLOAD_ERROR,
+    name         = EventNames.XXFormsUploadError,
     targetObject = target,
     properties   = XXFormsUploadErrorEvent.reasonToProperties(target).toMap orElse properties,
     bubbles      = true,

@@ -202,8 +202,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     indentedLogger      : IndentedLogger
   ): List[LocalEvent] = {
 
-    def isHeartbeat(event: LocalEvent)      = event.name == XXFORMS_SESSION_HEARTBEAT
-    def isUploadProgress(event: LocalEvent) = event.name == XXFORMS_UPLOAD_PROGRESS
+    def isHeartbeat(event: LocalEvent)      = event.name == EventNames.XXFormsSessionHeartbeat
+    def isUploadProgress(event: LocalEvent) = event.name == EventNames.XXFormsUploadProgress
 
     def hasHeartBeat(clientEvents: List[LocalEvent]) =
       clientEvents exists isHeartbeat
@@ -436,7 +436,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     val DummyEvent = List(LocalEvent(DocumentFactory.createElement("dummy"), trusted = false))
 
-    val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
+    val QuickResponseEventNames = Set(EventNames.XXFormsSessionHeartbeat, EventNames.XXFormsUploadProgress)
 
     def safelyCreateAndMapEvent(doc: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
 

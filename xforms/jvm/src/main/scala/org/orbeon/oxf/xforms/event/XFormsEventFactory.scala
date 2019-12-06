@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.EventNames._
 
 // Factory for XForms events
 object XFormsEventFactory {
@@ -46,11 +46,11 @@ object XFormsEventFactory {
     XXFORMS_BINDING_ERROR       → (new XXFormsBindingErrorEvent(_, _)),
     XXFORMS_XPATH_ERROR         → (new XXFormsXPathErrorEvent(_, _)),
     XXFORMS_INSTANCE_INVALIDATE → (new XXFormsInstanceInvalidate(_, _)),
-    XXFORMS_UPLOAD_CANCEL       → (new XXFormsUploadCancelEvent(_, _)),
-    XXFORMS_UPLOAD_PROGRESS     → (new XXFormsUploadProgressEvent(_, _)),
-    XXFORMS_UPLOAD_START        → (new XXFormsUploadStartEvent(_, _)),
-    XXFORMS_UPLOAD_DONE         → (new XXFormsUploadDoneEvent(_, _)),
-    XXFORMS_UPLOAD_ERROR        → (new XXFormsUploadErrorEvent(_, _)),
+    XXFormsUploadStart          → (new XXFormsUploadStartEvent(_, _)),
+    XXFormsUploadProgress       → (new XXFormsUploadProgressEvent(_, _)),
+    XXFormsUploadCancel         → (new XXFormsUploadCancelEvent(_, _)),
+    XXFormsUploadDone           → (new XXFormsUploadDoneEvent(_, _)),
+    XXFormsUploadError          → (new XXFormsUploadErrorEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT_DONE → (new XFormsModelConstructDoneEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT      → (new XFormsModelConstructEvent(_, _)),
     XXFORMS_INSTANCES_READY     → (new XXFormsInstancesReadyEvent(_, _)),
@@ -70,9 +70,9 @@ object XFormsEventFactory {
     XXFORMS_ITERATION_MOVED     → (new XXFormsIterationMovedEvent(_, _)),
     XXFORMS_REPEAT_ACTIVATE     → (new XXFormsRepeatActivateEvent(_, _)),
     // Other other events ;)
-    EventNames.KeyPress         → (new KeypressEvent(_, _)),
-    EventNames.KeyDown          → (new KeydownEvent(_, _)),
-    EventNames.KeyUp            → (new KeyupEvent(_, _)),
+    KeyPress                    → (new KeypressEvent(_, _)),
+    KeyDown                     → (new KeydownEvent(_, _)),
+    KeyUp                       → (new KeyupEvent(_, _)),
     XFORMS_DESELECT             → (new XFormsDeselectEvent(_, _)),
     XFORMS_INSERT               → (new XFormsInsertEvent(_, _)),
     XFORMS_LINK_ERROR           → (new XFormsLinkErrorEvent(_, _)),
@@ -92,7 +92,7 @@ object XFormsEventFactory {
     XXFORMS_VALUE_CHANGED       → (new XXFormsValueChangedEvent(_, _)),
     XFORMS_DELETE               → (new XFormsDeleteEvent(_, _)),
     XXFORMS_REPLACE             → (new XXFormsReplaceEvent(_, _)),
-    EventNames.XXFormsValue     → (new XXFormsValueEvent(_, _))
+    XXFormsValue                → (new XXFormsValueEvent(_, _))
   )
 
   // Create an event

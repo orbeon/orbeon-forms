@@ -37,10 +37,10 @@ object ControlAnalysisFactory {
   // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
   private val UploadExternalEvents  = Set(
     XFORMS_SELECT,
-    XXFORMS_UPLOAD_START,
-    XXFORMS_UPLOAD_PROGRESS,
-    XXFORMS_UPLOAD_CANCEL,
-    XXFORMS_UPLOAD_ERROR
+    EventNames.XXFormsUploadStart,
+    EventNames.XXFormsUploadProgress,
+    EventNames.XXFormsUploadCancel,
+    EventNames.XXFormsUploadError
   )
 
   abstract class ValueControl(

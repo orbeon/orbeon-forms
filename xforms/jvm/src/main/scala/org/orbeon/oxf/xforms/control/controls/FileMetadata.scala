@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{NetUtils, UploadProgress}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
@@ -178,10 +178,14 @@ object FileMetadata {
   // All possible property names
   val AllMetadataNames: Seq[String] = Evaluators.keys.toList
 
-  def progress(metadata: FileMetadata) = {
-    val option = UploaderServer.getUploadProgress(NetUtils.getExternalContext.getRequest, metadata.containingDocument.getUUID, metadata.getEffectiveId)
-    option filter (_.fieldName == metadata.getEffectiveId)
-  }
+  // Find the progress information in the session
+  def progress(metadata: FileMetadata): Option[UploadProgress] =
+    UploaderServer.getUploadProgress(
+      NetUtils.getExternalContext.getRequest,
+      metadata.containingDocument.getUUID,
+      metadata.getEffectiveId
+    ) filter
+      (_.fieldName == metadata.getEffectiveId)
 
   private def childMetadataValue(m: FileMetadata, element: Element) = {
     val contextStack = m.getContextStack
@@ -192,7 +196,7 @@ object FileMetadata {
 
   // Format a string containing a number of bytes to a human-readable string
   // If the input string doesn't represent a Long, return the string unchanged
-  def humanReadableBytes(size: String) =
+  def humanReadableBytes(size: String): String =
     try FileUtils.byteCountToDisplaySize(size.toLong)
     catch { case NonFatal(_) ⇒ size }
 }

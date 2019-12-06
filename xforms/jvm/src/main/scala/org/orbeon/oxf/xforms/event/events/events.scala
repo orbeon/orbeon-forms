@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.xforms.EventNames
+import shapeless.syntax.typeable._
 
 class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_STATE_RESTORED, target, properties, bubbles = false, cancelable = false) {
@@ -159,10 +160,9 @@ class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
 object XXFormsUploadErrorEvent {
   // Attempt to retrieve a reason if any
-  def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] = (
-    CollectionUtils.collectByErasedType[XFormsUploadControl](target).to[List]
-    flatMap FileMetadata.progress
-    flatMap {
+  def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
+    target.cast[XFormsUploadControl].to[List] flatMap
+      FileMetadata.progress                   flatMap {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) ⇒
         List(
           "error-type" → Some("size-error"),
@@ -183,7 +183,6 @@ object XXFormsUploadErrorEvent {
       case _ ⇒
         List("error-type" → Some("upload-error"))
     }
-  )
 }
 
 class XXFormsInstanceInvalidate(target: XFormsEventTarget, properties: PropertyGetter)

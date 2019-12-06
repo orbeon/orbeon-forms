@@ -132,6 +132,7 @@
     // Box that contains the Bootstrap popover used for help
     .popover.xforms-help-popover {
 
+        width: max-content;  // based on intrinsic width of the content, not the positioned container (which is the `td`)
         max-width: 400px;    // overrides max set by default by Bootstrap
         min-width: 254px;    // following #3557, help with narrow text looks ugly; 254px shows ok on narrowest devices
 
@@ -142,7 +143,7 @@
 
         .popover-content {
             overflow: auto;         // scrollbars when necessary
-            -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; // so that height we set in JS is correct
+            box-sizing: border-box; // so that height we set in JS is correct
             white-space: pre-wrap;  // newlines wrap, see https://github.com/orbeon/orbeon-forms/issues/1618
         }
     }

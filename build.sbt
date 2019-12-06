@@ -126,6 +126,8 @@ orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getO
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 historyPath                 in ThisBuild := Some((target in LocalRootProject).value / ".history")
 
+traceLevel in ThisBuild := 0
+
 // Give a .js or .jvm project's base directory, return the shared assets directory
 def sharedAssetsDir(baseDirectory: File) =
   baseDirectory.getParentFile / "shared" / "src" / "main" / "assets"

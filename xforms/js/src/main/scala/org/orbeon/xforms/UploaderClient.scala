@@ -26,6 +26,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
+import org.orbeon.oxf.util.CoreUtils._
+
 case class UploadEvent(form: html.Form, upload: Upload)
 
 // - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
@@ -144,44 +146,23 @@ object UploaderClient {
       val uploadElem =
         currentEvent.form.elements.iterator collect { case e: html.Input ⇒ e } filter isThisUpload toList
 
-      val data = new dom.FormData
-      data.append(uuidInput.head.name,   uuidInput.head.value)
-      data.append(uploadElem.head.name,  uploadElem.head.files(0))
-
-      val fetchPromise =
-        Fetch.fetch(
-          Page.getForm(currentEvent.form.id).xformsServerUploadPath,
-          new RequestInit {
-            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
-            var body           : js.UndefOr[BodyInit]           = data
-            var headers        : js.UndefOr[HeadersInit]        = js.undefined // set automatically via the `FormData`
-            var referrer       : js.UndefOr[String]             = js.undefined
-            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
-            var mode           : js.UndefOr[RequestMode]        = js.undefined
-            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
-            var cache          : js.UndefOr[RequestCache]       = js.undefined
-            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
-            var integrity      : js.UndefOr[String]             = js.undefined
-            var keepalive      : js.UndefOr[Boolean]            = js.undefined
-            var signal         : js.UndefOr[AbortSignal]        = controller.signal
-            var window         : js.UndefOr[Null]               = null
-          }
-        )
+      val data =
+        new dom.FormData |!>
+          (_.append(uuidInput.head.name,   uuidInput.head.value)) |!>
+          (_.append(uploadElem.head.name,  uploadElem.head.files(0)))
 
       val responseF =
-        for {
-          response ← fetchPromise.toFuture
-          text     ← response.text().toFuture
-        } yield
-          (
-            response.status,
-            text,
-            Support.stringToDom(text)
-          )
+        Support.fetchText(
+          url         = Page.getForm(currentEvent.form.id).xformsServerUploadPath,
+          requestBody = data,
+          contentType = None,
+          formId      = currentEvent.form.id,
+          signal      = controller.signal.some
+        )
 
       askForProgressUpdate()
 
-      // TODO: Determine whether we should call `handleFailureAjax` or `exceptionWhenTalkingToServer` when the `Future` fails.
+      // TODO: Determine whether we should call `handleFailureAjax` or `logAndShowError` when the `Future` fails.
       // TODO: Check `status`.
       responseF.onComplete {
         case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
@@ -196,6 +177,7 @@ object UploaderClient {
         case Failure(_) ⇒ // network failure/anything preventing the request from completing
           // NOTE: can be an `AbortError` (to verify)
           cancel(doAbort = false, EventNames.XXFormsUploadError)
+          // xxx TODO: we are no supposed to retry uploads, are we? check with previous implementation.
           AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, currentEvent.form.id)
       }
     }

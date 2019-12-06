@@ -61,45 +61,23 @@ object AjaxClient {
   }
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.asyncAjaxRequest")
-  def asyncAjaxRequest(): Unit =
-    try {
+  def asyncAjaxRequest(): Unit = {
 
-      Globals.requestTryCount += 1
+    Globals.requestTryCount += 1
 
-      val requestFormId = Globals.requestForm.id
+    // TODO: pass as parameter and remove `requestForm`
+    val requestFormId = Globals.requestForm.id
 
-      val fetchPromise =
-        Fetch.fetch(
-          Page.getForm(requestFormId).xformsServerPath,
-          new RequestInit {
-            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
-            var body           : js.UndefOr[BodyInit]           = Globals.requestDocument
-            var headers        : js.UndefOr[HeadersInit]        = js.Dictionary("Content-Type" → "application/xml")
-            var referrer       : js.UndefOr[String]             = js.undefined
-            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
-            var mode           : js.UndefOr[RequestMode]        = js.undefined
-            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
-            var cache          : js.UndefOr[RequestCache]       = js.undefined
-            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
-            var integrity      : js.UndefOr[String]             = js.undefined
-            var keepalive      : js.UndefOr[Boolean]            = js.undefined
-            var signal         : js.UndefOr[AbortSignal]        = js.undefined
-            var window         : js.UndefOr[Null]               = null
-          }
-        )
+    val responseF =
+      Support.fetchText(
+        url         = Page.getForm(requestFormId).xformsServerPath,
+        requestBody = Globals.requestDocument,
+        contentType = "application/xml".some,
+        formId      = requestFormId,
+        signal      = None
+      )
 
-      val responseF =
-        for {
-          response ← fetchPromise.toFuture
-          text     ← response.text().toFuture
-        } yield
-          (
-            response.status,
-            text,
-            Support.stringToDom(text)
-          )
-
-      // TODO: Determine whether we should call `handleFailureAjax` or `exceptionWhenTalkingToServer` when the `Future` fails.
+      // TODO: Determine whether we should call `handleFailureAjax` or `logAndShowError` when the `Future` fails.
       // TODO: Check `status`.
       responseF.onComplete {
         case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
@@ -107,10 +85,6 @@ object AjaxClient {
         case Failure(_) ⇒ // network failure/anything preventing the request from completing
           AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, requestFormId)
       }
-    } catch {
-      case NonFatal(t) ⇒
-        Globals.requestInProgress = false
-        AjaxServer.exceptionWhenTalkingToServer(t, Globals.requestForm.id)
     }
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent")
@@ -305,7 +279,6 @@ object AjaxClient {
       Globals.requestIgnoreErrors = ! (events exists (_.ignoreErrors))
       Globals.eventQueue          = remainingEvents.toJSArray
       Globals.requestForm         = currentForm
-      Globals.requestInProgress   = true
       Globals.requestDocument     = buildXmlRequest(currentFormId, events)
       Globals.requestTryCount     = 0
 

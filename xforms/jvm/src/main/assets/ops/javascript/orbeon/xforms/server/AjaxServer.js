@@ -40,7 +40,7 @@
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
      * This is to prevent the UI from becoming totally unusable after an error.
      */
-    AjaxServer.exceptionWhenTalkingToServer = function(e, formID) {
+    AjaxServer.logAndShowError = function(e, formID) {
         ORBEON.util.Utils.logMessage("JavaScript error");
         ORBEON.util.Utils.logMessage(e);
         var details = "Exception in client-side code.";
@@ -1629,7 +1629,7 @@
             }
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.exceptionWhenTalkingToServer(e, formID);
+            AjaxServer.logAndShowError(e, formID);
             // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         } finally {
             // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().

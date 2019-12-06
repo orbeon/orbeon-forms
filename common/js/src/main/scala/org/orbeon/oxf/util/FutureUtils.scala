@@ -73,4 +73,15 @@ object FutureUtils {
       f map Success.apply recover PartialFunction(Failure.apply)
   }
 
+  def withFutureSideEffects[T](
+    before      : ⇒ Unit,
+    after       : ⇒ Unit)(
+    body        : ⇒ Future[T])(implicit
+    execContext : ExecutionContext
+  ): Future[T] = {
+    before
+    val f = body
+    f.onComplete(_ ⇒ after)
+    f
+  }
 }

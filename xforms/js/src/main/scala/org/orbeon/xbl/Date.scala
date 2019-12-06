@@ -17,7 +17,7 @@ import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxServerEvent, EventNames, Language}
+import org.orbeon.xforms.{$, AjaxEvent, EventNames, Language}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -172,8 +172,8 @@ private class DateCompanion extends XBLCompanionWithState {
     def onKeypress(e: JQueryEventObject): Unit =
       if (Set(10, 13)(e.which)) {
         onDateSelectedUpdateStateAndSendValueToServer()
-        AjaxServerEvent.dispatchEvent(
-          AjaxServerEvent(
+        AjaxEvent.dispatchEvent(
+          AjaxEvent(
             eventName = EventNames.DOMActivate,
             targetId  = containerElem.id
           )

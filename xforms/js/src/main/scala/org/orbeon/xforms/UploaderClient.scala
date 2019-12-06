@@ -15,7 +15,8 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
-import org.orbeon.xforms.facade.{AjaxServer, Properties}
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.ext._
@@ -25,8 +26,6 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.util.{Failure, Success}
-
-import org.orbeon.oxf.util.CoreUtils._
 
 case class UploadEvent(form: html.Form, upload: Upload)
 
@@ -64,8 +63,8 @@ object UploaderClient {
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(Properties.delayBeforeUploadProgressRefresh.get()) {
       currentEventOpt foreach { processingEvent ⇒
-        AjaxServerEvent.dispatchEvent(
-          AjaxServerEvent(
+        AjaxEvent.dispatchEvent(
+          AjaxEvent(
             eventName    = EventNames.XXFormsUploadProgress,
             targetId     = processingEvent.upload.container.id,
             showProgress = false
@@ -85,8 +84,8 @@ object UploaderClient {
       currentAbortControllerOpt foreach (_.abort())
 
     currentEventOpt foreach { processingEvent ⇒
-      AjaxServerEvent.dispatchEvent(
-          AjaxServerEvent(
+      AjaxEvent.dispatchEvent(
+          AjaxEvent(
             eventName = eventName,
             targetId  = processingEvent.upload.container.id
           )
@@ -120,65 +119,93 @@ object UploaderClient {
 
       val currentEvent = events.head
 
-      currentEventOpt = currentEvent.some
-      remainingEvents = events.tail
-      val controller = new AbortController
-      currentAbortControllerOpt = controller.some
+      // If we can't extract form data, we don't attempt to do anything. That *might* happen if, between the time the
+      // event is queued and the time it is processed, the event is gone from the DOM (repeat iteration removed, wizard
+      // page toggled?). But we don't have a formal proof it can happen.
 
-      // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-      currentEvent.upload.setState("progress")
+      extractFormData(currentEvent.form, currentEvent.upload) foreach { formData ⇒
 
-      // Tell server we're starting uploads
-      AjaxServerEvent.dispatchEvent(
-        AjaxServerEvent(
-          eventName    = EventNames.XXFormsUploadStart,
-          targetId     = currentEvent.upload.container.id,
-          showProgress = false
-        )
-      )
+        val requestFormId = currentEvent.form.id
 
-      def isUuidInput (e: html.Input) = e.name == "$uuid"
-      def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+        currentEventOpt = currentEvent.some
+        remainingEvents = events.tail
 
-      val uuidInput =
-        currentEvent.form.elements.iterator collect { case e: html.Input ⇒ e } filter isUuidInput toList
+        val controller = new AbortController
+        currentAbortControllerOpt = controller.some
 
-      val uploadElem =
-        currentEvent.form.elements.iterator collect { case e: html.Input ⇒ e } filter isThisUpload toList
+        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
+        currentEvent.upload.setState("progress")
 
-      val data =
-        new dom.FormData |!>
-          (_.append(uuidInput.head.name,   uuidInput.head.value)) |!>
-          (_.append(uploadElem.head.name,  uploadElem.head.files(0)))
-
-      val responseF =
-        Support.fetchText(
-          url         = Page.getForm(currentEvent.form.id).xformsServerUploadPath,
-          requestBody = data,
-          contentType = None,
-          formId      = currentEvent.form.id,
-          signal      = controller.signal.some
+        // Tell server we're starting uploads
+        AjaxEvent.dispatchEvent(
+          AjaxEvent(
+            eventName    = EventNames.XXFormsUploadStart,
+            targetId     = currentEvent.upload.container.id,
+            showProgress = false
+          )
         )
 
-      askForProgressUpdate()
+        val responseF =
+          Support.fetchText(
+            url         = Page.getForm(requestFormId).xformsServerUploadPath,
+            requestBody = formData,
+            contentType = None,
+            formId      = requestFormId,
+            signal      = controller.signal.some
+          )
 
-      // TODO: Determine whether we should call `handleFailureAjax` or `logAndShowError` when the `Future` fails.
-      // TODO: Check `status`.
-      responseF.onComplete {
-        case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
-          if ((responseText ne null) && responseText.startsWith("<xxf:event-response")) {
-            // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-            currentEvent.upload.clear()
-            // The Ajax response typically contains information about each file (name, size, etc)
-            AjaxServer.handleResponseAjax(responseText, responseXml, currentEvent.form.id, isResponseToBackgroundUpload = true)
-            // Are we done, or do we still need to handle events for other forms?
-            continueWithRemainingEvents()
-          }
-        case Failure(_) ⇒ // network failure/anything preventing the request from completing
-          // NOTE: can be an `AbortError` (to verify)
-          cancel(doAbort = false, EventNames.XXFormsUploadError)
-          // xxx TODO: we are no supposed to retry uploads, are we? check with previous implementation.
-          AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, currentEvent.form.id)
+        askForProgressUpdate()
+
+        responseF.onComplete {
+          case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
+              // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+              currentEvent.upload.clear()
+              // The Ajax response typically contains information about each file (name, size, etc)
+              AjaxClient.handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = true, ignoreErrors = false)
+              // Are we done, or do we still need to handle events for other forms?
+              continueWithRemainingEvents()
+          case Success((_, responseText, responseXmlOpt)) ⇒
+            AjaxClient.handleFailure(responseText.some, responseXmlOpt, requestFormId, formData, ignoreErrors = false)
+          case Failure(_) ⇒
+            // NOTE: can be an `AbortError` (to verify)
+            cancel(doAbort = false, EventNames.XXFormsUploadError)
+            // TODO: we are no supposed to retry uploads, are we? check with previous implementation.
+            AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
+            AjaxClient.handleFailure(None, None, requestFormId, formData, ignoreErrors = false)
+        }
+      }
+    }
+
+    // This is a lot of work just to get two form fields and their values!
+    private def extractFormData(form: html.Form, upload: Upload): Option[dom.FormData] = {
+
+      object UuidExtractor {
+        def unapply(e: html.Input): Option[(String, String)] =
+          e.name == Constants.UuidFieldName option (e.name, e.value)
+      }
+
+      object FileExtractor {
+        def unapply(e: html.Input): Option[(String, dom.FileList)] =
+          (
+            $(e).hasClass(controls.Upload.UploadSelectClass) &&
+            $.contains(upload.container, e)     &&
+            e.files.length > 0
+          ) option (e.name, e.files)
+      }
+
+      val it =
+        form.elements.iterator collect[(String, js.Any)] {
+          case UuidExtractor(name, value) ⇒ name → value
+          case FileExtractor(name, value) ⇒ name → value(0) // for now take the first file only
+        }
+
+      it.to[List] match {
+        case l @ List(_, _) ⇒ // exactly two items
+          val d = new dom.FormData
+          l foreach { case (name, value) ⇒ d.append(name, value) }
+          d.some
+        case _ ⇒
+          None
       }
     }
   }

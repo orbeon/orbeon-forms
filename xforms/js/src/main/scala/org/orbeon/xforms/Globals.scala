@@ -23,16 +23,14 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object Globals {
 
-  lazy val isRenderingEngineTrident: Boolean                   = Bowser.msie.getOrElse(false) // one usage left to check as of 2019-01-04
+  lazy val isRenderingEngineTrident: Boolean                   = Bowser.msie.getOrElse(false) // one usage left to check as of 2019-12-09
 
-  var eventQueue                  : js.Array[AjaxServerEvent] = js.Array()                   // events to be sent to the server
+  var eventQueue                  : js.Array[AjaxEvent]       = js.Array()                   // events to be sent to the server
   var eventsFirstEventTime        : Double                    = 0                            // time when the first event in the queue was added
-  var requestForm                 : html.Form                 = null                         // hTML for the request currently in progress
-  var requestIgnoreErrors         : Boolean                   = false                        // should we ignore errors that result from running this request
   var requestInProgress           : Boolean                   = false                        // indicates whether an Ajax request is currently in process
-  var requestDocument             : String                    = ""                           // the last Ajax request, so we can resend it if necessary
   var requestTryCount             : Int                       = 0                            // how many attempts to run the current Ajax request we have done so far
   var executeEventFunctionQueued  : Int                       = 0                            // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
+  var changedIdsRequest           : js.Dictionary[Int]        = js.Dictionary.empty          // id of controls that have been touched by user since the last response was received
 
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server
@@ -40,7 +38,7 @@ object Globals {
   var currentFocusControlElement  : js.Object                 = null                         // element for the control that got the focus last
   var yuiCalendar                 : js.Object                 = null                         // reusable calendar widget
   var tooltipLibraryInitialized   : Boolean                   = false
-  var changedIdsRequest           : js.Dictionary[Int]        = js.Dictionary.empty          // id of controls that have been touched by user since the last response was received
+
   var loadingOtherPage            : Boolean                   = false                        // flag set when loading other page that prevents the loading indicator to disappear
   var activeControl               : js.Object                 = null                         // the currently active control, used to disable hint
   var dialogs                     : js.Dictionary[js.Dynamic] = js.Dictionary.empty          // map for dialogs: id -> YUI dialog object

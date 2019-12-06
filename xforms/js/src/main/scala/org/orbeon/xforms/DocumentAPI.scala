@@ -32,7 +32,7 @@ object DocumentAPI {
   // Q: Can we type `eventObject`?
   @JSExport
   def dispatchEvent(eventObject: js.Dictionary[js.Any]): Unit =
-    AjaxServerEvent.dispatchEvent(new AjaxServerEvent(eventObject))
+    AjaxEvent.dispatchEvent(new AjaxEvent(eventObject))
 
   // Dispatch an event
   // We do NOT document this as of 2015-10 for JavaScript callers. This should be
@@ -96,8 +96,8 @@ object DocumentAPI {
     Controls.setCurrentValue(control, newStringValue)
 
     // And also fire server event
-    AjaxServerEvent.dispatchEvent(
-      AjaxServerEvent(
+    AjaxEvent.dispatchEvent(
+      AjaxEvent(
         eventName  = EventNames.XXFormsValue,
         targetId   = control.id,
         properties = Map("value" → newStringValue)
@@ -114,8 +114,8 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     Controls.setFocus(control.id)
-    AjaxServerEvent.dispatchEvent(
-      AjaxServerEvent(
+    AjaxEvent.dispatchEvent(
+      AjaxEvent(
         eventName = EventNames.XFormsFocus,
         targetId  = control.id
       )

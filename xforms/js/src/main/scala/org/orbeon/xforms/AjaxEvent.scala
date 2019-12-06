@@ -24,7 +24,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-object AjaxServerEvent {
+object AjaxEvent {
 
   // This defines the order of parameters to the constructor of `AjaxServerEvent`. This must
   // be kept in this order for legacy JavaScript callers.
@@ -53,8 +53,8 @@ object AjaxServerEvent {
     ignoreErrors : Boolean             = DefaultIgnoreErrors,
     showProgress : Boolean             = DefaultShowProgress,
     incremental  : Boolean             = DefaultIncremental
-  ): AjaxServerEvent =
-    new AjaxServerEvent(
+  ): AjaxEvent =
+    new AjaxEvent(
       js.Dictionary[js.Any](
         "eventName"    → eventName,
         "targetId"     → targetId,
@@ -70,15 +70,15 @@ object AjaxServerEvent {
   def apply(
     eventName    : String,
     form         : html.Form
-  ): AjaxServerEvent =
-    new AjaxServerEvent(
+  ): AjaxEvent =
+    new AjaxEvent(
       js.Dictionary[js.Any](
         "form"      → form,
         "eventName" → eventName
       )
     )
 
-  def dispatchEvent(event: AjaxServerEvent): Unit =
+  def dispatchEvent(event: AjaxEvent): Unit =
     AjaxClient.fireEvents(
       events      = js.Array(event),
       incremental = event.incremental
@@ -86,11 +86,11 @@ object AjaxServerEvent {
 }
 
 @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
-class AjaxServerEvent(args: js.Any*) extends js.Object {
+class AjaxEvent(args: js.Any*) extends js.Object {
 
   require(args.nonEmpty)
 
-  import AjaxServerEvent._
+  import AjaxEvent._
 
   // Normalize parameters:
   //
@@ -99,7 +99,7 @@ class AjaxServerEvent(args: js.Any*) extends js.Object {
   //
   private val argsDict =
     if (args.length > 1)
-      js.Dictionary(AjaxServerEvent.ParamNames.zip(args): _*)
+      js.Dictionary(AjaxEvent.ParamNames.zip(args): _*)
     else
       args.head.asInstanceOf[js.Dictionary[js.Any]]
 

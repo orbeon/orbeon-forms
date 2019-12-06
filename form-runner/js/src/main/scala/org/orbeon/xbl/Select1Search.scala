@@ -16,7 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.jquery._
 import org.orbeon.xbl.Select2.toJQuerySelect2
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxServerEvent, ServerValueStore}
+import org.orbeon.xforms.{$, AjaxEvent, ServerValueStore}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -98,8 +98,8 @@ private class Select1SearchCompanion extends XBLCompanion {
     val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
     val label = selectedOption.text
     val value = selectedOption.value
-    AjaxServerEvent.dispatchEvent(
-      AjaxServerEvent(
+    AjaxEvent.dispatchEvent(
+      AjaxEvent(
         eventName  = "fr-change",
         targetId   = containerElem.id,
         properties = Map(
@@ -137,8 +137,8 @@ private class Select1SearchCompanion extends XBLCompanion {
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
       select2SuccessCallbacks.enqueue(success)
-      AjaxServerEvent.dispatchEvent(
-        AjaxServerEvent(
+      AjaxEvent.dispatchEvent(
+        AjaxEvent(
           eventName  = "fr-search",
           targetId   = containerElem.id,
           properties = Map(

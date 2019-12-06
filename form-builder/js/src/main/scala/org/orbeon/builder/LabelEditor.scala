@@ -17,9 +17,9 @@ import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms.{$, AjaxClient, AjaxServerEvent, EventNames}
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -36,8 +36,8 @@ object LabelEditor {
     var labelInputOpt: js.UndefOr[JQuery] = js.undefined
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
-    AjaxServer.beforeSendingEvent.add((
-      event         : AjaxServerEvent,
+    AjaxClient.beforeSendingEvent.add((
+      event         : AjaxEvent,
       addProperties : js.Function1[js.Dictionary[String], Unit]
     ) ⇒ {
 
@@ -70,7 +70,7 @@ object LabelEditor {
 
     def showLabelEditor(clickInterceptor: JQuery): Unit = {
 
-      if (AjaxClient.hasEventsToProcess) {
+      if (AjaxClient.hasEventsToProcess()) {
 
         // If we have a request in progress or events in the queue, try this again later
         js.timers.setTimeout(Properties.internalShortDelay.get()) {

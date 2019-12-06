@@ -21,9 +21,7 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global ⇒ g}
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.ErrorPanel")
 object ErrorPanel {
 
   import Private._
@@ -117,7 +115,6 @@ object ErrorPanel {
     }
   }
 
-  @JSExport
   def showError(formId: String, detailsOrNull: String): Unit = {
     val formErrorPanel = Page.getForm(formId).errorPanel.asInstanceOf[js.Dynamic]
 

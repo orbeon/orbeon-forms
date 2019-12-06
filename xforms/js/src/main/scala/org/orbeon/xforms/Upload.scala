@@ -18,6 +18,7 @@ import org.orbeon.xforms.controls.Upload._
 import org.orbeon.xforms.facade.{Events, Properties}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
+import org.scalajs.jquery.JQueryEventObject
 
 import scala.concurrent.duration._
 import scala.scalajs.js
@@ -178,9 +179,9 @@ class Upload {
   }
 
   // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
-  private def cancelButtonActivated(event: js.Object): Unit = {
+  private def cancelButtonActivated(event: JQueryEventObject): Unit = {
     scribe.debug("cancel button activated")
-    Event.preventDefault(event)
+    event.preventDefault()
     UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
   }
 

@@ -13,16 +13,12 @@
  */
 (function() {
 
-    /**
-     * Server is a singleton.
-     */
     ORBEON.xforms.server.AjaxServer = {};
 
     var $ = ORBEON.jQuery;
     var AjaxServer  = ORBEON.xforms.server.AjaxServer;
     var Controls    = ORBEON.xforms.Controls;
     var Properties  = ORBEON.util.Properties;
-    var StringUtils = ORBEON.util.StringOps;
     var Globals     = ORBEON.xforms.Globals;
 
     function childrenWithLocalName(node, name) {
@@ -35,32 +31,6 @@
         });
         return result;
     }
-
-    /**
-     * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
-     * This is to prevent the UI from becoming totally unusable after an error.
-     */
-    AjaxServer.logAndShowError = function(e, formID) {
-        ORBEON.util.Utils.logMessage("JavaScript error");
-        ORBEON.util.Utils.logMessage(e);
-        var details = "Exception in client-side code.";
-        details += "<ul>";
-        if (e.message != null) details += "<li>Message: " + e.message + "</li>";
-        if (e.fileName != null) details += "<li>File: " + e.fileName + "</li>";
-        if (e.lineNumber != null) details += "<li>Line number: " + e.lineNumber + "</li>";
-        details += "</ul>";
-        AjaxServer.showError("Exception in client-side code", details, formID);
-    };
-
-    /**
-     * Display the error panel and shows the specified detailed message in the detail section of the panel.
-     */
-    AjaxServer.showError = function(title, details, formID) {
-        ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
-        if (! ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
-            ORBEON.xforms.ErrorPanel.showError(formID, details);
-        }
-    };
 
     /**
      * Create a timer which after the specified delay will fire a server event.
@@ -76,155 +46,12 @@
             ORBEON.xforms.Page.getForm(formID).addDiscardableTimerId(timerId);
     };
 
-    AjaxServer.beforeSendingEvent = $.Callbacks();
-    AjaxServer.ajaxResponseReceived = $.Callbacks();
-
-    /**
-     * Unless we get a clear indication from the server that an error occurred, we retry to send the request to
-     * the AjaxServer.
-     *
-     * Browsers behaviors:
-     *
-     *      On Safari, when o.status == 0, it might not be an error. Instead, it can be happen when users click on a
-     *      link to download a file, and Safari stops the current Ajax request before it knows that new page is loaded
-     *      (vs. a file being downloaded). With the current core, we assimilate this to a communication error, and
-     *      we'll retry to send the Ajax request to the AjaxServer.
-     *
-     *      On Firefox, when users navigate to another page while an Ajax request is in progress,
-     *      we receive an error here, which we don't want to display. We don't have a good way of knowing if we get
-     *      this error because there was really a communication failure or if this is because the user is
-     *      going to another page. We handle this as a communication failure, and resend the request to the server,
-     *      This  doesn't hurt as the server knows that it must not execute the request more than once.
-     *
-     *      2015-01-26: Firefox (and others) return a <parsererror> document if the XML doesn't parse. So if there is an
-     *      XML Content-Type header but an empty body, for example, we get <parsererror>. See:
-     *
-     *      https://github.com/orbeon/orbeon-forms/issues/2074
-     */
-    AjaxServer.handleFailureAjax = function(status, responseText, responseXML, formID) {
-        if (responseXML &&
-            responseXML.documentElement &&
-            responseXML.documentElement.tagName == "error" && // don't catch <parsererror>
-            status != 503) {                                  // 503 is specifically sent to trigger a retry
-
-            // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
-            // we show an error to users.
-            //
-            //   <error>
-            //       <title>...</title>
-            //       <body>...</body>
-            //   </error>
-
-            ORBEON.xforms.Globals.requestInProgress = false;
-            ORBEON.xforms.Globals.requestDocument = "";
-            var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "title", null)[0]);
-            var body = ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "body", null)[0];
-            var detailsFromBody = body != null ? ORBEON.util.Dom.getStringValue(body) : null;
-            AjaxServer.showError(title, detailsFromBody, formID);
-        } else {
-            var loginRegexp = ORBEON.util.Properties.loginPageDetectionRegexp.get();
-            if (loginRegexp != '' && new RegExp(loginRegexp).test(responseText)) {
-
-                // It seems we got a login page back, so display dialog and reload form
-                var dialogEl = $('#' + formID + ' .xforms-login-detected-dialog');
-
-                // Link dialog with title for ARIA
-                var title = dialogEl.find('h4');
-                if (_.isUndefined(title.attr('id'))) {
-                    var titleId = _.uniqueId('xf-');
-                    title.attr('id', titleId);
-                    dialogEl.attr('aria-labelledby', titleId);
-                }
-
-                dialogEl.find('button').one('click.xf', function() {
-                    // Reloading the page will redirect us to the login page if necessary
-                    window.location.href = window.location.href;
-                });
-                dialogEl.modal({
-                  backdrop: 'static', // Click on the background doesn't hide dialog
-                  keyboard: false     // Can't use esc to close the dialog
-                });
-            } else {
-                AjaxServer.retryRequestAfterDelay(AjaxServer.asyncAjaxRequest);
-            }
-        }
-    };
-
-    AjaxServer.handleResponseAjax = function(responseText, responseXML, formID, isResponseToBackgroundUpload) {
-
-        if (responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-
-            // Everything is fine with the response
-
-            if (! isResponseToBackgroundUpload)
-                AjaxServer.ajaxResponseReceived.fire();
-
-            // If neither of these two conditions is met, hide the modal progress panel:
-            //      a) There is another Ajax request in the queue, which could be the one that triggered the
-            //         display of the modal progress panel, so we don't want to hide before that request ran.
-            //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
-            //         users could start interacting with a page which is going to be replaced shortly.
-            // We remove the modal progress panel before handling DOM response, as script actions may dispatch
-            // events and we don't want them to be filtered. If there are server events, we don't remove the
-            // panel until they have been processed, i.e. the request sending the server events returns.
-            function doHideProgressDialog() {
-
-                /**
-                 * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
-                 * window and for which the user didn't specify xxf:show-progress="false".
-                 *
-                 * The logic here corresponds to the following XPath:
-                 * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
-                 */
-                function serverSaysToKeepModelProgressPanelDisplayed() {
-                    if (responseXML && responseXML.documentElement
-                                && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-                        var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
-                        YAHOO.util.Dom.getElementsBy(function(element) {
-                            var localName = ORBEON.util.Utils.getLocalName(element);
-                            var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
-                            if ((localName  == "submission" || localName == "load")) {
-                                if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
-                                    foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
-                            }
-                        }, null, responseXML.documentElement);
-                        return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
-                    }
-                    return false;
-                }
-
-                return ! (ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent()
-                        || serverSaysToKeepModelProgressPanelDisplayed());
-            }
-
-            if (doHideProgressDialog()) {
-                ORBEON.util.Utils.hideModalProgressPanel();
-            }
-
-            AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formID);
-            // Reset changes, as changes are included in this bach of events
-            ORBEON.xforms.Globals.changedIdsRequest = {};
-            // Notify listeners that we are done processing this request
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(formID);
-            // Go ahead with next request, if any
-            ORBEON.xforms.Globals.requestDocument = "";
-            ORBEON.xforms.Globals.executeEventFunctionQueued++;
-            AjaxServer.executeNextRequest(false);
-
-        } else {
-            // Consider this a failure
-            // As if the server returned an error code (5xx), in particular used by the loading indicator
-            YAHOO.util.Connect.failureEvent.fire();
-            AjaxServer.handleFailureAjax(500, responseText, responseXML, formID);
-        }
-    };
-
     /**
      * Process events in the DOM passed as parameter.
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID) {
+    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID, ignoreErrors) {
 
         try {
             var responseRoot = responseXML.documentElement;
@@ -1616,8 +1443,8 @@
                         if (exception) details += " (" + ORBEON.common.MarkupUtils.escapeXmlMinimal(exception) + ")";
                         details += "</li>";
                     });
+                    AjaxServer.showError("Non-fatal error", details, formID, ignoreErrors);
                     details += "</ul>";
-                    AjaxServer.showError("Non-fatal error", details, formID);
                 }
             });
 
@@ -1629,12 +1456,8 @@
             }
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.logAndShowError(e, formID);
+            AjaxServer.logAndShowError(e, formID, ignoreErrors);
             // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
-        } finally {
-            // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
-            if (! isResponseToBackgroundUpload)
-                ORBEON.xforms.Globals.requestInProgress = false;
         }
     };
 

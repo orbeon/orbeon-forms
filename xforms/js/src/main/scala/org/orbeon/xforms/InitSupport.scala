@@ -170,8 +170,8 @@ object InitSupport {
           case StateResult.Uuid(uuid) ⇒
             uuid
           case StateResult.Restore(uuid) ⇒
-            AjaxServerEvent.dispatchEvent(
-              AjaxServerEvent(
+            AjaxEvent.dispatchEvent(
+              AjaxEvent(
                 eventName = EventNames.XXFormsAllEventsRequired,
                 form      = formElem
               )
@@ -388,8 +388,8 @@ object InitSupport {
             Map(KeyTextPropertyName → (keyText: js.Any)) ++
               (modifiers map (_ ⇒ KeyModifiersPropertyName → (modifierString: js.Any)))
 
-          AjaxServerEvent.dispatchEvent(
-            AjaxServerEvent(
+          AjaxEvent.dispatchEvent(
+            AjaxEvent(
               eventName   = e.`type`,
               targetId    = observer,
               properties  = properties

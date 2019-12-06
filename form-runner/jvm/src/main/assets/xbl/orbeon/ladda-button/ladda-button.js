@@ -30,24 +30,18 @@
         state: STATE_BEGIN,
 
         init: function() {
+            // Init buttons
+            this.button = $(this.container).find('button');
+            this.button.attr('data-style', 'slide-left');
+            var isPrimary = this.button.parents('.xforms-trigger-appearance-xxforms-primary').is('*');
+            this.button.attr('data-spinner-color', isPrimary ? 'white' : 'black');
+            this.button.addClass('ladda-button');
+            this.button.ladda();
 
-            // Ladda button uses document.createRange, which isn't supported on IE8, so we don't do anything if that
-            // function isn't available.
-            if (_.isFunction(document.createRange)) {
-
-                // Init buttons
-                this.button = $(this.container).find('button');
-                this.button.attr('data-style', 'slide-left');
-                var isPrimary = this.button.parents('.xforms-trigger-appearance-xxforms-primary').is('*');
-                this.button.attr('data-spinner-color', isPrimary ? 'white' : 'black');
-                this.button.addClass('ladda-button');
-                this.button.ladda();
-
-                // Events
-                this.button.on('click',             _.bind(this.click    , this));
-                AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this));
-                AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this));
-            }
+            // Events
+            this.button.on('click',               _.bind(this.click    , this));
+            AjaxServer.beforeSendingEvent().add  (_.bind(this.sending  , this));
+            AjaxServer.ajaxResponseReceived().add(_.bind(this.receiving, this));
         },
 
         destroy: function () {

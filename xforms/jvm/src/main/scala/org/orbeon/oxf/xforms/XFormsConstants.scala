@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.{EventNames, Namespaces}
 
 // Constants useful for the XForms engine.
 //
@@ -74,13 +74,13 @@ object XFormsConstants {
 
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
-  val XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms"
+  val XFORMS_NAMESPACE_URI = Namespaces.XF
   val XFORMS_NAMESPACE = Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI)
   val XFORMS_NAMESPACE_SHORT = Namespace(XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI)
 
   val XXFORMS_PREFIX = "xxforms"
   val XXFORMS_SHORT_PREFIX = "xxf"
-  val XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms"
+  val XXFORMS_NAMESPACE_URI = Namespaces.XXF
   val XXFORMS_NAMESPACE = Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI)
   val XXFORMS_NAMESPACE_SHORT = Namespace(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
 
@@ -148,7 +148,7 @@ object XFormsConstants {
 
   // XBL
   val XBL_PREFIX = "xbl"
-  val XBL_NAMESPACE_URI = "http://www.w3.org/ns/xbl"
+  val XBL_NAMESPACE_URI = Namespaces.XBL
   val XBL_NAMESPACE = Namespace(XBL_PREFIX, XBL_NAMESPACE_URI)
   val XBL_XBL_QNAME = QName("xbl", XBL_NAMESPACE)
   val XBL_BINDING_QNAME = QName("binding", XBL_NAMESPACE)
@@ -165,7 +165,7 @@ object XFormsConstants {
 
   // XBL extensions
   val XXBL_PREFIX = "xxbl"
-  val XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl"
+  val XXBL_NAMESPACE_URI = Namespaces.XXBL
   val XXBL_NAMESPACE = Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI)
   val XXBL_TRANSFORM_QNAME = QName("transform", XXBL_NAMESPACE)
   val XXBL_AVT_QNAME = QName("avt", XXBL_NAMESPACE)

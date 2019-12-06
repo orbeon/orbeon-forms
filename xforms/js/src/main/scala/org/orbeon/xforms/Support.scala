@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.FutureUtils
-import org.orbeon.xforms.facade.AjaxServer
+import org.orbeon.oxf.util.StringUtils._
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
@@ -47,15 +47,22 @@ object Support {
     form → Page.namespaceIdIfNeeded(formId, targetId)
   }
 
-  def stringToDom(xmlString: String): dom.Node =
+  def parseStringAsXml(xmlString: String): Option[dom.Document] =
     try {
-      (new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)
+      Option((new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)) filter
+        (_.documentElement.getElementsByTagName("parsererror").length == 0)
     } catch {
       case NonFatal(_) ⇒
-        // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
-        // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
-        dom.document.createElement("parsererror")
+        // If `xmlString` can't be parsed, `parseFromString()` is expected to return a document with `<parsererror/>`
+        // (which is crazy), but IE11 throws an exception instead.
+        None
     }
+
+  def getLocalName(n: dom.Node): Option[String] =
+    Option(n) collect { case e: dom.Element ⇒ getLocalName(e)}
+
+  def getLocalName(e: dom.Element): String =
+    if (e.tagName.contains(":")) e.tagName.substringAfter(":") else e.tagName
 
   def fetchText(
     url         : String,
@@ -63,48 +70,40 @@ object Support {
     contentType : Option[String],
     formId      : String,
     signal      : Option[AbortSignal]
-  ): Future[(Int, String, dom.Node)] = {
+  ): Future[(Int, String, Option[dom.Document])] =
+    FutureUtils.withFutureSideEffects(
+      before = Globals.requestInProgress = true,
+      after  = Globals.requestInProgress = false
+    ) {
 
-    val f =
-      FutureUtils.withFutureSideEffects(
-        before = Globals.requestInProgress = true,
-        after  = Globals.requestInProgress = false
-      ) {
+      val fetchPromise =
+        Fetch.fetch(
+          url,
+          new RequestInit {
+            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
+            var body           : js.UndefOr[BodyInit]           = requestBody
+            var headers        : js.UndefOr[HeadersInit]        = contentType map (ct ⇒ js.defined(js.Dictionary("Content-Type" → ct))) getOrElse js.undefined
+            var referrer       : js.UndefOr[String]             = js.undefined
+            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
+            var mode           : js.UndefOr[RequestMode]        = js.undefined
+            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
+            var cache          : js.UndefOr[RequestCache]       = js.undefined
+            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
+            var integrity      : js.UndefOr[String]             = js.undefined
+            var keepalive      : js.UndefOr[Boolean]            = js.undefined
+            var signal         : js.UndefOr[AbortSignal]        = signal map (js.defined.apply) getOrElse js.undefined
+            var window         : js.UndefOr[Null]               = null
+          }
+        )
 
-        val fetchPromise =
-          Fetch.fetch(
-            url,
-            new RequestInit {
-              var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
-              var body           : js.UndefOr[BodyInit]           = requestBody
-              var headers        : js.UndefOr[HeadersInit]        = contentType map (ct ⇒ js.defined(js.Dictionary("Content-Type" → ct))) getOrElse js.undefined
-              var referrer       : js.UndefOr[String]             = js.undefined
-              var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
-              var mode           : js.UndefOr[RequestMode]        = js.undefined
-              var credentials    : js.UndefOr[RequestCredentials] = js.undefined
-              var cache          : js.UndefOr[RequestCache]       = js.undefined
-              var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
-              var integrity      : js.UndefOr[String]             = js.undefined
-              var keepalive      : js.UndefOr[Boolean]            = js.undefined
-              var signal         : js.UndefOr[AbortSignal]        = signal map (js.defined.apply) getOrElse js.undefined
-              var window         : js.UndefOr[Null]               = null
-            }
-          )
-
-        for {
-          response ← fetchPromise.toFuture
-          text     ← response.text().toFuture
-        } yield
-          (
-            response.status,
-            text,
-            Support.stringToDom(text)
-          )
-      }
-
-    // Side-effect to tell the user in case or error
-    f.failed.foreach(AjaxServer.logAndShowError(_, formId))
-
-    f
-  }
+      for {
+        response ← fetchPromise.toFuture
+        text     ← response.text().toFuture
+      } yield
+        (
+          response.status,
+          text,
+          Support.parseStringAsXml(text)
+        )
+    }
 }

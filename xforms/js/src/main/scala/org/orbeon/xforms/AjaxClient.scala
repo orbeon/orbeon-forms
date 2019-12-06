@@ -19,26 +19,55 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.FutureUtils
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.EventNames.{DOMActivate, XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Events, Properties, Utils}
 import org.scalajs.dom
-import org.scalajs.dom.experimental._
-import org.scalajs.dom.{Node, html}
+import org.scalajs.dom.ext._
+import org.scalajs.dom.{FormData, html}
+import org.scalajs.jquery.{JQueryCallback, JQueryEventObject}
 
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSExportTopLevel
-import scala.scalajs.js.timers
-import scala.util.control.NonFatal
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
+
 
 object AjaxClient {
 
   import Private._
+
+  private lazy val _beforeSendingEvent  : JQueryCallback = $.Callbacks()
+  private lazy val _ajaxResponseReceived: JQueryCallback = $.Callbacks()
+
+  // TODO: Convert `ladda-button.js` so we can remove the def/lazy val and export
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.beforeSendingEvent")
+  def  beforeSendingEvent()  : JQueryCallback = _beforeSendingEvent
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseReceived")
+  def ajaxResponseReceived(): JQueryCallback = _ajaxResponseReceived
+
+  // Used by `OrbeonClientTest`
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseReceivedForTests")
+  def ajaxResponseReceivedForTests(): js.Promise[Unit] = {
+
+    val result = Promise[Unit]()
+
+    lazy val callback: js.Function = () ⇒ {
+      ajaxResponseReceived().asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
+      result.success(())
+    }
+
+    ajaxResponseReceived().add(callback)
+
+    result.future.toJSPromise
+  }
+
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.executeNextRequest")
   def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
@@ -60,32 +89,183 @@ object AjaxClient {
       }
   }
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.asyncAjaxRequest")
-  def asyncAjaxRequest(): Unit = {
+  def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {
+
+    val result = Promise[Unit]()
+
+    // When there is a request in progress, we need to wait for the response after the next response processed
+    var skipNext = Globals.requestInProgress
+
+    lazy val callback: js.Function = () ⇒ {
+      if (skipNext) {
+        skipNext = false
+      } else {
+        Events.ajaxResponseProcessedEvent.unsubscribe(callback)
+        result.success(())
+      }
+    }
+
+    Events.ajaxResponseProcessedEvent.subscribe(callback)
+
+    result.future
+  }
+
+  def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
 
     Globals.requestTryCount += 1
 
-    // TODO: pass as parameter and remove `requestForm`
-    val requestFormId = Globals.requestForm.id
+    FutureUtils.withFutureSideEffects(
+      before = Page.getForm(requestFormId).loadingIndicator.requestStarted(),
+      after  = Page.getForm(requestFormId).loadingIndicator.requestEnded()
+    ) {
+    Support.fetchText(
+      url         = Page.getForm(requestFormId).xformsServerPath,
+      requestBody = requestBody,
+      contentType = "application/xml".some,
+      formId      = requestFormId,
+      signal      = None
+    )
+  } onComplete {
+      case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
+        // We ignore HTTP status and just check that we have a well-formed response document
+        handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
+      case Success((503, _, _)) ⇒
+        // I can't find a place were we use or document this but this is a standard HTTP status code to say that we may retry later, so
+        // it probably makes sense to read it as such.
+        retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+      case Success((_, responseText, responseXmlOpt)) ⇒
+        handleFailure(responseText.some, responseXmlOpt, requestFormId, requestBody, ignoreErrors)
+      case Failure(_) ⇒
+        logAndShowError(_, requestFormId, ignoreErrors)
+        handleFailure(None, None, requestFormId, requestBody, ignoreErrors)
+    }
+  }
 
-    val responseF =
-      Support.fetchText(
-        url         = Page.getForm(requestFormId).xformsServerPath,
-        requestBody = Globals.requestDocument,
-        contentType = "application/xml".some,
-        formId      = requestFormId,
-        signal      = None
-      )
+  // Public for `UploaderClient`
+  def handleResponseAjax(responseXML: dom.Document, formId: String, isResponseToBackgroundUpload: Boolean, ignoreErrors: Boolean) {
 
-      // TODO: Determine whether we should call `handleFailureAjax` or `logAndShowError` when the `Future` fails.
-      // TODO: Check `status`.
-      responseF.onComplete {
-        case Success((status, responseText, responseXml)) ⇒ // includes 404 or 500 etc.
-          AjaxServer.handleResponseAjax(responseText, responseXml, requestFormId, isResponseToBackgroundUpload = false)
-        case Failure(_) ⇒ // network failure/anything preventing the request from completing
-          AjaxServer.handleFailureAjax(js.undefined, js.undefined, js.undefined, requestFormId)
+    if (! isResponseToBackgroundUpload)
+        AjaxClient.ajaxResponseReceived.fire()
+
+    // If neither of these two conditions is met, hide the modal progress panel:
+    //      a) There is another Ajax request in the queue, which could be the one that triggered the
+    //         display of the modal progress panel, so we don't want to hide before that request ran.
+    //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
+    //         users could start interacting with a page which is going to be replaced shortly.
+    // We remove the modal progress panel before handling DOM response, as script actions may dispatch
+    // events and we don't want them to be filtered. If there are server events, we don't remove the
+    // panel until they have been processed, i.e. the request sending the server events returns.
+    def mustHideProgressDialog: Boolean = {
+
+      // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
+      val serverSaysToKeepModelProgressPanelDisplayed =
+        responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
+          responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
+          (e ⇒ ! e.hasAttribute("target") && ! e.hasAttribute("show-progress"))
+
+      ! (eventQueueHasShowProgressEvent || serverSaysToKeepModelProgressPanelDisplayed)
+    }
+
+    if (mustHideProgressDialog)
+        Utils.hideModalProgressPanel()
+
+    AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formId, ignoreErrors)
+    // Reset changes, as changes are included in this bach of events
+    Globals.changedIdsRequest = js.Dictionary.empty
+    // Notify listeners that we are done processing this request
+    Events.ajaxResponseProcessedEvent.fire(formId)
+    // Go ahead with next request, if any
+    Globals.executeEventFunctionQueued += 1
+    executeNextRequest(bypassRequestQueue = false)
+  }
+
+  // Unless we get a clear indication from the server that an error occurred, we retry to send the request to
+  // the AjaxServer.
+  //
+  // Browsers behaviors (might be out of date as of 2019-12-09):
+  //
+  // - On Safari, when o.status == 0, it might not be an error. Instead, it can be happen when users click on a
+  //   link to download a file, and Safari stops the current Ajax request before it knows that new page is loaded
+  //   (vs. a file being downloaded). With the current core, we assimilate this to a communication error, and
+  //   we'll retry to send the Ajax request to the AjaxServer.
+  //
+  // - On Firefox, when users navigate to another page while an Ajax request is in progress,
+  //   we receive an error here, which we don't want to display. We don't have a good way of knowing if we get
+  //   this error because there was really a communication failure or if this is because the user is
+  //   going to another page. We handle this as a communication failure, and resend the request to the server,
+  //   This  doesn't hurt as the server knows that it must not execute the request more than once.
+  //
+  // - 2015-01-26: Firefox (and others) return a <parsererror> document if the XML doesn't parse. So if there is an
+  //   XML Content-Type header but an empty body, for example, we get <parsererror>. See:
+  //
+  //   https://github.com/orbeon/orbeon-forms/issues/2074
+  //
+  def handleFailure(
+    responseText : Option[String],
+    responseXML  : Option[dom.Document],
+    formId       : String,
+    requestBody  : String | FormData,
+    ignoreErrors : Boolean
+  ): Unit = {
+
+    object LoginRegexpMatcher {
+      def unapply(s: String): Boolean = {
+        val loginRegexp = Properties.loginPageDetectionRegexp.get()
+        loginRegexp.nonEmpty && new js.RegExp(loginRegexp).test(s)
       }
     }
+
+    (responseText, responseXML) match {
+      case (_, Some(responseXml)) if Support.getLocalName(responseXml.documentElement) == "error" ⇒
+        // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
+        // we show an error to users.
+        //
+        //   <error>
+        //       <title>...</title>
+        //       <body>...</body>
+        //   </error>
+
+        val title = responseXml.getElementsByTagName("title") map (_.textContent) mkString ""
+        val body  = responseXml.getElementsByTagName("body")  map (_.textContent) mkString ""
+
+        showError(title, body, formId, ignoreErrors)
+
+      case (Some(LoginRegexpMatcher()), _) ⇒
+
+         // It seems we got a login page back, so display dialog and reload form
+        val dialogEl = $(s"$$$formId .xforms-login-detected-dialog")
+
+        def getUniqueId(prefix: String): String = {
+          var i = 0
+          var r: String = null
+          do {
+            r = prefix + i
+            i += 1
+          } while (dom.document.getElementById(r) ne null)
+          r
+        }
+
+        // Link dialog with title for ARIA
+        val title = dialogEl.find("h4")
+        if (title.attr("id").isEmpty) {
+            val titleId = getUniqueId("xf-aria-dialog-title-")
+            title.attr("id", titleId)
+            dialogEl.attr("aria-labelledby", titleId)
+        }
+
+        dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) ⇒ {
+          // Reloading the page will redirect us to the login page if necessary
+          dom.window.location.href = dom.window.location.href
+        }): js.Function1[JQueryEventObject, js.Any])
+        dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
+          val backdrop = "static" // Click on the background doesn't hide dialog
+          val keyboard = false    // Can't use esc to close the dialog
+        })
+
+      case _ ⇒
+        retryRequestAfterDelay(() ⇒ asyncAjaxRequest(formId, requestBody, ignoreErrors))
+    }
+  }
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent")
   def eventQueueHasShowProgressEvent(): Boolean =
@@ -95,19 +275,8 @@ object AjaxClient {
   def hasEventsToProcess(): Boolean =
     Globals.requestInProgress || Globals.eventQueue.nonEmpty
 
-  // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
-  // a maximum delay.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.retryRequestAfterDelay")
-  def retryRequestAfterDelay(requestFunction: js.Function0[js.Any]): Unit = {
-    val delay = Math.min(Properties.retryDelayIncrement.get() * (Globals.requestTryCount - 1), Properties.retryMaxDelay.get())
-    if (delay == 0)
-      requestFunction()
-    else
-      timers.setTimeout(delay.millis)(requestFunction())
-  }
-
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
-  def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean): Unit = {
+  def fireEvents(events: js.Array[AjaxEvent], incremental: Boolean): Unit = {
 
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
@@ -151,6 +320,39 @@ object AjaxClient {
     Globals.lastEventSentTime = new js.Date().getTime()
   }
 
+  // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
+  // This is to prevent the UI from becoming totally unusable after an error.
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.logAndShowError")
+  def logAndShowError(e: Throwable, formId: String, ignoreErrors: Boolean): Unit = {
+
+    // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
+    dom.console.log("JavaScript error", e.getMessage)
+
+    val sb = new StringBuilder("Exception in client-side code.")
+
+    // We used to log `fileName` and `lineNumber` as well, but those are strictly Firefox features
+    Option(e.getMessage) foreach { m ⇒
+      sb append "<ul><li>Message: "
+      sb append m
+      sb append "</li></ul>"
+    }
+
+    showError("Exception in client-side code", sb.toString, formId, ignoreErrors)
+  }
+
+  // Display the error panel and shows the specified detailed message in the detail section of the panel.
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.showError")
+  def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
+    Events.errorEvent.fire(
+      new js.Object {
+        val title   = titleString
+        val details = detailsString
+      }
+    )
+    if (! ignoreErrors && Properties.showErrorDialog.get())
+      ErrorPanel.showError(formId, detailsString)
+  }
+
   private object Private {
 
     val EventsToFilterOut: Set[String] = Properties.clientEventsFilter.get().splitTo[Set]()
@@ -159,16 +361,26 @@ object AjaxClient {
     def debugEventQueue(): Unit =
       println(s"Event queue: ${Globals.eventQueue mkString ", "}")
 
-    def findEventsToProcess: Option[(NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent])] = {
+    // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
+    // a maximum delay.
+    def retryRequestAfterDelay(requestFunction: () ⇒ Unit): Unit = {
+      val delay = Math.min(Properties.retryDelayIncrement.get() * (Globals.requestTryCount - 1), Properties.retryMaxDelay.get())
+      if (delay == 0)
+        requestFunction()
+      else
+        timers.setTimeout(delay.millis)(requestFunction())
+    }
+
+    def findEventsToProcess: Option[(NonEmptyList[AjaxEvent], html.Form, List[AjaxEvent])] = {
 
       // Filter events (typically used for xforms-focus/xxforms-blur events)
-      def  filterEvents(events: NonEmptyList[AjaxServerEvent]): Option[NonEmptyList[AjaxServerEvent]] =
+      def  filterEvents(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
         if (EventsToFilterOut.nonEmpty)
           NonEmptyList.fromList(events filterNot (e ⇒ EventsToFilterOut(e.eventName)))
         else
           events.some
 
-      def foundActivatingEvent(events: NonEmptyList[AjaxServerEvent]): Boolean =
+      def foundActivatingEvent(events: NonEmptyList[AjaxEvent]): Boolean =
         if (Properties.clientEventMode.get() == "deferred")
           hasActivationEventForDeferredLegacy(events.toList)
         else
@@ -179,9 +391,9 @@ object AjaxClient {
       // within a block. Here, we do something simpler: just find a string of `eventName`/`targetId` that match and keep only
       // the last event of such a string. This should be enough, as there shouldn't be many cases where value events between,
       // say, two controls are interleaved without boundary events in between.
-      def coalesceValueEvents(events: NonEmptyList[AjaxServerEvent]): NonEmptyList[AjaxServerEvent] = {
+      def coalesceValueEvents(events: NonEmptyList[AjaxEvent]): NonEmptyList[AjaxEvent] = {
 
-        def processBlock(l: NonEmptyList[AjaxServerEvent]): NonEmptyList[AjaxServerEvent] = {
+        def processBlock(l: NonEmptyList[AjaxEvent]): NonEmptyList[AjaxEvent] = {
 
           val (single, remaining) =
             l.head.eventName match {
@@ -204,7 +416,7 @@ object AjaxClient {
 
       // Keep only the last `XXFormsUploadProgress`. This makes sense because as of 2019-11-25, we only handle a
       // single upload at a time.
-      def coalescedProgressEvents(events: NonEmptyList[AjaxServerEvent]): Option[NonEmptyList[AjaxServerEvent]] =
+      def coalescedProgressEvents(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
         events collect { case e if e.eventName == XXFormsUploadProgress ⇒ e } lastOption match {
           case Some(lastProgressEvent) ⇒
             NonEmptyList.fromList(
@@ -217,7 +429,7 @@ object AjaxClient {
             events.some
         }
 
-      def eventsForFirstForm(events: NonEmptyList[AjaxServerEvent]): (NonEmptyList[AjaxServerEvent], html.Form, List[AjaxServerEvent]) = {
+      def eventsForFirstForm(events: NonEmptyList[AjaxEvent]): (NonEmptyList[AjaxEvent], html.Form, List[AjaxEvent]) = {
 
         val currentForm = events.head.form // process all events for the form associated with the first event
 
@@ -236,7 +448,7 @@ object AjaxClient {
         eventsForFirstForm(coalescedEvents)
     }
 
-    def processEvents(events: NonEmptyList[AjaxServerEvent], currentForm: html.Form, remainingEvents: List[AjaxServerEvent]): Unit = {
+    def processEvents(events: NonEmptyList[AjaxEvent], currentForm: html.Form, remainingEvents: List[AjaxEvent]): Unit = {
 
       events.toList foreach { event ⇒
 
@@ -245,7 +457,7 @@ object AjaxClient {
           properties ⇒ event.properties = properties
 
         // 2019-11-22: `beforeSendingEvent` is undocumented but used
-        AjaxServer.beforeSendingEvent.fire(event, updateProps)
+        beforeSendingEvent.fire(event, updateProps)
       }
 
       // Only remember the last value for a given `targetId`. Notes:
@@ -276,10 +488,7 @@ object AjaxClient {
 
       val currentFormId = currentForm.id
 
-      Globals.requestIgnoreErrors = ! (events exists (_.ignoreErrors))
       Globals.eventQueue          = remainingEvents.toJSArray
-      Globals.requestForm         = currentForm
-      Globals.requestDocument     = buildXmlRequest(currentFormId, events)
       Globals.requestTryCount     = 0
 
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
@@ -295,11 +504,11 @@ object AjaxClient {
       // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
       Page.getForm(currentFormId).loadingIndicator.setNextConnectShow(showProgress)
 
-      asyncAjaxRequest()
+      asyncAjaxRequest(currentFormId, buildXmlRequest(currentFormId, events), ! (events exists (_.ignoreErrors)))
     }
 
     // NOTE: Later we can switch this to an automatically-generated protocol
-    def buildXmlRequest(currentFormId: String, eventsToSend: NonEmptyList[AjaxServerEvent]): String = {
+    def buildXmlRequest(currentFormId: String, eventsToSend: NonEmptyList[AjaxEvent]): String = {
 
       val requestDocumentString = new jl.StringBuilder
 
@@ -342,10 +551,10 @@ object AjaxClient {
           // response is processed, we incur the risk of incrementing the counter while the response is
           // garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
           StateHandling.updateSequence(currentFormId, currentSequenceNumber.toInt + 1)
-          AjaxServer.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(incrementSequenceNumberCallback) // because has `removed`
+          AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(incrementSequenceNumberCallback) // because has `removed`
         }
 
-        AjaxServer.ajaxResponseReceived.add(incrementSequenceNumberCallback)
+        AjaxClient.ajaxResponseReceived.add(incrementSequenceNumberCallback)
       }
       requestDocumentString.append("</xxf:sequence>")
       newLine()
@@ -401,7 +610,7 @@ object AjaxClient {
     }
 
     // TODO: Review and simplify this algorithm.
-    def hasActivationEventForDeferredLegacy(events: List[AjaxServerEvent]): Boolean = {
+    def hasActivationEventForDeferredLegacy(events: List[AjaxEvent]): Boolean = {
 
       val ElementType = 1
 

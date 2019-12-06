@@ -17,40 +17,15 @@ import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
-import scala.scalajs.js.|
 
 // YUI definitions. Eventually this will go away, see:
 // https://github.com/orbeon/orbeon-forms/issues/1599
-
-@JSGlobal("YAHOO.util.Connect")
-@js.native
-object YUIConnect extends js.Object {
-  val startEvent    : CustomEvent = js.native
-  val failureEvent  : CustomEvent = js.native
-}
-
-@js.native
-trait CustomEvent extends js.Object {
-  def subscribe(
-    fn              : js.Function,
-    obj             : js.UndefOr[js.Object]           = js.undefined,
-    overrideContext : js.UndefOr[Boolean | js.Object] = js.undefined
-  ): Unit = js.native
-}
-
-trait YUICallback extends js.Object {
-  var timeout  : js.UndefOr[Int]         = js.undefined
-  val upload   : js.UndefOr[js.Function] = js.undefined
-  val success  : js.UndefOr[js.Function] = js.undefined
-  val failure  : js.Function
-  val argument : js.Object
-}
 
 @js.native
 trait YUICustomEvent extends js.Object {
   def subscribe(fn: js.Function)   : Unit = js.native
   def unsubscribe(fn: js.Function) : Unit = js.native
-  def fire()                       : Unit = js.native
+  def fire(args: js.Any*)          : Unit = js.native
 }
 
 @JSGlobal("YAHOO.widget.ProgressBar")
@@ -59,10 +34,4 @@ class ProgressBar(config: js.Object) extends js.Object {
   def render(parent: Element, before: js.UndefOr[Element] = js.undefined) : Unit       = js.native
   def set(key: String, value: Int)                                        : Unit       = js.native
   def get(key: String)                                                    : js.Dynamic = js.native
-}
-
-@JSGlobal("YAHOO.util.Event")
-@js.native
-object Event extends js.Object {
-  def preventDefault(event: js.Object): Unit = js.native
 }

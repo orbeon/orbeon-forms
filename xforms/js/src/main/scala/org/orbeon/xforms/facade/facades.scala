@@ -13,13 +13,10 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.{AjaxServerEvent, Globals, YUICustomEvent}
+import org.orbeon.xforms.YUICustomEvent
 import org.scalajs.dom
-import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
-import org.scalajs.jquery.JQueryCallback
 
-import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
@@ -64,24 +61,18 @@ object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {
+  def ajaxResponseReceivedForTests(): js.Promise[Unit] = js.native
+}
 
-  def logAndShowError(throwable: Throwable, formId: String)               : Unit           = js.native
-  def beforeSendingEvent                                                  : JQueryCallback = js.native
-  def ajaxResponseReceived                                                : JQueryCallback = js.native
-  def fireEvents(events: js.Array[AjaxServerEvent], incremental: Boolean) : Unit           = js.native
+@js.native
+@JSGlobal("ORBEON.xforms.server.AjaxServer")
+object AjaxServer extends AjaxServerTrait {
 
-  def handleResponseAjax(
-    responseText                 : String,
-    responseXml                  : dom.Node,
+  def handleResponseDom(
+    responseXML                  : dom.Document,
+    isResponseToBackgroundUpload : Boolean,
     formId                       : String,
-    isResponseToBackgroundUpload : Boolean
-  ): Unit = js.native
-
-  def handleFailureAjax(
-    status                       : js.UndefOr[Int],
-    responseText                 : js.UndefOr[String],
-    responseXml                  : js.UndefOr[dom.Node],
-    formId                       : String
+    ignoreErrors                 : Boolean
   ): Unit = js.native
 
   def createDelayedServerEvent(
@@ -91,51 +82,6 @@ trait AjaxServerTrait extends js.Object {
     discardable  : Boolean,
     formId       : String
   ): Unit = js.native
-}
-
-@js.native
-@JSGlobal("ORBEON.xforms.server.AjaxServer")
-object AjaxServer extends AjaxServerTrait
-
-object AjaxServerOps {
-
-  implicit class AjaxServerOps(private val ajaxServer: AjaxServerTrait) extends AnyVal {
-
-    def ajaxResponseReceivedF: Future[Unit] = {
-
-      val result = Promise[Unit]()
-
-      lazy val callback: js.Function = () ⇒ {
-        ajaxServer.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
-        result.success(())
-      }
-
-      ajaxServer.ajaxResponseReceived.add(callback)
-
-      result.future
-    }
-
-    def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {
-
-      val result = Promise[Unit]()
-
-      // When there is a request in progress, we need to wait for the response after the next response processed
-      var skipNext = Globals.requestInProgress
-
-      lazy val callback: js.Function = () ⇒ {
-        if (skipNext) {
-          skipNext = false
-        } else {
-          Events.ajaxResponseProcessedEvent.unsubscribe(callback)
-          result.success(())
-        }
-      }
-
-      Events.ajaxResponseProcessedEvent.subscribe(callback)
-
-      result.future
-    }
-  }
 }
 
 @js.native
@@ -193,6 +139,7 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @js.native
 object Events extends js.Object {
   val ajaxResponseProcessedEvent  : YUICustomEvent = js.native
+  val errorEvent                  : YUICustomEvent = js.native
   val orbeonLoadedEvent           : YUICustomEvent = js.native
   val componentChangedLayoutEvent : YUICustomEvent = js.native
 
@@ -232,6 +179,9 @@ object Properties extends js.Object {
 
   val clientEventsFilter               : Property[String]  = js.native
   val clientEventMode                  : Property[String]  = js.native
+
+  val loginPageDetectionRegexp         : Property[String]  = js.native
+  val showErrorDialog                  : Property[Boolean] = js.native
 }
 
 @js.native
@@ -242,8 +192,9 @@ trait InitData extends js.Object {
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
-  def appendToEffectiveId(effectiveId: String, ending: String)              : String =           js.native
+  def appendToEffectiveId(effectiveId: String, ending: String)              : String           = js.native
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
-  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element =      js.native
-  def overlayUseDisplayHidden(o: js.Object)                                 : Unit = js.native
+  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
+  def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
+  def hideModalProgressPanel()                                              : Unit             = js.native
 }

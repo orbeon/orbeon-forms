@@ -18,8 +18,8 @@ import fr.hmil.roshttp.response.SimpleHttpResponse
 import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.oxf.util.FutureUtils._
-import org.orbeon.xforms.facade.AjaxServerOps._
-import org.orbeon.xforms.{InitSupport, facade}
+import org.orbeon.xforms.facade.AjaxServerTrait
+import org.orbeon.xforms.{AjaxClient, InitSupport, facade}
 import org.scalajs.dom
 import org.scalajs.dom.raw.Window
 import org.scalatest.funspec.AsyncFunSpec
@@ -50,7 +50,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   val CookieTimeout       = 60.seconds
 
-  case class OrbeonWindow(window: Window, documentAPI: facade.DocumentTrait, ajaxServerAPI: facade.AjaxServerTrait)
+  case class OrbeonWindow(window: Window, documentAPI: facade.DocumentTrait, ajaxServer: AjaxServerTrait)
 
   object OrbeonWindow {
     def apply(window: Window): OrbeonWindow = {
@@ -58,16 +58,16 @@ class OrbeonClientTest extends AsyncFunSpec {
       val ORBEON = window.asInstanceOf[js.Dynamic].ORBEON
 
       OrbeonWindow(
-        window        = window,
-        documentAPI   = ORBEON.xforms.Document.asInstanceOf[facade.DocumentTrait],
-        ajaxServerAPI = ORBEON.xforms.server.AjaxServer.asInstanceOf[facade.AjaxServerTrait]
+        window       = window,
+        documentAPI  = ORBEON.xforms.Document.asInstanceOf[facade.DocumentTrait],
+        ajaxServer   = ORBEON.xforms.server.AjaxServer.asInstanceOf[AjaxServerTrait]
       )
     }
   }
 
   def updateWindow(window: OrbeonWindow, controlId: String, newValue: String | Double | Boolean): Future[Unit] = {
     window.documentAPI.setValue(controlId, newValue)
-    window.ajaxServerAPI.ajaxResponseReceivedF
+    window.ajaxServer.ajaxResponseReceivedForTests().toFuture
   }
 
   def updateWindowsAndAssert(windows: List[OrbeonWindow], line: Int): Future[Unit] = async {

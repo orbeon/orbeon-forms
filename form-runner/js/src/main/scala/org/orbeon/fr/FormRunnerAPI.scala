@@ -14,10 +14,8 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.{ControlOps, Names}
-import org.orbeon.xforms.{$, AjaxServerEvent, Page, Support, XFormsId}
-import org.scalajs.dom
-import org.scalajs.dom.ext._
-import org.scalajs.dom.{XMLHttpRequest, html}
+import org.orbeon.xforms._
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -47,65 +45,6 @@ object FormRunnerAPI {
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
 
-  def destroyForm(container: html.Element): Unit = {
-    Option(container.querySelector("form")).foreach { (formElem) ⇒
-      val form = Page.getForm(formElem.id)
-      while (form.xblInstances.nonEmpty) {
-        org.scalajs.dom.console.log("Destroying", form.xblInstances.last)
-        form.xblInstances.last.destroy()
-      }
-    }
-  }
-
-  def embedForm(
-    container   : html.Element,
-    context     : String,
-    app         : String,
-    form        : String,
-    action      : String,
-    documentId  : js.UndefOr[String],
-    queryString : js.UndefOr[String]
-  ): Unit = {
-
-    destroyForm(container)
-    val xhr = new XMLHttpRequest()
-    xhr.open(
-      method = "GET",
-      url = s"$context/fr/$app/$form/$action?orbeon-embeddable=true"
-    )
-    xhr.onload = { (_) ⇒
-      if (xhr.status == 200) {
-
-        // Find scripts we already have in the page, so not to include the same script more than once
-        val existingScripts =
-          dom.document.head
-            .querySelectorAll("script")
-            .map(_.asInstanceOf[html.Script])
-            .map(_.src)
-
-        // Insert HTML and find scripts
-        container.innerHTML = xhr.responseText
-        val innerScriptElements =
-          container
-            .querySelectorAll("script")
-            .map(_.asInstanceOf[html.Script])
-
-        // Add new scripts to the `<head>`
-        innerScriptElements.foreach { innerScriptElement: html.Script ⇒
-          val src = innerScriptElement.src
-          if (! existingScripts.contains(src)) {
-            val headScript =
-              dom.document
-                .createElement("script")
-                .asInstanceOf[html.Script]
-            headScript.src = innerScriptElement.src
-            dom.document.head.appendChild(headScript)
-          }
-        }
-      }
-    }
-    xhr.send()
-  }
 }
 
 @JSExportTopLevel("ORBEON.fr.API.wizard")

@@ -208,7 +208,8 @@ object InitSupport {
           errorPanel                    = errorPanel,
           repeatTreeChildToParent       = repeatTreeChildToParent,
           repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
-          repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes)
+          repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes),
+          xblInstances                  = js.Array()
         )
       )
 

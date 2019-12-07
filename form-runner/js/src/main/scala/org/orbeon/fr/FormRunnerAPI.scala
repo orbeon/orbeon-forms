@@ -47,6 +47,16 @@ object FormRunnerAPI {
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
 
+  def destroyForm(container: html.Element): Unit = {
+    Option(container.querySelector("form")).foreach { (formElem) ⇒
+      val form = Page.getForm(formElem.id)
+      while (form.xblInstances.nonEmpty) {
+        org.scalajs.dom.console.log("Destroying", form.xblInstances.last)
+        form.xblInstances.last.destroy()
+      }
+    }
+  }
+
   def embedForm(
     container   : html.Element,
     context     : String,
@@ -56,6 +66,8 @@ object FormRunnerAPI {
     documentId  : js.UndefOr[String],
     queryString : js.UndefOr[String]
   ): Unit = {
+
+    destroyForm(container)
     val xhr = new XMLHttpRequest()
     xhr.open(
       method = "GET",

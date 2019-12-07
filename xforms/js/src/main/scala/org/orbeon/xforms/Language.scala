@@ -20,6 +20,7 @@ import org.scalajs.dom.raw.{MutationObserver, MutationRecord}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.collection.{mutable ⇒ m}
 
 @JSExportTopLevel("ORBEON.xforms.Language")
 object Language {
@@ -36,20 +37,31 @@ object Language {
       .getOrElse("en")
   }
 
-  def onLangChange(listener: String ⇒ Unit): Unit =
+  def onLangChange(listenerId: String, listener: String ⇒ Unit): Unit =
     langElement.foreach { elem ⇒
       val callback =
         (_: js.Array[MutationRecord], _: MutationObserver) ⇒ listener(getLang())
-      new MutationObserver(callback).observe(
+      val mutationObserver = new MutationObserver(callback)
+      mutationObserver.observe(
         target  = elem,
         options = dom.MutationObserverInit(
           attributes      = true,
           attributeFilter = js.Array(HtmlLangAttr)
         )
       )
+      langListeners.put(listenerId, mutationObserver)
     }
 
+  def offLangChange(listenerId: String): Unit = {
+    langListeners.get(listenerId).foreach { mutationObserver ⇒
+      mutationObserver.disconnect()
+      langListeners.remove(listenerId)
+    }
+  }
+
   private object Private {
+
+    val langListeners = m.Map.empty[String, MutationObserver]
 
     def langElement: Option[dom.Element] = {
 

@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -30,7 +31,8 @@ class Form(
   val errorPanel                    : js.Object,
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
-  val repeatIndexes                 : js.Dictionary[String]            // for JavaScript access
+  val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access
+  val xblInstances                  : js.Array[XBLCompanion]
 ) extends js.Object { // so that properties/methods can be accessed from JavaScript
 
   private var discardableTimerIds: List[Int] = Nil

@@ -17,7 +17,7 @@ import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxServerEvent, DocumentAPI, EventNames, Language}
+import org.orbeon.xforms.{$, AjaxServerEvent, EventNames, Language}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -75,12 +75,18 @@ private class DateCompanion extends XBLCompanionWithState {
       datePicker.onChangeDate(        ()                     ⇒ onDateSelectedUpdateStateAndSendValueToServer())
       datePicker.onHide(              ()                     ⇒ { inputEl.focus() }) // Set focus back on field when done with the picker
       datePicker.onShow(              ()                     ⇒ { inputEl.focus() }) // For date picker to be usable with the keyboard
-      Language.onLangChange { newLang ⇒
-        datePicker.options.language = newLang
-        datePicker.update()
-      }
+      Language.onLangChange(
+        listenerId = containerElem.id,
+        listener   = { newLang ⇒
+          datePicker.options.language = newLang
+          datePicker.update()
+        }
+      )
     }
   }
+
+  override def destroy(): Unit =
+    Language.offLangChange(containerElem.id)
 
   def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {
 

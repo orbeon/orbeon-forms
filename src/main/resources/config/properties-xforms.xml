@@ -253,7 +253,6 @@
             { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
             { "full": "/ops/yui/event/event.js",                                             "min": true  },
             { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
-            { "full": "/ops/yui/connection/connection.js",                                   "min": true  },
             { "full": "/ops/yui/element/element.js",                                         "min": true  },
             { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
             { "full": "/ops/yui/progressbar/progressbar.js",                                 "min": true  },

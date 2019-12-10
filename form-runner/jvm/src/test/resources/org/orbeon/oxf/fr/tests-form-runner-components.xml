@@ -130,7 +130,6 @@
                 <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/connection/connection.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/element/element.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/animation/animation.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/progressbar/progressbar.min.js" class="xforms-baseline"/>

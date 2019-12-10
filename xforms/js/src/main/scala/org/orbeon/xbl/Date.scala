@@ -158,7 +158,6 @@ private class DateCompanion extends XBLCompanionWithState {
           newState       = state.copy(value = valueFromUI),
           valueFromState = _.value
         )
-        org.scalajs.dom.console.log("onDatePickerChangeUpdateStateAndSendValueToServer")
       }
 
     // Force an update of the date picker if we have a valid date, so when users type "1/2", the value

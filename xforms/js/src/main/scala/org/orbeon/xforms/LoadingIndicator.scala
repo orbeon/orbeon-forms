@@ -63,7 +63,7 @@ class LoadingIndicator extends js.Object {
     this.nextConnectShow = nextConnectShow
 
   // Actually shows the loading indicator (no delay or counter)
-  private def show(): Unit =
+  def show(): Unit =
     NProgress.start()
 
   // Actually hides the loading indicator (no counter)

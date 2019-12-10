@@ -34,7 +34,7 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
 
@@ -53,6 +53,7 @@ object AjaxClient {
   def ajaxResponseReceived(): JQueryCallback = _ajaxResponseReceived
 
   // Used by `OrbeonClientTest`
+  // TODO: Check if `ajaxResponseProcessedForCurrentEventQueueF` should/could be used instead.
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseReceivedForTests")
   def ajaxResponseReceivedForTests(): js.Promise[Unit] = {
 
@@ -68,27 +69,7 @@ object AjaxClient {
     result.future.toJSPromise
   }
 
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.executeNextRequest")
-  def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
-
-    Globals.executeEventFunctionQueued -= 1
-
-    if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
-      findEventsToProcess match {
-        case Some((events, currentForm, remainingEvents)) ⇒
-          // Remove from this list of ids that changed the id of controls for
-          // which we have received the keyup corresponding to the keydown.
-          // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
-          // TODO: check where this is used!
-          Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
-
-          processEvents(events, currentForm, remainingEvents)
-        case None ⇒
-          Globals.eventQueue = js.Array()
-      }
-  }
-
+  // TODO: `formId` is not used.
   def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {
 
     val result = Promise[Unit]()
@@ -108,37 +89,6 @@ object AjaxClient {
     Events.ajaxResponseProcessedEvent.subscribe(callback)
 
     result.future
-  }
-
-  def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
-
-    Globals.requestTryCount += 1
-
-    FutureUtils.withFutureSideEffects(
-      before = Page.getForm(requestFormId).loadingIndicator.requestStarted(),
-      after  = Page.getForm(requestFormId).loadingIndicator.requestEnded()
-    ) {
-    Support.fetchText(
-      url         = Page.getForm(requestFormId).xformsServerPath,
-      requestBody = requestBody,
-      contentType = "application/xml".some,
-      formId      = requestFormId,
-      signal      = None
-    )
-  } onComplete {
-      case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
-        // We ignore HTTP status and just check that we have a well-formed response document
-        handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
-      case Success((503, _, _)) ⇒
-        // I can't find a place were we use or document this but this is a standard HTTP status code to say that we may retry later, so
-        // it probably makes sense to read it as such.
-        retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
-      case Success((_, responseText, responseXmlOpt)) ⇒
-        handleFailure(responseText.some, responseXmlOpt, requestFormId, requestBody, ignoreErrors)
-      case Failure(_) ⇒
-        logAndShowError(_, requestFormId, ignoreErrors)
-        handleFailure(None, None, requestFormId, requestBody, ignoreErrors)
-    }
   }
 
   // Public for `UploaderClient`
@@ -200,6 +150,7 @@ object AjaxClient {
   //
   //   https://github.com/orbeon/orbeon-forms/issues/2074
   //
+  // Public for `UploaderClient`
   def handleFailure(
     responseText : Option[String],
     responseXML  : Option[dom.Document],
@@ -266,10 +217,6 @@ object AjaxClient {
         retryRequestAfterDelay(() ⇒ asyncAjaxRequest(formId, requestBody, ignoreErrors))
     }
   }
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.eventQueueHasShowProgressEvent")
-  def eventQueueHasShowProgressEvent(): Boolean =
-    Globals.eventQueue exists (_.showProgress)
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasEventsToProcess")
   def hasEventsToProcess(): Boolean =
@@ -369,6 +316,59 @@ object AjaxClient {
         requestFunction()
       else
         timers.setTimeout(delay.millis)(requestFunction())
+    }
+
+    def eventQueueHasShowProgressEvent(): Boolean =
+      Globals.eventQueue exists (_.showProgress)
+
+    def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
+
+      Globals.executeEventFunctionQueued -= 1
+
+      if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
+        findEventsToProcess match {
+          case Some((events, currentForm, remainingEvents)) ⇒
+            // Remove from this list of ids that changed the id of controls for
+            // which we have received the keyup corresponding to the keydown.
+            // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
+            // TODO: check where this is used!
+            Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
+
+            processEvents(events, currentForm, remainingEvents)
+          case None ⇒
+            Globals.eventQueue = js.Array()
+        }
+    }
+
+    def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
+
+      Globals.requestTryCount += 1
+
+      FutureUtils.withFutureSideEffects(
+        before = Page.getForm(requestFormId).loadingIndicator.requestStarted(),
+        after  = Page.getForm(requestFormId).loadingIndicator.requestEnded()
+      ) {
+      Support.fetchText(
+        url         = Page.getForm(requestFormId).xformsServerPath,
+        requestBody = requestBody,
+        contentType = "application/xml".some,
+        formId      = requestFormId,
+        signal      = None
+      )
+    } onComplete {
+        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
+          // We ignore HTTP status and just check that we have a well-formed response document
+          handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
+        case Success((503, _, _)) ⇒
+          // I can't find a place were we use or document this but this is a standard HTTP status code to say that we may retry later, so
+          // it probably makes sense to read it as such.
+          retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+        case Success((_, responseText, responseXmlOpt)) ⇒
+          handleFailure(responseText.some, responseXmlOpt, requestFormId, requestBody, ignoreErrors)
+        case Failure(_) ⇒
+          logAndShowError(_, requestFormId, ignoreErrors)
+          handleFailure(None, None, requestFormId, requestBody, ignoreErrors)
+      }
     }
 
     def findEventsToProcess: Option[(NonEmptyList[AjaxEvent], html.Form, List[AjaxEvent])] = {

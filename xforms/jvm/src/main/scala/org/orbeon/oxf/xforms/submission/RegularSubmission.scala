@@ -44,14 +44,14 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        UriScheme.withName(absoluteResolvedURL.getScheme),
-        p.httpMethod,
-        p2.credentialsOpt.isDefined,
-        sp.actualRequestMediatype,
-        p2.encoding,
-        SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
-        Connection.headersToForwardFromProperty,
-        containingDocument.headersGetter)(
+        scheme           = UriScheme.withName(absoluteResolvedURL.getScheme),
+        method           = p.httpMethod,
+        hasCredentials   = p2.credentialsOpt.isDefined,
+        mediatype        = sp.actualRequestMediatype,
+        encodingForSOAP  = p2.encoding,
+        customHeaders    = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
+        headersToForward = Connection.headersToForwardFromProperty,
+        getHeader        = containingDocument.headersGetter)(
         detailsLogger
       )
 

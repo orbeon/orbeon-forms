@@ -26,7 +26,7 @@ object NProgress extends js.Object {
   def done()                        : Unit = js.native
 }
 
-class LoadingIndicator extends js.Object {
+class LoadingIndicator extends js.Object { // so that properties/methods can be accessed from JavaScript
 
   private var nextConnectShow = false
   private var shownCounter    = 0

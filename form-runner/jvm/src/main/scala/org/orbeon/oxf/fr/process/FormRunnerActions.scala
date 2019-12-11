@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
-import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
@@ -310,8 +310,8 @@ trait FormRunnerActions {
   private val SendParameterKeys = List(
     "uri",
     "serialization",
-    "content-type",
     PruneMetadataName,
+    Headers.ContentTypeLower,
     "headers",
     ShowProgressName,
     FormTargetName,
@@ -405,7 +405,7 @@ trait FormRunnerActions {
             (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
 
         val effectiveContentType =
-          evaluatedPropertiesAsMap.get("content-type").flatten orElse
+          evaluatedPropertiesAsMap.get(Headers.ContentTypeLower).flatten orElse
             findDefaultContentType
 
         val effectivePruneMetadata =

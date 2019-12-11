@@ -24,18 +24,23 @@ object Page {
   import Private._
 
   def setForm(namespacedFormId: String, form: Form): Unit = {
-    forms       += namespacedFormId → form
-    formsByUuid += form.uuid → form
+    formsByNamespacedFormId += namespacedFormId → form
+    formsByUuid             += form.uuid        → form
   }
 
-  def countInitializedForms: Int = forms.size
+  def unsetForm(form: Form): Unit = {
+    formsByNamespacedFormId -= form.elem.id
+    formsByUuid             -= form.uuid
+  }
+
+  def countInitializedForms: Int = formsByNamespacedFormId.size
 
   def findFormByUuid(uuid: String): Option[Form] =
     formsByUuid.get(uuid)
 
   @JSExport
   def getForm(namespacedFormId: String): Form =
-    forms.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
+    formsByNamespacedFormId.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
 
   @JSExport
   def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
@@ -94,10 +99,9 @@ object Page {
 
     case class ConstructorPredicate(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean)
 
-    var forms       = Map[String, Form]()
-    var formsByUuid = Map[String, Form]()
-
-    var controlConstructors: List[ConstructorPredicate] = Nil
-    var idToControl = Map[String, Upload]()
+    var formsByNamespacedFormId = Map[String, Form]()
+    var formsByUuid             = Map[String, Form]()
+    var controlConstructors     = List[ConstructorPredicate]()
+    var idToControl             = Map[String, Upload]()
   }
 }

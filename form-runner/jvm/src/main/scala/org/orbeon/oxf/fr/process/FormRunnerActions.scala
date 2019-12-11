@@ -312,6 +312,7 @@ trait FormRunnerActions {
     "serialization",
     "content-type",
     PruneMetadataName,
+    "headers",
     ShowProgressName,
     FormTargetName,
     "prune", // for backward compatibility,
@@ -358,13 +359,20 @@ trait FormRunnerActions {
             requestedParamNames = findParamValue("parameters").toList flatMap (_.splitTo[List]())
           )
 
+        // `ProcessParser` should handle all the escapes, but it doesn't right now. So, specifically for
+        // `headers`, we handle line breaks here.
+        // https://github.com/orbeon/orbeon-forms/issues/4295
+        def updateLineBreaks(s: String) =
+          s.replaceAllLiterally("\\r\\n", "\n").replaceAllLiterally("\\n", "\n")
+
         val propertiesAsPairs =
           SendParameterKeys map (key ⇒ key → findParamValue(key))
 
         propertiesAsPairs map {
-          case (n @ "uri",    s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map updateUri)
-          case (n @ "method", s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (_.toLowerCase))
-          case (n,            s @ Some(_)) ⇒ n → (s map evaluateValueTemplate)
+          case (n @ "uri",     s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map updateUri)
+          case (n @ "method",  s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (_.toLowerCase))
+          case (n @ "headers", s @ Some(_)) ⇒ n → (s map updateLineBreaks map evaluateValueTemplate)
+          case (n,             s @ Some(_)) ⇒ n → (s map evaluateValueTemplate)
           case other                       ⇒ other
         } toMap
       }

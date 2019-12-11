@@ -51,7 +51,14 @@
         instance="fr-send-submission-response"
         xxf:show-progress="{instance('fr-send-submission-params')/@show-progress}"
         xxf:target="{instance('fr-send-submission-params')/@formtarget}"
-        xxf:response-url-type="{'resource'[event('response-is-resource') = 'true']}"/>
+        xxf:response-url-type="{'resource'[event('response-is-resource') = 'true']}">
+
+        <xf:header ref="instance('fr-send-submission-params')/@headers/tokenize(., '\r?\n', '')[contains(., ':')]">
+            <xf:name  value="xxf:trim(substring-before(., ':'))"/>
+            <xf:value value="xxf:trim(substring-after(., ':'))"/>
+        </xf:header>
+
+    </xf:submission>
 
     <!-- Instance to store the result of `fr-send-submission` if any -->
     <xf:instance id="fr-send-submission-response">
@@ -74,7 +81,8 @@
             show-progress=""
             formtarget=""
             response-is-resource=""
-            binary-content-key=""/>
+            binary-content-key=""
+            headers=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission">
         <xf:setvalue

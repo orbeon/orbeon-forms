@@ -226,9 +226,10 @@
                                     <xf:var name="source"   value="$items[$p]"/>
                                     <xf:var name="instance" value="$source/root()"/>
 
-                                    <!-- Delete source node in any case. It's ok because we have a
-                                         reference to it for operations that still require it. -->
-                                    <xf:delete ref="$source"/>
+                                    <!-- We have a reference to the source for operations that still require it. -->
+                                    <xf:delete
+                                        if="event('xxf:type') = ('fr-move-up', 'fr-move-down', 'fr-clear', 'fr-remove')"
+                                        ref="$source"/>
 
                                     <xf:action if="event('xxf:type') = 'fr-clear'">
 
@@ -319,9 +320,9 @@
 
                                         <xf:insert
                                             context="$context"
-                                            ref="$items[$p - 1]"
-                                            origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template), $source"
-                                            position="after"
+                                            ref="$items[$p]"
+                                            origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                            position="before"
                                             xxf:defaults="{$apply-defaults}"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
@@ -343,8 +344,8 @@
 
                                         <xf:insert
                                             context="$context"
-                                            ref="$items[$p - 1]"
-                                            origin="$source, frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                            ref="$items[$p]"
+                                            origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
                                             position="after"
                                             xxf:defaults="{$apply-defaults}"/>
 

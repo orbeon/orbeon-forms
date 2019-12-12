@@ -114,9 +114,9 @@
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
                 <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
-                <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
+                <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
+                <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css"/>
                 <xh:script src="/ops/jquery/jquery-3.3.1.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-browser-mobile.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
@@ -149,9 +149,9 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
+                <xh:script src="/ops/yui/datasource/datasource.js"/>
+                <xh:script src="/ops/yui/autocomplete/autocomplete.js]"/>
             </xh:head>
         </output>
     </test>

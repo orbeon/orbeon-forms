@@ -108,15 +108,10 @@
         name="assets-baseline-updates"
         as="xs:string"
         select="
-            string-join(
-                (
-                    p:property('oxf.xforms.assets.baseline.updates.fr'),
-                    if ($is-form-builder)
-                        then p:property('oxf.xforms.assets.baseline.updates.fb')
-                        else ()
-                ),
-                ' '
-            )
+            let $updates :=
+                for $update in ('fr', 'fb'[$is-form-builder])
+                return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
+            return string-join($updates, ' ')
         "/>
     <xsl:variable
         name="label-appearance"

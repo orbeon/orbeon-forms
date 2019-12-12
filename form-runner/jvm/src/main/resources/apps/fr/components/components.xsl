@@ -107,8 +107,7 @@
     <xsl:variable
         name="assets-baseline-updates"
         as="xs:string*"
-        select="fr:get-uris-from-properties('assets.baseline.updates')"/>
-
+        select="p:property(concat('oxf.xforms.assets.baseline.updates.', if ($is-form-builder) then 'fb' else 'fr'))"/>
     <xsl:variable
         name="label-appearance"
         as="xs:string"

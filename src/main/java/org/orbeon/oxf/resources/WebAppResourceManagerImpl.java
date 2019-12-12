@@ -105,7 +105,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return true if write operations are allowed
      */
     public boolean canWrite(String key) {
-        return getRealPath(key) != null;
+        return getRealPath(key, false) != null;
     }
 
     /**
@@ -115,7 +115,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      */
     public OutputStream getOutputStream(String key) {
 
-        final String realPath = getRealPath(key);
+        final String realPath = getRealPath(key, false);
         if (realPath == null)
             throw new OXFException("Write Operation not supported");
 
@@ -132,7 +132,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return  a writer
      */
     public Writer getWriter(String key) {
-        final String realPath = getRealPath(key);
+        final String realPath = getRealPath(key, false);
         if (realPath == null)
             throw new OXFException("Write Operation not supported");
 
@@ -159,16 +159,12 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    public String getRealPath(String key) {
-        return webAppContext.getRealPath(rootDirectory + key);
-        // Need an option for this as some callers call this for non-existing files
-//        final String realPath = servletContext.getRealPath(rootDirectory + key);
-//        if (realPath == null)
-//            return null;
-//
-//        if (!new File(realPath).canRead())
-//            throw new ResourceNotFoundException("Cannot read from file " + key);
-//        else
-//            return realPath;
+    public String getRealPath(String key, boolean search) {
+        final String realPath = webAppContext.getRealPath(rootDirectory + key);
+        if (search) {
+            if (realPath == null || ! new File(realPath).canRead())
+                throw new ResourceNotFoundException(key);
+        }
+        return realPath;
     }
 }

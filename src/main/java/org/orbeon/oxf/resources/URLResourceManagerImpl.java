@@ -138,7 +138,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
         throw new OXFException("Write Operation not supported");
     }
 
-    public String getRealPath(String key) {
+    public String getRealPath(String key, boolean search) {
         return null;
     }
 

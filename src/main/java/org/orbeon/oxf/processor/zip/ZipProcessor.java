@@ -102,7 +102,7 @@ public class ZipProcessor extends ProcessorImpl {
 
                                         if (fullURL.getProtocol().equals("oxf")) {
                                             // Get real path to resource path if possible
-                                            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+                                            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile(), true);
                                             if (realPath == null)
                                                 throw new OXFException("Zip processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + uri.toString());
                                         } else if (fullURL.getProtocol().equals("file")) {

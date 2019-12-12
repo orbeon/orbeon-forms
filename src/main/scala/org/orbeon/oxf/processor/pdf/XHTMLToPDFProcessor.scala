@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.serializer.HttpSerializerBase
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
@@ -44,20 +45,29 @@ private object XHTMLToPDFProcessor {
   val DefaultDotsPerPixel = 14
 
   def embedFontsConfiguredInProperties(renderer: ITextRenderer): Unit = {
-    val propertySet = Properties.instance.getPropertySet
+
+    val props = Properties.instance.getPropertySet
+
     for {
-      propertyName ← propertySet.propertiesStartsWith("oxf.fr.pdf.font.path") // for example `oxf.fr.pdf.font.path.my-font`
-      filePath     ← propertySet.getNonBlankString(propertyName)
+      propName  ← props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
+      path      ← props.getNonBlankString(propName)
+      _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } locally {
       try {
-        val familyOpt =
-          propertyName.splitTo[List](".").lift(5) flatMap
-            (id ⇒ propertySet.getNonBlankString(s"oxf.fr.pdf.font.family.$id"))
 
-        renderer.getFontResolver.addFont(filePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
+        val familyOpt = props.getNonBlankString(s"oxf.fr.pdf.font.family.$name")
+
+        val absolutePath =
+          pathOrResource match {
+            case "path"     ⇒ path
+            case "resource" ⇒ ResourceManagerWrapper.instance.getRealPath(path, true)
+            case _          ⇒ throw new IllegalStateException
+          }
+
+        renderer.getFontResolver.addFont(absolutePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
       } catch {
         case NonFatal(e) ⇒
-          logger.warn(s"Failed to load font by path: `$filePath` specified with property `$propertyName`")
+          logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
       }
     }
   }

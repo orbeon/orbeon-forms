@@ -184,21 +184,20 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    public String getRealPath(final String key) {
+    public String getRealPath(final String key, boolean search) {
         return (String) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return resourceManager.getRealPath(key);
-                // Need an option for this as some callers call this for non-existing files
-//                final String realPath = resourceManager.getRealPath(key);
-//                // Here consider null as not found
-//                // The semantic is a bit different from the underlying managers, which have:
-//                //
-//                // - null: unsupported
-//                // - ResourceNotFoundException: supported by not found
-//                if (realPath == null)
-//                   throw new ResourceNotFoundException("Cannot read from file " + key);
-//                else
-//                    return realPath;
+                final String realPath = resourceManager.getRealPath(key, search);
+                if (search) {
+                    // Here consider null as not found
+                    // The semantic is a bit different from the underlying managers, which have:
+                    //
+                    // - null: unsupported
+                    // - ResourceNotFoundException: supported by not found
+                    if (realPath == null)
+                       throw new ResourceNotFoundException(key);
+                }
+                return realPath;
             }
         });
     }
@@ -214,8 +213,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    private static interface Operation {
-        public Object run(ResourceManager resourceManager);
+    private interface Operation {
+        Object run(ResourceManager resourceManager);
     }
 
     private Object delegate(Operation operation) {

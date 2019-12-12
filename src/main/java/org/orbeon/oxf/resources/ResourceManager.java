@@ -138,7 +138,7 @@ public interface ResourceManager {
      * the local file system cannot be provided by the resource manager, null is
      * returned.
      */
-    String getRealPath(String key);
+    String getRealPath(String key, boolean search);
 
     /**
      * Check if a resource exists given its key.

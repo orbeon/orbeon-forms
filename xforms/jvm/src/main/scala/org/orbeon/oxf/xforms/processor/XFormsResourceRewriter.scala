@@ -257,7 +257,7 @@ object XFormsResourceRewriter extends Logging {
     implicit val indentedLogger = XFormsResourceServer.indentedLogger
     val rm = ResourceManagerWrapper.instance
 
-    Option(rm.getRealPath(resourcePath)) match {
+    Option(rm.getRealPath(resourcePath, false)) match {
       case Some(realPath) ⇒
         // We hope to be able to cache as a resource
         def logParameters = Seq("resource path" → resourcePath, "real path" → realPath)

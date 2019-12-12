@@ -269,15 +269,22 @@ object AjaxClient {
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
   // This is to prevent the UI from becoming totally unusable after an error.
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.logAndShowError")
-  def logAndShowError(e: Throwable, formId: String, ignoreErrors: Boolean): Unit = {
+  def logAndShowError(e: AnyRef, formId: String, ignoreErrors: Boolean): Unit = {
+
+    // Because we catch errors in JavaScript right now in AjaxServer.js, and in JavaScript any object can be thrown,
+    // we receive an `AnyRef` here.
+    val message = e match {
+      case t: Throwable ⇒ t.getMessage
+      case r ⇒ r.toString
+    }
 
     // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
-    dom.console.log("JavaScript error", e.getMessage)
+    dom.console.log("JavaScript error", message)
 
     val sb = new StringBuilder("Exception in client-side code.")
 
     // We used to log `fileName` and `lineNumber` as well, but those are strictly Firefox features
-    Option(e.getMessage) foreach { m ⇒
+    Option(message) foreach { m ⇒
       sb append "<ul><li>Message: "
       sb append m
       sb append "</li></ul>"

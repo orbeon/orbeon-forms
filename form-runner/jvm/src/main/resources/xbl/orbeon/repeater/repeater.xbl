@@ -28,14 +28,14 @@
     <xbl:binding
         id="fr-repeater-binding"
         element="fr|repeater"
-        xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
+        xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/repeater/repeater.css"/>
         </xbl:resources>
 
         <xbl:handlers>
-            <xbl:handler event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below" phase="target">
+            <xbl:handler event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove" phase="target">
                 <xf:dispatch name="{event('xxf:type')}" targetid="repeat-group" xxf:repeat-indexes="{event('row')}"/>
             </xbl:handler>
         </xbl:handlers>
@@ -59,6 +59,10 @@
                     </li>
                     <li role="presentation" class="fr-move-down">
                         <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li role="presentation" class="divider"/>
+                    <li role="presentation" class="fr-clear">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-remove"/><xf:output value="xxf:r('components.grid.clear.label', 'fr-fr-resources')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
@@ -211,7 +215,7 @@
 
                                 <!-- Run row operations, checking that they are allowed first -->
                                 <xf:action
-                                    event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
+                                    event="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove"
                                     target="#observer"
                                     if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-repeater-repeat-iteration', 'class'))">
 
@@ -225,6 +229,25 @@
                                     <!-- Delete source node in any case. It's ok because we have a
                                          reference to it for operations that still require it. -->
                                     <xf:delete ref="$source"/>
+
+                                    <xf:action if="event('xxf:type') = 'fr-clear'">
+
+                                        <xf:insert
+                                            context="$context"
+                                            ref="$items[$p - 1]"
+                                            origin="frf:updateTemplateFromInScopeItemsetMaps($context, $repeat-template)"
+                                            position="after"
+                                            xxf:defaults="{$apply-defaults}"/>
+
+                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                        <xf:setfocus
+                                            control="repeat-group"
+                                            xxf:repeat-indexes="{{$p}}"
+                                            id="sf5"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+
+                                    </xf:action>
 
                                     <xf:action if="event('xxf:type') = 'fr-remove'">
                                         <!-- Handle itemset metadata -->
@@ -355,11 +378,12 @@
                                         <xf:var
                                             name="can-classes"
                                             value="
-                                                'can-remove'      [$remove-constraint and not($frozen) and count($repeat-sequence) gt $min],
                                                 'can-move-up'     [$repeat-position gt $freeze + 1],
                                                 'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                 'can-insert-above'[$can-add and not($frozen)],
-                                                'can-insert-below'[$can-add and $repeat-position ge $freeze]"
+                                                'can-insert-below'[$can-add and $repeat-position ge $freeze],
+                                                'can-remove'      [$remove-constraint and not($frozen) and count($repeat-sequence) gt $min],
+                                                'can-clear'"
                                         />
                                     </xsl:when>
                                     <xsl:otherwise>

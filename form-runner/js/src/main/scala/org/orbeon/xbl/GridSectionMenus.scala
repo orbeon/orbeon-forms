@@ -44,6 +44,7 @@ trait GridSectionMenus {
     case object MoveDown    extends Operation
     case object InsertAbove extends Operation
     case object InsertBelow extends Operation
+    case object Clear       extends Operation
     case object Remove      extends Operation
   }
 

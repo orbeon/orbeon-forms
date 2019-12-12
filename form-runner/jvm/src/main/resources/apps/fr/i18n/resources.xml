@@ -98,6 +98,9 @@
                 <insert-below>Insert Below</insert-below>
                 <move-up>Move Up</move-up>
                 <move-down>Move Down</move-down>
+                <clear>
+                    <label>Clear Line</label>
+                </clear>
                 <remove>
                     <label>Remove Line</label>
                     <hint>Remove Line from the Repeated Grid</hint>
@@ -565,6 +568,9 @@
                 <insert-below>Insérer dessous</insert-below>
                 <move-up>Déplacer vers le haut</move-up>
                 <move-down>Déplacer vers le bas</move-down>
+                <clear>
+                    <label>Réinitialiser la ligne</label>
+                </clear>
                 <remove>
                     <label>Supprimer</label>
                     <hint>Supprimer la ligne du tableau répété</hint>
@@ -1036,6 +1042,9 @@
                 <insert-below>Insertar Debajo</insert-below>
                 <move-up>Mover Arriba</move-up>
                 <move-down>Mover Debajo</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Remover</label>
                     <hint>Remover Fila de Grilla Repetible</hint>
@@ -1493,6 +1502,9 @@
                 <insert-below todo="true">[Insert Below]</insert-below>
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label todo="true">[Remove]</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -1949,6 +1961,9 @@
                 <insert-below todo="true">[Insert Below]</insert-below>
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label todo="true">[Remove]</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -2403,6 +2418,9 @@
                 <insert-below>Inserisci sotto</insert-below>
                 <move-up>Sposta in sù</move-up>
                 <move-down>Sposta in giù</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Rimuovi</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -2870,6 +2888,9 @@
                 <insert-below>Darunter einfügen</insert-below>
                 <move-up>Nach oben verschieben</move-up>
                 <move-down>Nach unten verschieben</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Löschen</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -3337,6 +3358,9 @@
                 <insert-below>Liitä alle</insert-below>
                 <move-up>Siirrä ylös</move-up>
                 <move-down>Siirrä alas</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Poista</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -3804,6 +3828,9 @@
                 <insert-below>Infoga nedanför</insert-below>
                 <move-up>Flytta upp</move-up>
                 <move-down>Flytta ned</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Ta bort</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -4271,6 +4298,9 @@
                 <insert-below>Onder invoegen</insert-below>
                 <move-up>Omhoog</move-up>
                 <move-down>Omlaag</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Verwijderen</label>
                     <hint>Verwijdert de regel van het Repeated Grid</hint>
@@ -4737,6 +4767,9 @@
                 <insert-below>Insere em Baixo</insert-below>
                 <move-up>Move para Cima</move-up>
                 <move-down>Move para Baixo</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label todo="true">[Remove]</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>
@@ -5203,6 +5236,9 @@
                 <insert-below>Indsæt under</insert-below>
                 <move-up>Flyt op</move-up>
                 <move-down>Flyt ned</move-down>
+                <clear>
+                    <label todo="true">[Clear Line]</label>
+                </clear>
                 <remove>
                     <label>Fjern</label>
                     <hint todo="true">[Remove Line from the Repeated Grid]</hint>

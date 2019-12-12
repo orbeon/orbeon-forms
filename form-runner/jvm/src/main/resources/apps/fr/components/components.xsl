@@ -106,8 +106,18 @@
         select="fr:get-uris-from-properties('js.uri'), fr:get-uris-from-properties('js.custom.uri')"/>
     <xsl:variable
         name="assets-baseline-updates"
-        as="xs:string*"
-        select="p:property(concat('oxf.xforms.assets.baseline.updates.', if ($is-form-builder) then 'fb' else 'fr'))"/>
+        as="xs:string"
+        select="
+            string-join(
+                (
+                    p:property('oxf.xforms.assets.baseline.updates.fr'),
+                    if ($is-form-builder)
+                        then p:property('oxf.xforms.assets.baseline.updates.fb')
+                        else ()
+                ),
+                ' '
+            )
+        "/>
     <xsl:variable
         name="label-appearance"
         as="xs:string"

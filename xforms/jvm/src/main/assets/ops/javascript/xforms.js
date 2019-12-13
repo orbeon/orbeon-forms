@@ -3214,7 +3214,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         var originalInit = this.prototype.init;
                         this.prototype.init = function () {
                             if (! this.initialized) {
-                                var formId = ORBEON.xforms.Controls.getForm(target).id;
+                                var formId = ORBEON.xforms.Controls.getForm(this.container).id;
                                 var form   = ORBEON.xforms.Page.getForm(formId);
                                 form.xblInstances.push(this);
                                 originalInit.call(this);

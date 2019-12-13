@@ -177,7 +177,6 @@ object Properties extends js.Object {
   val sessionHeartbeat                 : Property[Boolean] = js.native
   val sessionHeartbeatDelay            : Property[Int]     = js.native
 
-  val clientEventsFilter               : Property[String]  = js.native
   val clientEventMode                  : Property[String]  = js.native
 
   val loginPageDetectionRegexp         : Property[String]  = js.native

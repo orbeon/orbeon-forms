@@ -302,7 +302,6 @@ object AjaxClient {
 
   private object Private {
 
-    val EventsToFilterOut: Set[String] = Properties.clientEventsFilter.get().splitTo[Set]()
     val Indent: String = " " * 4
 
     def debugEventQueue(): Unit =
@@ -373,13 +372,6 @@ object AjaxClient {
 
     def findEventsToProcess: Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
-      // Filter events (typically used for xforms-focus/xxforms-blur events)
-      def  filterOutEventsFromProperty(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        if (EventsToFilterOut.nonEmpty)
-          NonEmptyList.fromList(events filterNot (e ⇒ EventsToFilterOut(e.eventName)))
-        else
-          events.some
-
       def hasActivatingEvent(events: NonEmptyList[AjaxEvent]): Boolean =
         if (Properties.clientEventMode.get() == "deferred")
           hasActivationEventForDeferredLegacy(events.toList)
@@ -442,9 +434,8 @@ object AjaxClient {
 
       for {
         originalEvents  ← NonEmptyList.fromList(Globals.eventQueue.toList)
-        filteredEvents  ← filterOutEventsFromProperty(originalEvents)
-        if hasActivatingEvent(filteredEvents)
-        coalescedEvents ← coalescedProgressEvents(coalesceValueEvents(filteredEvents))
+        if hasActivatingEvent(originalEvents)
+        coalescedEvents ← coalescedProgressEvents(coalesceValueEvents(originalEvents))
       } yield
         eventsForOldestEventForm(coalescedEvents)
     }

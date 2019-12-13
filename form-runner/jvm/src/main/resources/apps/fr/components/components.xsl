@@ -511,11 +511,7 @@
                 )
             }}"
         >
-
-            <!-- Don't enable client events filtering for FB -->
-            <xsl:if test="$is-form-builder">
-                <xsl:attribute name="xxf:client.events.filter"/>
-            </xsl:if>
+            
             <!-- Override if specified -->
             <xsl:copy-of select="@xxf:xpath-analysis"/>
             <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests -->

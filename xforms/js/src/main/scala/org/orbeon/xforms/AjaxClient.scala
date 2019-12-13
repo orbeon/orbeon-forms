@@ -327,14 +327,14 @@ object AjaxClient {
 
       if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
         findEventsToProcess match {
-          case Some((events, currentForm, remainingEvents)) ⇒
+          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) ⇒
             // Remove from this list of ids that changed the id of controls for
             // which we have received the keyup corresponding to the keydown.
             // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
             // TODO: check where this is used!
             Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
-
-            processEvents(events, currentForm, remainingEvents)
+            Globals.eventQueue        = eventsForOtherForms.toJSArray
+            processEvents(currentForm, eventsForCurrentForm)
           case None ⇒
             Globals.eventQueue = js.Array()
         }
@@ -371,16 +371,16 @@ object AjaxClient {
       }
     }
 
-    def findEventsToProcess: Option[(NonEmptyList[AjaxEvent], html.Form, List[AjaxEvent])] = {
+    def findEventsToProcess: Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
       // Filter events (typically used for xforms-focus/xxforms-blur events)
-      def  filterEvents(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
+      def  filterOutEventsFromProperty(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
         if (EventsToFilterOut.nonEmpty)
           NonEmptyList.fromList(events filterNot (e ⇒ EventsToFilterOut(e.eventName)))
         else
           events.some
 
-      def foundActivatingEvent(events: NonEmptyList[AjaxEvent]): Boolean =
+      def hasActivatingEvent(events: NonEmptyList[AjaxEvent]): Boolean =
         if (Properties.clientEventMode.get() == "deferred")
           hasActivationEventForDeferredLegacy(events.toList)
         else
@@ -429,26 +429,27 @@ object AjaxClient {
             events.some
         }
 
-      def eventsForFirstForm(events: NonEmptyList[AjaxEvent]): (NonEmptyList[AjaxEvent], html.Form, List[AjaxEvent]) = {
+      def eventsForOldestEventForm(events: NonEmptyList[AjaxEvent]): (html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent]) = {
 
-        val currentForm = events.head.form // process all events for the form associated with the first event
+        val oldestEvent = events.head
+        val currentForm = oldestEvent.form
 
-        val (eventsToSend, remainingEvents) =
+        val (eventsToSend, eventsForOtherForms) =
           events.toList partition (event ⇒ event.form.isSameNode(currentForm))
 
-        (NonEmptyList(events.head, eventsToSend.tail), currentForm, remainingEvents)
+        (currentForm, NonEmptyList(oldestEvent, eventsToSend.tail), eventsForOtherForms)
       }
 
       for {
         originalEvents  ← NonEmptyList.fromList(Globals.eventQueue.toList)
-        filteredEvents  ← filterEvents(originalEvents)
-        if foundActivatingEvent(filteredEvents)
+        filteredEvents  ← filterOutEventsFromProperty(originalEvents)
+        if hasActivatingEvent(filteredEvents)
         coalescedEvents ← coalescedProgressEvents(coalesceValueEvents(filteredEvents))
       } yield
-        eventsForFirstForm(coalescedEvents)
+        eventsForOldestEventForm(coalescedEvents)
     }
 
-    def processEvents(events: NonEmptyList[AjaxEvent], currentForm: html.Form, remainingEvents: List[AjaxEvent]): Unit = {
+    def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
       events.toList foreach { event ⇒
 
@@ -488,8 +489,7 @@ object AjaxClient {
 
       val currentFormId = currentForm.id
 
-      Globals.eventQueue          = remainingEvents.toJSArray
-      Globals.requestTryCount     = 0
+      Globals.requestTryCount = 0
 
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)

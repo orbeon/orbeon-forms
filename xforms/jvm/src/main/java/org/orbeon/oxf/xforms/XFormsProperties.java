@@ -99,7 +99,6 @@ public class XFormsProperties {
     public static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
 
     public static final String LOGIN_PAGE_DETECTION_REGEXP = "login-page-detection-regexp";
-    public static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
 
     public static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
@@ -284,7 +283,6 @@ public class XFormsProperties {
             new PropertyDefinition(DATEPICKER_TWO_MONTHS_PROPERTY                , false,                          true),
             new PropertyDefinition(SHOW_ERROR_DIALOG_PROPERTY                    , true,                           true),
             new PropertyDefinition(LOGIN_PAGE_DETECTION_REGEXP                   , "",                             true),
-            new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY                   , "default",                      true),
     };
 
     public static final Map<String, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;

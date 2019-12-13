@@ -752,7 +752,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 this.datePickerTwoMonths              = new ORBEON.util.Property("datepicker.two-months", false);
                 this.showErrorDialog                  = new ORBEON.util.Property("show-error-dialog", true);
                 this.loginPageDetectionRegexp         = new ORBEON.util.Property("login-page-detection-regexp", "");
-                this.clientEventMode                  = new ORBEON.util.Property("client.events.mode", "default");
                 this.retryDelayIncrement              = new ORBEON.util.Property("retry.delay-increment", 5000);
                 this.retryMaxDelay                    = new ORBEON.util.Property("retry.max-delay", 30000);
                 this.useARIA                          = new ORBEON.util.Property("use-aria", false);

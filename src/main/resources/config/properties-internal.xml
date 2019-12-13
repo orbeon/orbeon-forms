@@ -97,9 +97,6 @@
 
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                value="true"/>
 
-    <!-- default | deferred -->
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                        value="default"/>
-
     <!-- NOTE: This is only used client-side by dialogs. Unclear why it should default to false. -->
     <property as="xs:boolean" name="oxf.xforms.use-aria"                                  value="false"/>
 

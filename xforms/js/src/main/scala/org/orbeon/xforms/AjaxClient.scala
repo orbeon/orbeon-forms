@@ -21,8 +21,7 @@ import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.FutureUtils
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.EventNames.{DOMActivate, XXFormsUploadProgress, XXFormsValue}
+import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events, Properties, Utils}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
@@ -372,12 +371,6 @@ object AjaxClient {
 
     def findEventsToProcess: Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
-      def hasActivatingEvent(events: NonEmptyList[AjaxEvent]): Boolean =
-        if (Properties.clientEventMode.get() == "deferred")
-          hasActivationEventForDeferredLegacy(events.toList)
-        else
-          true // every event is an activating event
-
       // Coalesce value events for a given `targetId`, but only between boundaries of other events. We used to do this, more
       // or less, between those boundaries, but also including `XXFormsUploadProgress`, and allowing interleaving of `targetId`
       // within a block. Here, we do something simpler: just find a string of `eventName`/`targetId` that match and keep only
@@ -434,7 +427,6 @@ object AjaxClient {
 
       for {
         originalEvents  ← NonEmptyList.fromList(Globals.eventQueue.toList)
-        if hasActivatingEvent(originalEvents)
         coalescedEvents ← coalescedProgressEvents(coalesceValueEvents(originalEvents))
       } yield
         eventsForOldestEventForm(coalescedEvents)
@@ -598,72 +590,6 @@ object AjaxClient {
       requestDocumentString.append("</xxf:event-request>")
 
       requestDocumentString.toString
-    }
-
-    // TODO: Review and simplify this algorithm.
-    def hasActivationEventForDeferredLegacy(events: List[AjaxEvent]): Boolean = {
-
-      val ElementType = 1
-
-      // Element with class `xxforms-events-mode-default` which is the parent of a target
-      var parentWithDefaultClass: dom.Node = null
-      // Set to true when we find a target which is not under and element with the default class
-      var foundTargetWithNoParentWithDefaultClass = false
-
-      // Look for events that we need to send to the server when deferred mode is enabled
-      for (event ← events) {
-
-        // DOMActivate is considered to be an "activating" event
-        if (event.eventName == DOMActivate)
-          return true
-
-        // Check if we find a class on the target that tells us this is an activating event
-        // Do NOT consider a filtered event as an activating event
-        event.targetIdOpt foreach { targetId ⇒
-          val target = dom.document.getElementById(targetId)
-          if (target == null) {
-            // Target is not on the client. For most use cases, assume event should be dispatched right away.
-            return true
-          } else {
-            // Target is on the client
-
-            if ($(target).is(".xxforms-events-mode-default"))
-              return true
-
-            // Look for parent with the default class
-            var parent = target.parentNode
-            var foundParentWithDefaultClass = false
-            while (parent ne null) {
-              // Found a parent with the default class
-              if (parent.nodeType == ElementType && $(parent).is(".xxforms-events-mode-default")) {
-                foundParentWithDefaultClass = true
-                if (foundTargetWithNoParentWithDefaultClass) {
-                  // And there is another target which is outside of a parent with a default class
-                  return true
-                }
-                if (parentWithDefaultClass eq null) {
-                  parentWithDefaultClass = parent
-                } else if (parentWithDefaultClass != parent) {
-                  // And there is another target which is under another parent with a default class
-                  return true
-                }
-                parent = null // break
-              } else {
-                parent = parent.parentNode
-              }
-            }
-
-            // Record the fact
-            if (! foundParentWithDefaultClass) {
-              foundTargetWithNoParentWithDefaultClass = true
-              if (parentWithDefaultClass ne null)
-                return true
-            }
-          }
-        }
-      }
-
-      false
     }
   }
 }

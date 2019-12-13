@@ -151,7 +151,7 @@
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
                 <xh:script src="/ops/yui/datasource/datasource.js"/>
-                <xh:script src="/ops/yui/autocomplete/autocomplete.js]"/>
+                <xh:script src="/ops/yui/autocomplete/autocomplete.js"/>
             </xh:head>
         </output>
     </test>

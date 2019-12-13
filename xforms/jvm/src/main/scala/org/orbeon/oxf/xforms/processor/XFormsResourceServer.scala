@@ -234,45 +234,16 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     response.setContentType(if (isCSS) ContentTypes.CssContentTypeWithCharset else ContentTypes.JavaScriptContentTypeWithCharset)
 
-    // Namespace to use, must be None if empty
-    def namespaceOpt = {
+    // Namespace to use, must be `None` if empty
+    def namespaceOpt: Option[String] = {
       def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
       def nsFromContainer  = Some(response.getNamespacePrefix)
 
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
     }
 
-    val requestPath = externalContext.getRequest.getRequestPath
-
-    def debugParameters = Seq("request path" → requestPath)
-
-    if (XFormsProperties.isCacheCombinedResources) {
-
-      // Caching requested
-      XFormsResourceRewriter.cacheAssets(
-        resources,
-        requestPath,
-        namespaceOpt,
-        combinedLastModified,
-        isCSS,
-        isMinimal
-      ) match {
-        case Some(resourceFile) ⇒
-          // Caching could take place, send out cached result
-          debug("serving from cache ", debugParameters)
-          useAndClose(response.getOutputStream) { os ⇒
-            copyStream(new FileInputStream(resourceFile), os)
-          }
-        case None ⇒
-          // Was unable to cache, just serve
-          debug("caching requested but not possible, serving directly", debugParameters)
-          XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
-      }
-    } else {
-      // Should not cache, just serve
-      debug("caching not requested, serving directly", debugParameters)
-      XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
-    }
+    debug("caching not requested, serving directly", Seq("request path" → externalContext.getRequest.getRequestPath))
+    XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
   }
 }
 

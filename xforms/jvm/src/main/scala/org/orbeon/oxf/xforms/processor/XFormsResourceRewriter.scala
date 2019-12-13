@@ -17,13 +17,13 @@ package org.orbeon.oxf.xforms.processor
 import java.io._
 import java.util.regex.Matcher
 
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.AssetPath
@@ -243,48 +243,5 @@ object XFormsResourceRewriter extends Logging {
       Try(rm.lastModified(r.assetPath(isMinimal), false)) getOrElse 0L
 
     if (assetPaths.isEmpty) 0L else assetPaths map lastModified max
-  }
-
-  def cacheAssets(
-    assetPaths           : List[AssetPath],
-    resourcePath         : String,
-    namespaceOpt         : Option[String],
-    combinedLastModified : Long,
-    isCSS                : Boolean,
-    isMinimal            : Boolean
-  ): Option[File] = {
-
-    implicit val indentedLogger = XFormsResourceServer.indentedLogger
-    val rm = ResourceManagerWrapper.instance
-
-    Option(rm.getRealPath(resourcePath, false)) match {
-      case Some(realPath) ⇒
-        // We hope to be able to cache as a resource
-        def logParameters = Seq("resource path" → resourcePath, "real path" → realPath)
-
-        val resourceFile = new File(realPath)
-        if (resourceFile.exists) {
-          // Resources exist, generate if needed
-          val resourceLastModified = resourceFile.lastModified
-          if (resourceLastModified < combinedLastModified) {
-            // Resource is out of date, generate
-            debug("cached combined resources out of date, saving", logParameters)
-            val fos = new FileOutputStream(resourceFile)
-            generateAndClose(assetPaths, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
-          } else
-            debug("cached combined resources exist and are up-to-date", logParameters)
-        } else {
-          // Resource doesn't exist, generate
-          debug("cached combined resources don't exist, saving", logParameters)
-          resourceFile.getParentFile.mkdirs()
-          resourceFile.createNewFile()
-          val fos = new FileOutputStream(resourceFile)
-          generateAndClose(assetPaths, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
-        }
-        Some(resourceFile)
-      case None ⇒
-        debug("unable to locate real path for cached combined resources, not saving", Seq("resource path" → resourcePath))
-        None
-    }
   }
 }

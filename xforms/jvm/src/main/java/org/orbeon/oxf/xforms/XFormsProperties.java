@@ -307,9 +307,6 @@ public class XFormsProperties {
     public static final String COMBINE_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "combine-resources";
     public static final boolean COMBINE_RESOURCES_PROPERTY_DEFAULT = true;
 
-    public static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
-    public static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
-
     public static final String REPLICATION_PROPERTY = XFORMS_PROPERTY_PREFIX + "replication";
     public static final boolean REPLICATION_PROPERTY_DEFAULT = false;
 
@@ -373,11 +370,6 @@ public class XFormsProperties {
     public static boolean isCombinedResources() {
         return Properties.instance().getPropertySet().getBoolean
                 (COMBINE_RESOURCES_PROPERTY, COMBINE_RESOURCES_PROPERTY_DEFAULT);
-    }
-
-    public static boolean isCacheCombinedResources() {
-        return Properties.instance().getPropertySet().getBoolean
-                (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
     }
 
     public static boolean isReplication() {

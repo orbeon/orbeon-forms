@@ -85,7 +85,6 @@ class ResourcesAggregator extends ProcessorImpl {
             val isPortlet = request.getContainerType == "portlet"
             val namespaceOpt = isPortlet option response.getNamespacePrefix
             val isMinimal = XFormsProperties.isMinimalResources
-            val isCacheCombinedResources = XFormsProperties.isCacheCombinedResources
 
             // Whether a path is a user resource in separate deployment
             def isSeparatePath(path: String) = isSeparateDeployment && ! URLRewriterUtils.isPlatformPath(path)
@@ -181,15 +180,15 @@ class ResourcesAggregator extends ProcessorImpl {
                 builder append """{"scripts":["""
 
                 builder append
-                  (aggregate(baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
-                    aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
+                  (aggregate(baselineJS, appendJS, namespaceOpt, isCSS = false) ++
+                    aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCSS = false) ++
                       (preservedJS flatMap (appendPreservedElement(_).toList)) mkString ",")
 
                 builder append """],"styles":["""
 
                 builder append
-                  (aggregate(baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
-                    aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
+                  (aggregate(baselineCSS, appendCSS, namespaceOpt, isCSS = true) ++
+                    aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCSS = true) ++
                       (preservedCSS flatMap (appendPreservedElement(_).toList)) mkString ",")
 
                 builder append """]}"""
@@ -201,8 +200,8 @@ class ResourcesAggregator extends ProcessorImpl {
 
               def outputCSS() = {
                 val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
-                aggregate(baselineCSS, outputCSSElement, namespaceOpt, isCacheCombinedResources, isCSS = true)
-                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCacheCombinedResources, isCSS = true)
+                aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
+                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCSS = true)
                 preservedCSS foreach outputPreservedElement
               }
 
@@ -213,8 +212,8 @@ class ResourcesAggregator extends ProcessorImpl {
                     "script"
                   )(_)
 
-                aggregate(baselineJS, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
-                aggregate(supplementalJS -- baselineJS, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
+                aggregate(baselineJS, outputJSElement, namespaceOpt, isCSS = false)
+                aggregate(supplementalJS -- baselineJS, outputJSElement, namespaceOpt, isCSS = false)
                 preservedJS foreach outputPreservedElement
               }
 
@@ -267,7 +266,6 @@ object ResourcesAggregator extends Logging {
     resources               : scala.collection.Set[String],
     outputElement           : String ⇒ T,
     namespaceOpt            : Option[String],
-    isCacheCombinedResources: Boolean,
     isCSS                   : Boolean
   ): Option[T] =
     resources.nonEmpty option {
@@ -295,27 +293,14 @@ object ResourcesAggregator extends Logging {
         "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
 
       debug("aggregating resources", Seq(
-        "isCSS"                    → isCSS.toString,
-        "isCacheCombinedResources" → isCacheCombinedResources.toString,
-        "hasAppResource"           → hasAppResource.toString,
-        "appVersion"               → appVersion,
-        "resourcesHash"            → resourcesHash,
-        "namespaceOpt"             → namespaceOpt.orNull,
-        "resources"                → (resources mkString " | ")
+        "isCSS"          → isCSS.toString,
+        "hasAppResource" → hasAppResource.toString,
+        "appVersion"     → appVersion,
+        "resourcesHash"  → resourcesHash,
+        "namespaceOpt"   → namespaceOpt.orNull,
+        "resources"      → (resources mkString " | ")
       ))
 
-      val result = outputElement(path)
-
-      // Store on disk if requested to make the resource available to external software, like Apache
-      if (isCacheCombinedResources) {
-        val resourcesConfig = resources.to[List] map (r ⇒ AssetPath(r, hasMin = false))
-
-        assert(resourcesConfig.head.assetPath(tryMin = false) == resources.head) // set order is tricky so make sure order is kept
-
-        val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, isMinimal = false)
-        XFormsResourceRewriter.cacheAssets(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)
-      }
-
-      result
+      outputElement(path)
     }
 }

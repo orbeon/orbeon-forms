@@ -50,7 +50,7 @@ public class OXFHandler extends URLStreamHandler {
             }
 
             public OutputStream getOutputStream() {
-                return ResourceManagerWrapper.instance().getOutputStream(getKey());
+                throw new UnsupportedOperationException();
             }
 
             public long getLastModified() {

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream}
+import java.io.OutputStream
 import java.net._
 
 import org.apache.http.impl.client.BasicCookieStore
@@ -23,34 +23,19 @@ import org.orbeon.oxf.util.StringUtils._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-// Expose ApacheHttpClient as HttpURLConnection
-// This has limitations and should generally NOT be used for any request with a body, as this requires calling
-// getOutputStream before connect(), which is incompatible with the contract of HttpURLConnection.
-// Currently only used with POST by URLSerializer. Should remove that use and then we can make this support only GET.
+// Expose `ApacheHttpClient` as `HttpURLConnection`
+// 2019-12-13: No longer supports methods which set a body.
 class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends HttpURLConnection(url) {
 
   private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
 
-  private var _method      : Option[String]                = None
-  private var _os          : Option[ByteArrayOutputStream] = None
-  private var _httpResponse: Option[HttpResponse]          = None
+  private var _httpResponse: Option[HttpResponse] = None
 
-  override def setRequestMethod(methodName: String): Unit = {
-
-    if (_httpResponse.isDefined)
-      throw new ProtocolException("Can't reset method: already connected")
-
-    _method = Some(methodName)
-  }
-
-  override def getOutputStream: OutputStream =
-    _os getOrElse { val os = new ByteArrayOutputStream; _os = Some(os); os }
-
-  def connect(): Unit = {
+  def connect(): Unit =
     if (_httpResponse.isEmpty)
       _httpResponse = {
 
-        def credentialsFromURL(url: URL) = {
+        def credentialsFromURL(url: URL): Option[Credentials] = {
           url.getUserInfo.trimAllToOpt flatMap { userInfo ⇒
             // Set username and optional password specified on URL
             val separatorPosition = userInfo.indexOf(":")
@@ -73,23 +58,17 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
           }
         }
 
-        val methodName = _method getOrElse "GET"
-        val method     = HttpMethod.withNameInsensitive(methodName)
-        val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
-        val bodyLength = _os map (_.size.toLong)
-
         Some(
           client.connect(
             url         = url.toExternalForm,
             credentials = credentialsFromURL(url),
             cookieStore = new BasicCookieStore,
-            method      = method,
+            method      = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
             headers     = _requestHeaders mapValues (_.toList) toMap,
-            content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
+            content     = None
           )
         )
       }
-  }
 
   override def setRequestProperty(key: String, value: String): Unit =
     _requestHeaders.put(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer(value))
@@ -133,8 +112,10 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
     body(_httpResponse.get)
   }
 
+  override def getOutputStream: OutputStream = throw new UnsupportedOperationException
+
   // Rarely used methods which we don't use and haven't implemented
-  override def usingProxy                = ???
-  override def getHeaderFieldKey(n: Int) = ???
-  override def getHeaderField(n: Int)    = ???
+  override def usingProxy                = throw new UnsupportedOperationException
+  override def getHeaderFieldKey(n: Int) = throw new UnsupportedOperationException
+  override def getHeaderField(n: Int)    = throw new UnsupportedOperationException
 }

@@ -3229,7 +3229,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         if (! _.isUndefined(originalDestroy))
                             originalDestroy.call(this);
                         $(this.container).data('xforms-xbl-object', null);
-                        var formId = ORBEON.xforms.Controls.getForm(target).id;
+                        var formId = ORBEON.xforms.Controls.getForm(this.container).id;
                         var form   = ORBEON.xforms.Page.getForm(formId);
                         form.xblInstances = _.without(form.xblInstances, this);
                     }

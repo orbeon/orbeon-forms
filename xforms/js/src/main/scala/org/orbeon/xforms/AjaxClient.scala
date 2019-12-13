@@ -371,6 +371,10 @@ object AjaxClient {
 
     def findEventsToProcess: Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
+      // Ignore events for form that are no longer part of the document
+      def eventsForFormsInDocument(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
+        NonEmptyList.fromList(events.filter((event) ⇒ dom.document.contains(event.form)))
+
       // Coalesce value events for a given `targetId`, but only between boundaries of other events. We used to do this, more
       // or less, between those boundaries, but also including `XXFormsUploadProgress`, and allowing interleaving of `targetId`
       // within a block. Here, we do something simpler: just find a string of `eventName`/`targetId` that match and keep only
@@ -426,8 +430,9 @@ object AjaxClient {
       }
 
       for {
-        originalEvents  ← NonEmptyList.fromList(Globals.eventQueue.toList)
-        coalescedEvents ← coalescedProgressEvents(coalesceValueEvents(originalEvents))
+        originalEvents           ← NonEmptyList.fromList(Globals.eventQueue.toList)
+        eventsForFormsInDocument ← eventsForFormsInDocument(originalEvents)
+        coalescedEvents          ← coalescedProgressEvents(coalesceValueEvents(eventsForFormsInDocument))
       } yield
         eventsForOldestEventForm(coalescedEvents)
     }

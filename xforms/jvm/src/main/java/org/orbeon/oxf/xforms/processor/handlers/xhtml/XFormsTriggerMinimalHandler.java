@@ -44,6 +44,8 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
         htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0");
         htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "button");
+        // https://github.com/orbeon/orbeon-forms/issues/4210
+        htmlAnchorAttributes.addAttribute("", "href"    , "href"    , XMLReceiverHelper.CDATA, "#");
 
         // Output xxf:* extension attributes
         triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());

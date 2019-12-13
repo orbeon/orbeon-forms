@@ -874,7 +874,7 @@ public class NetUtils {
         final String realPath;
         if (fullURL.getProtocol().equals("oxf")) {
             // Get real path to resource path if possible
-            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile(), true);
+            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
             if (realPath == null)
                 throw new OXFException("Unable to obtain the real path of the file using the oxf: protocol for URL: " + configUrl);
         } else if (fullURL.getProtocol().equals("file")) {

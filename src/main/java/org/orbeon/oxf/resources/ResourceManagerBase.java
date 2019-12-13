@@ -15,20 +15,16 @@ package org.orbeon.oxf.resources;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.resources.handler.OXFHandler;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.w3c.dom.Node;
 import org.xml.sax.Locator;
 
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 
 /**
@@ -55,18 +51,6 @@ public abstract class ResourceManagerBase implements ResourceManager {
             minReloadInterval = longValue;
         }
         lastModifiedMap = new ExpirationMap(minReloadInterval);
-    }
-
-    public Node getContentAsDOM(String key) {
-        try {
-            final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-            final DOMResult domResult = new DOMResult(XMLParsing.createDocument());
-            identity.setResult(domResult);
-            getContentAsSAX(key, identity);
-            return domResult.getNode();
-        } catch (IllegalArgumentException e) {
-            throw new OXFException(e);
-        }
     }
 
     public org.orbeon.dom.Document getContentAsDOM4J(String key) {
@@ -113,13 +97,6 @@ public abstract class ResourceManagerBase implements ResourceManager {
                 throw new OXFException(e);
             }
         }
-    }
-
-    public XMLReceiver getWriteContentHandler(String key) {
-        final OutputStream os = getOutputStream(key);
-        final TransformerXMLReceiver transformer = TransformerUtils.getIdentityTransformerHandler();
-        transformer.setResult(new StreamResult(os));
-        return transformer;
     }
 
     final synchronized public long lastModified(String key, boolean doNotThrowResourceNotFound) {

@@ -20,8 +20,6 @@ import org.orbeon.oxf.xml.XMLReceiver;
 import org.w3c.dom.Node;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -84,14 +82,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         }
     }
 
-    public Node getContentAsDOM(final String key) {
-        return (Node) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                return resourceManager.getContentAsDOM(key);
-            }
-        });
-    }
-
     public Document getContentAsDOM4J(final String key) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
@@ -151,64 +141,18 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    public boolean canWrite(final String key) {
-        final boolean[] result = new boolean[1];
-        delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                // Logical "or"
-                result[0] |= resourceManager.canWrite(key);
-                return null;
-            }
-        });
-
-        return result[0];
-    }
-
-    public OutputStream getOutputStream(final String key) {
-        return (OutputStream) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException(key);
-                return resourceManager.getOutputStream(key);
-            }
-        });
-    }
-
-    public Writer getWriter(final String key) {
-        return (Writer) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException(key);
-                return resourceManager.getWriter(key);
-            }
-        });
-    }
-
-    public String getRealPath(final String key, boolean search) {
+    public String getRealPath(final String key) {
         return (String) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                final String realPath = resourceManager.getRealPath(key, search);
-                if (search) {
-                    // Here consider null as not found
-                    // The semantic is a bit different from the underlying managers, which have:
-                    //
-                    // - null: unsupported
-                    // - ResourceNotFoundException: supported by not found
-                    if (realPath == null)
-                       throw new ResourceNotFoundException(key);
-                }
+                final String realPath = resourceManager.getRealPath(key);
+                // Here consider null as not found
+                // The semantic is a bit different from the underlying managers, which have:
+                //
+                // - null: unsupported
+                // - ResourceNotFoundException: supported by not found
+                if (realPath == null)
+                   throw new ResourceNotFoundException(key);
                 return realPath;
-            }
-        });
-    }
-
-
-    public XMLReceiver getWriteContentHandler(final String key) {
-        return (XMLReceiver) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException(key);
-                return resourceManager.getWriteContentHandler(key);
             }
         });
     }

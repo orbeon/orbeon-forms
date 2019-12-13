@@ -60,7 +60,7 @@ private object XHTMLToPDFProcessor {
         val absolutePath =
           pathOrResource match {
             case "path"     ⇒ path
-            case "resource" ⇒ ResourceManagerWrapper.instance.getRealPath(path, true)
+            case "resource" ⇒ ResourceManagerWrapper.instance.getRealPath(path)
             case _          ⇒ throw new IllegalStateException
           }
 

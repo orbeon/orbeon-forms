@@ -33,14 +33,6 @@ import java.io.Writer;
  *
  */
 public interface ResourceManager {
-    /**
-     * Gets a W3C DOM node for the specified key. The key must point to an XML
-     * document, or a OXFException is raised.
-     *
-     * @param key a Resource Manager key
-     * @return a node element
-     */
-    Node getContentAsDOM(String key);
 
     /**
      * Gets a DOM4J document for the specified key. The key must point to an XML
@@ -105,40 +97,11 @@ public interface ResourceManager {
     int length(String key);
 
     /**
-     * Indicates if the resource manager implementation suports write operations
-     * @param key a Resource Manager key
-     * @return true if write operations are allowed
-     */
-    boolean canWrite(String key);
-
-    /**
-     * Returns a receiver that can write to the Resource Manager.
-     *
-     * @param key   a Resource Manager key
-     * @return      receiver
-     */
-    XMLReceiver getWriteContentHandler(String key);
-
-    /**
-     * Allows writing to the resource
-     * @param key a Resource Manager key
-     * @return an output stream
-     */
-    OutputStream getOutputStream(String key);
-
-    /**
-     * Allow writing to the resource
-     * @param key a Resource Manager key
-     * @return  a writer
-     */
-    Writer getWriter(String key);
-
-    /**
      * Returns the path to the given resource on the file system. If a path on
      * the local file system cannot be provided by the resource manager, null is
      * returned.
      */
-    String getRealPath(String key, boolean search);
+    String getRealPath(String key);
 
     /**
      * Check if a resource exists given its key.

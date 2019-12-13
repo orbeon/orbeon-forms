@@ -19,8 +19,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.jar.JarEntry;
 
 
@@ -144,36 +149,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    /**
-     * Indicates if the resource manager implementation suports write operations
-     *
-     * @return true if write operations are allowed
-     */
-    public boolean canWrite(String key) {
-        return false;
-    }
-
-    /**
-     * Allows writing to the resource
-     *
-     * @param key A Resource Manager key
-     * @return an output stream
-     */
-    public OutputStream getOutputStream(String key) {
-        throw new OXFException("Write Operation not supported");
-    }
-
-    /**
-     * Allow writing to the resource
-     *
-     * @param key A Resource Manager key
-     * @return a writer
-     */
-    public Writer getWriter(String key) {
-        throw new OXFException("Write Operation not supported");
-    }
-
-    public String getRealPath(String key, boolean search) {
+    public String getRealPath(String key) {
         return null;
     }
 }

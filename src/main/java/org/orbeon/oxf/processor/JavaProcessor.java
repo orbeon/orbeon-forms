@@ -367,7 +367,7 @@ public class JavaProcessor extends ProcessorImpl {
         } else if (sourcePathURL.getProtocol().equals("oxf")) {
             // Get real path to source path
             String path = sourcePathURL.getFile();
-            return new File(ResourceManagerWrapper.instance().getRealPath(path, true));
+            return new File(ResourceManagerWrapper.instance().getRealPath(path));
         } else {
             throw new ValidationException("Invalid sourcepath attribute: '" + urlString
                     + "'. The Java processor only supports the oxf: and file: protocols for the sourcepath attribute.", locationData);

@@ -21,8 +21,6 @@ import org.orbeon.oxf.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,7 +36,6 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
     private static Logger logger = LoggerFactory.createLogger(URLResourceManagerImpl.class);
 
     protected URL baseURL;
-//    protected Map urlCache = Collections.synchronizedMap(new HashMap());
 
     public URLResourceManagerImpl(Map props) throws OXFException {
         super(props);
@@ -112,33 +109,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    /**
-     * Indicates if the resource manager implementation supports write operations
-     * @return true if write operations are allowed
-     */
-    public boolean canWrite(String key) {
-        return false;
-    }
-
-    /**
-     * Allows writing to the resource
-     * @param key A Resource Manager key
-     * @return an output stream
-     */
-    public OutputStream getOutputStream(String key) {
-        throw new OXFException("Write Operation not supported");
-    }
-
-    /**
-     * Allow writing to the resource
-     * @param key A Resource Manager key
-     * @return  a writer
-     */
-    public Writer getWriter(String key) {
-        throw new OXFException("Write Operation not supported");
-    }
-
-    public String getRealPath(String key, boolean search) {
+    public String getRealPath(String key) {
         return null;
     }
 

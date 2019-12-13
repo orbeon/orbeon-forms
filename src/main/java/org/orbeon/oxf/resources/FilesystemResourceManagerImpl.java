@@ -94,63 +94,6 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
         return new Long(getFile(key).length()).intValue();
     }
 
-    /**
-     * Indicates if the resource manager implementation supports write operations
-     * @return true if write operations are allowed
-     */
-    public boolean canWrite(String key) {
-        return getFile(key).getParentFile().canWrite();
-    }
-
-    /**
-     * Allows writing to the resource
-     * @param key A Resource Manager key
-     * @return an output stream
-     */
-    public OutputStream getOutputStream(String key) {
-        try {
-            File file = getFile(key);
-            // Delete file if it exists
-            if (file.exists() && file.canWrite())
-                file.delete();
-            // Create file
-            file.createNewFile();
-
-            if(file.canWrite())
-                return new FileOutputStream(file);
-            else
-                throw new OXFException("Can't write to file: "+file);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    /**
-     * Allow writing to the resource
-     * @param key A Resource Manager key
-     * @return  a writer
-     */
-    public Writer getWriter(String key) {
-        try {
-            File file = getFile(key);
-
-            // Delete file if it exists
-            if (file.exists() && file.canWrite())
-                file.delete();
-            // Create file
-            if (!file.createNewFile())
-                throw new OXFException("Can't create file: " + file);
-
-            if(file.canWrite())
-                return new FileWriter(file);
-            else
-                throw new OXFException("Can't write to file: "+file);
-
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
-
     protected File getFile(String key) {
         try {
             // The key comes from a URL, and therefore needs to be decoded to be used as a file
@@ -169,13 +112,11 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    public String getRealPath(String key, boolean search) {
+    public String getRealPath(String key) {
         final File file = getFile(key);
         final String realPath = file.getAbsolutePath();
-        if (search) {
-            if (realPath == null || ! file.canRead())
-                throw new ResourceNotFoundException(key);
-        }
+        if (realPath == null || ! file.canRead())
+            throw new ResourceNotFoundException(key);
         return realPath;
     }
 }

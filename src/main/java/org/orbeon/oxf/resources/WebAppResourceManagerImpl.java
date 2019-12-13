@@ -15,10 +15,12 @@ package org.orbeon.oxf.resources;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.externalcontext.WebAppContext;
+import org.orbeon.oxf.util.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
@@ -101,49 +103,6 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     }
 
     /**
-     * Indicates if the resource manager implementation supports write operations
-     * @return true if write operations are allowed
-     */
-    public boolean canWrite(String key) {
-        return getRealPath(key, false) != null;
-    }
-
-    /**
-     * Allows writing to the resource
-     * @param key A Resource Manager key
-     * @return an output stream
-     */
-    public OutputStream getOutputStream(String key) {
-
-        final String realPath = getRealPath(key, false);
-        if (realPath == null)
-            throw new OXFException("Write Operation not supported");
-
-        try {
-            return new FileOutputStream(realPath);
-        } catch (FileNotFoundException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    /**
-     * Allow writing to the resource
-     * @param key A Resource Manager key
-     * @return  a writer
-     */
-    public Writer getWriter(String key) {
-        final String realPath = getRealPath(key, false);
-        if (realPath == null)
-            throw new OXFException("Write Operation not supported");
-
-        try {
-            return new FileWriter(realPath);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    /**
      * Returns the length of the file denoted by this abstract pathname.
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
@@ -159,12 +118,10 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    public String getRealPath(String key, boolean search) {
+    public String getRealPath(String key) {
         final String realPath = webAppContext.getRealPath(rootDirectory + key);
-        if (search) {
-            if (realPath == null || ! new File(realPath).canRead())
-                throw new ResourceNotFoundException(key);
-        }
+        if (realPath == null || ! new File(realPath).canRead())
+            throw new ResourceNotFoundException(key);
         return realPath;
     }
 }

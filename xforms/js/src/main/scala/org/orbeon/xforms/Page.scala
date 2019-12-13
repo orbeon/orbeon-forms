@@ -23,12 +23,12 @@ object Page {
 
   import Private._
 
-  def setForm(namespacedFormId: String, form: Form): Unit = {
+  def registerForm(namespacedFormId: String, form: Form): Unit = {
     formsByNamespacedFormId += namespacedFormId → form
     formsByUuid             += form.uuid        → form
   }
 
-  def unsetForm(form: Form): Unit = {
+  def unregisterForm(form: Form): Unit = {
     formsByNamespacedFormId -= form.elem.id
     formsByUuid             -= form.uuid
   }

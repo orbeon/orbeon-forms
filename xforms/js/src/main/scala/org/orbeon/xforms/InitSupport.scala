@@ -194,7 +194,7 @@ object InitSupport {
       // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
       // server values it is.
 
-      Page.setForm(
+      Page.registerForm(
         formId,
         new Form(
           uuid                          = uuid,

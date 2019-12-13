@@ -11,15 +11,11 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="instance"/>
 
@@ -70,32 +66,7 @@
             </p:processor>
         </p:when>
         <p:otherwise>
-            <!-- Discriminate based on the HTTP method and content type -->
-            <p:choose href="#request">
-
-                <!-- Binary PUT -->
-                <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
-
-                    <!-- TODO: fix oxf:url-serializer to support binary documents
-                               Note that the file serializer can now be used with oxf:/ URLs... -->
-
-                </p:when>
-                <!-- XML PUT -->
-                <p:when test="/*/method = 'PUT'">
-
-                    <p:processor name="oxf:url-serializer">
-                        <p:input name="config" transform="oxf:xslt" href="#matcher-groups">
-                            <config xsl:version="2.0">
-                                <url><xsl:value-of select="concat('oxf:/forms/', /*/group[1])"/></url>
-                            </config>
-                        </p:input>
-                        <p:input name="data" href="#instance"/>
-                    </p:processor>
-                </p:when>
-            </p:choose>
-
-            <!-- TODO: provide a response? -->
-
+            <!-- Unsupported -->
         </p:otherwise>
     </p:choose>
 

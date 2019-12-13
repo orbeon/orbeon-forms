@@ -424,10 +424,6 @@
         <class name="org.orbeon.oxf.processor.serializer.FileSerializer"/>
     </processor>
 
-    <processor name="oxf:url-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.URLSerializer"/>
-    </processor>
-
     <!-- Legacy serializers -->
     <processor name="oxf:xml-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.XMLSerializer"/>

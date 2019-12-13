@@ -310,29 +310,6 @@
             <zipfileset src="lib/runtime/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>
 
-        <!-- TODO: Restore command-line -->
-        <!--<fileset id="war.libs" dir="lib/runtime">-->
-            <!--<include name="**/*.jar"/>-->
-        <!--</fileset>-->
-
-        <!--<property name="cli.jar.lib.dir" location="lib"/>-->
-        <!--<pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">-->
-          <!--<map from="${cli.jar.lib.dir}" to="lib"/>-->
-        <!--</pathconvert>-->
-
-        <!--<jar destfile="build/lib/orbeon-cli.jar" compress="false">-->
-          <!--<manifest>-->
-            <!--<attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>-->
-            <!--<attribute name="Class-Path" value="lib/orbeon-core.jar lib/orbeon-dom.jar lib/orbeon-common.jar lib/orbeon-common-shared.jar lib/orbeon-xforms-filter.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>-->
-          <!--</manifest>-->
-        <!--</jar>-->
-        <!--<copy todir="build/orbeon-war/WEB-INF">-->
-            <!--<fileset dir="lib">-->
-                <!--<include name="commons-cli-1_0.jar"/>-->
-            <!--</fileset>-->
-        <!--</copy>-->
-        <!--<copy file="build/lib/orbeon-cli.jar" todir="build/orbeon-war/WEB-INF"/>-->
-
     </target>
 
     <target name="orbeon-dev-war" depends="war-common" description="Create exploded WAR">

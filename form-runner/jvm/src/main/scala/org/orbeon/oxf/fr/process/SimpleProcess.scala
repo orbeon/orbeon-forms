@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -59,7 +59,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
     // Remove resource and temporary file if any
     childElems map (_.stringValue) flatMap trimAllToOpt foreach { path ⇒
-      XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
+      XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
     }
 
     // Clear stored paths

@@ -36,12 +36,10 @@ import scala.util.control.NonFatal
 
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
-  *
-  * NOTE: Should rename to XFormsAssetServer?
   */
-class XFormsResourceServer extends ProcessorImpl with Logging {
+class XFormsAssetServer extends ProcessorImpl with Logging {
 
-  import org.orbeon.oxf.xforms.processor.XFormsResourceServer._
+  import org.orbeon.oxf.xforms.processor.XFormsAssetServer._
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
@@ -247,7 +245,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
   }
 }
 
-object XFormsResourceServer {
+object XFormsAssetServer {
 
   val XFormServerPrefix          = "/xforms-server/"
 

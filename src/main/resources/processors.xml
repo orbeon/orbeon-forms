@@ -472,7 +472,7 @@
     </processor>
 
     <processor name="oxf:xforms-resource-server">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsResourceServer"/>
+        <class name="org.orbeon.oxf.xforms.processor.XFormsAssetServer"/>
     </processor>
 
     <processor name="oxf:xforms-upload">

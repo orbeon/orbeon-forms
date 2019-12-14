@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceManagerTestBase, XFormsSupport}
 import org.scalatest.funspec.AnyFunSpecLike
 
-class XFormsResourceServerTest
+class XFormsAssetServerTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with AnyFunSpecLike
@@ -29,14 +29,14 @@ class XFormsResourceServerTest
     it("must work for an absolute path") {
       withTestExternalContext { _ ⇒
         assert("/xforms-server/dynamic/04fcb2850925c9064012678737bb76216020facf" ===
-          XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+          XFormsAssetServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
       }
     }
 
     it("must work for an absolute URL") {
       withTestExternalContext { _ ⇒
         assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
-          XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+          XFormsAssetServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
       }
     }
 

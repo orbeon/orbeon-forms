@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
@@ -108,7 +108,7 @@ class XHTMLHeadHandler(
               "type", "text/javascript",
               "class", "xforms-standalone-resource",
               "defer", "defer",
-              "src", XFormsResourceServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js"
+              "src", XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js"
             )
           )
 
@@ -121,7 +121,7 @@ class XHTMLHeadHandler(
             "type", "text/javascript",
             "class", "xforms-standalone-resource",
             "defer", "defer",
-            "src", XFormsResourceServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js"
+            "src", XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js"
           )
         )
 

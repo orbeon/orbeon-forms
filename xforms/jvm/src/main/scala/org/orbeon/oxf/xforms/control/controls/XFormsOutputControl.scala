@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
@@ -182,7 +182,7 @@ class XFormsOutputControl(
                 defaultValue
               )
             case "base64Binary" ⇒
-              // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
+              // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
               doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
             case _ ⇒
               defaultValue

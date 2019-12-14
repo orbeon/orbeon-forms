@@ -1587,7 +1587,7 @@
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config">
                         <xsl:transform version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml"
-                                       xmlns:rs="java:org.orbeon.oxf.xforms.processor.XFormsResourceServer"
+                                       xmlns:rs="java:org.orbeon.oxf.xforms.processor.XFormsAssetServer"
                                        xmlns:version="java:org.orbeon.oxf.common.Version">
                             <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                             <xsl:template match="xh:body">

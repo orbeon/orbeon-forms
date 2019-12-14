@@ -147,7 +147,7 @@ public class NetUtils {
                 throw new OXFException(e);
             }
         } else {
-            // Value of 0 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
+            // Value of `0` for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now".
             lastModified = 0;
         }
         return lastModified;

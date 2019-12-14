@@ -219,7 +219,7 @@ object APISupport {
   def mustRewriteForMediatype(mediatype: String): Boolean =
     ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype)
 
-  // TODO: Duplicated from `XFormsResourceServer`
+  // TODO: Duplicated from `XFormsAssetServer`
   val XFormServerPrefix          = "/xforms-server/"
   val FormDynamicResourcesPath   = XFormServerPrefix + "form/dynamic/"
   val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r

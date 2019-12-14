@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -40,7 +40,7 @@ import java.io.OutputStream;
 /**
  * The File Serializer serializes text and binary documents to files on disk.
  *
- * TODO: 2017-07-07: The only reason this is in the `xforms` module is that this depends on `XFormsResourceServer`.
+ * TODO: 2017-07-07: The only reason this is in the `xforms` module is that this depends on `XFormsAssetServer`.
  * See https://github.com/orbeon/orbeon-forms/issues/3292.
  */
 public class FileSerializer extends ProcessorImpl {
@@ -321,7 +321,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = XFormsResourceServer.jProxyURI(localURL, config.getRequestedContentType());
+                            resultURL = XFormsAssetServer.jProxyURI(localURL, config.getRequestedContentType());
                         else
                             resultURL = localURL;
                     }

@@ -31,18 +31,16 @@ import scala.collection.mutable.{Buffer, LinkedHashSet}
 
 /**
   * Aggregate CSS and JS resources under <head>.
-  *
-  * NOTE: Should rename to AssetsAggregator?
   */
-class ResourcesAggregator extends ProcessorImpl {
+class AssetsAggregator extends ProcessorImpl {
 
-  import ResourcesAggregator._
+  import AssetsAggregator._
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
   override def createOutput(name: String) =
-    addOutput(name, new ProcessorOutputImpl(ResourcesAggregator.this, name) {
+    addOutput(name, new ProcessorOutputImpl(AssetsAggregator.this, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
           if (! XFormsProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
@@ -259,7 +257,7 @@ class ResourcesAggregator extends ProcessorImpl {
     })
 }
 
-object ResourcesAggregator extends Logging {
+object AssetsAggregator extends Logging {
 
   // Output combined resources
   def aggregate[T](

@@ -759,7 +759,7 @@
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
-                                <xh:ul class="nav nav-list">
+                                <xh:ul class="nav nav-list" role="navigation">
                                     <xsl:apply-templates mode="toc-sections"/>
                                 </xh:ul>
                                 <xh:div class="fr-wizard-navigation{{if (xxf:instance('local')/separate-toc/data(.)) then ' xforms-hidden' else ''}}">
@@ -1284,7 +1284,7 @@
 
                             <xsl:choose>
                                 <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
-                                    <xh:ul class="nav nav-list">
+                                    <xh:ul class="nav nav-list" role="navigation">
                                         <xsl:apply-templates mode="toc-sections"/>
                                     </xh:ul>
                                 </xsl:when>

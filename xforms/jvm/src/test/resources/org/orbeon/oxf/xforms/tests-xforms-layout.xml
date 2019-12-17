@@ -205,6 +205,7 @@
                             <xf:help>My help</xf:help>
                             <xf:alert>My alert</xf:alert>
                         </xf:output>
+                        <xf:output id="my-new-output-inline">Inline value</xf:output>
                     </xf:repeat>
                 </xh:body>
             </xh:html>
@@ -227,6 +228,10 @@
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
+                <xh:span id="my-new-output-inline⊙1" class="xforms-control xforms-output xforms-repeat-selected-item-1 xforms-update-full">
+                    <xh:span id="my-new-output-inline≡≡c⊙1" class="xforms-output-output">Inline value</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>

@@ -62,28 +62,29 @@ class XFormsOutputControl(
     markFileMetadataDirty()
   }
 
-  override def computeValue: String = {
+  override def computeValue: String =
+    staticControlOpt flatMap (_.staticValue) getOrElse {
 
-    val bc = bindingContext
-    val value =
-      valueAttributeOpt match {
-        case Some(valueAttribute) ⇒
-          // Value from the `value` attribute
-          evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
-        case None ⇒
-          // Value from the binding
-          bc.singleItemOpt map DataModel.getValue // using `singleItemOpt` directly so we can handle the case of a missing binding
+      val bc = bindingContext
+      val value =
+        valueAttributeOpt match {
+          case Some(valueAttribute) ⇒
+            // Value from the `value` attribute
+            evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
+          case None ⇒
+            // Value from the binding
+            bc.singleItemOpt map DataModel.getValue // using `singleItemOpt` directly so we can handle the case of a missing binding
+      }
+
+      val result = value getOrElse ""
+
+      // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
+      // We need to find a better solution.
+      setValue(result)
+      evaluateFileMetadata(isRelevant)
+
+      result
     }
-
-    val result = value getOrElse ""
-
-    // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
-    // We need to find a better solution.
-    setValue(result)
-    evaluateFileMetadata(isRelevant)
-
-    result
-  }
 
   override def evaluateExternalValue(): Unit = {
     assert(isRelevant)
@@ -92,15 +93,12 @@ class XFormsOutputControl(
     assert(internalValue ne null)
 
     val updatedValue =
-      if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
-        // Download appearance
+      if (staticControlOpt exists (_.isDownloadAppearance)) {
         proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
-      } else if (mediatype exists (_.startsWith("image/"))) {
-        // Image mediatype
+      } else if (staticControlOpt exists (_.isImageMediatype)) {
         // Use dummy image as default value so that client always has something to load
         proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, fileMediatype orElse mediatype)
-      } else if (mediatype contains "text/html") {
-        // HTML mediatype
+      } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {
         // Other mediatypes
@@ -206,7 +204,7 @@ class XFormsOutputControl(
     }
 
   override def getRelevantEscapedExternalValue: String =
-    if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatype exists (_.startsWith("image/")))) {
+    if (staticControlOpt exists (c ⇒ c.isDownloadAppearance || c.isImageMediatype)) {
       val externalValue = getExternalValue
       if (externalValue.nonBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
@@ -216,7 +214,7 @@ class XFormsOutputControl(
       } else
         // Empty value, return as is
         externalValue
-    } else if (mediatype contains "text/html")
+    } else if (staticControlOpt exists (_.isHtmlMediatype))
       // Rewrite the HTML value with resolved @href and @src attributes
       XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
     else
@@ -257,10 +255,8 @@ class XFormsOutputControl(
     }
 
   override def findAriaByControlEffectiveId: Option[String] =
-    if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) ||
-        appearances(XXFORMS_TEXT_APPEARANCE_QNAME)     ||
-        (mediatype exists (_.startsWith("image/")))    ||
-        (mediatype contains "text/html"))
+    if (appearances(XXFORMS_TEXT_APPEARANCE_QNAME) ||
+        (staticControlOpt exists (c ⇒ c.isDownloadAppearance || c.isImageMediatype || c.isHtmlMediatype)))
       None
     else
       super.findAriaByControlEffectiveId

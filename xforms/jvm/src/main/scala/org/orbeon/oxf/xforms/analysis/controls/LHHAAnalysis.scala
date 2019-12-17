@@ -280,7 +280,7 @@ object LHHAAnalysis {
   }
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
-  private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
+  def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
 
     val SearchExpression =
       """

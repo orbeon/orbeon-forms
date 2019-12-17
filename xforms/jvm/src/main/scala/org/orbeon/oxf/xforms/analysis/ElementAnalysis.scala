@@ -131,10 +131,10 @@ abstract class ElementAnalysis(
   val locationData = ElementAnalysis.createLocationData(element)
 
   // Element attributes: @context, @ref, @bind, @value
-  val context = Option(element.attributeValue(XFormsConstants.CONTEXT_QNAME))
+  val context = element.attributeValueOpt(XFormsConstants.CONTEXT_QNAME)
   val ref = ElementAnalysis.getBindingExpression(element)
-  val bind = Option(element.attributeValue(XFormsConstants.BIND_QNAME))
-  val value = Option(element.attributeValue(XFormsConstants.VALUE_QNAME))
+  val bind = element.attributeValueOpt(XFormsConstants.BIND_QNAME)
+  val value = element.attributeValueOpt(XFormsConstants.VALUE_QNAME)
 
   def modelJava = model map (_.staticId) orNull
   def contextJava = context.orNull
@@ -513,8 +513,8 @@ object ElementAnalysis {
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.
    */
   def getBindingExpression(element: Element): Option[String] =
-    Option(element.attributeValue(XFormsConstants.REF_QNAME)) orElse
-      Option(element.attributeValue(XFormsConstants.NODESET_QNAME))
+    element.attributeValueOpt(XFormsConstants.REF_QNAME) orElse
+      element.attributeValueOpt(XFormsConstants.NODESET_QNAME)
 
   def createLocationData(element: Element): ExtendedLocationData =
       element.getData match {

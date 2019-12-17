@@ -190,7 +190,7 @@ class LHHAAnalysis(
   override protected def computeContextAnalysis = None
   override protected def computeBindingAnalysis = None
 
-  override protected def computeValueAnalysis = {
+  override protected def computeValueAnalysis: Option[XPathAnalysis] = {
     if (staticValue.isEmpty) {
       // Value is likely not static
 

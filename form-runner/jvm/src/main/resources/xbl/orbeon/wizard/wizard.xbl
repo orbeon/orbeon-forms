@@ -1161,7 +1161,10 @@
                             'first-page'         [$relevant-top-level-case-ids[1]      = '{concat($static-section-id, '-case')}'],
                             'last-top-level-page'[$relevant-top-level-case-ids[last()] = '{concat($static-section-id, '-case')}'],
                             'last-page'          [$relevant-nav-case-ids[last()]       = '{concat($static-section-id, '-case')}']
-                        }}">
+                        }}" aria-current="{{
+                                if ($section-active) then 'page' else 'false'
+                            }}"
+                        >
 
                             <xf:trigger appearance="minimal">
                                 <xf:label>

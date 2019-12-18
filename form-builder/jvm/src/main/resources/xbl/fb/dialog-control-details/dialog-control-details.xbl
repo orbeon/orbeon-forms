@@ -254,8 +254,15 @@
                     <xf:action iterate="$control/@*">
                         <xf:var name="control-attribute" value="."/>
                         <xf:delete
-                            if="$control-attribute/local-name() != 'bind' and
-                                empty($control-template/@*[local-name() = $control-attribute/local-name()])"
+                            if="not(
+                                    (: Always keep `id` and `bind` :)
+                                    $control-attribute/local-name() = ('id', 'bind')
+                                ) and
+                                empty(
+                                    $control-template/@*[
+                                        local-name() = $control-attribute/local-name()
+                                    ]
+                                )"
                             ref="$control-attribute"/>
                     </xf:action>
 
@@ -318,11 +325,11 @@
 
                         <!-- Replace all attributes and content -->
                         <xf:delete
-                            ref="$control/(@*, node())"/>
+                            ref="$control/(@* except (@id, @bind), node())"/>
 
                         <xf:insert
                             context="$control"
-                            origin="instance('dynamic')//xf:instance[1]/*/(@*, node())"/>
+                            origin="instance('dynamic')//xf:instance[1]/*/(@* except (@id, @bind), node())"/>
 
                     </xf:action>
 
